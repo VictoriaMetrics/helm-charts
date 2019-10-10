@@ -1,0 +1,2 @@
+lint:
+	helm lint charts/*
