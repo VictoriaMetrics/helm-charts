@@ -15,11 +15,11 @@ helm search vm
 ```
 The command must display existing helm chart e.g.
 ```
-NAME                                     	CHART VERSION	APP VERSION	DESCRIPTION
-vm/victoria-metrics-cluster	0.1.0        	1.28.0      	Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheusvictoria-metrics/victoria-metrics-cluster	0.1.0        	1.28.0     	Victoria Metrics Cluster version - high-performance, cost...
+NAME                       	CHART VERSION	APP VERSION	DESCRIPTION
+vm/victoria-metrics-cluster	0.1.0        	1.28.0     	Victoria Metrics Cluster version - high-performance, cost...
 ```
 
-### Installing the chart
+#### Installing the chart
 
 ```console
 helm install -n victria-metrics-cluster vm/victoria-metrics-cluster
