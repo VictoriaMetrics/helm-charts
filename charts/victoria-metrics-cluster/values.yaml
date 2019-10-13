@@ -12,9 +12,10 @@ vmselect:
   name: vmselect
   image:
     repository: victoriametrics/vmselect
-    tag: v1.27.3-cluster
+    tag: v1.28.0-cluster
     pullPolicy: IfNotPresent
   priorityClassName: ""
+  fullnameOverride: ""
   extraArgs: {}
 
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -28,6 +29,9 @@ vmselect:
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##
   nodeSelector: {}
+    ## Pod affinity
+    ##
+  affinity: {}
   podAnnotations: {}
   replicaCount: 2
   resources: {}
@@ -37,6 +41,8 @@ vmselect:
     # requests:
     #   cpu: 50m
     #   memory: 64Mi
+
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   securityContext: {}
   ## Root folder for cache
   ##
@@ -109,9 +115,10 @@ vminsert:
   name: vminsert
   image:
     repository: victoriametrics/vminsert
-    tag: v1.27.3-cluster
+    tag: v1.28.0-cluster
     pullPolicy: IfNotPresent
   priorityClassName: ""
+  fullnameOverride: ""
   extraArgs: {}
 
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -125,6 +132,9 @@ vminsert:
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##
   nodeSelector: {}
+  ## Pod affinity
+  ##
+  affinity: {}
   podAnnotations: {}
   replicaCount: 2
   resources: {}
@@ -172,7 +182,7 @@ vmstorage:
   name: vmstorage
   image:
     repository: victoriametrics/vmstorage
-    tag: v1.27.3-cluster
+    tag: v1.28.0-cluster
     pullPolicy: IfNotPresent
   priorityClassName: ""
   fullnameOverride:

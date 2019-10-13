@@ -24,3 +24,7 @@ vm/victoria-metrics-cluster	0.1.0        	1.28.0     	Victoria Metrics Cluster v
 ```console
 helm install -n victria-metrics-cluster vm/victoria-metrics-cluster
 ```
+
+## List of Charts 
+
+- [Victoria Metrics Cluster](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-cluster/README.md) 
