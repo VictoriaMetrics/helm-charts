@@ -1,4 +1,4 @@
-# Victoria Metrics Helm Chart for CLuster Version
+# Victoria Metrics Helm Chart for Cluster Version
 
 ## Prerequisites Details
 * [Victoria Metrics helm repository](https://github.com/VictoriaMetrics/helm-charts/#usage) is added.
