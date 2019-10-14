@@ -65,7 +65,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.persistentVolume.annotations`      | Persistant volume annotations      | `{}`                                                       |
 | `vmselect.persistentVolume.existingClaim`         | Existing Claim name        | `""`                                                       |
 | `vmselect.persistentVolume.size`     | Size of the volume. Better to set the same as resource limit memory property    | `2Gi`                          |
-| `vmselect.persistentVolume.subPath`        | Moung subpath       | `""`                                                 |
+| `vmselect.persistentVolume.subPath`        | Mount subpath       | `""`                                                 |
 | `vmselect.serviceMonitor.enabled` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operatior object      | `false`     |
 | `vmselect.serviceMonitor.extraLabels`  | Service Monitor labels        | `{}`                                                    |
 | `vmselect.serviceMonitor.annotations`       | Service Monitor annotations | `{}`                                    |
