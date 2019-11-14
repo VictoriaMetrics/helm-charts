@@ -101,6 +101,9 @@ spec:
       securityContext:
 {{ toYaml .Values.vmstorage.securityContext | indent 8 }}
     {{- end }}
+    {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
+    {{- end }}
     {{- if .Values.vmstorage.tolerations }}
       tolerations:
 {{ toYaml .Values.vmstorage.tolerations | indent 8 }}

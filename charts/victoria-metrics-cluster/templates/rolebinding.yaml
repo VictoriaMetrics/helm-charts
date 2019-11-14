@@ -1,0 +1,24 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: {{ template "victoria-metrics.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "victoria-metrics.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+{{- with .Values.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "victoria-metrics.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "victoria-metrics.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{- end -}}
