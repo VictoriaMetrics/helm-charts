@@ -7,10 +7,17 @@ metadata:
     chart: {{ template "victoria-metrics.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-{{- with .Values.annotations }}
+{{- with .Values.rbac.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
   name: {{ template "victoria-metrics.fullname" . }}-clusterrole
+{{- if .Values.rbac.pspEnabled }}
+- apiGroups:      ['extensions']
+  resources:      ['podsecuritypolicies']
+  verbs:          ['use']
+  resourceNames:  [{{ template "victoria-metrics.fullname" . }}]
+{{- else }}
 rules: []
-{{- end}}
+{{- end }}
+{{- end }}
