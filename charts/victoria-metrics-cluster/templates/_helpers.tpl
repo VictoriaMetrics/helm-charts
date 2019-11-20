@@ -85,6 +85,11 @@ app: {{ .Values.vminsert.name }}
 {{ include "victoria-metrics.common.matchLabels" . }}
 {{- end -}}
 
+{{- define "victoria-metrics.rbac.labels" -}}
+{{ include "victoria-metrics.common.matchLabels" . }}
+{{ include "victoria-metrics.common.metaLabels" . }}
+{{- end -}}
+
 {{/*
 Create a fully qualified vmstorage name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
