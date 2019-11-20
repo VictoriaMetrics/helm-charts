@@ -85,7 +85,6 @@ app: {{ .Values.vminsert.name }}
 {{ include "victoria-metrics.common.matchLabels" . }}
 {{- end -}}
 
-
 {{/*
 Create a fully qualified vmstorage name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
