@@ -85,10 +85,6 @@ app: {{ .Values.vminsert.name }}
 {{ include "victoria-metrics.common.matchLabels" . }}
 {{- end -}}
 
-{{- define "victoria-metrics.rbac.labels" -}}
-{{ include "victoria-metrics.common.matchLabels" . }}
-{{ include "victoria-metrics.common.metaLabels" . }}
-{{- end -}}
 
 {{/*
 Create a fully qualified vmstorage name.
