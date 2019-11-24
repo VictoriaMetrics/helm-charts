@@ -12,6 +12,9 @@ metadata:
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default'
     seccomp.security.alpha.kubernetes.io/defaultProfileName:  'docker/default'
+    {{- if .Values.rbac.annotations }}
+    {{ toYaml .Values.rbac.annotations | indent 4}}
+    {{- end }}
 spec:
   privileged: false
   allowPrivilegeEscalation: false
