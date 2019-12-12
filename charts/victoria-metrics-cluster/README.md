@@ -34,7 +34,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.image.pullPolicy`  | Image pull policy                      | `IfNotPresent`                                                   |
 | `vmselect.priorityClassName` | Name of Priority Class | `""`                                |
 | `vmselect.fullnameOverride`  | Overrides the full name of vmselect component  | `""`                                |
-| `vmselect.extraArgs`         | Extra command line arguments for vmselect component               | `{}`
+| `vmselect.extraArgs`         | Extra command line arguments for vmselect component               | `[]`
 | `vmselect.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
 | `vmselect.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
 | `vmselect. affinity `      | Pod affinity| `{}`
@@ -78,7 +78,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vminsert.image.pullPolicy`  | Image pull policy                      | `IfNotPresent`                                                   |
 | `vminsert.priorityClassName` | Name of Priority Class | `""`                                |
 | `vminsert.fullnameOverride`  | Overrides the full name of vminsert component  | `""`                                |
-| `vminsert.extraArgs`         | Extra command line arguments for vminsert component               | `{}`
+| `vminsert.extraArgs`         | Extra command line arguments for vminsert component               | `[]`
 | `vminsert.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
 | `vminsert.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
 | `vmselect. affinity `      | Pod affinity| `{}`
@@ -111,7 +111,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmstorage.priorityClassName` | Name of Priority Class | `""`                                |
 | `vmstorage.fullnameOverride`  | Overrides the full name of vmstorage component  | `""`                                |
 | `vmstorage.retentionPeriod`   | Data retention period in month | `1`                                |
-| `vmstorage.extraArgs`         | Extra command line arguments for vmstorage component               | `{}`
+| `vmstorage.extraArgs`         | Extra command line arguments for vmstorage component               | `[]`
 | `vmstorage.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
 | `vmstorage.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
 | `vmstorage.affinity `         | Pod affinity| `{}` |

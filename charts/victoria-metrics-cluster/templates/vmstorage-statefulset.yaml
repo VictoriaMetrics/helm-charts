@@ -43,7 +43,7 @@ spec:
             - {{ printf "%s=%d" "--retentionPeriod" (int .Values.vmstorage.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
           {{- range $key, $value := .Values.vmstorage.extraArgs }}
-            - --{{ $key }}={{ $value }}
+            - {{ printf "--%s" $value | quote }}
           {{- end }}
           ports:
             - name: http

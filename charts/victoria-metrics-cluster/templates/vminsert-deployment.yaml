@@ -29,7 +29,7 @@ spec:
           args:
           {{- include "victoria-metrics.vminsert.vmstorage-pod-fqdn" . | nindent 12 }}
           {{- range $key, $value := .Values.vminsert.extraArgs }}
-            - --{{ $key }}={{ $value }}
+            - {{ printf "--%s" $value | quote }}
           {{- end }}
           ports:
             - name: http
