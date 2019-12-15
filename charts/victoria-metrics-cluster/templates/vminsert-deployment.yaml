@@ -34,6 +34,31 @@ spec:
           ports:
             - name: http
               containerPort: 8480
+{{- if .Values.vminsert.extraArgs.graphiteListenAddr }}
+            - name: graphite-tcp
+              protocol: TCP
+              containerPort: {{ include "split-host-port" .Values.vminsert.extraArgs.graphiteListenAddr }}
+{{- end }}
+{{- if .Values.vminsert.extraArgs.graphiteListenAddr }}
+            - name: graphite-udp
+              protocol: UDP
+              containerPort: {{ include "split-host-port" .Values.vminsert.extraArgs.graphiteListenAddr }}
+{{- end }}
+{{- if .Values.vminsert.extraArgs.opentsdbHTTPListenAddr }}
+            - name: opentsdbhttp
+              protocol: TCP
+              containerPort: {{ include "split-host-port" .Values.vminsert.extraArgs.opentsdbHTTPListenAddr }}
+{{- end }}
+{{- if .Values.vminsert.extraArgs.opentsdbListenAddr }}
+            - name: opentsdb-tcp
+              protocol: TCP
+              containerPort: {{ include "split-host-port" .Values.vminsert.extraArgs.opentsdbListenAddr }}
+{{- end }}
+{{- if .Values.vminsert.extraArgs.opentsdbListenAddr }}
+            - name: opentsdb-udp
+              protocol: UDP
+              containerPort: {{ include "split-host-port" .Values.vminsert.extraArgs.opentsdbListenAddr }}
+{{- end }}
           readinessProbe:
             httpGet:
               path: /health

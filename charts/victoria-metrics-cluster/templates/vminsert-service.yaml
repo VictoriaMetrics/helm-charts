@@ -34,6 +34,36 @@ spec:
       port: {{ .Values.vminsert.service.servicePort }}
       protocol: TCP
       targetPort: http
+{{- if .Values.vminsert.extraArgs.graphiteListenAddr }}
+    - name: graphite-tcp
+      protocol: TCP
+      port: {{ include "split-host-port" .Values.vminsert.extraArgs.graphiteListenAddr }}
+      targetPort: graphite-tcp
+{{- end }}
+{{- if .Values.vminsert.extraArgs.graphiteListenAddr }}
+    - name: graphite-udp
+      protocol: UDP
+      port: {{ include "split-host-port" .Values.vminsert.extraArgs.graphiteListenAddr }}
+      targetPort: graphite-udp
+{{- end }}
+{{- if .Values.vminsert.extraArgs.opentsdbHTTPListenAddr }}
+    - name: opentsdbhttp
+      port: {{ include "split-host-port" .Values.vminsert.extraArgs.opentsdbHTTPListenAddr }}
+      targetPort: opentsdbhttp
+{{- end }}
+{{- if .Values.vminsert.extraArgs.opentsdbListenAddr }}
+    - name: opentsdb-udp
+      protocol: UDP
+      port: {{ include "split-host-port" .Values.vminsert.extraArgs.opentsdbListenAddr }}
+      targetPort: opentsdb-udp
+{{- end }}
+{{- if .Values.vminsert.extraArgs.opentsdbListenAddr }}
+    - name: opentsdb-tcp
+      protocol: TCP
+      port: {{ include "split-host-port" .Values.vminsert.extraArgs.opentsdbListenAddr }}
+      targetPort: opentsdb-tcp
+{{- end }}
+
   selector:
     {{- include "victoria-metrics.vminsert.matchLabels" . | nindent 4 }}
   type: "{{ .Values.vminsert.service.type }}"

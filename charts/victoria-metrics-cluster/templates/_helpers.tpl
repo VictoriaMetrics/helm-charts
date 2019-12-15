@@ -155,3 +155,8 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- printf "- --storageNode=%s-%d.%s.%s.svc.%s:8401\n" $pod $i $svc $namespace $dnsSuffix -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "split-host-port" -}}
+{{- $hp := split ":" . -}}
+{{- printf "%s" $hp._1 -}}
+{{- end -}}
