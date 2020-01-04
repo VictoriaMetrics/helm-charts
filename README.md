@@ -16,7 +16,7 @@ helm search vm
 The command must display existing helm chart e.g.
 ```
 NAME                       	CHART VERSION	APP VERSION	DESCRIPTION
-vm/victoria-metrics-cluster	0.1.0        	1.31.5     	Victoria Metrics Cluster version - high-performance, cost...
+vm/victoria-metrics-cluster	0.1.0        	1.32.0     	Victoria Metrics Cluster version - high-performance, cost...
 ```
 
 #### Installing the chart
