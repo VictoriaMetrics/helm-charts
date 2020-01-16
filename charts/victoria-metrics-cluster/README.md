@@ -30,7 +30,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.enabled`           | Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet                 | `true`                       |
 | `vmselect.name`              | Vmselect container name                   | `vmselect`                                                    |
 | `vmselect.image.repository`  | Image repository                 | `victoriametrics/vmselect`                                                   |
-| `vmselect.image.tag`         | Image tag              | `v1.32.2-cluster`                                                        |
+| `vmselect.image.tag`         | Image tag              | `v1.32.3-cluster`                                                        |
 | `vmselect.image.pullPolicy`  | Image pull policy                      | `IfNotPresent`                                                   |
 | `vmselect.priorityClassName` | Name of Priority Class | `""`                                |
 | `vmselect.fullnameOverride`  | Overrides the full name of vmselect component  | `""`                                |
@@ -74,7 +74,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vminsert.enabled`           | Enable deployment of vminsert component. Deployment is used             | `true`                       |
 | `vminsert.name`              | vminsert container name                   | `vminsert`                                                    |
 | `vminsert.image.repository`  | Image repository                 | `victoriametrics/vminsert`                                                   |
-| `vminsert.image.tag`         | Image tag              | `v1.32.2-cluster`                                                        |
+| `vminsert.image.tag`         | Image tag              | `v1.32.3-cluster`                                                        |
 | `vminsert.image.pullPolicy`  | Image pull policy                      | `IfNotPresent`                                                   |
 | `vminsert.priorityClassName` | Name of Priority Class | `""`                                |
 | `vminsert.fullnameOverride`  | Overrides the full name of vminsert component  | `""`                                |
@@ -106,7 +106,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmstorage.enabled`           | Enable deployment of vmstorage component. StatefulSet is used               | `true`                       |
 | `vmstorage.name`              | vmstorage container name                   | `vmstorage`                                                    |
 | `vmstorage.image.repository`  | Image repository                 | `victoriametrics/vmstorage`                                                   |
-| `vmstorage.image.tag`         | Image tag              | `v1.32.2-cluster`                                                        |
+| `vmstorage.image.tag`         | Image tag              | `v1.32.3-cluster`                                                        |
 | `vmstorage.image.pullPolicy`  | Image pull policy                      | `IfNotPresent`                                                   |
 | `vmstorage.priorityClassName` | Name of Priority Class | `""`                                |
 | `vmstorage.fullnameOverride`  | Overrides the full name of vmstorage component  | `""`                                |
