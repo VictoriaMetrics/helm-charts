@@ -1,22 +1,22 @@
-{{- if and .Values.server.enabled .Values.server.statefulSet.enabled -}}
+{{- if .Values.server.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-{{- if .Values.server.statefulSet.service.annotations }}
+{{- if .Values.server.service.annotations }}
   annotations:
-{{ toYaml .Values.server.statefulSet.service.annotations | indent 4}}
+{{ toYaml .Values.server.service.annotations | indent 4}}
 {{- end }}
   labels:
   {{- include "victoria-metrics.server.labels" . | nindent 4 }}
-{{- if .Values.server.statefulSet.service.labels }}
-{{ toYaml .Values.server.statefulSet.service.labels | indent 4}}
+{{- if .Values.server.service.labels }}
+{{ toYaml .Values.server.service.labels | indent 4}}
 {{- end }}
   name: {{ template "victoria-metrics.server.fullname" . }}
 spec:
   clusterIP: None
   ports:
     - name: http
-      port: {{ .Values.server.statefulSet.service.servicePort }}
+      port: {{ .Values.server.service.servicePort }}
       protocol: TCP
       targetPort: http
 {{- if .Values.server.extraArgs.graphiteListenAddr }}
