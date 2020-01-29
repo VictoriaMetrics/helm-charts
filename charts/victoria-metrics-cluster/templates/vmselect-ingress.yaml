@@ -22,7 +22,7 @@ spec:
         - path: {{ .path }}
           backend:
             serviceName: {{ $serviceName }}
-            servicePort: http
+            servicePort: {{ .port | default "http"}}
     {{- end -}}
 {{- if .Values.vmselect.ingress.tls }}
   tls:
