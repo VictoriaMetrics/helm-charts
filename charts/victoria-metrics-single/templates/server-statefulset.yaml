@@ -73,19 +73,14 @@ spec:
               protocol: UDP
               containerPort: {{ include "split-host-port" .Values.server.extraArgs.opentsdbListenAddr }}
           {{- end }}
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-            timeoutSeconds: 5
+          {{- with $.Values.server.livenessProbe }}
           livenessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-            timeoutSeconds: 5
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.server.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           resources:
 {{ toYaml .Values.server.resources | indent 12 }}
           volumeMounts:
