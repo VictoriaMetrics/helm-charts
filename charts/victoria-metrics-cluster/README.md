@@ -37,7 +37,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.extraArgs`         | Extra command line arguments for vmselect component               | `{}`
 | `vmselect.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
 | `vmselect.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
-| `vmselect. affinity `      | Pod affinity| `{}`
+| `vmselect.affinity `         | Pod affinity| `{}`
 | `vmselect.podAnnotations`    | Pod's annotations     | `{}`                                                     |
 | `vmselect.replicaCount`      | Count of vmselect pods | `2`                                                       |
 | `vmselect.resources`         | Resource object    | `{}`                                                     |
@@ -81,7 +81,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vminsert.extraArgs`         | Extra command line arguments for vminsert component               | `{}`
 | `vminsert.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
 | `vminsert.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
-| `vmselect. affinity `      | Pod affinity| `{}`
+| `vmselect.affinity `         | Pod affinity| `{}`
 | `vminsert.podAnnotations`    | Pod's annotations     | `{}`                                                     |
 | `vminsert.replicaCount`      | Count of vminsert pods | `2`                                                       |
 | `vminsert.resources`         | Resource object    | `{}`                                                     |
