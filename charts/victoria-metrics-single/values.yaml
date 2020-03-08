@@ -97,6 +97,28 @@ server:
     #   cpu: 500m
     #   memory: 512Mi
 
+  # readinessProbe: Indicates whether the Container is ready to service requests.
+  # If the readiness probe fails, the endpoints controller removes the Podâ€™s IP address from the endpoints
+  # of all Services that match the Pod. The default state of readiness before the initial delay is Failure.
+  # If a Container does not provide a readiness probe, the default state is Success.
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+
+  # livenessProbe: Indicates whether the Container is running. If the liveness
+  # probe fails, the kubelet kills the Container, and the Container is subjected
+  # to its restart policy. If a Container does not provide a liveness probe, the default state is Success.
+  livenessProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+
   ## Security context to be added to server pods
   ##
   securityContext: {}
