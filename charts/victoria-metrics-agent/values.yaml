@@ -22,10 +22,9 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name:
 
-args:
-  []
-  # - -promscrape.maxScrapeSize=167772160
-  # - -remoteWrite.url=http://insert.vm:8480/insert/0/prometheus
+extraArgs:
+  {}
+  # promscrape.maxScrapeSize: 167772160
 
 podSecurityContext:
   {}
@@ -57,11 +56,14 @@ nodeSelector: {}
 
 tolerations: []
 
-config: |
-  # global:
-  #   scrape_interval: 10s
+# vmagent scraping configuration:
+# https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/docs/vmagent.md#how-to-collect-metrics-in-prometheus-format
+config:
+  global:
+    scrape_interval: 10s
 
-  # scrape_configs:
-  #   - job_name: test
-  #     static_configs:
-  #       - targets: ["test-service:9100"]
+  # scrape self by default
+  scrape_configs:
+    - job_name: vmagent
+      static_configs:
+        - targets: ["localhost:8429"]
