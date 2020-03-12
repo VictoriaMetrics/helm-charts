@@ -28,6 +28,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           args:
             - -promscrape.config=/config/scrape.yml
+          {{- range $key, $value := required "at least one item in `.remoteWriteUrls` must be set" .Values.remoteWriteUrls }}
+            - -remoteWrite.url={{ $value }}
+          {{- end }}
           {{- range $key, $value := .Values.extraArgs }}
             - -{{ $key }}={{ $value }}
           {{- end }}
