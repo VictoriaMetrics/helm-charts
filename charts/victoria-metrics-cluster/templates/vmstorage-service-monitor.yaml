@@ -12,6 +12,9 @@ metadata:
 {{ toYaml .Values.vmstorage.serviceMonitor.extraLabels | indent 4 }}
   {{- end }}
   name: {{ template "victoria-metrics.vmstorage.fullname" . }}
+  {{- if .Values.vmstorage.serviceMonitor.namespace }}
+  namespace: {{ .Values.vmstorage.serviceMonitor.namespace }}
+  {{- end }}
 spec:
   namespaceSelector:
     matchNames:
