@@ -67,6 +67,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.persistentVolume.size`     | Size of the volume. Better to set the same as resource limit memory property    | `2Gi`                          |
 | `vmselect.persistentVolume.subPath`        | Mount subpath       | `""`                                                 |
 | `vmselect.serviceMonitor.enabled` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operatior object      | `false`     |
+| `vmselect.serviceMonitor.namespace` | Target namespace of ServiceMonitor manifest |  |
 | `vmselect.serviceMonitor.extraLabels`  | Service Monitor labels        | `{}`                                                    |
 | `vmselect.serviceMonitor.annotations`       | Service Monitor annotations | `{}`                                    |
 | `vmselect.serviceMonitor.interval`       | Commented. Prometheus scare interval for vmselect component| `15s`                                    |
@@ -99,6 +100,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vminsert.ingress.hosts`         | Array of host objects          | `[]`                                                     |
 | `vminsert.ingress.tls`              | Array of TLS objects              | `[]`                                          |
 | `vminsert.serviceMonitor.enabled` | Enable deployment of Service Monitor for vminsert component. This is Prometheus operatior object      | `false`     |
+| `vminsert.serviceMonitor.namespace` | Target namespace of ServiceMonitor manifest |  |
 | `vminsert.serviceMonitor.extraLabels`  | Service Monitor labels        | `{}`                                                    |
 | `vminsert.serviceMonitor.annotations`       | Service Monitor annotations | `{}`                                    |
 | `vminsert.serviceMonitor.interval`       | Commented. Prometheus scare interval for vminsert component| `15s`                                    |
@@ -134,6 +136,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmstorage.service.vmselectPort`      | Port for accepting connections from vmselect           | `8401`                                                     |
 | `vmstorage.terminationGracePeriodSeconds`      | Pod's termination grace period in seconds          | `60`                                                     |
 | `vmstorage.serviceMonitor.enabled` | Enable deployment of Service Monitor for vmstorage component. This is Prometheus operatior object      | `false`     |
+| `vmstorage.serviceMonitor.namespace` | Target namespace of ServiceMonitor manifest |  |
 | `vmstorage.serviceMonitor.extraLabels`  | Service Monitor labels        | `{}`                                                    |
 | `vmstorage.serviceMonitor.annotations`       | Service Monitor annotations | `{}`                                    |
 | `vmstorage.serviceMonitor.interval`       | Commented. Prometheus scare interval for vmstorage component| `15s`                                    |
