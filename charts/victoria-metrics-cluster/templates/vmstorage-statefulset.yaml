@@ -87,7 +87,7 @@ spec:
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
+              readOnly: {{ .readOnly | default "false" }}
           {{- end }}
     {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -113,6 +113,18 @@ spec:
 {{ toYaml .Values.vmstorage.affinity | indent 8 }}
     {{- end }}
       terminationGracePeriodSeconds: {{ .Values.vmstorage.terminationGracePeriodSeconds }}
+{{- if or (not .Values.vmstorage.persistentVolume.enabled) .Values.vmstorage.extraSecretMounts }}
+      volumes:
+      {{- if not .Values.vmstorage.persistentVolume.enabled }}
+        - name: vmstorage-volume
+          emptyDir: {}
+      {{- end }}
+      {{- range .Values.vmstorage.extraSecretMounts }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .name }}
+      {{- end }}
+{{- end }}
 {{- if .Values.vmstorage.persistentVolume.enabled }}
   volumeClaimTemplates:
     - metadata:
@@ -134,9 +146,5 @@ spec:
         storageClassName: "{{ .Values.vmstorage.persistentVolume.storageClass }}"
       {{- end }}
       {{- end }}
-{{- else }}
-      volumes:
-        - name: vmstorage-volume
-          emptyDir: {}
 {{- end }}
 {{- end }}

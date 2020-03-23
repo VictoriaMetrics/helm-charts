@@ -195,7 +195,8 @@ vmstorage:
   enabled: true
   name: vmstorage
   image:
-    repository: victoriametrics/vmstorage
+    #repository: victoriametrics/vmstorage
+    repository: railsonservices/vmstorage
     tag: v1.34.2-cluster
     pullPolicy: IfNotPresent
   priorityClassName: ""
@@ -250,7 +251,11 @@ vmstorage:
     mountPath: /storage
     size: 8Gi
     subPath: ""
-
+  extraSecretMounts:
+    - name: aws-credentials
+      mountPath: /aws/credentials
+    - name: aws-config
+      mountPath: /aws/config
   podAnnotations: {}
   replicaCount: 2
   podManagementPolicy: OrderedReady
