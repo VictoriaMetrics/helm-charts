@@ -134,8 +134,8 @@ group :development do
 end
 
 group :test do
-  # gem 'danger'
-  # gem 'danger-junit'
+  gem 'danger'
+  gem 'danger-junit'
   gem 'karafka-testing'
   # provide JUnit formatters so that we can collect during CI
   gem 'rspec_junit_formatter'
