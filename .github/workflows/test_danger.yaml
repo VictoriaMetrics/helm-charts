@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+  pull_request:
+
 jobs:
   danger:
     name: Post Test results
@@ -31,6 +33,6 @@ jobs:
           bundle install --jobs 4 --retry 3
       - name: Run danger
         env:
-          GITHUB_TOKEN: test #${{ secrets.PERX_API_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         run: |
           bundle exec danger
