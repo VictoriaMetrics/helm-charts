@@ -35,6 +35,40 @@ spec:
 {{- if .Values.vmstorage.schedulerName }}
       schedulerName: "{{ .Values.vmstorage.schedulerName }}"
 {{- end }}
+      initContainers:
+        - name: vmrestore
+          image: "{{ .Values.vmstorage.image.repository }}:{{ .Values.vmstorage.image.tag }}"
+          imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
+          command: ["sh" , "-c"]
+          args:
+            - "/vmrestore-prod -src=s3://perx-devops/backup/vm/${POD_NAME} -storageDataPath=/storage -configFilePath=/aws/config/config -credsFilePath=/aws/credentials/credentials -concurrency=50"
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: vmstorage-volume
+              mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
+              subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
+          {{- range .Values.vmstorage.extraHostPathMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly }}
+          {{- end }}
+          {{- range .Values.vmstorage.extraConfigmapMounts }}
+            - name: {{ $.Values.vmstorage.name }}-{{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly }}
+          {{- end }}
+          {{- range .Values.vmstorage.extraSecretMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly | default "false" }}
+          {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vmstorage.name }}
           image: "{{ .Values.vmstorage.image.repository }}:{{ .Values.vmstorage.image.tag }}"
