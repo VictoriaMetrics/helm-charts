@@ -1,3 +1,6 @@
+{{- if eq (len .Values.remoteWriteUrls) 0 -}}
+{{- fail "at least one item in `.remoteWriteUrls` must be set " -}}
+{{- end -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,7 +31,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           args:
             - -promscrape.config=/config/scrape.yml
-          {{- range $key, $value := required "at least one item in `.remoteWriteUrls` must be set" .Values.remoteWriteUrls }}
+          {{- range $key, $value := .Values.remoteWriteUrls }}
             - -remoteWrite.url={{ $value }}
           {{- end }}
           {{- range $key, $value := .Values.extraArgs }}

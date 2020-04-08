@@ -44,7 +44,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.securityContext`   | Pod's security context. [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)      | `{}`                                                      |
 | `vmselect.cacheMountPath`    | Cache root folder                | `/cache`                                                      |
 | `vmselect.service.annotations` | Service annotations       | `{}`                                                      |
-| `vmselect.service.labels`      | Service lables            | `{}`                                                     |
+| `vmselect.service.labels`      | Service labels            | `{}`                                                     |
 | `vmselect.service.clusterIP`   | Service ClusterIP | `""`                                                       |
 | `vmselect.service.externalIPs`  | Service External IPs. [ https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips)                     | `[]`                                                      |
 | `vmselect.service.loadBalancerIP`               | Service load balacner IP             | `"`                                                     |
@@ -55,14 +55,14 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.ingress.annotations`    | Ingress annotations       | `{}`                                                     |
 | `vmselect.ingress.hosts`         | Array of host objects          | `[]`                                                     |
 | `vmselect.ingress.tls`              | Array of TLS objects              | `[]`                                          |
-| `vmselect.statefulSet.enabled`          | Deploy StatefulSet instread of Deployment for vmselect. Usefull if you want to keep cache data        | `false` |
+| `vmselect.statefulSet.enabled`          | Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data        | `false` |
 | `vmselect.statefulSet.podManagementPolicy`           | Deploy order policy for StatefulSet pods        | `OrderedReady`                  |
 | `vmselect.statefulSet.service.annotations`        | Headless service annotations | `{}`                                                        |
 | `vmselect.statefulSet.service.labels`            | Headless service labels                  | `{}`                                                     |
 | `vmselect.statefulSet.service.servicePort`     | Headless service port      | `8481`                                                    |
 | `vmselect.persistentVolume.enabled` | Create/use Persistent Volume Claim for vmselect component. Empty dir if false  | `false`|
 | `vmselect.persistentVolume.accessModes`      | Array of access modes       | `["ReadWriteOnce"]`                                                       |
-| `vmselect.persistentVolume.annotations`      | Persistant volume annotations      | `{}`                                                       |
+| `vmselect.persistentVolume.annotations`      | Persistent volume annotations      | `{}`                                                       |
 | `vmselect.persistentVolume.existingClaim`         | Existing Claim name        | `""`                                                       |
 | `vmselect.persistentVolume.size`     | Size of the volume. Better to set the same as resource limit memory property    | `2Gi`                          |
 | `vmselect.persistentVolume.subPath`        | Mount subpath       | `""`                                                 |
@@ -88,10 +88,10 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vminsert.resources`         | Resource object    | `{}`                                                     |
 | `vminsert.securityContext`   | Pod's security context. [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)      | `{}`                                                      |
 | `vminsert.service.annotations` | Service annotations       | `{}`                                                      |
-| `vminsert.service.labels`      | Service lables            | `{}`                                                     |
+| `vminsert.service.labels`      | Service labels            | `{}`                                                     |
 | `vminsert.service.clusterIP`   | Service ClusterIP | `""`                                                       |
 | `vminsert.service.externalIPs`  | Service External IPs. [ https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips)                     | `[]`                                                      |
-| `vminsert.service.loadBalancerIP`               | Service load balacner IP             | `"`                                                     |
+| `vminsert.service.loadBalancerIP`               | Service load balancer IP             | `"`                                                     |
 | `vminsert.service.loadBalancerSourceRanges`     | Load balancer source range     | `[]`                                                     |
 | `vminsert.service.servicePort`        | Service port | `8480`                                                     |
 | `vminsert.service.type`           | Service type     | `ClusterIP`                                                     |
@@ -119,7 +119,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmstorage.affinity `         | Pod affinity| `{}` |
 | `vmstorage.persistentVolume.enabled` | Create/use Persistent Volume Claim for vmstorage component. Empty dir if false  | `true`|
 | `vmstorage.persistentVolume.accessModes`      | Array of access modes       | `["ReadWriteOnce"]`                                                       |
-| `vmstorage.persistentVolume.annotations`      | Persistant volume annotations      | `{}`                                                       |
+| `vmstorage.persistentVolume.annotations`      | Persistent volume annotations      | `{}`                                                       |
 | `vmstorage.persistentVolume.existingClaim`         | Existing Claim name        | `""`                                                       |
 | `vmstorage.persistentVolume.mountPath`         | Data root path        | `"/storage"`                                                       |
 | `vmstorage.persistentVolume.size`     | Size of the volume. Better to set the same as resource limit memory property    | `2Gi`                          |
@@ -130,7 +130,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmstorage.resources`         | Resource object    | `{}`                                                     |
 | `vmstorage.securityContext`   | Pod's security context. [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)      | `{}`                                                      |
 | `vmstorage.service.annotations` | Service annotations       | `{}`                                                      |
-| `vmstorage.service.labels`      | Service lables            | `{}`                                                     |
+| `vmstorage.service.labels`      | Service labels            | `{}`                                                     |
 | `vmstorage.service.servicePort` | Service port            | `8482`                                                     |
 | `vmstorage.service.vminsertPort`| Port for accepting connections from vminsert            | `8400`                                                     |
 | `vmstorage.service.vmselectPort`      | Port for accepting connections from vmselect           | `8401`                                                     |

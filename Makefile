@@ -2,7 +2,9 @@ URL=https://victoriametrics.github.io/helm-charts/
 
 # Run linter for helm chart
 lint:
-	helm lint charts/*
+	@helm lint charts/victoria-metrics-cluster &&\
+	helm lint charts/victoria-metrics-single &&\
+	helm lint charts/victoria-metrics-agent --set remoteWriteUrls[0]="victoriametrics.com"
 
 # Package chart into zip file
 package:
