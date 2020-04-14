@@ -1,6 +1,6 @@
-{{- if and .Values.server.enabled .Values.server.statefulSet.enabled -}}
+{{- if and .Values.server.enabled (not .Values.server.statefulSet.enabled) -}}
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
 {{- if .Values.server.annotations }}
   annotations:
@@ -10,12 +10,10 @@ metadata:
     {{- include "victoria-metrics.server.labels" . | nindent 4 }}
   name: {{ template "victoria-metrics.server.fullname" . }}
 spec:
-  serviceName: {{ template "victoria-metrics.server.fullname" . }}
   selector:
     matchLabels:
       {{- include "victoria-metrics.server.matchLabels" . | nindent 6 }}
   replicas: 1
-  podManagementPolicy: {{ .Values.server.podManagementPolicy }}
   template:
     metadata:
     {{- if .Values.server.podAnnotations }}
@@ -129,30 +127,12 @@ spec:
 {{ toYaml .Values.server.affinity | indent 8 }}
     {{- end }}
       terminationGracePeriodSeconds: {{ .Values.server.terminationGracePeriodSeconds }}
-{{- if .Values.server.persistentVolume.enabled }}
-  volumeClaimTemplates:
-    - metadata:
-        name: server-volume
-        {{- if .Values.server.persistentVolume.annotations }}
-        annotations:
-{{ toYaml .Values.server.persistentVolume.annotations | indent 10 }}
-        {{- end }}
-      spec:
-        accessModes:
-{{ toYaml .Values.server.persistentVolume.accessModes | indent 10 }}
-        resources:
-          requests:
-            storage: "{{ .Values.server.persistentVolume.size }}"
-      {{- if .Values.server.persistentVolume.storageClass }}
-      {{- if (eq "-" .Values.server.persistentVolume.storageClass) }}
-        storageClassName: ""
-      {{- else }}
-        storageClassName: "{{ .Values.server.persistentVolume.storageClass }}"
-      {{- end }}
-      {{- end }}
-{{- else }}
       volumes:
-        - name: server-volume
-          emptyDir: {}
+      - name: server-volume
+{{- if .Values.server.persistentVolume.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ if .Values.server.persistentVolume.existingClaim }}{{ .Values.server.persistentVolume.existingClaim }}{{- else }}{{ template "victoria-metrics.server.fullname" . }}{{- end }}
+{{- else }}
+        emptyDir: {}
 {{- end }}
 {{- end }}
