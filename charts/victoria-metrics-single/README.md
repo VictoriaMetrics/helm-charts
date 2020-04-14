@@ -42,6 +42,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `server.persistentVolume.accessModes`      | Array of access modes       | `["ReadWriteOnce"]`                                                       |
 | `server.persistentVolume.annotations`      | Persistant volume annotations      | `{}`                                                       |
 | `server.persistentVolume.existingClaim`         | Existing Claim name        | `""`                                                       |
+| `server.persistentVolume.storageClass`         | StorageClass to use for persistent volume       | `""`                                                       |
 | `server.persistentVolume.size`     | Size of the volume. Better to set the same as resource limit memory property    | `16Gi`                          |
 | `server.persistentVolume.mountPath`        | Mount path       | `""/storage`                                                 |
 | `server.persistentVolume.subPath`        | Mount subpath       | `""`                                                 |
