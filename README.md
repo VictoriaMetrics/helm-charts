@@ -16,7 +16,7 @@ helm repo add vm https://victoriametrics.github.io/helm-charts/
 helm search vm
 ```
 The command must display existing helm chart e.g.
-```
+```console
 NAME                       	CHART VERSION	APP VERSION	DESCRIPTION
 vm/victoria-metrics-agent  	0.1.2        	v1.34.7    	Victoria Metrics Agent - collects metrics from ...
 vm/victoria-metrics-cluster	0.4.5        	1.34.7     	Victoria Metrics Cluster version - high-perform...
