@@ -19,7 +19,9 @@ spec:
   resources:
     requests:
       storage: {{ .Values.server.persistentVolume.size | quote }}
+{{- if .Values.server.persistentVolume.storageClass }}
   storageClassName: {{ .Values.server.persistentVolume.storageClass | quote }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
