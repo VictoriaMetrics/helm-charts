@@ -10,7 +10,7 @@ metadata:
 {{ toYaml . | indent 4 }}
 {{- end }}
   labels:
-    app: prometheus-external
+{{- include "victoria-metrics.server.labels" . | nindent 4 }}
 spec:
 {{- with .Values.server.persistentVolume.accessModes }}
   accessModes:
