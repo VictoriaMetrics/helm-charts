@@ -1,0 +1,25 @@
+{{- if .Values.server.persistentVolume.enabled -}}
+{{- if not .Values.server.statefulSet.enabled -}}
+{{- if not .Values.server.persistentVolume.existingClaim -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "victoria-metrics.server.fullname" . }}
+{{- with .Values.server.persistentVolume.annotations  }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: prometheus-external
+spec:
+{{- with .Values.server.persistentVolume.accessModes }}
+  accessModes:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.server.persistentVolume.size | quote }}
+  storageClassName: {{ .Values.server.persistentVolume.storageClass | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
