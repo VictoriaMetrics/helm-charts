@@ -44,6 +44,16 @@ spec:
               protocol: UDP
               containerPort: {{ include "split-host-port" .Values.vminsert.extraArgs.graphiteListenAddr }}
 {{- end }}
+{{- if .Values.vminsert.extraArgs.influxListenAddr }}
+            - name: influx-tcp
+              protocol: TCP
+              containerPort: {{ include "split-host-port" .Values.vminsert.extraArgs.influxListenAddr }}
+{{- end }}
+{{- if .Values.vminsert.extraArgs.influxListenAddr }}
+            - name: influx-udp
+              protocol: UDP
+              containerPort: {{ include "split-host-port" .Values.vminsert.extraArgs.influxListenAddr }}
+{{- end }}
 {{- if .Values.vminsert.extraArgs.opentsdbHTTPListenAddr }}
             - name: opentsdbhttp
               protocol: TCP
