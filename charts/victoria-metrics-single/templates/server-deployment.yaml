@@ -14,6 +14,11 @@ spec:
     matchLabels:
       {{- include "victoria-metrics.server.matchLabels" . | nindent 6 }}
   replicas: 1
+{{- if .Values.server.persistentVolume.enabled }}
+  strategy:
+    # Must be "Recreate" when we have a persistent volume
+    type: Recreate
+{{- end }}
   template:
     metadata:
     {{- if .Values.server.podAnnotations }}
