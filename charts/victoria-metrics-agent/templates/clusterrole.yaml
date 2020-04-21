@@ -1,8 +1,15 @@
+{{- if .Values.serviceAccount.create -}}
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: {{ template "chart.fullname" . }}-clusterrole
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 rules:
 - apiGroups: [""]
   resources:
@@ -19,3 +26,4 @@ rules:
   verbs: ["get", "list", "watch"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
+{{- end -}}
