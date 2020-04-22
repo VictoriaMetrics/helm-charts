@@ -1,4 +1,4 @@
-{{- if .Values.serviceAccount.create -}}
+{{- if .Values.rbac.create -}}
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
@@ -6,7 +6,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "chart.labels" . | nindent 4 }}
-  {{- with .Values.serviceAccount.annotations }}
+  {{- with .Values.rbac.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
