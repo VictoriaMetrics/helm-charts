@@ -31,6 +31,18 @@ spec:
       port: {{ include "split-host-port" .Values.server.extraArgs.graphiteListenAddr }}
       targetPort: graphite-udp
 {{- end }}
+{{- if .Values.server.extraArgs.influxListenAddr }}
+    - name: influx-tcp
+      protocol: TCP
+      port: {{ include "split-host-port" .Values.server.extraArgs.influxListenAddr }}
+      targetPort: influx-tcp
+{{- end }}
+{{- if .Values.server.extraArgs.influxListenAddr }}
+    - name: influx-udp
+      protocol: UDP
+      port: {{ include "split-host-port" .Values.server.extraArgs.influxListenAddr }}
+      targetPort: influx-udp
+{{- end }}
 {{- if .Values.server.extraArgs.opentsdbHTTPListenAddr }}
     - name: opentsdbhttp
       port: {{ include "split-host-port" .Values.server.extraArgs.opentsdbHTTPListenAddr }}
