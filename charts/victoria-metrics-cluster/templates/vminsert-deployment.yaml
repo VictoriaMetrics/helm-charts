@@ -4,7 +4,8 @@ kind: Deployment
 metadata:
   labels:
     {{- include "victoria-metrics.vminsert.labels" . | nindent 4 }}
-  name: {{ template "victoria-metrics.vminsert.fullname" . }}
+  name: {{ template "victoria-metrics.fullname" . }}
+  namespace: {{ .Release.Namespace }}
 spec:
   selector:
     matchLabels:

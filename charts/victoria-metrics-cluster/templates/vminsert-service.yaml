@@ -12,6 +12,7 @@ metadata:
 {{ toYaml .Values.vminsert.service.labels | indent 4}}
 {{- end }}
   name: {{ template "victoria-metrics.vminsert.fullname" . }}
+  namespace: {{ .Release.Namespace }}
 spec:
 {{- if .Values.vminsert.service.clusterIP }}
   clusterIP: {{ .Values.vminsert.service.clusterIP }}

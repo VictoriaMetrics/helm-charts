@@ -12,6 +12,7 @@ metadata:
 {{ toYaml .Values.vmselect.ingress.extraLabels | indent 4 }}
   {{ end }}
   name: {{ template "victoria-metrics.vmselect.fullname" . }}
+  namespace: {{ .Release.Namespace }}
 spec:
   rules:
   {{- $serviceName := include "victoria-metrics.vmselect.fullname" . }}

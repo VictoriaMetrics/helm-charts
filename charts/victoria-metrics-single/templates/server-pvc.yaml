@@ -5,6 +5,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ template "victoria-metrics.server.fullname" . }}
+  namespace: {{ .Release.Namespace }}
 {{- with .Values.server.persistentVolume.annotations  }}
   annotations:
 {{ toYaml . | indent 4 }}
