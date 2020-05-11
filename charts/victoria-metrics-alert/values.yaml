@@ -1,0 +1,113 @@
+# Default values for victoria-metrics-alert.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+imagePullSecrets: []
+
+server:
+  name: server
+  enabled: true
+  image:
+    repository: victoriametrics/vmalert
+    tag: "" # rewrites Chart.AppVersion
+    pullPolicy: IfNotPresent
+  nameOverride: ""
+  fullnameOverride: ""
+  replicaCount: 1
+  # vmalert reads metrics from source, next section represents its configuration. It can be any service which supports
+  # MetricsQL or PromQL.
+  datasource:
+    url: "ad"
+    basicAuth:
+      username: ""
+      password: ""
+
+  remote:
+    write:
+      url: ""
+    read:
+      url: ""
+
+  notifier:
+    alertmanager:
+      url: "asd"
+
+  extraArgs: {}
+
+  service:
+    annotations: {}
+    labels: {}
+    clusterIP: ""
+    ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+    ##
+    externalIPs: []
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    servicePort: 8880
+    type: ClusterIP
+  ingress:
+    enabled: false
+    annotations: {}
+    #   kubernetes.io/ingress.class: nginx
+    #   kubernetes.io/tls-acme: 'true'
+
+    extraLabels: {}
+    hosts: []
+    #   - name: vmselect.local
+    #     path: /select
+    #     port: http
+
+    tls: []
+    #   - secretName: vmselect-ingress-tls
+    #     hosts:
+    #       - vmselect.local
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+  # runAsUser: 1000
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+  #   memory: 128Mi
+
+  # Annotations to be added to the deployment
+  annotations: {}
+  # labels to be added to the deployment
+  labels: {}
+
+  # Annotations to be added to pod
+  podAnnotations: {}
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  # vmalert alert rules configuration configuration:
+  config:
+    alerts:
+      groups: {}

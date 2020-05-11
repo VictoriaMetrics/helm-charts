@@ -1,0 +1,95 @@
+{{- if and .Values.server.enabled -}}
+{{- if eq (len .Values.server.config.alerts.groups) 0 -}}
+{{- fail "at least one item in `.server.config.alerts.groups` must be set " -}}
+{{- end -}}
+{{- if eq .Values.server.notifier.alertmanager.url "" -}}
+{{- fail "alert manager URL must be specified" -}}
+{{- end -}}
+{{- if eq .Values.server.datasource.url "" -}}
+{{- fail "datarouce URL must be specified" -}}
+{{- end -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vmalert.server.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vmalert.server.labels" . | nindent 4 }}
+  {{- with .Values.server.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.server.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "vmalert.server.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "vmalert.server.labels" . | nindent 8 }}
+      annotations:
+        {{- range $key, $value := .Values.server.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+    {{- with .Values.server.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      securityContext:
+        {{- toYaml .Values.server.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ template "vmalert.name" . }}-{{ .Values.server.name }}
+          securityContext:
+            {{- toYaml .Values.server.securityContext | nindent 12 }}
+          image: "{{ .Values.server.image.repository }}:{{ default .Chart.AppVersion .Values.server.image.tag }}"
+          args:
+            - -rule=/config/alert-rules.yaml
+            - -datasource.url={{ .Values.server.datasource.url}}
+            - -datasource.basicAuth.password={{ .Values.server.datasource.basicAuth.password}}
+            - -datasource.basicAuth.username={{ .Values.server.datasource.basicAuth.username}}
+            - -notifier.url={{ .Values.server.notifier.alertmanager.url }}
+            - -remoteread.url={{ .Values.server.remote.read.url}}
+            - -remotewrite.url={{ .Values.server.remote.write.url}}
+          {{- range $key, $value := .Values.server.extraArgs }}
+            - -{{ $key }}={{ $value }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8880
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: alerts-config
+              mountPath: /config
+          resources:
+            {{- toYaml .Values.server.resources | nindent 12 }}
+      {{- with .Values.server.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.server.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      volumes:
+        - name: alerts-config
+          configMap:
+            name: {{ include "vmalert.server.alertconfigname" . }}
+{{- end -}}
