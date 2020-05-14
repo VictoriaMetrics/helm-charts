@@ -2,6 +2,10 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
+{{- with .Values.vmselect.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
   labels:
     {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
   name: {{ template "victoria-metrics.vmselect.fullname" . }}

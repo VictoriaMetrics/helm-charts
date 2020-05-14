@@ -2,9 +2,9 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-{{- if .Values.vmstorage.annotations }}
+{{- with .Values.vmstorage.annotations }}
   annotations:
-{{ toYaml .Values.vmstorage.annotations | indent 4 }}
+    {{- toYaml . | nindent 4 }}
 {{- end }}
   labels:
     {{- include "victoria-metrics.vmstorage.labels" . | nindent 4 }}
