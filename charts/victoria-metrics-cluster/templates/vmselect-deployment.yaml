@@ -2,9 +2,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-{{- if .Values.vmselect.annotations }}
+{{- with .Values.vmselect.annotations }}
   annotations:
-{{ toYaml .Values.vmselect.annotations | indent 4 }}
+    {{- toYaml . | nindent 4 }}
 {{- end }}
   labels:
     {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
