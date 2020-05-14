@@ -2,6 +2,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+{{- if .Values.vminsert.annotations }}
+  annotations:
+{{ toYaml .Values.vminsert.annotations | indent 4 }}
+{{- end }}
   labels:
     {{- include "victoria-metrics.vminsert.labels" . | nindent 4 }}
   name: {{ template "victoria-metrics.fullname" . }}
