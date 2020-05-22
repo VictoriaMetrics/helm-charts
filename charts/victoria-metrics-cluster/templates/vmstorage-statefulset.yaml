@@ -26,10 +26,6 @@ spec:
       labels:
         {{- include "victoria-metrics.vmstorage.labels" . | nindent 8 }}
     spec:
-{{- if .Values.vmstorage.affinity }}
-      affinity:
-{{ toYaml .Values.vmstorage.affinity | indent 8 }}
-{{- end }}
 {{- if .Values.vmstorage.priorityClassName }}
       priorityClassName: "{{ .Values.vmstorage.priorityClassName }}"
 {{- end }}
