@@ -29,6 +29,7 @@ spec:
       labels:
         {{- include "vmalert.server.labels" . | nindent 8 }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/server-alerts-configmap.yaml") . | sha256sum }}
         {{- range $key, $value := .Values.server.podAnnotations }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
