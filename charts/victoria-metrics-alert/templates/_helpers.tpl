@@ -86,3 +86,32 @@ Create the name of the service account to use
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+
+
+{{- define "vmalert.alertmanager.labels" -}}
+{{ include "vmalert.alertmanager.matchLabels" . }}
+{{ include "vmalert.common.metaLabels" . }}
+{{- end -}}
+
+{{- define "vmalert.alertmanager.matchLabels" -}}
+app: alertmanager
+{{ include "vmalert.common.matchLabels" . }}
+{{- end -}}
+
+{{/*
+Create a fully qualified server name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "vmalert.alertmanager.fullname" -}}
+{{- if .Values.server.fullnameOverride -}}
+{{- .Values.server.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" .Release.Name "alertmanager" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" .Release.Name $name "alertmanager" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

@@ -1,0 +1,29 @@
+server:
+  config:
+    alerts:
+      groups:
+        - name: debug
+          rules:
+            - alert: VMRows
+              for: 10s
+              expr: vm_rows > 0
+              labels:
+                label: bar
+              annotations:
+                summary: "{{ $value|humanize }}"
+                description: "{{$labels}}"
+        - name: TestGroup
+          rules:
+            - alert: Conns
+              expr: sum(vm_tcplistener_conns) by(instance) > 1
+              annotations:
+                summary: "Too high connection number for {{$labels.instance}}"
+                description: "It is {{ $value }} connections for {{$labels.instance}}"
+            - alert: ExampleAlertAlwaysFiring
+              expr: sum by(job)
+                (up == 1)
+  notifier:
+    alertmanager:
+      url: http://www.ya.ru
+  datasource:
+    url: http://www.ya.ru
