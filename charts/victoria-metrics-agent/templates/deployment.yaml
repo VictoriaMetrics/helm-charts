@@ -81,6 +81,12 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       volumes:
+      {{- if ne .Values.configMap "" }}
+        - name: config
+          configMap:
+            name: {{ .Values.configMap }}
+      {{- else }}
         - name: config
           configMap:
             name: {{ include "chart.fullname" . }}-config
+      {{- end }}
