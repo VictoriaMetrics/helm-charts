@@ -104,18 +104,17 @@ Create a fully qualified server name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "vmalert.alertmanager.fullname" -}}
-{{- if .Values.server.fullnameOverride -}}
-{{- .Values.server.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
 {{- printf "%s-%s" .Release.Name "alertmanager" -}}
-{{- else -}}
-{{- printf "%s-%s-%s" .Release.Name $name "alertmanager" -}}
-{{- end -}}
-{{- end -}}
 {{- end -}}
 
 {{- define "vmalert.alertmanager.configname" -}}
 {{ include "vmalert.alertmanager.fullname" . }}-config
+{{- end -}}
+
+{{- define "vmalert.alertmanager.url" -}}
+{{- if .Values.alertmanager.enabled -}}
+http://{{- include "vmalert.alertmanager.fullname" . -}}:9093
+{{- else -}}
+{{- .Values.server.notifier.alertmanager.url -}}
+{{- end -}}
 {{- end -}}

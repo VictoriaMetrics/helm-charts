@@ -1,8 +1,8 @@
 {{- if and .Values.server.enabled -}}
-{{- if eq (len .Values.server.config.alerts.groups) 0 -}}
+{{- if and (eq .Values.server.configMap "") (eq (len .Values.server.config.alerts.groups) 0) -}}
 {{- fail "at least one item in `.server.config.alerts.groups` must be set " -}}
 {{- end -}}
-{{- if eq .Values.server.notifier.alertmanager.url "" -}}
+{{- if and (not .Values.alertmanager.enabled) (eq .Values.server.notifier.alertmanager.url "") -}}
 {{- fail "alert manager URL must be specified" -}}
 {{- end -}}
 {{- if eq .Values.server.datasource.url "" -}}
@@ -50,7 +50,7 @@ spec:
             - -datasource.url={{ .Values.server.datasource.url}}
             - -datasource.basicAuth.password={{ .Values.server.datasource.basicAuth.password}}
             - -datasource.basicAuth.username={{ .Values.server.datasource.basicAuth.username}}
-            - -notifier.url={{ .Values.server.notifier.alertmanager.url }}
+            - -notifier.url={{ include "vmalert.alertmanager.url" . }}
             - -remoteRead.url={{ .Values.server.remote.read.url}}
             - -remoteWrite.url={{ .Values.server.remote.write.url}}
           {{- range $key, $value := .Values.server.extraArgs }}
@@ -90,7 +90,13 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       volumes:
+      {{- if ne .Values.server.configMap "" }}
+        - name: alerts-config
+          configMap:
+            name: {{ .Values.server.configMap }}
+      {{- else }}
         - name: alerts-config
           configMap:
             name: {{ include "vmalert.server.alertconfigname" . }}
+      {{- end }}
 {{- end -}}

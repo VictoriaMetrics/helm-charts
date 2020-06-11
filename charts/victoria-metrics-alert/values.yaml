@@ -110,9 +110,12 @@ server:
   affinity: {}
 
   # vmalert alert rules configuration configuration:
+  # use existing configmap if specified
+  # otherwise .config values will be used
+  configMap: ""
   config:
     alerts:
-      groups: {}
+      groups: []
 
 alertmanager:
   enabled: false
@@ -123,7 +126,6 @@ alertmanager:
   image: prom/alertmanager
   tag: v0.20.0
   retention: 120h
-  externalURL: ""
   nodeSelector: {}
   resources: {}
   tolerations: []
