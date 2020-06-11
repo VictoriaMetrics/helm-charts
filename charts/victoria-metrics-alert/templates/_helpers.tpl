@@ -115,3 +115,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "vmalert.alertmanager.configname" -}}
+{{ include "vmalert.alertmanager.fullname" . }}-config
+{{- end -}}

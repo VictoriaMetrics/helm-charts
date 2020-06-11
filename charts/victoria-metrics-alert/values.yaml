@@ -115,18 +115,36 @@ server:
       groups: {}
 
 alertmanager:
-  enabled: true
+  enabled: false
   replicaCount: 1
   podMetadata:
     labels: {}
     annotations: {}
   image: prom/alertmanager
   tag: v0.20.0
-  configMaps:
-    - alertmanager-config
+  retention: 120h
   externalURL: ""
   nodeSelector: {}
   resources: {}
   tolerations: []
   imagePullSecrets: []
   podSecurityContext: {}
+  # use existing configmap if specified
+  # otherwise helm configuration will be used
+  configMap: ""
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      # default receiver
+      receiver: devnull
+      # tag to group by
+      group_by: ["alertname"]
+      # How long to initially wait to send a notification for a group of alerts
+      group_wait: 30s
+      # How long to wait before sending a notification about new alerts that are added to a group
+      group_interval: 10s
+      # How long to wait before sending a notification again if it has already been sent successfully for an alert
+      repeat_interval: 24h
+    receivers:
+      - name: devnull

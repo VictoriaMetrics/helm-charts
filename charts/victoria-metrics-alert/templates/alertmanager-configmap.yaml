@@ -1,0 +1,11 @@
+{{- if and .Values.alertmanager.enabled (eq .Values.alertmanager.configMap "") }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{include "vmalert.alertmanager.configname" .}}
+  namespace: {{.Release.Namespace}}
+  labels: {{- include "vmalert.alertmanager.labels" . | nindent 4}}
+data:
+  alertmanager.yaml: |
+    {{ toYaml .Values.alertmanager.config | nindent 4 }}
+{{- end }}

@@ -1,4 +1,4 @@
-{{- if and .Values.alertmanager.enabled -}}
+{{- if .Values.alertmanager.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,10 +6,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "vmalert.alertmanager.labels" . | nindent 4 }}
-  {{- with .Values.alertmanager.podMetadata.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 spec:
   replicas: {{ .Values.alertmanager.replicaCount }}
   selector:
@@ -19,9 +15,10 @@ spec:
     metadata:
       labels:
         {{- include "vmalert.alertmanager.labels" . | nindent 8 }}
-        {{- with .Values.alertmanager.podMetadata.annotations }}
-        annotations:
-          {{- toYaml . | nindent 10 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/alertmanager-configmap.yaml") . | sha256sum }}
+        {{- range $key, $value := .Values.alertmanager.podMetadata.annotations }}
+        {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
     {{- with .Values.alertmanager.imagePullSecrets }}
@@ -33,9 +30,21 @@ spec:
           securityContext:
             {{- toYaml .Values.alertmanager.podSecurityContext | nindent 12 }}
           image: "{{ .Values.alertmanager.image }}:{{ .Values.alertmanager.tag }}"
+          args:
+            - --config.file=/config/alertmanager.yaml
+            - --storage.path=/data
+            - --data.retention={{ .Values.alertmanager.retention }}
+            - --web.listen-address=0.0.0.0:9093
+            - --cluster.advertise-address=$(POD_IP):6783
           ports:
             - name: web
               containerPort: 9093
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
           readinessProbe:
             httpGet:
               path: /-/ready
@@ -44,14 +53,12 @@ spec:
             httpGet:
               path: /-/healthy
               port: web
-          {{- with .Values.alertmanager.configMaps }}
           volumeMounts:
-            {{- range $key, $value := . }}
-            - name: {{ $value }}
-              mountPath: /etc/alertmanager/configmaps/{{ $value }}
+            - name: storage
+              mountPath: /data
+            - name: config
+              mountPath: /config
               readOnly: true
-            {{- end }}
-          {{- end }}
           resources:
             {{- toYaml .Values.alertmanager.resources | nindent 12 }}
       {{- with .Values.alertmanager.nodeSelector }}
@@ -66,12 +73,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      {{- with .Values.alertmanager.configMaps }}
       volumes:
-        {{- range $key, $value := . }}
-        - name: {{ $value }}
+        - name: storage
+          emptyDir: {}
+      {{- if ne .Values.alertmanager.configMap "" }}
+        - name: config
           configMap:
-            name: {{ $value }}
-        {{- end }}
+            name: {{ .Values.alertmanager.configMap }}
+      {{- else }}
+        - name: config
+          configMap:
+            name: {{ include "vmalert.alertmanager.configname" . }}
       {{- end }}
 {{- end -}}
