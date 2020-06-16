@@ -72,8 +72,12 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 
-{{- define "vmalert.server.alertconfigname" -}}
-{{ include "vmalert.server.fullname" . }}-alert-rules-config
+{{- define "vmalert.server.configname" -}}
+{{- if .Values.server.configMap -}}
+{{- .Values.server.configMap -}}
+{{- else -}}
+{{- include "vmalert.server.fullname" . -}}-alert-rules-config
+{{- end -}}
 {{- end -}}
 
 {{/*
@@ -84,5 +88,41 @@ Create the name of the service account to use
     {{ default (include "vmalert.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+
+
+{{- define "vmalert.alertmanager.labels" -}}
+{{ include "vmalert.alertmanager.matchLabels" . }}
+{{ include "vmalert.common.metaLabels" . }}
+{{- end -}}
+
+{{- define "vmalert.alertmanager.matchLabels" -}}
+app: alertmanager
+{{ include "vmalert.common.matchLabels" . }}
+{{- end -}}
+
+{{/*
+Create a fully qualified server name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "vmalert.alertmanager.fullname" -}}
+{{- printf "%s-%s" .Release.Name "alertmanager" -}}
+{{- end -}}
+
+{{- define "vmalert.alertmanager.configname" -}}
+{{- if .Values.alertmanager.configMap -}}
+{{- .Values.alertmanager.configMap -}}
+{{- else -}}
+{{- include "vmalert.alertmanager.fullname" . -}}-alertmanager-config
+{{- end -}}
+{{- end -}}
+
+{{- define "vmalert.alertmanager.url" -}}
+{{- if .Values.alertmanager.enabled -}}
+http://{{- include "vmalert.alertmanager.fullname" . -}}:9093
+{{- else -}}
+{{- .Values.server.notifier.alertmanager.url -}}
 {{- end -}}
 {{- end -}}
