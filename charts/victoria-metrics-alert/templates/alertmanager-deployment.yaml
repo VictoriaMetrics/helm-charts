@@ -77,13 +77,7 @@ spec:
       volumes:
         - name: storage
           emptyDir: {}
-      {{- if ne .Values.alertmanager.configMap "" }}
-        - name: config
-          configMap:
-            name: {{ .Values.alertmanager.configMap }}
-      {{- else }}
         - name: config
           configMap:
             name: {{ include "vmalert.alertmanager.configname" . }}
-      {{- end }}
 {{- end -}}

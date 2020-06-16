@@ -11,7 +11,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "vmalert.server.fullname" . }}
+  name: {{- include "vmalert.server.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "vmalert.server.labels" . | nindent 4 }}
@@ -90,13 +90,7 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       volumes:
-      {{- if ne .Values.server.configMap "" }}
         - name: alerts-config
           configMap:
-            name: {{ .Values.server.configMap }}
-      {{- else }}
-        - name: alerts-config
-          configMap:
-            name: {{ include "vmalert.server.alertconfigname" . }}
-      {{- end }}
+            name: {{ include "vmalert.server.configname" . }}
 {{- end -}}

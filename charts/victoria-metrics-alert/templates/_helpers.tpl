@@ -72,8 +72,12 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 
-{{- define "vmalert.server.alertconfigname" -}}
-{{ include "vmalert.server.fullname" . }}-alert-rules-config
+{{- define "vmalert.server.configname" -}}
+{{- if .Values.server.configMap -}}
+{{- .Values.server.configMap -}}
+{{- else -}}
+{{- include "vmalert.server.fullname" . -}}-alert-rules-config
+{{- end -}}
 {{- end -}}
 
 {{/*
@@ -108,7 +112,11 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "vmalert.alertmanager.configname" -}}
-{{ include "vmalert.alertmanager.fullname" . }}-config
+{{- if .Values.alertmanager.configMap -}}
+{{- .Values.alertmanager.configMap -}}
+{{- else -}}
+{{- include "vmalert.alertmanager.fullname" . -}}-alertmanager-config
+{{- end -}}
 {{- end -}}
 
 {{- define "vmalert.alertmanager.url" -}}
