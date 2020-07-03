@@ -69,7 +69,6 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `server.statefulSet.service.labels`      | Headless service labels           | `{}`                                                     |
 | `server.statefulSet.service.servicePort`      | Headless service port          | `60`                                                     |
 | `server.terminationGracePeriodSeconds`      | Pod's termination grace period in seconds          | `60`                                                     |
-
 | `server.serviceMonitor.enabled` | Enable deployment of Service Monitor for server component. This is Prometheus operator object      | `false`     |
 | `server.serviceMonitor.extraLabels`  | Service Monitor labels        | `{}`                                                    |
 | `server.serviceMonitor.annotations`       | Service Monitor annotations | 8428                                    |
