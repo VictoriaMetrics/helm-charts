@@ -53,15 +53,17 @@ spec:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-            timeoutSeconds: 5
+            initialDelaySeconds: {{ .Values.vmstorage.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.vmstorage.probe.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.vmstorage.probe.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.vmstorage.probe.liveness.failureThreshold }}
           livenessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-            timeoutSeconds: 5
+            initialDelaySeconds: {{ .Values.vmstorage.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.vmstorage.probe.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.vmstorage.probe.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.vmstorage.probe.liveness.failureThreshold }}
           resources:
 {{ toYaml .Values.vmstorage.resources | indent 12 }}
           volumeMounts:
