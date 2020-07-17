@@ -6,8 +6,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "chart.labels" . | nindent 4 }}
-  {{- if .Values.podDisruptionBudget.labels }}
-{{ toYaml .Values.podDisruptionBudget.labels | indent 4}}
+  {{- with .Values.podDisruptionBudget.labels }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
 {{- if .Values.podDisruptionBudget.minAvailable }}

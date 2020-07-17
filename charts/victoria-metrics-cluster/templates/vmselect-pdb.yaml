@@ -6,8 +6,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
-  {{- if .Values.vmselect.podDisruptionBudget.labels }}
-{{ toYaml .Values.vmselect.podDisruptionBudget.labels | indent 4}}
+  {{- with .Values.vmselect.podDisruptionBudget.labels }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
 {{- if .Values.vmselect.podDisruptionBudget.minAvailable }}

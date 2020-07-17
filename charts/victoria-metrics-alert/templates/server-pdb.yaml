@@ -6,8 +6,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "vmalert.server.labels" . | nindent 4 }}
-  {{- if .Values.server.podDisruptionBudget.labels }}
-{{ toYaml .Values.server.podDisruptionBudget.labels | indent 4}}
+  {{- with .Values.server.podDisruptionBudget.labels }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
 {{- if .Values.server.podDisruptionBudget.minAvailable }}
