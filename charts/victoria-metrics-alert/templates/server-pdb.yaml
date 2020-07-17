@@ -5,7 +5,7 @@ metadata:
   name: {{ template "vmalert.server.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "chart.labels" . | nindent 4 }}
+    {{- include "vmalert.server.labels" . | nindent 4 }}
   {{- if .Values.server.podDisruptionBudget.labels }}
 {{ toYaml .Values.server.podDisruptionBudget.labels | indent 4}}
   {{- end }}
