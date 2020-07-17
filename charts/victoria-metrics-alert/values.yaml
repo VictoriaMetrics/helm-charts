@@ -22,6 +22,15 @@ server:
     pullPolicy: IfNotPresent
   nameOverride: ""
   fullnameOverride: ""
+
+  ## See `kubectl explain poddisruptionbudget.spec` for more
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    enabled: true
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
+
   replicaCount: 1
   # vmalert reads metrics from source, next section represents its configuration. It can be any service which supports
   # MetricsQL or PromQL.
