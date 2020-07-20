@@ -1,0 +1,22 @@
+{{- if .Values.server.podDisruptionBudget.enabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "vmalert.server.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vmalert.server.labels" . | nindent 4 }}
+  {{- with .Values.server.podDisruptionBudget.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+{{- if .Values.server.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.server.podDisruptionBudget.minAvailable }}
+{{- end }}
+{{- if .Values.server.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.server.podDisruptionBudget.maxUnavailable }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "vmalert.server.matchLabels" . | nindent 6 }}
+{{- end }}

@@ -16,7 +16,7 @@ rbac:
 
 serviceAccount:
   create: true
-  # name: 
+  # name:
   extraLabels: {}
   # annotations: {}
 
@@ -31,6 +31,14 @@ vmselect:
   fullnameOverride: ""
   extraArgs: {}
   annotations: {}
+
+  ## See `kubectl explain poddisruptionbudget.spec` for more
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
 
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
@@ -136,6 +144,14 @@ vminsert:
   extraArgs: {}
   annotations: {}
 
+  ## See `kubectl explain poddisruptionbudget.spec` for more
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
+
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
   tolerations: []
@@ -208,6 +224,15 @@ vmstorage:
   ## Additional vmstorage container arguments
   ##
   extraArgs: {}
+
+  ## See `kubectl explain poddisruptionbudget.spec` for more
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
+
   ## Node tolerations for server scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
