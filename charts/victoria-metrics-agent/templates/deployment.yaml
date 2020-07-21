@@ -39,6 +39,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -promscrape.config=/config/scrape.yml
           {{- range $key, $value := .Values.remoteWriteUrls }}
