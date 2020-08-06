@@ -32,7 +32,9 @@ spec:
           image: "{{ .Values.vminsert.image.repository }}:{{ .Values.vminsert.image.tag }}"
           imagePullPolicy: "{{ .Values.vminsert.image.pullPolicy }}"
           args:
+          {{- if not .Values.vminsert.suppresStorageFQDNsRender }}
           {{- include "victoria-metrics.vminsert.vmstorage-pod-fqdn" . | nindent 12 }}
+          {{- end }}
           {{- range $key, $value := .Values.vminsert.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
