@@ -4,7 +4,8 @@ URL=https://victoriametrics.github.io/helm-charts/
 lint:
 	@helm lint charts/victoria-metrics-cluster &&\
 	helm lint charts/victoria-metrics-single &&\
-	helm lint charts/victoria-metrics-agent --set remoteWriteUrls[0]="victoriametrics.com"
+	helm lint charts/victoria-metrics-agent -f hack/vmagent-lint-hack.yaml && \
+	helm lint charts/victoria-metrics-alert -f hack/vmalert-lint-hack.yaml
 
 # Package chart into zip file
 package:
