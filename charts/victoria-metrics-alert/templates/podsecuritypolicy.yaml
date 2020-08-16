@@ -6,8 +6,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
   {{- include "vmalert.server.labels" . | nindent 4 }}
-{{- if .Values.rbac.extraLabels }}
-{{ toYaml .Values.rbac.extraLabels | indent 4}}
+{{- with .Values.rbac.extraLabels }}
+{{ toYaml . | indent 4}}
 {{- end }}
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default'
