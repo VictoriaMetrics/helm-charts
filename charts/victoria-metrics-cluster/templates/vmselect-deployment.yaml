@@ -8,6 +8,9 @@ metadata:
 {{- end }}
   labels:
     {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
+{{- if .Values.vmselect.labels }}
+{{ toYaml .Values.vmselect.labels | indent 4 }}
+{{- end }}
   name: {{ template "victoria-metrics.vmselect.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
@@ -23,6 +26,9 @@ spec:
     {{- end }}
       labels:
         {{- include "victoria-metrics.vmselect.labels" . | nindent 8 }}
+{{- if .Values.vmselect.labels }}
+{{ toYaml .Values.vmselect.labels | indent 8 }}
+{{- end }}
     spec:
 {{- if .Values.vmselect.priorityClassName }}
       priorityClassName: "{{ .Values.vmselect.priorityClassName }}"
