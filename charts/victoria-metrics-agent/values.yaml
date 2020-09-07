@@ -48,7 +48,32 @@ securityContext:
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
+service:
+  annotations: {}
+  labels: {}
+  clusterIP: ""
+  ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+  ##
+  externalIPs: []
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  servicePort: 8429
+  type: ClusterIP
+ingress:
+  enabled: false
+  annotations: {}
+  #   kubernetes.io/ingress.class: nginx
+  #   kubernetes.io/tls-acme: 'true'
 
+  extraLabels: {}
+  hosts: []
+  #   - name: vmagent.local
+  #     path: /
+  #    port: http
+  tls: []
+  #   - secretName: vmagent-ingress-tls
+  #     hosts:
+  #       - vmagent.local
 resources:
   {}
   # We usually recommend not to specify default resources and to leave this as a conscious
