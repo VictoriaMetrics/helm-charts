@@ -61,8 +61,3 @@ Create the name of the service account to use
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
-
-{{- define "split-host-port" -}}
-{{- $hp := split ":" . -}}
-{{- printf "%s" $hp._1 -}}
-{{- end -}}
