@@ -7,8 +7,8 @@ metadata:
 {{- end }}
   labels:
     {{- include "chart.labels" . | nindent 4 }}
-{{- if .Values.service.labels }}
-{{ toYaml .Values.service.labels | indent 4}}
+{{- with .Values.service.labels }}
+  {{ toYaml . | indent 4}}
 {{- end }}
   name: {{ template "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
