@@ -37,6 +37,8 @@ spec:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vminsert.name }}
           image: "{{ .Values.vminsert.image.repository }}:{{ .Values.vminsert.image.tag }}"
           imagePullPolicy: "{{ .Values.vminsert.image.pullPolicy }}"
+          securityContext:
+            {{- toYaml .Values.vminsert.podSecurityContext | nindent 12 }}
           args:
           {{- if not .Values.vminsert.suppresStorageFQDNsRender }}
           {{- include "victoria-metrics.vminsert.vmstorage-pod-fqdn" . | nindent 12 }}

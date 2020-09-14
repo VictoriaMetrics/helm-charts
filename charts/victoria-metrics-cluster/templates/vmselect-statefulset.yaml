@@ -39,6 +39,8 @@ spec:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vmselect.name }}
           image: "{{ .Values.vmselect.image.repository }}:{{ .Values.vmselect.image.tag }}"
           imagePullPolicy: "{{ .Values.vmselect.image.pullPolicy }}"
+          securityContext:
+            {{- toYaml .Values.vmselect.podSecurityContext | nindent 12 }}
           args:
             - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
           {{- if not .Values.vmselect.suppresStorageFQDNsRender }}
