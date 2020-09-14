@@ -21,7 +21,7 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
-      automountServiceAccountToken: false
+      automountServiceAccountToken: {{ .Values.alertmanager.automountServiceAccountToken }}
     {{- with .Values.alertmanager.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

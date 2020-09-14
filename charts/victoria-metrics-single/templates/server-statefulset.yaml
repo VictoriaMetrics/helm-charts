@@ -12,6 +12,7 @@ metadata:
   name: {{ template "victoria-metrics.server.fullname" . }}
 spec:
   serviceName: {{ template "victoria-metrics.server.fullname" . }}
+  automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
   selector:
     matchLabels:
       {{- include "victoria-metrics.server.matchLabels" . | nindent 6 }}

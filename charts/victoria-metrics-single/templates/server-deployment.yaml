@@ -15,6 +15,7 @@ spec:
     matchLabels:
       {{- include "victoria-metrics.server.matchLabels" . | nindent 6 }}
   replicas: 1
+  automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
 {{- if .Values.server.persistentVolume.enabled }}
   strategy:
     # Must be "Recreate" when we have a persistent volume
