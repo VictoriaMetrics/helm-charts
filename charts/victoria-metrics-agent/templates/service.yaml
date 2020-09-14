@@ -5,7 +5,7 @@ metadata:
   annotations:
 {{ toYaml .Values.service.annotations | indent 4}}
 {{- end }}
-  labels:
+  extraLabels:
     {{- include "chart.labels" . | nindent 4 }}
 {{- with .Values.service.labels }}
   {{ toYaml . | indent 4}}
@@ -34,7 +34,6 @@ spec:
       port: {{ .Values.service.servicePort }}
       protocol: TCP
       targetPort: http
-
   selector:
     {{- include "chart.selectorLabels" . | nindent 4 }}
   type: "{{ .Values.service.type }}"
