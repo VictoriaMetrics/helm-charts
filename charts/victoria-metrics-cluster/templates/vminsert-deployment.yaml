@@ -33,7 +33,7 @@ spec:
 {{- if .Values.vminsert.priorityClassName }}
       priorityClassName: "{{ .Values.vminsert.priorityClassName }}"
 {{- end }}
-      automountServiceAccountToken: {{ .Values.vminsert.automountServiceAccountToken }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vminsert.name }}
           image: "{{ .Values.vminsert.image.repository }}:{{ .Values.vminsert.image.tag }}"

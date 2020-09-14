@@ -12,7 +12,6 @@ metadata:
   name: {{ template "victoria-metrics.server.fullname" . }}
 spec:
   serviceName: {{ template "victoria-metrics.server.fullname" . }}
-  automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
   selector:
     matchLabels:
       {{- include "victoria-metrics.server.matchLabels" . | nindent 6 }}
@@ -33,6 +32,7 @@ spec:
 {{- if .Values.server.schedulerName }}
       schedulerName: "{{ .Values.server.schedulerName }}"
 {{- end }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.server.name }}
           image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"

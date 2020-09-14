@@ -10,6 +10,8 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+  # mount API token to pod directly
+  automountToken: true
 
 imagePullSecrets: []
 
@@ -29,7 +31,6 @@ server:
     pullPolicy: IfNotPresent
   nameOverride: ""
   fullnameOverride: ""
-  automountServiceAccountToken: true
 
   ## See `kubectl explain poddisruptionbudget.spec` for more
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
@@ -137,7 +138,6 @@ server:
 alertmanager:
   enabled: false
   replicaCount: 1
-  automountServiceAccountToken: true
   podMetadata:
     labels: {}
     annotations: {}

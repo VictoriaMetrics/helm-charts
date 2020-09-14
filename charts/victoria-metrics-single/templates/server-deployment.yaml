@@ -15,7 +15,6 @@ spec:
     matchLabels:
       {{- include "victoria-metrics.server.matchLabels" . | nindent 6 }}
   replicas: 1
-  automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
 {{- if .Values.server.persistentVolume.enabled }}
   strategy:
     # Must be "Recreate" when we have a persistent volume
@@ -40,6 +39,7 @@ spec:
 {{- if .Values.server.schedulerName }}
       schedulerName: "{{ .Values.server.schedulerName }}"
 {{- end }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.server.name }}
           securityContext:

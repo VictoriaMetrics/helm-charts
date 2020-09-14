@@ -21,7 +21,6 @@ metadata:
   {{- end }}
 spec:
   replicas: {{ .Values.server.replicaCount }}
-  automountServiceAccountToken: {{ .Values.server.automountServiceAccountToken }}
   selector:
     matchLabels:
       {{- include "vmalert.server.matchLabels" . | nindent 6 }}
@@ -41,6 +40,7 @@ spec:
     {{- end }}
       securityContext:
         {{- toYaml .Values.server.securityContext | nindent 8 }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       containers:
         - name: {{ template "vmalert.name" . }}-{{ .Values.server.name }}
           securityContext:
