@@ -32,6 +32,7 @@ spec:
 {{- if .Values.server.schedulerName }}
       schedulerName: "{{ .Values.server.schedulerName }}"
 {{- end }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.server.name }}
           image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"

@@ -21,11 +21,11 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
-      automountServiceAccountToken: false
     {{- with .Values.alertmanager.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       containers:
         - name: {{ template "vmalert.name" . }}-alertmanager
           securityContext:
