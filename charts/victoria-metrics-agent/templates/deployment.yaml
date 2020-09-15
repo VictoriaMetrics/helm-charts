@@ -67,6 +67,12 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
+          {{- range .Values.extraHostPathMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -85,3 +91,8 @@ spec:
         - name: config
           configMap:
             name: {{ include "chart.configname" .}}
+      {{- range .Values.extraHostPathMounts }}
+        - name: {{ .name }}
+          hostPath:
+            path: {{ .hostPath }}
+      {{- end }}
