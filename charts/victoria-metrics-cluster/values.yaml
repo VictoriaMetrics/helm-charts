@@ -6,6 +6,7 @@
 ## Ref: https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/
 ##
 clusterDomainSuffix: cluster.local
+printNotes: true
 
 rbac:
   create: true
@@ -16,7 +17,7 @@ rbac:
 
 serviceAccount:
   create: true
-  # name: 
+  # name:
   extraLabels: {}
   # annotations: {}
 
@@ -25,11 +26,23 @@ vmselect:
   name: vmselect
   image:
     repository: victoriametrics/vmselect
-    tag: v1.35.3-cluster
+    tag: v1.41.0-cluster
     pullPolicy: IfNotPresent
   priorityClassName: ""
   fullnameOverride: ""
+  ## If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs
+  suppresStorageFQDNsRender: false
   extraArgs: {}
+  annotations: {}
+  extraLabels: {}
+
+  ## See `kubectl explain poddisruptionbudget.spec` for more
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
 
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
@@ -128,11 +141,23 @@ vminsert:
   name: vminsert
   image:
     repository: victoriametrics/vminsert
-    tag: v1.35.3-cluster
+    tag: v1.41.0-cluster
     pullPolicy: IfNotPresent
   priorityClassName: ""
   fullnameOverride: ""
   extraArgs: {}
+  annotations: {}
+  extraLabels: {}
+  ## If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs
+  suppresStorageFQDNsRender: false
+
+  ## See `kubectl explain poddisruptionbudget.spec` for more
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
 
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
@@ -190,13 +215,12 @@ vminsert:
 #    interval: 15s
 #    scrapeTimeout: 5s
 
-
 vmstorage:
   enabled: true
   name: vmstorage
   image:
     repository: victoriametrics/vmstorage
-    tag: v1.35.3-cluster
+    tag: v1.41.0-cluster
     pullPolicy: IfNotPresent
   priorityClassName: ""
   fullnameOverride:
@@ -206,6 +230,15 @@ vmstorage:
   ## Additional vmstorage container arguments
   ##
   extraArgs: {}
+
+  ## See `kubectl explain poddisruptionbudget.spec` for more
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
+
   ## Node tolerations for server scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
@@ -252,6 +285,8 @@ vmstorage:
     subPath: ""
 
   podAnnotations: {}
+  annotations: {}
+  extraLabels: {}
   replicaCount: 2
   podManagementPolicy: OrderedReady
 
@@ -275,6 +310,17 @@ vmstorage:
     vminsertPort: 8400
     vmselectPort: 8401
   terminationGracePeriodSeconds: 60
+  probe:
+    readiness:
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
+    liveness:
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
   serviceMonitor:
     enabled: false
     extraLabels: {}

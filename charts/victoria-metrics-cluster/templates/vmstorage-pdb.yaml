@@ -1,0 +1,22 @@
+{{- if .Values.vmstorage.podDisruptionBudget.enabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "victoria-metrics.vmstorage.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
+  {{- with .Values.vmstorage.podDisruptionBudget.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+{{- if .Values.vmstorage.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.vmstorage.podDisruptionBudget.minAvailable }}
+{{- end }}
+{{- if .Values.vmstorage.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.vmstorage.podDisruptionBudget.maxUnavailable }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "victoria-metrics.vmstorage.matchLabels" . | nindent 6 }}
+{{- end }}

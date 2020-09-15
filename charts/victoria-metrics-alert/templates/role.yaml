@@ -1,0 +1,25 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name:  {{ template "vmalert.server.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "vmalert.server.labels" . | nindent 4 }}
+{{- with .Values.rbac.extraLabels }}
+{{ toYaml . | indent 4}}
+{{- end }}
+{{- with .Values.rbac.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+rules:
+{{- if .Values.rbac.pspEnabled }}
+- apiGroups:      ['extensions']
+  resources:      ['podsecuritypolicies']
+  verbs:          ['use']
+  resourceNames:  [{{ template "vmalert.server.fullname" . }}]
+{{- else }}
+rules: []
+{{- end }}
+{{- end }}

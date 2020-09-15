@@ -13,9 +13,13 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+containerWorkingDir: "/"
+
 rbac:
   create: true
+  pspEnabled: true
   annotations: {}
+  extraLabels: {}
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -25,6 +29,14 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+
+## See `kubectl explain poddisruptionbudget.spec` for more
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+podDisruptionBudget:
+  enabled: false
+  # minAvailable: 1
+  # maxUnavailable: 1
+  labels: {}
 
 # WARN: need to specify at least one remote write url
 remoteWriteUrls: []
@@ -101,6 +113,11 @@ affinity: {}
 
 # vmagent scraping configuration:
 # https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/docs/vmagent.md#how-to-collect-metrics-in-prometheus-format
+
+# use existing configmap if specified
+# otherwise .config values will be used
+configMap: ""
+
 config:
   global:
     scrape_interval: 10s
@@ -120,7 +137,7 @@ config:
       # the endpoints associated with the default/kubernetes service using the
       # default named port `https`. This works for single API server deployments as
       # well as HA API server deployments.
-    - job_name: 'kubernetes-apiservers'
+    - job_name: "kubernetes-apiservers"
       kubernetes_sd_configs:
         - role: endpoints
       # Default to scraping over https. If required, just disable this or change to
@@ -146,10 +163,15 @@ config:
       # will add targets for each API server which Kubernetes adds an endpoint to
       # the default/kubernetes service.
       relabel_configs:
-        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        - source_labels:
+            [
+              __meta_kubernetes_namespace,
+              __meta_kubernetes_service_name,
+              __meta_kubernetes_endpoint_port_name,
+            ]
           action: keep
           regex: default;kubernetes;https
-    - job_name: 'kubernetes-nodes'
+    - job_name: "kubernetes-nodes"
       # Default to scraping over https. If required, just disable this or change to
       # `http`.
       scheme: https
@@ -180,7 +202,7 @@ config:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/$1/proxy/metrics
-    - job_name: 'kubernetes-nodes-cadvisor'
+    - job_name: "kubernetes-nodes-cadvisor"
       # Default to scraping over https. If required, just disable this or change to
       # `http`.
       scheme: https
@@ -228,22 +250,29 @@ config:
     # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
     # * `prometheus.io/port`: If the metrics are exposed on a different port to the
     # service then set this appropriately.
-    - job_name: 'kubernetes-service-endpoints'
+    - job_name: "kubernetes-service-endpoints"
       kubernetes_sd_configs:
         - role: endpoints
       relabel_configs:
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        - source_labels:
+            [__meta_kubernetes_service_annotation_prometheus_io_scrape]
           action: keep
           regex: true
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+        - source_labels:
+            [__meta_kubernetes_service_annotation_prometheus_io_scheme]
           action: replace
           target_label: __scheme__
           regex: (https?)
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+        - source_labels:
+            [__meta_kubernetes_service_annotation_prometheus_io_path]
           action: replace
           target_label: __metrics_path__
           regex: (.+)
-        - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+        - source_labels:
+            [
+              __address__,
+              __meta_kubernetes_service_annotation_prometheus_io_port,
+            ]
           action: replace
           target_label: __address__
           regex: ([^:]+)(?::\d+)?;(\d+)
@@ -271,24 +300,31 @@ config:
     # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
     # * `prometheus.io/port`: If the metrics are exposed on a different port to the
     # service then set this appropriately.
-    - job_name: 'kubernetes-service-endpoints-slow'
+    - job_name: "kubernetes-service-endpoints-slow"
       scrape_interval: 5m
       scrape_timeout: 30s
       kubernetes_sd_configs:
         - role: endpoints
       relabel_configs:
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
+        - source_labels:
+            [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
           action: keep
           regex: true
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+        - source_labels:
+            [__meta_kubernetes_service_annotation_prometheus_io_scheme]
           action: replace
           target_label: __scheme__
           regex: (https?)
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+        - source_labels:
+            [__meta_kubernetes_service_annotation_prometheus_io_path]
           action: replace
           target_label: __metrics_path__
           regex: (.+)
-        - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+        - source_labels:
+            [
+              __address__,
+              __meta_kubernetes_service_annotation_prometheus_io_port,
+            ]
           action: replace
           target_label: __address__
           regex: ([^:]+)(?::\d+)?;(\d+)
@@ -310,14 +346,15 @@ config:
     # via the following annotations:
     #
     # * `prometheus.io/probe`: Only probe services that have a value of `true`
-    - job_name: 'kubernetes-services'
+    - job_name: "kubernetes-services"
       metrics_path: /probe
       params:
         module: [http_2xx]
       kubernetes_sd_configs:
         - role: service
       relabel_configs:
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_probe]
+        - source_labels:
+            [__meta_kubernetes_service_annotation_prometheus_io_probe]
           action: keep
           regex: true
         - source_labels: [__address__]
@@ -340,7 +377,7 @@ config:
     # * `prometheus.io/scrape`: Only scrape pods that have a value of `true`
     # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
     # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the default of `9102`.
-    - job_name: 'kubernetes-pods'
+    - job_name: "kubernetes-pods"
       kubernetes_sd_configs:
         - role: pod
       relabel_configs:
@@ -351,7 +388,8 @@ config:
           action: replace
           target_label: __metrics_path__
           regex: (.+)
-        - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        - source_labels:
+            [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
           action: replace
           regex: ([^:]+)(?::\d+)?;(\d+)
           replacement: $1:$2

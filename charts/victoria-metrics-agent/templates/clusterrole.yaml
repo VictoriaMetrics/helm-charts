@@ -6,6 +6,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "chart.labels" . | nindent 4 }}
+{{- with .Values.rbac.extraLabels }}
+{{ toYaml . | indent 4}}
+{{- end }}
   {{- with .Values.rbac.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -15,6 +18,7 @@ rules:
   resources:
   - nodes
   - nodes/proxy
+  - nodes/metrics
   - services
   - endpoints
   - pods

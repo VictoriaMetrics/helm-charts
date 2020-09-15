@@ -30,10 +30,11 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.enabled`           | Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet                 | `true`                       |
 | `vmselect.name`              | Vmselect container name                   | `vmselect`                                                    |
 | `vmselect.image.repository`  | Image repository                 | `victoriametrics/vmselect`                                                   |
-| `vmselect.image.tag`         | Image tag              | `v1.35.3-cluster`                                                        |
+| `vmselect.image.tag`         | Image tag              | `v1.41.0-cluster`                                                        |
 | `vmselect.image.pullPolicy`  | Image pull policy                      | `IfNotPresent`                                                   |
 | `vmselect.priorityClassName` | Name of Priority Class | `""`                                |
 | `vmselect.fullnameOverride`  | Overrides the full name of vmselect component  | `""`                                |
+| `vmselect.suppresStorageFQDNsRender`  | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value | `false`                                |
 | `vmselect.extraArgs`         | Extra command line arguments for vmselect component               | `{}`
 | `vmselect.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
 | `vmselect.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
@@ -75,10 +76,11 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vminsert.enabled`           | Enable deployment of vminsert component. Deployment is used             | `true`                       |
 | `vminsert.name`              | vminsert container name                   | `vminsert`                                                    |
 | `vminsert.image.repository`  | Image repository                 | `victoriametrics/vminsert`                                                   |
-| `vminsert.image.tag`         | Image tag              | `v1.35.3-cluster`                                                        |
+| `vminsert.image.tag`         | Image tag              | `v1.41.0-cluster`                                                        |
 | `vminsert.image.pullPolicy`  | Image pull policy                      | `IfNotPresent`                                                   |
 | `vminsert.priorityClassName` | Name of Priority Class | `""`                                |
 | `vminsert.fullnameOverride`  | Overrides the full name of vminsert component  | `""`                                |
+| `vmselect.suppresStorageFQDNsRender`  | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value | `false`                                |
 | `vminsert.extraArgs`         | Extra command line arguments for vminsert component               | `{}`
 | `vminsert.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
 | `vminsert.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
@@ -108,7 +110,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmstorage.enabled`           | Enable deployment of vmstorage component. StatefulSet is used               | `true`                       |
 | `vmstorage.name`              | vmstorage container name                   | `vmstorage`                                                    |
 | `vmstorage.image.repository`  | Image repository                 | `victoriametrics/vmstorage`                                                   |
-| `vmstorage.image.tag`         | Image tag              | `v1.35.3-cluster`                                                        |
+| `vmstorage.image.tag`         | Image tag              | `v1.41.0-cluster`                                                        |
 | `vmstorage.image.pullPolicy`  | Image pull policy                      | `IfNotPresent`                                                   |
 | `vmstorage.priorityClassName` | Name of Priority Class | `""`                                |
 | `vmstorage.fullnameOverride`  | Overrides the full name of vmstorage component  | `""`                                |

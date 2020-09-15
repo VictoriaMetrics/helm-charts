@@ -13,6 +13,13 @@ serviceAccount:
 
 imagePullSecrets: []
 
+rbac:
+  create: true
+  pspEnabled: true
+  namespaced: false
+  extraLabels: {}
+  annotations: {}
+
 server:
   name: server
   enabled: true
@@ -22,11 +29,20 @@ server:
     pullPolicy: IfNotPresent
   nameOverride: ""
   fullnameOverride: ""
+
+  ## See `kubectl explain poddisruptionbudget.spec` for more
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
+
   replicaCount: 1
   # vmalert reads metrics from source, next section represents its configuration. It can be any service which supports
   # MetricsQL or PromQL.
   datasource:
-    url: "ad"
+    url: ""
     basicAuth:
       username: ""
       password: ""
@@ -39,7 +55,7 @@ server:
 
   notifier:
     alertmanager:
-      url: "asd"
+      url: ""
 
   extraArgs: {}
 
@@ -73,7 +89,8 @@ server:
   podSecurityContext: {}
   # fsGroup: 2000
 
-  securityContext: {}
+  securityContext:
+    {}
     # capabilities:
     #   drop:
     #   - ALL
@@ -81,7 +98,8 @@ server:
     # runAsNonRoot: true
   # runAsUser: 1000
 
-  resources: {}
+  resources:
+    {}
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -108,6 +126,43 @@ server:
   affinity: {}
 
   # vmalert alert rules configuration configuration:
+  # use existing configmap if specified
+  # otherwise .config values will be used
+  configMap: ""
   config:
     alerts:
-      groups: {}
+      groups: []
+
+alertmanager:
+  enabled: false
+  replicaCount: 1
+  podMetadata:
+    labels: {}
+    annotations: {}
+  image: prom/alertmanager
+  tag: v0.20.0
+  retention: 120h
+  nodeSelector: {}
+  resources: {}
+  tolerations: []
+  imagePullSecrets: []
+  podSecurityContext: {}
+  # use existing configmap if specified
+  # otherwise .config values will be used
+  configMap: ""
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      # default receiver
+      receiver: devnull
+      # tag to group by
+      group_by: ["alertname"]
+      # How long to initially wait to send a notification for a group of alerts
+      group_wait: 30s
+      # How long to wait before sending a notification about new alerts that are added to a group
+      group_interval: 10s
+      # How long to wait before sending a notification again if it has already been sent successfully for an alert
+      repeat_interval: 24h
+    receivers:
+      - name: devnull

@@ -2,8 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+{{- with .Values.vmselect.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
   labels:
     {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
+{{- with .Values.vmselect.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
   name: {{ template "victoria-metrics.vmselect.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
@@ -19,6 +26,9 @@ spec:
     {{- end }}
       labels:
         {{- include "victoria-metrics.vmselect.labels" . | nindent 8 }}
+{{- with .Values.vmselect.extraLabels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
     spec:
 {{- if .Values.vmselect.priorityClassName }}
       priorityClassName: "{{ .Values.vmselect.priorityClassName }}"
@@ -29,7 +39,9 @@ spec:
           imagePullPolicy: "{{ .Values.vmselect.image.pullPolicy }}"
           args:
             - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
+          {{- if not .Values.vmselect.suppresStorageFQDNsRender }}
           {{- include "victoria-metrics.vmselect.vmstorage-pod-fqdn" . | nindent 12 }}
+          {{- end }}
           {{- range $key, $value := .Values.vmselect.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}

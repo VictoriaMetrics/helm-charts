@@ -1,0 +1,17 @@
+{{- if .Values.alertmanager.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vmalert.alertmanager.labels" . | nindent 4 }}
+  name: {{ template "vmalert.alertmanager.fullname" . }}
+spec:
+  ports:
+    - name: web
+      port: 9093
+      targetPort: web
+      protocol: TCP
+  selector:
+    {{- include "vmalert.alertmanager.matchLabels" . | nindent 4 }}
+{{- end }}

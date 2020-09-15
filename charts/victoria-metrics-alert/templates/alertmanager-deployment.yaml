@@ -1,0 +1,83 @@
+{{- if .Values.alertmanager.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vmalert.alertmanager.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vmalert.alertmanager.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.alertmanager.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "vmalert.alertmanager.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "vmalert.alertmanager.labels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/alertmanager-configmap.yaml") . | sha256sum }}
+        {{- range $key, $value := .Values.alertmanager.podMetadata.annotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+      automountServiceAccountToken: false
+    {{- with .Values.alertmanager.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ template "vmalert.name" . }}-alertmanager
+          securityContext:
+            {{- toYaml .Values.alertmanager.podSecurityContext | nindent 12 }}
+          image: "{{ .Values.alertmanager.image }}:{{ .Values.alertmanager.tag }}"
+          args:
+            - --config.file=/config/alertmanager.yaml
+            - --storage.path=/data
+            - --data.retention={{ .Values.alertmanager.retention }}
+            - --web.listen-address=0.0.0.0:9093
+            - --cluster.advertise-address=$(POD_IP):6783
+          ports:
+            - name: web
+              containerPort: 9093
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: web
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: web
+          volumeMounts:
+            - name: storage
+              mountPath: /data
+            - name: config
+              mountPath: /config
+              readOnly: true
+          resources:
+            {{- toYaml .Values.alertmanager.resources | nindent 12 }}
+      {{- with .Values.alertmanager.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.alertmanager.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      volumes:
+        - name: storage
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: {{ include "vmalert.alertmanager.configname" . }}
+{{- end -}}

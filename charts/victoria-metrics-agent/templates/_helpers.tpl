@@ -61,3 +61,14 @@ Create the name of the service account to use
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Defins the name of configuratiob map
+*/}}
+{{- define "chart.configname" -}}
+{{- if .Values.configMap -}}
+{{- .Values.configMap -}}
+{{- else -}}
+{{- include "chart.fullname" . -}}-config
+{{- end -}}
+{{- end -}}

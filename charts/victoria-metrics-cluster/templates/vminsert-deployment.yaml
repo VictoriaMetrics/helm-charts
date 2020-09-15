@@ -2,9 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+{{- with .Values.vminsert.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
   labels:
     {{- include "victoria-metrics.vminsert.labels" . | nindent 4 }}
-  name: {{ template "victoria-metrics.fullname" . }}
+{{- with .Values.vminsert.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+  name: {{ template "victoria-metrics.vminsert.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
@@ -19,6 +26,9 @@ spec:
     {{- end }}
       labels:
         {{- include "victoria-metrics.vminsert.labels" . | nindent 8 }}
+{{- with .Values.vminsert.extraLabels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
     spec:
 {{- if .Values.vminsert.priorityClassName }}
       priorityClassName: "{{ .Values.vminsert.priorityClassName }}"
@@ -28,7 +38,9 @@ spec:
           image: "{{ .Values.vminsert.image.repository }}:{{ .Values.vminsert.image.tag }}"
           imagePullPolicy: "{{ .Values.vminsert.image.pullPolicy }}"
           args:
+          {{- if not .Values.vminsert.suppresStorageFQDNsRender }}
           {{- include "victoria-metrics.vminsert.vmstorage-pod-fqdn" . | nindent 12 }}
+          {{- end }}
           {{- range $key, $value := .Values.vminsert.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}

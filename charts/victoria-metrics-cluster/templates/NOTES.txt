@@ -1,3 +1,4 @@
+{{ if .Values.printNotes }}
 {{ if .Values.vminsert.enabled }}
 Write API:
 
@@ -72,5 +73,6 @@ for e.g. inside the kubernetes cluster:
 ```
 http://{{ template "victoria-metrics.vmselect.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomainSuffix }}:{{ .Values.vmselect.service.servicePort }}/select/0/prometheus/"
 ```
+{{- end }}
 {{- end }}
 
