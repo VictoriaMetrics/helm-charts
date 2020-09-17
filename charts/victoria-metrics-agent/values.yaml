@@ -299,6 +299,11 @@ config:
       kubernetes_sd_configs:
         - role: endpoints
       relabel_configs:
+        - action: drop
+          source_labels: [__meta_kubernetes_pod_container_init]
+          regex: true
+        - action: keep_if_equal
+          source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port, __meta_kubernetes_pod_container_port_number]
         - source_labels:
             [__meta_kubernetes_service_annotation_prometheus_io_scrape]
           action: keep
@@ -351,6 +356,11 @@ config:
       kubernetes_sd_configs:
         - role: endpoints
       relabel_configs:
+        - action: drop
+          source_labels: [__meta_kubernetes_pod_container_init]
+          regex: true
+        - action: keep_if_equal
+          source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port, __meta_kubernetes_pod_container_port_number]
         - source_labels:
             [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
           action: keep
@@ -426,6 +436,11 @@ config:
       kubernetes_sd_configs:
         - role: pod
       relabel_configs:
+        - action: drop
+          source_labels: [__meta_kubernetes_pod_container_init]
+          regex: true
+        - action: keep_if_equal
+          source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port, __meta_kubernetes_pod_container_port_number]
         - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
           action: keep
           regex: true
