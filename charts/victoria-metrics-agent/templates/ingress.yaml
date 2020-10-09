@@ -8,8 +8,8 @@ metadata:
 {{- end }}
   labels:
   {{- include "chart.labels" . | nindent 4 }}
-  {{ if .Values.ingress.extraLabels }}
-{{ toYaml .Values.ingress.extraLabels | indent 4 }}
+  {{ with .Values.ingress.extraLabels }}
+{{ toYaml . | indent 4 }}
   {{ end }}
   name: {{ template "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
