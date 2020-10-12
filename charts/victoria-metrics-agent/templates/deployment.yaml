@@ -47,10 +47,12 @@ spec:
             - -{{ $key }}={{ $value }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env: {{ toYaml .Values.env | nindent 10 }}
           ports:
             - name: http
               containerPort: 8429
+          {{- with .Values.env }}
+          env: {{ toYaml . | nindent 10 }}
+          {{- end }}
           readinessProbe:
             httpGet:
               path: /health
@@ -90,7 +92,7 @@ spec:
     {{- end }}
       volumes:
         - name: tmpdata
-      {{- if and .Values.persistence.enabled }}
+      {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "chart.fullname" .) }}
       {{- else }}

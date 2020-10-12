@@ -58,7 +58,9 @@ spec:
               containerPort: 8400
             - name: vmselect
               containerPort: 8401
-          env: {{ toYaml .Values.vmstorage.env | nindent 10 }}
+          {{- with .Values.vmstorage.env }}
+          env: {{ toYaml . | nindent 10 }}
+          {{- end }}
           readinessProbe:
             httpGet:
               path: /health

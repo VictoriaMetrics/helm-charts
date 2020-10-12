@@ -58,7 +58,9 @@ spec:
             - -{{ $key }}={{ $value }}
           {{- end }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
-          env: {{ toYaml .Values.server.env | nindent 10 }}
+          {{- with .Values.server.env }}
+          env: {{ toYaml . | nindent 10 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8880
