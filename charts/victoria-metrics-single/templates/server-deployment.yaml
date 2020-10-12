@@ -52,6 +52,7 @@ spec:
           {{- range $key, $value := .Values.server.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
+          env: {{ toYaml .Values.server.env | nindent 10 }}
           ports:
             - name: http
               containerPort: 8428

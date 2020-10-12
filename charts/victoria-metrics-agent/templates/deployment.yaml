@@ -50,6 +50,7 @@ spec:
             - -{{ $key }}={{ $value }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env: {{ toYaml .Values.env | nindent 10 }}
           ports:
             - name: http
               containerPort: 8429

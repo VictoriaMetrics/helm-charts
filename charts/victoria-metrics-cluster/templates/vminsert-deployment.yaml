@@ -47,6 +47,7 @@ spec:
           {{- range $key, $value := .Values.vminsert.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
+          env: {{ toYaml .Values.vminsert.env | nindent 10 }}
           ports:
             - name: http
               containerPort: 8480
