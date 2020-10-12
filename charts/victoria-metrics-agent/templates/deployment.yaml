@@ -93,7 +93,12 @@ spec:
     {{- end }}
       volumes:
         - name: tmpdata
+      {{- if and .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "chart.fullname" .) }}
+      {{- else }}
           emptyDir: {}
+      {{- end }}
         - name: config
           configMap:
             name: {{ include "chart.configname" .}}
