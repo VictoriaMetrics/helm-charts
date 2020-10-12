@@ -42,6 +42,7 @@ spec:
           workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -promscrape.config=/config/scrape.yml
+            - -remoteWrite.tmpDataPath=/tmpData
           {{- range $key, $value := .Values.remoteWriteUrls }}
             - -remoteWrite.url={{ $value }}
           {{- end }}
@@ -65,8 +66,16 @@ spec:
             periodSeconds: 15
             timeoutSeconds: 5
           volumeMounts:
+            - name: tmpdata
+              mountPath: /tmpData
             - name: config
               mountPath: /config
+          {{- range .Values.extraHostPathMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -82,6 +91,13 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       volumes:
+        - name: tmpdata
+          emptyDir: {}
         - name: config
           configMap:
             name: {{ include "chart.configname" .}}
+      {{- range .Values.extraHostPathMounts }}
+        - name: {{ .name }}
+          hostPath:
+            path: {{ .hostPath }}
+      {{- end }}
