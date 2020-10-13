@@ -1,6 +1,3 @@
-{{- if eq (len .Values.remoteWriteUrls) 0 -}}
-{{- fail "at least one item in `.remoteWriteUrls` must be set " -}}
-{{- end -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -53,6 +50,9 @@ spec:
           ports:
             - name: http
               containerPort: 8429
+          {{- with .Values.env }}
+          env: {{ toYaml . | nindent 10 }}
+          {{- end }}
           readinessProbe:
             httpGet:
               path: /health
@@ -92,7 +92,12 @@ spec:
     {{- end }}
       volumes:
         - name: tmpdata
+      {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "chart.fullname" .) }}
+      {{- else }}
           emptyDir: {}
+      {{- end }}
         - name: config
           configMap:
             name: {{ include "chart.configname" .}}

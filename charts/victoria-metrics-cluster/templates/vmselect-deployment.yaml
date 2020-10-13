@@ -48,6 +48,9 @@ spec:
           {{- range $key, $value := .Values.vmselect.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
+          {{- with .Values.vmselect.env }}
+          env: {{ toYaml . | nindent 10 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8481

@@ -41,7 +41,10 @@ server:
   retentionPeriod: 1
   ## Additional server container arguments
   ##
-  extraArgs: {}
+  extraArgs:
+    envflag.enable: "true"
+    envflag.prefix: VM_
+    loggerFormat: json
   ## Node tolerations for server scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
@@ -59,6 +62,10 @@ server:
   ## Pod affinity
   ##
   affinity: {}
+
+  ### Env variables
+  #
+  env: []
 
   ## Use an alternate scheduler, e.g. "stork".
   ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/

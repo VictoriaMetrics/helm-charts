@@ -45,11 +45,24 @@ remoteWriteUrls: []
 #   - http://prometheus:8480/insert/0/prometheus
 
 extraArgs:
-  {}
+  envflag.enable: "true"
+  envflag.prefix: VM_
+  loggerFormat: json
   # promscrape.maxScrapeSize: "167772160"
 
+### additional environment variables (ex.: secret tokens)
+# https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
+env:
+  []
+  # - name: VM_remoteWrite_basicAuth_password
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: auth_secret
+  #       key: password
+
 # Additional hostPath mounts
-extraHostPathMounts: []
+extraHostPathMounts:
+  []
   # - name: certs-dir
   #   mountPath: /etc/kubernetes/certs
   #   subPath: ""
@@ -126,6 +139,16 @@ affinity: {}
 # use existing configmap if specified
 # otherwise .config values will be used
 configMap: ""
+
+persistence:
+  enabled: false
+  # storageClassName: default
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+  extraLabels: {}
+  existingClaim: ""
 
 config:
   global:

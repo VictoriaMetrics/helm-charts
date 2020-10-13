@@ -35,9 +35,13 @@ vmselect:
   ## If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs
   suppresStorageFQDNsRender: false
   automountServiceAccountToken: true
-  extraArgs: {}
+  extraArgs:
+    envflag.enable: "true"
+    envflag.prefix: VM_
+    loggerFormat: json
   annotations: {}
   extraLabels: {}
+  env: []
 
   ## See `kubectl explain poddisruptionbudget.spec` for more
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
@@ -152,9 +156,13 @@ vminsert:
     pullPolicy: IfNotPresent
   priorityClassName: ""
   fullnameOverride: ""
-  extraArgs: {}
+  extraArgs:
+    envflag.enable: "true"
+    envflag.prefix: VM_
+    loggerFormat: json
   annotations: {}
   extraLabels: {}
+  env: []
   ## If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs
   suppresStorageFQDNsRender: false
   automountServiceAccountToken: true
@@ -236,12 +244,16 @@ vmstorage:
   priorityClassName: ""
   fullnameOverride:
   automountServiceAccountToken: true
+  env: []
   ## Data retention period in month
   ##
   retentionPeriod: 1
   ## Additional vmstorage container arguments
   ##
-  extraArgs: {}
+  extraArgs:
+    envflag.enable: "true"
+    envflag.prefix: VM_
+    loggerFormat: json
 
   ## See `kubectl explain poddisruptionbudget.spec` for more
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/

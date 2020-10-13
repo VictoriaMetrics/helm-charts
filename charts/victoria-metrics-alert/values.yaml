@@ -40,6 +40,14 @@ server:
     # maxUnavailable: 1
     labels: {}
 
+  env:
+    []
+    # - name: VM_remoteWrite_basicAuth_password
+    #   valueFrom:
+    #     secretKeyRef:
+    #       name: auth_secret
+    #       key: password
+
   replicaCount: 1
   # vmalert reads metrics from source, next section represents its configuration. It can be any service which supports
   # MetricsQL or PromQL.
@@ -59,7 +67,10 @@ server:
     alertmanager:
       url: ""
 
-  extraArgs: {}
+  extraArgs:
+    envflag.enable: "true"
+    envflag.prefix: VM_
+    loggerFormat: json
 
   service:
     annotations: {}
