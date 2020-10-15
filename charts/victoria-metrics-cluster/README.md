@@ -101,7 +101,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vminsert.ingress.annotations`    | Ingress annotations       | `{}`                                                     |
 | `vminsert.ingress.hosts`         | Array of host objects          | `[]`                                                     |
 | `vminsert.ingress.tls`              | Array of TLS objects              | `[]`                                          |
-| `vminsert.serviceMonitor.enabled` | Enable deployment of Service Monitor for vminsert component. This is Prometheus operatior object      | `false`     |
+| `vminsert.serviceMonitor.enabled` | Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object      | `false`     |
 | `vminsert.serviceMonitor.namespace` | Target namespace of ServiceMonitor manifest |  |
 | `vminsert.serviceMonitor.extraLabels`  | Service Monitor labels        | `{}`                                                    |
 | `vminsert.serviceMonitor.annotations`       | Service Monitor annotations | `{}`                                    |
