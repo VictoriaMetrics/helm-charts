@@ -26,6 +26,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+          {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value }}
+          {{- end }}
             - name: WATCH_NAMESPACE
               value: ""
             - name: POD_NAME
