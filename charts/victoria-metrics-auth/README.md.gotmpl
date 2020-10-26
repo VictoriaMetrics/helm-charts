@@ -1,0 +1,99 @@
+# Helm Chart For Victoria Metrics Auth.
+
+{{ template "chart.typeBadge" . }} {{ template "chart.versionBadge" . }}
+
+{{ template "chart.description" . }}
+
+# Prerequisites
+
+* Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
+
+# How to install
+
+Access a Kubernetes cluster.
+
+Add a chart helm repository with follow commands:
+
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
+
+helm repo update
+```
+
+List versions of ``vm/victoria-metrics-auth`` chart available to installation:
+
+##### for helm v3
+
+```console
+helm search repo vm/victoria-metrics-auth -l
+```
+
+Export default values of ``victoria-metrics-auth`` chart to file ``values.yaml``:
+
+```console
+helm show values vm/victoria-metrics-auth > values.yaml
+```
+
+Change the values according to the need of the environment in ``values.yaml`` file.
+
+Test the installation with command:
+
+```console
+helm install vmauth vm/victoria-metrics-auth -f values.yaml -n NAMESPACE --debug --dry-run
+```
+
+Install chart with command:
+
+##### for helm v3
+
+```console
+helm install vmauth vm/victoria-metrics-auth -f values.yaml -n NAMESPACE
+```
+
+Get the pods lists by running this commands:
+
+```console
+kubectl get pods -A | grep 'vmauth'
+```
+
+Get the application by running this command:
+
+```console
+helm list -f vmauth -n NAMESPACE
+```
+
+See the history of versions of ``vmauth`` application with command.
+
+```console
+helm history vmauth -n NAMESPACE
+```
+
+# How to uninstall
+
+Remove application with command.
+
+```console
+helm uninstall vmauth -n NAMESPACE
+```
+
+# Documentation of Helm Chart
+
+Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
+
+Generate docs with ``helm-docs`` command.
+
+```bash
+cd charts/victoria-metrics-auth
+
+helm-docs
+```
+
+The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+
+# Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-metrics-auth/values.yaml`` file.
+
+{{ template "chart.valuesTable" . }}

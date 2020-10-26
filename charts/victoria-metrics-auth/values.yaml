@@ -1,0 +1,198 @@
+# Default values for victoria-metrics-auth.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: victoriametrics/vmauth
+  tag: v1.44.0-cluster
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+containerWorkingDir: "/"
+
+rbac:
+  create: true
+  pspEnabled: true
+  annotations: {}
+  extraLabels: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+## See `kubectl explain poddisruptionbudget.spec` for more
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+podDisruptionBudget:
+  enabled: false
+  # minAvailable: 1
+  # maxUnavailable: 1
+  labels: {}
+
+# WARN: need to specify at least one remote write url
+remoteWriteUrls: []
+# remoteWriteUrls:
+#   - http://vm-insert:8480/insert/0/prometheus
+#   - http://prometheus:8480/insert/0/prometheus
+
+extraArgs:
+  envflag.enable: "true"
+  envflag.prefix: VM_
+  loggerFormat: json
+  # promscrape.maxScrapeSize: "167772160"
+
+### additional environment variables (ex.: secret tokens)
+# https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
+env: []
+
+# Additional hostPath mounts
+extraHostPathMounts: []
+  # - name: certs-dir
+  #   mountPath: /etc/kubernetes/certs
+  #   subPath: ""
+  #   hostPath: /etc/kubernetes/certs
+  #   readOnly: true
+
+# Extra Volumes for the pod
+extraVolumes: []
+  # - name: example
+  #   configMap:
+  #     name: example
+
+# Extra Volume Mounts for the container
+extraVolumeMounts: []
+  # - name: example
+  #   mountPath: /example
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+service:
+  enabled: true
+  annotations: {}
+  extraLabels: {}
+  clusterIP: ""
+  ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+  ##
+  externalIPs: []
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  servicePort: 8427
+  type: ClusterIP
+ingress:
+  enabled: false
+  annotations: {}
+  #   kubernetes.io/ingress.class: nginx
+  #   kubernetes.io/tls-acme: 'true'
+
+  extraLabels: {}
+  hosts: []
+  #   - name: vmauth.local
+  #     path: /
+  #     port: http
+  tls: []
+  #   - secretName: vmauth-ingress-tls
+  #     hosts:
+  #       - vmauth.local
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# Annotations to be added to the deployment
+annotations: {}
+
+# Annotations to be added to pod
+podAnnotations: {}
+
+## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+##
+tolerations: []
+  # - key: "key"
+  #   operator: "Equal|Exists"
+  #   value: "value"
+  #   effect: "NoSchedule|PreferNoSchedule"
+
+affinity: {}
+
+serviceMonitor:
+  enabled: false
+  extraLabels: {}
+  annotations: {}
+#    interval: 15s
+#    scrapeTimeout: 5s
+
+persistence:
+  enabled: false
+  # storageClassName: default
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+  extraLabels: {}
+  existingClaim: ""
+
+# vmauth configuration:
+# https://victoriametrics.github.io/vmauth.html
+
+# use existing configmap if specified
+# otherwise .config values will be used
+configMap: ""
+
+config:
+  # Arbitrary number of usernames may be put here.
+  # Usernames must be unique.
+  users:
+    # The user for querying local single-node VictoriaMetrics.
+    # All the requests to http://vmauth:8427 with the given Basic Auth (username:password)
+    # will be routed to http://localhost:8428 .
+    # For example, http://vmauth:8427/api/v1/query is routed to http://localhost:8428/api/v1/query
+  - username: "local-single-node"
+    password: "***"
+    url_prefix: "http://localhost:8428"
+
+    # The user for querying account 123 in VictoriaMetrics cluster
+    # See https://github.com/VictoriaMetrics/VictoriaMetrics/blob/cluster/README.md#url-format
+    # All the requests to http://vmauth:8427 with the given Basic Auth (username:password)
+    # will be routed to http://vmselect:8481/select/123/prometheus .
+    # For example, http://vmauth:8427/api/v1/query is routed to http://vmselect:8481/select/123/prometheus/api/v1/select
+  - username: "cluster-select-account-123"
+    password: "***"
+    url_prefix: "http://vmselect:8481/select/123/prometheus"
+
+    # The user for inserting Prometheus data into VictoriaMetrics cluster under account 42
+    # See https://github.com/VictoriaMetrics/VictoriaMetrics/blob/cluster/README.md#url-format
+    # All the reuqests to http://vmauth:8427 with the given Basic Auth (username:password)
+    # will be routed to http://vminsert:8480/insert/42/prometheus .
+    # For example, http://vmauth:8427/api/v1/write is routed to http://vminsert:8480/insert/42/prometheus/api/v1/write
+  - username: "cluster-insert-account-42"
+    password: "***"
+    url_prefix: "http://vminsert:8480/insert/42/prometheus"

@@ -5,7 +5,8 @@ lint:
 	@helm lint charts/victoria-metrics-cluster &&\
 	helm lint charts/victoria-metrics-single &&\
 	helm lint charts/victoria-metrics-agent -f hack/vmagent-lint-hack.yaml && \
-	helm lint charts/victoria-metrics-alert -f hack/vmalert-lint-hack.yaml
+	helm lint charts/victoria-metrics-alert -f hack/vmalert-lint-hack.yaml && \
+	helm lint charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml
 
 # Package chart into zip file
 package:
