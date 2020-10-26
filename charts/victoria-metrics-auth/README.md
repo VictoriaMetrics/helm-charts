@@ -98,30 +98,22 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
-| annotations | object | `{}` |  |
-| config.users[0].password | string | `"***"` |  |
-| config.users[0].url_prefix | string | `"http://localhost:8428"` |  |
-| config.users[0].username | string | `"local-single-node"` |  |
-| config.users[1].password | string | `"***"` |  |
-| config.users[1].url_prefix | string | `"http://vmselect:8481/select/123/prometheus"` |  |
-| config.users[1].username | string | `"cluster-select-account-123"` |  |
-| config.users[2].password | string | `"***"` |  |
-| config.users[2].url_prefix | string | `"http://vminsert:8480/insert/42/prometheus"` |  |
-| config.users[2].username | string | `"cluster-insert-account-42"` |  |
-| configMap | string | `""` |  |
+| affinity | object | `{}` | Affinity configurations |
+| annotations | object | `{}` | Annotations to be added to the deployment |
+| config | object | `{"users":[{"password":"***","url_prefix":"http://localhost:8428","username":"local-single-node"},{"password":"***","url_prefix":"http://vmselect:8481/select/123/prometheus","username":"cluster-select-account-123"},{"password":"***","url_prefix":"http://vminsert:8480/insert/42/prometheus","username":"cluster-insert-account-42"}]}` | Config file content. |
+| configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html |
 | containerWorkingDir | string | `"/"` |  |
-| env | list | `[]` |  |
+| env | list | `[]` | Additional environment variables (ex.: secret tokens) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | extraArgs.loggerFormat | string | `"json"` |  |
-| extraHostPathMounts | list | `[]` |  |
-| extraVolumeMounts | list | `[]` |  |
-| extraVolumes | list | `[]` |  |
+| extraHostPathMounts | list | `[]` | Additional hostPath mounts |
+| extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
+| extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"victoriametrics/vmauth"` |  |
-| image.tag | string | `"v1.44.0-cluster"` |  |
+| image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
+| image.repository | string | `"victoriametrics/vmauth"` | Victoria Metrics Auth Docker repository and image name |
+| image.tag | string | `"v1.44.0-cluster"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
@@ -129,24 +121,23 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.hosts | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
 | nameOverride | string | `""` |  |
-| nodeSelector | object | `{}` |  |
+| nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | persistence.annotations | object | `{}` |  |
 | persistence.enabled | bool | `false` |  |
 | persistence.existingClaim | string | `""` |  |
 | persistence.extraLabels | object | `{}` |  |
 | persistence.size | string | `"10Gi"` |  |
-| podAnnotations | object | `{}` |  |
-| podDisruptionBudget.enabled | bool | `false` |  |
-| podDisruptionBudget.labels | object | `{}` |  |
+| podAnnotations | object | `{}` | Annotations to be added to pod |
+| podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | podSecurityContext | object | `{}` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |
 | rbac.pspEnabled | bool | `true` |  |
-| remoteWriteUrls | list | `[]` |  |
-| replicaCount | int | `1` |  |
-| resources | object | `{}` |  |
+| remoteWriteUrls | list | `[]` | WARN: need to specify at least one remote write url |
+| replicaCount | int | `1` | Number of replicas of vmauth |
+| resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
 | securityContext | object | `{}` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
@@ -157,10 +148,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | service.loadBalancerSourceRanges | list | `[]` |  |
 | service.servicePort | int | `8427` |  |
 | service.type | string | `"ClusterIP"` |  |
-| serviceAccount.annotations | object | `{}` |  |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `nil` |  |
+| serviceAccount.name | string | `nil` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
-| tolerations | list | `[]` |  |
+| tolerations | list | `[]` | Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
