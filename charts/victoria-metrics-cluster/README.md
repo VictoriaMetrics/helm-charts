@@ -1,18 +1,17 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
 ## Prerequisites Details
+
 * [Victoria Metrics helm repository](https://github.com/VictoriaMetrics/helm-charts/#usage) is added.
 * PV support on underlying infrastructure
 
-
 ## Chart Details
+
 This chart will do the following:
 
 * Rollout victoria metrics cluster
 
 ## Installing the Chart
-
-### 
 
 To install the chart with the release name `my-release`:
 
@@ -35,10 +34,10 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.priorityClassName` | Name of Priority Class | `""`                                |
 | `vmselect.fullnameOverride`  | Overrides the full name of vmselect component  | `""`                                |
 | `vmselect.suppresStorageFQDNsRender`  | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value | `false`                                |
-| `vmselect.extraArgs`         | Extra command line arguments for vmselect component               | `{}`
+| `vmselect.extraArgs`         | Extra command line arguments for vmselect component               | `{}` |
 | `vmselect.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
-| `vmselect.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
-| `vmselect.affinity `         | Pod affinity| `{}`
+| `vmselect.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}` |
+| `vmselect.affinity`         | Pod affinity| `{}` |
 | `vmselect.podAnnotations`    | Pod's annotations     | `{}`                                                     |
 | `vmselect.replicaCount`      | Count of vmselect pods | `2`                                                       |
 | `vmselect.resources`         | Resource object    | `{}`                                                     |
@@ -47,7 +46,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.service.annotations` | Service annotations       | `{}`                                                      |
 | `vmselect.service.labels`      | Service labels            | `{}`                                                     |
 | `vmselect.service.clusterIP`   | Service ClusterIP | `""`                                                       |
-| `vmselect.service.externalIPs`  | Service External IPs. [ https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips)                     | `[]`                                                      |
+| `vmselect.service.externalIPs`  | Service External IPs. [https://kubernetes.io/docs/user-guide/services/#external-ips](https://kubernetes.io/docs/user-guide/services/#external-ips)                     | `[]`                                                      |
 | `vmselect.service.loadBalancerIP`               | Service load balacner IP             | `"`                                                     |
 | `vmselect.service.loadBalancerSourceRanges`     | Load balancer source range     | `[]`                                                     |
 | `vmselect.service.servicePort`        | Service port | `8481`                                                     |
@@ -67,7 +66,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmselect.persistentVolume.existingClaim`         | Existing Claim name        | `""`                                                       |
 | `vmselect.persistentVolume.size`     | Size of the volume. Better to set the same as resource limit memory property    | `2Gi`                          |
 | `vmselect.persistentVolume.subPath`        | Mount subpath       | `""`                                                 |
-| `vmselect.serviceMonitor.enabled` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operatior object      | `false`     |
+| `vmselect.serviceMonitor.enabled` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operator object      | `false`     |
 | `vmselect.serviceMonitor.namespace` | Target namespace of ServiceMonitor manifest |  |
 | `vmselect.serviceMonitor.extraLabels`  | Service Monitor labels        | `{}`                                                    |
 | `vmselect.serviceMonitor.annotations`       | Service Monitor annotations | `{}`                                    |
@@ -81,10 +80,10 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vminsert.priorityClassName` | Name of Priority Class | `""`                                |
 | `vminsert.fullnameOverride`  | Overrides the full name of vminsert component  | `""`                                |
 | `vmselect.suppresStorageFQDNsRender`  | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value | `false`                                |
-| `vminsert.extraArgs`         | Extra command line arguments for vminsert component               | `{}`
+| `vminsert.extraArgs`         | Extra command line arguments for vminsert component               | `{}` |
 | `vminsert.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
-| `vminsert.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
-| `vmselect.affinity `         | Pod affinity| `{}`
+| `vminsert.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}` |
+| `vmselect.affinity`         | Pod affinity | `{}` |
 | `vminsert.podAnnotations`    | Pod's annotations     | `{}`                                                     |
 | `vminsert.replicaCount`      | Count of vminsert pods | `2`                                                       |
 | `vminsert.resources`         | Resource object    | `{}`                                                     |
@@ -92,7 +91,7 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vminsert.service.annotations` | Service annotations       | `{}`                                                      |
 | `vminsert.service.labels`      | Service labels            | `{}`                                                     |
 | `vminsert.service.clusterIP`   | Service ClusterIP | `""`                                                       |
-| `vminsert.service.externalIPs`  | Service External IPs. [ https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips)                     | `[]`                                                      |
+| `vminsert.service.externalIPs`  | Service External IPs. [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips)                     | `[]`                                                      |
 | `vminsert.service.loadBalancerIP`               | Service load balancer IP             | `"`                                                     |
 | `vminsert.service.loadBalancerSourceRanges`     | Load balancer source range     | `[]`                                                     |
 | `vminsert.service.servicePort`        | Service port | `8480`                                                     |
@@ -115,10 +114,10 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmstorage.priorityClassName` | Name of Priority Class | `""`                                |
 | `vmstorage.fullnameOverride`  | Overrides the full name of vmstorage component  | `""`                                |
 | `vmstorage.retentionPeriod`   | Data retention period in month | `1`                                |
-| `vmstorage.extraArgs`         | Extra command line arguments for vmstorage component               | `{}`
+| `vmstorage.extraArgs`         | Extra command line arguments for vmstorage component               | `{}` |
 | `vmstorage.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
-| `vmstorage.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
-| `vmstorage.affinity `         | Pod affinity| `{}` |
+| `vmstorage.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}` |
+| `vmstorage.affinity`         | Pod affinity| `{}` |
 | `vmstorage.persistentVolume.enabled` | Create/use Persistent Volume Claim for vmstorage component. Empty dir if false  | `true`|
 | `vmstorage.persistentVolume.accessModes`      | Array of access modes       | `["ReadWriteOnce"]`                                                       |
 | `vmstorage.persistentVolume.annotations`      | Persistent volume annotations      | `{}`                                                       |
@@ -126,9 +125,9 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmstorage.persistentVolume.mountPath`         | Data root path        | `"/storage"`                                                       |
 | `vmstorage.persistentVolume.size`     | Size of the volume. Better to set the same as resource limit memory property    | `2Gi`                          |
 | `vmstorage.persistentVolume.subPath`        | Mount subpath       | `""`                          |
-| `vmstorage.podAnnotations`    | Pod's annotations     | `{}`   | 
+| `vmstorage.podAnnotations`    | Pod's annotations     | `{}`   |
 | `vmstorage.replicaCount`      | Count of vmstorage pods | `2`                                                       |
-| `vmstorage.podManagementPolicy `    | Deploy order policy for StatefulSet pods     | `OrderedReady`   | 
+| `vmstorage.podManagementPolicy`    | Deploy order policy for StatefulSet pods     | `OrderedReady`   |
 | `vmstorage.resources`         | Resource object    | `{}`                                                     |
 | `vmstorage.securityContext`   | Pod's security context. [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)      | `{}`                                                      |
 | `vmstorage.service.annotations` | Service annotations       | `{}`                                                      |
@@ -137,22 +136,19 @@ The following table lists the configurable parameters of the victoria metrics cl
 | `vmstorage.service.vminsertPort`| Port for accepting connections from vminsert            | `8400`                                                     |
 | `vmstorage.service.vmselectPort`      | Port for accepting connections from vmselect           | `8401`                                                     |
 | `vmstorage.terminationGracePeriodSeconds`      | Pod's termination grace period in seconds          | `60`                                                     |
-| `vmstorage.serviceMonitor.enabled` | Enable deployment of Service Monitor for vmstorage component. This is Prometheus operatior object      | `false`     |
+| `vmstorage.serviceMonitor.enabled` | Enable deployment of Service Monitor for vmstorage component. This is Prometheus operator object      | `false`     |
 | `vmstorage.serviceMonitor.namespace` | Target namespace of ServiceMonitor manifest |  |
 | `vmstorage.serviceMonitor.extraLabels`  | Service Monitor labels        | `{}`                                                    |
 | `vmstorage.serviceMonitor.annotations`       | Service Monitor annotations | `{}`                                    |
 | `vmstorage.serviceMonitor.interval`       | Commented. Prometheus scare interval for vmstorage component| `15s`                                    |
 | `vmstorage.serviceMonitor.scrapeTimeout`       | Commented. Prometheus pre-scrape timeout for vmstorage component| `5s`                                    |
 
-
-
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```console
-$ helm install -n my-release -f values.yaml vm/victoria-metrics-cluster
+helm install -n my-release -f values.yaml vm/victoria-metrics-cluster
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
-
