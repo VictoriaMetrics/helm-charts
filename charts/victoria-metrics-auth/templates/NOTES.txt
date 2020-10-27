@@ -25,14 +25,12 @@ prometheus.yml
 ```yaml
 remote_write:
   - url: "http://<insert-service>/insert/0/prometheus/"
-
 ```
 
 for e.g. inside the kubernetes cluster:
 ```yaml
 remote_write:
   - url: "http://{{ template "chart.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.servicePort }}/insert/0/prometheus/"
-
 ```
 
 Read API:
