@@ -46,7 +46,7 @@ spec:
           securityContext:
             {{- toYaml .Values.vmstorage.podSecurityContext | nindent 12 }}
           args:
-            - {{ printf "%s=%d" "--retentionPeriod" (int .Values.vmstorage.retentionPeriod) | quote}}
+            - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.vmstorage.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
           {{- range $key, $value := .Values.vmstorage.extraArgs }}
             - --{{ $key }}={{ $value }}
