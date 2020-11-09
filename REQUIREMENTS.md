@@ -72,7 +72,7 @@ https://github.com/peelmicro/learn-devops-the-complete-kubernetes-course
 Run the following commands to install ``helm-docs``.
 
 ```bash
-HELM_DOCS_VERSION=0.15.0
+HELM_DOCS_VERSION=1.4.0
 HELM_DOCS_PACKAGE=helm-docs_``$HELM_DOCS_VERSION``_linux_x86_64.tar.gz
 
 cd /tmp

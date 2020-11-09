@@ -2,15 +2,15 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# replicaCount -- Number of replicas of vmauth
+# -- Number of replicas of vmauth
 replicaCount: 1
 
 image:
-  # image.repository -- Victoria Metrics Auth Docker repository and image name
+  # -- Victoria Metrics Auth Docker repository and image name
   repository: victoriametrics/vmauth
-  # image.tag -- Tag of Docker image
+  # -- Tag of Docker image
   tag: v1.46.0-cluster
-  # image.pullPolicy -- Pull policy of Docker image
+  # -- Pull policy of Docker image
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -27,21 +27,21 @@ rbac:
 
 
 serviceAccount:
-  # serviceAccount.create - Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # serviceAccount.annotations -- Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # serviceAccount.name -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name:
 
-# podDisruptionBudget -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+# -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
 podDisruptionBudget:
   enabled: false
   # minAvailable: 1
   # maxUnavailable: 1
   labels: {}
 
-# remoteWriteUrls -- WARN: need to specify at least one remote write url
+# -- WARN: need to specify at least one remote write url
 remoteWriteUrls: []
 # remoteWriteUrls:
 #   - http://vm-insert:8480/insert/0/prometheus
@@ -53,10 +53,10 @@ extraArgs:
   loggerFormat: json
   # promscrape.maxScrapeSize: "167772160"
 
-# env -- Additional environment variables (ex.: secret tokens) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
+# -- Additional environment variables (ex.: secret tokens) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
 env: []
 
-# extraHostPathMounts -- Additional hostPath mounts
+# -- Additional hostPath mounts
 extraHostPathMounts: []
   # - name: certs-dir
   #   mountPath: /etc/kubernetes/certs
@@ -64,13 +64,13 @@ extraHostPathMounts: []
   #   hostPath: /etc/kubernetes/certs
   #   readOnly: true
 
-# extraVolumes -- Extra Volumes for the pod
+# -- Extra Volumes for the pod
 extraVolumes: []
   # - name: example
   #   configMap:
   #     name: example
 
-# extraVolumeMounts -- Extra Volume Mounts for the container
+# -- Extra Volume Mounts for the container
 extraVolumeMounts: []
   # - name: example
   #   mountPath: /example
@@ -114,7 +114,7 @@ ingress:
   #     hosts:
   #       - vmauth.local
 
-# resources -- We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# -- We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'.
 resources: {}
   # limits:
   #   cpu: 100m
@@ -123,23 +123,23 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-# annotations -- Annotations to be added to the deployment
+# -- Annotations to be added to the deployment
 annotations: {}
 
-# podAnnotations -- Annotations to be added to pod
+# -- Annotations to be added to pod
 podAnnotations: {}
 
-# nodeSelector -- NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+# -- NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/
 nodeSelector: {}
 
-# tolerations -- Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+# -- Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
 tolerations: []
   # - key: "key"
   #   operator: "Equal|Exists"
   #   value: "value"
   #   effect: "NoSchedule|PreferNoSchedule"
 
-# affinity -- Affinity configurations
+# -- Affinity configurations
 affinity: {}
 
 serviceMonitor:
@@ -159,10 +159,10 @@ persistence:
   extraLabels: {}
   existingClaim: ""
 
-# configMap -- Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html
+# -- Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html
 configMap: ""
 
-# config -- Config file content.
+# -- Config file content.
 config:
   # Arbitrary number of usernames may be put here.
   # Usernames must be unique.
