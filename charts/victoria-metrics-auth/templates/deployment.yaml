@@ -19,7 +19,7 @@ spec:
       labels:
         {{- include "chart.selectorLabels" . | nindent 8 }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         {{- range $key, $value := .Values.podAnnotations }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
@@ -90,7 +90,7 @@ spec:
       volumes:
         - name: config
           secret:
-            secretName: {{ include "chart.configname" .}}
+            secretName: {{ include "chart.fullname" .}}
       {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
