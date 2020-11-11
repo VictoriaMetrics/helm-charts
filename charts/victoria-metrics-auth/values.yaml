@@ -41,12 +41,6 @@ podDisruptionBudget:
   # maxUnavailable: 1
   labels: {}
 
-# -- WARN: need to specify at least one remote write url
-remoteWriteUrls: []
-# remoteWriteUrls:
-#   - http://vm-insert:8480/insert/0/prometheus
-#   - http://prometheus:8480/insert/0/prometheus
-
 extraArgs:
   envflag.enable: "true"
   envflag.prefix: VM_
@@ -148,16 +142,6 @@ serviceMonitor:
   annotations: {}
 #    interval: 15s
 #    scrapeTimeout: 5s
-
-persistence:
-  enabled: false
-  # storageClassName: default
-  accessModes:
-    - ReadWriteOnce
-  size: 10Gi
-  annotations: {}
-  extraLabels: {}
-  existingClaim: ""
 
 # -- Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html
 configMap: ""

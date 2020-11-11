@@ -39,9 +39,6 @@ spec:
           workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -auth.config=/config/auth.yml
-          {{- range $key, $value := .Values.remoteWriteUrls }}
-            - -remoteWrite.url={{ $value }}
-          {{- end }}
           {{- range $key, $value := .Values.extraArgs }}
             - -{{ $key }}={{ $value }}
           {{- end }}
@@ -65,8 +62,6 @@ spec:
             periodSeconds: 15
             timeoutSeconds: 5
           volumeMounts:
-            - name: tmpdata
-              mountPath: /tmpData
             - name: config
               mountPath: /config
           {{- range .Values.extraHostPathMounts }}
@@ -93,16 +88,11 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       volumes:
-        - name: tmpdata
-      {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "chart.fullname" .) }}
-      {{- else }}
-          emptyDir: {}
-      {{- end }}
         - name: config
-          configMap:
-            name: {{ include "chart.configname" .}}
+#          configMap:
+          secret:
+            secretName: {{ include "chart.configname" .}}
+            #path: auth.yml
       {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
