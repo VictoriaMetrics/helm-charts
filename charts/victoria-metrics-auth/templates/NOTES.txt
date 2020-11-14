@@ -1,0 +1,52 @@
+Write API:
+
+The Victoria Metrics Auth can be accessed via port {{ .Values.service.servicePort }} on the following DNS name from within your cluster:
+{{ template "chart.fullname" . }}
+
+Get the Victoria Metrics Auth service URL by running these commands in the same shell:
+{{- if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "chart.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        You can watch the status of by running 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "chart.fullname" . }}'
+
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "chart.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP:{{ .Values.service.servicePort }}
+{{- else if contains "ClusterIP"  .Values.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.service.servicePort }}
+{{- end }}
+
+You need to update your prometheus configuration file and add next lines into it:
+
+prometheus.yml
+```yaml
+remote_write:
+  - url: "http://<insert-service>/insert/0/prometheus/"
+```
+
+for e.g. inside the kubernetes cluster:
+```yaml
+remote_write:
+  - url: "http://{{ template "chart.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.servicePort }}/insert/0/prometheus/"
+```
+
+Read API:
+
+You need to update specify select service URL in your Grafana:
+ NOTE: you need to use Prometheus Data Source
+
+Input for URL field in Grafana
+
+```
+http://<select-service>:{{ .Values.service.servicePort }}/select/0/prometheus/
+```
+
+for e.g. inside the kubernetes cluster:
+```
+http://{{ template "chart.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.servicePort }}/select/0/prometheus/"
+```
+
+
