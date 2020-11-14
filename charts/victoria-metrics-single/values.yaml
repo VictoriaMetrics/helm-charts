@@ -10,44 +10,47 @@ rbac:
   # annotations: {}
 
 serviceAccount:
+  # -- Create service account.
   create: true
   # name:
   extraLabels: {}
   # annotations: {}
-  # mount API token to pod directly
+  # -- Mount API token to pod directly
   automountToken: true
 
 automountServiceAccountToken: true
 
-## See `kubectl explain poddisruptionbudget.spec` for more
-## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
 podDisruptionBudget:
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   enabled: false
   #  minAvailable: 1
   #  maxUnavailable: 1
   extraLabels: {}
 
 server:
+  # -- Enable deployment of server component. Deployed as StatefulSet
   enabled: true
+  # -- Server container name
   name: server
   image:
+    # -- Image repository
     repository: victoriametrics/victoria-metrics
+    # -- Image tag
     tag: v1.46.0
+    # -- Image pull policy
     pullPolicy: IfNotPresent
+  # -- Name of Priority Class
   priorityClassName: ""
+  # -- Overrides the full name of server component
   fullnameOverride:
-  ## Data retention period in month
-  ##
+  # -- Data retention period in month
   retentionPeriod: 1
-  ## Additional server container arguments
-  ##
+  # Extra command line arguments for container of component
   extraArgs:
     envflag.enable: "true"
     envflag.prefix: VM_
     loggerFormat: json
-  ## Node tolerations for server scheduling to nodes with taints
-  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  ##
+  # -- Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
   tolerations:
     []
     # - key: "key"
@@ -55,16 +58,13 @@ server:
     #   value: "value"
     #   effect: "NoSchedule|PreferNoSchedule"
 
-  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
+  # -- Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
-  ## Pod affinity
-  ##
+  # -- Pod affinity
   affinity: {}
 
-  ### Env variables
-  #
+  # -- Env variables
   env: []
 
   ## Use an alternate scheduler, e.g. "stork".
@@ -73,36 +73,34 @@ server:
   # schedulerName:
 
   persistentVolume:
-    ## If true,  server will create/use a Persistent Volume Claim
-    ## If false, use emptyDir
-    ##
+    # -- Create/use Persistent Volume Claim for server component. Empty dir if false
     enabled: true
 
-    ## Must match those of existing PV or dynamic provisioner
-    ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
-    ##
+    # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/)
     accessModes:
       - ReadWriteOnce
+    # -- Persistant volume annotations
     annotations: {}
 
-    ## Requires server.persistentVolume.enabled: true
-    ## If defined, PVC created automatically
+    # -- StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically
     storageClass: ""
 
-    ## If defined, PVC must be created manually before volume will be bound
+    # -- Existing Claim name. If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
 
-    ## Server data Persistent Volume mount root path
-    ##
+    # -- Mount path. Server data Persistent Volume mount root path.
     mountPath: /storage
+    # -- Mount subpath
     subPath: ""
+    # -- Size of the volume. Better to set the same as resource limit memory property.
     size: 16Gi
 
+  # -- Pod's annotations
   podAnnotations: {}
+  # -- Pod's management policy 
   podManagementPolicy: OrderedReady
 
-  ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
-  ##
+  # -- Resource object. Ref: [http://kubernetes.io/docs/user-guide/compute-resources/](http://kubernetes.io/docs/user-guide/compute-resources/
   resources:
     {}
     # limits:
@@ -112,10 +110,7 @@ server:
     #   cpu: 500m
     #   memory: 512Mi
 
-  # readinessProbe: Indicates whether the Container is ready to service requests.
-  # If the readiness probe fails, the endpoints controller removes the Podâ€™s IP address from the endpoints
-  # of all Services that match the Pod. The default state of readiness before the initial delay is Failure.
-  # If a Container does not provide a readiness probe, the default state is Success.
+  # Indicates whether the Container is ready to service requests. If the readiness probe fails, the endpoints controller removes the Pod's IP address from the endpoints of all Services that match the Pod. The default state of readiness before the initial delay is Failure. If a Container does not provide a readiness probe, the default state is Success.
   readinessProbe:
     httpGet:
       path: /health
@@ -124,9 +119,7 @@ server:
     periodSeconds: 15
     timeoutSeconds: 5
 
-  # livenessProbe: Indicates whether the Container is running. If the liveness
-  # probe fails, the kubelet kills the Container, and the Container is subjected
-  # to its restart policy. If a Container does not provide a liveness probe, the default state is Success.
+  # Indicates whether the Container is running. If the liveness probe fails, the kubelet kills the Container, and the Container is subjected to its restart policy. If a Container does not provide a liveness probe, the default state is Success.
   livenessProbe:
     tcpSocket:
       port: http
@@ -134,50 +127,72 @@ server:
     periodSeconds: 15
     timeoutSeconds: 5
 
-  ## Security context to be added to server pods
-  ##
+  # -- Security context to be added to server pods
   securityContext: {}
+  # -- Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext: {}
   ingress:
+    # -- Enable deployment of ingress for server component
     enabled: false
+    # -- Ingress annotations
     annotations: {}
     #   kubernetes.io/ingress.class: nginx
     #   kubernetes.io/tls-acme: 'true'
 
+    # -- Ingress extra labels
     extraLabels: {}
+    # -- Array of host objects
     hosts: []
     #   - name: vmselect.local
     #     path: /select
     #     port: http
 
+    # -- Array of TLS objects
     tls: []
     #   - secretName: vmselect-ingress-tls
     #     hosts:
     #       - vmselect.local
+
   service:
+    # -- Service annotations
     annotations: {}
+    # -- Service labels
     labels: {}
+    # -- Service ClusterIP
     clusterIP: ""
-    ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
-    ##
+    # -- Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
+    # -- Service load balacner IP
     loadBalancerIP: ""
+    # -- Load balancer source range
     loadBalancerSourceRanges: []
+    # -- Service port
     servicePort: 8428
+    # -- Service type
     type: ClusterIP
   statefulSet:
-    ## Creates statefulset instead of deployment, useful when you want to keep the cache
+    # -- Creates statefulset instead of deployment, useful when you want to keep the cache
     enabled: true
+    # -- Deploy order policy for StatefulSet pods
     podManagementPolicy: OrderedReady
-    ## Headless service for statefulset
+    # Headless service for statefulset
     service:
+      # -- Headless service annotations
       annotations: {}
+      # -- Headless service labels
       labels: {}
+      # -- Headless service port
       servicePort: 8428
+  # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60
   serviceMonitor:
+    # -- Enable deployment of Service Monitor for server component. This is Prometheus operator object
     enabled: false
+    # -- Service Monitor labels
     extraLabels: {}
+    # -- Service Monitor annotations
     annotations: {}
+    # -- Commented. Prometheus scare interval for server component
 #    interval: 15s
+    # -- Commented. Prometheus pre-scrape timeout for server component
 #    scrapeTimeout: 5s
