@@ -8,6 +8,14 @@ Victoria Metrics Operator
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
 
+* PV support on underlying infrastructure.
+
+# Chart Details
+
+This chart will do the following:
+
+* Rollout victoria metrics operator
+
 # How to install
 
 Access a Kubernetes cluster.
