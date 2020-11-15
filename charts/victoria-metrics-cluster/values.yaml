@@ -2,9 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-## Tour k8s cluster domain suffix, uses for pods' FQDN
-## Ref: https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/
-##
+# -- k8s cluster domain suffix, uses for building stroage pods' FQDN. Ref: [https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
 clusterDomainSuffix: cluster.local
 printNotes: true
 
@@ -24,17 +22,25 @@ serviceAccount:
   automountToken: true
 
 vmselect:
+  # -- Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet
   enabled: true
+  # -- Vmselect container name
   name: vmselect
   image:
+    # -- Image repository
     repository: victoriametrics/vmselect
+    # -- Image tag
     tag: v1.46.0-cluster
+    # -- Image pull policy
     pullPolicy: IfNotPresent
+  # -- Name of Priority Class
   priorityClassName: ""
+  # -- Overrides the full name of vmselect component
   fullnameOverride: ""
-  ## If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs
+  # -- Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs
   suppresStorageFQDNsRender: false
   automountServiceAccountToken: true
+  # Extra command line arguments for vmselect component
   extraArgs:
     envflag.enable: "true"
     envflag.prefix: VM_
@@ -43,34 +49,30 @@ vmselect:
   extraLabels: {}
   env: []
 
-  ## See `kubectl explain poddisruptionbudget.spec` for more
-  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   podDisruptionBudget:
+    # -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
     enabled: false
     # minAvailable: 1
     # maxUnavailable: 1
     labels: {}
 
-  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  ##
-  tolerations:
-    []
+  # -- Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+  tolerations: []
     # - key: "key"
     #   operator: "Equal|Exists"
     #   value: "value"
     #   effect: "NoSchedule|PreferNoSchedule"
 
-  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
-  nodeSelector:
-    {}
-    ## Pod affinity
-    ##
+  # -- Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)
+  nodeSelector: {}
+  # -- Pod affinity
   affinity: {}
+  # -- Pod's annotations
   podAnnotations: {}
+  # -- Count of vmselect pods
   replicaCount: 2
-  resources:
-    {}
+  # -- Resource object
+  resources: {}
     # limits:
     #   cpu: 50m
     #   memory: 64Mi
@@ -78,84 +80,110 @@ vmselect:
     #   cpu: 50m
     #   memory: 64Mi
 
-  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  # -- Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   securityContext: {}
   podSecurityContext: {}
-  ## Root folder for cache
-  ##
+  # -- Cache root folder
   cacheMountPath: /cache
   service:
+    # -- Service annotations
     annotations: {}
+    # -- Service labels
     labels: {}
+    # -- Service ClusterIP
     clusterIP: ""
-    ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
-    ##
+    # -- Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips](https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
+    # -- Service load balacner IP
     loadBalancerIP: ""
+    # -- Load balancer source range
     loadBalancerSourceRanges: []
+    # -- Service port
     servicePort: 8481
+    # -- Service type
     type: ClusterIP
   ingress:
+    # -- Enable deployment of ingress for vmselect component
     enabled: false
+    # -- Ingress annotations
     annotations: {}
     #   kubernetes.io/ingress.class: nginx
     #   kubernetes.io/tls-acme: 'true'
 
     extraLabels: {}
+    # -- Array of host objects
     hosts: []
     #   - name: vmselect.local
     #     path: /select
     #    port: http
+    # -- Array of TLS objects
     tls: []
     #   - secretName: vmselect-ingress-tls
     #     hosts:
     #       - vmselect.local
   statefulSet:
-    ## Creates statefulset instead of deployment, useful when you want to keep the cache
+    # -- Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data. Creates statefulset instead of deployment, useful when you want to keep the cache
     enabled: false
+    # -- Deploy order policy for StatefulSet pods
     podManagementPolicy: OrderedReady
     ## Headless service for statefulset
     service:
+      # -- Headless service annotations
       annotations: {}
+      # -- Headless service labels
       labels: {}
+      # -- Headless service port
       servicePort: 8481
   persistentVolume:
-    ## If true, vmselect will create/use a Persistent Volume Claim
-    ## If false, use emptyDir
-    ##
+    # -- Create/use Persistent Volume Claim for vmselect component. Empty dir if false. If true, vmselect will create/use a Persistent Volume Claim
     enabled: false
 
-    ## Must match those of existing PV or dynamic provisioner
-    ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
-    ##
+    # -- Array of access mode. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/)
     accessModes:
       - ReadWriteOnce
+    # -- Persistent volume annotations
     annotations: {}
 
-    ## Requires vmselect.persistentVolume.enabled: true
-    ## If defined, PVC must be created manually before volume will be bound
+    # -- Existing Claim name. Requires vmselect.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
 
     ## Vmselect data Persistent Volume mount root path
     ##
+    # -- Size of the volume. Better to set the same as resource limit memory property
     size: 2Gi
+    # -- Mount subpath
     subPath: ""
   serviceMonitor:
+    # -- Enable deployment of Service Monitor for vmselect component. This is Prometheus operator object
     enabled: false
+    # -- Target namespace of ServiceMonitor manifest
+    namespace: ""
+    # -- Service Monitor labels
     extraLabels: {}
+    # -- Service Monitor annotations
     annotations: {}
+    # Commented. Prometheus scare interval for vmselect component
 #    interval: 15s
+    # Commented. Prometheus pre-scrape timeout for vmselect component
 #    scrapeTimeout: 5s
 
 vminsert:
+  # -- Enable deployment of vminsert component. Deployment is used
   enabled: true
+  # -- vminsert container name
   name: vminsert
   image:
+    # -- Image repository
     repository: victoriametrics/vminsert
+    # -- Image tag
     tag: v1.46.0-cluster
+    # -- Image pull policy
     pullPolicy: IfNotPresent
+  # -- Name of Priority Class
   priorityClassName: ""
+  # -- Overrides the full name of vminsert component
   fullnameOverride: ""
+  # Extra command line arguments for vminsert component
   extraArgs:
     envflag.enable: "true"
     envflag.prefix: VM_
@@ -163,108 +191,126 @@ vminsert:
   annotations: {}
   extraLabels: {}
   env: []
-  ## If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs
+  # -- Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs
   suppresStorageFQDNsRender: false
   automountServiceAccountToken: true
 
-  ## See `kubectl explain poddisruptionbudget.spec` for more
-  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   podDisruptionBudget:
+    # -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
     enabled: false
     # minAvailable: 1
     # maxUnavailable: 1
     labels: {}
 
-  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  ##
-  tolerations:
-    []
+  # -- Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+  tolerations: []
     # - key: "key"
     #   operator: "Equal|Exists"
     #   value: "value"
     #   effect: "NoSchedule|PreferNoSchedule"
 
-  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
+  # -- Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
-  ## Pod affinity
-  ##
+  # -- Pod affinity
   affinity: {}
+  # -- Pod's annotations
   podAnnotations: {}
+  # -- Count of vminsert pods
   replicaCount: 2
-  resources:
-    {}
+  # -- Resource object
+  resources: {}
     # limits:
     #   cpu: 50m
     #   memory: 64Mi
     # requests:
     #   cpu: 50m
     #   memory: 64Mi
+  # -- Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   securityContext: {}
   podSecurityContext: {}
   service:
+    # -- Service annotations
     annotations: {}
+    # -- Service labels
     labels: {}
+    # -- Service ClusterIP
     clusterIP: ""
-    ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
-    ##
+    # -- Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
+    # -- Service load balancer IP
     loadBalancerIP: ""
+    # -- Load balancer source range
     loadBalancerSourceRanges: []
+    # -- Service port
     servicePort: 8480
+    # -- Service type
     type: ClusterIP
   ingress:
+    # -- Enable deployment of ingress for vminsert component
     enabled: false
+    # -- Ingress annotations
     annotations: {}
     #   kubernetes.io/ingress.class: nginx
     #   kubernetes.io/tls-acme: 'true'
     extraLabels: {}
+    # -- Array of host objects
     hosts: []
     # - name: vminsert.local
     #   path: /insert
     #   port: http
+    # -- Array of TLS objects
     tls: []
     #   - secretName: vminsert-ingress-tls
     #     hosts:
     #       - vminsert.local
   serviceMonitor:
+    # -- Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object
     enabled: false
+    # -- Target namespace of ServiceMonitor manifest
+    namespace: ""
+    # -- Service Monitor labels
     extraLabels: {}
+    # -- Service Monitor annotations
     annotations: {}
+    # Commented. Prometheus scare interval for vminsert component
 #    interval: 15s
+    # Commented. Prometheus pre-scrape timeout for vminsert component
 #    scrapeTimeout: 5s
 
 vmstorage:
+  # -- Enable deployment of vmstorage component. StatefulSet is used
   enabled: true
+  # -- vmstorage container name
   name: vmstorage
   image:
+    # -- Image repository
     repository: victoriametrics/vmstorage
+    # -- Image tag
     tag: v1.46.0-cluster
+    # -- Image pull policy
     pullPolicy: IfNotPresent
+  # -- Name of Priority Class
   priorityClassName: ""
+  # -- Overrides the full name of vmstorage component
   fullnameOverride:
   automountServiceAccountToken: true
   env: []
-  ## Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month
-  ##
+  # -- Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month
   retentionPeriod: 1
-  ## Additional vmstorage container arguments
-  ##
+  # Additional vmstorage container arguments. Extra command line arguments for vmstorage component
   extraArgs:
     envflag.enable: "true"
     envflag.prefix: VM_
     loggerFormat: json
 
-  ## See `kubectl explain poddisruptionbudget.spec` for more
-  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   podDisruptionBudget:
     enabled: false
     # minAvailable: 1
     # maxUnavailable: 1
     labels: {}
 
-  ## Node tolerations for server scheduling to nodes with taints
-  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  # -- Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
   ##
   tolerations:
     []
@@ -273,12 +319,10 @@ vmstorage:
     #   value: "value"
     #   effect: "NoSchedule|PreferNoSchedule"
 
-  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
+  # -- Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
-  ## Pod affinity
-  ##
+  # -- Pod affinity
   affinity: {}
 
   ## Use an alternate scheduler, e.g. "stork".
@@ -287,38 +331,36 @@ vmstorage:
   # schedulerName:
 
   persistentVolume:
-    ## If true,  vmstorage will create/use a Persistent Volume Claim
-    ## If false, use emptyDir
-    ##
+    # -- Create/use Persistent Volume Claim for vmstorage component. Empty dir if false. If true,  vmstorage will create/use a Persistent Volume Claim
     enabled: true
 
-    ## Must match those of existing PV or dynamic provisioner
-    ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
-    ##
+    # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/)
     accessModes:
       - ReadWriteOnce
+    # -- Persistent volume annotations
     annotations: {}
 
-    ## Requires vmstorage.persistentVolume.enabled: true
-    ## If defined, PVC must be created manually before volume will be bound
+    # --  Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
 
-    ## Vmstorage data Persistent Volume mount root path
-    ##
+    # -- Data root path. Vmstorage data Persistent Volume mount root path
     mountPath: /storage
+    # -- Size of the volume. Better to set the same as resource limit memory property
     size: 8Gi
+    # -- Mount subpath
     subPath: ""
 
+  # -- Pod's annotations
   podAnnotations: {}
   annotations: {}
   extraLabels: {}
+  # -- Count of vmstorage pods
   replicaCount: 2
+  # -- Deploy order policy for StatefulSet pods
   podManagementPolicy: OrderedReady
 
-  ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
-  ##
-  resources:
-    {}
+  # -- Resource object. Ref: [http://kubernetes.io/docs/user-guide/compute-resources/](http://kubernetes.io/docs/user-guide/compute-resources/)
+  resources: {}
     # limits:
     #   cpu: 500m
     #   memory: 512Mi
@@ -326,16 +368,21 @@ vmstorage:
     #   cpu: 500m
     #   memory: 512Mi
 
-  ## Security context to be added to server pods
-  ##
+  # -- Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   securityContext: {}
   podSecurityContext: {}
   service:
+    # -- Service annotations
     annotations: {}
+    # -- Service labels
     labels: {}
+    # -- Service port
     servicePort: 8482
+    # -- Port for accepting connections from vminsert
     vminsertPort: 8400
+    # -- Port for accepting connections from vmselect
     vmselectPort: 8401
+  # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60
   probe:
     readiness:
@@ -349,8 +396,15 @@ vmstorage:
       timeoutSeconds: 5
       failureThreshold: 3
   serviceMonitor:
+    # -- Enable deployment of Service Monitor for vmstorage component. This is Prometheus operator object
     enabled: false
+    # -- Target namespace of ServiceMonitor manifest
+    namespace: ""
+    # -- Service Monitor labels
     extraLabels: {}
+    # -- Service Monitor annotations
     annotations: {}
+    # Commented. Prometheus scare interval for vmstorage component
 #    interval: 15s
+    # Commented. Prometheus pre-scrape timeout for vmstorage component
 #    scrapeTimeout: 5s
