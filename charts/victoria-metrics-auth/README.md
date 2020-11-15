@@ -100,7 +100,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity configurations |
 | annotations | object | `{}` | Annotations to be added to the deployment |
-| config | object | `{"users":[{"password":"***","url_prefix":"http://localhost:8428","username":"local-single-node"},{"password":"***","url_prefix":"http://vmselect:8481/select/123/prometheus","username":"cluster-select-account-123"},{"password":"***","url_prefix":"http://vminsert:8480/insert/42/prometheus","username":"cluster-insert-account-42"}]}` | Config file content. |
+| config | string | `nil` | Config file content. |
 | configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html |
 | containerWorkingDir | string | `"/"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |

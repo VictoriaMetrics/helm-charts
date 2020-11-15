@@ -1,8 +1,8 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
+{{ template "chart.typeBadge" . }} {{ template "chart.versionBadge" . }}
 
-Victoria Metrics Operator
+{{ template "chart.description" . }}
 
 # Prerequisites
 
@@ -104,20 +104,4 @@ The following tables lists the configurable parameters of the chart and their de
 
 Change the values according to the need of the environment in ``victoria-metrics-operator/values.yaml`` file.
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| affinity | object | `{}` | Pod affinity |
-| env | list | `[]` |  |
-| fullnameOverride | string | `""` | Overrides the full name of server component |
-| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
-| image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.2.1"` | Image tag |
-| imagePullSecrets | list | `[]` | Secret to pull images |
-| logLevel | string | `"info"` | VM operator log level |
-| nameOverride | string | `""` | VM operatror deployment name overrid |
-| nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/ |
-| rbac.create | bool | `true` | Specifies whether the RBAC resources should be created |
-| resources | object | `{"limits":{"cpu":"120m","memory":"320Mi"},"requests":{"cpu":"80m","memory":"120Mi"}}` | Resource object |
-| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
+{{ template "chart.valuesTable" . }}
