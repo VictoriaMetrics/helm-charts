@@ -30,7 +30,7 @@ git branch
 ```
 
 * Make your changes and tests to the new branch.
-* Run command ``helm-docs`` to update content of ``README.md`` file using the ``README.md.gotmpl`` template.
+* Run command ``helm-docs`` to update content of ``README.md`` file of all charts using the ``README.md.gotmpl`` template.
 * Commit the changes to the branch.
 * Push files to repository remote with command:
 
