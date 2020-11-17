@@ -173,6 +173,31 @@ config:
       static_configs:
         - targets: ["localhost:8429"]
 
+      # Example scrape config for cluster services deployed by victoria-metrics-cluster chart.
+    - job_name: "vmstorage-cluster"
+      kubernetes_sd_configs:
+        - role: endpoints
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: victoria-metrics;victoria-metrics-cluster-vmstorage;http
+
+    - job_name: "vmselect-cluster"
+      kubernetes_sd_configs:
+        - role: endpoints
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: victoria-metrics;victoria-metrics-cluster-vmselect;http
+
+    - job_name: "vminsert-cluster"
+      kubernetes_sd_configs:
+        - role: endpoints
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: victoria-metrics;victoria-metrics-cluster-vminsert;http
+
       ## COPY from Prometheus helm chart https://github.com/helm/charts/blob/master/stable/prometheus/values.yaml
 
       # Scrape config for API servers.
