@@ -1,87 +1,177 @@
 # Victoria Metrics Helm Chart for Single Version
 
-## Prerequisites Details
-* [Victoria Metrics helm repository](https://github.com/VictoriaMetrics/helm-charts/#usage) is added.
-* PV support on underlying infrastructure
+ ![Version: 0.6.3](https://img.shields.io/badge/Version-0.6.3-informational?style=flat-square)
 
+Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
-## Chart Details
+# Prerequisites
+
+* Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
+
+* PV support on underlying infrastructure.
+
+# Chart Details
+
 This chart will do the following:
 
-* Rollout victoria metrics single 
+* Rollout Victoria Metrics Single.
 
-## Installing the Chart
+# How to install
 
-### 
+Access a Kubernetes cluster.
 
-To install the chart with the release name `my-release`:
-
-```console
-helm install -n my-release vm/victoria-metrics-single
-```
-
-## Configuration
-
-The following table lists the configurable parameters of the victoria metrics cluster chart and their default values.
-
-| Parameter               | Description                           | Default                                                    |
-| ----------------------- | ----------------------------------    | ---------------------------------------------------------- |
-| `server.enabled`           | Enable deployment of server component. Deployed as StatefulSet                 | `true`                       |
-| `server.name`              | Server container name                   | `server`                                                    |
-| `server.image.repository`  | Image repository                 | `victoriametrics/victoria-metrics`                                                   |
-| `server.image.tag`         | Image tag              | `v1.32.8`                                                        |
-| `server.image.pullPolicy`  | Image pull policy                      | `IfNotPresent`                                                   |
-| `server.priorityClassName` | Name of Priority Class | `""`                                |
-| `server.fullnameOverride`  | Overrides the full name of server component  | `""`                                |
-| `server.retentionPeriod`  | Data retention period in month  | `1`                                |
-| `server.extraArgs`         | Extra command line arguments for server component               | `{}`
-| `server.tolerations`       | Array of tolerations object. [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)                | `{}`                                 |
-| `server.nodeSelector`      | Pod's node selector. [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)| `{}`
-| `server.affinity `       | Pod affinity| `{}`
-| `server.persistentVolume.enabled` | Create/use Persistent Volume Claim for server component. Empty dir if false  | `true`|
-| `server.persistentVolume.accessModes`      | Array of access modes       | `["ReadWriteOnce"]`                                                       |
-| `server.persistentVolume.annotations`      | Persistant volume annotations      | `{}`                                                       |
-| `server.persistentVolume.existingClaim`         | Existing Claim name        | `""`                                                       |
-| `server.persistentVolume.storageClass`         | StorageClass to use for persistent volume       | `""`                                                       |
-| `server.persistentVolume.size`     | Size of the volume. Better to set the same as resource limit memory property    | `16Gi`                          |
-| `server.persistentVolume.mountPath`        | Mount path       | `""/storage`                                                 |
-| `server.persistentVolume.subPath`        | Mount subpath       | `""`                                                 |
-| `server.podAnnotations`    | Pod's annotations     | `{}`                                                     |
-| `server.podManagementPolicy`    | Pod's management policy     | `OrderedReady`                                                     |
-| `server.resources`         | Resource object    | `{}`                                                     |
-| `server.securityContext`   | Pod's security context. [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)      | `{}`                                                      |
-| `server.ingress.enabled`        | Enable deployment of ingress for server component | `false`                                                     |
-| `server.ingress.annotations`    | Ingress annotations       | `{}`                                                     |
-| `server.ingress.extraLabels`    | Ingress extra labels       | `{}`                                                     |
-| `server.ingress.hosts`         | Array of host objects          | `[]`                                                     |
-| `server.ingress.tls`              | Array of TLS objects              | `[]`                                          |
-| `server.service.annotations` | Service annotations       | `{}`                                                      |
-| `server.service.labels`      | Service labels            | `{}`                                                     |
-| `server.service.clusterIP`   | Service ClusterIP | `""`                                                       |
-| `server.service.externalIPs`  | Service External IPs. [ https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips)                     | `[]`                                                      |
-| `server.service.loadBalancerIP`               | Service load balacner IP             | `"`                                                     |
-| `server.service.loadBalancerSourceRanges`     | Load balancer source range     | `[]`                                                     |
-| `server.service.servicePort`        | Service port | `8428`                                                     |
-| `server.service.type`           | Service type     | `ClusterIP`                                                     |
-| `server.statefulSet.enabled`      | Deploy StatefulSet instead of Deployment         | `true`                                                     |
-| `server.statefulSet.podManagementPolicy`      | Deploy order policy for StatefulSet pods           | `OrderedReady`                                                     |
-| `server.statefulSet.service.annotations`      | Headless service annotations          | `{}`                                                     |
-| `server.statefulSet.service.labels`      | Headless service labels           | `{}`                                                     |
-| `server.statefulSet.service.servicePort`      | Headless service port          | `60`                                                     |
-| `server.terminationGracePeriodSeconds`      | Pod's termination grace period in seconds          | `60`                                                     |
-| `server.serviceMonitor.enabled` | Enable deployment of Service Monitor for server component. This is Prometheus operator object      | `false`     |
-| `server.serviceMonitor.extraLabels`  | Service Monitor labels        | `{}`                                                    |
-| `server.serviceMonitor.annotations`       | Service Monitor annotations | 8428                                    |
-| `server.serviceMonitor.interval`       | Commented. Prometheus scare interval for server component| `15s`                                    |
-| `server.serviceMonitor.scrapeTimeout`       | Commented. Prometheus pre-scrape timeout for server component| `5s`                                    |
-
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
-
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
+Add a chart helm repository with follow commands:
 
 ```console
-$ helm install -n my-release -f values.yaml vm/victoria-metrics-single
+helm repo add vm https://victoriametrics.github.io/helm-charts/
+
+helm repo update
 ```
 
-> **Tip**: You can use the default [values.yaml](values.yaml)
+List versions of ``vm/victoria-metrics-single`` chart available to installation:
 
+##### for helm v3
+
+```console
+helm search repo vm/victoria-metrics-single -l
+```
+
+Export default values of ``victoria-metrics-single`` chart to file ``values.yaml``:
+
+```console
+helm show values vm/victoria-metrics-single > values.yaml
+```
+
+Change the values according to the need of the environment in ``values.yaml`` file.
+
+Test the installation with command:
+
+```console
+helm install vmsingle vm/victoria-metrics-single -f values.yaml -n NAMESPACE --debug --dry-run
+```
+
+Install chart with command:
+
+##### for helm v3
+
+```console
+helm install vmsingle vm/victoria-metrics-single -f values.yaml -n NAMESPACE
+```
+
+Get the pods lists by running this commands:
+
+```console
+kubectl get pods -A | grep 'single'
+```
+
+Get the application by running this command:
+
+```console
+helm list -f vmsingle -n NAMESPACE
+```
+
+See the history of versions of ``vmsingle`` application with command.
+
+```console
+helm history vmsingle -n NAMESPACE
+```
+
+# How to uninstall
+
+Remove application with command.
+
+```console
+helm uninstall vmsingle -n NAMESPACE
+```
+
+# Documentation of Helm Chart
+
+Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
+
+Generate docs with ``helm-docs`` command.
+
+```bash
+cd charts/victoria-metrics-single
+
+helm-docs
+```
+
+The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+
+# Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-metrics-single/values.yaml`` file.
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| automountServiceAccountToken | bool | `true` |  |
+| podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
+| podDisruptionBudget.extraLabels | object | `{}` |  |
+| rbac.create | bool | `true` |  |
+| rbac.extraLabels | object | `{}` |  |
+| rbac.namespaced | bool | `false` |  |
+| rbac.pspEnabled | bool | `true` |  |
+| server.affinity | object | `{}` | Pod affinity |
+| server.enabled | bool | `true` | Enable deployment of server component. Deployed as StatefulSet |
+| server.env | list | `[]` | Env variables |
+| server.extraArgs."envflag.enable" | string | `"true"` |  |
+| server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
+| server.extraArgs.loggerFormat | string | `"json"` |  |
+| server.fullnameOverride | string | `nil` | Overrides the full name of server component |
+| server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| server.image.repository | string | `"victoriametrics/victoria-metrics"` | Image repository |
+| server.image.tag | string | `"v1.47.0"` | Image tag |
+| server.ingress.annotations | object | `{}` | Ingress annotations |
+| server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
+| server.ingress.extraLabels | object | `{}` | Ingress extra labels |
+| server.ingress.hosts | list | `[]` | Array of host objects |
+| server.ingress.tls | list | `[]` | Array of TLS objects |
+| server.livenessProbe.initialDelaySeconds | int | `5` |  |
+| server.livenessProbe.periodSeconds | int | `15` |  |
+| server.livenessProbe.tcpSocket.port | string | `"http"` |  |
+| server.livenessProbe.timeoutSeconds | int | `5` |  |
+| server.name | string | `"server"` | Server container name |
+| server.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
+| server.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
+| server.persistentVolume.annotations | object | `{}` | Persistant volume annotations |
+| server.persistentVolume.enabled | bool | `true` | Create/use Persistent Volume Claim for server component. Empty dir if false |
+| server.persistentVolume.existingClaim | string | `""` | Existing Claim name. If defined, PVC must be created manually before volume will be bound |
+| server.persistentVolume.mountPath | string | `"/storage"` | Mount path. Server data Persistent Volume mount root path. |
+| server.persistentVolume.size | string | `"16Gi"` | Size of the volume. Better to set the same as resource limit memory property. |
+| server.persistentVolume.storageClass | string | `""` | StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically |
+| server.persistentVolume.subPath | string | `""` | Mount subpath |
+| server.podAnnotations | object | `{}` | Pod's annotations |
+| server.podManagementPolicy | string | `"OrderedReady"` | Pod's management policy  |
+| server.podSecurityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| server.priorityClassName | string | `""` | Name of Priority Class |
+| server.readinessProbe.httpGet.path | string | `"/health"` |  |
+| server.readinessProbe.httpGet.port | string | `"http"` |  |
+| server.readinessProbe.initialDelaySeconds | int | `5` |  |
+| server.readinessProbe.periodSeconds | int | `15` |  |
+| server.readinessProbe.timeoutSeconds | int | `5` |  |
+| server.resources | object | `{}` | Resource object. Ref: [http://kubernetes.io/docs/user-guide/compute-resources/](http://kubernetes.io/docs/user-guide/compute-resources/ |
+| server.retentionPeriod | int | `1` | Data retention period in month |
+| server.securityContext | object | `{}` | Security context to be added to server pods |
+| server.service.annotations | object | `{}` | Service annotations |
+| server.service.clusterIP | string | `""` | Service ClusterIP |
+| server.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
+| server.service.labels | object | `{}` | Service labels |
+| server.service.loadBalancerIP | string | `""` | Service load balacner IP |
+| server.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
+| server.service.servicePort | int | `8428` | Service port |
+| server.service.type | string | `"ClusterIP"` | Service type |
+| server.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
+| server.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for server component. This is Prometheus operator object |
+| server.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
+| server.statefulSet.enabled | bool | `true` | Creates statefulset instead of deployment, useful when you want to keep the cache |
+| server.statefulSet.podManagementPolicy | string | `"OrderedReady"` | Deploy order policy for StatefulSet pods |
+| server.statefulSet.service.annotations | object | `{}` | Headless service annotations |
+| server.statefulSet.service.labels | object | `{}` | Headless service labels |
+| server.statefulSet.service.servicePort | int | `8428` | Headless service port |
+| server.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
+| server.tolerations | list | `[]` | Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
+| serviceAccount.automountToken | bool | `true` |  |
+| serviceAccount.create | bool | `true` | Create service account. |
+| serviceAccount.extraLabels | object | `{}` |  |

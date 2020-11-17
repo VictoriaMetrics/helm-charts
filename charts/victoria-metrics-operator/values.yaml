@@ -1,0 +1,54 @@
+# Default values for victoria-metrics.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image:
+  # -- Image repository
+  repository: victoriametrics/operator
+  # -- Image tag
+  tag: v0.2.1
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+
+# -- Secret to pull images
+imagePullSecrets: []
+
+# -- VM operatror deployment name overrid
+nameOverride: ""
+
+# -- Overrides the full name of server component
+fullnameOverride: ""
+
+# -- VM operator log level
+logLevel: "info"
+
+rbac:
+  # -- Specifies whether the RBAC resources should be created
+  create: true
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# -- Resource object
+resources: 
+  limits:
+    cpu: 120m
+    memory: 320Mi
+  requests:
+    cpu: 80m
+    memory: 120Mi
+
+# -- Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+# -- Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+tolerations: []
+
+# -- Pod affinity
+affinity: {}
+
+env: []
+  # - name: VM_VMSINGLEDEFAULT_VERSION
+  #   value: v1.43.0

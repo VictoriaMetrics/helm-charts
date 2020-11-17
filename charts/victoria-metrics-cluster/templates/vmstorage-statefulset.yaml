@@ -46,7 +46,7 @@ spec:
           securityContext:
             {{- toYaml .Values.vmstorage.podSecurityContext | nindent 12 }}
           args:
-            - {{ printf "%s=%d" "--retentionPeriod" (int .Values.vmstorage.retentionPeriod) | quote}}
+            - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.vmstorage.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
           {{- range $key, $value := .Values.vmstorage.extraArgs }}
             - --{{ $key }}={{ $value }}
@@ -58,6 +58,9 @@ spec:
               containerPort: 8400
             - name: vmselect
               containerPort: 8401
+          {{- with .Values.vmstorage.env }}
+          env: {{ toYaml . | nindent 10 }}
+          {{- end }}
           readinessProbe:
             httpGet:
               path: /health

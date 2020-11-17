@@ -38,10 +38,13 @@ spec:
           image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
           imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
           args:
-            - {{ printf "%s=%d" "--retentionPeriod" (int .Values.server.retentionPeriod) | quote}}
+            - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.server.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.server.persistentVolume.mountPath | quote}}
           {{- range $key, $value := .Values.server.extraArgs }}
             - --{{ $key }}={{ $value }}
+          {{- end }}
+          {{- with .Values.server.env }}
+          env: {{ toYaml . | nindent 10 }}
           {{- end }}
           ports:
             - name: http

@@ -1,0 +1,300 @@
+# Helm Chart For Victoria Metrics Agent.
+
+ ![Version: 0.6.4](https://img.shields.io/badge/Version-0.6.4-informational?style=flat-square)
+
+Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
+
+# Prerequisites
+
+* Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
+
+# How to install
+
+Access a Kubernetes cluster.
+
+Add a chart helm repository with follow commands:
+
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
+
+helm repo update
+```
+
+List versions of ``vm/victoria-metrics-agent`` chart available to installation:
+
+##### for helm v3
+
+```console
+helm search repo vm/victoria-metrics-agent -l
+```
+
+Export default values of ``victoria-metrics-agent`` chart to file ``values.yaml``:
+
+```console
+helm show values vm/victoria-metrics-agent > values.yaml
+```
+
+Change the values according to the need of the environment in ``values.yaml`` file.
+
+Test the installation with command:
+
+```console
+helm install vmagent vm/victoria-metrics-agent -f values.yaml -n NAMESPACE --debug --dry-run
+```
+
+Install chart with command:
+
+##### for helm v3
+
+```console
+helm install vmagent vm/victoria-metrics-agent -f values.yaml -n NAMESPACE
+```
+
+Get the pods lists by running this commands:
+
+```console
+kubectl get pods -A | grep 'agent'
+```
+
+Get the application by running this command:
+
+```console
+helm list -f vmagent -n NAMESPACE
+```
+
+See the history of versions of ``vmagent`` application with command.
+
+```console
+helm history vmagent -n NAMESPACE
+```
+
+# How to uninstall
+
+Remove application with command.
+
+```console
+helm uninstall vmagent -n NAMESPACE
+```
+
+# Documentation of Helm Chart
+
+Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
+
+Generate docs with ``helm-docs`` command.
+
+```bash
+cd charts/victoria-metrics-agent
+
+helm-docs
+```
+
+The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+
+# Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-metrics-agent/values.yaml`` file.
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity | object | `{}` |  |
+| annotations | object | `{}` |  |
+| config.global.scrape_interval | string | `"10s"` |  |
+| config.scrape_configs[0].job_name | string | `"vmagent"` |  |
+| config.scrape_configs[0].static_configs[0].targets[0] | string | `"localhost:8429"` |  |
+| config.scrape_configs[1].bearer_token_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| config.scrape_configs[1].job_name | string | `"kubernetes-apiservers"` |  |
+| config.scrape_configs[1].kubernetes_sd_configs[0].role | string | `"endpoints"` |  |
+| config.scrape_configs[1].relabel_configs[0].action | string | `"keep"` |  |
+| config.scrape_configs[1].relabel_configs[0].regex | string | `"default;kubernetes;https"` |  |
+| config.scrape_configs[1].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
+| config.scrape_configs[1].relabel_configs[0].source_labels[1] | string | `"__meta_kubernetes_service_name"` |  |
+| config.scrape_configs[1].relabel_configs[0].source_labels[2] | string | `"__meta_kubernetes_endpoint_port_name"` |  |
+| config.scrape_configs[1].scheme | string | `"https"` |  |
+| config.scrape_configs[1].tls_config.ca_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| config.scrape_configs[1].tls_config.insecure_skip_verify | bool | `true` |  |
+| config.scrape_configs[2].bearer_token_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| config.scrape_configs[2].job_name | string | `"kubernetes-nodes"` |  |
+| config.scrape_configs[2].kubernetes_sd_configs[0].role | string | `"node"` |  |
+| config.scrape_configs[2].relabel_configs[0].action | string | `"labelmap"` |  |
+| config.scrape_configs[2].relabel_configs[0].regex | string | `"__meta_kubernetes_node_label_(.+)"` |  |
+| config.scrape_configs[2].relabel_configs[1].replacement | string | `"kubernetes.default.svc:443"` |  |
+| config.scrape_configs[2].relabel_configs[1].target_label | string | `"__address__"` |  |
+| config.scrape_configs[2].relabel_configs[2].regex | string | `"(.+)"` |  |
+| config.scrape_configs[2].relabel_configs[2].replacement | string | `"/api/v1/nodes/$1/proxy/metrics"` |  |
+| config.scrape_configs[2].relabel_configs[2].source_labels[0] | string | `"__meta_kubernetes_node_name"` |  |
+| config.scrape_configs[2].relabel_configs[2].target_label | string | `"__metrics_path__"` |  |
+| config.scrape_configs[2].scheme | string | `"https"` |  |
+| config.scrape_configs[2].tls_config.ca_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| config.scrape_configs[2].tls_config.insecure_skip_verify | bool | `true` |  |
+| config.scrape_configs[3].bearer_token_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| config.scrape_configs[3].job_name | string | `"kubernetes-nodes-cadvisor"` |  |
+| config.scrape_configs[3].kubernetes_sd_configs[0].role | string | `"node"` |  |
+| config.scrape_configs[3].relabel_configs[0].action | string | `"labelmap"` |  |
+| config.scrape_configs[3].relabel_configs[0].regex | string | `"__meta_kubernetes_node_label_(.+)"` |  |
+| config.scrape_configs[3].relabel_configs[1].replacement | string | `"kubernetes.default.svc:443"` |  |
+| config.scrape_configs[3].relabel_configs[1].target_label | string | `"__address__"` |  |
+| config.scrape_configs[3].relabel_configs[2].regex | string | `"(.+)"` |  |
+| config.scrape_configs[3].relabel_configs[2].replacement | string | `"/api/v1/nodes/$1/proxy/metrics/cadvisor"` |  |
+| config.scrape_configs[3].relabel_configs[2].source_labels[0] | string | `"__meta_kubernetes_node_name"` |  |
+| config.scrape_configs[3].relabel_configs[2].target_label | string | `"__metrics_path__"` |  |
+| config.scrape_configs[3].scheme | string | `"https"` |  |
+| config.scrape_configs[3].tls_config.ca_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| config.scrape_configs[3].tls_config.insecure_skip_verify | bool | `true` |  |
+| config.scrape_configs[4].job_name | string | `"kubernetes-service-endpoints"` |  |
+| config.scrape_configs[4].kubernetes_sd_configs[0].role | string | `"endpoints"` |  |
+| config.scrape_configs[4].relabel_configs[0].action | string | `"keep"` |  |
+| config.scrape_configs[4].relabel_configs[0].regex | bool | `true` |  |
+| config.scrape_configs[4].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_service_annotation_prometheus_io_scrape"` |  |
+| config.scrape_configs[4].relabel_configs[1].action | string | `"replace"` |  |
+| config.scrape_configs[4].relabel_configs[1].regex | string | `"(https?)"` |  |
+| config.scrape_configs[4].relabel_configs[1].source_labels[0] | string | `"__meta_kubernetes_service_annotation_prometheus_io_scheme"` |  |
+| config.scrape_configs[4].relabel_configs[1].target_label | string | `"__scheme__"` |  |
+| config.scrape_configs[4].relabel_configs[2].action | string | `"replace"` |  |
+| config.scrape_configs[4].relabel_configs[2].regex | string | `"(.+)"` |  |
+| config.scrape_configs[4].relabel_configs[2].source_labels[0] | string | `"__meta_kubernetes_service_annotation_prometheus_io_path"` |  |
+| config.scrape_configs[4].relabel_configs[2].target_label | string | `"__metrics_path__"` |  |
+| config.scrape_configs[4].relabel_configs[3].action | string | `"replace"` |  |
+| config.scrape_configs[4].relabel_configs[3].regex | string | `"([^:]+)(?::\\d+)?;(\\d+)"` |  |
+| config.scrape_configs[4].relabel_configs[3].replacement | string | `"$1:$2"` |  |
+| config.scrape_configs[4].relabel_configs[3].source_labels[0] | string | `"__address__"` |  |
+| config.scrape_configs[4].relabel_configs[3].source_labels[1] | string | `"__meta_kubernetes_service_annotation_prometheus_io_port"` |  |
+| config.scrape_configs[4].relabel_configs[3].target_label | string | `"__address__"` |  |
+| config.scrape_configs[4].relabel_configs[4].action | string | `"labelmap"` |  |
+| config.scrape_configs[4].relabel_configs[4].regex | string | `"__meta_kubernetes_service_label_(.+)"` |  |
+| config.scrape_configs[4].relabel_configs[5].action | string | `"replace"` |  |
+| config.scrape_configs[4].relabel_configs[5].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
+| config.scrape_configs[4].relabel_configs[5].target_label | string | `"kubernetes_namespace"` |  |
+| config.scrape_configs[4].relabel_configs[6].action | string | `"replace"` |  |
+| config.scrape_configs[4].relabel_configs[6].source_labels[0] | string | `"__meta_kubernetes_service_name"` |  |
+| config.scrape_configs[4].relabel_configs[6].target_label | string | `"kubernetes_name"` |  |
+| config.scrape_configs[4].relabel_configs[7].action | string | `"replace"` |  |
+| config.scrape_configs[4].relabel_configs[7].source_labels[0] | string | `"__meta_kubernetes_pod_node_name"` |  |
+| config.scrape_configs[4].relabel_configs[7].target_label | string | `"kubernetes_node"` |  |
+| config.scrape_configs[5].job_name | string | `"kubernetes-service-endpoints-slow"` |  |
+| config.scrape_configs[5].kubernetes_sd_configs[0].role | string | `"endpoints"` |  |
+| config.scrape_configs[5].relabel_configs[0].action | string | `"keep"` |  |
+| config.scrape_configs[5].relabel_configs[0].regex | bool | `true` |  |
+| config.scrape_configs[5].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_service_annotation_prometheus_io_scrape_slow"` |  |
+| config.scrape_configs[5].relabel_configs[1].action | string | `"replace"` |  |
+| config.scrape_configs[5].relabel_configs[1].regex | string | `"(https?)"` |  |
+| config.scrape_configs[5].relabel_configs[1].source_labels[0] | string | `"__meta_kubernetes_service_annotation_prometheus_io_scheme"` |  |
+| config.scrape_configs[5].relabel_configs[1].target_label | string | `"__scheme__"` |  |
+| config.scrape_configs[5].relabel_configs[2].action | string | `"replace"` |  |
+| config.scrape_configs[5].relabel_configs[2].regex | string | `"(.+)"` |  |
+| config.scrape_configs[5].relabel_configs[2].source_labels[0] | string | `"__meta_kubernetes_service_annotation_prometheus_io_path"` |  |
+| config.scrape_configs[5].relabel_configs[2].target_label | string | `"__metrics_path__"` |  |
+| config.scrape_configs[5].relabel_configs[3].action | string | `"replace"` |  |
+| config.scrape_configs[5].relabel_configs[3].regex | string | `"([^:]+)(?::\\d+)?;(\\d+)"` |  |
+| config.scrape_configs[5].relabel_configs[3].replacement | string | `"$1:$2"` |  |
+| config.scrape_configs[5].relabel_configs[3].source_labels[0] | string | `"__address__"` |  |
+| config.scrape_configs[5].relabel_configs[3].source_labels[1] | string | `"__meta_kubernetes_service_annotation_prometheus_io_port"` |  |
+| config.scrape_configs[5].relabel_configs[3].target_label | string | `"__address__"` |  |
+| config.scrape_configs[5].relabel_configs[4].action | string | `"labelmap"` |  |
+| config.scrape_configs[5].relabel_configs[4].regex | string | `"__meta_kubernetes_service_label_(.+)"` |  |
+| config.scrape_configs[5].relabel_configs[5].action | string | `"replace"` |  |
+| config.scrape_configs[5].relabel_configs[5].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
+| config.scrape_configs[5].relabel_configs[5].target_label | string | `"kubernetes_namespace"` |  |
+| config.scrape_configs[5].relabel_configs[6].action | string | `"replace"` |  |
+| config.scrape_configs[5].relabel_configs[6].source_labels[0] | string | `"__meta_kubernetes_service_name"` |  |
+| config.scrape_configs[5].relabel_configs[6].target_label | string | `"kubernetes_name"` |  |
+| config.scrape_configs[5].relabel_configs[7].action | string | `"replace"` |  |
+| config.scrape_configs[5].relabel_configs[7].source_labels[0] | string | `"__meta_kubernetes_pod_node_name"` |  |
+| config.scrape_configs[5].relabel_configs[7].target_label | string | `"kubernetes_node"` |  |
+| config.scrape_configs[5].scrape_interval | string | `"5m"` |  |
+| config.scrape_configs[5].scrape_timeout | string | `"30s"` |  |
+| config.scrape_configs[6].job_name | string | `"kubernetes-services"` |  |
+| config.scrape_configs[6].kubernetes_sd_configs[0].role | string | `"service"` |  |
+| config.scrape_configs[6].metrics_path | string | `"/probe"` |  |
+| config.scrape_configs[6].params.module[0] | string | `"http_2xx"` |  |
+| config.scrape_configs[6].relabel_configs[0].action | string | `"keep"` |  |
+| config.scrape_configs[6].relabel_configs[0].regex | bool | `true` |  |
+| config.scrape_configs[6].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_service_annotation_prometheus_io_probe"` |  |
+| config.scrape_configs[6].relabel_configs[1].source_labels[0] | string | `"__address__"` |  |
+| config.scrape_configs[6].relabel_configs[1].target_label | string | `"__param_target"` |  |
+| config.scrape_configs[6].relabel_configs[2].replacement | string | `"blackbox"` |  |
+| config.scrape_configs[6].relabel_configs[2].target_label | string | `"__address__"` |  |
+| config.scrape_configs[6].relabel_configs[3].source_labels[0] | string | `"__param_target"` |  |
+| config.scrape_configs[6].relabel_configs[3].target_label | string | `"instance"` |  |
+| config.scrape_configs[6].relabel_configs[4].action | string | `"labelmap"` |  |
+| config.scrape_configs[6].relabel_configs[4].regex | string | `"__meta_kubernetes_service_label_(.+)"` |  |
+| config.scrape_configs[6].relabel_configs[5].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
+| config.scrape_configs[6].relabel_configs[5].target_label | string | `"kubernetes_namespace"` |  |
+| config.scrape_configs[6].relabel_configs[6].source_labels[0] | string | `"__meta_kubernetes_service_name"` |  |
+| config.scrape_configs[6].relabel_configs[6].target_label | string | `"kubernetes_name"` |  |
+| config.scrape_configs[7].job_name | string | `"kubernetes-pods"` |  |
+| config.scrape_configs[7].kubernetes_sd_configs[0].role | string | `"pod"` |  |
+| config.scrape_configs[7].relabel_configs[0].action | string | `"keep"` |  |
+| config.scrape_configs[7].relabel_configs[0].regex | bool | `true` |  |
+| config.scrape_configs[7].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_pod_annotation_prometheus_io_scrape"` |  |
+| config.scrape_configs[7].relabel_configs[1].action | string | `"replace"` |  |
+| config.scrape_configs[7].relabel_configs[1].regex | string | `"(.+)"` |  |
+| config.scrape_configs[7].relabel_configs[1].source_labels[0] | string | `"__meta_kubernetes_pod_annotation_prometheus_io_path"` |  |
+| config.scrape_configs[7].relabel_configs[1].target_label | string | `"__metrics_path__"` |  |
+| config.scrape_configs[7].relabel_configs[2].action | string | `"replace"` |  |
+| config.scrape_configs[7].relabel_configs[2].regex | string | `"([^:]+)(?::\\d+)?;(\\d+)"` |  |
+| config.scrape_configs[7].relabel_configs[2].replacement | string | `"$1:$2"` |  |
+| config.scrape_configs[7].relabel_configs[2].source_labels[0] | string | `"__address__"` |  |
+| config.scrape_configs[7].relabel_configs[2].source_labels[1] | string | `"__meta_kubernetes_pod_annotation_prometheus_io_port"` |  |
+| config.scrape_configs[7].relabel_configs[2].target_label | string | `"__address__"` |  |
+| config.scrape_configs[7].relabel_configs[3].action | string | `"labelmap"` |  |
+| config.scrape_configs[7].relabel_configs[3].regex | string | `"__meta_kubernetes_pod_label_(.+)"` |  |
+| config.scrape_configs[7].relabel_configs[4].action | string | `"replace"` |  |
+| config.scrape_configs[7].relabel_configs[4].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
+| config.scrape_configs[7].relabel_configs[4].target_label | string | `"kubernetes_namespace"` |  |
+| config.scrape_configs[7].relabel_configs[5].action | string | `"replace"` |  |
+| config.scrape_configs[7].relabel_configs[5].source_labels[0] | string | `"__meta_kubernetes_pod_name"` |  |
+| config.scrape_configs[7].relabel_configs[5].target_label | string | `"kubernetes_pod_name"` |  |
+| configMap | string | `""` |  |
+| containerWorkingDir | string | `"/"` |  |
+| env | list | `[]` |  |
+| extraArgs."envflag.enable" | string | `"true"` |  |
+| extraArgs."envflag.prefix" | string | `"VM_"` |  |
+| extraArgs.loggerFormat | string | `"json"` |  |
+| extraHostPathMounts | list | `[]` |  |
+| extraVolumeMounts | list | `[]` |  |
+| extraVolumes | list | `[]` |  |
+| fullnameOverride | string | `""` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.repository | string | `"victoriametrics/vmagent"` |  |
+| image.tag | string | `""` |  |
+| imagePullSecrets | list | `[]` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.enabled | bool | `false` |  |
+| ingress.extraLabels | object | `{}` |  |
+| ingress.hosts | list | `[]` |  |
+| ingress.tls | list | `[]` |  |
+| nameOverride | string | `""` |  |
+| nodeSelector | object | `{}` |  |
+| persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
+| persistence.annotations | object | `{}` |  |
+| persistence.enabled | bool | `false` |  |
+| persistence.existingClaim | string | `""` |  |
+| persistence.extraLabels | object | `{}` |  |
+| persistence.size | string | `"10Gi"` |  |
+| podAnnotations | object | `{}` |  |
+| podDisruptionBudget.enabled | bool | `false` |  |
+| podDisruptionBudget.labels | object | `{}` |  |
+| podSecurityContext | object | `{}` |  |
+| rbac.annotations | object | `{}` |  |
+| rbac.create | bool | `true` |  |
+| rbac.extraLabels | object | `{}` |  |
+| rbac.pspEnabled | bool | `true` |  |
+| remoteWriteUrls | list | `[]` |  |
+| replicaCount | int | `1` |  |
+| resources | object | `{}` |  |
+| securityContext | object | `{}` |  |
+| service.annotations | object | `{}` |  |
+| service.clusterIP | string | `""` |  |
+| service.enabled | bool | `false` |  |
+| service.externalIPs | list | `[]` |  |
+| service.extraLabels | object | `{}` |  |
+| service.loadBalancerIP | string | `""` |  |
+| service.loadBalancerSourceRanges | list | `[]` |  |
+| service.servicePort | int | `8429` |  |
+| service.type | string | `"ClusterIP"` |  |
+| serviceAccount.annotations | object | `{}` |  |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.name | string | `nil` |  |
+| tolerations | list | `[]` |  |
