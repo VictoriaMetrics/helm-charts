@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Auth.
 
- ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+ ![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square)
 
 Victoria Metrics Auth - is a simple auth proxy and router for VictoriaMetrics.
 
@@ -120,6 +120,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.extraLabels | object | `{}` |  |
 | ingress.hosts | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
+| ingressInternal.annotations | object | `{}` |  |
+| ingressInternal.enabled | bool | `false` |  |
+| ingressInternal.extraLabels | object | `{}` |  |
+| ingressInternal.hosts | list | `[]` |  |
+| ingressInternal.tls | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
