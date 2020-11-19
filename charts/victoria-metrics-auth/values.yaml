@@ -78,6 +78,7 @@ securityContext: {}
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
+
 service:
   enabled: true
   annotations: {}
@@ -90,7 +91,24 @@ service:
   loadBalancerSourceRanges: []
   servicePort: 8427
   type: ClusterIP
+
 ingress:
+  enabled: false
+  annotations: {}
+  #   kubernetes.io/ingress.class: nginx
+  #   kubernetes.io/tls-acme: 'true'
+
+  extraLabels: {}
+  hosts: []
+  #   - name: vmauth.local
+  #     path: /
+  #     port: http
+  tls: []
+  #   - secretName: vmauth-ingress-tls
+  #     hosts:
+  #       - vmauth.local
+
+ingressInternal:
   enabled: false
   annotations: {}
   #   kubernetes.io/ingress.class: nginx
