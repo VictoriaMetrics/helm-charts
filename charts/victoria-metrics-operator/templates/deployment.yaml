@@ -2,16 +2,28 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "vm-operator.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
 {{ include "vm-operator.labels" . | indent 4 }}
+{{- with .Values.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- with .Values.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
 spec:
-  replicas: 1
+  replicas: {{.Values.replicaCount}}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "vm-operator.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
+{{- with .Values.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}
+{{- end }}
       labels:
         app.kubernetes.io/name: {{ include "vm-operator.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
@@ -20,6 +32,10 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+{{- with .Values.securityContext }}
+      securityContext:
+{{ toYaml . | nindent 8 }}
+{{- end }}
       serviceAccountName: {{ template "vm-operator.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}
@@ -38,8 +54,22 @@ spec:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: {{ .Chart.Name }}
+            {{- if .Values.operator.disable_promethues_converter }}
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_PODMONITOR
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_SERVICESCRAPE
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_PROMETHEUSRULE
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_PROBE
+              value: "false"
+            {{- end }}
+            - name: VM_PSPAUTOCREATEENABLED
+              value: {{ .Values.operator.psp_auto_creation_enabled | quote }}
+            - name: VM_ENABLEDPROMETHEUSCONVERTEROWNERREFERENCES
+              value: {{.Values.operator.enable_converter_ownership | quote}}
           args:
-            #- --zap-log-level=debug={{ .Values.logLevel }}
+            - --zap-log-level={{ .Values.logLevel }}
             - --enable-leader-election
           command:
             - manager

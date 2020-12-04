@@ -5,6 +5,13 @@ metadata:
   name: {{ include "vm-operator.fullname" . }}
   labels:
 {{ include "vm-operator.labels" . | indent 4 }}
+{{- with .Values.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- with .Values.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
 subjects:
 - kind: ServiceAccount
   name: {{ template "vm-operator.serviceAccountName" . }}

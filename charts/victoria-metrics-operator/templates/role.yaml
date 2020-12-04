@@ -5,6 +5,14 @@ metadata:
   name: {{ template "vm-operator.fullname" . }}
   labels:
 {{ include "vm-operator.labels" . | indent 4 }}
+{{- with .Values.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- with .Values.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  namespace: {{ .Release.Namespace }}
 rules:
 - apiGroups:
   - ""
