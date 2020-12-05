@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
+ ![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square)
 
 Victoria Metrics Operator
 
@@ -107,17 +107,25 @@ Change the values according to the need of the environment in ``victoria-metrics
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Pod affinity |
-| env | list | `[]` |  |
+| annotations | object | `{}` | Annotations to be added to the all resources |
+| env | list | `[]` | extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD) |
+| extraLabels | object | `{}` | Labels to be added to the all resources |
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.4.0"` | Image tag |
+| image.tag | string | `"v0.5.0"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
-| logLevel | string | `"info"` | VM operator log level |
+| logLevel | string | `"info"` | VM operator log level -- possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name overrid |
 | nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/ |
+| operator.disable_promethues_converter | string | `"false"` | By default, operator converts prometheus-operator objects. |
+| operator.enable_converter_ownership | string | `"false"` | Enables ownership reference for converted prometheus-operator objects, it will remove corresponding victoria-metrics objects in case of deletion prometheus one. |
+| operator.psp_auto_creation_enabled | string | `"true"` | By default, operator creates psp for its objects. |
 | rbac.create | bool | `true` | Specifies whether the RBAC resources should be created |
+| rbac.pspEnabled | bool | `true` |  |
+| replicaCount | int | `1` |  |
 | resources | object | `{"limits":{"cpu":"120m","memory":"320Mi"},"requests":{"cpu":"80m","memory":"120Mi"}}` | Resource object |
+| securityContext | object | `{}` |  |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
