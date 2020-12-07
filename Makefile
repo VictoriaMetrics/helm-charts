@@ -6,7 +6,7 @@ lint:
 	helm lint charts/victoria-metrics-single &&\
 	helm lint charts/victoria-metrics-agent -f hack/vmagent-lint-hack.yaml && \
 	helm lint charts/victoria-metrics-alert -f hack/vmalert-lint-hack.yaml && \
-	helm lint charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml
+	helm lint charts/victoria-metrics-auth
 
 # Package chart into zip file
 package:
@@ -19,3 +19,9 @@ index:
 # Update index file add new version of package into it
 merge:
 	helm repo index --url ${URL} --merge index.yaml .
+
+gen-docs: $(make) install-helm-docs
+	helm-docs
+
+install-helm-docs:
+	which helm-docs || GO111MODULE=on go get github.com/norwoodj/helm-docs/cmd/helm-docs
