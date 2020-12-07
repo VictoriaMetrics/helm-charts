@@ -5,9 +5,11 @@ image:
   # -- Image repository
   repository: victoriametrics/operator
   # -- Image tag
-  tag: v0.4.0
+  tag: v0.5.0
   # -- Image pull policy
   pullPolicy: IfNotPresent
+
+replicaCount: 1
 
 # -- Secret to pull images
 imagePullSecrets: []
@@ -19,11 +21,30 @@ nameOverride: ""
 fullnameOverride: ""
 
 # -- VM operator log level
+# -- possible values: info and error.
 logLevel: "info"
 
 rbac:
   # -- Specifies whether the RBAC resources should be created
   create: true
+  pspEnabled: true
+
+# -- Labels to be added to the all resources
+extraLabels: {}
+# -- Annotations to be added to the all resources
+annotations: {}
+
+securityContext:
+  {}
+operator:
+  # -- By default, operator converts prometheus-operator objects.
+  disable_promethues_converter: "false"
+  # -- By default, operator creates psp for its objects.
+  psp_auto_creation_enabled: "true"
+  # -- Enables ownership reference for converted prometheus-operator objects,
+  # it will remove corresponding victoria-metrics objects in case of deletion prometheus one.
+  enable_converter_ownership: "false"
+
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -49,6 +70,7 @@ tolerations: []
 # -- Pod affinity
 affinity: {}
 
+# -- extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD)
 env: []
   # - name: VM_VMSINGLEDEFAULT_VERSION
   #   value: v1.43.0

@@ -90,6 +90,7 @@ rules:
   - operator.victoriametrics.com
   resources:
   - vmagents
+  - vmagents/finalizers
   verbs:
   - create
   - delete
@@ -110,6 +111,7 @@ rules:
   - operator.victoriametrics.com
   resources:
   - vmalertmanagers
+  - vmalertmanagers/finalizers
   verbs:
   - create
   - delete
@@ -130,6 +132,7 @@ rules:
   - operator.victoriametrics.com
   resources:
   - vmalerts
+  - vmalerts/finalizers
   verbs:
   - create
   - delete
@@ -150,6 +153,7 @@ rules:
   - operator.victoriametrics.com
   resources:
   - vmclusters
+  - vmclusters/finalizers
   verbs:
   - create
   - delete
@@ -170,6 +174,7 @@ rules:
   - operator.victoriametrics.com
   resources:
   - vmpodscrapes
+  - vmprobscrapes/finalizers
   verbs:
   - create
   - delete
@@ -190,6 +195,7 @@ rules:
   - operator.victoriametrics.com
   resources:
   - vmrules
+  - vmrules/finalizers
   verbs:
   - create
   - delete
@@ -210,6 +216,7 @@ rules:
   - operator.victoriametrics.com
   resources:
   - vmservicescrapes
+  - vmservicescrapes/finalizers
   verbs:
   - create
   - delete
@@ -250,6 +257,7 @@ rules:
   - operator.victoriametrics.com
   resources:
   - vmsingles
+  - vmsingles/finalizers
   verbs:
   - create
   - delete
@@ -266,4 +274,66 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+    - ""
+  resources:
+    - nodes
+    - nodes/proxy
+    - services
+    - endpoints
+    - pods
+    - endpointslices
+    - configmaps
+  verbs:
+    - get
+    - list
+    - watch
+- apiGroups:
+    - "extensions"
+    - "networking.k8s.io"
+  resources:
+    - ingresses
+  verbs:
+    - get
+    - list
+    - watch
+- nonResourceURLs:
+    - "/metrics"
+  verbs:
+    - get
+    - watch
+    - list
+- apiGroups:
+    - "rbac.authorization.k8s.io"
+  resources:
+    - clusterrolebindings
+    - clusterroles
+  verbs:
+    - get
+    - list
+    - create
+    - patch
+    - update
+    - watch
+- apiGroups:
+    - "policy"
+  resources:
+    - podsecuritypolicies
+  verbs:
+    - get
+    - list
+    - create
+    - patch
+    - update
+    - use
+    - watch
+- apiGroups:
+    - ""
+  resources:
+    - serviceaccounts
+  verbs:
+    - get
+    - list
+    - create
+    - watch
 {{- end -}}
