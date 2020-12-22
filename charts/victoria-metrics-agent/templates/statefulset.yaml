@@ -1,4 +1,4 @@
-{{- if eq .Values.kind "StatefulSet" }}
+{{- if .Values.statefulset.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -13,9 +13,9 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
   serviceName: {{ include "chart.fullname" . }}
-  {{- if .Values.updateStrategy.statefulset }}
+  {{- if .Values.statefulset.updateStrategy }}
   updateStrategy:
-    {{- toYaml .Values.updateStrategy.statefulset | nindent 4 }}
+    {{- toYaml .Values.statefulset.updateStrategy | nindent 4 }}
   {{- end }}
   selector:
     matchLabels:
