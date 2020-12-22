@@ -47,6 +47,7 @@ spec:
           {{- if not .Values.vmselect.suppresStorageFQDNsRender }}
           {{- include "victoria-metrics.vmselect.vmstorage-pod-fqdn" . | nindent 12 }}
           {{- end }}
+          {{- include "victoria-metrics.vmselect.vmselect-pod-fqdn" . | nindent 12 -}}
           {{- range $key, $value := .Values.vmselect.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
