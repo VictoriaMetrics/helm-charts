@@ -248,6 +248,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[7].relabel_configs[5].target_label | string | `"kubernetes_pod_name"` |  |
 | configMap | string | `""` |  |
 | containerWorkingDir | string | `"/"` |  |
+| deploymentStrategy | object | `{}` |  |
 | env | list | `[]` |  |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
