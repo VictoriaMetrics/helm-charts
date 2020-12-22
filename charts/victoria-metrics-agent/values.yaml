@@ -9,16 +9,18 @@ replicaCount: 1
 # StatefulSet ref:  https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
 kind: Deployment
 
-## WARN: If kind is Deployment that uses
-deploymentStrategy: {}
-  # rollingUpdate:
-  #  maxSurge: 25%
-  #  maxUnavailable: 25%
-  # type: RollingUpdate
 
-## WARN: If kind is StatefulSet that uses
-updateStrategy: {}
-  # type: RollingUpdate
+updateStrategy:
+   # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+   statefulset: {}
+     # type: RollingUpdate
+
+   # ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+   deployment: {}
+    # rollingUpdate:
+    #  maxSurge: 25%
+    #  maxUnavailable: 25%
+    # type: RollingUpdate
 
 image:
   repository: victoriametrics/vmagent

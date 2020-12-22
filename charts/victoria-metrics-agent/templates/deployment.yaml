@@ -12,8 +12,10 @@ metadata:
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  {{- if .Values.updateStrategy.deployment }}
   strategy:
-    {{- toYaml .Values.deploymentStrategy | nindent 4 }}
+    {{- toYaml .Values.updateStrategy.deployment | nindent 4 }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "chart.selectorLabels" . | nindent 6 }}
