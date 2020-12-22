@@ -113,14 +113,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.5.0"` | Image tag |
+| image.tag | string | `"v0.6.1"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
 | logLevel | string | `"info"` | VM operator log level -- possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name overrid |
 | nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/ |
-| operator.disable_promethues_converter | string | `"false"` | By default, operator converts prometheus-operator objects. |
-| operator.enable_converter_ownership | string | `"false"` | Enables ownership reference for converted prometheus-operator objects, it will remove corresponding victoria-metrics objects in case of deletion prometheus one. |
-| operator.psp_auto_creation_enabled | string | `"true"` | By default, operator creates psp for its objects. |
+| operator.disable_promethues_converter | bool | `false` | By default, operator converts prometheus-operator objects. |
+| operator.enable_converter_ownership | bool | `false` | Enables ownership reference for converted prometheus-operator objects, it will remove corresponding victoria-metrics objects in case of deletion prometheus one. |
+| operator.psp_auto_creation_enabled | bool | `true` | By default, operator creates psp for its objects. |
 | rbac.create | bool | `true` | Specifies whether the RBAC resources should be created |
 | rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` |  |
