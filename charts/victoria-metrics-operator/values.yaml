@@ -5,9 +5,13 @@ image:
   # -- Image repository
   repository: victoriametrics/operator
   # -- Image tag
-  tag: v0.5.0
+  tag: v0.6.1
   # -- Image pull policy
   pullPolicy: IfNotPresent
+
+# -- enables CRD creation and management.
+# -- with this option, if you remove this chart, all crd resources will be deleted with it.
+createCRD: true
 
 replicaCount: 1
 
@@ -38,12 +42,12 @@ securityContext:
   {}
 operator:
   # -- By default, operator converts prometheus-operator objects.
-  disable_promethues_converter: "false"
+  disable_promethues_converter: false
   # -- By default, operator creates psp for its objects.
-  psp_auto_creation_enabled: "true"
+  psp_auto_creation_enabled: true
   # -- Enables ownership reference for converted prometheus-operator objects,
   # it will remove corresponding victoria-metrics objects in case of deletion prometheus one.
-  enable_converter_ownership: "false"
+  enable_converter_ownership: false
 
 
 serviceAccount:
