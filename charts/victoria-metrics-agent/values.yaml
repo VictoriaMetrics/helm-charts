@@ -3,10 +3,21 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
+
+## Deployment or StatefulSet
+# Deployment ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+# StatefulSet ref:  https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+kind: StatefulSet
+
+## WARN: If kind is Deployment that uses
 deploymentStrategy: {}
   # rollingUpdate:
   #  maxSurge: 25%
   #  maxUnavailable: 25%
+  # type: RollingUpdate
+
+## WARN: If kind is StatefulSet that uses
+updateStrategy: {}
   # type: RollingUpdate
 
 image:

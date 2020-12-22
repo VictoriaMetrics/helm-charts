@@ -1,6 +1,6 @@
-{{- if eq .Values.kind "Deployment" }}
+{{- if eq .Values.kind "StatefulSet" }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
@@ -12,8 +12,9 @@ metadata:
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
-  strategy:
-    {{- toYaml .Values.deploymentStrategy | nindent 4 }}
+  serviceName: {{ include "chart.fullname" . }}
+  updateStrategy:
+    {{- toYaml .Values.updateStrategy | nindent 4 }}
   selector:
     matchLabels:
       {{- include "chart.selectorLabels" . | nindent 6 }}
@@ -97,12 +98,13 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       volumes:
+      {{- if not .Values.persistence.enabled }}
         - name: tmpdata
-      {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "chart.fullname" .) }}
-      {{- else }}
           emptyDir: {}
+      {{- else if .Values.persistence.existingClaim }}
+      - name: tmpdata
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim }}
       {{- end }}
         - name: config
           configMap:
@@ -115,4 +117,29 @@ spec:
       {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+  {{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
+  volumeClaimTemplates:
+  - metadata:
+      name: tmpdata
+      labels:
+        {{- include "chart.labels" . | nindent 8 }}
+        {{- with .Values.persistence.extraLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.persistence.annotations  }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      accessModes:
+        {{- range .Values.persistence.accessModes }}
+        - {{ . | quote }}
+        {{- end }}
+      {{- if .Values.persistence.storageClassName }}
+      storageClassName: {{ .Values.persistence.storageClassName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size | quote }}
+  {{- end }}
 {{- end }}
