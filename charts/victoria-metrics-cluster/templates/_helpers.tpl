@@ -156,6 +156,16 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 {{- end -}}
 
+{{- define "victoria-metrics.vmselect.vmselect-pod-fqdn" -}}
+{{- $pod := include "victoria-metrics.vmselect.fullname" . -}}
+{{- $svc := include "victoria-metrics.vmselect.fullname" . -}}
+{{- $namespace := .Release.Namespace -}}
+{{- $dnsSuffix := .Values.clusterDomainSuffix -}}
+{{- range $i := until (.Values.vmselect.replicaCount | int) -}}
+{{- printf "- --selectNode=%s-%d.%s.%s.svc.%s:8481\n" $pod $i $svc $namespace $dnsSuffix -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "split-host-port" -}}
 {{- $hp := split ":" . -}}
 {{- printf "%s" $hp._1 -}}
