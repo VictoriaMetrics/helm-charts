@@ -4,6 +4,25 @@
 
 replicaCount: 1
 
+
+# ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+deployment:
+  enabled: false
+  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  strategy: {}
+   # rollingUpdate:
+   #  maxSurge: 25%
+   #  maxUnavailable: 25%
+   # type: RollingUpdate
+
+# ref:  https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+statefulset:
+  enabled: true
+  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  updateStrategy: {}
+    # type: RollingUpdate
+
+
 image:
   repository: victoriametrics/vmagent
   tag: "" # rewrites Chart.AppVersion

@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.6.8](https://img.shields.io/badge/Version-0.6.8-informational?style=flat-square)
+ ![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
@@ -248,6 +248,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[7].relabel_configs[5].target_label | string | `"kubernetes_pod_name"` |  |
 | configMap | string | `""` |  |
 | containerWorkingDir | string | `"/"` |  |
+| deploymentStrategy | object | `{}` |  |
 | env | list | `[]` |  |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
@@ -265,6 +266,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.extraLabels | object | `{}` |  |
 | ingress.hosts | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
+| kind | string | `"StatefulSet"` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
@@ -298,3 +300,4 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `nil` |  |
 | tolerations | list | `[]` |  |
+| updateStrategy | object | `{}` |  |
