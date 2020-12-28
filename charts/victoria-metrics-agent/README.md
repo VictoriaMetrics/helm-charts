@@ -248,7 +248,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[7].relabel_configs[5].target_label | string | `"kubernetes_pod_name"` |  |
 | configMap | string | `""` |  |
 | containerWorkingDir | string | `"/"` |  |
-| deploymentStrategy | object | `{}` |  |
+| deployment.enabled | bool | `true` |  |
+| deployment.strategy | object | `{}` |  |
 | env | list | `[]` |  |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
@@ -266,7 +267,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.extraLabels | object | `{}` |  |
 | ingress.hosts | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
-| kind | string | `"StatefulSet"` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
@@ -299,5 +299,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `nil` |  |
+| statefulset.enabled | bool | `false` |  |
+| statefulset.updateStrategy | object | `{}` |  |
 | tolerations | list | `[]` |  |
-| updateStrategy | object | `{}` |  |
