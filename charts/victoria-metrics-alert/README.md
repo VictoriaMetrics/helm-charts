@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.3.16](https://img.shields.io/badge/Version-0.3.16-informational?style=flat-square)
+ ![Version: 0.3.17](https://img.shields.io/badge/Version-0.3.17-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
@@ -113,6 +113,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.podMetadata.annotations | object | `{}` |  |
 | alertmanager.podMetadata.labels | object | `{}` |  |
 | alertmanager.podSecurityContext | object | `{}` |  |
+| alertmanager.priorityClassName | string | `""` |  |
 | alertmanager.replicaCount | int | `1` |  |
 | alertmanager.resources | object | `{}` |  |
 | alertmanager.retention | string | `"120h"` |  |
@@ -157,7 +158,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.podAnnotations | object | `{}` |  |
 | server.podDisruptionBudget.enabled | bool | `false` |  |
 | server.podDisruptionBudget.labels | object | `{}` |  |
+| server.podLabels | object | `{}` |  |
 | server.podSecurityContext | object | `{}` |  |
+| server.priorityClassName | string | `""` |  |
 | server.remote.read.url | string | `""` |  |
 | server.remote.write.url | string | `""` |  |
 | server.replicaCount | int | `1` |  |
