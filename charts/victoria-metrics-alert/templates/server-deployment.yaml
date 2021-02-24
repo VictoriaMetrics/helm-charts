@@ -2,7 +2,7 @@
 {{- if and (eq .Values.server.configMap "") (eq (len .Values.server.config.alerts.groups) 0) -}}
 {{- fail "at least one item in `.server.config.alerts.groups` must be set " -}}
 {{- end -}}
-{{- if and (not .Values.alertmanager.enabled) (eq .Values.server.notifier.alertmanager.url "") -}}
+{{- if and (.Values.alertmanager.enabled) (eq .Values.server.notifier.alertmanager.url "") -}}
 {{- fail "alert manager URL must be specified" -}}
 {{- end -}}
 {{- if eq .Values.server.datasource.url "" -}}
