@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.6.15](https://img.shields.io/badge/Version-0.6.15-informational?style=flat-square)
+ ![Version: 0.6.16](https://img.shields.io/badge/Version-0.6.16-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -119,6 +119,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
+| server.extraContainers | list | `[]` |  |
+| server.extraHostPathMounts | list | `[]` |  |
+| server.extraVolumeMounts | list | `[]` |  |
+| server.extraVolumes | list | `[]` |  |
 | server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | server.image.repository | string | `"victoriametrics/victoria-metrics"` | Image repository |
@@ -171,7 +175,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.statefulSet.service.labels | object | `{}` | Headless service labels |
 | server.statefulSet.service.servicePort | int | `8428` | Headless service port |
 | server.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
-| server.tolerations | list | `[]` | Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
+| server.tolerations | list | `[]` |  |
 | serviceAccount.automountToken | bool | `true` |  |
 | serviceAccount.create | bool | `true` | Create service account. |
 | serviceAccount.extraLabels | object | `{}` |  |

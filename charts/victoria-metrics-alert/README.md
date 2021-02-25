@@ -126,7 +126,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.pspEnabled | bool | `true` |  |
 | server.affinity | object | `{}` |  |
 | server.annotations | object | `{}` |  |
-| server.config.alerts.groups | list | `[]` |  |
+| server.config.alerts.groups | string | `nil` |  |
 | server.configMap | string | `""` |  |
 | server.datasource.basicAuth.password | string | `""` |  |
 | server.datasource.basicAuth.username | string | `""` |  |
@@ -136,6 +136,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
+| server.extraContainers | list | `[]` |  |
+| server.extraHostPathMounts | list | `[]` |  |
+| server.extraVolumeMounts | list | `[]` |  |
+| server.extraVolumes | list | `[]` |  |
 | server.fullnameOverride | string | `""` |  |
 | server.image.pullPolicy | string | `"IfNotPresent"` |  |
 | server.image.repository | string | `"victoriametrics/vmalert"` |  |

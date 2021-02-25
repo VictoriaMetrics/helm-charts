@@ -72,8 +72,22 @@ spec:
           volumeMounts:
             - mountPath: {{ .Values.vmselect.cacheMountPath }}
               name: cache-volume
+            {{- range .Values.vmstorage.extraHostPathMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly }}
+            {{- end }}
+            {{- with .Values.vmselect.extraVolumeMounts }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.vmselect.resources }}
           resources:
-{{ toYaml .Values.vmselect.resources | indent 12 }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.vmselect.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
       {{ toYaml .Values.imagePullSecrets | indent 2 }}
@@ -97,7 +111,15 @@ spec:
       affinity:
 {{ toYaml .Values.vmselect.affinity | indent 8 }}
     {{- end }}
-{{- if .Values.vmselect.persistentVolume.enabled }}
+      volumes:
+      {{- with .Values.vmselect.extraVolumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- if not .Values.vmselect.persistentVolume.enabled }}
+      - name: cache-volume
+        emptyDir: {}
+      {{- end }}
+  {{- if .Values.vmselect.persistentVolume.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: cache-volume
@@ -118,9 +140,5 @@ spec:
         storageClassName: "{{ .Values.vmselect.persistentVolume.storageClass }}"
         {{- end }}
         {{- end }}
-    {{- else }}
-      volumes:
-        - name: cache-volume
-          emptyDir: {}
 {{- end }}
 {{- end }}

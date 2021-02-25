@@ -80,8 +80,20 @@ spec:
           volumeMounts:
             - name: alerts-config
               mountPath: /config
+            {{- range .Values.server.extraHostPathMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly }}
+            {{- end }}
+            {{- with .Values.server.extraVolumeMounts }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.server.resources | nindent 12 }}
+        {{- with .Values.server.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.server.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -98,4 +110,12 @@ spec:
         - name: alerts-config
           configMap:
             name: {{ include "vmalert.server.configname" . }}
+        {{- range .Values.server.extraHostPathMounts }}
+        - name: {{ .name }}
+          hostPath:
+            path: {{ .hostPath }}
+        {{- end }}
+        {{- with .Values.server.extraVolumes }}
+      {{- toYaml . | nindent 8 }}
+  {{- end }}
 {{- end -}}

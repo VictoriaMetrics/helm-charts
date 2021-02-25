@@ -93,7 +93,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           resources:
-{{ toYaml .Values.server.resources | indent 12 }}
+            {{- toYaml .Values.server.resources | nindent 12 }}
           volumeMounts:
             - name: server-volume
               mountPath: {{ .Values.server.persistentVolume.mountPath }}
@@ -116,6 +116,12 @@ spec:
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
           {{- end }}
+          {{- with .Values.server.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.server.extraContainers }}
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
     {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
        {{ toYaml .Values.imagePullSecrets | indent 2 }}
@@ -140,7 +146,15 @@ spec:
 {{ toYaml .Values.server.affinity | indent 8 }}
     {{- end }}
       terminationGracePeriodSeconds: {{ .Values.server.terminationGracePeriodSeconds }}
-{{- if .Values.server.persistentVolume.enabled }}
+      volumes:
+        {{- if not .Values.server.persistentVolume.enabled }}
+        - name: server-volume
+          emptyDir: {}
+        {{- end }}
+        {{- with .Values.server.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+  {{- if .Values.server.persistentVolume.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: server-volume
@@ -161,9 +175,5 @@ spec:
         storageClassName: "{{ .Values.server.persistentVolume.storageClass }}"
       {{- end }}
       {{- end }}
-{{- else }}
-      volumes:
-        - name: server-volume
-          emptyDir: {}
 {{- end }}
 {{- end }}

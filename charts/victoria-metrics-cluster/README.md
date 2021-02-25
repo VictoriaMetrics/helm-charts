@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.8.14](https://img.shields.io/badge/Version-0.8.14-informational?style=flat-square)
+ ![Version: 0.8.15](https://img.shields.io/badge/Version-0.8.15-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -166,7 +166,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.extraArgs."envflag.enable" | string | `"true"` |  |
 | vmselect.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vmselect.extraArgs.loggerFormat | string | `"json"` |  |
+| vmselect.extraContainers | list | `[]` |  |
+| vmselect.extraHostPathMounts | list | `[]` |  |
 | vmselect.extraLabels | object | `{}` |  |
+| vmselect.extraVolumeMounts | list | `[]` |  |
+| vmselect.extraVolumes | list | `[]` |  |
 | vmselect.fullnameOverride | string | `""` | Overrides the full name of vmselect component |
 | vmselect.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmselect.image.repository | string | `"victoriametrics/vmselect"` | Image repository |
@@ -219,7 +223,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.extraArgs."envflag.enable" | string | `"true"` |  |
 | vmstorage.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vmstorage.extraArgs.loggerFormat | string | `"json"` |  |
+| vmstorage.extraContainers | list | `[]` |  |
+| vmstorage.extraHostPathMounts | list | `[]` |  |
 | vmstorage.extraLabels | object | `{}` |  |
+| vmstorage.extraVolumeMounts | list | `[]` |  |
+| vmstorage.extraVolumes | list | `[]` |  |
 | vmstorage.fullnameOverride | string | `nil` | Overrides the full name of vmstorage component |
 | vmstorage.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmstorage.image.repository | string | `"victoriametrics/vmstorage"` | Image repository |

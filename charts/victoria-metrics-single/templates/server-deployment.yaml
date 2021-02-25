@@ -125,6 +125,12 @@ spec:
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
           {{- end }}
+          {{- with .Values.server.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.server.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
        {{ toYaml .Values.imagePullSecrets | indent 2 }}
@@ -150,6 +156,9 @@ spec:
     {{- end }}
       terminationGracePeriodSeconds: {{ .Values.server.terminationGracePeriodSeconds }}
       volumes:
+      {{- with .Values.server.extraVolumes }}
+       {{- toYaml . | nindent 6 }}
+      {{- end }}
       - name: server-volume
 {{- if .Values.server.persistentVolume.enabled }}
         persistentVolumeClaim:
