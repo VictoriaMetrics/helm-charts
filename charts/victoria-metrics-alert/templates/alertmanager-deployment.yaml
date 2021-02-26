@@ -15,6 +15,9 @@ spec:
     metadata:
       labels:
         {{- include "vmalert.alertmanager.labels" . | nindent 8 }}
+        {{- range $key, $value := .Values.alertmanager.podMetadata.labels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/alertmanager-configmap.yaml") . | sha256sum }}
         {{- range $key, $value := .Values.alertmanager.podMetadata.annotations }}
@@ -66,6 +69,9 @@ spec:
       {{- with .Values.alertmanager.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.alertmanager.priorityClassName }}
+      priorityClassName: {{ .Values.alertmanager.priorityClassName | quote }}
       {{- end }}
       {{- with .Values.server.affinity }}
       affinity:
