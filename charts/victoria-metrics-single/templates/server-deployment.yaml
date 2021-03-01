@@ -28,6 +28,9 @@ spec:
     {{- end }}
       labels:
         {{- include "victoria-metrics.server.labels" . | nindent 8 }}
+        {{- range $key, $value := .Values.server.podLabels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
     spec:
 {{- if .Values.server.affinity }}
       affinity:

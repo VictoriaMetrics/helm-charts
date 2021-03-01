@@ -147,6 +147,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.persistentVolume.storageClass | string | `""` | StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically |
 | server.persistentVolume.subPath | string | `""` | Mount subpath |
 | server.podAnnotations | object | `{}` | Pod's annotations |
+| server.podLabels | object | `{}` | Pod's additional labels |
 | server.podManagementPolicy | string | `"OrderedReady"` | Pod's management policy  |
 | server.podSecurityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | server.priorityClassName | string | `""` | Name of Priority Class |
