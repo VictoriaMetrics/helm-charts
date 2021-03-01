@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.3.17](https://img.shields.io/badge/Version-0.3.17-informational?style=flat-square)
+ ![Version: 0.3.18](https://img.shields.io/badge/Version-0.3.18-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
@@ -127,7 +127,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.pspEnabled | bool | `true` |  |
 | server.affinity | object | `{}` |  |
 | server.annotations | object | `{}` |  |
-| server.config.alerts.groups | string | `nil` |  |
+| server.config.alerts.groups | list | `[]` |  |
 | server.configMap | string | `""` |  |
 | server.datasource.basicAuth.password | string | `""` |  |
 | server.datasource.basicAuth.username | string | `""` |  |
