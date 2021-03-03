@@ -1,6 +1,8 @@
 {{- if and .Values.server.enabled -}}
+{{- if not .Values.server.extraArgs.rule }}
 {{- if and (eq .Values.server.configMap "") (eq (len .Values.server.config.alerts.groups) 0) -}}
-{{- fail "at least one item in `.server.config.alerts.groups` must be set " -}}
+{{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
+{{- end -}}
 {{- end -}}
 {{- if and (.Values.alertmanager.enabled) (eq .Values.server.notifier.alertmanager.url "") -}}
 {{- fail "alert manager URL must be specified" -}}
