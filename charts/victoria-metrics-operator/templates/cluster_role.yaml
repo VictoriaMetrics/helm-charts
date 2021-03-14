@@ -10,6 +10,7 @@ rules:
   - ""
   resources:
   - configmaps
+  - configmaps/finalizers
   verbs:
   - '*'
 - apiGroups:
@@ -36,6 +37,7 @@ rules:
   - ""
   resources:
   - persistentvolumeclaims
+  - persistentvolumeclaims/finalizers
   verbs:
   - '*'
 - apiGroups:
@@ -48,6 +50,7 @@ rules:
   - ""
   resources:
   - secrets
+  - secrets/finalizers
   verbs:
   - '*'
 - apiGroups:
@@ -66,6 +69,7 @@ rules:
   - apps
   resources:
   - deployments
+  - deployments/finalizers
   verbs:
   - '*'
 - apiGroups:
@@ -78,6 +82,7 @@ rules:
   - apps
   resources:
   - statefulsets
+  - statefulsets/finalizers
   verbs:
   - '*'
 - apiGroups:
@@ -307,7 +312,9 @@ rules:
     - "rbac.authorization.k8s.io"
   resources:
     - clusterrolebindings
+    - clusterrolebindings/finalizers
     - clusterroles
+    - clusterroles/finalizers
   verbs:
     - get
     - list
@@ -315,10 +322,12 @@ rules:
     - patch
     - update
     - watch
+    - delete
 - apiGroups:
     - "policy"
   resources:
     - podsecuritypolicies
+    - podsecuritypolicies/finalizers
   verbs:
     - get
     - list
@@ -327,15 +336,19 @@ rules:
     - update
     - use
     - watch
+    - delete
 - apiGroups:
     - ""
   resources:
     - serviceaccounts
+    - serviceaccounts/finalizers
   verbs:
     - get
     - list
     - create
     - watch
+    - update
+    - delete
 - apiGroups:
     - operator.victoriametrics.com
   resources:
@@ -353,6 +366,27 @@ rules:
     - operator.victoriametrics.com
   resources:
     - vmnodescrapes/status
+  verbs:
+    - get
+    - patch
+    - update
+- apiGroups:
+    - operator.victoriametrics.com
+  resources:
+    - vmstaticscrapes
+    - vmstaticscrapes/finalizers
+  verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - update
+    - watch
+- apiGroups:
+    - operator.victoriametrics.com
+  resources:
+    - vmstaticscrapes/status
   verbs:
     - get
     - patch

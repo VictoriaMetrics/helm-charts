@@ -264,7 +264,7 @@ spec:
                         - key
                         type: object
                       fieldRef:
-                        description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                        description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                         properties:
                           apiVersion:
                             description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -366,6 +366,22 @@ spec:
                 - name
                 type: object
               type: array
+            insertPorts:
+              description: InsertPorts - additional listen ports for data ingestion.
+              properties:
+                graphitePort:
+                  description: GraphitePort listen port
+                  type: string
+                influxPort:
+                  description: InfluxPort listen port
+                  type: string
+                openTSDBHTTPPort:
+                  description: OpenTSDBHTTPPort for http connections.
+                  type: string
+                openTSDBPort:
+                  description: OpenTSDBPort for tcp and udp listen
+                  type: string
+              type: object
             logFormat:
               description: LogFormat for VMAgent to be configured with.
               enum:
@@ -412,7 +428,7 @@ spec:
                   type: object
               type: object
             nodeScrapeSelector:
-              description: NodeScrapeSelector defines VMNodeScrape to be selected for scraping. if neither PodScrapeNamespaceSelector nor ProbeSelector nor PodScrapeSelector nor NodeScrapeSelector are specified, configuration is unmanaged.
+              description: NodeScrapeSelector defines VMNodeScrape to be selected for scraping.
               properties:
                 matchExpressions:
                   description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
@@ -465,7 +481,7 @@ spec:
                   type: string
               type: object
             podScrapeNamespaceSelector:
-              description: PodScrapeNamespaceSelector defines Namespaces to be selected for PodMonitor discovery. If nil, only check own namespace.
+              description: PodScrapeNamespaceSelector defines Namespaces to be selected for VMPodScrape discovery. If nil, only check own namespace.
               properties:
                 matchExpressions:
                   description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
@@ -495,7 +511,7 @@ spec:
                   type: object
               type: object
             podScrapeSelector:
-              description: PodScrapeSelector defines PodScrapes to be selected for target discovery. if neither PodScrapeNamespaceSelector nor ProbeSelector nor PodScrapeSelector nor NodeScrapeSelector are specified, configuration is unmanaged.
+              description: PodScrapeSelector defines PodScrapes to be selected for target discovery.
               properties:
                 matchExpressions:
                   description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
@@ -564,7 +580,7 @@ spec:
                   type: object
               type: object
             probeSelector:
-              description: ProbeSelector defines VMProbe to be selected for target probing. if neither PodScrapeNamespaceSelector nor ProbeSelector nor PodScrapeSelector nor NodeScrapeSelector are specified, configuration is unmanaged.
+              description: ProbeSelector defines VMProbe to be selected for target probing.
               properties:
                 matchExpressions:
                   description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
@@ -870,7 +886,7 @@ spec:
                   format: int64
                   type: integer
                 fsGroupChangePolicy:
-                  description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified defaults to "Always".'
+                  description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.'
                   type: string
                 runAsGroup:
                   description: The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
@@ -898,6 +914,18 @@ spec:
                     user:
                       description: User is a SELinux user label that applies to the container.
                       type: string
+                  type: object
+                seccompProfile:
+                  description: The seccomp options to use by the containers in this pod.
+                  properties:
+                    localhostProfile:
+                      description: localhostProfile indicates a profile defined in a file on the node should be used. The profile must be preconfigured on the node to work. Must be a descending path, relative to the kubelet's configured seccomp profile location. Must only be set if type is "Localhost".
+                      type: string
+                    type:
+                      description: "type indicates which kind of seccomp profile will be applied. Valid options are: \n Localhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied."
+                      type: string
+                  required:
+                  - type
                   type: object
                 supplementalGroups:
                   description: A list of groups applied to the first process run in each container, in addition to the container's primary GID.  If unspecified, no groups will be added to any container.
@@ -939,7 +967,7 @@ spec:
               description: ServiceAccountName is the name of the ServiceAccount to use to run the VMAgent Pods.
               type: string
             serviceScrapeNamespaceSelector:
-              description: ServiceScrapeNamespaceSelector Namespaces to be selected for ServiceMonitor discovery. If nil, only check own namespace.
+              description: ServiceScrapeNamespaceSelector Namespaces to be selected for VMServiceScrape discovery. If nil, only check own namespace.
               properties:
                 matchExpressions:
                   description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
@@ -969,7 +997,67 @@ spec:
                   type: object
               type: object
             serviceScrapeSelector:
-              description: ServiceScrapeSelector defines ServiceScrapes to be selected for target discovery. if if neither PodScrapeNamespaceSelector nor ProbeSelector nor PodScrapeSelector nor NodeScrapeSelector are specified, configuration is unmanaged.
+              description: ServiceScrapeSelector defines ServiceScrapes to be selected for target discovery.
+              properties:
+                matchExpressions:
+                  description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                  items:
+                    description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                    properties:
+                      key:
+                        description: key is the label key that the selector applies to.
+                        type: string
+                      operator:
+                        description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+                        type: string
+                      values:
+                        description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - key
+                    - operator
+                    type: object
+                  type: array
+                matchLabels:
+                  additionalProperties:
+                    type: string
+                  description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+                  type: object
+              type: object
+            staticScrapeNamespaceSelector:
+              description: StaticScrapeNamespaceSelector defines Namespaces to be selected for VMStaticScrape discovery. If nil, only check own namespace.
+              properties:
+                matchExpressions:
+                  description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                  items:
+                    description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                    properties:
+                      key:
+                        description: key is the label key that the selector applies to.
+                        type: string
+                      operator:
+                        description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+                        type: string
+                      values:
+                        description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - key
+                    - operator
+                    type: object
+                  type: array
+                matchLabels:
+                  additionalProperties:
+                    type: string
+                  description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+                  type: object
+              type: object
+            staticScrapeSelector:
+              description: StaticScrapeSelector defines PodScrapes to be selected for target discovery.
               properties:
                 matchExpressions:
                   description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
@@ -1183,7 +1271,7 @@ spec:
                     description: ConfigMap represents a configMap that should populate this volume
                     properties:
                       defaultMode:
-                        description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                        description: 'Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                         format: int32
                         type: integer
                       items:
@@ -1195,7 +1283,7 @@ spec:
                               description: The key to project.
                               type: string
                             mode:
-                              description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                              description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                               format: int32
                               type: integer
                             path:
@@ -1214,7 +1302,7 @@ spec:
                         type: boolean
                     type: object
                   csi:
-                    description: CSI (Container Storage Interface) represents storage that is handled by an external CSI driver (Alpha feature).
+                    description: CSI (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
                     properties:
                       driver:
                         description: Driver is the name of the CSI driver that handles this volume. Consult with your admin for the correct name as registered in the cluster.
@@ -1244,7 +1332,7 @@ spec:
                     description: DownwardAPI represents downward API about the pod that should populate this volume
                     properties:
                       defaultMode:
-                        description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                        description: 'Optional: mode bits to use on created files by default. Must be a Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                         format: int32
                         type: integer
                       items:
@@ -1265,7 +1353,7 @@ spec:
                               - fieldPath
                               type: object
                             mode:
-                              description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                              description: 'Optional: mode bits used to set permissions on this file, must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                               format: int32
                               type: integer
                             path:
@@ -1308,6 +1396,108 @@ spec:
                         description: 'Total amount of local storage required for this EmptyDir volume. The size limit is also applicable for memory medium. The maximum usage on memory medium EmptyDir would be the minimum value between the SizeLimit specified here and the sum of memory limits of all containers in a pod. The default is nil which means that the limit is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
                         pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                         x-kubernetes-int-or-string: true
+                    type: object
+                  ephemeral:
+                    description: "Ephemeral represents a volume that is handled by a cluster storage driver (Alpha feature). The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts, and deleted when the pod is removed. \n Use this if: a) the volume is only needed while the pod runs, b) features of normal volumes like restoring from snapshot or capacity    tracking are needed, c) the storage driver is specified through a storage class, and d) the storage driver supports dynamic volume provisioning through    a PersistentVolumeClaim (see EphemeralVolumeSource for more    information on the connection between this volume type    and PersistentVolumeClaim). \n Use PersistentVolumeClaim or one of the vendor-specific APIs for volumes that persist for longer than the lifecycle of an individual pod. \n Use CSI for light-weight local ephemeral volumes if the CSI driver is meant to be used that way - see the documentation of the driver for more information. \n A pod can use both types of ephemeral volumes and persistent volumes at the same time."
+                    properties:
+                      readOnly:
+                        description: Specifies a read-only configuration for the volume. Defaults to false (read/write).
+                        type: boolean
+                      volumeClaimTemplate:
+                        description: "Will be used to create a stand-alone PVC to provision the volume. The pod in which this EphemeralVolumeSource is embedded will be the owner of the PVC, i.e. the PVC will be deleted together with the pod.  The name of the PVC will be `<pod name>-<volume name>` where `<volume name>` is the name from the `PodSpec.Volumes` array entry. Pod validation will reject the pod if the concatenated name is not valid for a PVC (for example, too long). \n An existing PVC with that name that is not owned by the pod will *not* be used for the pod to avoid using an unrelated volume by mistake. Starting the pod is then blocked until the unrelated PVC is removed. If such a pre-created PVC is meant to be used by the pod, the PVC has to updated with an owner reference to the pod once the pod exists. Normally this should not be necessary, but it may be useful when manually reconstructing a broken cluster. \n This field is read-only and no changes will be made by Kubernetes to the PVC after it has been created. \n Required, must not be nil."
+                        properties:
+                          metadata:
+                            description: May contain labels and annotations that will be copied into the PVC when creating it. No other fields are allowed and will be rejected during validation.
+                            type: object
+                          spec:
+                            description: The specification for the PersistentVolumeClaim. The entire content is copied unchanged into the PVC that gets created from this template. The same fields as in a PersistentVolumeClaim are also valid here.
+                            properties:
+                              accessModes:
+                                description: 'AccessModes contains the desired access modes the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                                items:
+                                  type: string
+                                type: array
+                              dataSource:
+                                description: 'This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot) * An existing PVC (PersistentVolumeClaim) * An existing custom resource that implements data population (Alpha) In order to use custom resource types that implement data population, the AnyVolumeDataSource feature gate must be enabled. If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source.'
+                                properties:
+                                  apiGroup:
+                                    description: APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.
+                                    type: string
+                                  kind:
+                                    description: Kind is the type of resource being referenced
+                                    type: string
+                                  name:
+                                    description: Name is the name of resource being referenced
+                                    type: string
+                                required:
+                                - kind
+                                - name
+                                type: object
+                              resources:
+                                description: 'Resources represents the minimum resources the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
+                                properties:
+                                  limits:
+                                    additionalProperties:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      x-kubernetes-int-or-string: true
+                                    description: 'Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                    type: object
+                                  requests:
+                                    additionalProperties:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      x-kubernetes-int-or-string: true
+                                    description: 'Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                    type: object
+                                type: object
+                              selector:
+                                description: A label query over volumes to consider for binding.
+                                properties:
+                                  matchExpressions:
+                                    description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                                    items:
+                                      description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                      properties:
+                                        key:
+                                          description: key is the label key that the selector applies to.
+                                          type: string
+                                        operator:
+                                          description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+                                          type: string
+                                        values:
+                                          description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+                                          items:
+                                            type: string
+                                          type: array
+                                      required:
+                                      - key
+                                      - operator
+                                      type: object
+                                    type: array
+                                  matchLabels:
+                                    additionalProperties:
+                                      type: string
+                                    description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                    type: object
+                                type: object
+                              storageClassName:
+                                description: 'Name of the StorageClass required by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
+                                type: string
+                              volumeMode:
+                                description: volumeMode defines what type of volume is required by the claim. Value of Filesystem is implied when not included in claim spec.
+                                type: string
+                              volumeName:
+                                description: VolumeName is the binding reference to the PersistentVolume backing this claim.
+                                type: string
+                            type: object
+                        required:
+                        - spec
+                        type: object
                     type: object
                   fc:
                     description: FC represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
@@ -1542,7 +1732,7 @@ spec:
                     description: Items for all in one resources secrets, configmaps, and downward API
                     properties:
                       defaultMode:
-                        description: Mode bits to use on created files by default. Must be a value between 0 and 0777. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
+                        description: Mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
                         format: int32
                         type: integer
                       sources:
@@ -1562,7 +1752,7 @@ spec:
                                         description: The key to project.
                                         type: string
                                       mode:
-                                        description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                        description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                         format: int32
                                         type: integer
                                       path:
@@ -1601,7 +1791,7 @@ spec:
                                         - fieldPath
                                         type: object
                                       mode:
-                                        description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                        description: 'Optional: mode bits used to set permissions on this file, must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                         format: int32
                                         type: integer
                                       path:
@@ -1643,7 +1833,7 @@ spec:
                                         description: The key to project.
                                         type: string
                                       mode:
-                                        description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                        description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                         format: int32
                                         type: integer
                                       path:
@@ -1679,8 +1869,6 @@ spec:
                               type: object
                           type: object
                         type: array
-                    required:
-                    - sources
                     type: object
                   quobyte:
                     description: Quobyte represents a Quobyte mount on the host that shares a pod's lifetime
@@ -1790,7 +1978,7 @@ spec:
                     description: 'Secret represents a secret that should populate this volume. More info: https://kubernetes.io/docs/concepts/storage/volumes#secret'
                     properties:
                       defaultMode:
-                        description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                        description: 'Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                         format: int32
                         type: integer
                       items:
@@ -1802,7 +1990,7 @@ spec:
                               description: The key to project.
                               type: string
                             mode:
-                              description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                              description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                               format: int32
                               type: integer
                             path:
@@ -2108,7 +2296,7 @@ spec:
                   format: int64
                   type: integer
                 fsGroupChangePolicy:
-                  description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified defaults to "Always".'
+                  description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.'
                   type: string
                 runAsGroup:
                   description: The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
@@ -2136,6 +2324,18 @@ spec:
                     user:
                       description: User is a SELinux user label that applies to the container.
                       type: string
+                  type: object
+                seccompProfile:
+                  description: The seccomp options to use by the containers in this pod.
+                  properties:
+                    localhostProfile:
+                      description: localhostProfile indicates a profile defined in a file on the node should be used. The profile must be preconfigured on the node to work. Must be a descending path, relative to the kubelet's configured seccomp profile location. Must only be set if type is "Localhost".
+                      type: string
+                    type:
+                      description: "type indicates which kind of seccomp profile will be applied. Valid options are: \n Localhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied."
+                      type: string
+                  required:
+                  - type
                   type: object
                 supplementalGroups:
                   description: A list of groups applied to the first process run in each container, in addition to the container's primary GID.  If unspecified, no groups will be added to any container.
@@ -2231,7 +2431,7 @@ spec:
                             type: string
                           type: array
                         dataSource:
-                          description: 'This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot - Beta) * An existing PVC (PersistentVolumeClaim) * An existing custom resource/object that implements data population (Alpha) In order to use VolumeSnapshot object types, the appropriate feature gate must be enabled (VolumeSnapshotDataSource or AnyVolumeDataSource) If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source. If the specified data source is not supported, the volume will not be created and the failure will be reported as an event. In the future, we plan to support more data source types and the behavior of the provisioner may change.'
+                          description: 'This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot) * An existing PVC (PersistentVolumeClaim) * An existing custom resource that implements data population (Alpha) In order to use custom resource types that implement data population, the AnyVolumeDataSource feature gate must be enabled. If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source.'
                           properties:
                             apiGroup:
                               description: APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.
@@ -2542,7 +2742,7 @@ spec:
                     description: ConfigMap represents a configMap that should populate this volume
                     properties:
                       defaultMode:
-                        description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                        description: 'Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                         format: int32
                         type: integer
                       items:
@@ -2554,7 +2754,7 @@ spec:
                               description: The key to project.
                               type: string
                             mode:
-                              description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                              description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                               format: int32
                               type: integer
                             path:
@@ -2573,7 +2773,7 @@ spec:
                         type: boolean
                     type: object
                   csi:
-                    description: CSI (Container Storage Interface) represents storage that is handled by an external CSI driver (Alpha feature).
+                    description: CSI (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
                     properties:
                       driver:
                         description: Driver is the name of the CSI driver that handles this volume. Consult with your admin for the correct name as registered in the cluster.
@@ -2603,7 +2803,7 @@ spec:
                     description: DownwardAPI represents downward API about the pod that should populate this volume
                     properties:
                       defaultMode:
-                        description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                        description: 'Optional: mode bits to use on created files by default. Must be a Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                         format: int32
                         type: integer
                       items:
@@ -2624,7 +2824,7 @@ spec:
                               - fieldPath
                               type: object
                             mode:
-                              description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                              description: 'Optional: mode bits used to set permissions on this file, must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                               format: int32
                               type: integer
                             path:
@@ -2667,6 +2867,108 @@ spec:
                         description: 'Total amount of local storage required for this EmptyDir volume. The size limit is also applicable for memory medium. The maximum usage on memory medium EmptyDir would be the minimum value between the SizeLimit specified here and the sum of memory limits of all containers in a pod. The default is nil which means that the limit is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
                         pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                         x-kubernetes-int-or-string: true
+                    type: object
+                  ephemeral:
+                    description: "Ephemeral represents a volume that is handled by a cluster storage driver (Alpha feature). The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts, and deleted when the pod is removed. \n Use this if: a) the volume is only needed while the pod runs, b) features of normal volumes like restoring from snapshot or capacity    tracking are needed, c) the storage driver is specified through a storage class, and d) the storage driver supports dynamic volume provisioning through    a PersistentVolumeClaim (see EphemeralVolumeSource for more    information on the connection between this volume type    and PersistentVolumeClaim). \n Use PersistentVolumeClaim or one of the vendor-specific APIs for volumes that persist for longer than the lifecycle of an individual pod. \n Use CSI for light-weight local ephemeral volumes if the CSI driver is meant to be used that way - see the documentation of the driver for more information. \n A pod can use both types of ephemeral volumes and persistent volumes at the same time."
+                    properties:
+                      readOnly:
+                        description: Specifies a read-only configuration for the volume. Defaults to false (read/write).
+                        type: boolean
+                      volumeClaimTemplate:
+                        description: "Will be used to create a stand-alone PVC to provision the volume. The pod in which this EphemeralVolumeSource is embedded will be the owner of the PVC, i.e. the PVC will be deleted together with the pod.  The name of the PVC will be `<pod name>-<volume name>` where `<volume name>` is the name from the `PodSpec.Volumes` array entry. Pod validation will reject the pod if the concatenated name is not valid for a PVC (for example, too long). \n An existing PVC with that name that is not owned by the pod will *not* be used for the pod to avoid using an unrelated volume by mistake. Starting the pod is then blocked until the unrelated PVC is removed. If such a pre-created PVC is meant to be used by the pod, the PVC has to updated with an owner reference to the pod once the pod exists. Normally this should not be necessary, but it may be useful when manually reconstructing a broken cluster. \n This field is read-only and no changes will be made by Kubernetes to the PVC after it has been created. \n Required, must not be nil."
+                        properties:
+                          metadata:
+                            description: May contain labels and annotations that will be copied into the PVC when creating it. No other fields are allowed and will be rejected during validation.
+                            type: object
+                          spec:
+                            description: The specification for the PersistentVolumeClaim. The entire content is copied unchanged into the PVC that gets created from this template. The same fields as in a PersistentVolumeClaim are also valid here.
+                            properties:
+                              accessModes:
+                                description: 'AccessModes contains the desired access modes the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                                items:
+                                  type: string
+                                type: array
+                              dataSource:
+                                description: 'This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot) * An existing PVC (PersistentVolumeClaim) * An existing custom resource that implements data population (Alpha) In order to use custom resource types that implement data population, the AnyVolumeDataSource feature gate must be enabled. If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source.'
+                                properties:
+                                  apiGroup:
+                                    description: APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.
+                                    type: string
+                                  kind:
+                                    description: Kind is the type of resource being referenced
+                                    type: string
+                                  name:
+                                    description: Name is the name of resource being referenced
+                                    type: string
+                                required:
+                                - kind
+                                - name
+                                type: object
+                              resources:
+                                description: 'Resources represents the minimum resources the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
+                                properties:
+                                  limits:
+                                    additionalProperties:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      x-kubernetes-int-or-string: true
+                                    description: 'Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                    type: object
+                                  requests:
+                                    additionalProperties:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      x-kubernetes-int-or-string: true
+                                    description: 'Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                    type: object
+                                type: object
+                              selector:
+                                description: A label query over volumes to consider for binding.
+                                properties:
+                                  matchExpressions:
+                                    description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                                    items:
+                                      description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                      properties:
+                                        key:
+                                          description: key is the label key that the selector applies to.
+                                          type: string
+                                        operator:
+                                          description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+                                          type: string
+                                        values:
+                                          description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+                                          items:
+                                            type: string
+                                          type: array
+                                      required:
+                                      - key
+                                      - operator
+                                      type: object
+                                    type: array
+                                  matchLabels:
+                                    additionalProperties:
+                                      type: string
+                                    description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                    type: object
+                                type: object
+                              storageClassName:
+                                description: 'Name of the StorageClass required by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
+                                type: string
+                              volumeMode:
+                                description: volumeMode defines what type of volume is required by the claim. Value of Filesystem is implied when not included in claim spec.
+                                type: string
+                              volumeName:
+                                description: VolumeName is the binding reference to the PersistentVolume backing this claim.
+                                type: string
+                            type: object
+                        required:
+                        - spec
+                        type: object
                     type: object
                   fc:
                     description: FC represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
@@ -2901,7 +3203,7 @@ spec:
                     description: Items for all in one resources secrets, configmaps, and downward API
                     properties:
                       defaultMode:
-                        description: Mode bits to use on created files by default. Must be a value between 0 and 0777. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
+                        description: Mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
                         format: int32
                         type: integer
                       sources:
@@ -2921,7 +3223,7 @@ spec:
                                         description: The key to project.
                                         type: string
                                       mode:
-                                        description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                        description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                         format: int32
                                         type: integer
                                       path:
@@ -2960,7 +3262,7 @@ spec:
                                         - fieldPath
                                         type: object
                                       mode:
-                                        description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                        description: 'Optional: mode bits used to set permissions on this file, must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                         format: int32
                                         type: integer
                                       path:
@@ -3002,7 +3304,7 @@ spec:
                                         description: The key to project.
                                         type: string
                                       mode:
-                                        description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                        description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                         format: int32
                                         type: integer
                                       path:
@@ -3038,8 +3340,6 @@ spec:
                               type: object
                           type: object
                         type: array
-                    required:
-                    - sources
                     type: object
                   quobyte:
                     description: Quobyte represents a Quobyte mount on the host that shares a pod's lifetime
@@ -3149,7 +3449,7 @@ spec:
                     description: 'Secret represents a secret that should populate this volume. More info: https://kubernetes.io/docs/concepts/storage/volumes#secret'
                     properties:
                       defaultMode:
-                        description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                        description: 'Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                         format: int32
                         type: integer
                       items:
@@ -3161,7 +3461,7 @@ spec:
                               description: The key to project.
                               type: string
                             mode:
-                              description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                              description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                               format: int32
                               type: integer
                             path:
@@ -3465,6 +3765,11 @@ spec:
               description: EvaluationInterval how often evalute rules by default
               pattern: '[0-9]+(ms|s|m|h)'
               type: string
+            externalLabels:
+              additionalProperties:
+                type: string
+              description: 'ExternalLabels in the form ''name: value'' to add to all generated recording rules and alerts.'
+              type: object
             extraArgs:
               additionalProperties:
                 type: string
@@ -3500,7 +3805,7 @@ spec:
                         - key
                         type: object
                       fieldRef:
-                        description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                        description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                         properties:
                           apiVersion:
                             description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -4337,7 +4642,7 @@ spec:
                   format: int64
                   type: integer
                 fsGroupChangePolicy:
-                  description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified defaults to "Always".'
+                  description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.'
                   type: string
                 runAsGroup:
                   description: The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
@@ -4365,6 +4670,18 @@ spec:
                     user:
                       description: User is a SELinux user label that applies to the container.
                       type: string
+                  type: object
+                seccompProfile:
+                  description: The seccomp options to use by the containers in this pod.
+                  properties:
+                    localhostProfile:
+                      description: localhostProfile indicates a profile defined in a file on the node should be used. The profile must be preconfigured on the node to work. Must be a descending path, relative to the kubelet's configured seccomp profile location. Must only be set if type is "Localhost".
+                      type: string
+                    type:
+                      description: "type indicates which kind of seccomp profile will be applied. Valid options are: \n Localhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied."
+                      type: string
+                  required:
+                  - type
                   type: object
                 supplementalGroups:
                   description: A list of groups applied to the first process run in each container, in addition to the container's primary GID.  If unspecified, no groups will be added to any container.
@@ -4587,7 +4904,7 @@ spec:
                     description: ConfigMap represents a configMap that should populate this volume
                     properties:
                       defaultMode:
-                        description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                        description: 'Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                         format: int32
                         type: integer
                       items:
@@ -4599,7 +4916,7 @@ spec:
                               description: The key to project.
                               type: string
                             mode:
-                              description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                              description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                               format: int32
                               type: integer
                             path:
@@ -4618,7 +4935,7 @@ spec:
                         type: boolean
                     type: object
                   csi:
-                    description: CSI (Container Storage Interface) represents storage that is handled by an external CSI driver (Alpha feature).
+                    description: CSI (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
                     properties:
                       driver:
                         description: Driver is the name of the CSI driver that handles this volume. Consult with your admin for the correct name as registered in the cluster.
@@ -4648,7 +4965,7 @@ spec:
                     description: DownwardAPI represents downward API about the pod that should populate this volume
                     properties:
                       defaultMode:
-                        description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                        description: 'Optional: mode bits to use on created files by default. Must be a Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                         format: int32
                         type: integer
                       items:
@@ -4669,7 +4986,7 @@ spec:
                               - fieldPath
                               type: object
                             mode:
-                              description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                              description: 'Optional: mode bits used to set permissions on this file, must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                               format: int32
                               type: integer
                             path:
@@ -4712,6 +5029,108 @@ spec:
                         description: 'Total amount of local storage required for this EmptyDir volume. The size limit is also applicable for memory medium. The maximum usage on memory medium EmptyDir would be the minimum value between the SizeLimit specified here and the sum of memory limits of all containers in a pod. The default is nil which means that the limit is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
                         pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                         x-kubernetes-int-or-string: true
+                    type: object
+                  ephemeral:
+                    description: "Ephemeral represents a volume that is handled by a cluster storage driver (Alpha feature). The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts, and deleted when the pod is removed. \n Use this if: a) the volume is only needed while the pod runs, b) features of normal volumes like restoring from snapshot or capacity    tracking are needed, c) the storage driver is specified through a storage class, and d) the storage driver supports dynamic volume provisioning through    a PersistentVolumeClaim (see EphemeralVolumeSource for more    information on the connection between this volume type    and PersistentVolumeClaim). \n Use PersistentVolumeClaim or one of the vendor-specific APIs for volumes that persist for longer than the lifecycle of an individual pod. \n Use CSI for light-weight local ephemeral volumes if the CSI driver is meant to be used that way - see the documentation of the driver for more information. \n A pod can use both types of ephemeral volumes and persistent volumes at the same time."
+                    properties:
+                      readOnly:
+                        description: Specifies a read-only configuration for the volume. Defaults to false (read/write).
+                        type: boolean
+                      volumeClaimTemplate:
+                        description: "Will be used to create a stand-alone PVC to provision the volume. The pod in which this EphemeralVolumeSource is embedded will be the owner of the PVC, i.e. the PVC will be deleted together with the pod.  The name of the PVC will be `<pod name>-<volume name>` where `<volume name>` is the name from the `PodSpec.Volumes` array entry. Pod validation will reject the pod if the concatenated name is not valid for a PVC (for example, too long). \n An existing PVC with that name that is not owned by the pod will *not* be used for the pod to avoid using an unrelated volume by mistake. Starting the pod is then blocked until the unrelated PVC is removed. If such a pre-created PVC is meant to be used by the pod, the PVC has to updated with an owner reference to the pod once the pod exists. Normally this should not be necessary, but it may be useful when manually reconstructing a broken cluster. \n This field is read-only and no changes will be made by Kubernetes to the PVC after it has been created. \n Required, must not be nil."
+                        properties:
+                          metadata:
+                            description: May contain labels and annotations that will be copied into the PVC when creating it. No other fields are allowed and will be rejected during validation.
+                            type: object
+                          spec:
+                            description: The specification for the PersistentVolumeClaim. The entire content is copied unchanged into the PVC that gets created from this template. The same fields as in a PersistentVolumeClaim are also valid here.
+                            properties:
+                              accessModes:
+                                description: 'AccessModes contains the desired access modes the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                                items:
+                                  type: string
+                                type: array
+                              dataSource:
+                                description: 'This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot) * An existing PVC (PersistentVolumeClaim) * An existing custom resource that implements data population (Alpha) In order to use custom resource types that implement data population, the AnyVolumeDataSource feature gate must be enabled. If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source.'
+                                properties:
+                                  apiGroup:
+                                    description: APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.
+                                    type: string
+                                  kind:
+                                    description: Kind is the type of resource being referenced
+                                    type: string
+                                  name:
+                                    description: Name is the name of resource being referenced
+                                    type: string
+                                required:
+                                - kind
+                                - name
+                                type: object
+                              resources:
+                                description: 'Resources represents the minimum resources the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
+                                properties:
+                                  limits:
+                                    additionalProperties:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      x-kubernetes-int-or-string: true
+                                    description: 'Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                    type: object
+                                  requests:
+                                    additionalProperties:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      x-kubernetes-int-or-string: true
+                                    description: 'Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                    type: object
+                                type: object
+                              selector:
+                                description: A label query over volumes to consider for binding.
+                                properties:
+                                  matchExpressions:
+                                    description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                                    items:
+                                      description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                      properties:
+                                        key:
+                                          description: key is the label key that the selector applies to.
+                                          type: string
+                                        operator:
+                                          description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+                                          type: string
+                                        values:
+                                          description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+                                          items:
+                                            type: string
+                                          type: array
+                                      required:
+                                      - key
+                                      - operator
+                                      type: object
+                                    type: array
+                                  matchLabels:
+                                    additionalProperties:
+                                      type: string
+                                    description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                    type: object
+                                type: object
+                              storageClassName:
+                                description: 'Name of the StorageClass required by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
+                                type: string
+                              volumeMode:
+                                description: volumeMode defines what type of volume is required by the claim. Value of Filesystem is implied when not included in claim spec.
+                                type: string
+                              volumeName:
+                                description: VolumeName is the binding reference to the PersistentVolume backing this claim.
+                                type: string
+                            type: object
+                        required:
+                        - spec
+                        type: object
                     type: object
                   fc:
                     description: FC represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
@@ -4946,7 +5365,7 @@ spec:
                     description: Items for all in one resources secrets, configmaps, and downward API
                     properties:
                       defaultMode:
-                        description: Mode bits to use on created files by default. Must be a value between 0 and 0777. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
+                        description: Mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
                         format: int32
                         type: integer
                       sources:
@@ -4966,7 +5385,7 @@ spec:
                                         description: The key to project.
                                         type: string
                                       mode:
-                                        description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                        description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                         format: int32
                                         type: integer
                                       path:
@@ -5005,7 +5424,7 @@ spec:
                                         - fieldPath
                                         type: object
                                       mode:
-                                        description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                        description: 'Optional: mode bits used to set permissions on this file, must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                         format: int32
                                         type: integer
                                       path:
@@ -5047,7 +5466,7 @@ spec:
                                         description: The key to project.
                                         type: string
                                       mode:
-                                        description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                        description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                         format: int32
                                         type: integer
                                       path:
@@ -5083,8 +5502,6 @@ spec:
                               type: object
                           type: object
                         type: array
-                    required:
-                    - sources
                     type: object
                   quobyte:
                     description: Quobyte represents a Quobyte mount on the host that shares a pod's lifetime
@@ -5194,7 +5611,7 @@ spec:
                     description: 'Secret represents a secret that should populate this volume. More info: https://kubernetes.io/docs/concepts/storage/volumes#secret'
                     properties:
                       defaultMode:
-                        description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                        description: 'Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                         format: int32
                         type: integer
                       items:
@@ -5206,7 +5623,7 @@ spec:
                               description: The key to project.
                               type: string
                             mode:
-                              description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                              description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                               format: int32
                               type: integer
                             path:
@@ -5355,6 +5772,9 @@ spec:
         spec:
           description: VMClusterSpec defines the desired state of VMCluster
           properties:
+            clusterVersion:
+              description: ClusterVersion defines default images tag for all components. it can be overwritten with component specific image.tag value.
+              type: string
             imagePullSecrets:
               description: ImagePullSecrets An optional list of references to secrets in the same namespace to use for pulling images from registries see http://kubernetes.io/docs/user-guide/images#specifying-imagepullsecrets-on-a-pod
               items:
@@ -5434,7 +5854,7 @@ spec:
                             - key
                             type: object
                           fieldRef:
-                            description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                            description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                             properties:
                               apiVersion:
                                 description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -5508,6 +5928,22 @@ spec:
                     - name
                     type: object
                   type: array
+                insertPorts:
+                  description: InsertPorts - additional listen ports for data ingestion.
+                  properties:
+                    graphitePort:
+                      description: GraphitePort listen port
+                      type: string
+                    influxPort:
+                      description: InfluxPort listen port
+                      type: string
+                    openTSDBHTTPPort:
+                      description: OpenTSDBHTTPPort for http connections.
+                      type: string
+                    openTSDBPort:
+                      description: OpenTSDBPort for tcp and udp listen
+                      type: string
+                  type: object
                 logFormat:
                   description: LogFormat for VMSelect to be configured with. default or json
                   enum:
@@ -5593,7 +6029,7 @@ spec:
                       format: int64
                       type: integer
                     fsGroupChangePolicy:
-                      description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified defaults to "Always".'
+                      description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.'
                       type: string
                     runAsGroup:
                       description: The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
@@ -5621,6 +6057,18 @@ spec:
                         user:
                           description: User is a SELinux user label that applies to the container.
                           type: string
+                      type: object
+                    seccompProfile:
+                      description: The seccomp options to use by the containers in this pod.
+                      properties:
+                        localhostProfile:
+                          description: localhostProfile indicates a profile defined in a file on the node should be used. The profile must be preconfigured on the node to work. Must be a descending path, relative to the kubelet's configured seccomp profile location. Must only be set if type is "Localhost".
+                          type: string
+                        type:
+                          description: "type indicates which kind of seccomp profile will be applied. Valid options are: \n Localhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied."
+                          type: string
+                      required:
+                      - type
                       type: object
                     supplementalGroups:
                       description: A list of groups applied to the first process run in each container, in addition to the container's primary GID.  If unspecified, no groups will be added to any container.
@@ -5788,7 +6236,7 @@ spec:
                             - key
                             type: object
                           fieldRef:
-                            description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                            description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                             properties:
                               apiVersion:
                                 description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -5971,7 +6419,7 @@ spec:
                       format: int64
                       type: integer
                     fsGroupChangePolicy:
-                      description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified defaults to "Always".'
+                      description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.'
                       type: string
                     runAsGroup:
                       description: The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
@@ -5999,6 +6447,18 @@ spec:
                         user:
                           description: User is a SELinux user label that applies to the container.
                           type: string
+                      type: object
+                    seccompProfile:
+                      description: The seccomp options to use by the containers in this pod.
+                      properties:
+                        localhostProfile:
+                          description: localhostProfile indicates a profile defined in a file on the node should be used. The profile must be preconfigured on the node to work. Must be a descending path, relative to the kubelet's configured seccomp profile location. Must only be set if type is "Localhost".
+                          type: string
+                        type:
+                          description: "type indicates which kind of seccomp profile will be applied. Valid options are: \n Localhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied."
+                          type: string
+                      required:
+                      - type
                       type: object
                     supplementalGroups:
                       description: A list of groups applied to the first process run in each container, in addition to the container's primary GID.  If unspecified, no groups will be added to any container.
@@ -6163,7 +6623,7 @@ spec:
                             - key
                             type: object
                           fieldRef:
-                            description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                            description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                             properties:
                               apiVersion:
                                 description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -6322,7 +6782,7 @@ spec:
                       format: int64
                       type: integer
                     fsGroupChangePolicy:
-                      description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified defaults to "Always".'
+                      description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.'
                       type: string
                     runAsGroup:
                       description: The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
@@ -6350,6 +6810,18 @@ spec:
                         user:
                           description: User is a SELinux user label that applies to the container.
                           type: string
+                      type: object
+                    seccompProfile:
+                      description: The seccomp options to use by the containers in this pod.
+                      properties:
+                        localhostProfile:
+                          description: localhostProfile indicates a profile defined in a file on the node should be used. The profile must be preconfigured on the node to work. Must be a descending path, relative to the kubelet's configured seccomp profile location. Must only be set if type is "Localhost".
+                          type: string
+                        type:
+                          description: "type indicates which kind of seccomp profile will be applied. Valid options are: \n Localhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied."
+                          type: string
+                      required:
+                      - type
                       type: object
                     supplementalGroups:
                       description: A list of groups applied to the first process run in each container, in addition to the container's primary GID.  If unspecified, no groups will be added to any container.
@@ -6442,7 +6914,7 @@ spec:
                                 type: string
                               type: array
                             dataSource:
-                              description: 'This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot - Beta) * An existing PVC (PersistentVolumeClaim) * An existing custom resource/object that implements data population (Alpha) In order to use VolumeSnapshot object types, the appropriate feature gate must be enabled (VolumeSnapshotDataSource or AnyVolumeDataSource) If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source. If the specified data source is not supported, the volume will not be created and the failure will be reported as an event. In the future, we plan to support more data source types and the behavior of the provisioner may change.'
+                              description: 'This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot) * An existing PVC (PersistentVolumeClaim) * An existing custom resource that implements data population (Alpha) In order to use custom resource types that implement data population, the AnyVolumeDataSource feature gate must be enabled. If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source.'
                               properties:
                                 apiGroup:
                                   description: APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.
@@ -6655,6 +7127,85 @@ spec:
                         type: string
                       description: extra args like maxBytesPerSecond default 0
                       type: object
+                    extraEnvs:
+                      items:
+                        description: EnvVar represents an environment variable present in a Container.
+                        properties:
+                          name:
+                            description: Name of the environment variable. Must be a C_IDENTIFIER.
+                            type: string
+                          value:
+                            description: 'Variable references $(VAR_NAME) are expanded using the previous defined environment variables in the container and any service environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Defaults to "".'
+                            type: string
+                          valueFrom:
+                            description: Source for the environment variable's value. Cannot be used if value is not empty.
+                            properties:
+                              configMapKeyRef:
+                                description: Selects a key of a ConfigMap.
+                                properties:
+                                  key:
+                                    description: The key to select.
+                                    type: string
+                                  name:
+                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                    type: string
+                                  optional:
+                                    description: Specify whether the ConfigMap or its key must be defined
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                              fieldRef:
+                                description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                                properties:
+                                  apiVersion:
+                                    description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
+                                    type: string
+                                  fieldPath:
+                                    description: Path of the field to select in the specified API version.
+                                    type: string
+                                required:
+                                - fieldPath
+                                type: object
+                              resourceFieldRef:
+                                description: 'Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.'
+                                properties:
+                                  containerName:
+                                    description: 'Container name: required for volumes, optional for env vars'
+                                    type: string
+                                  divisor:
+                                    anyOf:
+                                    - type: integer
+                                    - type: string
+                                    description: Specifies the output format of the exposed resources, defaults to "1"
+                                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                    x-kubernetes-int-or-string: true
+                                  resource:
+                                    description: 'Required: resource to select'
+                                    type: string
+                                required:
+                                - resource
+                                type: object
+                              secretKeyRef:
+                                description: Selects a key of a secret in the pod's namespace
+                                properties:
+                                  key:
+                                    description: The key of the secret to select from.  Must be a valid secret key.
+                                    type: string
+                                  name:
+                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                    type: string
+                                  optional:
+                                    description: Specify whether the Secret or its key must be defined
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                            type: object
+                        required:
+                        - name
+                        type: object
+                      type: array
                     image:
                       description: Image - docker image settings for VMBackuper
                       properties:
@@ -6864,7 +7415,7 @@ spec:
                         description: ConfigMap represents a configMap that should populate this volume
                         properties:
                           defaultMode:
-                            description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                            description: 'Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                             format: int32
                             type: integer
                           items:
@@ -6876,7 +7427,7 @@ spec:
                                   description: The key to project.
                                   type: string
                                 mode:
-                                  description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                  description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                   format: int32
                                   type: integer
                                 path:
@@ -6895,7 +7446,7 @@ spec:
                             type: boolean
                         type: object
                       csi:
-                        description: CSI (Container Storage Interface) represents storage that is handled by an external CSI driver (Alpha feature).
+                        description: CSI (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
                         properties:
                           driver:
                             description: Driver is the name of the CSI driver that handles this volume. Consult with your admin for the correct name as registered in the cluster.
@@ -6925,7 +7476,7 @@ spec:
                         description: DownwardAPI represents downward API about the pod that should populate this volume
                         properties:
                           defaultMode:
-                            description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                            description: 'Optional: mode bits to use on created files by default. Must be a Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                             format: int32
                             type: integer
                           items:
@@ -6946,7 +7497,7 @@ spec:
                                   - fieldPath
                                   type: object
                                 mode:
-                                  description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                  description: 'Optional: mode bits used to set permissions on this file, must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                   format: int32
                                   type: integer
                                 path:
@@ -6989,6 +7540,108 @@ spec:
                             description: 'Total amount of local storage required for this EmptyDir volume. The size limit is also applicable for memory medium. The maximum usage on memory medium EmptyDir would be the minimum value between the SizeLimit specified here and the sum of memory limits of all containers in a pod. The default is nil which means that the limit is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
                             pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                             x-kubernetes-int-or-string: true
+                        type: object
+                      ephemeral:
+                        description: "Ephemeral represents a volume that is handled by a cluster storage driver (Alpha feature). The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts, and deleted when the pod is removed. \n Use this if: a) the volume is only needed while the pod runs, b) features of normal volumes like restoring from snapshot or capacity    tracking are needed, c) the storage driver is specified through a storage class, and d) the storage driver supports dynamic volume provisioning through    a PersistentVolumeClaim (see EphemeralVolumeSource for more    information on the connection between this volume type    and PersistentVolumeClaim). \n Use PersistentVolumeClaim or one of the vendor-specific APIs for volumes that persist for longer than the lifecycle of an individual pod. \n Use CSI for light-weight local ephemeral volumes if the CSI driver is meant to be used that way - see the documentation of the driver for more information. \n A pod can use both types of ephemeral volumes and persistent volumes at the same time."
+                        properties:
+                          readOnly:
+                            description: Specifies a read-only configuration for the volume. Defaults to false (read/write).
+                            type: boolean
+                          volumeClaimTemplate:
+                            description: "Will be used to create a stand-alone PVC to provision the volume. The pod in which this EphemeralVolumeSource is embedded will be the owner of the PVC, i.e. the PVC will be deleted together with the pod.  The name of the PVC will be `<pod name>-<volume name>` where `<volume name>` is the name from the `PodSpec.Volumes` array entry. Pod validation will reject the pod if the concatenated name is not valid for a PVC (for example, too long). \n An existing PVC with that name that is not owned by the pod will *not* be used for the pod to avoid using an unrelated volume by mistake. Starting the pod is then blocked until the unrelated PVC is removed. If such a pre-created PVC is meant to be used by the pod, the PVC has to updated with an owner reference to the pod once the pod exists. Normally this should not be necessary, but it may be useful when manually reconstructing a broken cluster. \n This field is read-only and no changes will be made by Kubernetes to the PVC after it has been created. \n Required, must not be nil."
+                            properties:
+                              metadata:
+                                description: May contain labels and annotations that will be copied into the PVC when creating it. No other fields are allowed and will be rejected during validation.
+                                type: object
+                              spec:
+                                description: The specification for the PersistentVolumeClaim. The entire content is copied unchanged into the PVC that gets created from this template. The same fields as in a PersistentVolumeClaim are also valid here.
+                                properties:
+                                  accessModes:
+                                    description: 'AccessModes contains the desired access modes the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                                    items:
+                                      type: string
+                                    type: array
+                                  dataSource:
+                                    description: 'This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot) * An existing PVC (PersistentVolumeClaim) * An existing custom resource that implements data population (Alpha) In order to use custom resource types that implement data population, the AnyVolumeDataSource feature gate must be enabled. If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source.'
+                                    properties:
+                                      apiGroup:
+                                        description: APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.
+                                        type: string
+                                      kind:
+                                        description: Kind is the type of resource being referenced
+                                        type: string
+                                      name:
+                                        description: Name is the name of resource being referenced
+                                        type: string
+                                    required:
+                                    - kind
+                                    - name
+                                    type: object
+                                  resources:
+                                    description: 'Resources represents the minimum resources the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
+                                    properties:
+                                      limits:
+                                        additionalProperties:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        description: 'Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                        type: object
+                                      requests:
+                                        additionalProperties:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        description: 'Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                        type: object
+                                    type: object
+                                  selector:
+                                    description: A label query over volumes to consider for binding.
+                                    properties:
+                                      matchExpressions:
+                                        description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                                        items:
+                                          description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                          properties:
+                                            key:
+                                              description: key is the label key that the selector applies to.
+                                              type: string
+                                            operator:
+                                              description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+                                              type: string
+                                            values:
+                                              description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+                                              items:
+                                                type: string
+                                              type: array
+                                          required:
+                                          - key
+                                          - operator
+                                          type: object
+                                        type: array
+                                      matchLabels:
+                                        additionalProperties:
+                                          type: string
+                                        description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                        type: object
+                                    type: object
+                                  storageClassName:
+                                    description: 'Name of the StorageClass required by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
+                                    type: string
+                                  volumeMode:
+                                    description: volumeMode defines what type of volume is required by the claim. Value of Filesystem is implied when not included in claim spec.
+                                    type: string
+                                  volumeName:
+                                    description: VolumeName is the binding reference to the PersistentVolume backing this claim.
+                                    type: string
+                                type: object
+                            required:
+                            - spec
+                            type: object
                         type: object
                       fc:
                         description: FC represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
@@ -7223,7 +7876,7 @@ spec:
                         description: Items for all in one resources secrets, configmaps, and downward API
                         properties:
                           defaultMode:
-                            description: Mode bits to use on created files by default. Must be a value between 0 and 0777. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
+                            description: Mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
                             format: int32
                             type: integer
                           sources:
@@ -7243,7 +7896,7 @@ spec:
                                             description: The key to project.
                                             type: string
                                           mode:
-                                            description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                            description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                             format: int32
                                             type: integer
                                           path:
@@ -7282,7 +7935,7 @@ spec:
                                             - fieldPath
                                             type: object
                                           mode:
-                                            description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                            description: 'Optional: mode bits used to set permissions on this file, must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                             format: int32
                                             type: integer
                                           path:
@@ -7324,7 +7977,7 @@ spec:
                                             description: The key to project.
                                             type: string
                                           mode:
-                                            description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                            description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                             format: int32
                                             type: integer
                                           path:
@@ -7360,8 +8013,6 @@ spec:
                                   type: object
                               type: object
                             type: array
-                        required:
-                        - sources
                         type: object
                       quobyte:
                         description: Quobyte represents a Quobyte mount on the host that shares a pod's lifetime
@@ -7471,7 +8122,7 @@ spec:
                         description: 'Secret represents a secret that should populate this volume. More info: https://kubernetes.io/docs/concepts/storage/volumes#secret'
                         properties:
                           defaultMode:
-                            description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                            description: 'Optional: mode bits used to set permissions on created files by default. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                             format: int32
                             type: integer
                           items:
@@ -7483,7 +8134,7 @@ spec:
                                   description: The key to project.
                                   type: string
                                 mode:
-                                  description: 'Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
+                                  description: 'Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
                                   format: int32
                                   type: integer
                                 path:
@@ -7974,6 +8625,58 @@ spec:
               items:
                 description: PodMetricsEndpoint defines a scrapeable endpoint of a Kubernetes Pod serving Prometheus metrics.
                 properties:
+                  basicAuth:
+                    description: 'BasicAuth allow an endpoint to authenticate over basic authentication More info: https://prometheus.io/docs/operating/configuration/#endpoints'
+                    properties:
+                      password:
+                        description: The secret in the service scrape namespace that contains the password for authentication.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                      username:
+                        description: The secret in the service scrape namespace that contains the username for authentication.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                    type: object
+                  bearerTokenFile:
+                    description: File to read bearer token for scraping targets.
+                    type: string
+                  bearerTokenSecret:
+                    description: Secret to mount to read bearer token for scraping targets. The secret needs to be in the same namespace as the service scrape and accessible by the victoria-metrics operator.
+                    properties:
+                      key:
+                        description: The key of the secret to select from.  Must be a valid secret key.
+                        type: string
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                        type: string
+                      optional:
+                        description: Specify whether the Secret or its key must be defined
+                        type: boolean
+                    required:
+                    - key
+                    type: object
                   honorLabels:
                     description: HonorLabels chooses the metric's labels on collisions with target labels.
                     type: boolean
@@ -8089,6 +8792,108 @@ spec:
                     - type: string
                     description: 'Deprecated: Use ''port'' instead.'
                     x-kubernetes-int-or-string: true
+                  tlsConfig:
+                    description: TLSConfig configuration to use when scraping the endpoint
+                    properties:
+                      ca:
+                        description: Stuct containing the CA cert to use for the targets.
+                        properties:
+                          configMap:
+                            description: ConfigMap containing data to use for the targets.
+                            properties:
+                              key:
+                                description: The key to select.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the ConfigMap or its key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                          secret:
+                            description: Secret containing data to use for the targets.
+                            properties:
+                              key:
+                                description: The key of the secret to select from.  Must be a valid secret key.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the Secret or its key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      caFile:
+                        description: Path to the CA cert in the container to use for the targets.
+                        type: string
+                      cert:
+                        description: Struct containing the client cert file for the targets.
+                        properties:
+                          configMap:
+                            description: ConfigMap containing data to use for the targets.
+                            properties:
+                              key:
+                                description: The key to select.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the ConfigMap or its key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                          secret:
+                            description: Secret containing data to use for the targets.
+                            properties:
+                              key:
+                                description: The key of the secret to select from.  Must be a valid secret key.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the Secret or its key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      certFile:
+                        description: Path to the client cert file in the container for the targets.
+                        type: string
+                      insecureSkipVerify:
+                        description: Disable target certificate validation.
+                        type: boolean
+                      keyFile:
+                        description: Path to the client key file in the container for the targets.
+                        type: string
+                      keySecret:
+                        description: Secret containing the client key file for the targets.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                      serverName:
+                        description: Used to verify the hostname for the targets.
+                        type: string
+                    type: object
                 type: object
               type: array
             podTargetLabels:
@@ -8893,7 +9698,7 @@ spec:
                         - key
                         type: object
                       fieldRef:
-                        description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                        description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                         properties:
                           apiVersion:
                             description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -8992,6 +9797,22 @@ spec:
                 - name
                 type: object
               type: array
+            insertPorts:
+              description: InsertPorts - additional listen ports for data ingestion.
+              properties:
+                graphitePort:
+                  description: GraphitePort listen port
+                  type: string
+                influxPort:
+                  description: InfluxPort listen port
+                  type: string
+                openTSDBHTTPPort:
+                  description: OpenTSDBHTTPPort for http connections.
+                  type: string
+                openTSDBPort:
+                  description: OpenTSDBPort for tcp and udp listen
+                  type: string
+              type: object
             logFormat:
               description: LogFormat for VMSingle to be configured with.
               enum:
@@ -9085,7 +9906,7 @@ spec:
                   format: int64
                   type: integer
                 fsGroupChangePolicy:
-                  description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified defaults to "Always".'
+                  description: 'fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.'
                   type: string
                 runAsGroup:
                   description: The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
@@ -9113,6 +9934,18 @@ spec:
                     user:
                       description: User is a SELinux user label that applies to the container.
                       type: string
+                  type: object
+                seccompProfile:
+                  description: The seccomp options to use by the containers in this pod.
+                  properties:
+                    localhostProfile:
+                      description: localhostProfile indicates a profile defined in a file on the node should be used. The profile must be preconfigured on the node to work. Must be a descending path, relative to the kubelet's configured seccomp profile location. Must only be set if type is "Localhost".
+                      type: string
+                    type:
+                      description: "type indicates which kind of seccomp profile will be applied. Valid options are: \n Localhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied."
+                      type: string
+                  required:
+                  - type
                   type: object
                 supplementalGroups:
                   description: A list of groups applied to the first process run in each container, in addition to the container's primary GID.  If unspecified, no groups will be added to any container.
@@ -9162,7 +9995,7 @@ spec:
                     type: string
                   type: array
                 dataSource:
-                  description: 'This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot - Beta) * An existing PVC (PersistentVolumeClaim) * An existing custom resource/object that implements data population (Alpha) In order to use VolumeSnapshot object types, the appropriate feature gate must be enabled (VolumeSnapshotDataSource or AnyVolumeDataSource) If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source. If the specified data source is not supported, the volume will not be created and the failure will be reported as an event. In the future, we plan to support more data source types and the behavior of the provisioner may change.'
+                  description: 'This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot) * An existing PVC (PersistentVolumeClaim) * An existing custom resource that implements data population (Alpha) In order to use custom resource types that implement data population, the AnyVolumeDataSource feature gate must be enabled. If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source.'
                   properties:
                     apiGroup:
                       description: APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.
@@ -9317,6 +10150,85 @@ spec:
                     type: string
                   description: extra args like maxBytesPerSecond default 0
                   type: object
+                extraEnvs:
+                  items:
+                    description: EnvVar represents an environment variable present in a Container.
+                    properties:
+                      name:
+                        description: Name of the environment variable. Must be a C_IDENTIFIER.
+                        type: string
+                      value:
+                        description: 'Variable references $(VAR_NAME) are expanded using the previous defined environment variables in the container and any service environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Defaults to "".'
+                        type: string
+                      valueFrom:
+                        description: Source for the environment variable's value. Cannot be used if value is not empty.
+                        properties:
+                          configMapKeyRef:
+                            description: Selects a key of a ConfigMap.
+                            properties:
+                              key:
+                                description: The key to select.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the ConfigMap or its key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                          fieldRef:
+                            description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                            properties:
+                              apiVersion:
+                                description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
+                                type: string
+                              fieldPath:
+                                description: Path of the field to select in the specified API version.
+                                type: string
+                            required:
+                            - fieldPath
+                            type: object
+                          resourceFieldRef:
+                            description: 'Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.'
+                            properties:
+                              containerName:
+                                description: 'Container name: required for volumes, optional for env vars'
+                                type: string
+                              divisor:
+                                anyOf:
+                                - type: integer
+                                - type: string
+                                description: Specifies the output format of the exposed resources, defaults to "1"
+                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                x-kubernetes-int-or-string: true
+                              resource:
+                                description: 'Required: resource to select'
+                                type: string
+                            required:
+                            - resource
+                            type: object
+                          secretKeyRef:
+                            description: Selects a key of a secret in the pod's namespace
+                            properties:
+                              key:
+                                description: The key of the secret to select from.  Must be a valid secret key.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the Secret or its key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  type: array
                 image:
                   description: Image - docker image settings for VMBackuper
                   properties:
@@ -9434,6 +10346,334 @@ spec:
           - replicas
           - unavailableReplicas
           - updatedReplicas
+          type: object
+      type: object
+  version: v1beta1
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
+  name: vmstaticscrapes.operator.victoriametrics.com
+spec:
+  group: operator.victoriametrics.com
+  names:
+    kind: VMStaticScrape
+    listKind: VMStaticScrapeList
+    plural: vmstaticscrapes
+    singular: vmstaticscrape
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: VMStaticScrape is the Schema for the vmstaticscrapes API, which defines static targets configuration for scraping.
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: VMStaticScrapeSpec defines the desired state of VMStaticScrape.
+          properties:
+            jobName:
+              description: JobName name of job.
+              type: string
+            sampleLimit:
+              description: SampleLimit defines per-scrape limit on number of scraped samples that will be accepted.
+              format: int64
+              type: integer
+            targetEndpoints:
+              description: A list of target endpoints to scrape metrics from.
+              items:
+                description: TargetEndpoint defines single static target endpoint.
+                properties:
+                  basicAuth:
+                    description: 'BasicAuth allow an endpoint to authenticate over basic authentication More info: https://prometheus.io/docs/operating/configuration/#endpoints'
+                    properties:
+                      password:
+                        description: The secret in the service scrape namespace that contains the password for authentication.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                      username:
+                        description: The secret in the service scrape namespace that contains the username for authentication.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                    type: object
+                  bearerTokenFile:
+                    description: File to read bearer token for scraping targets.
+                    type: string
+                  bearerTokenSecret:
+                    description: Secret to mount to read bearer token for scraping targets. The secret needs to be in the same namespace as the service scrape and accessible by the victoria-metrics operator.
+                    properties:
+                      key:
+                        description: The key of the secret to select from.  Must be a valid secret key.
+                        type: string
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                        type: string
+                      optional:
+                        description: Specify whether the Secret or its key must be defined
+                        type: boolean
+                    required:
+                    - key
+                    type: object
+                  interval:
+                    description: Interval at which metrics should be scraped
+                    type: string
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: Labels static labels for targets.
+                    type: object
+                  metricRelabelConfigs:
+                    description: MetricRelabelConfigs to apply to samples before ingestion.
+                    items:
+                      description: 'RelabelConfig allows dynamic rewriting of the label set, being applied to samples before ingestion. It defines `<metric_relabel_configs>`-section of configuration. More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs'
+                      properties:
+                        action:
+                          description: Action to perform based on regex matching. Default is 'replace'
+                          type: string
+                        modulus:
+                          description: Modulus to take of the hash of the source label values.
+                          format: int64
+                          type: integer
+                        regex:
+                          description: Regular expression against which the extracted value is matched. Default is '(.*)'
+                          type: string
+                        replacement:
+                          description: Replacement value against which a regex replace is performed if the regular expression matches. Regex capture groups are available. Default is '$1'
+                          type: string
+                        separator:
+                          description: Separator placed between concatenated source label values. default is ';'.
+                          type: string
+                        source_labels:
+                          description: UnderScoreSourceLabels - additional form of source labels source_labels for compatibility with original relabel config. if set  both sourceLabels and source_labels, sourceLabels has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                          items:
+                            type: string
+                          type: array
+                        sourceLabels:
+                          description: The source labels select values from existing labels. Their content is concatenated using the configured separator and matched against the configured regular expression for the replace, keep, and drop actions.
+                          items:
+                            type: string
+                          type: array
+                        target_label:
+                          description: UnderScoreTargetLabel - additional form of target label - target_label for compatibility with original relabel config. if set  both targetLabel and target_label, targetLabel has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                          type: string
+                        targetLabel:
+                          description: Label to which the resulting value is written in a replace action. It is mandatory for replace actions. Regex capture groups are available.
+                          type: string
+                      type: object
+                    type: array
+                  params:
+                    additionalProperties:
+                      items:
+                        type: string
+                      type: array
+                    description: Optional HTTP URL parameters
+                    type: object
+                  path:
+                    description: HTTP path to scrape for metrics.
+                    type: string
+                  port:
+                    description: Default port for target.
+                    type: string
+                  proxyURL:
+                    description: ProxyURL eg http://proxyserver:2195 Directs scrapes to proxy through this endpoint.
+                    type: string
+                  relabelConfigs:
+                    description: 'RelabelConfigs to apply to samples before scraping. More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config'
+                    items:
+                      description: 'RelabelConfig allows dynamic rewriting of the label set, being applied to samples before ingestion. It defines `<metric_relabel_configs>`-section of configuration. More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs'
+                      properties:
+                        action:
+                          description: Action to perform based on regex matching. Default is 'replace'
+                          type: string
+                        modulus:
+                          description: Modulus to take of the hash of the source label values.
+                          format: int64
+                          type: integer
+                        regex:
+                          description: Regular expression against which the extracted value is matched. Default is '(.*)'
+                          type: string
+                        replacement:
+                          description: Replacement value against which a regex replace is performed if the regular expression matches. Regex capture groups are available. Default is '$1'
+                          type: string
+                        separator:
+                          description: Separator placed between concatenated source label values. default is ';'.
+                          type: string
+                        source_labels:
+                          description: UnderScoreSourceLabels - additional form of source labels source_labels for compatibility with original relabel config. if set  both sourceLabels and source_labels, sourceLabels has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                          items:
+                            type: string
+                          type: array
+                        sourceLabels:
+                          description: The source labels select values from existing labels. Their content is concatenated using the configured separator and matched against the configured regular expression for the replace, keep, and drop actions.
+                          items:
+                            type: string
+                          type: array
+                        target_label:
+                          description: UnderScoreTargetLabel - additional form of target label - target_label for compatibility with original relabel config. if set  both targetLabel and target_label, targetLabel has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                          type: string
+                        targetLabel:
+                          description: Label to which the resulting value is written in a replace action. It is mandatory for replace actions. Regex capture groups are available.
+                          type: string
+                      type: object
+                    type: array
+                  scheme:
+                    description: HTTP scheme to use for scraping.
+                    type: string
+                  scrapeTimeout:
+                    description: Timeout after which the scrape is ended
+                    type: string
+                  targets:
+                    description: Targets static targets addresses in form of ["192.122.55.55:9100","some-name:9100"].
+                    items:
+                      type: string
+                    type: array
+                  tlsConfig:
+                    description: TLSConfig configuration to use when scraping the endpoint
+                    properties:
+                      ca:
+                        description: Stuct containing the CA cert to use for the targets.
+                        properties:
+                          configMap:
+                            description: ConfigMap containing data to use for the targets.
+                            properties:
+                              key:
+                                description: The key to select.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the ConfigMap or its key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                          secret:
+                            description: Secret containing data to use for the targets.
+                            properties:
+                              key:
+                                description: The key of the secret to select from.  Must be a valid secret key.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the Secret or its key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      caFile:
+                        description: Path to the CA cert in the container to use for the targets.
+                        type: string
+                      cert:
+                        description: Struct containing the client cert file for the targets.
+                        properties:
+                          configMap:
+                            description: ConfigMap containing data to use for the targets.
+                            properties:
+                              key:
+                                description: The key to select.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the ConfigMap or its key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                          secret:
+                            description: Secret containing data to use for the targets.
+                            properties:
+                              key:
+                                description: The key of the secret to select from.  Must be a valid secret key.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the Secret or its key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                      certFile:
+                        description: Path to the client cert file in the container for the targets.
+                        type: string
+                      insecureSkipVerify:
+                        description: Disable target certificate validation.
+                        type: boolean
+                      keyFile:
+                        description: Path to the client key file in the container for the targets.
+                        type: string
+                      keySecret:
+                        description: Secret containing the client key file for the targets.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                      serverName:
+                        description: Used to verify the hostname for the targets.
+                        type: string
+                    type: object
+                required:
+                - targets
+                type: object
+              type: array
+          required:
+          - targetEndpoints
+          type: object
+        status:
+          description: VMStaticScrapeStatus defines the observed state of VMStaticScrape
           type: object
       type: object
   version: v1beta1
