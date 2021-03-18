@@ -58,12 +58,12 @@ spec:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 5
+            initialDelaySeconds: {{ .Values.vmselect.probe.readiness.initialDelaySeconds }}
             periodSeconds: 15
           livenessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 5
+            initialDelaySeconds: {{ .Values.vmselect.probe.liveness.initialDelaySeconds }}
             periodSeconds: 15
             timeoutSeconds: 5
           volumeMounts:
