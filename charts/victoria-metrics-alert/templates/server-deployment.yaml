@@ -61,7 +61,7 @@ spec:
             - -remoteRead.url={{ .Values.server.remote.read.url}}
             - -remoteWrite.url={{ .Values.server.remote.write.url}}
           {{- range $key, $value := .Values.server.extraArgs }}
-              {{- if contains $key "rule" }}
+              {{- if eq $key "rule" }}
             - -{{ $key }}={{ $value | quote}}
               {{- else }}
             - -{{ $key }}={{ $value }}
