@@ -61,7 +61,11 @@ spec:
             - -remoteRead.url={{ .Values.server.remote.read.url}}
             - -remoteWrite.url={{ .Values.server.remote.write.url}}
           {{- range $key, $value := .Values.server.extraArgs }}
+              {{- if contains $key "rule" }}
+            - -{{ $key }}={{ $value | quote}}
+              {{- else }}
             - -{{ $key }}={{ $value }}
+            {{- end }}
           {{- end }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           {{- with .Values.server.env }}
