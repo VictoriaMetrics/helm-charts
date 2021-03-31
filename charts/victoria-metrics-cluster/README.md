@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.8.19](https://img.shields.io/badge/Version-0.8.19-informational?style=flat-square)
+ ![Version: 0.8.21](https://img.shields.io/badge/Version-0.8.21-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -140,6 +140,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.podDisruptionBudget.labels | object | `{}` |  |
 | vminsert.podSecurityContext | object | `{}` |  |
 | vminsert.priorityClassName | string | `""` | Name of Priority Class |
+| vminsert.probe.liveness.failureThreshold | int | `3` |  |
+| vminsert.probe.liveness.initialDelaySeconds | int | `5` |  |
+| vminsert.probe.liveness.periodSeconds | int | `15` |  |
+| vminsert.probe.liveness.timeoutSeconds | int | `5` |  |
+| vminsert.probe.readiness.failureThreshold | int | `3` |  |
+| vminsert.probe.readiness.initialDelaySeconds | int | `5` |  |
+| vminsert.probe.readiness.periodSeconds | int | `15` |  |
+| vminsert.probe.readiness.timeoutSeconds | int | `5` |  |
 | vminsert.replicaCount | int | `2` | Count of vminsert pods |
 | vminsert.resources | object | `{}` | Resource object |
 | vminsert.securityContext | object | `{}` |  |
@@ -193,6 +201,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.podDisruptionBudget.labels | object | `{}` |  |
 | vmselect.podSecurityContext | object | `{}` |  |
 | vmselect.priorityClassName | string | `""` | Name of Priority Class |
+| vmselect.probe.liveness.failureThreshold | int | `3` |  |
+| vmselect.probe.liveness.initialDelaySeconds | int | `5` |  |
+| vmselect.probe.liveness.periodSeconds | int | `15` |  |
+| vmselect.probe.liveness.timeoutSeconds | int | `5` |  |
+| vmselect.probe.readiness.failureThreshold | int | `3` |  |
+| vmselect.probe.readiness.initialDelaySeconds | int | `5` |  |
+| vmselect.probe.readiness.periodSeconds | int | `15` |  |
+| vmselect.probe.readiness.timeoutSeconds | int | `5` |  |
 | vmselect.replicaCount | int | `2` | Count of vmselect pods |
 | vmselect.resources | object | `{}` | Resource object |
 | vmselect.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
