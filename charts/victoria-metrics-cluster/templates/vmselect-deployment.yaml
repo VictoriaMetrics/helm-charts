@@ -58,14 +58,17 @@ spec:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
+            initialDelaySeconds: {{ .Values.vmselect.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.vmselect.probe.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.vmselect.probe.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.vmselect.probe.readiness.failureThreshold }}
           livenessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-            timeoutSeconds: 5
+            initialDelaySeconds: {{ .Values.vmselect.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.vmselect.probe.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.vmselect.probe.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.vmselect.probe.liveness.failureThreshold }}
           volumeMounts:
             - mountPath: {{ .Values.vmselect.cacheMountPath }}
               name: cache-volume
