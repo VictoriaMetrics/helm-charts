@@ -77,6 +77,22 @@ server:
     []
     #- name: config-reloader
     #  image: reloader-image
+
+  initContainers:
+    []
+    # - name: vmrestore
+    #   image: victoriametrics/vmrestore:latest
+    #   volumeMounts:
+    #   - mountPath: /storage
+    #     name: vmstorage-volume
+    #   - mountPath: /etc/vm/creds
+    #     name: secret-remote-storage-keys
+    #     readOnly: true
+    #   args:
+    #   - -storageDataPath=/storage
+    #   - -src=s3://your_bucket/folder/latest
+    #   - -credsFilePath=/etc/vm/creds/credentials
+
   # -- Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
   tolerations:
     []

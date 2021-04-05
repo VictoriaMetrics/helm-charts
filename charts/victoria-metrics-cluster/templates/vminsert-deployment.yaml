@@ -34,6 +34,10 @@ spec:
       priorityClassName: "{{ .Values.vminsert.priorityClassName }}"
 {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
+      {{- with .Values.vminsert.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vminsert.name }}
           image: "{{ .Values.vminsert.image.repository }}:{{ .Values.vminsert.image.tag }}"

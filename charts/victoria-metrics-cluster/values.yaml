@@ -21,6 +21,14 @@ serviceAccount:
   # mount API token to pod directly
   automountToken: true
 
+extraSecrets:
+  []
+  # - name: secret-remote-storage-keys
+  #   annotations: []
+  #   labels: []
+  #   data: |
+  #     credentials: b64_encoded_str
+
 vmselect:
   # -- Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet
   enabled: true
@@ -89,6 +97,10 @@ vmselect:
     # - name: config-reloader
     #   image: reloader-image
 
+  initContainers:
+    []
+    # - name: example
+    #   image: example-image
 
   podDisruptionBudget:
     # -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
@@ -249,6 +261,11 @@ vminsert:
       timeoutSeconds: 5
       failureThreshold: 3
 
+  initContainers:
+    []
+    # - name: example
+    #   image: example-image
+
   podDisruptionBudget:
     # -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
     enabled: false
@@ -383,6 +400,21 @@ vmstorage:
     []
     # - name: config-reloader
     #   image: reloader-image
+
+  initContainers:
+    []
+    # - name: vmrestore
+    #   image: victoriametrics/vmrestore:latest
+    #   volumeMounts:
+    #   - mountPath: /storage
+    #     name: vmstorage-volume
+    #   - mountPath: /etc/vm/creds
+    #     name: secret-remote-storage-keys
+    #     readOnly: true
+    #   args:
+    #   - -storageDataPath=/storage
+    #   - -src=s3://your_bucket/folder/latest
+    #   - -credsFilePath=/etc/vm/creds/credentials
 
   # -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   podDisruptionBudget:
