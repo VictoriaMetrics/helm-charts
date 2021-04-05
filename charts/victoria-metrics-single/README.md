@@ -132,6 +132,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
 | server.ingress.hosts | list | `[]` | Array of host objects |
 | server.ingress.tls | list | `[]` | Array of TLS objects |
+| server.initContainers | list | `[]` |  |
 | server.livenessProbe.initialDelaySeconds | int | `5` |  |
 | server.livenessProbe.periodSeconds | int | `15` |  |
 | server.livenessProbe.tcpSocket.port | string | `"http"` |  |
@@ -176,7 +177,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.statefulSet.service.labels | object | `{}` | Headless service labels |
 | server.statefulSet.service.servicePort | int | `8428` | Headless service port |
 | server.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
-| server.tolerations | list | `[]` |  |
+| server.tolerations | list | `[]` | Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | serviceAccount.automountToken | bool | `true` |  |
 | serviceAccount.create | bool | `true` | Create service account. |
 | serviceAccount.extraLabels | object | `{}` |  |

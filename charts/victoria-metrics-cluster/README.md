@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.8.21](https://img.shields.io/badge/Version-0.8.21-informational?style=flat-square)
+ ![Version: 0.8.22](https://img.shields.io/badge/Version-0.8.22-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -107,6 +107,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | clusterDomainSuffix | string | `"cluster.local"` | k8s cluster domain suffix, uses for building stroage pods' FQDN. Ref: [https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/) |
+| extraSecrets | list | `[]` |  |
 | printNotes | bool | `true` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |
@@ -133,6 +134,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.ingress.extraLabels | object | `{}` |  |
 | vminsert.ingress.hosts | list | `[]` | Array of host objects |
 | vminsert.ingress.tls | list | `[]` |  |
+| vminsert.initContainers | list | `[]` |  |
 | vminsert.name | string | `"vminsert"` | vminsert container name |
 | vminsert.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
 | vminsert.podAnnotations | object | `{}` | Pod's annotations |
@@ -188,6 +190,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.ingress.extraLabels | object | `{}` |  |
 | vmselect.ingress.hosts | list | `[]` | Array of host objects |
 | vmselect.ingress.tls | list | `[]` |  |
+| vmselect.initContainers | list | `[]` |  |
 | vmselect.name | string | `"vmselect"` | Vmselect container name |
 | vmselect.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
 | vmselect.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access mode. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
@@ -248,6 +251,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmstorage.image.repository | string | `"victoriametrics/vmstorage"` | Image repository |
 | vmstorage.image.tag | string | `"v1.57.1-cluster"` | Image tag |
+| vmstorage.initContainers | list | `[]` |  |
 | vmstorage.name | string | `"vmstorage"` | vmstorage container name |
 | vmstorage.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
 | vmstorage.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
