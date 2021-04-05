@@ -126,9 +126,8 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: tmpdata
+      {{- with .Values.persistence.extraLabels }}
       labels:
-        {{- include "chart.labels" . | nindent 8 }}
-        {{- with .Values.persistence.extraLabels }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- with .Values.persistence.annotations  }}
