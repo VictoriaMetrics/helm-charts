@@ -72,3 +72,8 @@ Defins the name of configuratiob map
 {{- include "chart.fullname" . -}}-config
 {{- end -}}
 {{- end -}}
+
+{{- define "split-host-port" -}}
+{{- $hp := split ":" . -}}
+{{- printf "%s" $hp._1 -}}
+{{- end -}}
