@@ -109,6 +109,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.enabled | bool | `false` |  |
 | alertmanager.image | string | `"prom/alertmanager"` |  |
 | alertmanager.imagePullSecrets | list | `[]` |  |
+| alertmanager.ingress.annotations | object | `{}` |  |
+| alertmanager.ingress.enabled | bool | `false` |  |
+| alertmanager.ingress.extraLabels | object | `{}` |  |
+| alertmanager.ingress.hosts | list | `[]` |  |
+| alertmanager.ingress.tls | list | `[]` |  |
 | alertmanager.nodeSelector | object | `{}` |  |
 | alertmanager.podMetadata.annotations | object | `{}` |  |
 | alertmanager.podMetadata.labels | object | `{}` |  |
