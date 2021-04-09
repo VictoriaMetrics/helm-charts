@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.8.22](https://img.shields.io/badge/Version-0.8.22-informational?style=flat-square)
+ ![Version: 0.8.24](https://img.shields.io/badge/Version-0.8.24-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -257,10 +257,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
 | vmstorage.persistentVolume.annotations | object | `{}` | Persistent volume annotations |
 | vmstorage.persistentVolume.enabled | bool | `true` | Create/use Persistent Volume Claim for vmstorage component. Empty dir if false. If true,  vmstorage will create/use a Persistent Volume Claim |
-| vmstorage.persistentVolume.storageClass | string | Storage class name. Will be empty if not setted
 | vmstorage.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
 | vmstorage.persistentVolume.mountPath | string | `"/storage"` | Data root path. Vmstorage data Persistent Volume mount root path |
 | vmstorage.persistentVolume.size | string | `"8Gi"` | Size of the volume. Better to set the same as resource limit memory property |
+| vmstorage.persistentVolume.storageClass | string | `""` | Storage class name. Will be empty if not setted |
 | vmstorage.persistentVolume.subPath | string | `""` | Mount subpath |
 | vmstorage.podAnnotations | object | `{}` | Pod's annotations |
 | vmstorage.podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
