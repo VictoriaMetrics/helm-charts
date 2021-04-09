@@ -10,16 +10,12 @@
   * [x] Nodeexporter
   * [x] Grafana
   * [x] kube-state-metrics
-  * [ ] kubelet
-  * [ ] core-dns
-  * [ ] kube-api-server
-  * [ ] kube-controller-manager
-  * [ ] kube-etcd
-  * [ ] kube-proxy
-  * [ ] kube-scheduler 
+  * [ ] kube-mixin
 * [x] Grafana DS
-* [ ] Dashboards
+* [x] Dashboards
   * [x] Nodeexporter
-  * [ ] kube-state-metrics 
+  * [x] kube-state-metrics 
+  * [x] kube-mixin
 * [ ] Rules
+  * [ ] kube-mixin
 * [ ] ServiceAccounts stuff

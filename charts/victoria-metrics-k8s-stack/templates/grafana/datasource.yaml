@@ -10,6 +10,7 @@ metadata:
 {{- end }}
   labels:
     {{ $.Values.grafana.sidecar.datasources.label }}: "1"
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
 {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 data:
   datasource.yaml: |-
