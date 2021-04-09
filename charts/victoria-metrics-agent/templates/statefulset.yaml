@@ -56,6 +56,41 @@ spec:
           ports:
             - name: http
               containerPort: 8429
+          {{- if .Values.extraArgs.graphiteListenAddr }}
+            - name: graphite-tcp
+              protocol: TCP
+              containerPort: {{ include "split-host-port" .Values.extraArgs.graphiteListenAddr }}
+          {{- end }}
+          {{- if .Values.extraArgs.graphiteListenAddr }}
+            - name: graphite-udp
+              protocol: UDP
+              containerPort: {{ include "split-host-port" .Values.extraArgs.graphiteListenAddr }}
+          {{- end }}
+          {{- if .Values.extraArgs.influxListenAddr }}
+            - name: influx-tcp
+              protocol: TCP
+              containerPort: {{ include "split-host-port" .Values.extraArgs.influxListenAddr }}
+          {{- end }}
+          {{- if .Values.extraArgs.influxListenAddr }}
+            - name: influx-udp
+              protocol: UDP
+              containerPort: {{ include "split-host-port" .Values.extraArgs.influxListenAddr }}
+          {{- end }}
+          {{- if .Values.extraArgs.opentsdbHTTPListenAddr }}
+            - name: opentsdbhttp
+              protocol: TCP
+              containerPort: {{ include "split-host-port" .Values.extraArgs.opentsdbHTTPListenAddr }}
+          {{- end }}
+          {{- if .Values.extraArgs.opentsdbListenAddr }}
+            - name: opentsdb-tcp
+              protocol: TCP
+              containerPort: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
+          {{- end }}
+          {{- if .Values.extraArgs.opentsdbListenAddr }}
+            - name: opentsdb-udp
+              protocol: UDP
+              containerPort: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
+          {{- end }}
           {{- with .Values.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}

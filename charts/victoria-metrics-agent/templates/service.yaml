@@ -35,6 +35,48 @@ spec:
       port: {{ .Values.service.servicePort }}
       protocol: TCP
       targetPort: http
+{{- if .Values.extraArgs.graphiteListenAddr }}
+    - name: graphite-tcp
+      protocol: TCP
+      port: {{ include "split-host-port" .Values.extraArgs.graphiteListenAddr }}
+      targetPort: graphite-tcp
+{{- end }}
+{{- if .Values.extraArgs.graphiteListenAddr }}
+    - name: graphite-udp
+      protocol: UDP
+      port: {{ include "split-host-port" .Values.extraArgs.graphiteListenAddr }}
+      targetPort: graphite-udp
+{{- end }}
+{{- if .Values.extraArgs.influxListenAddr }}
+    - name: influx-tcp
+      protocol: TCP
+      port: {{ include "split-host-port" .Values.extraArgs.influxListenAddr }}
+      targetPort: influx-tcp
+{{- end }}
+{{- if .Values.extraArgs.influxListenAddr }}
+    - name: influx-udp
+      protocol: UDP
+      port: {{ include "split-host-port" .Values.extraArgs.influxListenAddr }}
+      targetPort: influx-udp
+{{- end }}
+{{- if .Values.extraArgs.opentsdbHTTPListenAddr }}
+    - name: opentsdbhttp
+      port: {{ include "split-host-port" .Values.extraArgs.opentsdbHTTPListenAddr }}
+      targetPort: opentsdbhttp
+{{- end }}
+{{- if .Values.extraArgs.opentsdbListenAddr }}
+    - name: opentsdb-udp
+      protocol: UDP
+      port: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
+      targetPort: opentsdb-udp
+{{- end }}
+{{- if .Values.extraArgs.opentsdbListenAddr }}
+    - name: opentsdb-tcp
+      protocol: TCP
+      port: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
+      targetPort: opentsdb-tcp
+{{- end }}
+
   selector:
     {{- include "chart.selectorLabels" . | nindent 4 }}
   type: "{{ .Values.service.type }}"
