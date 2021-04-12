@@ -2,7 +2,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-state-metrics
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-state-metrics" | trunc 63 | trimSuffix "-" }}
   namespace: {{ $.Release.Namespace }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec:
@@ -13,6 +13,8 @@ spec:
 {{- if empty (index .Values "kube-state-metrics" "vmServiceScrape" "spec") }}
   endpoints:
   - port: http
+    honorLabels: true
+  jobLabel: app.kubernetes.io/name
 {{ else }}
 {{- if not (hasKey (index .Values "kube-state-metrics" "vmServiceScrape" "spec") "endpoints") }}
   endpoints:

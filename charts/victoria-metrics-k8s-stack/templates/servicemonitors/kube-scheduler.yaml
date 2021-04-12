@@ -1,0 +1,70 @@
+
+{{- if .Values.kubeScheduler.enabled }}
+{{- if .Values.kubeScheduler.endpoints }}
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-scheduler" | trunc 63 | trimSuffix "-" }}
+  namespace: kube-system 
+  labels: 
+    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-scheduler
+    k8s-app: etcd-server
+{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+subsets:
+  - addresses:
+      {{- range .Values.kubeScheduler.endpoints }}
+      - ip: {{ . }}
+      {{- end }}
+    ports:
+      - name: http-metrics
+        port: {{ .Values.kubeScheduler.service.port }}
+        protocol: TCP
+{{- end }}
+{{- if .Values.kubeScheduler.service.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-scheduler" | trunc 63 | trimSuffix "-" }}
+  namespace: kube-system
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-scheduler
+    jobLabel: kube-scheduler
+{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+spec:
+  clusterIP: None
+  ports:
+    - name: http-metrics
+      port: {{ .Values.kubeScheduler.service.port }}
+      protocol: TCP
+      targetPort: {{ .Values.kubeScheduler.service.targetPort }}
+{{- if .Values.kubeScheduler.endpoints }}{{- else }}
+  selector:
+    {{- if .Values.kubeScheduler.service.selector }}
+{{ toYaml .Values.kubeScheduler.service.selector | indent 4 }}
+    {{- else}}
+    component: kube-scheduler
+    {{- end}}
+{{- end }}
+  type: ClusterIP
+{{- end }}
+{{- if .Values.kubeScheduler.vmServiceScrape.enabled }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-scheduler" | trunc 63 | trimSuffix "-" }}
+  namespace: {{ $.Release.Namespace }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-scheduler
+      app.kubernetes.io/instance: {{ $.Release.Name | quote }}
+  namespaceSelector:
+    matchNames:
+      - "kube-system"
+{{ omit .Values.kubeScheduler.vmServiceScrape.spec "selector" "namespaceSelector" | toYaml | indent 2 }}
+{{- end }}
+{{- end }}

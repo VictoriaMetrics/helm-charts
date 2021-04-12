@@ -6,11 +6,12 @@
 * [x] VMAlert
 * [x] AlertManager
 * [ ] Annotations
-* [ ] ServiceScrapes
+* [x] ServiceScrapes
   * [x] Nodeexporter
   * [x] Grafana
   * [x] kube-state-metrics
-  * [ ] kube-mixin
+  * [x] kube-mixin
+  * [x] core-dns
 * [x] Grafana DS
 * [x] Dashboards
   * [x] Nodeexporter
@@ -19,3 +20,4 @@
 * [ ] Rules
   * [ ] kube-mixin
 * [ ] ServiceAccounts stuff
+* [ ] SelectorOvverride for ServiceScrapes

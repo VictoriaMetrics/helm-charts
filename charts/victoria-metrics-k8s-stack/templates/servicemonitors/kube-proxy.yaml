@@ -1,0 +1,70 @@
+
+{{- if .Values.kubeProxy.enabled }}
+{{- if .Values.kubeProxy.endpoints }}
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-proxy" | trunc 63 | trimSuffix "-" }}
+  namespace: kube-system 
+  labels: 
+    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-proxy
+    k8s-app: etcd-server
+{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+subsets:
+  - addresses:
+      {{- range .Values.kubeProxy.endpoints }}
+      - ip: {{ . }}
+      {{- end }}
+    ports:
+      - name: http-metrics
+        port: {{ .Values.kubeProxy.service.port }}
+        protocol: TCP
+{{- end }}
+{{- if .Values.kubeProxy.service.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-proxy" | trunc 63 | trimSuffix "-" }}
+  namespace: kube-system
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-proxy
+    jobLabel: kube-proxy
+{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+spec:
+  clusterIP: None
+  ports:
+    - name: http-metrics
+      port: {{ .Values.kubeProxy.service.port }}
+      protocol: TCP
+      targetPort: {{ .Values.kubeProxy.service.targetPort }}
+{{- if .Values.kubeProxy.endpoints }}{{- else }}
+  selector:
+    {{- if .Values.kubeProxy.service.selector }}
+{{ toYaml .Values.kubeProxy.service.selector | indent 4 }}
+    {{- else}}
+    k8s-app: kube-proxy
+    {{- end}}
+{{- end }}
+  type: ClusterIP
+{{- end }}
+{{- if .Values.kubeProxy.vmServiceScrape.enabled }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-proxy" | trunc 63 | trimSuffix "-" }}
+  namespace: {{ $.Release.Namespace }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-proxy
+      app.kubernetes.io/instance: {{ $.Release.Name | quote }}
+  namespaceSelector:
+    matchNames:
+      - "kube-system"
+{{ omit .Values.kubeProxy.vmServiceScrape.spec "selector" "namespaceSelector" | toYaml | indent 2 }}
+{{- end }}
+{{- end }}

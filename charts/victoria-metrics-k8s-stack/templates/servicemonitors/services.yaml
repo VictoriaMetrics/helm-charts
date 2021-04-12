@@ -1,0 +1,37 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: services
+  namespace: monitoring-system
+spec:
+  discoveryRole: "endpoints"
+  jobLabel: "app.kubernetes.io/name"
+  endpoints:
+    - port: metrics
+      relabelConfigs:
+        - sourceLabels:
+            [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+          action: keep
+          regex: "true"
+        - targetLabels:
+            [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+          action: replace
+          targetLabel: __scheme__
+          regex: (https?)
+        - sourceLabels:
+            [__meta_kubernetes_service_annotation_prometheus_io_path]
+          action: replace
+          targetLabel: __metrics_path__
+          regex: (.+)
+        - sourceLabels:
+            [
+              __address__,
+              __meta_kubernetes_service_annotation_prometheus_io_port,
+            ]
+          action: replace
+          targetLabel: __address__
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+  namespaceSelector:
+    any: true
+  selector: {}

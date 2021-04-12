@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-grafana-ds
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "grafana-ds" | trunc 63 | trimSuffix "-" }}
   namespace: {{ .Release.Namespace }}
 {{- if .Values.grafana.sidecar.datasources.annotations }}
   annotations:
