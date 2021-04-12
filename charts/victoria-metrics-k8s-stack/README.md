@@ -1,23 +1,285 @@
-### plans
+# Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-* [ ] VMCluster
-* [x] VMSingle
-* [x] VMAgent
-* [x] VMAlert
-* [x] AlertManager
-* [ ] Annotations
-* [x] ServiceScrapes
-  * [x] Nodeexporter
-  * [x] Grafana
-  * [x] kube-state-metrics
-  * [x] kube-mixin
-  * [x] core-dns
-* [x] Grafana DS
-* [x] Dashboards
-  * [x] Nodeexporter
-  * [x] kube-state-metrics 
-  * [x] kube-mixin
-* [ ] Rules
-  * [ ] kube-mixin
-* [ ] ServiceAccounts stuff
-* [ ] SelectorOvverride for ServiceScrapes
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square)
+
+Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
+
+# Prerequisites
+
+* Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
+
+* PV support on underlying infrastructure.
+
+# Upgrade guide
+
+```console
+$ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
+```
+
+With Helm v3, CRDs created by this chart are not updated by default and should be manually updated.
+Consult also the [Helm Documentation on CRDs](https://helm.sh/docs/chart_best_practices/custom_resource_definitions).
+
+_See [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/) for command documentation._
+
+# Chart Details
+
+This chart will do the following:
+
+* Rollout victoria metrics operator, grafana, prometheus-node-exporter and kube-state-metrics helm charts
+* Create VMSingle, VMAgent, VMAlert, VMAlertManager CRDs
+* Configure Grafana for VictoriaMetrics datasource
+* Configure ServiceScrapes for Node Exporter, kube-state-metrics and various kubernetes metrics
+* Install Grafana dashboards for kubernetes monitoring based on [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
+
+## Dependencies
+
+By default this chart installs additional, dependent charts:
+
+- [VictoriaMetrics/victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator)
+- [kubernetes/kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/tree/master/charts/kube-state-metrics)
+- [prometheus-community/prometheus-node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter)
+- [grafana/grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
+
+_See [helm dependency](https://helm.sh/docs/helm/helm_dependency/) for command documentation._
+
+# How to install
+
+Access a Kubernetes cluster.
+
+Add a chart helm repository with follow commands:
+
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
+
+helm repo update
+```
+
+List versions of ``vm/victoria-metrics-k8s-stack`` chart available to installation:
+
+##### for helm v3
+
+```console
+helm search repo vm/victoria-metrics-k8s-stack -l
+```
+
+Export default values of ``victoria-metrics-k8s-stack`` chart to file ``values.yaml``:
+
+```console
+helm show values vm/victoria-metrics-k8s-stack > values.yaml
+```
+
+Change the values according to the need of the environment in ``values.yaml`` file.
+
+Test the installation with command:
+
+```console
+helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE --debug --dry-run
+```
+
+Install chart with command:
+
+##### for helm v3
+
+```console
+helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE
+```
+
+Get the pods lists by running this commands:
+
+```console
+kubectl get pods -A | grep 'victoria-metrics'
+```
+
+# How to uninstall
+
+Remove application with command.
+
+```console
+helm uninstall [RELEASE_NAME] -n NAMESPACE
+```
+This removes all the Kubernetes components associated with the chart and deletes the release.
+
+_See [helm uninstall](https://helm.sh/docs/helm/helm_uninstall/) for command documentation._
+
+CRDs created by this chart are not removed by default and should be manually cleaned up:
+
+```console
+kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl delete crd {}
+```
+
+# Documentation of Helm Chart
+
+Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
+
+Generate docs with ``helm-docs`` command.
+
+```bash
+cd charts/victoria-metrics-k8s-stack
+
+helm-docs
+```
+
+The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+
+# Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-metrics-k8s-stack/values.yaml`` file.
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity | object | `{}` |  |
+| alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
+| alertmanager.config.receivers[0].name | string | `"webhook"` |  |
+| alertmanager.config.receivers[0].webhook_configs[0].url | string | `"http://slack:30500/"` |  |
+| alertmanager.config.route.group_by[0] | string | `"job"` |  |
+| alertmanager.config.route.group_interval | string | `"5m"` |  |
+| alertmanager.config.route.group_wait | string | `"30s"` |  |
+| alertmanager.config.route.receiver | string | `"webhook"` |  |
+| alertmanager.config.route.repeat_interval | string | `"12h"` |  |
+| alertmanager.enabled | bool | `true` |  |
+| alertmanager.spec | object | `{}` |  |
+| cadvisor.enabled | bool | `true` |  |
+| cadvisor.spec.bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| cadvisor.spec.interval | string | `"30s"` |  |
+| cadvisor.spec.relabelConfigs[0].action | string | `"labelmap"` |  |
+| cadvisor.spec.relabelConfigs[0].regex | string | `"__meta_kubernetes_node_label_(.+)"` |  |
+| cadvisor.spec.relabelConfigs[1].replacement | string | `"kubernetes.default.svc:443"` |  |
+| cadvisor.spec.relabelConfigs[1].targetLabel | string | `"__address__"` |  |
+| cadvisor.spec.relabelConfigs[2].regex | string | `"(.+)"` |  |
+| cadvisor.spec.relabelConfigs[2].replacement | string | `"/api/v1/nodes/$1/proxy/metrics/cadvisor"` |  |
+| cadvisor.spec.relabelConfigs[2].sourceLabels[0] | string | `"__meta_kubernetes_node_name"` |  |
+| cadvisor.spec.relabelConfigs[2].targetLabel | string | `"__metrics_path__"` |  |
+| cadvisor.spec.relabelConfigs[3].replacement | string | `"cadvisor"` |  |
+| cadvisor.spec.relabelConfigs[3].targetLabel | string | `"job"` |  |
+| cadvisor.spec.scheme | string | `"https"` |  |
+| cadvisor.spec.scrapeTimeout | string | `"5s"` |  |
+| cadvisor.spec.selector | object | `{}` |  |
+| cadvisor.spec.tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| cadvisor.spec.tlsConfig.insecureSkipVerify | bool | `true` |  |
+| coreDns.enabled | bool | `true` |  |
+| coreDns.service.enabled | bool | `true` |  |
+| coreDns.service.port | int | `9153` |  |
+| coreDns.service.targetPort | int | `9153` |  |
+| coreDns.vmServiceScrape.enabled | bool | `true` |  |
+| coreDns.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| coreDns.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
+| fullnameOverride | string | `""` |  |
+| grafana.additionalDataSources | list | `[]` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".apiVersion | int | `1` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].disableDeletion | bool | `false` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].editable | bool | `true` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].folder | string | `""` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].name | string | `"default"` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].options.path | string | `"/var/lib/grafana/dashboards/default"` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].orgId | int | `1` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].type | string | `"file"` |  |
+| grafana.dashboards.default.nodeexporter.datasource | string | `"VictoriaMetrics"` |  |
+| grafana.dashboards.default.nodeexporter.gnetId | int | `1860` |  |
+| grafana.dashboards.default.victoriametrics.url | string | `"https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json"` |  |
+| grafana.dashboards.default.vmagent.url | string | `"https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json"` |  |
+| grafana.defaultDashboardsEnabled | bool | `true` |  |
+| grafana.enabled | bool | `true` |  |
+| grafana.sidecar.dashboards.enabled | bool | `true` |  |
+| grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |
+| grafana.sidecar.datasources.enabled | bool | `true` |  |
+| grafana.vmServiceScrape.enabled | bool | `true` |  |
+| grafana.vmServiceScrape.spec | object | `{}` |  |
+| imagePullSecrets | list | `[]` |  |
+| kube-state-metrics.enabled | bool | `true` |  |
+| kube-state-metrics.vmServiceScrape.spec | object | `{}` |  |
+| kubeApiServer.enabled | bool | `true` |  |
+| kubeApiServer.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeApiServer.spec.endpoints[0].port | string | `"https"` |  |
+| kubeApiServer.spec.endpoints[0].scheme | string | `"https"` |  |
+| kubeApiServer.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| kubeApiServer.spec.endpoints[0].tlsConfig.serverName | string | `"kubernetes"` |  |
+| kubeApiServer.spec.jobLabel | string | `"component"` |  |
+| kubeApiServer.spec.namespaceSelector.matchNames[0] | string | `"default"` |  |
+| kubeApiServer.spec.selector.matchLabels.component | string | `"apiserver"` |  |
+| kubeApiServer.spec.selector.matchLabels.provider | string | `"kubernetes"` |  |
+| kubeControllerManager.enabled | bool | `true` |  |
+| kubeControllerManager.endpoints | list | `[]` |  |
+| kubeControllerManager.service.enabled | bool | `true` |  |
+| kubeControllerManager.service.port | int | `10252` |  |
+| kubeControllerManager.service.targetPort | int | `10252` |  |
+| kubeControllerManager.vmServiceScrape.enabled | bool | `true` |  |
+| kubeControllerManager.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeControllerManager.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
+| kubeControllerManager.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
+| kubeControllerManager.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| kubeControllerManager.vmServiceScrape.spec.endpoints[0].tlsConfig.serverName | string | `"kubernetes"` |  |
+| kubeControllerManager.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| kubeEtcd.enabled | bool | `true` |  |
+| kubeEtcd.endpoints | list | `[]` |  |
+| kubeEtcd.service.enabled | bool | `true` |  |
+| kubeEtcd.service.port | int | `2379` |  |
+| kubeEtcd.service.targetPort | int | `2379` |  |
+| kubeEtcd.vmServiceScrape.enabled | bool | `true` |  |
+| kubeEtcd.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeEtcd.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
+| kubeEtcd.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
+| kubeEtcd.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| kubeEtcd.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| kubeProxy.enabled | bool | `true` |  |
+| kubeProxy.endpoints | list | `[]` |  |
+| kubeProxy.service.enabled | bool | `true` |  |
+| kubeProxy.service.port | int | `10249` |  |
+| kubeProxy.service.targetPort | int | `10249` |  |
+| kubeProxy.vmServiceScrape.enabled | bool | `true` |  |
+| kubeProxy.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeProxy.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
+| kubeProxy.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
+| kubeProxy.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| kubeProxy.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| kubeScheduler.enabled | bool | `true` |  |
+| kubeScheduler.endpoints | list | `[]` |  |
+| kubeScheduler.service.enabled | bool | `true` |  |
+| kubeScheduler.service.port | int | `10251` |  |
+| kubeScheduler.service.targetPort | int | `10251` |  |
+| kubeScheduler.vmServiceScrape.enabled | bool | `true` |  |
+| kubeScheduler.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeScheduler.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
+| kubeScheduler.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
+| kubeScheduler.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| kubeScheduler.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| kubelet.enabled | bool | `true` |  |
+| kubelet.spec.bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubelet.spec.interval | string | `"30s"` |  |
+| kubelet.spec.relabelConfigs[0].action | string | `"labelmap"` |  |
+| kubelet.spec.relabelConfigs[0].regex | string | `"__meta_kubernetes_node_label_(.+)"` |  |
+| kubelet.spec.relabelConfigs[1].replacement | string | `"kubernetes.default.svc:443"` |  |
+| kubelet.spec.relabelConfigs[1].targetLabel | string | `"__address__"` |  |
+| kubelet.spec.relabelConfigs[2].regex | string | `"(.+)"` |  |
+| kubelet.spec.relabelConfigs[2].replacement | string | `"/api/v1/nodes/$1/proxy/metrics"` |  |
+| kubelet.spec.relabelConfigs[2].sourceLabels[0] | string | `"__meta_kubernetes_node_name"` |  |
+| kubelet.spec.relabelConfigs[2].targetLabel | string | `"__metrics_path__"` |  |
+| kubelet.spec.relabelConfigs[3].replacement | string | `"kubelet"` |  |
+| kubelet.spec.relabelConfigs[3].targetLabel | string | `"job"` |  |
+| kubelet.spec.scheme | string | `"https"` |  |
+| kubelet.spec.scrapeTimeout | string | `"5s"` |  |
+| kubelet.spec.tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| kubelet.spec.tlsConfig.insecureSkipVerify | bool | `true` |  |
+| nameOverride | string | `""` |  |
+| nodeSelector | object | `{}` |  |
+| podAnnotations | object | `{}` |  |
+| podSecurityContext | object | `{}` |  |
+| prometheus-node-exporter.enabled | bool | `true` |  |
+| prometheus-node-exporter.vmServiceScrape.enabled | bool | `true` |  |
+| prometheus-node-exporter.vmServiceScrape.spec | object | `{}` |  |
+| securityContext | object | `{}` |  |
+| serviceAccount.annotations | object | `{}` |  |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.name | string | `""` |  |
+| tolerations | list | `[]` |  |
+| victoria-metrics-operator.createCRD | bool | `false` |  |
+| victoria-metrics-operator.operator.disable_promethues_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
+| vmagent.enabled | bool | `true` |  |
+| vmagent.spec.scrapeInterval | string | `"25s"` |  |
+| vmalert.enabled | bool | `true` |  |
+| vmalert.spec.evaluationInterval | string | `"15s"` |  |
+| vmalert.spec.remoteRead.lookback | string | `"1h"` |  |
+| vmsingle.enabled | bool | `true` |  |
+| vmsingle.spec.replicaCount | int | `1` |  |
+| vmsingle.spec.retentionPeriod | string | `"14"` |  |
