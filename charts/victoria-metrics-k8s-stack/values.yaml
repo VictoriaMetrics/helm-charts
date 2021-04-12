@@ -100,6 +100,8 @@ vmagent:
   # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmagentspec
   spec:
     scrapeInterval: 25s
+    externalLabels:
+      cluster: cluster-name
 
 
 
@@ -177,7 +179,10 @@ prometheus-node-exporter:
 
     # spec for VMServiceScrape crd 
     # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
-    spec: {}
+    spec:
+      relabelConfigs:
+      - targetLabel: "job"
+        replacement: "node-exporter"
 
 
 
@@ -209,12 +214,8 @@ kubelet:
     relabelConfigs:
       - action: labelmap
         regex: __meta_kubernetes_node_label_(.+)
-      - targetLabel: __address__
-        replacement: kubernetes.default.svc:443
-      - sourceLabels: [__meta_kubernetes_node_name]
-        regex: (.+)
-        targetLabel: __metrics_path__
-        replacement: /api/v1/nodes/$1/proxy/metrics
+      - sourceLabels: [__metrics_path__]
+        targetLabel: metrics_path
       - targetLabel: "job"
         replacement: "kubelet"
 
@@ -235,12 +236,8 @@ cadvisor:
     relabelConfigs:
       - action: labelmap
         regex: __meta_kubernetes_node_label_(.+)
-      - targetLabel: __address__
-        replacement: kubernetes.default.svc:443
-      - sourceLabels: [__meta_kubernetes_node_name]
-        regex: (.+)
-        targetLabel: __metrics_path__
-        replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
+      - sourceLabels: [__metrics_path__]
+        targetLabel: metrics_path
       - targetLabel: "job"
         replacement: "cadvisor"
 
@@ -405,7 +402,7 @@ kubeScheduler:
 ## Component scraping kube proxy
 ##
 kubeProxy:
-  enabled: true
+  enabled: false
 
   ## If your kube proxy is not deployed as a pod, specify IPs it can be found on
   ##
