@@ -206,10 +206,16 @@ kube-state-metrics:
 ## Component scraping the kubelets
 kubelet:
   enabled: true
+
+  ## Enable scraping /metrics/cadvisor from kubelet's service
+  cadvisor: true
+  ## Enable scraping /metrics/probes from kubelet's service
+  probes: true
   # spec for VMNodeScrape crd 
   # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmnodescrapespec
   spec:
     scheme: "https"
+    honorLabels: true
     interval: "30s"
     scrapeTimeout: "5s"
     tlsConfig:
@@ -223,28 +229,6 @@ kubelet:
         targetLabel: metrics_path
       - targetLabel: "job"
         replacement: "kubelet"
-
-## Component scraping cadvisor
-cadvisor:
-  enabled: true
-  # spec for VMNodeScrape crd 
-  # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmnodescrapespec
-  spec:
-    scheme: "https"
-    interval: "30s"
-    scrapeTimeout: "5s"
-    selector: {}
-    tlsConfig:
-      insecureSkipVerify: true
-      caFile: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-    bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
-    relabelConfigs:
-      - action: labelmap
-        regex: __meta_kubernetes_node_label_(.+)
-      - sourceLabels: [__metrics_path__]
-        targetLabel: metrics_path
-      - targetLabel: "job"
-        replacement: "cadvisor"
 
     
 ## Component scraping the kube api server
