@@ -1,0 +1,77 @@
+{{- /*
+Generated from 'vmagent' group from https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts.yml
+Do not change in-place! In order to change this file first read following link:
+https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
+*/ -}}
+{{- if and .Values.defaultRules.create }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "vmagent" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}
+{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+{{- if .Values.defaultRules.labels }}
+{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - concurrency: 2
+    interval: 30s
+    name: vmagent
+    rules:
+    - alert: PersistentQueueIsDroppingData
+      annotations:
+        dashboard: http://localhost:3000/d/G7Z9GzMGz?viewPanel=49&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        description: Vmagent dropped {{`{{`}} $value | humanize1024 {{`}}`}} from persistent queue on instance {{`{{`}} $labels.instance {{`}}`}} for the last 10m.
+        summary: Instance {{`{{`}} $labels.instance {{`}}`}} is dropping data from persistent queue
+      expr: sum(increase(vm_persistentqueue_bytes_dropped_total[5m])) by (job, instance) > 0
+      for: 10m
+      labels:
+        severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: TooManyScrapeErrors
+      annotations:
+        dashboard: http://localhost:3000/d/G7Z9GzMGz?viewPanel=31&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        summary: Job "{{`{{`}} $labels.job {{`}}`}}" on instance {{`{{`}} $labels.instance {{`}}`}} fails to scrape targets for last 15m
+      expr: sum(increase(vm_promscrape_scrapes_failed_total[5m])) by (job, instance) > 0
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: TooManyWriteErrors
+      annotations:
+        dashboard: http://localhost:3000/d/G7Z9GzMGz?viewPanel=77&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        summary: Job "{{`{{`}} $labels.job {{`}}`}}" on instance {{`{{`}} $labels.instance {{`}}`}} responds with errors to write requests for last 15m.
+      expr: |-
+        (sum(increase(vm_ingestserver_request_errors_total[5m])) by (job, instance)
+        +
+        sum(increase(vmagent_http_request_errors_total[5m])) by (job, instance)) > 0
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: TooManyRemoteWriteErrors
+      annotations:
+        dashboard: http://localhost:3000/d/G7Z9GzMGz?viewPanel=61&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        description: "Vmagent fails to push data via remote write protocol to destination \"{{`{{`}} $labels.url {{`}}`}}\"\n Ensure that destination is up and reachable."
+        summary: Job "{{`{{`}} $labels.job {{`}}`}}" on instance {{`{{`}} $labels.instance {{`}}`}} fails to push to remote storage
+      expr: sum(rate(vmagent_remotewrite_retries_count_total[5m])) by(job, instance, url) > 0
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}

@@ -42,6 +42,8 @@ By default this chart installs additional, dependent charts:
 
 _See [helm dependency](https://helm.sh/docs/helm/helm_dependency/) for command documentation._
 
+> ATTENTION !!! Default values are inherited from helm charts declared as a dependency in the Chart.yaml file. If you want to change the default values that are inherited, access the documentation and the values.yaml file for each chart to understand the content and create a customized values.yaml file for your need.
+
 # How to install
 
 Access a Kubernetes cluster.
@@ -129,7 +131,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
 | alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
 | alertmanager.config.receivers[0].name | string | `"webhook"` |  |
 | alertmanager.config.receivers[0].webhook_configs[0].url | string | `"http://slack:30500/"` |  |
@@ -140,24 +141,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.config.route.repeat_interval | string | `"12h"` |  |
 | alertmanager.enabled | bool | `true` |  |
 | alertmanager.spec | object | `{}` |  |
-| cadvisor.enabled | bool | `true` |  |
-| cadvisor.spec.bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| cadvisor.spec.interval | string | `"30s"` |  |
-| cadvisor.spec.relabelConfigs[0].action | string | `"labelmap"` |  |
-| cadvisor.spec.relabelConfigs[0].regex | string | `"__meta_kubernetes_node_label_(.+)"` |  |
-| cadvisor.spec.relabelConfigs[1].replacement | string | `"kubernetes.default.svc:443"` |  |
-| cadvisor.spec.relabelConfigs[1].targetLabel | string | `"__address__"` |  |
-| cadvisor.spec.relabelConfigs[2].regex | string | `"(.+)"` |  |
-| cadvisor.spec.relabelConfigs[2].replacement | string | `"/api/v1/nodes/$1/proxy/metrics/cadvisor"` |  |
-| cadvisor.spec.relabelConfigs[2].sourceLabels[0] | string | `"__meta_kubernetes_node_name"` |  |
-| cadvisor.spec.relabelConfigs[2].targetLabel | string | `"__metrics_path__"` |  |
-| cadvisor.spec.relabelConfigs[3].replacement | string | `"cadvisor"` |  |
-| cadvisor.spec.relabelConfigs[3].targetLabel | string | `"job"` |  |
-| cadvisor.spec.scheme | string | `"https"` |  |
-| cadvisor.spec.scrapeTimeout | string | `"5s"` |  |
-| cadvisor.spec.selector | object | `{}` |  |
-| cadvisor.spec.tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
-| cadvisor.spec.tlsConfig.insecureSkipVerify | bool | `true` |  |
 | coreDns.enabled | bool | `true` |  |
 | coreDns.service.enabled | bool | `true` |  |
 | coreDns.service.port | int | `9153` |  |
@@ -165,6 +148,29 @@ Change the values according to the need of the environment in ``victoria-metrics
 | coreDns.vmServiceScrape.enabled | bool | `true` |  |
 | coreDns.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | coreDns.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
+| defaultRules.additionalRuleLabels | object | `{}` |  |
+| defaultRules.annotations | object | `{}` |  |
+| defaultRules.appNamespacesTarget | string | `".*"` |  |
+| defaultRules.create | bool | `true` |  |
+| defaultRules.labels | object | `{}` |  |
+| defaultRules.rules.etcd | bool | `true` |  |
+| defaultRules.rules.general | bool | `true` |  |
+| defaultRules.rules.k8s | bool | `true` |  |
+| defaultRules.rules.kubeApiserver | bool | `true` |  |
+| defaultRules.rules.kubeApiserverAvailability | bool | `true` |  |
+| defaultRules.rules.kubeApiserverSlos | bool | `true` |  |
+| defaultRules.rules.kubePrometheusGeneral | bool | `true` |  |
+| defaultRules.rules.kubePrometheusNodeRecording | bool | `true` |  |
+| defaultRules.rules.kubeScheduler | bool | `true` |  |
+| defaultRules.rules.kubeStateMetrics | bool | `true` |  |
+| defaultRules.rules.kubelet | bool | `true` |  |
+| defaultRules.rules.kubernetesApps | bool | `true` |  |
+| defaultRules.rules.kubernetesResources | bool | `true` |  |
+| defaultRules.rules.kubernetesStorage | bool | `true` |  |
+| defaultRules.rules.kubernetesSystem | bool | `true` |  |
+| defaultRules.rules.network | bool | `true` |  |
+| defaultRules.rules.node | bool | `true` |  |
+| defaultRules.runbookUrl | string | `"https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#"` |  |
 | fullnameOverride | string | `""` |  |
 | grafana.additionalDataSources | list | `[]` |  |
 | grafana.dashboardProviders."dashboardproviders.yaml".apiVersion | int | `1` |  |
@@ -177,6 +183,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.dashboardProviders."dashboardproviders.yaml".providers[0].type | string | `"file"` |  |
 | grafana.dashboards.default.nodeexporter.datasource | string | `"VictoriaMetrics"` |  |
 | grafana.dashboards.default.nodeexporter.gnetId | int | `1860` |  |
+| grafana.dashboards.default.nodeexporter.revision | int | `22` |  |
 | grafana.dashboards.default.victoriametrics.url | string | `"https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json"` |  |
 | grafana.dashboards.default.vmagent.url | string | `"https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json"` |  |
 | grafana.defaultDashboardsEnabled | bool | `true` |  |
@@ -186,7 +193,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.datasources.enabled | bool | `true` |  |
 | grafana.vmServiceScrape.enabled | bool | `true` |  |
 | grafana.vmServiceScrape.spec | object | `{}` |  |
-| imagePullSecrets | list | `[]` |  |
 | kube-state-metrics.enabled | bool | `true` |  |
 | kube-state-metrics.vmServiceScrape.spec | object | `{}` |  |
 | kubeApiServer.enabled | bool | `true` |  |
@@ -222,7 +228,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeEtcd.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
 | kubeEtcd.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | kubeEtcd.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
-| kubeProxy.enabled | bool | `true` |  |
+| kubeProxy.enabled | bool | `false` |  |
 | kubeProxy.endpoints | list | `[]` |  |
 | kubeProxy.service.enabled | bool | `true` |  |
 | kubeProxy.service.port | int | `10249` |  |
@@ -244,38 +250,36 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeScheduler.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
 | kubeScheduler.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | kubeScheduler.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| kubelet.cadvisor | bool | `true` |  |
 | kubelet.enabled | bool | `true` |  |
+| kubelet.probes | bool | `true` |  |
 | kubelet.spec.bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubelet.spec.honorLabels | bool | `true` |  |
 | kubelet.spec.interval | string | `"30s"` |  |
 | kubelet.spec.relabelConfigs[0].action | string | `"labelmap"` |  |
 | kubelet.spec.relabelConfigs[0].regex | string | `"__meta_kubernetes_node_label_(.+)"` |  |
-| kubelet.spec.relabelConfigs[1].replacement | string | `"kubernetes.default.svc:443"` |  |
-| kubelet.spec.relabelConfigs[1].targetLabel | string | `"__address__"` |  |
-| kubelet.spec.relabelConfigs[2].regex | string | `"(.+)"` |  |
-| kubelet.spec.relabelConfigs[2].replacement | string | `"/api/v1/nodes/$1/proxy/metrics"` |  |
-| kubelet.spec.relabelConfigs[2].sourceLabels[0] | string | `"__meta_kubernetes_node_name"` |  |
-| kubelet.spec.relabelConfigs[2].targetLabel | string | `"__metrics_path__"` |  |
-| kubelet.spec.relabelConfigs[3].replacement | string | `"kubelet"` |  |
-| kubelet.spec.relabelConfigs[3].targetLabel | string | `"job"` |  |
+| kubelet.spec.relabelConfigs[1].sourceLabels[0] | string | `"__metrics_path__"` |  |
+| kubelet.spec.relabelConfigs[1].targetLabel | string | `"metrics_path"` |  |
+| kubelet.spec.relabelConfigs[2].replacement | string | `"kubelet"` |  |
+| kubelet.spec.relabelConfigs[2].targetLabel | string | `"job"` |  |
 | kubelet.spec.scheme | string | `"https"` |  |
 | kubelet.spec.scrapeTimeout | string | `"5s"` |  |
 | kubelet.spec.tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | kubelet.spec.tlsConfig.insecureSkipVerify | bool | `true` |  |
 | nameOverride | string | `""` |  |
-| nodeSelector | object | `{}` |  |
-| podAnnotations | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
 | prometheus-node-exporter.enabled | bool | `true` |  |
+| prometheus-node-exporter.extraArgs[0] | string | `"--collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"` |  |
+| prometheus-node-exporter.extraArgs[1] | string | `"--collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"` |  |
+| prometheus-node-exporter.podLabels.jobLabel | string | `"node-exporter"` |  |
 | prometheus-node-exporter.vmServiceScrape.enabled | bool | `true` |  |
-| prometheus-node-exporter.vmServiceScrape.spec | object | `{}` |  |
-| securityContext | object | `{}` |  |
+| prometheus-node-exporter.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
-| tolerations | list | `[]` |  |
 | victoria-metrics-operator.createCRD | bool | `false` |  |
 | victoria-metrics-operator.operator.disable_promethues_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.enabled | bool | `true` |  |
+| vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
 | vmalert.enabled | bool | `true` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |

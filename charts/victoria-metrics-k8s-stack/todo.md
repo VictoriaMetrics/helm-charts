@@ -17,7 +17,9 @@
   * [x] Nodeexporter
   * [x] kube-state-metrics 
   * [x] kube-mixin
-* [ ] Rules
-  * [ ] kube-mixin
+* [x] Rules
+  * [x] kube-mixin
+  * [x] kube-prometheus
+  * [x] victoria-metrics
 * [ ] ServiceAccounts stuff
 * [ ] SelectorOvverride for ServiceScrapes

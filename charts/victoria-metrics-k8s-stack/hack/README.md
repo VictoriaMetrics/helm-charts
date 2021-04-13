@@ -2,9 +2,9 @@
 Thanks to [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) community
 this scripts was created by them, and we just adopted it for our needs
 
-## [sync_prometheus_rules.py](sync_prometheus_rules.py)
+## [sync_rules.py](sync_rules.py)
 
-This script generates prometheus rules set for alertmanager from any properly formatted kubernetes yaml based on defined input, splitting rules to separate files based on group name.
+This script generates VMRules set from any properly formatted kubernetes yaml based on defined input, splitting rules to separate files based on group name.
 
 Currently following imported:
 

@@ -1,9 +1,3 @@
-# Default values for victoria-metrics-k8s-stack.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-
-imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
@@ -16,29 +10,47 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations: {}
+## Create default rules for monitoring the cluster
+##
+defaultRules:
+  create: true
+  rules:
+    etcd: true
+    general: true
+    k8s: true
+    kubeApiserver: true
+    kubeApiserverAvailability: true
+    kubeApiserverSlos: true
+    kubelet: true
+    kubePrometheusGeneral: true
+    kubePrometheusNodeRecording: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    kubeScheduler: true
+    kubeStateMetrics: true
+    network: true
+    node: true
 
-podSecurityContext: {}
-  # fsGroup: 2000
+  ## Runbook url prefix for default rules
+  runbookUrl: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#
+  ## Reduce app namespace alert scope
+  appNamespacesTarget: ".*"
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+  ## Labels for default rules
+  labels: {}
+  ## Annotations for default rules
+  annotations: {}
+
+  ## Additional labels for PrometheusRule alerts
+  additionalRuleLabels: {}
 
 
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
 
 ##############
 
+# victoria-metrics-operator dependency chart configuration. For possible values refer to https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator#parameters
 victoria-metrics-operator:
   ## all values for victoria-metrics-operator helm chart can be specified here
   createCRD: false
@@ -108,6 +120,7 @@ vmagent:
 #################################################
 ###              dependencies               #####
 #################################################
+# Grafana dependency chart configuration. For possible values refer to https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration
 grafana:
   enabled: true
   ## all values for grafana helm chart can be specified here
@@ -155,6 +168,7 @@ grafana:
         url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json
       nodeexporter:
         gnetId: 1860
+        revision: 22
         datasource: VictoriaMetrics
 
   defaultDashboardsEnabled: true
@@ -169,6 +183,7 @@ grafana:
 
 
 
+# prometheus-node-exporter dependency chart configuration. For possible values refer to https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/values.yaml
 prometheus-node-exporter:
   enabled: true
 
@@ -191,6 +206,8 @@ prometheus-node-exporter:
       jobLabel: jobLabel
 
 
+
+# kube-state-metrics dependency chart configuration. For possible values refer to https://github.com/kubernetes/kube-state-metrics/blob/master/charts/kube-state-metrics/values.yaml
 kube-state-metrics:
   enabled: true
   ## all values for kube-state-metrics helm chart can be specified here
@@ -201,6 +218,8 @@ kube-state-metrics:
     spec: {}
 
   #TODO: selector override for kube-state-metrics deployed separatelly
+
+
 
 ### Service Monitors
 ## Component scraping the kubelets
@@ -230,6 +249,7 @@ kubelet:
       - targetLabel: "job"
         replacement: "kubelet"
 
+
     
 ## Component scraping the kube api server
 kubeApiServer:
@@ -254,6 +274,8 @@ kubeApiServer:
       matchLabels:
         component: apiserver
         provider: kubernetes
+
+
 
 ## Component scraping the kube controller manager
 kubeControllerManager:
@@ -293,6 +315,7 @@ kubeControllerManager:
             serverName: kubernetes
 
 
+
 ## Component scraping coreDns. Use either this or kubeDns
 ##
 coreDns:
@@ -313,6 +336,7 @@ coreDns:
       - port: http-metrics
         bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
     
+
 
 ## Component scraping etcd
 ##
@@ -351,6 +375,7 @@ kubeEtcd:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
 
+
 ## Component scraping kube scheduler
 ##
 kubeScheduler:
@@ -386,6 +411,7 @@ kubeScheduler:
           scheme: https
           tlsConfig:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
 
 
 ## Component scraping kube proxy

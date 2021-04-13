@@ -37,6 +37,11 @@ charts = [
     },
 ]
 
+skip_list = [
+    "prometheus.json",
+    "prometheus-remote-write.json"
+]
+
 # Additional conditions map
 condition_map = {
     'grafana-coredns-k8s': ' .Values.coreDns.enabled',
@@ -49,11 +54,6 @@ condition_map = {
     'node-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
     'node-cluster-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
 }
-
-skip_list = [
-    "prometheus.json",
-    "prometheus-remote-write.json"
-]
 
 # standard header
 header = '''{{- /*
