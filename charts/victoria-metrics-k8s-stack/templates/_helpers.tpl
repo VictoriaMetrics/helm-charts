@@ -105,7 +105,7 @@ VMAlert spec
 {{- $vmAlertStackRemoteWrite := dict "remoteWrite" ( include "victoria-metrics-k8s-stack.vmEndpoint" . | fromYaml ) -}}
 {{- $vmAlertStackRemoteRead := dict "remoteRead" ( include "victoria-metrics-k8s-stack.vmEndpoint" . | fromYaml ) -}}
 {{- $vmAlertStackDatasource := dict "datasource" ( include "victoria-metrics-k8s-stack.vmEndpoint" . | fromYaml ) -}}
-{{- $vmAlertStackNotifier := dict "notifier"  ( dict "url" ( printf "http://vmalertmanager-%s.%s.svc:9094" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace ) ) -}}
+{{- $vmAlertStackNotifier := dict "notifier"  ( dict "url" ( printf "http://vmalertmanager-%s.%s.svc:9093" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace ) ) -}}
 {{ deepCopy .Values.vmalert.spec | mergeOverwrite $vmAlertStackRemoteWrite $vmAlertStackRemoteRead $vmAlertStackDatasource $vmAlertStackNotifier | toYaml }}
 {{- end }}
 
