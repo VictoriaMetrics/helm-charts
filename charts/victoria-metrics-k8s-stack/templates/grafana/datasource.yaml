@@ -1,0 +1,36 @@
+{{- if and .Values.grafana.enabled .Values.grafana.sidecar.datasources.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "grafana-ds" | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+{{- if .Values.grafana.sidecar.datasources.annotations }}
+  annotations:
+{{ toYaml .Values.grafana.sidecar.datasources.annotations | indent 4 }}
+{{- end }}
+  labels:
+    {{ $.Values.grafana.sidecar.datasources.label }}: "1"
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+{{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+data:
+  datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+    - name: VictoriaMetrics
+      type: prometheus
+      {{ include "victoria-metrics-k8s-stack.vmEndpoint" . }}
+      access: proxy
+      isDefault: true
+{{- if .Values.grafana.sidecar.datasources.createVMReplicasDatasources }}
+{{- range until (int .Values.vmsingle.spec.replicaCount) }}
+    - name: VictoriaMetrics-{{ . }}
+      type: prometheus
+      url: "http://{{ include "victoria-metrics-k8s-stack.vmsingleName" $ }}-{{ . }}.{{ $.Release.Namespace }}.svc:{{ $.Values.vmsingle.spec.port | default 8428 }}"
+      access: proxy
+      isDefault: false
+{{- end }}
+{{- end }}
+{{- if .Values.grafana.additionalDataSources }}
+{{ tpl (toYaml .Values.grafana.additionalDataSources | indent 4) . }}
+{{- end }}
+{{- end }}

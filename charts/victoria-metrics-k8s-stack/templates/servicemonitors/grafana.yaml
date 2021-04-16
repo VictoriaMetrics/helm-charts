@@ -1,0 +1,23 @@
+{{- if and .Values.grafana.enabled .Values.grafana.vmServiceScrape.enabled }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "grafana" | trunc 63 | trimSuffix "-" }}
+  namespace: {{ $.Release.Namespace }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/instance: {{ $.Release.Name | quote }}
+{{- if empty .Values.grafana.vmServiceScrape.spec }}
+  endpoints:
+  - port: {{ .Values.grafana.service.portName }}
+{{ else }}
+{{- if not (hasKey .Values.grafana.vmServiceScrape.spec "endpoints") }}
+  endpoints:
+  - port: {{ .Values.grafana.service.portName }}
+{{- end }}
+{{ omit .Values.grafana.vmServiceScrape.spec "selector" | toYaml | indent 2 }}
+{{- end }}
+{{- end }}

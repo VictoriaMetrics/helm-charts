@@ -1,0 +1,147 @@
+# Helm Chart For Victoria Metrics kubernetes monitoring stack.
+
+{{ template "chart.typeBadge" . }} {{ template "chart.versionBadge" . }}
+
+{{ template "chart.description" . }}
+
+# Prerequisites
+
+* Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
+
+* Add dependency chart repositories
+
+```console
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo add ksm https://kubernetes.github.io/kube-state-metrics 
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 
+helm update
+```
+
+* PV support on underlying infrastructure.
+
+# Upgrade guide
+
+```console
+$ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
+```
+
+With Helm v3, CRDs created by this chart are not updated by default and should be manually updated.
+Consult also the [Helm Documentation on CRDs](https://helm.sh/docs/chart_best_practices/custom_resource_definitions).
+
+_See [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/) for command documentation._
+
+
+# Chart Details
+
+This chart will do the following:
+
+* Rollout victoria metrics operator, grafana, prometheus-node-exporter and kube-state-metrics helm charts
+* Create VMSingle, VMAgent, VMAlert, VMAlertManager CRDs 
+* Configure Grafana for VictoriaMetrics datasource
+* Configure ServiceScrapes for Node Exporter, kube-state-metrics and various kubernetes metrics
+* Install Grafana dashboards for kubernetes monitoring based on [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
+
+## Dependencies
+
+By default this chart installs additional, dependent charts:
+
+- [VictoriaMetrics/victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator)
+- [kubernetes/kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/tree/master/charts/kube-state-metrics)
+- [prometheus-community/prometheus-node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter)
+- [grafana/grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
+
+
+_See [helm dependency](https://helm.sh/docs/helm/helm_dependency/) for command documentation._
+
+
+> ATTENTION !!! Default values are inherited from helm charts declared as a dependency in the Chart.yaml file. If you want to change the default values that are inherited, access the documentation and the values.yaml file for each chart to understand the content and create a customized values.yaml file for your need.
+
+
+# How to install
+
+Access a Kubernetes cluster.
+
+Add a chart helm repository with follow commands:
+
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
+
+helm repo update
+```
+
+List versions of ``vm/victoria-metrics-k8s-stack`` chart available to installation:
+
+##### for helm v3
+
+```console
+helm search repo vm/victoria-metrics-k8s-stack -l
+```
+
+Export default values of ``victoria-metrics-k8s-stack`` chart to file ``values.yaml``:
+
+```console
+helm show values vm/victoria-metrics-k8s-stack > values.yaml
+```
+
+Change the values according to the need of the environment in ``values.yaml`` file.
+
+Test the installation with command:
+
+```console
+helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE --debug --dry-run
+```
+
+Install chart with command:
+
+##### for helm v3
+
+```console
+helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE
+```
+
+Get the pods lists by running this commands:
+
+```console
+kubectl get pods -A | grep 'victoria-metrics'
+```
+
+# How to uninstall
+
+Remove application with command.
+
+```console
+helm uninstall [RELEASE_NAME] -n NAMESPACE
+```
+This removes all the Kubernetes components associated with the chart and deletes the release.
+
+_See [helm uninstall](https://helm.sh/docs/helm/helm_uninstall/) for command documentation._
+
+CRDs created by this chart are not removed by default and should be manually cleaned up:
+
+```console
+kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl delete crd {}
+```
+
+
+
+# Documentation of Helm Chart
+
+Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
+
+Generate docs with ``helm-docs`` command.
+
+```bash
+cd charts/victoria-metrics-k8s-stack
+
+helm-docs
+```
+
+The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+
+# Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-metrics-k8s-stack/values.yaml`` file.
+
+{{ template "chart.valuesTable" . }}

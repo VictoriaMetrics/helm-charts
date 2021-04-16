@@ -1,0 +1,26 @@
+{{- if .Values.alertmanager.enabled }}
+{{- if not .Values.alertmanager.spec.configSecret }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-alertmanager
+  namespace: {{ .Release.Namespace }}
+  labels: 
+    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-alertmanager
+{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+stringData:
+  alertmanager.yaml: {{ toYaml .Values.alertmanager.config | quote }}
+{{- end }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertmanager
+metadata:
+  name: {{ .Values.alertmanager.name | default (include "victoria-metrics-k8s-stack.fullname" .) }}
+  namespace: {{ .Release.Namespace }}
+  labels: 
+    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-alertmanager
+{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+spec:
+{{ include "victoria-metrics-k8s-stack.alertmanagerSpec" . | indent 2}}
+{{- end }}
