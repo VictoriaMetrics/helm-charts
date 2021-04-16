@@ -14,7 +14,7 @@ Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operato
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo add ksm https://kubernetes.github.io/kube-state-metrics
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm update
+helm repo update
 ```
 
 * PV support on underlying infrastructure.
