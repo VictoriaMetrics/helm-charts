@@ -81,21 +81,21 @@ url: "http://{{ include "victoria-metrics-k8s-stack.vmsingleName" .}}.{{ .Releas
 
 
 {{/*
-Alermanager config secret name
-*/}}
-{{- define "victoria-metrics-k8s-stack.alertmanagerConfigSecret" -}}
-{{- if .Values.alertmanager.secretName -}}
-configSecret: {{ .Values.alertmanager.secretName | default (printf "%s-alertmanager" (include "victoria-metrics-k8s-stack.fullname" .)) }}
-{{- else -}}
-configSecret: {{ .Values.alertmanager.spec.configSecret | default (printf "%s-alertmanager" (include "victoria-metrics-k8s-stack.fullname" .)) }}
-{{- end }}
-{{- end }}
-
-{{/*
 Alermanager spec
 */}}
 {{- define "victoria-metrics-k8s-stack.alertmanagerSpec" -}}
-{{ deepCopy (include "victoria-metrics-k8s-stack.alertmanagerConfigSecret" . | fromYaml ) | mergeOverwrite ( .Values.alertmanager.spec ) | toYaml }}
+{{ omit .Values.alertmanager.spec  "configMaps" "configSecret" | toYaml }}
+configSecret: {{ .Values.alertmanager.spec.configSecret | default (printf "%s-alertmanager" (include "victoria-metrics-k8s-stack.fullname" .)) }}
+{{- if or .Values.alertmanager.spec.configMaps .Values.alertmanager.monzoTemplate.enabled }}
+{{- $list := .Values.alertmanager.spec.configMaps | default (list "") }}
+{{- if .Values.alertmanager.monzoTemplate.enabled }}
+{{- $list = append $list (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "alertmanager-monzo-tpl" | trunc 63 | trimSuffix "-") }}
+{{- end }}
+configMaps:
+{{- range compact $list }}
+- {{ . }}
+{{- end }}
+{{- end }}
 {{- end }}
 
 {{/*
