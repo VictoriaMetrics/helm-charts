@@ -23,3 +23,4 @@
   * [x] victoria-metrics
 * [ ] ServiceAccounts stuff
 * [ ] SelectorOvverride for ServiceScrapes
+* [ ] helm hook for uninstall crd objects before chart remove
