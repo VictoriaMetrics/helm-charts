@@ -290,6 +290,7 @@ rules:
     - endpointslices
     - configmaps
     - nodes/metrics
+    - namespaces
   verbs:
     - get
     - list
@@ -305,6 +306,7 @@ rules:
     - watch
 - nonResourceURLs:
     - "/metrics"
+    - "/metrics/resources"
   verbs:
     - get
     - watch
@@ -407,4 +409,12 @@ rules:
     - poddisruptionbudgets/finalizers
   verbs:
     - '*'
+- apiGroups:
+    - route.openshift.io
+    - image.openshift.io
+  resources:
+    - routers/metrics
+    - registry/metrics
+  verbs:
+    - get
 {{- end -}}

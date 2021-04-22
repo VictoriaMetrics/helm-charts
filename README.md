@@ -114,6 +114,10 @@ Remove application with command.
 helm uninstall victoria-metrics -n NAMESPACE
 ```
 
+# Kubernetes compatibility versions
+
+helm charts tested at kubernetes versions from 1.13 to 1.20
+
 # List of Charts
 
 - [Victoria Metrics Agent](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-agent)

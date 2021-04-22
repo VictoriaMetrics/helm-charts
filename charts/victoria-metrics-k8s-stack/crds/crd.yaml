@@ -463,6 +463,73 @@ spec:
                 - name
                 type: object
               type: array
+            inlineRelabelConfig:
+              description: InlineRelabelConfig - defines GlobalRelabelConfig for vmagent,
+                can be defined directly at CRD.
+              items:
+                description: 'RelabelConfig allows dynamic rewriting of the label
+                  set, being applied to samples before ingestion. It defines `<metric_relabel_configs>`-section
+                  of configuration. More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs'
+                properties:
+                  action:
+                    description: Action to perform based on regex matching. Default
+                      is 'replace'
+                    type: string
+                  modulus:
+                    description: Modulus to take of the hash of the source label values.
+                    format: int64
+                    type: integer
+                  regex:
+                    description: Regular expression against which the extracted value
+                      is matched. Default is '(.*)'
+                    type: string
+                  replacement:
+                    description: Replacement value against which a regex replace is
+                      performed if the regular expression matches. Regex capture groups
+                      are available. Default is '$1'
+                    type: string
+                  separator:
+                    description: Separator placed between concatenated source label
+                      values. default is ';'.
+                    type: string
+                  source_labels:
+                    description: UnderScoreSourceLabels - additional form of source
+                      labels source_labels for compatibility with original relabel
+                      config. if set  both sourceLabels and source_labels, sourceLabels
+                      has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                    items:
+                      type: string
+                    type: array
+                  sourceLabels:
+                    description: The source labels select values from existing labels.
+                      Their content is concatenated using the configured separator
+                      and matched against the configured regular expression for the
+                      replace, keep, and drop actions.
+                    items:
+                      type: string
+                    type: array
+                  target_label:
+                    description: UnderScoreTargetLabel - additional form of target
+                      label - target_label for compatibility with original relabel
+                      config. if set  both targetLabel and target_label, targetLabel
+                      has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                    type: string
+                  targetLabel:
+                    description: Label to which the resulting value is written in
+                      a replace action. It is mandatory for replace actions. Regex
+                      capture groups are available.
+                    type: string
+                type: object
+              type: array
+            inlineScrapeConfig:
+              description: 'InlineScrapeConfig As scrape configs are appended, the
+                user is responsible to make sure it is valid. Note that using this
+                feature may expose the possibility to break upgrades of VMAgent. It
+                is advised to review VMAgent release notes to ensure that no incompatible
+                scrape configs are going to break VMAgent after the upgrade. it should
+                be defined as single yaml file. inlineScrapeConfig: |     - job_name:
+                "prometheus"       static_configs:       - targets: ["localhost:9090"]'
+              type: string
             insertPorts:
               description: InsertPorts - additional listen ports for data ingestion.
               properties:
@@ -1132,6 +1199,66 @@ spec:
                     required:
                     - key
                     type: object
+                  inlineUrlRelabelConfig:
+                    description: InlineUrlRelabelConfig defines relabeling config
+                      for remoteWriteURL, it can be defined at crd spec.
+                    items:
+                      description: 'RelabelConfig allows dynamic rewriting of the
+                        label set, being applied to samples before ingestion. It defines
+                        `<metric_relabel_configs>`-section of configuration. More
+                        info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs'
+                      properties:
+                        action:
+                          description: Action to perform based on regex matching.
+                            Default is 'replace'
+                          type: string
+                        modulus:
+                          description: Modulus to take of the hash of the source label
+                            values.
+                          format: int64
+                          type: integer
+                        regex:
+                          description: Regular expression against which the extracted
+                            value is matched. Default is '(.*)'
+                          type: string
+                        replacement:
+                          description: Replacement value against which a regex replace
+                            is performed if the regular expression matches. Regex
+                            capture groups are available. Default is '$1'
+                          type: string
+                        separator:
+                          description: Separator placed between concatenated source
+                            label values. default is ';'.
+                          type: string
+                        source_labels:
+                          description: UnderScoreSourceLabels - additional form of
+                            source labels source_labels for compatibility with original
+                            relabel config. if set  both sourceLabels and source_labels,
+                            sourceLabels has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                          items:
+                            type: string
+                          type: array
+                        sourceLabels:
+                          description: The source labels select values from existing
+                            labels. Their content is concatenated using the configured
+                            separator and matched against the configured regular expression
+                            for the replace, keep, and drop actions.
+                          items:
+                            type: string
+                          type: array
+                        target_label:
+                          description: UnderScoreTargetLabel - additional form of
+                            target label - target_label for compatibility with original
+                            relabel config. if set  both targetLabel and target_label,
+                            targetLabel has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                          type: string
+                        targetLabel:
+                          description: Label to which the resulting value is written
+                            in a replace action. It is mandatory for replace actions.
+                            Regex capture groups are available.
+                          type: string
+                      type: object
+                    type: array
                   label:
                     additionalProperties:
                       type: string
@@ -13041,6 +13168,25 @@ spec:
                   - FATAL
                   - PANIC
                   type: string
+                maintenanceInsertNodeIDs:
+                  description: 'MaintenanceInsertNodeIDs - excludes given node ids
+                    from insert requests routing, must contain pod suffixes - for
+                    pod-0, id will be 0 and etc. lets say, you have pod-0, pod-1,
+                    pod-2, pod-3. to exclude pod-0 and pod-3 from insert routing,
+                    define nodeIDs: [0,3]. Useful at storage expanding, when you want
+                    to rebalance some data at cluster.'
+                  items:
+                    format: int32
+                    type: integer
+                  type: array
+                maintenanceSelectNodeIDs:
+                  description: MaintenanceInsertNodeIDs - excludes given node ids
+                    from select requests routing, must contain pod suffixes - for
+                    pod-0, id will be 0 and etc.
+                  items:
+                    format: int32
+                    type: integer
+                  type: array
                 name:
                   type: string
                 podDisruptionBudget:

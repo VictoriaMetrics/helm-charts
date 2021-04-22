@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -204,7 +204,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.hosts | list | `[]` |  |
 | alertmanager.ingress.paths | list | `[]` |  |
 | alertmanager.monzoTemplate.enabled | bool | `true` |  |
-| alertmanager.spec.externalURL | string | `nil` |  |
+| alertmanager.spec.externalURL | string | `""` |  |
 | alertmanager.spec.routePrefix | string | `"/"` |  |
 | coreDns.enabled | bool | `true` |  |
 | coreDns.service.enabled | bool | `true` |  |
