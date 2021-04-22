@@ -139,7 +139,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.14.0"` | Image tag |
+| image.tag | string | `"v0.14.1"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
 | logLevel | string | `"info"` | VM operator log level -- possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name overrid |
