@@ -43,6 +43,18 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Create the name of service account and clusterRole for cleanup-hook
+*/}}
+{{- define "victoria-metrics-k8s-stack.cleanupHookName" -}}
+{{- if .Values.operator.cleanupSA.create }}
+{{- default ("victoria-metrics-k8s-stack-cleanup-hook") .Values.operator.cleanupSA.name }}
+{{- else }}
+{{- default "default" .Values.operator.cleanupSA.name }}
+{{- end }}
+{{- end }}
+
+
+{{/*
 Create the name for VMSingle
 */}}
 {{- define "victoria-metrics-k8s-stack.vmsingleName" -}}

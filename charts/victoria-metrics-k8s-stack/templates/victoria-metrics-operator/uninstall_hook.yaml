@@ -1,0 +1,72 @@
+{{- if and .Values.operator.cleanupCRD }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+      containers:
+        - name: kubectl
+          image: "{{ .Values.operator.kubectlImage.repository }}:{{ .Values.operator.kubectlImage.tag }}"
+          imagePullPolicy: "{{ .Values.operator.kubectlImage.pullPolicy }}"
+          command:
+            - /bin/sh
+            - -c
+            - >
+              kubectl delete vmalerts --all;
+              kubectl delete vmagents --all;
+              kubectl delete vmsingles --all;
+              kubectl delete vmalertmanagers --all;
+      restartPolicy: OnFailure
+---
+{{- if .Values.operator.cleanupSA.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+  labels: {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ["operator.victoriametrics.com"]
+    resources:
+      - vmagents
+      - vmalerts
+      - vmsingles
+      - vmalertmanagers
+    verbs: ["get", "list", "watch","delete"]
+---
+{{- end }}
+---
+{{- end }}
