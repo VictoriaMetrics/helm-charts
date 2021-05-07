@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.2](https://img.shields.io/badge/Version-0.2.2-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.3](https://img.shields.io/badge/Version-0.2.3-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -350,6 +350,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | victoria-metrics-operator.operator.disable_promethues_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.enabled | bool | `true` |  |
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
+| vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
 | vmalert.enabled | bool | `true` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
@@ -357,3 +358,5 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmsingle.enabled | bool | `true` |  |
 | vmsingle.spec.replicaCount | int | `1` |  |
 | vmsingle.spec.retentionPeriod | string | `"14"` |  |
+| vmsingle.spec.storage.accessModes[0] | string | `"ReadWriteOnce"` |  |
+| vmsingle.spec.storage.resources.requests.storage | string | `"20Gi"` |  |

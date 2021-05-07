@@ -77,7 +77,12 @@ vmsingle:
   spec:
     retentionPeriod: "14"
     replicaCount: 1
-
+    storage:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 20Gi
 
 
 alertmanager:
@@ -205,6 +210,8 @@ vmagent:
     scrapeInterval: 25s
     externalLabels:
       cluster: cluster-name
+    extraArgs:
+      promscrape.streamParse: "true"
 
 
 
