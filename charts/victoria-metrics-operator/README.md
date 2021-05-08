@@ -144,7 +144,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | logLevel | string | `"info"` | VM operator log level -- possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name overrid |
 | nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/ |
-| operator.disable_promethues_converter | bool | `false` | By default, operator converts prometheus-operator objects. |
+| operator.disable_prometheus_converter | bool | `false` | By default, operator converts prometheus-operator objects. |
 | operator.enable_converter_ownership | bool | `false` | Enables ownership reference for converted prometheus-operator objects, it will remove corresponding victoria-metrics objects in case of deletion prometheus one. |
 | operator.psp_auto_creation_enabled | bool | `true` | By default, operator creates psp for its objects. |
 | rbac.create | bool | `true` | Specifies whether the RBAC resources should be created |

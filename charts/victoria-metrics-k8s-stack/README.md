@@ -347,7 +347,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
 | victoria-metrics-operator.createCRD | bool | `false` |  |
-| victoria-metrics-operator.operator.disable_promethues_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
+| victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.enabled | bool | `true` |  |
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
