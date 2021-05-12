@@ -35,6 +35,16 @@ charts = [
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
     },
+    {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json',
+        'destination': '../templates/grafana/dashboards',
+        'type': 'json'
+    },
+    {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json',
+        'destination': '../templates/grafana/dashboards',
+        'type': 'json'
+    },
 ]
 
 skip_list = [
