@@ -7,8 +7,9 @@ metadata:
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec:
 {{ .Values.vmsingle.spec | toYaml | indent 2 }}
+{{- end }}
 
-{{ if .Values.vmsingle.ingress.enabled -}}
+{{ if and .Values.vmsingle.enabled .Values.vmsingle.ingress.enabled -}}
 ---
 {{- $servicePort := 8429 -}}
 {{- $ingressPath := .Values.vmsingle.ingress.path -}}
@@ -89,5 +90,4 @@ spec:
             path: {{ $ingressPath }}
             {{- end }}
   {{- end -}}
-{{- end }}
 {{- end }}
