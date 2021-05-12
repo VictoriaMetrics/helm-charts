@@ -1,64 +1,81 @@
 {{- if and .Values.alertmanager.enabled .Values.alertmanager.ingress.enabled }}
-{{- $pathType := .Values.alertmanager.ingress.pathType | default "" }}
-{{- $serviceName := printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) }}
 {{- $servicePort := 9093 -}}
-{{- $paths := compact ( append ( .Values.alertmanager.ingress.paths | default ( list "" )) .Values.alertmanager.spec.routePrefix) -}}
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
+{{- $ingressPath := .Values.alertmanager.ingress.path -}}
+{{- $serviceName := printf "%s-%s" "alertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- $ingressPathType := .Values.alertmanager.ingress.pathType | default "" -}}
+{{- $extraPaths := .Values.alertmanager.ingress.extraPaths -}}
+{{- $newAPI := .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" -}}
+{{- if $newAPI -}}
+apiVersion: networking.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1/Ingress" }}
 apiVersion: networking.k8s.io/v1beta1
-{{ else }}
+{{- else }}
 apiVersion: extensions/v1beta1
-{{ end -}}
+{{- end }}
 kind: Ingress
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "alertmanager" | trunc 63 | trimSuffix "-" }}
+  name: {{ .Values.alertmanager.name | default $serviceName }}
   namespace: {{ .Release.Namespace }}
-{{- if .Values.alertmanager.ingress.annotations }}
-  annotations:
-{{ toYaml .Values.alertmanager.ingress.annotations | indent 4 }}
-{{- end }}
   labels:
     app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-alertmanager
+{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
 {{- if .Values.alertmanager.ingress.labels }}
 {{ toYaml .Values.alertmanager.ingress.labels | indent 4 }}
 {{- end }}
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+  {{- if .Values.alertmanager.ingress.annotations }}
+  annotations:
+    {{- range $key, $value := .Values.alertmanager.ingress.annotations }}
+    {{ $key }}: {{ tpl $value $ | quote }}
+    {{- end }}
+  {{- end }}
 spec:
-  {{- if or (.Capabilities.APIVersions.Has "networking.k8s.io/v1") (.Capabilities.APIVersions.Has "networking.k8s.io/v1beta1") }}
   {{- if .Values.alertmanager.ingress.ingressClassName }}
   ingressClassName: {{ .Values.alertmanager.ingress.ingressClassName }}
-  {{- end }}
-  {{- end }}
+  {{- end -}}
+{{- if .Values.alertmanager.ingress.tls }}
+  tls:
+{{ tpl (toYaml .Values.alertmanager.ingress.tls) $ | indent 4 }}
+{{- end }}
   rules:
-  {{- if .Values.alertmanager.ingress.hosts }}
-  {{- range $host := .Values.alertmanager.ingress.hosts }}
-    - host: {{ tpl $host $ }}
+  {{- if .Values.alertmanager.ingress.hosts  }}
+  {{- range .Values.alertmanager.ingress.hosts }}
+    - host: {{ tpl . $}}
       http:
         paths:
-  {{- range $p := $paths }}
-          - path: {{ tpl $p $ }}
-            {{- if $pathType }}
-            pathType: {{ $pathType }}
+{{- if $extraPaths }}
+{{ toYaml $extraPaths | indent 10 }}
+{{- end }}
+          - path: {{ $ingressPath }}
+            {{- if $newAPI }}
+            pathType: {{ $ingressPathType }}
             {{- end }}
             backend:
+              {{- if $newAPI }}
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+              {{- else }}
               serviceName: {{ $serviceName }}
               servicePort: {{ $servicePort }}
-  {{- end -}}
-  {{- end -}}
+              {{- end }}
+  {{- end }}
   {{- else }}
     - http:
         paths:
-  {{- range $p := $paths }}
-          - path: {{ tpl $p $ }}
-            {{- if $pathType }}
-            pathType: {{ $pathType }}
-            {{- end }}
-            backend:
+          - backend:
+              {{- if $newAPI }}
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+            pathType: {{ $ingressPathType }}
+              {{- else }}
               serviceName: {{ $serviceName }}
               servicePort: {{ $servicePort }}
+              {{- end }}
+          {{- if $ingressPath }}
+            path: {{ $ingressPath }}
+            {{- end }}
   {{- end -}}
-  {{- end -}}
-  {{- if .Values.alertmanager.ingress.tls }}
-  tls:
-{{ tpl (toYaml .Values.alertmanager.ingress.tls | indent 4) . }}
-  {{- end -}}
-{{- end -}}
+{{- end }}
