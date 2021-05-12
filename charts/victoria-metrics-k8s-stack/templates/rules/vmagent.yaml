@@ -27,7 +27,7 @@ spec:
     rules:
     - alert: PersistentQueueIsDroppingData
       annotations:
-        dashboard: http://localhost:3000/d/G7Z9GzMGz?viewPanel=49&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=49&var-instance={{`{{`}} $labels.instance {{`}}`}}
         description: Vmagent dropped {{`{{`}} $value | humanize1024 {{`}}`}} from persistent queue on instance {{`{{`}} $labels.instance {{`}}`}} for the last 10m.
         summary: Instance {{`{{`}} $labels.instance {{`}}`}} is dropping data from persistent queue
       expr: sum(increase(vm_persistentqueue_bytes_dropped_total[5m])) by (job, instance) > 0
@@ -39,7 +39,7 @@ spec:
 {{- end }}
     - alert: TooManyScrapeErrors
       annotations:
-        dashboard: http://localhost:3000/d/G7Z9GzMGz?viewPanel=31&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=31&var-instance={{`{{`}} $labels.instance {{`}}`}}
         summary: Job "{{`{{`}} $labels.job {{`}}`}}" on instance {{`{{`}} $labels.instance {{`}}`}} fails to scrape targets for last 15m
       expr: sum(increase(vm_promscrape_scrapes_failed_total[5m])) by (job, instance) > 0
       for: 15m
@@ -50,7 +50,7 @@ spec:
 {{- end }}
     - alert: TooManyWriteErrors
       annotations:
-        dashboard: http://localhost:3000/d/G7Z9GzMGz?viewPanel=77&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=77&var-instance={{`{{`}} $labels.instance {{`}}`}}
         summary: Job "{{`{{`}} $labels.job {{`}}`}}" on instance {{`{{`}} $labels.instance {{`}}`}} responds with errors to write requests for last 15m.
       expr: |-
         (sum(increase(vm_ingestserver_request_errors_total[5m])) by (job, instance)
@@ -64,7 +64,7 @@ spec:
 {{- end }}
     - alert: TooManyRemoteWriteErrors
       annotations:
-        dashboard: http://localhost:3000/d/G7Z9GzMGz?viewPanel=61&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=61&var-instance={{`{{`}} $labels.instance {{`}}`}}
         description: "Vmagent fails to push data via remote write protocol to destination \"{{`{{`}} $labels.url {{`}}`}}\"\n Ensure that destination is up and reachable."
         summary: Job "{{`{{`}} $labels.job {{`}}`}}" on instance {{`{{`}} $labels.instance {{`}}`}} fails to push to remote storage
       expr: sum(rate(vmagent_remotewrite_retries_count_total[5m])) by(job, instance, url) > 0

@@ -91,7 +91,7 @@ data:
                             {
                                 "expr": "(\n  (1 - rate(node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\", instance=\"$instance\"}[$__interval]))\n/ ignoring(cpu) group_left\n  count without (cpu)( node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\", instance=\"$instance\"})\n)\n",
                                 "format": "time_series",
-                                "interval": "1m",
+                                "interval": "$__rate_interval",
                                 "intervalFactor": 5,
                                 "legendFormat": "{{`{{`}}cpu{{`}}`}}",
                                 "refId": "A"
@@ -527,7 +527,7 @@ data:
                             {
                                 "expr": "rate(node_disk_read_bytes_total{job=\"node-exporter\", instance=\"$instance\", device=~\"mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|dasd.+\"}[$__interval])",
                                 "format": "time_series",
-                                "interval": "1m",
+                                "interval": "$__rate_interval",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}device{{`}}`}} read",
                                 "refId": "A"
@@ -535,7 +535,7 @@ data:
                             {
                                 "expr": "rate(node_disk_written_bytes_total{job=\"node-exporter\", instance=\"$instance\", device=~\"mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|dasd.+\"}[$__interval])",
                                 "format": "time_series",
-                                "interval": "1m",
+                                "interval": "$__rate_interval",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}device{{`}}`}} written",
                                 "refId": "B"
@@ -543,7 +543,7 @@ data:
                             {
                                 "expr": "rate(node_disk_io_time_seconds_total{job=\"node-exporter\", instance=\"$instance\", device=~\"mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|dasd.+\"}[$__interval])",
                                 "format": "time_series",
-                                "interval": "1m",
+                                "interval": "$__rate_interval",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}device{{`}}`}} io time",
                                 "refId": "C"
@@ -757,7 +757,7 @@ data:
                             {
                                 "expr": "rate(node_network_receive_bytes_total{job=\"node-exporter\", instance=\"$instance\", device!=\"lo\"}[$__interval])",
                                 "format": "time_series",
-                                "interval": "1m",
+                                "interval": "$__rate_interval",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}device{{`}}`}}",
                                 "refId": "A"
@@ -851,7 +851,7 @@ data:
                             {
                                 "expr": "rate(node_network_transmit_bytes_total{job=\"node-exporter\", instance=\"$instance\", device!=\"lo\"}[$__interval])",
                                 "format": "time_series",
-                                "interval": "1m",
+                                "interval": "$__rate_interval",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}device{{`}}`}}",
                                 "refId": "A"

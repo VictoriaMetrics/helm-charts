@@ -109,6 +109,9 @@ replacement_map = {
         'replacement': 'job="kubelet", namespace=~"{{ $targetNamespace }}"',
         'limitGroup': ['kubernetes-storage'],
         'init': '{{- $targetNamespace := .Values.defaultRules.appNamespacesTarget }}'},
+    'http://localhost:3000': {
+        'replacement': '{{ index .Values.grafana.ingress.hosts 0 }}',
+        'init': ''},
 }
 
 # standard header
