@@ -13,7 +13,7 @@ spec:
 ---
 {{- $servicePort := 8429 -}}
 {{- $ingressPath := .Values.vmsingle.ingress.path -}}
-{{- $serviceName := printf "%s-%s" "vmsingle" (include "victoria-metrics-k8s-stack.fullname" .) }}
+{{- $serviceName := printf "%s-%s" "vmsingle" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- $ingressPathType := .Values.vmsingle.ingress.pathType | default "" -}}
 {{- $extraPaths := .Values.vmsingle.ingress.extraPaths -}}
 {{- $newAPI := .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" -}}
@@ -30,7 +30,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-vmsingle
-{{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
 {{- if .Values.vmsingle.ingress.labels }}
 {{ toYaml .Values.vmsingle.ingress.labels | indent 4 }}
 {{- end }}
@@ -54,7 +54,7 @@ spec:
     - host: {{ tpl . $}}
       http:
         paths:
-{{ if $extraPaths }}
+{{- if $extraPaths }}
 {{ toYaml $extraPaths | indent 10 }}
 {{- end }}
           - path: {{ $ingressPath }}

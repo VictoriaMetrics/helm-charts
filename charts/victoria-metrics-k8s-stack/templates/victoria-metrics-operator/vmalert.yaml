@@ -14,7 +14,7 @@ spec:
 ---
 {{- $servicePort := 8080 -}}
 {{- $ingressPath := .Values.vmalert.ingress.path -}}
-{{- $serviceName := printf "%s-%s" "vmalert" (include "victoria-metrics-k8s-stack.fullname" .) }}
+{{- $serviceName := printf "%s-%s" "vmalert" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- $ingressPathType := .Values.vmalert.ingress.pathType | default "" -}}
 {{- $extraPaths := .Values.vmalert.ingress.extraPaths -}}
 {{- $newAPI := .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" -}}
@@ -31,7 +31,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-vmalert
-{{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
 {{- if .Values.vmalert.ingress.labels }}
 {{ toYaml .Values.vmalert.ingress.labels | indent 4 }}
 {{- end }}
@@ -55,7 +55,7 @@ spec:
     - host: {{ tpl . $}}
       http:
         paths:
-{{ if $extraPaths }}
+{{- if $extraPaths }}
 {{ toYaml $extraPaths | indent 10 }}
 {{- end }}
           - path: {{ $ingressPath }}
