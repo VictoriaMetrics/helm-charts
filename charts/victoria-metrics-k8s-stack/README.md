@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.3](https://img.shields.io/badge/Version-0.2.3-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.4](https://img.shields.io/badge/Version-0.2.4-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -199,9 +199,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.config.route.routes[1].receiver | string | `"slack-monitoring"` |  |
 | alertmanager.config.templates[0] | string | `"/etc/vm/configs/**/*.tmpl"` |  |
 | alertmanager.enabled | bool | `true` |  |
+| alertmanager.ingress.annotations | object | `{}` |  |
 | alertmanager.ingress.enabled | bool | `false` |  |
-| alertmanager.ingress.hosts | list | `[]` |  |
-| alertmanager.ingress.paths | list | `[]` |  |
+| alertmanager.ingress.extraPaths | list | `[]` |  |
+| alertmanager.ingress.hosts[0] | string | `"alertmanager.domain.com"` |  |
+| alertmanager.ingress.labels | object | `{}` |  |
+| alertmanager.ingress.path | string | `"/"` |  |
+| alertmanager.ingress.pathType | string | `"Prefix"` |  |
+| alertmanager.ingress.tls | list | `[]` |  |
 | alertmanager.monzoTemplate.enabled | bool | `true` |  |
 | alertmanager.spec.externalURL | string | `""` |  |
 | alertmanager.spec.routePrefix | string | `"/"` |  |
@@ -252,6 +257,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.dashboards.default.vmagent.url | string | `"https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json"` |  |
 | grafana.defaultDashboardsEnabled | bool | `true` |  |
 | grafana.enabled | bool | `true` |  |
+| grafana.ingress.annotations | object | `{}` |  |
+| grafana.ingress.enabled | bool | `false` |  |
+| grafana.ingress.extraPaths | list | `[]` |  |
+| grafana.ingress.hosts[0] | string | `"grafana.domain.com"` |  |
+| grafana.ingress.labels | object | `{}` |  |
+| grafana.ingress.path | string | `"/"` |  |
+| grafana.ingress.pathType | string | `"Prefix"` |  |
+| grafana.ingress.tls | list | `[]` |  |
 | grafana.sidecar.dashboards.enabled | bool | `true` |  |
 | grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |
 | grafana.sidecar.datasources.enabled | bool | `true` |  |
@@ -335,8 +348,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | operator.cleanupSA.create | bool | `true` |  |
 | operator.cleanupSA.name | string | `""` |  |
 | operator.kubectlImage.pullPolicy | string | `"IfNotPresent"` |  |
-| operator.kubectlImage.repository | string | `"bitnami/kubectl"` |  |
-| operator.kubectlImage.tag | float | `1.16` |  |
+| operator.kubectlImage.repository | string | `"gcr.io/google_containers/hyperkube"` |  |
+| operator.kubectlImage.tag | string | `"v1.16.0"` |  |
 | prometheus-node-exporter.enabled | bool | `true` |  |
 | prometheus-node-exporter.extraArgs[0] | string | `"--collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"` |  |
 | prometheus-node-exporter.extraArgs[1] | string | `"--collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"` |  |
@@ -349,13 +362,37 @@ Change the values according to the need of the environment in ``victoria-metrics
 | victoria-metrics-operator.createCRD | bool | `false` |  |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.enabled | bool | `true` |  |
+| vmagent.ingress.annotations | object | `{}` |  |
+| vmagent.ingress.enabled | bool | `false` |  |
+| vmagent.ingress.extraPaths | list | `[]` |  |
+| vmagent.ingress.hosts[0] | string | `"vmagent.domain.com"` |  |
+| vmagent.ingress.labels | object | `{}` |  |
+| vmagent.ingress.path | string | `"/"` |  |
+| vmagent.ingress.pathType | string | `"Prefix"` |  |
+| vmagent.ingress.tls | list | `[]` |  |
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
 | vmalert.enabled | bool | `true` |  |
+| vmalert.ingress.annotations | object | `{}` |  |
+| vmalert.ingress.enabled | bool | `false` |  |
+| vmalert.ingress.extraPaths | list | `[]` |  |
+| vmalert.ingress.hosts[0] | string | `"vmalert.domain.com"` |  |
+| vmalert.ingress.labels | object | `{}` |  |
+| vmalert.ingress.path | string | `"/"` |  |
+| vmalert.ingress.pathType | string | `"Prefix"` |  |
+| vmalert.ingress.tls | list | `[]` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
 | vmalert.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmsingle.enabled | bool | `true` |  |
+| vmsingle.ingress.annotations | object | `{}` |  |
+| vmsingle.ingress.enabled | bool | `false` |  |
+| vmsingle.ingress.extraPaths | list | `[]` |  |
+| vmsingle.ingress.hosts[0] | string | `"vmsingle.domain.com"` |  |
+| vmsingle.ingress.labels | object | `{}` |  |
+| vmsingle.ingress.path | string | `"/"` |  |
+| vmsingle.ingress.pathType | string | `"Prefix"` |  |
+| vmsingle.ingress.tls | list | `[]` |  |
 | vmsingle.spec.replicaCount | int | `1` |  |
 | vmsingle.spec.retentionPeriod | string | `"14"` |  |
 | vmsingle.spec.storage.accessModes[0] | string | `"ReadWriteOnce"` |  |
