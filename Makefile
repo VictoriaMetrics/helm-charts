@@ -30,7 +30,7 @@ index:
 
 # Update index file add new version of package into it
 merge:
-	CMD="helm repo index --url ${URL} --merge index.yaml ." $(MAKE) helm
+	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) helm
 
 gen-docs:
 	docker run --rm --name helm-docs  \
