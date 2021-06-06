@@ -63,7 +63,7 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
-Defins the name of configuratiob map
+Defines the name of configuration map
 */}}
 {{- define "chart.configname" -}}
 {{- if .Values.configMap -}}

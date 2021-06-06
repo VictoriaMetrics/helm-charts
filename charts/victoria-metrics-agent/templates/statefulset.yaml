@@ -142,9 +142,9 @@ spec:
         - name: tmpdata
           emptyDir: {}
       {{- else if .Values.persistence.existingClaim }}
-      - name: tmpdata
-        persistentVolumeClaim:
-          claimName: {{ .Values.persistence.existingClaim }}
+        - name: tmpdata
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim }}
       {{- end }}
         - name: config
           configMap:

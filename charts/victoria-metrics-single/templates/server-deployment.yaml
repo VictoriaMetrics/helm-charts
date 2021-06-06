@@ -53,9 +53,13 @@ spec:
             {{- toYaml .Values.server.podSecurityContext | nindent 12 }}
           image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
           imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
+          workingDir: {{ .Values.server.containerWorkingDir }}
           args:
             - {{ printf "%s=%d" "--retentionPeriod" (int .Values.server.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.server.persistentVolume.mountPath | quote}}
+          {{- if .Values.server.scrape.enabled }}
+            - -promscrape.config=/scrapeconfig/scrape.yml
+          {{- end }}
           {{- range $key, $value := .Values.server.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
@@ -114,6 +118,10 @@ spec:
             - name: server-volume
               mountPath: {{ .Values.server.persistentVolume.mountPath }}
               subPath: {{ .Values.server.persistentVolume.subPath }}
+          {{- if .Values.server.scrape.enabled }}
+            - name: scrapeconfig
+              mountPath: /scrapeconfig
+          {{- end }}
           {{- range .Values.server.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
@@ -163,6 +171,11 @@ spec:
     {{- end }}
       terminationGracePeriodSeconds: {{ .Values.server.terminationGracePeriodSeconds }}
       volumes:
+      {{- if .Values.server.scrape.enabled }}
+      - name: scrapeconfig
+        configMap:
+          name: {{ include "victoria-metrics.server.scrape.configname" . }}
+      {{- end }}
       {{- with .Values.server.extraVolumes }}
        {{- toYaml . | nindent 6 }}
       {{- end }}
