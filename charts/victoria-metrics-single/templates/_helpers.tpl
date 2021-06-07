@@ -87,3 +87,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- $hp := split ":" . -}}
 {{- printf "%s" $hp._1 -}}
 {{- end -}}
+
+{{/*
+Defines the name of scrape configuration map
+*/}}
+{{- define "victoria-metrics.server.scrape.configname" -}}
+{{- if .Values.server.scrape.configMap -}}
+{{- .Values.configMap -}}
+{{- else -}}
+{{- include "victoria-metrics.server.fullname" . -}}-scrapeconfig
+{{- end -}}
+{{- end -}}
