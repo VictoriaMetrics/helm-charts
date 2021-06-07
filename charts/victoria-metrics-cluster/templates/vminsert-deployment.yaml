@@ -42,6 +42,9 @@ spec:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vminsert.name }}
           image: "{{ .Values.vminsert.image.repository }}:{{ .Values.vminsert.image.tag }}"
           imagePullPolicy: "{{ .Values.vminsert.image.pullPolicy }}"
+          {{- if .Values.vminsert.containerWorkingDir }}
+          workingDir: {{ .Values.vminsert.containerWorkingDir }}
+          {{- end }}
           securityContext:
             {{- toYaml .Values.vminsert.podSecurityContext | nindent 12 }}
           args:
