@@ -31,7 +31,7 @@ charts = [
         'type': 'yaml'
     },
     {
-        'source': 'https://etcd.io/docs/v3.1/op-guide/grafana.json',
+        'source': 'https://etcd.io/docs/v3.4/op-guide/grafana.json',
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
     },
