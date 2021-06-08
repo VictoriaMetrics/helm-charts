@@ -45,11 +45,6 @@ charts = [
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
     },
-    {
-        'source': 'https://etcd.io/docs/v3.4/op-guide/grafana.json',
-        'destination': '../templates/grafana/dashboards',
-        'type': 'json'
-    },
 ]
 
 skip_list = [
