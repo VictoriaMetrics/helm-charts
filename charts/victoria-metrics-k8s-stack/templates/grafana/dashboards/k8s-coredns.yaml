@@ -1,31 +1,25 @@
 {{- /* Added manually, can be changed in-place. */ -}}
-{{- $kubeTargetVersion := default .Capabilities.KubeVersion.GitVersion .Values.kubeTargetVersionOverride }}
-{{- if and (semverCompare ">=1.14.0-0" $kubeTargetVersion) (semverCompare "<9.9.9-9" $kubeTargetVersion) .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled .Values.coreDns.enabled }}
+{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled .Values.coreDns.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: {{ .Release.Namespace }}
   name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "k8s-coredns" | trunc 63 | trimSuffix "-" }}
-  annotations:
-{{ toYaml .Values.grafana.sidecar.dashboards.annotations | indent 4 }}
   labels:
     {{- if $.Values.grafana.sidecar.dashboards.label }}
     {{ $.Values.grafana.sidecar.dashboards.label }}: "1"
     {{- end }}
-    app: {{ template "victoria-metrics-k8s-stack.name" $ }}-grafana
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
 data:
   k8s-coredns.json: |-
     {
         "__inputs": [
-
         ],
         "__requires": [
-
         ],
         "annotations": {
             "list": [
-
             ]
         },
         "editable": false,
@@ -34,7 +28,6 @@ data:
         "hideControls": false,
         "id": null,
         "links": [
-
         ],
         "panels": [
             {
@@ -1269,7 +1262,6 @@ data:
                     "label": null,
                     "name": "datasource",
                     "options": [
-
                     ],
                     "query": "prometheus",
                     "refresh": 1,
