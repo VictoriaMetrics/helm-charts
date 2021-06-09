@@ -114,7 +114,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.namespaced | bool | `false` |  |
 | rbac.pspEnabled | bool | `true` |  |
 | server.affinity | object | `{}` | Pod affinity |
-| server.containerWorkingDir | string | `"/"` |  |
+| server.containerWorkingDir | string | `""` | Container workdir |
 | server.enabled | bool | `true` | Enable deployment of server component. Deployed as StatefulSet |
 | server.env | list | `[]` | Env variables |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |

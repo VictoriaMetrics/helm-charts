@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.8.26](https://img.shields.io/badge/Version-0.8.26-informational?style=flat-square)
+ ![Version: 0.8.27](https://img.shields.io/badge/Version-0.8.27-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -119,6 +119,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.affinity | object | `{}` | Pod affinity |
 | vminsert.annotations | object | `{}` |  |
 | vminsert.automountServiceAccountToken | bool | `true` |  |
+| vminsert.containerWorkingDir | string | `""` | Container workdir |
 | vminsert.enabled | bool | `true` | Enable deployment of vminsert component. Deployment is used |
 | vminsert.env | list | `[]` |  |
 | vminsert.extraArgs."envflag.enable" | string | `"true"` |  |
@@ -171,6 +172,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.annotations | object | `{}` |  |
 | vmselect.automountServiceAccountToken | bool | `true` |  |
 | vmselect.cacheMountPath | string | `"/cache"` | Cache root folder |
+| vmselect.containerWorkingDir | string | `""` | Container workdir |
 | vmselect.enabled | bool | `true` | Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet |
 | vmselect.env | list | `[]` |  |
 | vmselect.extraArgs."envflag.enable" | string | `"true"` |  |
@@ -237,6 +239,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.affinity | object | `{}` | Pod affinity |
 | vmstorage.annotations | object | `{}` |  |
 | vmstorage.automountServiceAccountToken | bool | `true` |  |
+| vmstorage.containerWorkingDir | string | `""` | Container workdir |
 | vmstorage.enabled | bool | `true` | Enable deployment of vmstorage component. StatefulSet is used |
 | vmstorage.env | list | `[]` |  |
 | vmstorage.extraArgs."envflag.enable" | string | `"true"` |  |
