@@ -13,12 +13,32 @@ metadata:
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
-{{- if .Values.rbac.pspEnabled }}
+{{- if or .Values.rbac.pspEnabled .Values.server.scrape.enabled }}
 rules:
+  {{- if .Values.server.scrape.enabled }}
+  - apiGroups: [ "" ]
+    resources:
+      - nodes
+      - nodes/proxy
+      - nodes/metrics
+      - services
+      - endpoints
+      - pods
+    verbs: [ "get", "list", "watch" ]
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs: [ "get", "list", "watch" ]
+  - nonResourceURLs: [ "/metrics" ]
+    verbs: [ "get" ]
+  {{- end }}
+  {{- if .Values.rbac.pspEnabled  }}
   - apiGroups:      ['extensions']
     resources:      ['podsecuritypolicies']
     verbs:          ['use']
     resourceNames:  [{{ template "victoria-metrics.fullname" . }}]
+  {{- end }}
 {{- else }}
 rules: []
 {{- end }}

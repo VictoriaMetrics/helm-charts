@@ -24,18 +24,17 @@ Get the Victoria Metrics insert service URL by running these commands in the sam
 You need to update your prometheus configuration file and add next lines into it:
 
 prometheus.yml
-```yaml
-remote_write:
-  - url: "http://<insert-service>/insert/0/prometheus/"
 
-```
+    remote_write:
+      - url: "http://<insert-service>/insert/0/prometheus/"
+
+
 
 for e.g. inside the kubernetes cluster:
-```yaml
-remote_write:
-  - url: "http://{{ template "victoria-metrics.vminsert.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomainSuffix }}:{{ .Values.vminsert.service.servicePort }}/insert/0/prometheus/"
 
-```
+    remote_write:
+      - url: "http://{{ template "victoria-metrics.vminsert.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomainSuffix }}:{{ .Values.vminsert.service.servicePort }}/insert/0/prometheus/"
+
 {{- end }}
 
 {{- if .Values.vmselect.enabled }}
@@ -65,14 +64,13 @@ You need to update specify select service URL in your Grafana:
 
 Input for URL field in Grafana
 
-```
-http://<select-service>/select/0/prometheus/
-```
+    http://<select-service>/select/0/prometheus/
+
 
 for e.g. inside the kubernetes cluster:
-```
-http://{{ template "victoria-metrics.vmselect.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomainSuffix }}:{{ .Values.vmselect.service.servicePort }}/select/0/prometheus/"
-```
+
+    http://{{ template "victoria-metrics.vmselect.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomainSuffix }}:{{ .Values.vmselect.service.servicePort }}/select/0/prometheus/"
+
 {{- end }}
 {{- end }}
 
