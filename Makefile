@@ -9,6 +9,9 @@ helm:
 		--user $(shell id -u):$(shell id -g) \
 		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
 		-w /helm-charts \
+		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
+		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
+		-e HELM_DATA_HOME=/helm-charts/.helm/data \
 		$(HELM_IMAGE) \
 		$(CMD)
 
@@ -28,8 +31,14 @@ package:
 index:
 	CMD="repo index --url ${URL} ." $(MAKE) helm
 
+init:
+	CMD="repo add prometheus-community https://prometheus-community.github.io/helm-charts" $(MAKE) helm
+	CMD="repo add grafana https://grafana.github.io/helm-charts" $(MAKE) helm
+	CMD="repo update" $(MAKE) helm
+
 # Update index file add new version of package into it
 merge:
+	CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) helm
 	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) helm
 
 gen-docs:
