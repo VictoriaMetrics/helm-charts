@@ -25,6 +25,7 @@ lint:
 
 # Package chart into zip file
 package:
+	CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) helm
 	CMD="package charts/* -d packages" $(MAKE) helm
 
 # Create index file (use only for initial setup)
@@ -38,7 +39,6 @@ init:
 
 # Update index file add new version of package into it
 merge:
-	CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) helm
 	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) helm
 
 gen-docs:
