@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.1.13](https://img.shields.io/badge/Version-0.1.13-informational?style=flat-square)
+ ![Version: 0.1.14](https://img.shields.io/badge/Version-0.1.14-informational?style=flat-square)
 
 Victoria Metrics Operator
 
@@ -105,6 +105,19 @@ Remove application with command.
 helm uninstall vmoperator -n NAMESPACE
 ```
 
+# Validation webhook
+
+  Its possible to use validation of created resources with operator. For now, you need cert-manager to easily certificate management https://cert-manager.io/docs/
+
+```yaml
+admissionWebhooks:
+  enabled: true
+  # what to do in case, when operator not available to validate request.
+  certManager:
+    # enables cert creation and injection by cert-manager
+    enabled: true
+```
+
 # Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
@@ -127,19 +140,24 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| admissionWebhooks | object | `{"caBundle":"","certManager":{"enabled":false,"issuerName":""},"enabled":false,"policy":"Fail"}` | Configures resource validation |
+| admissionWebhooks.caBundle | string | `""` | Enables custom ca bundle, if you are not using cert-manager. -- in case of custom ca, you have to create secret - {{chart-name}}-validation -- with keys: tls.key, tls.crt, ca.crt |
+| admissionWebhooks.certManager.enabled | bool | `false` | Enables cert creation and injection by cert-manager. |
+| admissionWebhooks.enabled | bool | `false` | Enables validation webhook. |
+| admissionWebhooks.policy | string | `"Fail"` | What to do in case, when operator not available to validate request. |
 | affinity | object | `{}` | Pod affinity |
 | annotations | object | `{}` | Annotations to be added to the all resources |
 | createCRD | bool | `true` | enables CRD creation and management. -- with this option, if you remove this chart, all crd resources will be deleted with it. |
 | env | list | `[]` | extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD) |
 | extraContainers | list | `[]` |  |
-| extraHostPathMounts | list | `[]` |  |
+| extraHostPathMounts | list | `[]` | Additional hostPath mounts |
 | extraLabels | object | `{}` | Labels to be added to the all resources |
-| extraVolumeMounts | list | `[]` |  |
-| extraVolumes | list | `[]` |  |
+| extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
+| extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.14.2"` | Image tag |
+| image.tag | string | `"v0.15.0"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
 | logLevel | string | `"info"` | VM operator log level -- possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name overrid |

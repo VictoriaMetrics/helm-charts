@@ -395,6 +395,30 @@ rules:
     - patch
     - update
 - apiGroups:
+    - operator.victoriametrics.com
+  resources:
+  - vmauths
+  - vmauths/finalizers
+  - vmusers
+  - vmusers/finalizers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+    - operator.victoriametrics.com
+  resources:
+    - vmusers/status
+    - vmauths/status
+  verbs:
+    - get
+    - patch
+    - update
+- apiGroups:
     - storage.k8s.io
   resources:
     - storageclasses
@@ -417,4 +441,27 @@ rules:
     - registry/metrics
   verbs:
     - get
+- apiGroups:
+    - autoscaling
+  verbs:
+    - list
+    - get
+    - delete
+    - create
+    - update
+  resources:
+    - horizontalpodautoscalers
+- apiGroups:
+    - networking.k8s.io
+    - extensions
+  resources:
+  - ingresses
+  - ingresses/finalizers
+  verbs:
+  - create
+  - delete
+  - get
+  - patch
+  - update
+  - watch
 {{- end -}}

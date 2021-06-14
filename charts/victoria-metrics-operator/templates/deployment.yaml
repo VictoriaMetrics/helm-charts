@@ -8,8 +8,11 @@ metadata:
 {{- with .Values.extraLabels }}
 {{ toYaml . | indent 4 }}
 {{- end }}
-{{- with .Values.annotations }}
   annotations:
+{{- if .Values.admissionWebhooks.certManager.enabled }}
+
+{{- end }}
+{{- with .Values.annotations }}
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
@@ -71,9 +74,24 @@ spec:
           args:
             - --zap-log-level={{ .Values.logLevel }}
             - --enable-leader-election
+            {{- if .Values.admissionWebhooks.enabled }}
+            - --webhook.enable=true
+            {{- end }}
           command:
             - manager
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9443
+              name: webhook
+              protocol: TCP
           volumeMounts:
+            {{- if .Values.admissionWebhooks.enabled }}
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: cert
+              readOnly: true
+            {{- end }}
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -95,6 +113,12 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       volumes:
+      {{- if .Values.admissionWebhooks.enabled }}
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: {{ template "vm-operator.fullname" . }}-validation
+      {{- end }}
       {{- with .Values.extraVolumes }}
-      {{- toYaml .| nindent 12 }}
+      {{- toYaml .| nindent 10 }}
       {{- end }}

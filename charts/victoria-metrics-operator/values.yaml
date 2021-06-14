@@ -5,7 +5,7 @@ image:
   # -- Image repository
   repository: victoriametrics/operator
   # -- Image tag
-  tag: v0.14.2
+  tag: v0.15.0
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
@@ -79,7 +79,7 @@ env: []
   # - name: VM_VMSINGLEDEFAULT_VERSION
   #   value: v1.43.0
 
-# Additional hostPath mounts
+# -- Additional hostPath mounts
 extraHostPathMounts:
   []
   # - name: certs-dir
@@ -88,14 +88,14 @@ extraHostPathMounts:
   #   hostPath: /etc/kubernetes/certs
 #   readOnly: true
 
-# Extra Volumes for the pod
+# -- Extra Volumes for the pod
 extraVolumes:
   []
   # - name: example
   #   configMap:
   #     name: example
 
-# Extra Volume Mounts for the container
+# -- Extra Volume Mounts for the container
 extraVolumeMounts:
   []
   # - name: example
@@ -105,3 +105,20 @@ extraContainers:
   []
   # - name: config-reloader
   #   image: reloader-image
+
+# -- Configures resource validation
+admissionWebhooks:
+  # -- Enables validation webhook.
+  enabled: false
+  # -- What to do in case, when operator not available to validate request.
+  policy: Fail
+  # -- Enables custom ca bundle, if you are not using cert-manager.
+  # -- in case of custom ca, you have to create secret - {{chart-name}}-validation
+  # -- with keys: tls.key, tls.crt, ca.crt
+  caBundle: ""
+  certManager:
+    # -- Enables cert creation and injection by cert-manager.
+    enabled: false
+    # --If needed, provide own issuerName. Operator will create self-signed if empty.
+    issuerName: ""
+
