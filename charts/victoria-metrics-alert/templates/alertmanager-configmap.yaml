@@ -8,4 +8,9 @@ metadata:
 data:
   alertmanager.yaml: |
     {{ toYaml .Values.alertmanager.config | nindent 4 }}
+
+    {{- range $key, $value := .Values.alertmanager.templates }}
+      {{ $key }}: |-
+        {{- $value | nindent 4 }}
+    {{- end }}
 {{- end }}
