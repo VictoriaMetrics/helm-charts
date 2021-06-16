@@ -13,6 +13,7 @@ metadata:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
 {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 data:
+{{- if .Values.vmsingle.enabled }}  
   datasource.yaml: |-
     apiVersion: 1
     datasources:
@@ -21,6 +22,7 @@ data:
       {{ include "victoria-metrics-k8s-stack.vmEndpoint" . }}
       access: proxy
       isDefault: true
+{{- end }}      
 {{- if .Values.grafana.sidecar.datasources.createVMReplicasDatasources }}
 {{- range until (int .Values.vmsingle.spec.replicaCount) }}
     - name: VictoriaMetrics-{{ . }}
