@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.7.3](https://img.shields.io/badge/Version-0.7.3-informational?style=flat-square)
+ ![Version: 0.7.4](https://img.shields.io/badge/Version-0.7.4-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -128,7 +128,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | server.image.repository | string | `"victoriametrics/victoria-metrics"` | Image repository |
-| server.image.tag | string | `"v1.61.1"` | Image tag |
+| server.image.tag | string | `"v1.62.0"` | Image tag |
 | server.ingress.annotations | object | `{}` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
