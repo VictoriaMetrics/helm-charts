@@ -23,6 +23,11 @@ spec:
 {{- if .Values.server.persistentVolume.storageClass }}
   storageClassName: {{ .Values.server.persistentVolume.storageClass | quote }}
 {{- end }}
+{{- if .Values.server.persistentVolume.matchLabels }}
+  selector:
+    matchLabels:
+      {{ toYaml .Values.server.persistentVolume.matchLabels | indent 6 }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

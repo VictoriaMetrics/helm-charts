@@ -295,6 +295,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | persistence.enabled | bool | `false` |  |
 | persistence.existingClaim | string | `""` |  |
 | persistence.extraLabels | object | `{}` |  |
+| persistence.matchLabels | object | `{}` | Bind Persistent Volume by labels. Must match all labels of targeted PV. |
 | persistence.size | string | `"10Gi"` |  |
 | podAnnotations | object | `{}` |  |
 | podDisruptionBudget.enabled | bool | `false` |  |
