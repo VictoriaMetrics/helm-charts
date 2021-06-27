@@ -60,6 +60,11 @@ spec:
           ports:
             - name: http
               containerPort: 8480
+{{- if .Values.vminsert.extraArgs.clusternativeListenAddr }}
+            - name: cluster-tcp
+              protocol: TCP
+              containerPort: {{ include "split-host-port" .Values.vminsert.extraArgs.clusternativeListenAddr }}
+{{- end }}
 {{- if .Values.vminsert.extraArgs.graphiteListenAddr }}
             - name: graphite-tcp
               protocol: TCP
