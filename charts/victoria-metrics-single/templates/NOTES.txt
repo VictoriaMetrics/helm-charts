@@ -1,6 +1,6 @@
 {{- if .Values.printNotes }}
 {{- if .Values.server.enabled }}
-The Victoria Metrics write api can be accessed via port {{ .Values.server.service.servicePort }} on the following DNS name from within your cluster:
+The VictoriaMetrics write api can be accessed via port {{ .Values.server.service.servicePort }} on the following DNS name from within your cluster:
     {{ template "victoria-metrics.server.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
 
 
@@ -28,15 +28,15 @@ Metrics Ingestion:
 {{- if .Values.server.scrape.enabled }}
 
 Metrics Scrape:
-  Pull-based scrapes is enabled
-  Scrape config can be displaying by running command:
+  Pull-based scrapes are enabled
+  Scrape config can be displayed by running this command::
     {{- if eq .Values.server.scrape.configMap "" }}
     kubectl get cm {{ template "victoria-metrics.server.fullname" . }}-scrapeconfig -n {{ .Release.Namespace }}
     {{- else }}
     kubectl get cm .Values.server.scrape.configMap -n {{ .Release.Namespace }}
     {{- end }}
 
-  The targets information is accessible via api:
+  The target’s information is accessible via api:
     Inside cluster:
       http://{{ template "victoria-metrics.server.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.server.service.servicePort }}/targets
     Outside cluster:
@@ -45,7 +45,7 @@ Metrics Scrape:
 {{- end }}
 
 Read Data:
-  The next url can be used as datasource url in Grafana:
+  The following url can be used as the datasource url in Grafana::
     http://{{ template "victoria-metrics.server.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.server.service.servicePort }}
 {{- end }}
 {{- end }}
