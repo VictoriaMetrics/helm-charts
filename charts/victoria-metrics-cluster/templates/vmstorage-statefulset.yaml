@@ -68,6 +68,7 @@ spec:
           {{- with .Values.vmstorage.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
+          {{- if .Values.vmstorage.probe.readiness.enabled }}
           readinessProbe:
             httpGet:
               path: /health
@@ -76,6 +77,8 @@ spec:
             periodSeconds: {{ .Values.vmstorage.probe.readiness.periodSeconds }}
             timeoutSeconds: {{ .Values.vmstorage.probe.readiness.timeoutSeconds }}
             failureThreshold: {{ .Values.vmstorage.probe.readiness.failureThreshold }}
+          {{- end}}
+          {{- if .Values.vmstorage.probe.liveness.enabled }}
           livenessProbe:
             tcpSocket:
               port: http
@@ -83,6 +86,7 @@ spec:
             periodSeconds: {{ .Values.vmstorage.probe.liveness.periodSeconds }}
             timeoutSeconds: {{ .Values.vmstorage.probe.liveness.timeoutSeconds }}
             failureThreshold: {{ .Values.vmstorage.probe.liveness.failureThreshold }}
+          {{- end }}
           resources:
 {{ toYaml .Values.vmstorage.resources | indent 12 }}
           volumeMounts:
