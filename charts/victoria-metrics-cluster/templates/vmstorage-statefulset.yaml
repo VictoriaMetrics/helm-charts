@@ -68,21 +68,14 @@ spec:
           {{- with .Values.vmstorage.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: http
-            initialDelaySeconds: {{ .Values.vmstorage.probe.readiness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.vmstorage.probe.readiness.periodSeconds }}
-            timeoutSeconds: {{ .Values.vmstorage.probe.readiness.timeoutSeconds }}
-            failureThreshold: {{ .Values.vmstorage.probe.readiness.failureThreshold }}
+          {{- with $.Values.vmstorage.probe.liveness }}
           livenessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: {{ .Values.vmstorage.probe.liveness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.vmstorage.probe.liveness.periodSeconds }}
-            timeoutSeconds: {{ .Values.vmstorage.probe.liveness.timeoutSeconds }}
-            failureThreshold: {{ .Values.vmstorage.probe.liveness.failureThreshold }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.vmstorage.probe.readiness }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           resources:
 {{ toYaml .Values.vmstorage.resources | indent 12 }}
           volumeMounts:

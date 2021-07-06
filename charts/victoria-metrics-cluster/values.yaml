@@ -506,15 +506,20 @@ vmstorage:
   terminationGracePeriodSeconds: 60
   probe:
     readiness:
+      httpGet:
+        path: /health
+        port: http
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
     liveness:
-      initialDelaySeconds: 5
-      periodSeconds: 15
+      tcpSocket:
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 30
       timeoutSeconds: 5
-      failureThreshold: 3
+      failureThreshold: 10
   serviceMonitor:
     # -- Enable deployment of Service Monitor for vmstorage component. This is Prometheus operator object
     enabled: false
