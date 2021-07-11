@@ -1,8 +1,17 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.8](https://img.shields.io/badge/Version-0.2.8-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.9](https://img.shields.io/badge/Version-0.2.9-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
+
+# Title
+* [Prerequisites](#Prerequisites)
+* [Dependencies](#Dependencies)
+* [Quick Start](#How to install)
+* [Uninstall](#How to uninstall)
+* [Version Upgrade](#Upgrade-guide)
+* [Troubleshooting](#Troubleshooting)
+* [Values](#Parameters)
 
 # Prerequisites
 
@@ -17,17 +26,6 @@ helm repo update
 ```
 
 * PV support on underlying infrastructure.
-
-# Upgrade guide
-
-```console
-$ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
-```
-
-With Helm v3, CRDs created by this chart are not updated by default and should be manually updated.
-Consult also the [Helm Documentation on CRDs](https://helm.sh/docs/chart_best_practices/custom_resource_definitions).
-
-_See [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/) for command documentation._
 
 # Chart Details
 
@@ -117,11 +115,37 @@ CRDs created by this chart are not removed by default and should be manually cle
 kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl delete crd {}
 ```
 
-# How to upgrade
+# Troubleshooting
 
- Usually, helm upgrade doesn't requires manual actions. But release with CRD update must be patched manually with kubectl.
+- If you cannot install helm chart with error `configmap already exist`. It could happen because of name collisions, if you set too long release name.
+  Kubernetes by default, allows only 63 symbols at resource names and all resource names are trimmed by helm to 63 symbols.
+  To mitigate it, use shorter name for helm chart release name, like:
+```bash
+# stack - is short enough
+helm upgrade -i stack vm/victoria-metrics-k8s-stack
+```
+  Or use override for helm chart release name:
+```bash
+helm upgrade -i some-very-long-name vm/victoria-metrics-k8s-stack --set fullnameOverride=stack
+```
 
- Versions with CRD change:
+# Upgrade guide
+
+Usually, helm upgrade doesn't requires manual actions. But release with CRD update must be patched manually with kubectl.
+ Just execute command:
+```console
+$ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
+```
+ All CRD manual actions upgrades listed below:
+
+### Upgrade from 0.2.8 to 0.2.9
+
+ Update `VMAgent` crd
+
+command:
+```bash
+kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.16.0/config/crd/bases/operator.victoriametrics.com_vmagents.yaml
+```
 
  ### Upgrade from 0.2.5 to 0.2.6
 
