@@ -187,7 +187,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.horizontalPodAutoscaler.enabled | bool | `false` | Use HPA for vmselect component |
 | vmselect.horizontalPodAutoscaler.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale the vmselect component |
 | vmselect.horizontalPodAutoscaler.minReplicas | int | `1` | Minimum replicas for HPA to use to scale the vmselect component |
-| vmselect.horizontalPodAutoscaler.targetCPUUtilizationPercentage | int | `70` | CPU Utilization to scale upon for vmselect component |
+| vmselect.horizontalPodAutoscaler.metrics | object | `` | Metric for HPA to use to scale the vmselect component |
 | vmselect.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmselect.image.repository | string | `"victoriametrics/vmselect"` | Image repository |
 | vmselect.image.tag | string | `"v1.62.0-cluster"` | Image tag |
