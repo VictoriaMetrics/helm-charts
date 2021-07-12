@@ -16,5 +16,6 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ template "victoria-metrics.vmselect.fullname" . }}
-  targetCPUUtilizationPercentage: {{ .Values.vmselect.horizontalPodAutoscaler.targetCPUUtilizationPercentage }}
+  metrics:
+  {{ toYaml .Values.vmselect.horizontalPodAutoscaler.metrics | indent 4 }}
 {{- end -}}
