@@ -96,12 +96,12 @@ spec:
     {{- end }}
       volumes:
         - name: storage
-        {{- if .Values.alertmanager.persistentVolume.enabled }}
-        persistentVolumeClaim:
-          claimName: {{ if .Values.alertmanager.persistentVolume.existingClaim }}{{ .Values.alertmanager.persistentVolume.existingClaim }}{{- else }}{{ include "vmalert.alertmanager.fullname" . }}{{- end }}
-        {{- else }}
-          emptyDir: {}
-        {{- end }}
+          {{- if .Values.alertmanager.persistentVolume.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.alertmanager.persistentVolume.existingClaim }}{{ .Values.alertmanager.persistentVolume.existingClaim }}{{- else }}{{ include "vmalert.alertmanager.fullname" . }}{{- end }}
+          {{- else }}
+            emptyDir: {}
+          {{- end }}
         - name: config
           configMap:
             name: {{ include "vmalert.alertmanager.configname" . }}
