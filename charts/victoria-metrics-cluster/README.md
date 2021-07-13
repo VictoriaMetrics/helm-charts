@@ -127,6 +127,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.extraArgs.loggerFormat | string | `"json"` |  |
 | vminsert.extraLabels | object | `{}` |  |
 | vminsert.fullnameOverride | string | `""` | Overrides the full name of vminsert component |
+| vminsert.horizontalPodAutoscaler.enabled | bool | `false` | Use HPA for vminsert component |
+| vminsert.horizontalPodAutoscaler.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale the vminsert component |
+| vminsert.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vminsert component |
+| vminsert.horizontalPodAutoscaler.metrics | object | `` | Metric for HPA to use to scale the vminsert component |
 | vminsert.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vminsert.image.repository | string | `"victoriametrics/vminsert"` | Image repository |
 | vminsert.image.tag | string | `"v1.62.0-cluster"` | Image tag |
@@ -186,7 +190,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.fullnameOverride | string | `""` | Overrides the full name of vmselect component |
 | vmselect.horizontalPodAutoscaler.enabled | bool | `false` | Use HPA for vmselect component |
 | vmselect.horizontalPodAutoscaler.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale the vmselect component |
-| vmselect.horizontalPodAutoscaler.minReplicas | int | `1` | Minimum replicas for HPA to use to scale the vmselect component |
+| vmselect.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vmselect component |
 | vmselect.horizontalPodAutoscaler.metrics | object | `` | Metric for HPA to use to scale the vmselect component |
 | vmselect.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmselect.image.repository | string | `"victoriametrics/vmselect"` | Image repository |
