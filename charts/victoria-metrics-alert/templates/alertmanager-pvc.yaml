@@ -1,3 +1,4 @@
+{{- if .Values.alertmanager.enabled -}}
 {{- if and .Values.alertmanager.persistentVolume.enabled (not .Values.alertmanager.persistentVolume.existingClaim)}}
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -21,4 +22,5 @@ spec:
   {{- if .Values.alertmanager.persistentVolume.storageClass }}
   storageClassName: {{ .Values.alertmanager.persistentVolume.storageClass }}
   {{- end -}}
+{{- end -}}
 {{- end -}}

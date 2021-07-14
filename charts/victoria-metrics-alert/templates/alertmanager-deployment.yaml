@@ -71,7 +71,7 @@ spec:
             - name: storage
               {{- if .Values.alertmanager.persistentVolume.enabled }}
               mountPath: {{ .Values.alertmanager.persistentVolume.mountPath }}
-              {{- else}}
+              {{- else }}
               mountPath: /data
               {{- end }}
             - name: config
@@ -100,7 +100,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ if .Values.alertmanager.persistentVolume.existingClaim }}{{ .Values.alertmanager.persistentVolume.existingClaim }}{{- else }}{{ include "vmalert.alertmanager.fullname" . }}{{- end }}
           {{- else }}
-            emptyDir: {}
+          emptyDir: {}
           {{- end }}
         - name: config
           configMap:
