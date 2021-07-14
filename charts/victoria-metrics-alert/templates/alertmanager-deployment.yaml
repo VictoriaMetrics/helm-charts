@@ -11,6 +11,11 @@ spec:
   selector:
     matchLabels:
       {{- include "vmalert.alertmanager.matchLabels" . | nindent 6 }}
+{{- if .Values.alertmanager.persistentVolume.enabled }}
+  strategy:
+    # Must be "Recreate" when we have a persistent volume
+    type: Recreate
+{{- end }}
   template:
     metadata:
       labels:
@@ -37,7 +42,11 @@ spec:
           image: "{{ .Values.alertmanager.image }}:{{ .Values.alertmanager.tag }}"
           args:
             - --config.file=/config/alertmanager.yaml
+            {{ if .Values.alertmanager.persistentVolume.enabled }}
+            - {{ printf "%s=%s" "--storage.path" .Values.alertmanager.persistentVolume.mountPath | quote}}
+            {{- else}}
             - --storage.path=/data
+            {{- end}}
             - --data.retention={{ .Values.alertmanager.retention }}
             - --web.listen-address=0.0.0.0:9093
             - --cluster.advertise-address=$(POD_IP):6783
@@ -60,7 +69,11 @@ spec:
               port: web
           volumeMounts:
             - name: storage
+              {{- if .Values.alertmanager.persistentVolume.enabled }}
+              mountPath: {{ .Values.alertmanager.persistentVolume.mountPath }}
+              {{- else}}
               mountPath: /data
+              {{- end }}
             - name: config
               mountPath: /config
               readOnly: true
@@ -83,7 +96,12 @@ spec:
     {{- end }}
       volumes:
         - name: storage
-          emptyDir: {}
+          {{- if .Values.alertmanager.persistentVolume.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.alertmanager.persistentVolume.existingClaim }}{{ .Values.alertmanager.persistentVolume.existingClaim }}{{- else }}{{ include "vmalert.alertmanager.fullname" . }}{{- end }}
+          {{- else }}
+            emptyDir: {}
+          {{- end }}
         - name: config
           configMap:
             name: {{ include "vmalert.alertmanager.configname" . }}
