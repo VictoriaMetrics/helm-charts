@@ -17,7 +17,9 @@ spec:
   selector:
     matchLabels:
       {{- include "victoria-metrics.vminsert.matchLabels" . | nindent 6 }}
+{{- if not .Values.vminsert.horizontalPodAutoscaler.enabled }}
   replicas: {{ .Values.vminsert.replicaCount }}
+{{- end }}
   template:
     metadata:
     {{- if .Values.vminsert.podAnnotations }}

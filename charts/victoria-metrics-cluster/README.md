@@ -127,9 +127,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.extraArgs.loggerFormat | string | `"json"` |  |
 | vminsert.extraLabels | object | `{}` |  |
 | vminsert.fullnameOverride | string | `""` | Overrides the full name of vminsert component |
+| vminsert.horizontalPodAutoscaler.enabled | bool | `false` | Use HPA for vminsert component |
+| vminsert.horizontalPodAutoscaler.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale the vminsert component |
+| vminsert.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vminsert component |
+| vminsert.horizontalPodAutoscaler.metrics | object | `` | Metric for HPA to use to scale the vminsert component |
 | vminsert.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vminsert.image.repository | string | `"victoriametrics/vminsert"` | Image repository |
-| vminsert.image.tag | string | `"v1.62.0-cluster"` | Image tag |
+| vminsert.image.tag | string | `"v1.63.0-cluster"` | Image tag |
 | vminsert.ingress.annotations | object | `{}` | Ingress annotations |
 | vminsert.ingress.enabled | bool | `false` | Enable deployment of ingress for vminsert component |
 | vminsert.ingress.extraLabels | object | `{}` |  |
@@ -184,9 +188,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.extraVolumeMounts | list | `[]` |  |
 | vmselect.extraVolumes | list | `[]` |  |
 | vmselect.fullnameOverride | string | `""` | Overrides the full name of vmselect component |
+| vmselect.horizontalPodAutoscaler.enabled | bool | `false` | Use HPA for vmselect component |
+| vmselect.horizontalPodAutoscaler.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale the vmselect component |
+| vmselect.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vmselect component |
+| vmselect.horizontalPodAutoscaler.metrics | object | `` | Metric for HPA to use to scale the vmselect component |
 | vmselect.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmselect.image.repository | string | `"victoriametrics/vmselect"` | Image repository |
-| vmselect.image.tag | string | `"v1.62.0-cluster"` | Image tag |
+| vmselect.image.tag | string | `"v1.63.0-cluster"` | Image tag |
 | vmselect.ingress.annotations | object | `{}` | Ingress annotations |
 | vmselect.ingress.enabled | bool | `false` | Enable deployment of ingress for vmselect component |
 | vmselect.ingress.extraLabels | object | `{}` |  |
@@ -253,13 +261,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.fullnameOverride | string | `nil` | Overrides the full name of vmstorage component |
 | vmstorage.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmstorage.image.repository | string | `"victoriametrics/vmstorage"` | Image repository |
-| vmstorage.image.tag | string | `"v1.62.0-cluster"` | Image tag |
+| vmstorage.image.tag | string | `"v1.63.0-cluster"` | Image tag |
 | vmstorage.initContainers | list | `[]` |  |
 | vmstorage.name | string | `"vmstorage"` | vmstorage container name |
 | vmstorage.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
 | vmstorage.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
 | vmstorage.persistentVolume.annotations | object | `{}` | Persistent volume annotations |
 | vmstorage.persistentVolume.enabled | bool | `true` | Create/use Persistent Volume Claim for vmstorage component. Empty dir if false. If true,  vmstorage will create/use a Persistent Volume Claim |
+| vmstorage.persistentVolume.storageClass | string | Storage class name. Will be empty if not setted
 | vmstorage.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
 | vmstorage.persistentVolume.mountPath | string | `"/storage"` | Data root path. Vmstorage data Persistent Volume mount root path |
 | vmstorage.persistentVolume.size | string | `"8Gi"` | Size of the volume. Better to set the same as resource limit memory property |

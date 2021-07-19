@@ -24,10 +24,10 @@ spec:
             - /bin/sh
             - -c
             - >
-              kubectl delete vmalerts --all;
-              kubectl delete vmagents --all;
-              kubectl delete vmsingles --all;
-              kubectl delete vmalertmanagers --all;
+              kubectl delete vmalerts --all --ignore-not-found=true;
+              kubectl delete vmagents --all --ignore-not-found=true;
+              kubectl delete vmsingles --all --ignore-not-found=true;
+              kubectl delete vmalertmanagers --all --ignore-not-found=true;
       restartPolicy: OnFailure
 ---
 {{- if .Values.operator.cleanupSA.create }}

@@ -38,7 +38,7 @@ vmselect:
     # -- Image repository
     repository: victoriametrics/vmselect
     # -- Image tag
-    tag: v1.62.0-cluster
+    tag: v1.63.0-cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -69,6 +69,13 @@ vmselect:
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
+
+# Horizontal Pod Autoscaling
+  horizontalPodAutoscaler:
+    enabled: false
+    maxReplicas: 10
+    minReplicas: 2
+    metrics: []
 
   # Additional hostPath mounts
   extraHostPathMounts:
@@ -231,7 +238,7 @@ vminsert:
     # -- Image repository
     repository: victoriametrics/vminsert
     # -- Image tag
-    tag: v1.62.0-cluster
+    tag: v1.63.0-cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -262,6 +269,13 @@ vminsert:
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
+
+# Horizontal Pod Autoscaling
+  horizontalPodAutoscaler:
+    enabled: false
+    maxReplicas: 10
+    minReplicas: 2
+    metrics: []
 
   initContainers:
     []
@@ -361,7 +375,7 @@ vmstorage:
     # -- Image repository
     repository: victoriametrics/vmstorage
     # -- Image tag
-    tag: v1.62.0-cluster
+    tag: v1.63.0-cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class

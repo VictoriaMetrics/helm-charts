@@ -4,8 +4,8 @@
 {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
 {{- end -}}
 {{- end -}}
-{{- if and (.Values.alertmanager.enabled) (eq .Values.server.notifier.alertmanager.url "") -}}
-{{- fail "alert manager URL must be specified" -}}
+{{- if and (not .Values.alertmanager.enabled) (eq .Values.server.notifier.alertmanager.url "") -}}
+{{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or enable Alertmanager in values file" -}}
 {{- end -}}
 {{- if eq .Values.server.datasource.url "" -}}
 {{- fail "datarouce URL must be specified" -}}

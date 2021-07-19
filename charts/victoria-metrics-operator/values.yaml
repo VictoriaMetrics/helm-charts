@@ -5,7 +5,7 @@ image:
   # -- Image repository
   repository: victoriametrics/operator
   # -- Image tag
-  tag: v0.15.1
+  tag: v0.16.0
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
@@ -13,12 +13,13 @@ image:
 # -- with this option, if you remove this chart, all crd resources will be deleted with it.
 createCRD: true
 
+
 replicaCount: 1
 
 # -- Secret to pull images
 imagePullSecrets: []
 
-# -- VM operatror deployment name overrid
+# -- VM operatror deployment name override
 nameOverride: ""
 
 # -- Overrides the full name of server component
@@ -48,6 +49,9 @@ operator:
   # -- Enables ownership reference for converted prometheus-operator objects,
   # it will remove corresponding victoria-metrics objects in case of deletion prometheus one.
   enable_converter_ownership: false
+  # -- Enables custom config-reloader, bundled with operator.
+  # It should reduce  vmagent and vmauth config sync-time and make it predictable.
+  useCustomConfigReloader: false
 
 
 serviceAccount:
