@@ -21,7 +21,7 @@ Get the Victoria Metrics insert service URL by running these commands in the sam
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.vminsert.service.servicePort }}
 {{- end }}
 
-You need to update your prometheus configuration file and add next lines into it:
+You need to update your Prometheus configuration file and add the following lines to it:
 
 prometheus.yml
 
@@ -30,7 +30,7 @@ prometheus.yml
 
 
 
-for e.g. inside the kubernetes cluster:
+for example -  inside the Kubernetes cluster:
 
     remote_write:
       - url: "http://{{ template "victoria-metrics.vminsert.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomainSuffix }}:{{ .Values.vminsert.service.servicePort }}/insert/0/prometheus/"
@@ -40,10 +40,10 @@ for e.g. inside the kubernetes cluster:
 {{- if .Values.vmselect.enabled }}
 Read API:
 
-The Victoria Metrics read api can be accessed via port {{ .Values.vmselect.service.servicePort }} on the following DNS name from within your cluster:
+The VictoriaMetrics read api can be accessed via port {{ .Values.vmselect.service.servicePort }} on the following DNS name from within your cluster:
 {{ template "victoria-metrics.vmselect.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomainSuffix }}
 
-Get the Victoria Metrics select service URL by running these commands in the same shell:
+Get the VictoriaMetrics select service URL by running these commands in the same shell:
 {{- if contains "NodePort" .Values.vmselect.service.type }}
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "victoria-metrics.vminsert.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
@@ -59,15 +59,15 @@ Get the Victoria Metrics select service URL by running these commands in the sam
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.vmselect.service.servicePort }}
 {{- end }}
 
-You need to update specify select service URL in your Grafana:
+You need to specify select service URL in your Grafana:
  NOTE: you need to use Prometheus Data Source
 
-Input for URL field in Grafana
+Input this URL field in Grafana
 
     http://<select-service>/select/0/prometheus/
 
 
-for e.g. inside the kubernetes cluster:
+for example - inside the Kubernetes cluster:
 
     http://{{ template "victoria-metrics.vmselect.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomainSuffix }}:{{ .Values.vmselect.service.servicePort }}/select/0/prometheus/"
 
