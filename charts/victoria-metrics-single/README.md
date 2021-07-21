@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.7.4](https://img.shields.io/badge/Version-0.7.4-informational?style=flat-square)
+ ![Version: 0.8.0](https://img.shields.io/badge/Version-0.8.0-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -135,8 +135,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.ingress.hosts | list | `[]` | Array of host objects |
 | server.ingress.tls | list | `[]` | Array of TLS objects |
 | server.initContainers | list | `[]` |  |
-| server.livenessProbe.initialDelaySeconds | int | `5` |  |
-| server.livenessProbe.periodSeconds | int | `15` |  |
+| server.livenessProbe.failureThreshold | int | `10` |  |
+| server.livenessProbe.initialDelaySeconds | int | `30` |  |
+| server.livenessProbe.periodSeconds | int | `30` |  |
 | server.livenessProbe.tcpSocket.port | string | `"http"` |  |
 | server.livenessProbe.timeoutSeconds | int | `5` |  |
 | server.name | string | `"server"` | Server container name |
@@ -154,6 +155,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.podManagementPolicy | string | `"OrderedReady"` | Pod's management policy  |
 | server.podSecurityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | server.priorityClassName | string | `""` | Name of Priority Class |
+| server.readinessProbe.failureThreshold | int | `3` |  |
 | server.readinessProbe.httpGet.path | string | `"/health"` |  |
 | server.readinessProbe.httpGet.port | string | `"http"` |  |
 | server.readinessProbe.initialDelaySeconds | int | `5` |  |
@@ -190,6 +192,36 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.statefulSet.service.servicePort | int | `8428` | Headless service port |
 | server.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
 | server.tolerations | list | `[]` | Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
+| server.vmbackupmanager.destination | string | `""` | backup destination at S3, GCS or local filesystem. Release name will be included to path! |
+| server.vmbackupmanager.disableDaily | bool | `false` | disable daily backups |
+| server.vmbackupmanager.disableHourly | bool | `false` | disable hourly backups |
+| server.vmbackupmanager.disableMonthly | bool | `false` | disable monthly backups |
+| server.vmbackupmanager.disableWeekly | bool | `false` | disable weekly backups |
+| server.vmbackupmanager.enable | bool | `false` | enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages |
+| server.vmbackupmanager.env | list | `[]` |  |
+| server.vmbackupmanager.eula | bool | `false` | should be true and means that you have the legal right to run a backup manager that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/assets/VM_EULA.pdf |
+| server.vmbackupmanager.extraArgs."envflag.enable" | string | `"true"` |  |
+| server.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
+| server.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
+| server.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
+| server.vmbackupmanager.image.tag | string | `"v1.63.0-enterprise"` | vmbackupmanager image tag |
+| server.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
+| server.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
+| server.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |
+| server.vmbackupmanager.livenessProbe.tcpSocket.port | string | `"manager-http"` |  |
+| server.vmbackupmanager.livenessProbe.timeoutSeconds | int | `5` |  |
+| server.vmbackupmanager.readinessProbe.failureThreshold | int | `3` |  |
+| server.vmbackupmanager.readinessProbe.httpGet.path | string | `"/health"` |  |
+| server.vmbackupmanager.readinessProbe.httpGet.port | string | `"manager-http"` |  |
+| server.vmbackupmanager.readinessProbe.initialDelaySeconds | int | `5` |  |
+| server.vmbackupmanager.readinessProbe.periodSeconds | int | `15` |  |
+| server.vmbackupmanager.readinessProbe.timeoutSeconds | int | `5` |  |
+| server.vmbackupmanager.resources | object | `{}` |  |
+| server.vmbackupmanager.retention | object | `{"keepLastDaily":2,"keepLastHourly":2,"keepLastMonthly":2,"keepLastWeekly":2}` | backups' retention settings |
+| server.vmbackupmanager.retention.keepLastDaily | int | `2` | keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off |
+| server.vmbackupmanager.retention.keepLastHourly | int | `2` | keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off |
+| server.vmbackupmanager.retention.keepLastMonthly | int | `2` | keep last N monthly backups. 0 means delete all existing monthly backups. Specify -1 to turn off |
+| server.vmbackupmanager.retention.keepLastWeekly | int | `2` | keep last N weekly backups. 0 means delete all existing weekly backups. Specify -1 to turn off |
 | serviceAccount.automountToken | bool | `true` |  |
 | serviceAccount.create | bool | `true` | Create service account. |
 | serviceAccount.extraLabels | object | `{}` |  |

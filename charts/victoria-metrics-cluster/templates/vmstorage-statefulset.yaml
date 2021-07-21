@@ -76,8 +76,7 @@ spec:
           readinessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          resources:
-{{ toYaml .Values.vmstorage.resources | indent 12 }}
+          resources: {{ toYaml .Values.vmstorage.resources | nindent 12 }}
           volumeMounts:
             - name: vmstorage-volume
               mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
@@ -103,6 +102,54 @@ spec:
           {{- with .Values.vmstorage.extraVolumeMounts }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
+        {{- if .Values.vmstorage.vmbackupmanager.enable }}
+        - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
+          image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
+          imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
+          args:
+            - {{ printf "%s=%t" "--eula" .Values.vmstorage.vmbackupmanager.eula | quote}}
+            - {{ printf "%s=%t" "--disableHourly" .Values.vmstorage.vmbackupmanager.disableHourly | quote}}
+            - {{ printf "%s=%t" "--disableDaily" .Values.vmstorage.vmbackupmanager.disableDaily | quote}}
+            - {{ printf "%s=%t" "--disableWeekly" .Values.vmstorage.vmbackupmanager.disableWeekly | quote}}
+            - {{ printf "%s=%t" "--disableMonthly" .Values.vmstorage.vmbackupmanager.disableMonthly | quote}}
+            - {{ printf "%s=%d" "--keepLastHourly" (int .Values.vmstorage.vmbackupmanager.retention.keepLastHourly) | quote}}
+            - {{ printf "%s=%d" "--keepLastDaily" (int .Values.vmstorage.vmbackupmanager.retention.keepLastDaily) | quote}}
+            - {{ printf "%s=%d" "--keepLastWeekly" (int .Values.vmstorage.vmbackupmanager.retention.keepLastWeekly) | quote}}
+            - {{ printf "%s=%d" "--keepLastMonthly" (int .Values.vmstorage.vmbackupmanager.retention.keepLastMonthly) | quote}}
+            - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
+            - "--dst={{ .Values.vmstorage.vmbackupmanager.destination }}/$(POD_NAME)"
+            - "--snapshot.createURL=http://localhost:8482/snapshot/create"
+            - "--snapshot.deleteURL=http://localhost:8482/snapshot/delete"
+            {{- range $key, $value := .Values.vmstorage.vmbackupmanager.extraArgs }}
+            - --{{ $key }}={{ $value }}
+            {{- end }}
+          {{- with .Values.vmstorage.vmbackupmanager.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.vmstorage.vmbackupmanager.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.vmstorage.vmbackupmanager.readinessProbe }}
+          readinessProbe:
+           {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          {{- with .Values.vmstorage.vmbackupmanager.env }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: manager-http
+              containerPort: 8300
+          volumeMounts:
+            - name: vmstorage-volume
+              mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
+              subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
+        {{- end }}
         {{- with .Values.vmstorage.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

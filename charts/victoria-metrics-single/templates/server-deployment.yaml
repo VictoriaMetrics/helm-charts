@@ -145,6 +145,47 @@ spec:
           {{- with .Values.server.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+        {{- if .Values.server.vmbackupmanager.enable }}
+        - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
+          image: "{{ .Values.server.vmbackupmanager.image.repository }}:{{ .Values.server.vmbackupmanager.image.tag }}"
+          imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
+          args:
+            - {{ printf "%s=%t" "--eula" .Values.server.vmbackupmanager.eula | quote}}
+            - {{ printf "%s=%t" "--disableHourly" .Values.server.vmbackupmanager.disableHourly | quote}}
+            - {{ printf "%s=%t" "--disableDaily" .Values.server.vmbackupmanager.disableDaily | quote}}
+            - {{ printf "%s=%t" "--disableWeekly" .Values.server.vmbackupmanager.disableWeekly | quote}}
+            - {{ printf "%s=%t" "--disableMonthly" .Values.server.vmbackupmanager.disableMonthly | quote}}
+            - {{ printf "%s=%d" "--keepLastHourly" (int .Values.server.vmbackupmanager.retention.keepLastHourly) | quote}}
+            - {{ printf "%s=%d" "--keepLastDaily" (int .Values.server.vmbackupmanager.retention.keepLastDaily) | quote}}
+            - {{ printf "%s=%d" "--keepLastWeekly" (int .Values.server.vmbackupmanager.retention.keepLastWeekly) | quote}}
+            - {{ printf "%s=%d" "--keepLastMonthly" (int .Values.server.vmbackupmanager.retention.keepLastMonthly) | quote}}
+            - {{ printf "%s=%s" "--dst" (printf "%s/%s" .Values.server.vmbackupmanager.destination (include "victoria-metrics.name" .) ) | quote}}
+            - {{ printf "%s=%s" "--storageDataPath" .Values.server.persistentVolume.mountPath | quote}}
+            - "--snapshot.createURL=http://localhost:8428/snapshot/create"
+            - "--snapshot.deleteURL=http://localhost:8428/snapshot/delete"
+            {{- range $key, $value := .Values.server.vmbackupmanager.extraArgs }}
+            - --{{ $key }}={{ $value }}
+            {{- end }}
+          {{- with .Values.server.vmbackupmanager.resources }}
+          resources: {{ toYaml . | nindent 12  }}
+          {{- end }}
+          {{- with $.Values.server.vmbackupmanager.livenessProbe }}
+          livenessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.server.vmbackupmanager.readinessProbe }}
+          readinessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.server.vmbackupmanager.env }}
+          env: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: manager-http
+              containerPort: 8300
+          volumeMounts:
+            - name: server-volume
+              mountPath: {{ .Values.server.persistentVolume.mountPath }}
+              subPath: {{ .Values.server.persistentVolume.subPath }}
+        {{- end }}
         {{- with .Values.server.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

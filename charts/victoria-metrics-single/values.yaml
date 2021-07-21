@@ -205,6 +205,59 @@ server:
     #     hosts:
     #       - vmselect.local
 
+  vmbackupmanager:
+    # -- enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages
+    enable: false
+    # -- should be true and means that you have the legal right to run a backup manager
+    # that can either be a signed contract or an email with confirmation to run the service in a trial period
+    # https://victoriametrics.com/assets/VM_EULA.pdf
+    eula: false
+    image:
+      # -- vmbackupmanager image repository
+      repository: victoriametrics/vmbackupmanager
+      # -- vmbackupmanager image tag
+      tag: v1.63.0-enterprise
+    # -- disable hourly backups
+    disableHourly: false
+    # -- disable daily backups
+    disableDaily: false
+    # -- disable weekly backups
+    disableWeekly: false
+    # -- disable monthly backups
+    disableMonthly: false
+    # -- backup destination at S3, GCS or local filesystem. Release name will be included to path!
+    destination: ""
+    # -- backups' retention settings
+    retention:
+      # -- keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off
+      keepLastHourly: 2
+      # -- keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off
+      keepLastDaily: 2
+      # -- keep last N weekly backups. 0 means delete all existing weekly backups. Specify -1 to turn off
+      keepLastWeekly: 2
+      # -- keep last N monthly backups. 0 means delete all existing monthly backups. Specify -1 to turn off
+      keepLastMonthly: 2
+    extraArgs:
+      envflag.enable: "true"
+      envflag.prefix: VM_
+      loggerFormat: json
+    resources: {}
+    env: []
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: manager-http
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
+    livenessProbe:
+      tcpSocket:
+        port: manager-http
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 5
+      failureThreshold: 10
   service:
     # -- Service annotations
     annotations: {}

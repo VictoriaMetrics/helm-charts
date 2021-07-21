@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.8.29](https://img.shields.io/badge/Version-0.8.29-informational?style=flat-square)
+ ![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -129,8 +129,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.fullnameOverride | string | `""` | Overrides the full name of vminsert component |
 | vminsert.horizontalPodAutoscaler.enabled | bool | `false` | Use HPA for vminsert component |
 | vminsert.horizontalPodAutoscaler.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale the vminsert component |
+| vminsert.horizontalPodAutoscaler.metrics | list | `[]` | Metric for HPA to use to scale the vminsert component |
 | vminsert.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vminsert component |
-| vminsert.horizontalPodAutoscaler.metrics | object | `` | Metric for HPA to use to scale the vminsert component |
 | vminsert.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vminsert.image.repository | string | `"victoriametrics/vminsert"` | Image repository |
 | vminsert.image.tag | string | `"v1.63.0-cluster"` | Image tag |
@@ -190,8 +190,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.fullnameOverride | string | `""` | Overrides the full name of vmselect component |
 | vmselect.horizontalPodAutoscaler.enabled | bool | `false` | Use HPA for vmselect component |
 | vmselect.horizontalPodAutoscaler.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale the vmselect component |
+| vmselect.horizontalPodAutoscaler.metrics | list | `[]` | Metric for HPA to use to scale the vmselect component |
 | vmselect.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vmselect component |
-| vmselect.horizontalPodAutoscaler.metrics | object | `` | Metric for HPA to use to scale the vmselect component |
 | vmselect.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmselect.image.repository | string | `"victoriametrics/vmselect"` | Image repository |
 | vmselect.image.tag | string | `"v1.63.0-cluster"` | Image tag |
@@ -268,7 +268,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
 | vmstorage.persistentVolume.annotations | object | `{}` | Persistent volume annotations |
 | vmstorage.persistentVolume.enabled | bool | `true` | Create/use Persistent Volume Claim for vmstorage component. Empty dir if false. If true,  vmstorage will create/use a Persistent Volume Claim |
-| vmstorage.persistentVolume.storageClass | string | Storage class name. Will be empty if not setted
 | vmstorage.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
 | vmstorage.persistentVolume.mountPath | string | `"/storage"` | Data root path. Vmstorage data Persistent Volume mount root path |
 | vmstorage.persistentVolume.size | string | `"8Gi"` | Size of the volume. Better to set the same as resource limit memory property |
@@ -279,11 +278,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.podManagementPolicy | string | `"OrderedReady"` | Deploy order policy for StatefulSet pods |
 | vmstorage.podSecurityContext | object | `{}` |  |
 | vmstorage.priorityClassName | string | `""` | Name of Priority Class |
-| vmstorage.probe.liveness.failureThreshold | int | `3` |  |
-| vmstorage.probe.liveness.initialDelaySeconds | int | `5` |  |
-| vmstorage.probe.liveness.periodSeconds | int | `15` |  |
+| vmstorage.probe.liveness.failureThreshold | int | `10` |  |
+| vmstorage.probe.liveness.initialDelaySeconds | int | `30` |  |
+| vmstorage.probe.liveness.periodSeconds | int | `30` |  |
+| vmstorage.probe.liveness.tcpSocket.port | string | `"http"` |  |
 | vmstorage.probe.liveness.timeoutSeconds | int | `5` |  |
 | vmstorage.probe.readiness.failureThreshold | int | `3` |  |
+| vmstorage.probe.readiness.httpGet.path | string | `"/health"` |  |
+| vmstorage.probe.readiness.httpGet.port | string | `"http"` |  |
 | vmstorage.probe.readiness.initialDelaySeconds | int | `5` |  |
 | vmstorage.probe.readiness.periodSeconds | int | `15` |  |
 | vmstorage.probe.readiness.timeoutSeconds | int | `5` |  |
@@ -302,3 +304,33 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vmstorage.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
 | vmstorage.tolerations | list | `[]` | Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
+| vmstorage.vmbackupmanager.destination | string | `""` | backup destination at S3, GCS or local filesystem. Pod name will be included to path! |
+| vmstorage.vmbackupmanager.disableDaily | bool | `false` | disable daily backups |
+| vmstorage.vmbackupmanager.disableHourly | bool | `false` | disable hourly backups |
+| vmstorage.vmbackupmanager.disableMonthly | bool | `false` | disable monthly backups |
+| vmstorage.vmbackupmanager.disableWeekly | bool | `false` | disable weekly backups |
+| vmstorage.vmbackupmanager.enable | bool | `false` | enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages |
+| vmstorage.vmbackupmanager.env | list | `[]` |  |
+| vmstorage.vmbackupmanager.eula | bool | `false` | should be true and means that you have the legal right to run a backup manager that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/assets/VM_EULA.pdf |
+| vmstorage.vmbackupmanager.extraArgs."envflag.enable" | string | `"true"` |  |
+| vmstorage.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
+| vmstorage.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
+| vmstorage.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
+| vmstorage.vmbackupmanager.image.tag | string | `"v1.63.0-enterprise"` | vmbackupmanager image tag |
+| vmstorage.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
+| vmstorage.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
+| vmstorage.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |
+| vmstorage.vmbackupmanager.livenessProbe.tcpSocket.port | string | `"manager-http"` |  |
+| vmstorage.vmbackupmanager.livenessProbe.timeoutSeconds | int | `5` |  |
+| vmstorage.vmbackupmanager.readinessProbe.failureThreshold | int | `3` |  |
+| vmstorage.vmbackupmanager.readinessProbe.httpGet.path | string | `"/health"` |  |
+| vmstorage.vmbackupmanager.readinessProbe.httpGet.port | string | `"manager-http"` |  |
+| vmstorage.vmbackupmanager.readinessProbe.initialDelaySeconds | int | `5` |  |
+| vmstorage.vmbackupmanager.readinessProbe.periodSeconds | int | `15` |  |
+| vmstorage.vmbackupmanager.readinessProbe.timeoutSeconds | int | `5` |  |
+| vmstorage.vmbackupmanager.resources | object | `{}` |  |
+| vmstorage.vmbackupmanager.retention | object | `{"keepLastDaily":2,"keepLastHourly":2,"keepLastMonthly":2,"keepLastWeekly":2}` | backups' retention settings |
+| vmstorage.vmbackupmanager.retention.keepLastDaily | int | `2` | keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off |
+| vmstorage.vmbackupmanager.retention.keepLastHourly | int | `2` | keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off |
+| vmstorage.vmbackupmanager.retention.keepLastMonthly | int | `2` | keep last N monthly backups. 0 means delete all existing monthly backups. Specify -1 to turn off |
+| vmstorage.vmbackupmanager.retention.keepLastWeekly | int | `2` | keep last N weekly backups. 0 means delete all existing weekly backups. Specify -1 to turn off |

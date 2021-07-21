@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.3.34](https://img.shields.io/badge/Version-0.3.34-informational?style=flat-square)
+ ![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
@@ -117,7 +117,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.nodeSelector | object | `{}` |  |
 | alertmanager.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
 | alertmanager.persistentVolume.annotations | object | `{}` | Persistant volume annotations |
-| alertmanager.persistentVolume.enabled | bool | `true` | Create/use Persistent Volume Claim for alertmanager component. Empty dir if false |
+| alertmanager.persistentVolume.enabled | bool | `false` | Create/use Persistent Volume Claim for alertmanager component. Empty dir if false |
 | alertmanager.persistentVolume.existingClaim | string | `""` | Existing Claim name. If defined, PVC must be created manually before volume will be bound |
 | alertmanager.persistentVolume.mountPath | string | `"/data"` | Mount path. Alertmanager data Persistent Volume mount root path. |
 | alertmanager.persistentVolume.size | string | `"50Mi"` | Size of the volume. Better to set the same as resource limit memory property. |
