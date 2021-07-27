@@ -13,13 +13,13 @@ metadata:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
 {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 data:
-{{- if .Values.vmsingle.enabled }}  
+{{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled }}  
   datasource.yaml: |-
     apiVersion: 1
     datasources:
     - name: VictoriaMetrics
       type: prometheus
-      {{ include "victoria-metrics-k8s-stack.vmEndpoint" . }}
+      url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
       access: proxy
       isDefault: true
 {{- end }}      

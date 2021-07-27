@@ -95,11 +95,8 @@ alert_condition_map = {
 }
 
 replacement_map = {
-    'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#': {
+    'https://runbooks.prometheus-operator.dev/runbooks': {
         'replacement': '{{ .Values.defaultRules.runbookUrl }}',
-        'init': ''},
-    'https://github.com/prometheus-operator/kube-prometheus/wiki/': {
-        'replacement': '{{ .Values.defaultRules.runbookUrl }}alert-name-',
         'init': ''},
     'job="kube-state-metrics"': {
         'replacement': 'job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"',

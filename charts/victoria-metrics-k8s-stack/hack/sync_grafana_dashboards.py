@@ -45,6 +45,11 @@ charts = [
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
     },
+    {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/cluster/dashboards/clusterbytenant.json',
+        'destination': '../templates/grafana/dashboards',
+        'type': 'json'
+    },
 ]
 
 skip_list = [
@@ -63,6 +68,7 @@ condition_map = {
     'scheduler': ' .Values.kubeScheduler.enabled',
     'node-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
     'node-cluster-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
+    'clusterbytenant': '.Values.vmcluster.enabled'
 }
 
 # standard header
