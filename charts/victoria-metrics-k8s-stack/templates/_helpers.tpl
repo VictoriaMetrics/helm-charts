@@ -82,13 +82,61 @@ app.kubernetes.io/name: {{ include "victoria-metrics-k8s-stack.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
-{{/*
-VM endpoint
-*/}}
-{{- define "victoria-metrics-k8s-stack.vmEndpoint" -}}
+
+{{- define "victoria-metrics-k8s-stack.vmSelectEndpoint" -}}
 {{- if .Values.vmsingle.enabled -}}
-url: "http://{{ include "victoria-metrics-k8s-stack.vmsingleName" .}}.{{ .Release.Namespace }}.svc:{{ .Values.vmsingle.spec.port | default 8429 }}"
+{{ printf "http://%s.%s.svc:%d" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default 8429) }}
 {{- end }}
+{{- if .Values.vmcluster.enabled -}}
+{{ printf "http://%s-%s.%s.svc:%d/select/0/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default 8481) }}
+{{- end }}
+{{- end }}
+
+{{- define "victoria-metrics-k8s-stack.vmInsertEndpoint" -}}
+{{- if .Values.vmsingle.enabled -}}
+{{ printf "http://%s.%s.svc:%d" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default 8429) }}
+{{- end }}
+{{- if .Values.vmcluster.enabled -}}
+{{ printf "http://%s-%s.%s.svc:%d/insert/0" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default 8480) }}
+{{- end }}
+{{- end }}
+
+
+{{/*
+VMAlert remotes 
+*/}}
+{{- define "victoria-metrics-k8s-stack.vmAlertRemotes" -}}
+remoteWrite:
+    - url: {{ include "victoria-metrics-k8s-stack.vmInsertEndpoint" . }}
+remoteRead:
+    - url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
+datasource:
+    - url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
+notifier:
+    - url: {{ printf "http://%s-%s.%s.svc:9093" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace }}
+{{- end }}
+
+{{/*
+VMAlert spec
+*/}}
+{{- define "victoria-metrics-k8s-stack.vmAlertSpec" -}}
+{{ deepCopy .Values.vmalert.spec | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertRemotes" . | fromYaml) | toYaml }}
+{{- end }}
+
+
+{{/*
+VM Agent remoteWrite
+*/}}
+{{- define "victoria-metrics-k8s-stack.vmAgentRemoteWrite" -}}
+remoteWrite:
+    - url: {{ include "victoria-metrics-k8s-stack.vmInsertEndpoint" . }}/api/v1/write
+{{- end }}
+
+{{/*
+VMAgent spec
+*/}}
+{{- define "victoria-metrics-k8s-stack.vmAgentSpec" -}}
+{{ deepCopy .Values.vmagent.spec | mergeOverwrite ( include "victoria-metrics-k8s-stack.vmAgentRemoteWrite" . | fromYaml) | toYaml }}
 {{- end }}
 
 
@@ -108,31 +156,4 @@ configMaps:
 - {{ . }}
 {{- end }}
 {{- end }}
-{{- end }}
-
-{{/*
-VMAlert spec
-*/}}
-{{- define "victoria-metrics-k8s-stack.vmAlertSpec" -}}
-{{- $vmAlertStackRemoteWrite := dict "remoteWrite" ( include "victoria-metrics-k8s-stack.vmEndpoint" . | fromYaml ) -}}
-{{- $vmAlertStackRemoteRead := dict "remoteRead" ( include "victoria-metrics-k8s-stack.vmEndpoint" . | fromYaml ) -}}
-{{- $vmAlertStackDatasource := dict "datasource" ( include "victoria-metrics-k8s-stack.vmEndpoint" . | fromYaml ) -}}
-{{- $vmAlertStackNotifier := dict "notifier"  ( dict "url" ( printf "http://vmalertmanager-%s.%s.svc:9093" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace ) ) -}}
-{{ deepCopy .Values.vmalert.spec | mergeOverwrite $vmAlertStackRemoteWrite $vmAlertStackRemoteRead $vmAlertStackDatasource $vmAlertStackNotifier | toYaml }}
-{{- end }}
-
-
-{{/*
-VM remoteWrite
-*/}}
-{{- define "victoria-metrics-k8s-stack.vmAgentRemoteWrite" -}}
-remoteWrite:
-    - url: "http://{{ .Values.vmsingle.name | default (printf "vmsingle-%s" (include "victoria-metrics-k8s-stack.fullname" .))}}.{{ .Release.Namespace }}.svc:{{ .Values.vmsingle.spec.port | default 8429 }}/api/v1/write"
-{{- end }}
-
-{{/*
-VMAgent spec
-*/}}
-{{- define "victoria-metrics-k8s-stack.vmAgentSpec" -}}
-{{ deepCopy .Values.vmagent.spec | mergeOverwrite ( include "victoria-metrics-k8s-stack.vmAgentRemoteWrite" . | fromYaml ) | toYaml }}
 {{- end }}
