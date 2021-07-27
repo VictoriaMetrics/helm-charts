@@ -27,13 +27,16 @@ spec:
     - alert: KubePersistentVolumeFillingUp
       annotations:
         description: The PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} is only {{`{{`}} $value | humanizePercentage {{`}}`}} free.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-kubepersistentvolumefillingup
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/kubepersistentvolumefillingup
         summary: PersistentVolume is filling up.
       expr: |-
-        kubelet_volume_stats_available_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
-          /
-        kubelet_volume_stats_capacity_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
-          < 0.03
+        (
+          kubelet_volume_stats_available_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
+            /
+          kubelet_volume_stats_capacity_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
+        ) < 0.03
+        and
+        kubelet_volume_stats_used_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"} > 0
       for: 1m
       labels:
         severity: critical
@@ -43,7 +46,7 @@ spec:
     - alert: KubePersistentVolumeFillingUp
       annotations:
         description: Based on recent sampling, the PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} is expected to fill up within four days. Currently {{`{{`}} $value | humanizePercentage {{`}}`}} is available.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-kubepersistentvolumefillingup
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/kubepersistentvolumefillingup
         summary: PersistentVolume is filling up.
       expr: |-
         (
@@ -51,6 +54,8 @@ spec:
             /
           kubelet_volume_stats_capacity_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
         ) < 0.15
+        and
+        kubelet_volume_stats_used_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"} > 0
         and
         predict_linear(kubelet_volume_stats_available_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}[6h], 4 * 24 * 3600) < 0
       for: 1h
@@ -62,7 +67,7 @@ spec:
     - alert: KubePersistentVolumeErrors
       annotations:
         description: The persistent volume {{`{{`}} $labels.persistentvolume {{`}}`}} has status {{`{{`}} $labels.phase {{`}}`}}.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-kubepersistentvolumeerrors
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/kubepersistentvolumeerrors
         summary: PersistentVolume is having issues with provisioning.
       expr: kube_persistentvolume_status_phase{phase=~"Failed|Pending",job="kube-state-metrics"} > 0
       for: 5m

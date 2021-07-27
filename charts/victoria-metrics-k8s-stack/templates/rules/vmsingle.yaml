@@ -31,16 +31,16 @@ spec:
         description: "Taking into account current ingestion rate, free disk space will be enough only for {{`{{`}} $value | humanizeDuration {{`}}`}} on instance {{`{{`}} $labels.instance {{`}}`}}.\n Consider to limit the ingestion rate, decrease retention or scale the disk space if possible."
         summary: Instance {{`{{`}} $labels.instance {{`}}`}} will run out of disk space soon
       expr: |-
-        vm_free_disk_space_bytes / ignoring(path) (
-         (
-          sum(rate(vm_rows_added_to_storage_total[1d])) -
-          sum(rate(vm_deduplicated_samples_total[1d])) without(type)
-         )
-        *
-         (
-          sum(vm_data_size_bytes{type!="indexdb"}) /
-          sum(vm_rows{type!="indexdb"})
-         )
+        vm_free_disk_space_bytes / ignoring(path)
+        (
+           (
+            rate(vm_rows_added_to_storage_total[1d]) -
+            ignoring(type) rate(vm_deduplicated_samples_total{type="merge"}[1d])
+           )
+          * scalar(
+            sum(vm_data_size_bytes{type!="indexdb"}) /
+            sum(vm_rows{type!="indexdb"})
+           )
         ) < 3 * 24 * 3600
       for: 30m
       labels:
@@ -171,6 +171,18 @@ spec:
       for: 5m
       labels:
         severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: LabelsLimitExceededOnIngestion
+      annotations:
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=74&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        description: "VictoriaMetrics limits the number of labels per each metric with `-maxLabelsPerTimeseries` command-line flag.\n This prevents from ingesting metrics with too many labels. Please verify that `-maxLabelsPerTimeseries` is configured correctly or that clients which send these metrics aren't misbehaving."
+        summary: Metrics ingested in ({{`{{`}} $labels.instance {{`}}`}}) are exceeding labels limit
+      expr: sum(increase(vm_metrics_with_dropped_labels_total[5m])) by (instance) > 0
+      for: 15m
+      labels:
+        severity: warning
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
