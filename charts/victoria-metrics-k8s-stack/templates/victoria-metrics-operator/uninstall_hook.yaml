@@ -1,4 +1,5 @@
-{{- if and .Values.operator.cleanupCRD }}
+{{- if .Values.operator.enabled }}
+{{- if .Values.operator.cleanupCRD }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -28,6 +29,7 @@ spec:
               kubectl delete vmagents --all --ignore-not-found=true;
               kubectl delete vmsingles --all --ignore-not-found=true;
               kubectl delete vmalertmanagers --all --ignore-not-found=true;
+              kubectl delete vmclusters --all --ignore-not-found=true;
       restartPolicy: OnFailure
 ---
 {{- if .Values.operator.cleanupSA.create }}
@@ -65,8 +67,10 @@ rules:
       - vmalerts
       - vmsingles
       - vmalertmanagers
+      - vmclusters
     verbs: ["get", "list", "watch","delete"]
 ---
 {{- end }}
 ---
+{{- end }}
 {{- end }}
