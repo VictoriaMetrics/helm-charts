@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.9](https://img.shields.io/badge/Version-0.2.9-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -252,6 +252,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.tls | list | `[]` |  |
 | alertmanager.monzoTemplate.enabled | bool | `true` |  |
 | alertmanager.spec.externalURL | string | `""` |  |
+| alertmanager.spec.image.tag | string | `"v0.22.2"` |  |
 | alertmanager.spec.routePrefix | string | `"/"` |  |
 | coreDns.enabled | bool | `true` |  |
 | coreDns.service.enabled | bool | `true` |  |
@@ -282,7 +283,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rules.kubernetesSystem | bool | `true` |  |
 | defaultRules.rules.network | bool | `true` |  |
 | defaultRules.rules.node | bool | `true` |  |
-| defaultRules.runbookUrl | string | `"https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#"` |  |
+| defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` |  |
 | fullnameOverride | string | `""` |  |
 | grafana.additionalDataSources | list | `[]` |  |
 | grafana.dashboardProviders."dashboardproviders.yaml".apiVersion | int | `1` |  |
@@ -390,6 +391,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | operator.cleanupCRD | bool | `true` |  |
 | operator.cleanupSA.create | bool | `true` |  |
 | operator.cleanupSA.name | string | `""` |  |
+| operator.enabled | bool | `true` |  |
 | operator.kubectlImage.pullPolicy | string | `"IfNotPresent"` |  |
 | operator.kubectlImage.repository | string | `"gcr.io/google_containers/hyperkube"` |  |
 | operator.kubectlImage.tag | string | `"v1.16.0"` |  |
@@ -415,6 +417,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.ingress.tls | list | `[]` |  |
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
+| vmagent.spec.image.tag | string | `"v1.63.0"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
 | vmalert.enabled | bool | `true` |  |
 | vmalert.ingress.annotations | object | `{}` |  |
@@ -426,6 +429,54 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.ingress.pathType | string | `"Prefix"` |  |
 | vmalert.ingress.tls | list | `[]` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
+| vmalert.spec.image.tag | string | `"v1.63.0"` |  |
+| vmcluster.enabled | bool | `false` |  |
+| vmcluster.ingress.insert.annotations | object | `{}` |  |
+| vmcluster.ingress.insert.enabled | bool | `false` |  |
+| vmcluster.ingress.insert.extraPaths | list | `[]` |  |
+| vmcluster.ingress.insert.hosts[0] | string | `"vminsert.domain.com"` |  |
+| vmcluster.ingress.insert.labels | object | `{}` |  |
+| vmcluster.ingress.insert.path | string | `"/"` |  |
+| vmcluster.ingress.insert.pathType | string | `"Prefix"` |  |
+| vmcluster.ingress.insert.tls | list | `[]` |  |
+| vmcluster.ingress.select.annotations | object | `{}` |  |
+| vmcluster.ingress.select.enabled | bool | `false` |  |
+| vmcluster.ingress.select.extraPaths | list | `[]` |  |
+| vmcluster.ingress.select.hosts[0] | string | `"vmselect.domain.com"` |  |
+| vmcluster.ingress.select.labels | object | `{}` |  |
+| vmcluster.ingress.select.path | string | `"/"` |  |
+| vmcluster.ingress.select.pathType | string | `"Prefix"` |  |
+| vmcluster.ingress.select.tls | list | `[]` |  |
+| vmcluster.ingress.storage.annotations | object | `{}` |  |
+| vmcluster.ingress.storage.enabled | bool | `false` |  |
+| vmcluster.ingress.storage.extraPaths | list | `[]` |  |
+| vmcluster.ingress.storage.hosts[0] | string | `"vmstorage.domain.com"` |  |
+| vmcluster.ingress.storage.labels | object | `{}` |  |
+| vmcluster.ingress.storage.path | string | `"/"` |  |
+| vmcluster.ingress.storage.pathType | string | `"Prefix"` |  |
+| vmcluster.ingress.storage.tls | list | `[]` |  |
+| vmcluster.spec.replicationFactor | int | `2` |  |
+| vmcluster.spec.retentionPeriod | string | `"14"` |  |
+| vmcluster.spec.vminsert.image.tag | string | `"v1.63.0-cluster"` |  |
+| vmcluster.spec.vminsert.replicaCount | int | `2` |  |
+| vmcluster.spec.vminsert.resources.limits.cpu | string | `"1"` |  |
+| vmcluster.spec.vminsert.resources.limits.memory | string | `"1000Mi"` |  |
+| vmcluster.spec.vminsert.resources.requests.cpu | string | `"0.5"` |  |
+| vmcluster.spec.vminsert.resources.requests.memory | string | `"500Mi"` |  |
+| vmcluster.spec.vmselect.cacheMountPath | string | `"/select-cache"` |  |
+| vmcluster.spec.vmselect.image.tag | string | `"v1.63.0-cluster"` |  |
+| vmcluster.spec.vmselect.replicaCount | int | `2` |  |
+| vmcluster.spec.vmselect.resources.limits.cpu | string | `"1"` |  |
+| vmcluster.spec.vmselect.resources.limits.memory | string | `"1000Mi"` |  |
+| vmcluster.spec.vmselect.resources.requests.cpu | string | `"0.5"` |  |
+| vmcluster.spec.vmselect.resources.requests.memory | string | `"500Mi"` |  |
+| vmcluster.spec.vmselect.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"2Gi"` |  |
+| vmcluster.spec.vmstorage.image.tag | string | `"v1.63.0-cluster"` |  |
+| vmcluster.spec.vmstorage.replicaCount | int | `2` |  |
+| vmcluster.spec.vmstorage.resources.limits.cpu | string | `"1"` |  |
+| vmcluster.spec.vmstorage.resources.limits.memory | string | `"1500Mi"` |  |
+| vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
+| vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
 | vmsingle.enabled | bool | `true` |  |
 | vmsingle.ingress.annotations | object | `{}` |  |
 | vmsingle.ingress.enabled | bool | `false` |  |
@@ -435,6 +486,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmsingle.ingress.path | string | `"/"` |  |
 | vmsingle.ingress.pathType | string | `"Prefix"` |  |
 | vmsingle.ingress.tls | list | `[]` |  |
+| vmsingle.spec.image.tag | string | `"v1.63.0"` |  |
 | vmsingle.spec.replicaCount | int | `1` |  |
 | vmsingle.spec.retentionPeriod | string | `"14"` |  |
 | vmsingle.spec.storage.accessModes[0] | string | `"ReadWriteOnce"` |  |
