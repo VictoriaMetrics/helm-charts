@@ -107,12 +107,12 @@ VMAlert remotes
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAlertRemotes" -}}
 remoteWrite:
-    - url: {{ include "victoria-metrics-k8s-stack.vmInsertEndpoint" . }}
+     url: {{ include "victoria-metrics-k8s-stack.vmInsertEndpoint" . }}
 remoteRead:
-    - url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
+     url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
 datasource:
-    - url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
-notifier:
+     url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
+notifiers:
     - url: {{ printf "http://%s-%s.%s.svc:9093" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace }}
 {{- end }}
 
