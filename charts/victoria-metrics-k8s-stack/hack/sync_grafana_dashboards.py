@@ -68,7 +68,7 @@ condition_map = {
     'scheduler': ' .Values.kubeScheduler.enabled',
     'node-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
     'node-cluster-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
-    'clusterbytenant': '.Values.vmcluster.enabled'
+    'clusterbytenant': ' .Values.vmcluster.enabled'
 }
 
 # standard header
