@@ -44,4 +44,26 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+    - alert: ProcessNearFDLimits
+      annotations:
+        description: Exhausting OS file descriptors limit can cause severe degradation of the process. Consider to increase the limit as fast as possible.
+        summary: Number of free file descriptors is less than 100 for "{{`{{`}} $labels.job {{`}}`}}"("{{`{{`}} $labels.instance {{`}}`}}") for the last 5m
+      expr: (process_max_fds - process_open_fds) < 100
+      for: 5m
+      labels:
+        severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: TooHighMemoryUsage
+      annotations:
+        description: Too high memory usage may result into multiple issues such as OOMs or degraded performance. Consider to either increase available memory or decrease the load on the process.
+        summary: It is more than 90% of memory used by "{{`{{`}} $labels.job {{`}}`}}"("{{`{{`}} $labels.instance {{`}}`}}") during the last 5m
+      expr: (process_resident_memory_anon_bytes / vm_available_memory_bytes) > 0.9
+      for: 5m
+      labels:
+        severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
