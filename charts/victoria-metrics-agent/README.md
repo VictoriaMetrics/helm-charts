@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.7.21](https://img.shields.io/badge/Version-0.7.21-informational?style=flat-square)
+ ![Version: 0.7.22](https://img.shields.io/badge/Version-0.7.22-informational?style=flat-square)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
@@ -286,6 +286,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.extraLabels | object | `{}` |  |
 | ingress.hosts | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
+| multiTenantUrls | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
