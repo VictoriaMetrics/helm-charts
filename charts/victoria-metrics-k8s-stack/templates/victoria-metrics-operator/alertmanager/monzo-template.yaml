@@ -87,30 +87,6 @@ data:
         {{- end }}
     {{- end }}
 
-    {{- /* If none of the below matches, send to #monitoring-no-owner, and we 
-    can then assign the expected code_owner to the alert or map the code_owner
-    to the correct channel */ -}}
-    {{ define "__get_channel_for_code_owner" -}}
-        {{- if eq . "platform-team" -}}
-            platform-alerts
-        {{- else if eq . "security-team" -}}
-            security-alerts
-        {{- else -}}
-            monitoring-no-owner
-        {{- end -}}
-    {{- end }}
-
-    {{- /* Select the channel based on the code_owner. We only expect to get
-    into this template function if the code_owners label is present on an alert.
-    This is to defend against us accidentally breaking the routing logic. */ -}}
-    {{ define "slack.monzo.code_owner_channel" -}}
-        {{- if .CommonLabels.code_owner }}
-            {{ template "__get_channel_for_code_owner" .CommonLabels.code_owner }}
-        {{- else -}}
-            monitoring
-        {{- end }}
-    {{- end }}
-
     {{ define "slack.monzo.link_button_text" -}}
         {{- if .CommonAnnotations.link_text -}}
             {{- .CommonAnnotations.link_text -}}
