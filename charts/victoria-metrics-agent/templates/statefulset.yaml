@@ -49,6 +49,9 @@ spec:
           {{- range $key, $value := .Values.remoteWriteUrls }}
             - -remoteWrite.url={{ $value }}
           {{- end }}
+          {{- range $key, $value := .Values.multiTenantUrls }}
+            - -remoteWrite.multitenantURL={{ $value }}
+          {{- end }}
           {{- range $key, $value := .Values.extraArgs }}
             - -{{ $key }}={{ $value }}
           {{- end }}
