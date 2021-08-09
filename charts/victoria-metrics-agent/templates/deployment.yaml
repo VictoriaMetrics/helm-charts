@@ -45,8 +45,11 @@ spec:
           args:
             - -promscrape.config=/config/scrape.yml
             - -remoteWrite.tmpDataPath=/tmpData
-          {{- range $key, $value := .Values.remoteWriteUrls }}
-            - -remoteWrite.url={{ $value }}
+          {{- range .Values.remoteWriteUrls }}
+            - -remoteWrite.url={{ . }}
+          {{- end }}
+          {{- range .Values.multiTenantUrls }}
+            - -remoteWrite.multitenantURL={{ . }}
           {{- end }}
           {{- range $key, $value := .Values.extraArgs }}
             - -{{ $key }}={{ $value }}

@@ -7,8 +7,8 @@ Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operato
 # Title
 * [Prerequisites](#Prerequisites)
 * [Dependencies](#Dependencies)
-* [Quick Start](#How-to-install)
-* [Uninstall](#How-to-uninstall)
+* [Quick Start](#How to install)
+* [Uninstall](#How to uninstall)
 * [Version Upgrade](#Upgrade-guide)
 * [Troubleshooting](#Troubleshooting)
 * [Values](#Parameters)
