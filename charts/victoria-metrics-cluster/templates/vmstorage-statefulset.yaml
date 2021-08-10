@@ -184,8 +184,14 @@ spec:
         {{- if not .Values.vmstorage.persistentVolume.enabled }}
         - name: vmstorage-volume
           emptyDir: {}
+        {{- else }}
+        {{- if .Values.vmstorage.persistentVolume.existingClaim }}
+        - name: vmstorage-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.vmstorage.persistentVolume.existingClaim }}
         {{- end }}
-  {{- if .Values.vmstorage.persistentVolume.enabled }}
+        {{- end }}
+  {{- if and .Values.vmstorage.persistentVolume.enabled (not .Values.vmstorage.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
     - metadata:
         name: vmstorage-volume
