@@ -2,7 +2,7 @@
 {{ if .Values.vminsert.enabled }}
 Write API:
 
-The Victoria Metrics write api can be accessed via port {{ .Values.vminsert.service.servicePort }} on the following DNS name from within your cluster:
+The Victoria Metrics write api can be accessed via port {{ .Values.vminsert.service.servicePort }} with the following DNS name from within your cluster:
 {{ template "victoria-metrics.vminsert.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomainSuffix }}
 
 Get the Victoria Metrics insert service URL by running these commands in the same shell:
@@ -40,7 +40,7 @@ for example -  inside the Kubernetes cluster:
 {{- if .Values.vmselect.enabled }}
 Read API:
 
-The VictoriaMetrics read api can be accessed via port {{ .Values.vmselect.service.servicePort }} on the following DNS name from within your cluster:
+The VictoriaMetrics read api can be accessed via port {{ .Values.vmselect.service.servicePort }} with the following DNS name from within your cluster:
 {{ template "victoria-metrics.vmselect.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomainSuffix }}
 
 Get the VictoriaMetrics select service URL by running these commands in the same shell:
@@ -59,10 +59,10 @@ Get the VictoriaMetrics select service URL by running these commands in the same
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.vmselect.service.servicePort }}
 {{- end }}
 
-You need to specify select service URL in your Grafana:
- NOTE: you need to use Prometheus Data Source
+You need to specify select service URL into your Grafana:
+ NOTE: you need to use the Prometheus Data Source
 
-Input this URL field in Grafana
+Input this URL field into Grafana
 
     http://<select-service>/select/0/prometheus/
 
