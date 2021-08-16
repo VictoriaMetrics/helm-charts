@@ -18,23 +18,30 @@ metadata:
 data:
   node-cluster-rsrc-use.json: |-
     {
+        "__inputs": [
+
+        ],
+        "__requires": [
+
+        ],
         "annotations": {
             "list": [
 
             ]
         },
-        "editable": true,
+        "editable": false,
         "gnetId": null,
-        "graphTooltip": 0,
+        "graphTooltip": 1,
         "hideControls": false,
+        "id": null,
         "links": [
 
         ],
-        "refresh": "10s",
+        "refresh": "30s",
         "rows": [
             {
                 "collapse": false,
-                "height": "250px",
+                "collapsed": false,
                 "panels": [
                     {
                         "aliasColors": {
@@ -45,26 +52,34 @@ data:
                         "dashes": false,
                         "datasource": "$datasource",
                         "fill": 10,
-                        "id": 1,
+                        "fillGradient": 0,
+                        "gridPos": {
+
+                        },
+                        "id": 2,
                         "legend": {
+                            "alignAsTable": false,
                             "avg": false,
                             "current": false,
                             "max": false,
                             "min": false,
-                            "show": true,
+                            "rightSide": false,
+                            "show": false,
+                            "sideWidth": null,
                             "total": false,
                             "values": false
                         },
                         "lines": true,
-                        "linewidth": 0,
+                        "linewidth": 1,
                         "links": [
 
                         ],
-                        "nullPointMode": "null as zero",
+                        "nullPointMode": "null",
                         "percentage": false,
                         "pointradius": 5,
                         "points": false,
                         "renderer": "flot",
+                        "repeat": null,
                         "seriesOverrides": [
 
                         ],
@@ -74,12 +89,11 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "(\n  instance:node_cpu_utilisation:rate5m{job=\"node-exporter\"}\n*\n  instance:node_num_cpu:sum{job=\"node-exporter\"}\n)\n/ scalar(sum(instance:node_num_cpu:sum{job=\"node-exporter\"}))\n",
+                                "expr": "((\n  instance:node_cpu_utilisation:rate5m{job=\"node-exporter\", cluster=\"$cluster\"}\n  *\n  instance:node_num_cpu:sum{job=\"node-exporter\", cluster=\"$cluster\"}\n) != 0 )\n/ scalar(sum(instance:node_num_cpu:sum{job=\"node-exporter\", cluster=\"$cluster\"}))\n",
                                 "format": "time_series",
                                 "intervalFactor": 2,
-                                "legendFormat": "{{`{{`}}instance{{`}}`}}",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "legendFormat": "{{`{{`}} instance {{`}}`}}",
+                                "refId": "A"
                             }
                         ],
                         "thresholds": [
@@ -89,8 +103,8 @@ data:
                         "timeShift": null,
                         "title": "CPU Utilisation",
                         "tooltip": {
-                            "shared": false,
-                            "sort": 0,
+                            "shared": true,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -108,17 +122,17 @@ data:
                                 "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
-                                "max": 1,
-                                "min": 0,
+                                "max": null,
+                                "min": null,
                                 "show": true
                             },
                             {
-                                "format": "short",
+                                "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
                                 "max": null,
                                 "min": null,
-                                "show": false
+                                "show": true
                             }
                         ]
                     },
@@ -131,26 +145,34 @@ data:
                         "dashes": false,
                         "datasource": "$datasource",
                         "fill": 10,
-                        "id": 2,
+                        "fillGradient": 0,
+                        "gridPos": {
+
+                        },
+                        "id": 3,
                         "legend": {
+                            "alignAsTable": false,
                             "avg": false,
                             "current": false,
                             "max": false,
                             "min": false,
-                            "show": true,
+                            "rightSide": false,
+                            "show": false,
+                            "sideWidth": null,
                             "total": false,
                             "values": false
                         },
                         "lines": true,
-                        "linewidth": 0,
+                        "linewidth": 1,
                         "links": [
 
                         ],
-                        "nullPointMode": "null as zero",
+                        "nullPointMode": "null",
                         "percentage": false,
                         "pointradius": 5,
                         "points": false,
                         "renderer": "flot",
+                        "repeat": null,
                         "seriesOverrides": [
 
                         ],
@@ -160,12 +182,11 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "instance:node_load1_per_cpu:ratio{job=\"node-exporter\"}\n/ scalar(count(instance:node_load1_per_cpu:ratio{job=\"node-exporter\"}))\n",
+                                "expr": "(\n  instance:node_load1_per_cpu:ratio{job=\"node-exporter\", cluster=\"$cluster\"}\n  / scalar(count(instance:node_load1_per_cpu:ratio{job=\"node-exporter\", cluster=\"$cluster\"}))\n)  != 0\n",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}}",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "refId": "A"
                             }
                         ],
                         "thresholds": [
@@ -173,10 +194,10 @@ data:
                         ],
                         "timeFrom": null,
                         "timeShift": null,
-                        "title": "CPU Saturation (load1 per CPU)",
+                        "title": "CPU Saturation (Load1 per CPU)",
                         "tooltip": {
-                            "shared": false,
-                            "sort": 0,
+                            "shared": true,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -194,17 +215,17 @@ data:
                                 "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
-                                "max": 1,
-                                "min": 0,
+                                "max": null,
+                                "min": null,
                                 "show": true
                             },
                             {
-                                "format": "short",
+                                "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
                                 "max": null,
                                 "min": null,
-                                "show": false
+                                "show": true
                             }
                         ]
                     }
@@ -214,11 +235,12 @@ data:
                 "repeatRowId": null,
                 "showTitle": true,
                 "title": "CPU",
-                "titleSize": "h6"
+                "titleSize": "h6",
+                "type": "row"
             },
             {
                 "collapse": false,
-                "height": "250px",
+                "collapsed": false,
                 "panels": [
                     {
                         "aliasColors": {
@@ -229,26 +251,34 @@ data:
                         "dashes": false,
                         "datasource": "$datasource",
                         "fill": 10,
-                        "id": 3,
+                        "fillGradient": 0,
+                        "gridPos": {
+
+                        },
+                        "id": 4,
                         "legend": {
+                            "alignAsTable": false,
                             "avg": false,
                             "current": false,
                             "max": false,
                             "min": false,
-                            "show": true,
+                            "rightSide": false,
+                            "show": false,
+                            "sideWidth": null,
                             "total": false,
                             "values": false
                         },
                         "lines": true,
-                        "linewidth": 0,
+                        "linewidth": 1,
                         "links": [
 
                         ],
-                        "nullPointMode": "null as zero",
+                        "nullPointMode": "null",
                         "percentage": false,
                         "pointradius": 5,
                         "points": false,
                         "renderer": "flot",
+                        "repeat": null,
                         "seriesOverrides": [
 
                         ],
@@ -258,12 +288,11 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "instance:node_memory_utilisation:ratio{job=\"node-exporter\"}\n/ scalar(count(instance:node_memory_utilisation:ratio{job=\"node-exporter\"}))\n",
+                                "expr": "(\n  instance:node_memory_utilisation:ratio{job=\"node-exporter\", cluster=\"$cluster\"}\n  / scalar(count(instance:node_memory_utilisation:ratio{job=\"node-exporter\", cluster=\"$cluster\"}))\n) != 0\n",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}}",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "refId": "A"
                             }
                         ],
                         "thresholds": [
@@ -273,8 +302,8 @@ data:
                         "timeShift": null,
                         "title": "Memory Utilisation",
                         "tooltip": {
-                            "shared": false,
-                            "sort": 0,
+                            "shared": true,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -292,17 +321,17 @@ data:
                                 "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
-                                "max": 1,
-                                "min": 0,
+                                "max": null,
+                                "min": null,
                                 "show": true
                             },
                             {
-                                "format": "short",
+                                "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
                                 "max": null,
                                 "min": null,
-                                "show": false
+                                "show": true
                             }
                         ]
                     },
@@ -315,26 +344,34 @@ data:
                         "dashes": false,
                         "datasource": "$datasource",
                         "fill": 10,
-                        "id": 4,
+                        "fillGradient": 0,
+                        "gridPos": {
+
+                        },
+                        "id": 5,
                         "legend": {
+                            "alignAsTable": false,
                             "avg": false,
                             "current": false,
                             "max": false,
                             "min": false,
-                            "show": true,
+                            "rightSide": false,
+                            "show": false,
+                            "sideWidth": null,
                             "total": false,
                             "values": false
                         },
                         "lines": true,
-                        "linewidth": 0,
+                        "linewidth": 1,
                         "links": [
 
                         ],
-                        "nullPointMode": "null as zero",
+                        "nullPointMode": "null",
                         "percentage": false,
                         "pointradius": 5,
                         "points": false,
                         "renderer": "flot",
+                        "repeat": null,
                         "seriesOverrides": [
 
                         ],
@@ -344,12 +381,11 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "instance:node_vmstat_pgmajfault:rate5m{job=\"node-exporter\"}",
+                                "expr": "instance:node_vmstat_pgmajfault:rate5m{job=\"node-exporter\", cluster=\"$cluster\"}",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}}",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "refId": "A"
                             }
                         ],
                         "thresholds": [
@@ -359,8 +395,8 @@ data:
                         "timeShift": null,
                         "title": "Memory Saturation (Major Page Faults)",
                         "tooltip": {
-                            "shared": false,
-                            "sort": 0,
+                            "shared": true,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -375,20 +411,20 @@ data:
                         },
                         "yaxes": [
                             {
-                                "format": "rps",
-                                "label": null,
-                                "logBase": 1,
-                                "max": null,
-                                "min": 0,
-                                "show": true
-                            },
-                            {
-                                "format": "short",
+                                "format": "rds",
                                 "label": null,
                                 "logBase": 1,
                                 "max": null,
                                 "min": null,
-                                "show": false
+                                "show": true
+                            },
+                            {
+                                "format": "rds",
+                                "label": null,
+                                "logBase": 1,
+                                "max": null,
+                                "min": null,
+                                "show": true
                             }
                         ]
                     }
@@ -398,11 +434,12 @@ data:
                 "repeatRowId": null,
                 "showTitle": true,
                 "title": "Memory",
-                "titleSize": "h6"
+                "titleSize": "h6",
+                "type": "row"
             },
             {
                 "collapse": false,
-                "height": "250px",
+                "collapsed": false,
                 "panels": [
                     {
                         "aliasColors": {
@@ -413,33 +450,41 @@ data:
                         "dashes": false,
                         "datasource": "$datasource",
                         "fill": 10,
-                        "id": 5,
+                        "fillGradient": 0,
+                        "gridPos": {
+
+                        },
+                        "id": 6,
                         "legend": {
+                            "alignAsTable": false,
                             "avg": false,
                             "current": false,
                             "max": false,
                             "min": false,
-                            "show": true,
+                            "rightSide": false,
+                            "show": false,
+                            "sideWidth": null,
                             "total": false,
                             "values": false
                         },
                         "lines": true,
-                        "linewidth": 0,
+                        "linewidth": 1,
                         "links": [
 
                         ],
-                        "nullPointMode": "null as zero",
+                        "nullPointMode": "null",
                         "percentage": false,
                         "pointradius": 5,
                         "points": false,
                         "renderer": "flot",
+                        "repeat": null,
                         "seriesOverrides": [
                             {
-                                "alias": "/ Receive/",
+                                "alias": "/Receive/",
                                 "stack": "A"
                             },
                             {
-                                "alias": "/ Transmit/",
+                                "alias": "/Transmit/",
                                 "stack": "B",
                                 "transform": "negative-Y"
                             }
@@ -450,20 +495,18 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "instance:node_network_receive_bytes_excluding_lo:rate5m{job=\"node-exporter\"}",
+                                "expr": "instance:node_network_receive_bytes_excluding_lo:rate5m{job=\"node-exporter\", cluster=\"$cluster\"} != 0",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}} Receive",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "refId": "A"
                             },
                             {
-                                "expr": "instance:node_network_transmit_bytes_excluding_lo:rate5m{job=\"node-exporter\"}",
+                                "expr": "instance:node_network_transmit_bytes_excluding_lo:rate5m{job=\"node-exporter\", cluster=\"$cluster\"} != 0",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}} Transmit",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "refId": "B"
                             }
                         ],
                         "thresholds": [
@@ -471,10 +514,10 @@ data:
                         ],
                         "timeFrom": null,
                         "timeShift": null,
-                        "title": "Net Utilisation (Bytes Receive/Transmit)",
+                        "title": "Network Utilisation (Bytes Receive/Transmit)",
                         "tooltip": {
-                            "shared": false,
-                            "sort": 0,
+                            "shared": true,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -497,12 +540,12 @@ data:
                                 "show": true
                             },
                             {
-                                "format": "short",
+                                "format": "Bps",
                                 "label": null,
                                 "logBase": 1,
                                 "max": null,
                                 "min": null,
-                                "show": false
+                                "show": true
                             }
                         ]
                     },
@@ -515,26 +558,34 @@ data:
                         "dashes": false,
                         "datasource": "$datasource",
                         "fill": 10,
-                        "id": 6,
+                        "fillGradient": 0,
+                        "gridPos": {
+
+                        },
+                        "id": 7,
                         "legend": {
+                            "alignAsTable": false,
                             "avg": false,
                             "current": false,
                             "max": false,
                             "min": false,
-                            "show": true,
+                            "rightSide": false,
+                            "show": false,
+                            "sideWidth": null,
                             "total": false,
                             "values": false
                         },
                         "lines": true,
-                        "linewidth": 0,
+                        "linewidth": 1,
                         "links": [
 
                         ],
-                        "nullPointMode": "null as zero",
+                        "nullPointMode": "null",
                         "percentage": false,
                         "pointradius": 5,
                         "points": false,
                         "renderer": "flot",
+                        "repeat": null,
                         "seriesOverrides": [
                             {
                                 "alias": "/ Receive/",
@@ -552,20 +603,18 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "instance:node_network_receive_drop_excluding_lo:rate5m{job=\"node-exporter\"}",
+                                "expr": "instance:node_network_receive_drop_excluding_lo:rate5m{job=\"node-exporter\", cluster=\"$cluster\"} != 0",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}} Receive",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "refId": "A"
                             },
                             {
-                                "expr": "instance:node_network_transmit_drop_excluding_lo:rate5m{job=\"node-exporter\"}",
+                                "expr": "instance:node_network_transmit_drop_excluding_lo:rate5m{job=\"node-exporter\", cluster=\"$cluster\"} != 0",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}} Transmit",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "refId": "B"
                             }
                         ],
                         "thresholds": [
@@ -573,10 +622,10 @@ data:
                         ],
                         "timeFrom": null,
                         "timeShift": null,
-                        "title": "Net Saturation (Drops Receive/Transmit)",
+                        "title": "Network Saturation (Drops Receive/Transmit)",
                         "tooltip": {
-                            "shared": false,
-                            "sort": 0,
+                            "shared": true,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -591,7 +640,7 @@ data:
                         },
                         "yaxes": [
                             {
-                                "format": "rps",
+                                "format": "Bps",
                                 "label": null,
                                 "logBase": 1,
                                 "max": null,
@@ -599,12 +648,12 @@ data:
                                 "show": true
                             },
                             {
-                                "format": "short",
+                                "format": "Bps",
                                 "label": null,
                                 "logBase": 1,
                                 "max": null,
                                 "min": null,
-                                "show": false
+                                "show": true
                             }
                         ]
                     }
@@ -614,11 +663,12 @@ data:
                 "repeatRowId": null,
                 "showTitle": true,
                 "title": "Network",
-                "titleSize": "h6"
+                "titleSize": "h6",
+                "type": "row"
             },
             {
                 "collapse": false,
-                "height": "250px",
+                "collapsed": false,
                 "panels": [
                     {
                         "aliasColors": {
@@ -629,26 +679,34 @@ data:
                         "dashes": false,
                         "datasource": "$datasource",
                         "fill": 10,
-                        "id": 7,
+                        "fillGradient": 0,
+                        "gridPos": {
+
+                        },
+                        "id": 8,
                         "legend": {
+                            "alignAsTable": false,
                             "avg": false,
                             "current": false,
                             "max": false,
                             "min": false,
-                            "show": true,
+                            "rightSide": false,
+                            "show": false,
+                            "sideWidth": null,
                             "total": false,
                             "values": false
                         },
                         "lines": true,
-                        "linewidth": 0,
+                        "linewidth": 1,
                         "links": [
 
                         ],
-                        "nullPointMode": "null as zero",
+                        "nullPointMode": "null",
                         "percentage": false,
                         "pointradius": 5,
                         "points": false,
                         "renderer": "flot",
+                        "repeat": null,
                         "seriesOverrides": [
 
                         ],
@@ -658,12 +716,11 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "instance_device:node_disk_io_time_seconds:rate5m{job=\"node-exporter\"}\n/ scalar(count(instance_device:node_disk_io_time_seconds:rate5m{job=\"node-exporter\"}))\n",
+                                "expr": "(\n  instance_device:node_disk_io_time_seconds:rate5m{job=\"node-exporter\", cluster=\"$cluster\"}\n  / scalar(count(instance_device:node_disk_io_time_seconds:rate5m{job=\"node-exporter\", cluster=\"$cluster\"}))\n) != 0\n",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}} {{`{{`}}device{{`}}`}}",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "refId": "A"
                             }
                         ],
                         "thresholds": [
@@ -673,8 +730,8 @@ data:
                         "timeShift": null,
                         "title": "Disk IO Utilisation",
                         "tooltip": {
-                            "shared": false,
-                            "sort": 0,
+                            "shared": true,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -692,17 +749,17 @@ data:
                                 "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
-                                "max": 1,
-                                "min": 0,
+                                "max": null,
+                                "min": null,
                                 "show": true
                             },
                             {
-                                "format": "short",
+                                "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
                                 "max": null,
                                 "min": null,
-                                "show": false
+                                "show": true
                             }
                         ]
                     },
@@ -715,26 +772,34 @@ data:
                         "dashes": false,
                         "datasource": "$datasource",
                         "fill": 10,
-                        "id": 8,
+                        "fillGradient": 0,
+                        "gridPos": {
+
+                        },
+                        "id": 9,
                         "legend": {
+                            "alignAsTable": false,
                             "avg": false,
                             "current": false,
                             "max": false,
                             "min": false,
-                            "show": true,
+                            "rightSide": false,
+                            "show": false,
+                            "sideWidth": null,
                             "total": false,
                             "values": false
                         },
                         "lines": true,
-                        "linewidth": 0,
+                        "linewidth": 1,
                         "links": [
 
                         ],
-                        "nullPointMode": "null as zero",
+                        "nullPointMode": "null",
                         "percentage": false,
                         "pointradius": 5,
                         "points": false,
                         "renderer": "flot",
+                        "repeat": null,
                         "seriesOverrides": [
 
                         ],
@@ -744,12 +809,11 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "instance_device:node_disk_io_time_weighted_seconds:rate5m{job=\"node-exporter\"}\n/ scalar(count(instance_device:node_disk_io_time_weighted_seconds:rate5m{job=\"node-exporter\"}))\n",
+                                "expr": "(\n  instance_device:node_disk_io_time_weighted_seconds:rate5m{job=\"node-exporter\", cluster=\"$cluster\"}\n  / scalar(count(instance_device:node_disk_io_time_weighted_seconds:rate5m{job=\"node-exporter\", cluster=\"$cluster\"}))\n) != 0\n",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}} {{`{{`}}device{{`}}`}}",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "refId": "A"
                             }
                         ],
                         "thresholds": [
@@ -759,8 +823,8 @@ data:
                         "timeShift": null,
                         "title": "Disk IO Saturation",
                         "tooltip": {
-                            "shared": false,
-                            "sort": 0,
+                            "shared": true,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -778,17 +842,17 @@ data:
                                 "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
-                                "max": 1,
-                                "min": 0,
+                                "max": null,
+                                "min": null,
                                 "show": true
                             },
                             {
-                                "format": "short",
+                                "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
                                 "max": null,
                                 "min": null,
-                                "show": false
+                                "show": true
                             }
                         ]
                     }
@@ -798,11 +862,12 @@ data:
                 "repeatRowId": null,
                 "showTitle": true,
                 "title": "Disk IO",
-                "titleSize": "h6"
+                "titleSize": "h6",
+                "type": "row"
             },
             {
                 "collapse": false,
-                "height": "250px",
+                "collapsed": false,
                 "panels": [
                     {
                         "aliasColors": {
@@ -813,26 +878,34 @@ data:
                         "dashes": false,
                         "datasource": "$datasource",
                         "fill": 10,
-                        "id": 9,
+                        "fillGradient": 0,
+                        "gridPos": {
+
+                        },
+                        "id": 10,
                         "legend": {
+                            "alignAsTable": false,
                             "avg": false,
                             "current": false,
                             "max": false,
                             "min": false,
-                            "show": true,
+                            "rightSide": false,
+                            "show": false,
+                            "sideWidth": null,
                             "total": false,
                             "values": false
                         },
                         "lines": true,
-                        "linewidth": 0,
+                        "linewidth": 1,
                         "links": [
 
                         ],
-                        "nullPointMode": "null as zero",
+                        "nullPointMode": "null",
                         "percentage": false,
                         "pointradius": 5,
                         "points": false,
                         "renderer": "flot",
+                        "repeat": null,
                         "seriesOverrides": [
 
                         ],
@@ -842,12 +915,11 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum without (device) (\n  max without (fstype, mountpoint) (\n    node_filesystem_size_bytes{job=\"node-exporter\", fstype!=\"\"} - node_filesystem_avail_bytes{job=\"node-exporter\", fstype!=\"\"}\n  )\n) \n/ scalar(sum(max without (fstype, mountpoint) (node_filesystem_size_bytes{job=\"node-exporter\", fstype!=\"\"})))\n",
+                                "expr": "sum without (device) (\n  max without (fstype, mountpoint) ((\n    node_filesystem_size_bytes{job=\"node-exporter\", fstype!=\"\", cluster=\"$cluster\"}\n    -\n    node_filesystem_avail_bytes{job=\"node-exporter\", fstype!=\"\", cluster=\"$cluster\"}\n  ) != 0)\n)\n/ scalar(sum(max without (fstype, mountpoint) (node_filesystem_size_bytes{job=\"node-exporter\", fstype!=\"\", cluster=\"$cluster\"})))\n",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}}",
-                                "legendLink": "/dashboard/file/node-rsrc-use.json",
-                                "step": 10
+                                "refId": "A"
                             }
                         ],
                         "thresholds": [
@@ -857,8 +929,8 @@ data:
                         "timeShift": null,
                         "title": "Disk Space Utilisation",
                         "tooltip": {
-                            "shared": false,
-                            "sort": 0,
+                            "shared": true,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -876,17 +948,17 @@ data:
                                 "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
-                                "max": 1,
-                                "min": 0,
+                                "max": null,
+                                "min": null,
                                 "show": true
                             },
                             {
-                                "format": "short",
+                                "format": "percentunit",
                                 "label": null,
                                 "logBase": 1,
                                 "max": null,
                                 "min": null,
-                                "show": false
+                                "show": true
                             }
                         ]
                     }
@@ -896,20 +968,21 @@ data:
                 "repeatRowId": null,
                 "showTitle": true,
                 "title": "Disk Space",
-                "titleSize": "h6"
+                "titleSize": "h6",
+                "type": "row"
             }
         ],
         "schemaVersion": 14,
         "style": "dark",
         "tags": [
-
+            "node-exporter-mixin"
         ],
         "templating": {
             "list": [
                 {
                     "current": {
-                        "text": "default",
-                        "value": "default"
+                        "text": "Prometheus",
+                        "value": "Prometheus"
                     },
                     "hide": 0,
                     "label": null,
@@ -921,6 +994,33 @@ data:
                     "refresh": 1,
                     "regex": "",
                     "type": "datasource"
+                },
+                {
+                    "allValue": null,
+                    "current": {
+                        "text": "",
+                        "value": ""
+                    },
+                    "datasource": "$datasource",
+                    "hide": {{ if .Values.grafana.sidecar.dashboards.multicluster }}0{{ else }}2{{ end }},
+                    "includeAll": false,
+                    "label": null,
+                    "multi": false,
+                    "name": "cluster",
+                    "options": [
+
+                    ],
+                    "query": "label_values(node_time_seconds, cluster)",
+                    "refresh": 2,
+                    "regex": "",
+                    "sort": 1,
+                    "tagValuesQuery": "",
+                    "tags": [
+
+                    ],
+                    "tagsQuery": "",
+                    "type": "query",
+                    "useTags": false
                 }
             ]
         },
@@ -954,8 +1054,7 @@ data:
             ]
         },
         "timezone": "utc",
-        "title": "USE Method / Cluster",
-        "uid": "",
+        "title": "Node Exporter / USE Method / Cluster",
         "version": 0
     }
 {{- end }}

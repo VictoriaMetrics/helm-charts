@@ -162,18 +162,6 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: ProcessNearFDLimits
-      annotations:
-        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=75&var-instance={{`{{`}} $labels.instance {{`}}`}}
-        description: Exhausting OS file descriptors limit can cause severe degradation of the process. Consider to increase the limit as fast as possible.
-        summary: Number of free file descriptors is less than 100 for "{{`{{`}} $labels.job {{`}}`}}"("{{`{{`}} $labels.instance {{`}}`}}") for the last 5m
-      expr: (process_max_fds - process_open_fds) < 100
-      for: 5m
-      labels:
-        severity: critical
-{{- if .Values.defaultRules.additionalRuleLabels }}
-{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
-{{- end }}
     - alert: LabelsLimitExceededOnIngestion
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=74&var-instance={{`{{`}} $labels.instance {{`}}`}}
