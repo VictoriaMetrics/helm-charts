@@ -1,14 +1,14 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.3.6](https://img.shields.io/badge/Version-0.3.6-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
 # Title
 * [Prerequisites](#Prerequisites)
 * [Dependencies](#Dependencies)
-* [Quick Start](#How-to-install)
-* [Uninstall](#How-to-uninstall)
+* [Quick Start](#How to install)
+* [Uninstall](#How to uninstall)
 * [Version Upgrade](#Upgrade-guide)
 * [Troubleshooting](#Troubleshooting)
 * [Values](#Parameters)
@@ -222,23 +222,26 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.config.receivers[1].slack_configs[0].actions[4].text | string | `"{{ template \"slack.monzo.link_button_text\" . }}"` |  |
 | alertmanager.config.receivers[1].slack_configs[0].actions[4].type | string | `"button"` |  |
 | alertmanager.config.receivers[1].slack_configs[0].actions[4].url | string | `"{{ .CommonAnnotations.link_url }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].channel | string | `"#{{- template \"slack.monzo.code_owner_channel\" . -}}"` |  |
+| alertmanager.config.receivers[1].slack_configs[0].channel | string | `"#{{ .CommonLabels.code_owner_channel }}"` |  |
 | alertmanager.config.receivers[1].slack_configs[0].color | string | `"{{ template \"slack.monzo.color\" . }}"` |  |
 | alertmanager.config.receivers[1].slack_configs[0].icon_emoji | string | `"{{ template \"slack.monzo.icon_emoji\" . }}"` |  |
 | alertmanager.config.receivers[1].slack_configs[0].send_resolved | bool | `true` |  |
 | alertmanager.config.receivers[1].slack_configs[0].text | string | `"{{ template \"slack.monzo.text\" . }}"` |  |
 | alertmanager.config.receivers[1].slack_configs[0].title | string | `"{{ template \"slack.monzo.title\" . }}"` |  |
-| alertmanager.config.route.group_by[0] | string | `"job"` |  |
+| alertmanager.config.route.group_by[0] | string | `"alertgroup"` |  |
+| alertmanager.config.route.group_by[1] | string | `"job"` |  |
 | alertmanager.config.route.group_interval | string | `"5m"` |  |
 | alertmanager.config.route.group_wait | string | `"30s"` |  |
 | alertmanager.config.route.receiver | string | `"slack-monitoring"` |  |
 | alertmanager.config.route.repeat_interval | string | `"12h"` |  |
-| alertmanager.config.route.routes[0].match_re.code_owner | string | `".+"` |  |
-| alertmanager.config.route.routes[0].routes[0].continue | bool | `true` |  |
-| alertmanager.config.route.routes[0].routes[0].match.severity | string | `"info|warning|critical"` |  |
-| alertmanager.config.route.routes[0].routes[0].receiver | string | `"slack-code-owners"` |  |
+| alertmanager.config.route.routes[0].group_by[0] | string | `"code_owner_channel"` |  |
+| alertmanager.config.route.routes[0].group_by[1] | string | `"alertgroup"` |  |
+| alertmanager.config.route.routes[0].group_by[2] | string | `"job"` |  |
+| alertmanager.config.route.routes[0].matchers[0] | string | `"code_owner_channel!=\"\""` |  |
+| alertmanager.config.route.routes[0].matchers[1] | string | `"severity=~\"info|warning|critical\""` |  |
+| alertmanager.config.route.routes[0].receiver | string | `"slack-code-owners"` |  |
 | alertmanager.config.route.routes[1].continue | bool | `true` |  |
-| alertmanager.config.route.routes[1].match_re.severity | string | `"info|warning|critical"` |  |
+| alertmanager.config.route.routes[1].matchers[0] | string | `"severity=~\"info|warning|critical\""` |  |
 | alertmanager.config.route.routes[1].receiver | string | `"slack-monitoring"` |  |
 | alertmanager.config.templates[0] | string | `"/etc/vm/configs/**/*.tmpl"` |  |
 | alertmanager.enabled | bool | `true` |  |
