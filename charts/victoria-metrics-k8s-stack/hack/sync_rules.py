@@ -26,7 +26,7 @@ def change_style(style, representer):
 # Source files list
 charts = [
     {
-        'source': 'https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/master/manifests/kubernetes-prometheusRule.yaml',
+        'source': 'https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetes-prometheusRule.yaml',
         'destination': '../templates/rules',
     },
     {
