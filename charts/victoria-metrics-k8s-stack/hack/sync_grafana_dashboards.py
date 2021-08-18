@@ -26,11 +26,11 @@ def change_style(style, representer):
 # Source files list
 charts = [
     {
-        'source': 'https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/master/manifests/grafana-dashboardDefinitions.yaml',
+        'source': 'https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml',
         'destination': '../templates/grafana/dashboards',
         'type': 'yaml'
     },
-    {
+    { 
         'source': 'https://etcd.io/docs/v3.4/op-guide/grafana.json',
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
@@ -46,7 +46,8 @@ charts = [
         'type': 'json'
     },
     {
-        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/cluster/dashboards/clusterbytenant.json',
+        'name': 'victoriametrics-cluster',
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/cluster/dashboards/victoriametrics.json',
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
     },
@@ -68,7 +69,8 @@ condition_map = {
     'scheduler': ' .Values.kubeScheduler.enabled',
     'node-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
     'node-cluster-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
-    'clusterbytenant': ' .Values.vmcluster.enabled'
+    'victoriametrics-cluster': ' .Values.vmcluster.enabled',
+    'victoriametrics': ' .Values.vmsingle.enabled'
 }
 
 # standard header
@@ -214,7 +216,7 @@ def main():
             # is it already a dashboard structure or is it nested (etcd case)?
             flat_structure = bool(json_text.get('annotations'))
             if flat_structure:
-                resource = path.basename(chart['source']).replace('.json', '')
+                resource = chart.get('name', path.basename(chart['source']).replace('.json', ''))
                 write_group_to_file(resource, json.dumps(json_text, indent=4), chart['source'], chart['destination'])
             else:
                 for resource, content in json_text.items():
