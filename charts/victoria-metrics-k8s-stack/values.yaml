@@ -12,6 +12,11 @@ operator:
     tag: v1.16.0
     pullPolicy: IfNotPresent
 
+# If this chart is used in "Agrocd" with "releaseName" field then  
+# VMServiceScrapes couldn't select the proper services.
+# For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME'
+argocdReleaseOverride: ""
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -373,6 +378,14 @@ alertmanager:
   # source https://gist.github.com/milesbxf/e2744fc90e9c41b47aa47925f8ff6512
   monzoTemplate:
     enabled: true
+
+  # extra alert templates
+  templateFiles: {}
+    # template_1.tmpl: |-
+    #   {{ define "hello" -}}
+    #   hello, Victoria!
+    #   {{- end }}
+    # template_2.tmpl: ""
 
   ingress:
     enabled: false

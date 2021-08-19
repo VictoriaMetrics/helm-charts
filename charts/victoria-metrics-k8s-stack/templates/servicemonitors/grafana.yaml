@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: grafana
-      app.kubernetes.io/instance: {{ $.Release.Name | quote }}
+      app.kubernetes.io/instance: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
 {{- if empty .Values.grafana.vmServiceScrape.spec }}
   endpoints:
   - port: {{ .Values.grafana.service.portName }}

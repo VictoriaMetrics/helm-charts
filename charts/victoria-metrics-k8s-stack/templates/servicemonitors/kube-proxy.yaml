@@ -61,7 +61,7 @@ spec:
   selector:
     matchLabels:
       app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-proxy
-      app.kubernetes.io/instance: {{ $.Release.Name | quote }}
+      app.kubernetes.io/instance: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
   namespaceSelector:
     matchNames:
       - "kube-system"

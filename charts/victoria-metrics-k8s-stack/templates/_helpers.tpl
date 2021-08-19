@@ -151,6 +151,9 @@ configSecret: {{ .Values.alertmanager.spec.configSecret | default (printf "%s-al
 {{- if .Values.alertmanager.monzoTemplate.enabled }}
 {{- $list = append $list (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "alertmanager-monzo-tpl" | trunc 63 | trimSuffix "-") }}
 {{- end }}
+{{- if .Values.alertmanager.templateFiles }}
+{{- $list = append $list (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "alertmanager-extra-tpl" | trunc 63 | trimSuffix "-") }}
+{{- end }}
 configMaps:
 {{- range compact $list }}
 - {{ . }}

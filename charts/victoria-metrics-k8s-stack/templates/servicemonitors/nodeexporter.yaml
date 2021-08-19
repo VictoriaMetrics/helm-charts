@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: prometheus-node-exporter
-      release: {{ $.Release.Name | quote }}
+      release: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
 {{- if empty (index .Values "prometheus-node-exporter" "vmServiceScrape" "spec") }}
   endpoints:
   - port: metrics
