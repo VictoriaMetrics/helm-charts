@@ -138,6 +138,15 @@ $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
  All CRD manual actions upgrades listed below:
 
+### Upgrade to 0.4.0
+
+ All `CRD` must be update to `v1` version with command:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/master/charts/victoria-metrics-k8s-stack/crds/crd.yaml
+
+```
+
 ### Upgrade from 0.2.8 to 0.2.9
 
  Update `VMAgent` crd
