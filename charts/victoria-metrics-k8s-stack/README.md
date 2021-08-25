@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.3.6](https://img.shields.io/badge/Version-0.3.6-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -257,6 +257,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.spec.externalURL | string | `""` |  |
 | alertmanager.spec.image.tag | string | `"v0.22.2"` |  |
 | alertmanager.spec.routePrefix | string | `"/"` |  |
+| alertmanager.templateFiles | object | `{}` |  |
+| argocdReleaseOverride | string | `""` |  |
 | coreDns.enabled | bool | `true` |  |
 | coreDns.service.enabled | bool | `true` |  |
 | coreDns.service.port | int | `9153` |  |
