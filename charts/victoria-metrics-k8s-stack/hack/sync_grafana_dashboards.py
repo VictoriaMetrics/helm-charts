@@ -51,6 +51,11 @@ charts = [
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
     },
+    {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmalert.json',
+        'destination': '../templates/grafana/dashboards',
+        'type': 'json'
+    }
 ]
 
 skip_list = [
@@ -70,7 +75,8 @@ condition_map = {
     'node-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
     'node-cluster-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
     'victoriametrics-cluster': ' .Values.vmcluster.enabled',
-    'victoriametrics': ' .Values.vmsingle.enabled'
+    'victoriametrics': ' .Values.vmsingle.enabled',
+    'vmalert': ' .Values.vmalert.enabled'
 }
 
 # standard header
