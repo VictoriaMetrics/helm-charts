@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: prometheus-node-exporter
-      release: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
+      app.kubernetes.io/instance: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
 {{- if empty (index .Values "prometheus-node-exporter" "vmServiceScrape" "spec") }}
   endpoints:
   - port: metrics
