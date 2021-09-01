@@ -50,6 +50,12 @@ spec:
             - --data.retention={{ .Values.alertmanager.retention }}
             - --web.listen-address=0.0.0.0:9093
             - --cluster.advertise-address=$(POD_IP):6783
+            {{ if .Values.alertmanager.baseURL }}
+            - --web.external-url={{ .Values.alertmanager.baseURL }}
+            {{- end }}
+            {{- range $key, $value := .Values.alertmanager.extraArgs }}
+            - --{{ $key }}={{ $value }}
+            {{- end }}
           ports:
             - name: web
               containerPort: 9093
