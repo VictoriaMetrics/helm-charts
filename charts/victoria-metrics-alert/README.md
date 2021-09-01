@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.4.3](https://img.shields.io/badge/Version-0.4.3-informational?style=flat-square)
+ ![Version: 0.4.4](https://img.shields.io/badge/Version-0.4.4-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
@@ -98,7 +98,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| alertmanager.baseURL | string | "" |  |
+| alertmanager.baseURL | string | `""` |  |
 | alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
 | alertmanager.config.receivers[0].name | string | `"devnull"` |  |
 | alertmanager.config.route.group_by[0] | string | `"alertname"` |  |
