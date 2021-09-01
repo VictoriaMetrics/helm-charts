@@ -98,6 +98,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| alertmanager.baseURL | string | "" |  |
 | alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
 | alertmanager.config.receivers[0].name | string | `"devnull"` |  |
 | alertmanager.config.route.group_by[0] | string | `"alertname"` |  |
@@ -107,6 +108,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.config.route.repeat_interval | string | `"24h"` |  |
 | alertmanager.configMap | string | `""` |  |
 | alertmanager.enabled | bool | `false` |  |
+| alertmanager.extraArgs | object | `{}` |  |
 | alertmanager.image | string | `"prom/alertmanager"` |  |
 | alertmanager.imagePullSecrets | list | `[]` |  |
 | alertmanager.ingress.annotations | object | `{}` |  |
