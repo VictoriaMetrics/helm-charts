@@ -1,5 +1,11 @@
 {{- if and .Values.vminsert.enabled .Values.vminsert.ingress.enabled }}
-apiVersion: networking.k8s.io/v1beta1
+{{- $ingressApiIsStable := eq (include "victoria-metrics.ingress.isStable" .) "true" -}}
+{{- $ingressSupportsIngressClassName := eq (include "victoria-metrics.ingress.supportsIngressClassName" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "victoria-metrics.ingress.supportsPathType" .) "true" -}}
+{{- $servicePort := .Values.vminsert.service.servicePort -}}
+{{- $ingressPath := .Values.vminsert.ingress.path -}}
+{{- $ingressPathType := .Values.vminsert.ingress.pathType -}}
+apiVersion: {{ include "victoria-metrics.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
 {{- if .Values.vminsert.ingress.annotations }}
@@ -14,6 +20,9 @@ metadata:
   name: {{ template "victoria-metrics.vminsert.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
+  {{- if and $ingressSupportsIngressClassName .Values.vminsert.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.vminsert.ingress.ingressClassName }}
+  {{- end }}
   rules:
   {{- $serviceName := include "victoria-metrics.vminsert.fullname" . }}
   {{- range .Values.vminsert.ingress.hosts }}
@@ -21,9 +30,19 @@ spec:
     http:
       paths:
         - path: {{ .path }}
+          {{- if $ingressSupportsPathType }}
+          pathType: {{ $ingressPathType }}
+          {{- end }}
           backend:
+            {{- if $ingressApiIsStable }}
+            service:
+              name: {{ $serviceName }}
+              port:
+                number: {{ $servicePort }}
+            {{- else }}
             serviceName: {{ $serviceName }}
             servicePort: {{ .port | default "http"}}
+            {{- end }}
   {{- end -}}
 {{- if .Values.vminsert.ingress.tls }}
   tls:
