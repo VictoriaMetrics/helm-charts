@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.4.4](https://img.shields.io/badge/Version-0.4.4-informational?style=flat-square)
+ ![Version: 0.4.5](https://img.shields.io/badge/Version-0.4.5-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
@@ -196,3 +196,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.automountToken | bool | `true` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `nil` |  |
+| serviceMonitor.annotations | object | `{}` |  |
+| serviceMonitor.enabled | bool | `false` |  |
+| serviceMonitor.extraLabels | object | `{}` |  |
