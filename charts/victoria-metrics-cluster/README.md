@@ -138,6 +138,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.ingress.enabled | bool | `false` | Enable deployment of ingress for vminsert component |
 | vminsert.ingress.extraLabels | object | `{}` |  |
 | vminsert.ingress.hosts | list | `[]` | Array of host objects |
+| vminsert.ingress.pathType | string | `"Prefix"` |  |
 | vminsert.ingress.tls | list | `[]` |  |
 | vminsert.initContainers | list | `[]` |  |
 | vminsert.name | string | `"vminsert"` | vminsert container name |
@@ -199,6 +200,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.ingress.enabled | bool | `false` | Enable deployment of ingress for vmselect component |
 | vmselect.ingress.extraLabels | object | `{}` |  |
 | vmselect.ingress.hosts | list | `[]` | Array of host objects |
+| vmselect.ingress.pathType | string | `"Prefix"` |  |
 | vmselect.ingress.tls | list | `[]` |  |
 | vmselect.initContainers | list | `[]` |  |
 | vmselect.name | string | `"vmselect"` | Vmselect container name |
