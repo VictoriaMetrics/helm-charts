@@ -165,6 +165,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.ingress.enabled | bool | `false` |  |
 | server.ingress.extraLabels | object | `{}` |  |
 | server.ingress.hosts | list | `[]` |  |
+| server.ingress.pathType | string | `"Prefix"` |  |
 | server.ingress.tls | list | `[]` |  |
 | server.labels | object | `{}` |  |
 | server.name | string | `"server"` |  |

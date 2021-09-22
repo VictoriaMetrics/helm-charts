@@ -186,6 +186,11 @@ vmselect:
     #   - secretName: vmselect-ingress-tls
     #     hosts:
     #       - vmselect.local
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    # ingressClassName: nginx
+    # -- pathType is only for k8s >= 1.1=
+    pathType: Prefix
   statefulSet:
     # -- Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data. Creates statefulset instead of deployment, useful when you want to keep the cache
     enabled: false
@@ -359,6 +364,11 @@ vminsert:
     #   - secretName: vminsert-ingress-tls
     #     hosts:
     #       - vminsert.local
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    # ingressClassName: nginx
+    # -- pathType is only for k8s >= 1.1=
+    pathType: Prefix
   serviceMonitor:
     # -- Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object
     enabled: false
