@@ -737,6 +737,31 @@ kubeControllerManager:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             serverName: kubernetes
 
+## Component scraping kubeDns. Use either this or coreDns
+##
+kubeDns:
+  enabled: false
+  service:
+    enabled: false
+    dnsmasq:
+      port: 10054
+      targetPort: 10054
+    skydns:
+      port: 10055
+      targetPort: 10055
+    # selector:
+    #   k8s-app: kube-dns
+  vmServiceScrape:
+   enabled: false
+   # spec for VMServiceScrape crd
+   # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
+   spec:
+     endpoints:
+       - port: http-metrics-dnsmasq
+         bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+       - port: http-metrics-skydns
+         bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+
 ## Component scraping coreDns. Use either this or kubeDns
 ##
 coreDns:
