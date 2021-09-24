@@ -551,6 +551,66 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+              nodeScrapeRelabelTemplate:
+                description: NodeScrapeRelabelTemplate defines relabel config, that
+                  will be added to each VMNodeScrape. it's useful for adding specific
+                  labels to all targets
+                items:
+                  description: 'RelabelConfig allows dynamic rewriting of the label
+                    set, being applied to samples before ingestion. It defines `<metric_relabel_configs>`-section
+                    of configuration. More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs'
+                  properties:
+                    action:
+                      description: Action to perform based on regex matching. Default
+                        is 'replace'
+                      type: string
+                    modulus:
+                      description: Modulus to take of the hash of the source label
+                        values.
+                      format: int64
+                      type: integer
+                    regex:
+                      description: Regular expression against which the extracted
+                        value is matched. Default is '(.*)'
+                      type: string
+                    replacement:
+                      description: Replacement value against which a regex replace
+                        is performed if the regular expression matches. Regex capture
+                        groups are available. Default is '$1'
+                      type: string
+                    separator:
+                      description: Separator placed between concatenated source label
+                        values. default is ';'.
+                      type: string
+                    source_labels:
+                      description: UnderScoreSourceLabels - additional form of source
+                        labels source_labels for compatibility with original relabel
+                        config. if set  both sourceLabels and source_labels, sourceLabels
+                        has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                      items:
+                        type: string
+                      type: array
+                    sourceLabels:
+                      description: The source labels select values from existing labels.
+                        Their content is concatenated using the configured separator
+                        and matched against the configured regular expression for
+                        the replace, keep, and drop actions.
+                      items:
+                        type: string
+                      type: array
+                    target_label:
+                      description: UnderScoreTargetLabel - additional form of target
+                        label - target_label for compatibility with original relabel
+                        config. if set  both targetLabel and target_label, targetLabel
+                        has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                      type: string
+                    targetLabel:
+                      description: Label to which the resulting value is written in
+                        a replace action. It is mandatory for replace actions. Regex
+                        capture groups are available.
+                      type: string
+                  type: object
+                type: array
               nodeScrapeSelector:
                 description: NodeScrapeSelector defines VMNodeScrape to be selected
                   for scraping.
@@ -708,6 +768,66 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+              podScrapeRelabelTemplate:
+                description: PodScrapeRelabelTemplate defines relabel config, that
+                  will be added to each VMPodScrape. it's useful for adding specific
+                  labels to all targets
+                items:
+                  description: 'RelabelConfig allows dynamic rewriting of the label
+                    set, being applied to samples before ingestion. It defines `<metric_relabel_configs>`-section
+                    of configuration. More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs'
+                  properties:
+                    action:
+                      description: Action to perform based on regex matching. Default
+                        is 'replace'
+                      type: string
+                    modulus:
+                      description: Modulus to take of the hash of the source label
+                        values.
+                      format: int64
+                      type: integer
+                    regex:
+                      description: Regular expression against which the extracted
+                        value is matched. Default is '(.*)'
+                      type: string
+                    replacement:
+                      description: Replacement value against which a regex replace
+                        is performed if the regular expression matches. Regex capture
+                        groups are available. Default is '$1'
+                      type: string
+                    separator:
+                      description: Separator placed between concatenated source label
+                        values. default is ';'.
+                      type: string
+                    source_labels:
+                      description: UnderScoreSourceLabels - additional form of source
+                        labels source_labels for compatibility with original relabel
+                        config. if set  both sourceLabels and source_labels, sourceLabels
+                        has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                      items:
+                        type: string
+                      type: array
+                    sourceLabels:
+                      description: The source labels select values from existing labels.
+                        Their content is concatenated using the configured separator
+                        and matched against the configured regular expression for
+                        the replace, keep, and drop actions.
+                      items:
+                        type: string
+                      type: array
+                    target_label:
+                      description: UnderScoreTargetLabel - additional form of target
+                        label - target_label for compatibility with original relabel
+                        config. if set  both targetLabel and target_label, targetLabel
+                        has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                      type: string
+                    targetLabel:
+                      description: Label to which the resulting value is written in
+                        a replace action. It is mandatory for replace actions. Regex
+                        capture groups are available.
+                      type: string
+                  type: object
+                type: array
               podScrapeSelector:
                 description: PodScrapeSelector defines PodScrapes to be selected for
                   target discovery.
@@ -808,6 +928,66 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+              probeScrapeRelabelTemplate:
+                description: ProbeScrapeRelabelTemplate defines relabel config, that
+                  will be added to each VMProbeScrape. it's useful for adding specific
+                  labels to all targets
+                items:
+                  description: 'RelabelConfig allows dynamic rewriting of the label
+                    set, being applied to samples before ingestion. It defines `<metric_relabel_configs>`-section
+                    of configuration. More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs'
+                  properties:
+                    action:
+                      description: Action to perform based on regex matching. Default
+                        is 'replace'
+                      type: string
+                    modulus:
+                      description: Modulus to take of the hash of the source label
+                        values.
+                      format: int64
+                      type: integer
+                    regex:
+                      description: Regular expression against which the extracted
+                        value is matched. Default is '(.*)'
+                      type: string
+                    replacement:
+                      description: Replacement value against which a regex replace
+                        is performed if the regular expression matches. Regex capture
+                        groups are available. Default is '$1'
+                      type: string
+                    separator:
+                      description: Separator placed between concatenated source label
+                        values. default is ';'.
+                      type: string
+                    source_labels:
+                      description: UnderScoreSourceLabels - additional form of source
+                        labels source_labels for compatibility with original relabel
+                        config. if set  both sourceLabels and source_labels, sourceLabels
+                        has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                      items:
+                        type: string
+                      type: array
+                    sourceLabels:
+                      description: The source labels select values from existing labels.
+                        Their content is concatenated using the configured separator
+                        and matched against the configured regular expression for
+                        the replace, keep, and drop actions.
+                      items:
+                        type: string
+                      type: array
+                    target_label:
+                      description: UnderScoreTargetLabel - additional form of target
+                        label - target_label for compatibility with original relabel
+                        config. if set  both targetLabel and target_label, targetLabel
+                        has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                      type: string
+                    targetLabel:
+                      description: Label to which the resulting value is written in
+                        a replace action. It is mandatory for replace actions. Regex
+                        capture groups are available.
+                      type: string
+                  type: object
+                type: array
               probeSelector:
                 description: ProbeSelector defines VMProbe to be selected for target
                   probing.
@@ -1435,6 +1615,66 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+              serviceScrapeRelabelTemplate:
+                description: ServiceScrapeRelabelTemplate defines relabel config,
+                  that will be added to each VMServiceScrape. it's useful for adding
+                  specific labels to all targets
+                items:
+                  description: 'RelabelConfig allows dynamic rewriting of the label
+                    set, being applied to samples before ingestion. It defines `<metric_relabel_configs>`-section
+                    of configuration. More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs'
+                  properties:
+                    action:
+                      description: Action to perform based on regex matching. Default
+                        is 'replace'
+                      type: string
+                    modulus:
+                      description: Modulus to take of the hash of the source label
+                        values.
+                      format: int64
+                      type: integer
+                    regex:
+                      description: Regular expression against which the extracted
+                        value is matched. Default is '(.*)'
+                      type: string
+                    replacement:
+                      description: Replacement value against which a regex replace
+                        is performed if the regular expression matches. Regex capture
+                        groups are available. Default is '$1'
+                      type: string
+                    separator:
+                      description: Separator placed between concatenated source label
+                        values. default is ';'.
+                      type: string
+                    source_labels:
+                      description: UnderScoreSourceLabels - additional form of source
+                        labels source_labels for compatibility with original relabel
+                        config. if set  both sourceLabels and source_labels, sourceLabels
+                        has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                      items:
+                        type: string
+                      type: array
+                    sourceLabels:
+                      description: The source labels select values from existing labels.
+                        Their content is concatenated using the configured separator
+                        and matched against the configured regular expression for
+                        the replace, keep, and drop actions.
+                      items:
+                        type: string
+                      type: array
+                    target_label:
+                      description: UnderScoreTargetLabel - additional form of target
+                        label - target_label for compatibility with original relabel
+                        config. if set  both targetLabel and target_label, targetLabel
+                        has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                      type: string
+                    targetLabel:
+                      description: Label to which the resulting value is written in
+                        a replace action. It is mandatory for replace actions. Regex
+                        capture groups are available.
+                      type: string
+                  type: object
+                type: array
               serviceScrapeSelector:
                 description: ServiceScrapeSelector defines ServiceScrapes to be selected
                   for target discovery.
@@ -1575,6 +1815,66 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+              staticScrapeRelabelTemplate:
+                description: StaticScrapeRelabelTemplate defines relabel config, that
+                  will be added to each VMStaticScrape. it's useful for adding specific
+                  labels to all targets
+                items:
+                  description: 'RelabelConfig allows dynamic rewriting of the label
+                    set, being applied to samples before ingestion. It defines `<metric_relabel_configs>`-section
+                    of configuration. More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs'
+                  properties:
+                    action:
+                      description: Action to perform based on regex matching. Default
+                        is 'replace'
+                      type: string
+                    modulus:
+                      description: Modulus to take of the hash of the source label
+                        values.
+                      format: int64
+                      type: integer
+                    regex:
+                      description: Regular expression against which the extracted
+                        value is matched. Default is '(.*)'
+                      type: string
+                    replacement:
+                      description: Replacement value against which a regex replace
+                        is performed if the regular expression matches. Regex capture
+                        groups are available. Default is '$1'
+                      type: string
+                    separator:
+                      description: Separator placed between concatenated source label
+                        values. default is ';'.
+                      type: string
+                    source_labels:
+                      description: UnderScoreSourceLabels - additional form of source
+                        labels source_labels for compatibility with original relabel
+                        config. if set  both sourceLabels and source_labels, sourceLabels
+                        has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                      items:
+                        type: string
+                      type: array
+                    sourceLabels:
+                      description: The source labels select values from existing labels.
+                        Their content is concatenated using the configured separator
+                        and matched against the configured regular expression for
+                        the replace, keep, and drop actions.
+                      items:
+                        type: string
+                      type: array
+                    target_label:
+                      description: UnderScoreTargetLabel - additional form of target
+                        label - target_label for compatibility with original relabel
+                        config. if set  both targetLabel and target_label, targetLabel
+                        has priority. for details https://github.com/VictoriaMetrics/operator/issues/131
+                      type: string
+                    targetLabel:
+                      description: Label to which the resulting value is written in
+                        a replace action. It is mandatory for replace actions. Regex
+                        capture groups are available.
+                      type: string
+                  type: object
+                type: array
               staticScrapeSelector:
                 description: StaticScrapeSelector defines PodScrapes to be selected
                   for target discovery.
@@ -5650,6 +5950,74 @@ spec:
                         - key
                         type: object
                     type: object
+                  selector:
+                    description: Selector allows service discovery for alertmanager
+                      in this case all matched vmalertmanager replicas will be added
+                      into vmalert notifier.url as statefulset pod.fqdn
+                    properties:
+                      labelSelector:
+                        description: A label selector is a label query over a set
+                          of resources. The result of matchLabels and matchExpressions
+                          are ANDed. An empty label selector matches all objects.
+                          A null label selector matches no objects.
+                        properties:
+                          matchExpressions:
+                            description: matchExpressions is a list of label selector
+                              requirements. The requirements are ANDed.
+                            items:
+                              description: A label selector requirement is a selector
+                                that contains values, a key, and an operator that
+                                relates the key and values.
+                              properties:
+                                key:
+                                  description: key is the label key that the selector
+                                    applies to.
+                                  type: string
+                                operator:
+                                  description: operator represents a key's relationship
+                                    to a set of values. Valid operators are In, NotIn,
+                                    Exists and DoesNotExist.
+                                  type: string
+                                values:
+                                  description: values is an array of string values.
+                                    If the operator is In or NotIn, the values array
+                                    must be non-empty. If the operator is Exists or
+                                    DoesNotExist, the values array must be empty.
+                                    This array is replaced during a strategic merge
+                                    patch.
+                                  items:
+                                    type: string
+                                  type: array
+                              required:
+                              - key
+                              - operator
+                              type: object
+                            type: array
+                          matchLabels:
+                            additionalProperties:
+                              type: string
+                            description: matchLabels is a map of {key,value} pairs.
+                              A single {key,value} in the matchLabels map is equivalent
+                              to an element of matchExpressions, whose key field is
+                              "key", the operator is "In", and the values array contains
+                              only "value". The requirements are ANDed.
+                            type: object
+                        type: object
+                      namespaceSelector:
+                        description: NamespaceSelector is a selector for selecting
+                          either all namespaces or a list of namespaces.
+                        properties:
+                          any:
+                            description: Boolean describing whether all namespaces
+                              are selected in contrast to a list restricting them.
+                            type: boolean
+                          matchNames:
+                            description: List of namespace names.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                    type: object
                   tlsConfig:
                     description: TLSConfig describes tls configuration for notifier
                     properties:
@@ -5777,10 +6145,8 @@ spec:
                         type: string
                     type: object
                   url:
-                    description: AlertManager url. Required parameter. E.g. http://127.0.0.1:9093
+                    description: AlertManager url.  E.g. http://127.0.0.1:9093
                     type: string
-                required:
-                - url
                 type: object
               notifiers:
                 description: Notifiers prometheus alertmanager endpoints. Required
@@ -5838,6 +6204,74 @@ spec:
                               type: boolean
                           required:
                           - key
+                          type: object
+                      type: object
+                    selector:
+                      description: Selector allows service discovery for alertmanager
+                        in this case all matched vmalertmanager replicas will be added
+                        into vmalert notifier.url as statefulset pod.fqdn
+                      properties:
+                        labelSelector:
+                          description: A label selector is a label query over a set
+                            of resources. The result of matchLabels and matchExpressions
+                            are ANDed. An empty label selector matches all objects.
+                            A null label selector matches no objects.
+                          properties:
+                            matchExpressions:
+                              description: matchExpressions is a list of label selector
+                                requirements. The requirements are ANDed.
+                              items:
+                                description: A label selector requirement is a selector
+                                  that contains values, a key, and an operator that
+                                  relates the key and values.
+                                properties:
+                                  key:
+                                    description: key is the label key that the selector
+                                      applies to.
+                                    type: string
+                                  operator:
+                                    description: operator represents a key's relationship
+                                      to a set of values. Valid operators are In,
+                                      NotIn, Exists and DoesNotExist.
+                                    type: string
+                                  values:
+                                    description: values is an array of string values.
+                                      If the operator is In or NotIn, the values array
+                                      must be non-empty. If the operator is Exists
+                                      or DoesNotExist, the values array must be empty.
+                                      This array is replaced during a strategic merge
+                                      patch.
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - key
+                                - operator
+                                type: object
+                              type: array
+                            matchLabels:
+                              additionalProperties:
+                                type: string
+                              description: matchLabels is a map of {key,value} pairs.
+                                A single {key,value} in the matchLabels map is equivalent
+                                to an element of matchExpressions, whose key field
+                                is "key", the operator is "In", and the values array
+                                contains only "value". The requirements are ANDed.
+                              type: object
+                          type: object
+                        namespaceSelector:
+                          description: NamespaceSelector is a selector for selecting
+                            either all namespaces or a list of namespaces.
+                          properties:
+                            any:
+                              description: Boolean describing whether all namespaces
+                                are selected in contrast to a list restricting them.
+                              type: boolean
+                            matchNames:
+                              description: List of namespace names.
+                              items:
+                                type: string
+                              type: array
                           type: object
                       type: object
                     tlsConfig:
@@ -5968,10 +6402,8 @@ spec:
                           type: string
                       type: object
                     url:
-                      description: AlertManager url. Required parameter. E.g. http://127.0.0.1:9093
+                      description: AlertManager url.  E.g. http://127.0.0.1:9093
                       type: string
-                  required:
-                  - url
                   type: object
                 type: array
               podDisruptionBudget:
@@ -12094,9 +12526,24 @@ spec:
                     concurrency:
                       description: Concurrency defines how many rules execute at once.
                       type: integer
+                    extra_filter_labels:
+                      additionalProperties:
+                        type: string
+                      description: ExtraFilterLabels optional list of label filters
+                        applied to every rule's request withing a group. Is compatible
+                        only with VM datasource. See more details at https://docs.victoriametrics.com#prometheus-querying-api-enhancements
+                      type: object
                     interval:
                       description: evaluation interval for group
                       type: string
+                    labels:
+                      additionalProperties:
+                        type: string
+                      description: Labels optional list of labels added to every rule
+                        within a group. It has priority over the external labels.
+                        Labels are commonly used for adding environment or tenant-specific
+                        tag.
+                      type: object
                     name:
                       description: Name of group
                       type: string
@@ -12135,6 +12582,10 @@ spec:
                             type: string
                         type: object
                       type: array
+                    tenant:
+                      description: Tenant id for group, can be used only with enterprise
+                        version of vmalert See more details at https://docs.victoriametrics.com/vmalert.html#multitenancy
+                      type: string
                   required:
                   - name
                   - rules
