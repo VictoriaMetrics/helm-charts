@@ -132,6 +132,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.replicaCount | int | `1` |  |
 | alertmanager.resources | object | `{}` |  |
 | alertmanager.retention | string | `"120h"` |  |
+| alertmanager.service.annotations | object | `{}` |  |
+| alertmanager.service.port | int | `9093` |  |
+| alertmanager.service.type | string | `"ClusterIP"` |  |
 | alertmanager.tag | string | `"v0.20.0"` |  |
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
