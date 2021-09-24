@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.8.5](https://img.shields.io/badge/Version-0.8.5-informational?style=flat-square)
+ ![Version: 0.8.6](https://img.shields.io/badge/Version-0.8.6-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -128,7 +128,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | server.image.repository | string | `"victoriametrics/victoria-metrics"` | Image repository |
-| server.image.tag | string | `"v1.65.0"` | Image tag |
+| server.image.tag | string | `"v1.66.2"` | Image tag |
 | server.ingress.annotations | object | `{}` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
@@ -205,7 +205,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | server.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| server.vmbackupmanager.image.tag | string | `"v1.65.0-enterprise"` | vmbackupmanager image tag |
+| server.vmbackupmanager.image.tag | string | `"v1.66.2-enterprise"` | vmbackupmanager image tag |
 | server.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
 | server.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
 | server.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |
