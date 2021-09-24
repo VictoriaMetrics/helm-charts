@@ -8,7 +8,7 @@ metadata:
   labels:
     app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kubedns
     jobLabel: kubedns
-  {{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
 spec:
   clusterIP: None
   ports:
@@ -21,11 +21,9 @@ spec:
       protocol: TCP
       targetPort: {{ .Values.kubeDns.service.skydns.targetPort }}
   selector:
-    {{- if .Values.kubeDns.service.selector }}
-    {{ toYaml .Values.kubeDns.service.selector | indent 4 }}
-    {{- else}}
-    k8s-app: kube-dns
-{{- end}}
+    {{- with .Values.kubeDns.service.selector -}}
+    {{- toYaml . | nindent 4 }}
+    {{- end}}
 {{- end }}
 ---
 {{- if .Values.kubeDns.vmServiceScrape.enabled }}
@@ -44,6 +42,6 @@ spec:
   namespaceSelector:
     matchNames:
       - "kube-system"
-    {{ omit .Values.kubeDns.vmServiceScrape.spec "selector" "namespaceSelector" | toYaml | indent 2 }}
+{{ omit .Values.kubeDns.vmServiceScrape.spec "selector" "namespaceSelector" | toYaml | indent 2 }}
 {{- end }}
 {{- end }}
