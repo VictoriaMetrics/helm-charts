@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.4.5](https://img.shields.io/badge/Version-0.4.5-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.4.6](https://img.shields.io/badge/Version-0.4.6-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -352,6 +352,17 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeControllerManager.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | kubeControllerManager.vmServiceScrape.spec.endpoints[0].tlsConfig.serverName | string | `"kubernetes"` |  |
 | kubeControllerManager.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| kubeDns.enabled | bool | `false` |  |
+| kubeDns.service.dnsmasq.port | int | `10054` |  |
+| kubeDns.service.dnsmasq.targetPort | int | `10054` |  |
+| kubeDns.service.enabled | bool | `false` |  |
+| kubeDns.service.skydns.port | int | `10055` |  |
+| kubeDns.service.skydns.targetPort | int | `10055` |  |
+| kubeDns.vmServiceScrape.enabled | bool | `false` |  |
+| kubeDns.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeDns.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics-dnsmasq"` |  |
+| kubeDns.vmServiceScrape.spec.endpoints[1].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeDns.vmServiceScrape.spec.endpoints[1].port | string | `"http-metrics-skydns"` |  |
 | kubeEtcd.enabled | bool | `true` |  |
 | kubeEtcd.endpoints | list | `[]` |  |
 | kubeEtcd.service.enabled | bool | `true` |  |
