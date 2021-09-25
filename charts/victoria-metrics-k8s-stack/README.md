@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.4.6](https://img.shields.io/badge/Version-0.4.6-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -196,7 +196,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.config.receivers[0].name | string | `"slack-monitoring"` |  |
 | alertmanager.config.receivers[0].slack_configs[0].actions[0].text | string | `"Runbook :green_book:"` |  |
 | alertmanager.config.receivers[0].slack_configs[0].actions[0].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[0].url | string | `"{{ (index .Alerts 0).Annotations.runbook }}"` |  |
+| alertmanager.config.receivers[0].slack_configs[0].actions[0].url | string | `"{{ (index .Alerts 0).Annotations.runbook_url }}"` |  |
 | alertmanager.config.receivers[0].slack_configs[0].actions[1].text | string | `"Query :mag:"` |  |
 | alertmanager.config.receivers[0].slack_configs[0].actions[1].type | string | `"button"` |  |
 | alertmanager.config.receivers[0].slack_configs[0].actions[1].url | string | `"{{ (index .Alerts 0).GeneratorURL }}"` |  |
@@ -305,8 +305,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.dashboards.default.nodeexporter.datasource | string | `"VictoriaMetrics"` |  |
 | grafana.dashboards.default.nodeexporter.gnetId | int | `1860` |  |
 | grafana.dashboards.default.nodeexporter.revision | int | `22` |  |
-| grafana.dashboards.default.victoriametrics.url | string | `"https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json"` |  |
-| grafana.dashboards.default.vmagent.url | string | `"https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json"` |  |
 | grafana.defaultDashboardsEnabled | bool | `true` |  |
 | grafana.enabled | bool | `true` |  |
 | grafana.ingress.annotations | object | `{}` |  |
@@ -318,6 +316,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.ingress.pathType | string | `"Prefix"` |  |
 | grafana.ingress.tls | list | `[]` |  |
 | grafana.sidecar.dashboards.enabled | bool | `true` |  |
+| grafana.sidecar.dashboards.multicluster | bool | `false` |  |
 | grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |
 | grafana.sidecar.datasources.enabled | bool | `true` |  |
 | grafana.vmServiceScrape.enabled | bool | `true` |  |

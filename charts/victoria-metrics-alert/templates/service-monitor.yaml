@@ -7,11 +7,11 @@ metadata:
 {{ toYaml .Values.serviceMonitor.annotations | indent 4 }}
   {{- end }}
   labels:
-  {{- include "chart.labels" . | nindent 4 }}
-  {{- if .Values.serviceMonitor.extraLabels }}
-{{ toYaml .Values.serviceMonitor.extraLabels | indent 4 }}
-  {{- end }}
-  name: {{ template "chart.fullname" . }}
+{{- include "vmalert.server.labels" . | nindent 4 }}
+{{- if .Values.serviceMonitor.extraLabels -}}
+{{ toYaml .Values.serviceMonitor.extraLabels | nindent 4 }}
+{{- end }}
+  name: {{ template "vmalert.server.fullname" . }}
   {{- if .Values.serviceMonitor.namespace }}
   namespace: {{ .Values.serviceMonitor.namespace }}
   {{- end }}
@@ -21,7 +21,7 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "chart.matchLabels" . | nindent 6 }} 
+{{- include "vmalert.server.matchLabels" . | nindent 4 }}
   endpoints:
     - port: http
       {{- if .Values.serviceMonitor.interval }}
