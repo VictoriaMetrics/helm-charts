@@ -3,7 +3,7 @@ Generated from 'vmagent' group from https://raw.githubusercontent.com/VictoriaMe
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.defaultRules.create }}
+{{- if and .Values.defaultRules.create .Values.vmagent.enabled }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
@@ -68,6 +68,18 @@ spec:
         description: "Vmagent fails to push data via remote write protocol to destination \"{{`{{`}} $labels.url {{`}}`}}\"\n Ensure that destination is up and reachable."
         summary: Job "{{`{{`}} $labels.job {{`}}`}}" on instance {{`{{`}} $labels.instance {{`}}`}} fails to push to remote storage
       expr: sum(rate(vmagent_remotewrite_retries_count_total[5m])) by(job, instance, url) > 0
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: RemoteWriteConnectionIsSaturated
+      annotations:
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=84&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        description: "The remote write connection between vmagent \"{{`{{`}} $labels.job {{`}}`}}\" (instance {{`{{`}} $labels.instance {{`}}`}}) and destination \"{{`{{`}} $labels.url {{`}}`}}\" is saturated by more than 90% and vmagent won't be able to keep up.\n This usually means that `-remoteWrite.queues` command-line flag must be increased in order to increase the number of connections per each remote storage."
+        summary: Remote write connection from "{{`{{`}} $labels.job {{`}}`}}" (instance {{`{{`}} $labels.instance {{`}}`}}) to {{`{{`}} $labels.url {{`}}`}} is saturated
+      expr: rate(vmagent_remotewrite_send_duration_seconds_total[5m]) > 0.9
       for: 15m
       labels:
         severity: warning

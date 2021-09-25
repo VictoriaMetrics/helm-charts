@@ -57,29 +57,30 @@ skip_list = [
 ]
 # Additional conditions map
 condition_map = {
-    'etcd': ' .Values.kubeEtcd.enabled .Values.defaultRules.rules.etcd',
-    'general.rules': ' .Values.defaultRules.rules.general',
-    'k8s.rules': ' .Values.defaultRules.rules.k8s',
-    'kube-apiserver-availability.rules': ' .Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverAvailability',
-    'kube-apiserver-slos': ' .Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverSlos',
-    'kube-apiserver.rules': ' .Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserver',
-    'kube-prometheus-general.rules': ' .Values.defaultRules.rules.kubePrometheusGeneral',
-    'kube-prometheus-node-recording.rules': ' .Values.defaultRules.rules.kubePrometheusNodeRecording',
-    'kube-scheduler.rules': ' .Values.kubeScheduler.enabled .Values.defaultRules.rules.kubeScheduler',
-    'kube-state-metrics': ' .Values.defaultRules.rules.kubeStateMetrics',
-    'kubelet.rules': ' .Values.kubelet.enabled .Values.defaultRules.rules.kubelet',
-    'kubernetes-apps': ' .Values.defaultRules.rules.kubernetesApps',
-    'kubernetes-resources': ' .Values.defaultRules.rules.kubernetesResources',
-    'kubernetes-storage': ' .Values.defaultRules.rules.kubernetesStorage',
-    'kubernetes-system': ' .Values.defaultRules.rules.kubernetesSystem',
-    'kubernetes-system-apiserver': ' .Values.defaultRules.rules.kubernetesSystem',
-    'kubernetes-system-controller-manager': ' .Values.kubeControllerManager.enabled',
-    'kubernetes-system-kubelet': ' .Values.defaultRules.rules.kubernetesSystem',
-    'kubernetes-system-scheduler': ' .Values.kubeScheduler.enabled .Values.defaultRules.rules.kubeScheduler',
-    'node-exporter': ' .Values.defaultRules.rules.node',
-    'node-exporter.rules': ' .Values.defaultRules.rules.node',
-    'node-network': ' .Values.defaultRules.rules.network',
-    'node.rules': ' .Values.defaultRules.rules.node',
+    'etcd': '.Values.kubeEtcd.enabled .Values.defaultRules.rules.etcd',
+    'general.rules': '.Values.defaultRules.rules.general',
+    'k8s.rules': '.Values.defaultRules.rules.k8s',
+    'kube-apiserver-availability.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverAvailability',
+    'kube-apiserver-slos': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverSlos',
+    'kube-apiserver.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserver',
+    'kube-prometheus-general.rules': '.Values.defaultRules.rules.kubePrometheusGeneral',
+    'kube-prometheus-node-recording.rules': '.Values.defaultRules.rules.kubePrometheusNodeRecording',
+    'kube-scheduler.rules': '.Values.kubeScheduler.enabled .Values.defaultRules.rules.kubeScheduler',
+    'kube-state-metrics': '.Values.defaultRules.rules.kubeStateMetrics',
+    'kubelet.rules': '.Values.kubelet.enabled .Values.defaultRules.rules.kubelet',
+    'kubernetes-apps': '.Values.defaultRules.rules.kubernetesApps',
+    'kubernetes-resources': '.Values.defaultRules.rules.kubernetesResources',
+    'kubernetes-storage': '.Values.defaultRules.rules.kubernetesStorage',
+    'kubernetes-system': '.Values.defaultRules.rules.kubernetesSystem',
+    'kubernetes-system-apiserver': '.Values.defaultRules.rules.kubernetesSystem',
+    'kubernetes-system-controller-manager': '.Values.kubeControllerManager.enabled',
+    'kubernetes-system-kubelet': '.Values.defaultRules.rules.kubernetesSystem',
+    'kubernetes-system-scheduler': '.Values.kubeScheduler.enabled .Values.defaultRules.rules.kubeScheduler',
+    'node-exporter': '.Values.defaultRules.rules.node',
+    'node-exporter.rules': '.Values.defaultRules.rules.node',
+    'node-network': '.Values.defaultRules.rules.network',
+    'node.rules': '.Values.defaultRules.rules.node',
+    'vmagent': '.Values.vmagent.enabled'
 }
 
 alert_condition_map = {
@@ -117,7 +118,7 @@ Generated from '%(name)s' group from %(url)s
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.defaultRules.create%(condition)s }}%(init_line)s
+{{- if and .Values.defaultRules.create %(condition)s }}%(init_line)s
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:

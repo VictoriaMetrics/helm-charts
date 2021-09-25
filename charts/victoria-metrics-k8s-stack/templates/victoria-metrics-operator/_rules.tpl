@@ -27,4 +27,5 @@ rules:
   - "node-exporter.rules"
   - "node-network"
   - "node.rules"
+  - "vmagent"
 {{- end }}

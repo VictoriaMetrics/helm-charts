@@ -65,18 +65,18 @@ skip_list = [
 
 # Additional conditions map
 condition_map = {
-    'grafana-coredns-k8s': ' .Values.coreDns.enabled',
-    'etcd': ' .Values.kubeEtcd.enabled',
-    'apiserver': ' .Values.kubeApiServer.enabled',
-    'controller-manager': ' .Values.kubeControllerManager.enabled',
-    'kubelet': ' .Values.kubelet.enabled',
-    'proxy': ' .Values.kubeProxy.enabled',
-    'scheduler': ' .Values.kubeScheduler.enabled',
-    'node-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
-    'node-cluster-rsrc-use': ' (index .Values "prometheus-node-exporter" "enabled")',
-    'victoriametrics-cluster': ' .Values.vmcluster.enabled',
-    'victoriametrics': ' .Values.vmsingle.enabled',
-    'vmalert': ' .Values.vmalert.enabled'
+    'grafana-coredns-k8s': '.Values.coreDns.enabled',
+    'etcd': '.Values.kubeEtcd.enabled',
+    'apiserver': '.Values.kubeApiServer.enabled',
+    'controller-manager': '.Values.kubeControllerManager.enabled',
+    'kubelet': '.Values.kubelet.enabled',
+    'proxy': '.Values.kubeProxy.enabled',
+    'scheduler': '.Values.kubeScheduler.enabled',
+    'node-rsrc-use': '(index .Values "prometheus-node-exporter" "enabled")',
+    'node-cluster-rsrc-use': '(index .Values "prometheus-node-exporter" "enabled")',
+    'victoriametrics-cluster': '.Values.vmcluster.enabled',
+    'victoriametrics': '.Values.vmsingle.enabled',
+    'vmalert': '.Values.vmalert.enabled'
 }
 
 # standard header
@@ -85,7 +85,7 @@ Generated from '%(name)s' from %(url)s
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled%(condition)s }}
+{{- if and %(condition)s }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -127,15 +127,24 @@ def yaml_str_repr(struct, indent=2):
     return text
 
 
-def patch_json_for_multicluster_configuration(content):
+def patch_dashboards_json(content):
     try:
         content_struct = json.loads(content)
+
+        ## multicluster
         overwrite_list = []
         for variable in content_struct['templating']['list']:
             if variable['name'] == 'cluster':
                 variable['hide'] = ':multicluster:'
             overwrite_list.append(variable)
         content_struct['templating']['list'] = overwrite_list
+
+        ## make dashboards readonly
+        content_struct['editable'] = 'false'
+
+        ## add common tag
+        content_struct['tags'].append('vm-k8s-stack')
+
         content_array = []
         original_content_lines = content.split('\n')
         for i, line in enumerate(json.dumps(content_struct, indent=4).split('\n')):
@@ -173,10 +182,14 @@ def write_group_to_file(resource_name, content, url, destination):
     lines = header % {
         'name': resource_name,
         'url': url,
-        'condition': condition_map.get(resource_name, '')
+        'condition': ' '.join([
+            '.Values.grafana.enabled',
+            '.Values.grafana.defaultDashboardsEnabled',
+            condition_map.get(resource_name, '')
+            ]).strip()
     }
 
-    content = patch_json_for_multicluster_configuration(content)
+    content = patch_dashboards_json(content)
 
     filename_struct = {resource_name + '.json': (LiteralStr(content))}
     # rules themselves

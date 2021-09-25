@@ -339,7 +339,7 @@ alertmanager:
             actions:
               - type: button
                 text: "Runbook :green_book:"
-                url: "{{ (index .Alerts 0).Annotations.runbook }}"
+                url: "{{ (index .Alerts 0).Annotations.runbook_url }}"
               - type: button
                 text: "Query :mag:"
                 url: "{{ (index .Alerts 0).GeneratorURL }}"
@@ -383,7 +383,8 @@ alertmanager:
     enabled: true
 
   # extra alert templates
-  templateFiles: {}
+  templateFiles:
+    {}
     # template_1.tmpl: |-
     #   {{ define "hello" -}}
     #   hello, Victoria!
@@ -531,6 +532,7 @@ grafana:
       createVMReplicasDatasources: false
     dashboards:
       enabled: true
+      multicluster: false
 
   ## Configure additional grafana datasources (passed through tpl)
   ## ref: http://docs.grafana.org/administration/provisioning/#datasources
@@ -563,10 +565,6 @@ grafana:
 
   dashboards:
     default:
-      victoriametrics:
-        url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json
-      vmagent:
-        url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json
       nodeexporter:
         gnetId: 1860
         revision: 22
