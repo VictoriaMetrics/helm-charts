@@ -85,7 +85,7 @@ Generated from '%(name)s' from %(url)s
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled %(condition)s }}
+{{- if and %(condition)s }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -182,7 +182,11 @@ def write_group_to_file(resource_name, content, url, destination):
     lines = header % {
         'name': resource_name,
         'url': url,
-        'condition': condition_map.get(resource_name, '')
+        'condition': ' '.join([
+            '.Values.grafana.enabled',
+            '.Values.grafana.defaultDashboardsEnabled',
+            condition_map.get(resource_name, '')
+            ]).strip()
     }
 
     content = patch_dashboards_json(content)
