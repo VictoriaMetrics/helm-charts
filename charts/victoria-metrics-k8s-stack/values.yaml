@@ -1,8 +1,10 @@
 nameOverride: ""
 fullnameOverride: ""
 
+# -- Configures operator CRD
 operator:
   enabled: true
+  # -- Tells helm to remove CRD after chart remove
   cleanupCRD: true
   cleanupSA:
     create: true
@@ -12,22 +14,21 @@ operator:
     tag: v1.16.0
     pullPolicy: IfNotPresent
 
-# If this chart is used in "Agrocd" with "releaseName" field then  
-# VMServiceScrapes couldn't select the proper services.
-# For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME'
+# -- If this chart is used in "Agrocd" with "releaseName" field then
+# -- VMServiceScrapes couldn't select the proper services.
+# -- For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME'
 argocdReleaseOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- The name of the service account to use.
+  # -- If not set and create is true, a name is generated using the fullname template
   name: ""
 
-## Create default rules for monitoring the cluster
-##
+## -- Create default rules for monitoring the cluster
 defaultRules:
   create: true
   rules:
@@ -49,29 +50,31 @@ defaultRules:
     network: true
     node: true
 
-  ## Runbook url prefix for default rules
+  # -- Runbook url prefix for default rules
   runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
   ## Reduce app namespace alert scope
   appNamespacesTarget: ".*"
 
-  ## Labels for default rules
+  # -- Labels for default rules
   labels: {}
-  ## Annotations for default rules
+  # -- Annotations for default rules
   annotations: {}
 
-  ## Additional labels for PrometheusRule alerts
+  # -- Additional labels for PrometheusRule alerts
   additionalRuleLabels: {}
 
 ##############
 
-# victoria-metrics-operator dependency chart configuration. For possible values refer to https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator#parameters
+# -- victoria-metrics-operator dependency chart configuration.
+# -- For possible values refer to https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator#parameters
 victoria-metrics-operator:
-  ## all values for victoria-metrics-operator helm chart can be specified here
+  # -- all values for victoria-metrics-operator helm chart can be specified here
   createCRD: false
   operator:
     # -- By default, operator converts prometheus-operator objects.
     disable_prometheus_converter: true
 
+# -- Configures vmsingle params
 vmsingle:
   enabled: true
   # spec for VMSingle crd
@@ -649,14 +652,14 @@ kube-state-metrics:
 
   #TODO: selector override for kube-state-metrics deployed separatelly
 
-### Service Monitors
+## Service Monitors
 ## Component scraping the kubelets
 kubelet:
   enabled: true
 
-  ## Enable scraping /metrics/cadvisor from kubelet's service
+  # -- Enable scraping /metrics/cadvisor from kubelet's service
   cadvisor: true
-  ## Enable scraping /metrics/probes from kubelet's service
+  # -- Enable scraping /metrics/probes from kubelet's service
   probes: true
   # spec for VMNodeScrape crd
   # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmnodescrapespec
@@ -677,7 +680,7 @@ kubelet:
       - targetLabel: "job"
         replacement: "kubelet"
 
-## Component scraping the kube api server
+# -- Component scraping the kube api server
 kubeApiServer:
   enabled: true
   # spec for VMServiceScrape crd
@@ -701,7 +704,7 @@ kubeApiServer:
         component: apiserver
         provider: kubernetes
 
-## Component scraping the kube controller manager
+# -- Component scraping the kube controller manager
 kubeControllerManager:
   enabled: true
 
@@ -737,16 +740,39 @@ kubeControllerManager:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             serverName: kubernetes
 
-## Component scraping coreDns. Use either this or kubeDns
-##
+# -Component scraping kubeDns. Use either this or coreDns
+kubeDns:
+  enabled: false
+  service:
+    enabled: false
+    dnsmasq:
+      port: 10054
+      targetPort: 10054
+    skydns:
+      port: 10055
+      targetPort: 10055
+    selector:
+      k8s-app: kube-dns
+  vmServiceScrape:
+   enabled: true
+   # spec for VMServiceScrape crd
+   # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
+   spec:
+     endpoints:
+       - port: http-metrics-dnsmasq
+         bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+       - port: http-metrics-skydns
+         bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+# -- Component scraping coreDns. Use either this or kubeDns
 coreDns:
   enabled: true
   service:
     enabled: true
     port: 9153
     targetPort: 9153
-    # selector:
-    #   k8s-app: kube-dns
+    selector:
+       k8s-app: kube-dns
 
   vmServiceScrape:
     enabled: true

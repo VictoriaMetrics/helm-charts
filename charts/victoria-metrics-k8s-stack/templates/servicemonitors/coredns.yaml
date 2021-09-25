@@ -19,10 +19,8 @@ spec:
       protocol: TCP
       targetPort: {{ .Values.coreDns.service.targetPort }}
   selector:
-    {{- if .Values.coreDns.service.selector }}
-{{ toYaml .Values.coreDns.service.selector | indent 4 }}
-    {{- else}}
-    k8s-app: kube-dns
+    {{- with .Values.coreDns.service.selector -}}
+    {{ toYaml . | nindent 4 }}
     {{- end}}
 {{- end }}
 {{- if .Values.coreDns.vmServiceScrape.enabled }}
