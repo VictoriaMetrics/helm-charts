@@ -216,11 +216,17 @@ spec:
         {{- if not .Values.server.persistentVolume.enabled }}
         - name: server-volume
           emptyDir: {}
+        {{ else }}
+        {{- if .Values.server.persistentVolume.existingClaim }}
+        - name: server-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.server.persistentVolume.existingClaim }}
+        {{- end }}
         {{- end }}
         {{- with .Values.server.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-  {{- if .Values.server.persistentVolume.enabled }}
+  {{- if and .Values.server.persistentVolume.enabled (not .Values.server.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
     - metadata:
         name: server-volume
