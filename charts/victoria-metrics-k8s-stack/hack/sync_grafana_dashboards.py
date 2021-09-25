@@ -85,7 +85,7 @@ Generated from '%(name)s' from %(url)s
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled %(condition)s}}
+{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled %(condition)s }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
