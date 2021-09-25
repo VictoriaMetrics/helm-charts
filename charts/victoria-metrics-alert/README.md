@@ -115,6 +115,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.enabled | bool | `false` |  |
 | alertmanager.ingress.extraLabels | object | `{}` |  |
 | alertmanager.ingress.hosts | list | `[]` |  |
+| alertmanager.ingress.pathType | string | `"Prefix"` |  |
 | alertmanager.ingress.tls | list | `[]` |  |
 | alertmanager.nodeSelector | object | `{}` |  |
 | alertmanager.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
@@ -132,6 +133,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.replicaCount | int | `1` |  |
 | alertmanager.resources | object | `{}` |  |
 | alertmanager.retention | string | `"120h"` |  |
+| alertmanager.service.annotations | object | `{}` |  |
+| alertmanager.service.port | int | `9093` |  |
+| alertmanager.service.type | string | `"ClusterIP"` |  |
 | alertmanager.tag | string | `"v0.20.0"` |  |
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
