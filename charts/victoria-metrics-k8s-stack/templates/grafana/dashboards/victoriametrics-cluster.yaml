@@ -3,7 +3,7 @@ Generated from 'victoriametrics-cluster' from https://raw.githubusercontent.com/
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled .Values.vmcluster.enabled }}
+{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled .Values.vmcluster.enabled}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -64,12 +64,12 @@ data:
                 }
             ]
         },
-        "description": "Overview for cluster VictoriaMetrics v1.57.0 or higher",
-        "editable": true,
+        "description": "Overview for cluster VictoriaMetrics v1.64.0 or higher",
+        "editable": "false",
         "gnetId": null,
         "graphTooltip": 0,
         "id": null,
-        "iteration": 1624970989155,
+        "iteration": 1630495970262,
         "links": [
             {
                 "icon": "doc",
@@ -6022,6 +6022,122 @@ data:
                         "dashLength": 10,
                         "dashes": false,
                         "datasource": "$ds",
+                        "description": "Shows the saturation level of connection between vminsert and vmstorage components. If the threshold of 0.9sec is reached, then the connection is saturated by more than 90% and vminsert won't be able to keep up. This usually means that more vminsert or vmstorage nodes must be added to the cluster in order to increase the total number of vminsert -> vmstorage links.\n",
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 1,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 25
+                        },
+                        "hiddenSeries": false,
+                        "id": 139,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": false,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null as zero",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.0.0",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "exemplar": true,
+                                "expr": "rate(vm_rpc_send_duration_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "{{`{{`}}instance{{`}}`}} => {{`{{`}}addr{{`}}`}}",
+                                "refId": "A"
+                            }
+                        ],
+                        "thresholds": [
+                            {
+                                "$$hashKey": "object:234",
+                                "colorMode": "critical",
+                                "fill": true,
+                                "line": true,
+                                "op": "gt",
+                                "value": 0.9,
+                                "yaxis": "left"
+                            }
+                        ],
+                        "timeFrom": null,
+                        "timeRegions": [],
+                        "timeShift": null,
+                        "title": "Storage connection saturation ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 2,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "buckets": null,
+                            "mode": "time",
+                            "name": null,
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "$$hashKey": "object:156",
+                                "decimals": 0,
+                                "format": "s",
+                                "label": null,
+                                "logBase": 1,
+                                "max": null,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "$$hashKey": "object:157",
+                                "format": "short",
+                                "label": null,
+                                "logBase": 1,
+                                "max": null,
+                                "min": "0",
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false,
+                            "alignLevel": null
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": "$ds",
                         "description": "Shows if vmstorage node is reachable for vminsert. If below 1 means vmstorage is not reachable at this moment of time. ",
                         "fieldConfig": {
                             "defaults": {
@@ -6126,7 +6242,9 @@ data:
         ],
         "schemaVersion": 30,
         "style": "dark",
-        "tags": [],
+        "tags": [
+            "vm-k8s-stack"
+        ],
         "templating": {
             "list": [
                 {
@@ -6142,7 +6260,9 @@ data:
                     "label": null,
                     "multi": false,
                     "name": "ds",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": "prometheus",
                     "refresh": 1,
                     "regex": "",
@@ -6151,7 +6271,9 @@ data:
                 },
                 {
                     "allValue": null,
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": "$ds",
                     "definition": "label_values(vm_app_version{version=~\"^vminsert.*\"}, job)",
                     "description": null,
@@ -6161,7 +6283,9 @@ data:
                     "label": null,
                     "multi": false,
                     "name": "job_insert",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{version=~\"^vminsert.*\"}, job)",
                         "refId": "VictoriaMetrics-job_insert-Variable-Query"
@@ -6177,7 +6301,9 @@ data:
                 },
                 {
                     "allValue": null,
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": "$ds",
                     "definition": "label_values(vm_app_version{version=~\"^vmselect.*\"}, job)",
                     "description": null,
@@ -6187,7 +6313,9 @@ data:
                     "label": null,
                     "multi": false,
                     "name": "job_select",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{version=~\"^vmselect.*\"}, job)",
                         "refId": "VictoriaMetrics-job_select-Variable-Query"
@@ -6203,7 +6331,9 @@ data:
                 },
                 {
                     "allValue": null,
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": "$ds",
                     "definition": "label_values(vm_app_version{version=~\"^vmstorage.*\"}, job)",
                     "description": null,
@@ -6213,7 +6343,9 @@ data:
                     "label": null,
                     "multi": false,
                     "name": "job_storage",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{version=~\"^vmstorage.*\"}, job)",
                         "refId": "VictoriaMetrics-job_storage-Variable-Query"
@@ -6229,7 +6361,9 @@ data:
                 },
                 {
                     "allValue": null,
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": "$ds",
                     "definition": "label_values(vm_app_version{version=~\"^vm(insert|select|storage).*\"}, job)",
                     "description": null,
@@ -6239,7 +6373,9 @@ data:
                     "label": null,
                     "multi": true,
                     "name": "job",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{version=~\"^vm(insert|select|storage).*\"}, job)",
                         "refId": "VictoriaMetrics-job-Variable-Query"
@@ -6255,7 +6391,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": "$ds",
                     "definition": "label_values(vm_app_version{job=~\"$job\"}, instance)",
                     "description": null,
@@ -6265,7 +6403,9 @@ data:
                     "label": null,
                     "multi": true,
                     "name": "instance",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{job=~\"$job\"}, instance)",
                         "refId": "VictoriaMetrics-instance-Variable-Query"
