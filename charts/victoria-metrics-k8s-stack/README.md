@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.4.5](https://img.shields.io/badge/Version-0.4.5-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.4.6](https://img.shields.io/badge/Version-0.4.6-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -267,19 +267,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.spec.image.tag | string | `"v0.22.2"` |  |
 | alertmanager.spec.routePrefix | string | `"/"` |  |
 | alertmanager.templateFiles | object | `{}` |  |
-| argocdReleaseOverride | string | `""` |  |
-| coreDns.enabled | bool | `true` |  |
-| coreDns.service.enabled | bool | `true` |  |
-| coreDns.service.port | int | `9153` |  |
-| coreDns.service.targetPort | int | `9153` |  |
-| coreDns.vmServiceScrape.enabled | bool | `true` |  |
-| coreDns.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| coreDns.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
-| defaultRules.additionalRuleLabels | object | `{}` |  |
-| defaultRules.annotations | object | `{}` |  |
+| argocdReleaseOverride | string | `""` | If this chart is used in "Agrocd" with "releaseName" field then -- VMServiceScrapes couldn't select the proper services. -- For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
+| coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"vmServiceScrape":{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}]}}}` | Component scraping coreDns. Use either this or kubeDns |
+| defaultRules.additionalRuleLabels | object | `{}` | Additional labels for PrometheusRule alerts |
+| defaultRules.annotations | object | `{}` | Annotations for default rules |
 | defaultRules.appNamespacesTarget | string | `".*"` |  |
 | defaultRules.create | bool | `true` |  |
-| defaultRules.labels | object | `{}` |  |
+| defaultRules.labels | object | `{}` | Labels for default rules |
 | defaultRules.rules.etcd | bool | `true` |  |
 | defaultRules.rules.general | bool | `true` |  |
 | defaultRules.rules.k8s | bool | `true` |  |
@@ -297,7 +291,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rules.kubernetesSystem | bool | `true` |  |
 | defaultRules.rules.network | bool | `true` |  |
 | defaultRules.rules.node | bool | `true` |  |
-| defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` |  |
+| defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
 | fullnameOverride | string | `""` |  |
 | grafana.additionalDataSources | list | `[]` |  |
 | grafana.dashboardProviders."dashboardproviders.yaml".apiVersion | int | `1` |  |
@@ -330,28 +324,20 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.vmServiceScrape.spec | object | `{}` |  |
 | kube-state-metrics.enabled | bool | `true` |  |
 | kube-state-metrics.vmServiceScrape.spec | object | `{}` |  |
-| kubeApiServer.enabled | bool | `true` |  |
-| kubeApiServer.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeApiServer.spec.endpoints[0].port | string | `"https"` |  |
-| kubeApiServer.spec.endpoints[0].scheme | string | `"https"` |  |
-| kubeApiServer.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
-| kubeApiServer.spec.endpoints[0].tlsConfig.serverName | string | `"kubernetes"` |  |
-| kubeApiServer.spec.jobLabel | string | `"component"` |  |
-| kubeApiServer.spec.namespaceSelector.matchNames[0] | string | `"default"` |  |
-| kubeApiServer.spec.selector.matchLabels.component | string | `"apiserver"` |  |
-| kubeApiServer.spec.selector.matchLabels.provider | string | `"kubernetes"` |  |
-| kubeControllerManager.enabled | bool | `true` |  |
-| kubeControllerManager.endpoints | list | `[]` |  |
-| kubeControllerManager.service.enabled | bool | `true` |  |
-| kubeControllerManager.service.port | int | `10252` |  |
-| kubeControllerManager.service.targetPort | int | `10252` |  |
-| kubeControllerManager.vmServiceScrape.enabled | bool | `true` |  |
-| kubeControllerManager.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeControllerManager.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
-| kubeControllerManager.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
-| kubeControllerManager.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
-| kubeControllerManager.vmServiceScrape.spec.endpoints[0].tlsConfig.serverName | string | `"kubernetes"` |  |
-| kubeControllerManager.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| kubeApiServer | object | `{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"https","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"component","namespaceSelector":{"matchNames":["default"]},"selector":{"matchLabels":{"component":"apiserver","provider":"kubernetes"}}}}` | Component scraping the kube api server |
+| kubeControllerManager | object | `{"enabled":true,"endpoints":[],"service":{"enabled":true,"port":10252,"targetPort":10252},"vmServiceScrape":{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"jobLabel"}}}` | Component scraping the kube controller manager |
+| kubeDns.enabled | bool | `false` |  |
+| kubeDns.service.dnsmasq.port | int | `10054` |  |
+| kubeDns.service.dnsmasq.targetPort | int | `10054` |  |
+| kubeDns.service.enabled | bool | `false` |  |
+| kubeDns.service.selector.k8s-app | string | `"kube-dns"` |  |
+| kubeDns.service.skydns.port | int | `10055` |  |
+| kubeDns.service.skydns.targetPort | int | `10055` |  |
+| kubeDns.vmServiceScrape.enabled | bool | `true` |  |
+| kubeDns.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeDns.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics-dnsmasq"` |  |
+| kubeDns.vmServiceScrape.spec.endpoints[1].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeDns.vmServiceScrape.spec.endpoints[1].port | string | `"http-metrics-skydns"` |  |
 | kubeEtcd.enabled | bool | `true` |  |
 | kubeEtcd.endpoints | list | `[]` |  |
 | kubeEtcd.service.enabled | bool | `true` |  |
@@ -385,9 +371,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeScheduler.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
 | kubeScheduler.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | kubeScheduler.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
-| kubelet.cadvisor | bool | `true` |  |
+| kubelet.cadvisor | bool | `true` | Enable scraping /metrics/cadvisor from kubelet's service |
 | kubelet.enabled | bool | `true` |  |
-| kubelet.probes | bool | `true` |  |
+| kubelet.probes | bool | `true` | Enable scraping /metrics/probes from kubelet's service |
 | kubelet.spec.bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubelet.spec.honorLabels | bool | `true` |  |
 | kubelet.spec.interval | string | `"30s"` |  |
@@ -402,23 +388,18 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubelet.spec.tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | kubelet.spec.tlsConfig.insecureSkipVerify | bool | `true` |  |
 | nameOverride | string | `""` |  |
-| operator.cleanupCRD | bool | `true` |  |
-| operator.cleanupSA.create | bool | `true` |  |
-| operator.cleanupSA.name | string | `""` |  |
-| operator.enabled | bool | `true` |  |
-| operator.kubectlImage.pullPolicy | string | `"IfNotPresent"` |  |
-| operator.kubectlImage.repository | string | `"gcr.io/google_containers/hyperkube"` |  |
-| operator.kubectlImage.tag | string | `"v1.16.0"` |  |
+| operator | object | `{"cleanupCRD":true,"cleanupSA":{"create":true,"name":""},"enabled":true,"kubectlImage":{"pullPolicy":"IfNotPresent","repository":"gcr.io/google_containers/hyperkube","tag":"v1.16.0"}}` | Configures operator CRD |
+| operator.cleanupCRD | bool | `true` | Tells helm to remove CRD after chart remove |
 | prometheus-node-exporter.enabled | bool | `true` |  |
 | prometheus-node-exporter.extraArgs[0] | string | `"--collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"` |  |
 | prometheus-node-exporter.extraArgs[1] | string | `"--collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"` |  |
 | prometheus-node-exporter.podLabels.jobLabel | string | `"node-exporter"` |  |
 | prometheus-node-exporter.vmServiceScrape.enabled | bool | `true` |  |
 | prometheus-node-exporter.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
-| serviceAccount.annotations | object | `{}` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `""` |  |
-| victoria-metrics-operator.createCRD | bool | `false` |  |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
+| serviceAccount.name | string | `""` | The name of the service account to use. -- If not set and create is true, a name is generated using the fullname template |
+| victoria-metrics-operator.createCRD | bool | `false` | all values for victoria-metrics-operator helm chart can be specified here |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.enabled | bool | `true` |  |
 | vmagent.ingress.annotations | object | `{}` |  |
@@ -491,17 +472,4 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.spec.vmstorage.resources.limits.memory | string | `"1500Mi"` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle.enabled | bool | `true` |  |
-| vmsingle.ingress.annotations | object | `{}` |  |
-| vmsingle.ingress.enabled | bool | `false` |  |
-| vmsingle.ingress.extraPaths | list | `[]` |  |
-| vmsingle.ingress.hosts[0] | string | `"vmsingle.domain.com"` |  |
-| vmsingle.ingress.labels | object | `{}` |  |
-| vmsingle.ingress.path | string | `"/"` |  |
-| vmsingle.ingress.pathType | string | `"Prefix"` |  |
-| vmsingle.ingress.tls | list | `[]` |  |
-| vmsingle.spec.image.tag | string | `"v1.65.0"` |  |
-| vmsingle.spec.replicaCount | int | `1` |  |
-| vmsingle.spec.retentionPeriod | string | `"14"` |  |
-| vmsingle.spec.storage.accessModes[0] | string | `"ReadWriteOnce"` |  |
-| vmsingle.spec.storage.resources.requests.storage | string | `"20Gi"` |  |
+| vmsingle | object | `{"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"image":{"tag":"v1.65.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
