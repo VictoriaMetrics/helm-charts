@@ -140,10 +140,17 @@ def patch_dashboards_json(content):
         content_struct['templating']['list'] = overwrite_list
 
         ## make dashboards readonly
-        content_struct['editable'] = 'false'
+        content_struct['editable'] = False
 
         ## add common tag
         content_struct['tags'].append('vm-k8s-stack')
+
+        ## fix drilldown links. see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/659
+        for row in content_struct['rows']:
+            for panel in row['panels']:
+                for style in panel.get('styles', []):
+                    if 'linkUrl' in style and style['linkUrl'].startswith('./d'):
+                        style['linkUrl'] = style['linkUrl'].replace('./d', '/d')
 
         content_array = []
         original_content_lines = content.split('\n')
