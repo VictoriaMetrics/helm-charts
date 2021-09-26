@@ -145,7 +145,7 @@ def patch_dashboards_json(content):
         ## add common tag
         content_struct['tags'].append('vm-k8s-stack')
 
-        ## fix drilldown links
+        ## fix drilldown links. see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/659
         for row in content_struct['rows']:
             for panel in row['panels']:
                 for style in panel.get('styles', []):
