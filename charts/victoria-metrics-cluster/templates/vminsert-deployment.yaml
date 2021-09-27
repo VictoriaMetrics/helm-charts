@@ -131,9 +131,7 @@ spec:
       securityContext:
 {{ toYaml .Values.vminsert.securityContext | indent 8 }}
     {{- end }}
-    {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
-    {{- end }}
     {{- if .Values.vminsert.tolerations }}
       tolerations:
 {{ toYaml .Values.vminsert.tolerations | indent 8 }}
