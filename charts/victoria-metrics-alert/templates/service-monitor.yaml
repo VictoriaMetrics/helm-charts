@@ -8,8 +8,8 @@ metadata:
   {{- end }}
   labels:
 {{- include "vmalert.server.labels" . | nindent 4 }}
-{{- if .Values.serviceMonitor.extraLabels -}}
-{{ toYaml .Values.serviceMonitor.extraLabels | nindent 4 }}
+{{- with .Values.serviceMonitor.extraLabels -}}
+{{ toYaml . | nindent 4 }}
 {{- end }}
   name: {{ template "vmalert.server.fullname" . }}
   {{- if .Values.serviceMonitor.namespace }}
@@ -21,7 +21,7 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-{{- include "vmalert.server.matchLabels" . | nindent 4 }}
+{{- include "vmalert.server.matchLabels" . | nindent 6 }}
   endpoints:
     - port: http
       {{- if .Values.serviceMonitor.interval }}
