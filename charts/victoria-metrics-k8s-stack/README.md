@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.5.2](https://img.shields.io/badge/Version-0.5.2-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -264,7 +264,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.tls | list | `[]` |  |
 | alertmanager.monzoTemplate.enabled | bool | `true` |  |
 | alertmanager.spec.externalURL | string | `""` |  |
-| alertmanager.spec.image.tag | string | `"v0.22.2"` |  |
+| alertmanager.spec.image.tag | string | `"v0.23.0"` |  |
 | alertmanager.spec.routePrefix | string | `"/"` |  |
 | alertmanager.templateFiles | object | `{}` |  |
 | argocdReleaseOverride | string | `""` | If this chart is used in "Agrocd" with "releaseName" field then -- VMServiceScrapes couldn't select the proper services. -- For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
@@ -411,7 +411,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.ingress.tls | list | `[]` |  |
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
-| vmagent.spec.image.tag | string | `"v1.65.0"` |  |
+| vmagent.spec.image.tag | string | `"v1.66.2"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
 | vmalert.enabled | bool | `true` |  |
 | vmalert.ingress.annotations | object | `{}` |  |
@@ -423,7 +423,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.ingress.pathType | string | `"Prefix"` |  |
 | vmalert.ingress.tls | list | `[]` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
-| vmalert.spec.image.tag | string | `"v1.65.0"` |  |
+| vmalert.spec.image.tag | string | `"v1.66.2"` |  |
 | vmcluster.enabled | bool | `false` |  |
 | vmcluster.ingress.insert.annotations | object | `{}` |  |
 | vmcluster.ingress.insert.enabled | bool | `false` |  |
@@ -451,24 +451,24 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.ingress.storage.tls | list | `[]` |  |
 | vmcluster.spec.replicationFactor | int | `2` |  |
 | vmcluster.spec.retentionPeriod | string | `"14"` |  |
-| vmcluster.spec.vminsert.image.tag | string | `"v1.65.0-cluster"` |  |
+| vmcluster.spec.vminsert.image.tag | string | `"v1.66.2-cluster"` |  |
 | vmcluster.spec.vminsert.replicaCount | int | `2` |  |
 | vmcluster.spec.vminsert.resources.limits.cpu | string | `"1"` |  |
 | vmcluster.spec.vminsert.resources.limits.memory | string | `"1000Mi"` |  |
 | vmcluster.spec.vminsert.resources.requests.cpu | string | `"0.5"` |  |
 | vmcluster.spec.vminsert.resources.requests.memory | string | `"500Mi"` |  |
 | vmcluster.spec.vmselect.cacheMountPath | string | `"/select-cache"` |  |
-| vmcluster.spec.vmselect.image.tag | string | `"v1.65.0-cluster"` |  |
+| vmcluster.spec.vmselect.image.tag | string | `"v1.66.2-cluster"` |  |
 | vmcluster.spec.vmselect.replicaCount | int | `2` |  |
 | vmcluster.spec.vmselect.resources.limits.cpu | string | `"1"` |  |
 | vmcluster.spec.vmselect.resources.limits.memory | string | `"1000Mi"` |  |
 | vmcluster.spec.vmselect.resources.requests.cpu | string | `"0.5"` |  |
 | vmcluster.spec.vmselect.resources.requests.memory | string | `"500Mi"` |  |
 | vmcluster.spec.vmselect.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"2Gi"` |  |
-| vmcluster.spec.vmstorage.image.tag | string | `"v1.65.0-cluster"` |  |
+| vmcluster.spec.vmstorage.image.tag | string | `"v1.66.2-cluster"` |  |
 | vmcluster.spec.vmstorage.replicaCount | int | `2` |  |
 | vmcluster.spec.vmstorage.resources.limits.cpu | string | `"1"` |  |
 | vmcluster.spec.vmstorage.resources.limits.memory | string | `"1500Mi"` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"image":{"tag":"v1.65.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle | object | `{"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"image":{"tag":"v1.66.2"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
