@@ -120,6 +120,10 @@ spec:
       affinity:
 {{ toYaml .Values.vmselect.affinity | indent 8 }}
     {{- end }}
+    {{- if .Values.vmselect.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .Values.vmselect.topologySpreadConstraints | indent 8 }}
+    {{- end }}
       volumes:
         {{- with .Values.vmselect.extraVolumes }}
         {{- toYaml . | nindent 8 }}
