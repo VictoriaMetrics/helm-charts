@@ -112,6 +112,11 @@ ingress:
   #   - secretName: vmauth-ingress-tls
   #     hosts:
   #       - vmauth.local
+  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+  # ingressClassName: nginx
+  # -- pathType is only for k8s >= 1.1=
+  pathType: Prefix
 
 ingressInternal:
   enabled: false
@@ -128,6 +133,11 @@ ingressInternal:
   #   - secretName: vmauth-ingress-tls
   #     hosts:
   #       - vmauth.local
+  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+  # ingressClassName: nginx
+  # -- pathType is only for k8s >= 1.1=
+  pathType: Prefix
 
 # -- We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'.
 resources: {}
