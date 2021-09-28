@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.7.30](https://img.shields.io/badge/Version-0.7.30-informational?style=flat-square)
+ ![Version: 0.7.31](https://img.shields.io/badge/Version-0.7.31-informational?style=flat-square)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
@@ -148,7 +148,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[4].relabel_configs[0].regex | bool | `true` |  |
 | config.scrape_configs[4].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_pod_container_init"` |  |
 | config.scrape_configs[4].relabel_configs[1].action | string | `"keep_if_equal"` |  |
-| config.scrape_configs[4].relabel_configs[1].source_labels[0] | string | `"__meta_kubernetes_pod_annotation_prometheus_io_port"` |  |
+| config.scrape_configs[4].relabel_configs[1].source_labels[0] | string | `"__meta_kubernetes_service_annotation_prometheus_io_port"` |  |
 | config.scrape_configs[4].relabel_configs[1].source_labels[1] | string | `"__meta_kubernetes_pod_container_port_number"` |  |
 | config.scrape_configs[4].relabel_configs[2].action | string | `"keep"` |  |
 | config.scrape_configs[4].relabel_configs[2].regex | bool | `true` |  |
@@ -184,7 +184,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[5].relabel_configs[0].regex | bool | `true` |  |
 | config.scrape_configs[5].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_pod_container_init"` |  |
 | config.scrape_configs[5].relabel_configs[1].action | string | `"keep_if_equal"` |  |
-| config.scrape_configs[5].relabel_configs[1].source_labels[0] | string | `"__meta_kubernetes_pod_annotation_prometheus_io_port"` |  |
+| config.scrape_configs[5].relabel_configs[1].source_labels[0] | string | `"__meta_kubernetes_service_annotation_prometheus_io_port"` |  |
 | config.scrape_configs[5].relabel_configs[1].source_labels[1] | string | `"__meta_kubernetes_pod_container_port_number"` |  |
 | config.scrape_configs[5].relabel_configs[2].action | string | `"keep"` |  |
 | config.scrape_configs[5].relabel_configs[2].regex | bool | `true` |  |
@@ -285,6 +285,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.enabled | bool | `false` |  |
 | ingress.extraLabels | object | `{}` |  |
 | ingress.hosts | list | `[]` |  |
+| ingress.pathType | string | `"Prefix"` |  |
 | ingress.tls | list | `[]` |  |
 | multiTenantUrls | list | `[]` |  |
 | nameOverride | string | `""` |  |

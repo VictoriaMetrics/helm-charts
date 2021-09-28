@@ -1,5 +1,10 @@
 {{- if .Values.ingress.enabled }}
-apiVersion: networking.k8s.io/v1beta1
+{{- $ingressApiIsStable := eq (include "vmagent.ingress.isStable" .) "true" -}}
+{{- $ingressSupportsIngressClassName := eq (include "vmagent.ingress.supportsIngressClassName" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "vmagent.ingress.supportsPathType" .) "true" -}}
+{{- $servicePort := .Values.service.servicePort -}}
+{{- $ingressPathType := .Values.ingress.pathType -}}
+apiVersion: {{ include "vmagent.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
 {{- if .Values.ingress.annotations }}
@@ -14,6 +19,9 @@ metadata:
   name: {{ template "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
+  {{- if and $ingressSupportsIngressClassName .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- end }}
   rules:
   {{- $serviceName := include "chart.fullname" . }}
   {{- range .Values.ingress.hosts }}
@@ -21,9 +29,19 @@ spec:
     http:
       paths:
         - path: {{ .path }}
+          {{- if $ingressSupportsPathType }}
+          pathType: {{ $ingressPathType }}
+          {{- end }}
           backend:
+            {{- if $ingressApiIsStable }}
+            service:
+              name: {{ $serviceName }}
+              port:
+                number: {{ $servicePort }}
+            {{- else }}
             serviceName: {{ $serviceName }}
             servicePort: {{ .port | default "http"}}
+            {{- end }}
   {{- end -}}
 {{- if .Values.ingress.tls }}
   tls:
