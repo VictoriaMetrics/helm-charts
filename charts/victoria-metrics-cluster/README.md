@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.9.5](https://img.shields.io/badge/Version-0.9.5-informational?style=flat-square)
+ ![Version: 0.9.6](https://img.shields.io/badge/Version-0.9.6-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -246,6 +246,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.statefulSet.service.servicePort | int | `8481` | Headless service port |
 | vmselect.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs |
 | vmselect.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
+| vmselect.topologySpreadConstraints | list | `[]` | Pod topologySpreadConstraints |
 | vmstorage.affinity | object | `{}` | Pod affinity |
 | vmstorage.annotations | object | `{}` |  |
 | vmstorage.automountServiceAccountToken | bool | `true` |  |
