@@ -38,7 +38,7 @@ Simple shell function for Kubectl installation in Linux 64 bits. Copy and paste 
 ```bash
 sudo su
 
-VERSION=v1.20.4
+VERSION=v1.22.2
 KUBECTL_BIN=kubectl
 
 function install_kubectl {
@@ -46,6 +46,7 @@ if [ -z $(which $KUBECTL_BIN) ]; then
     curl -LO https://storage.googleapis.com/kubernetes-release/release/$VERSION/bin/linux/amd64/$KUBECTL_BIN
     chmod +x ${KUBECTL_BIN}
     sudo mv ${KUBECTL_BIN} /usr/local/bin/${KUBECTL_BIN}
+    sudo ln -sf /usr/local/bin/${KUBECTL_BIN} /usr/bin/${KUBECTL_BIN}
 else
     echo "Kubectl is most likely installed"
 fi
@@ -100,7 +101,7 @@ Execute these commands to install helm 3.
 ```bash
 sudo su
 
-HELM_TAR_FILE=helm-v3.4.0-linux-amd64.tar.gz
+HELM_TAR_FILE=helm-v3.7.0-linux-amd64.tar.gz
 HELM_URL=https://get.helm.sh
 HELM_BIN=helm3
 
@@ -121,10 +122,8 @@ fi
 }
 
 install_helm3
-
-which helm3
-
-helm3 version
+which $HELM_BIN
+$HELM_BIN version
 
 exit
 ```
@@ -134,4 +133,3 @@ Documentation: https://helm.sh/docs/
 **Credits**: Juan Pablo Perez - https://www.linkedin.com/in/juanpabloperezpeelmicro/ 
 
 https://github.com/peelmicro/learn-devops-the-complete-kubernetes-course
-

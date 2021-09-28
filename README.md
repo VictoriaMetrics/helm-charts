@@ -16,25 +16,6 @@ helm repo update
 
 List all charts and versions of ``vm`` repository available to installation:
 
-##### for helm v2
-
- ```console
-helm search vm/
-```
-
-The command must display existing helm chart e.g.
-
-```console
-NAME                          CHART VERSION  APP VERSION DESCRIPTION
-vm/victoria-metrics-agent     0.7.25         v1.65.0     Victoria Metrics Agent - collects metrics from ...
-vm/victoria-metrics-alert     0.4.4          v1.65.0     Victoria Metrics Alert - executes a list of giv...
-vm/victoria-metrics-auth      0.2.27         1.65.0      Victoria Metrics Auth - is a simple auth proxy ...
-vm/victoria-metrics-cluster   0.9.3          1.65.0      Victoria Metrics Cluster version - high-perform...
-vm/victoria-metrics-k8s-stack 0.4.3          1.65.0      Kubernetes monitoring on VictoriaMetrics stack....
-vm/victoria-metrics-operator  0.1.17         0.16.0      Victoria Metrics Operator
-vm/victoria-metrics-single    0.8.4          1.65.0      Victoria Metrics Single version - high-performa...
-```
-
 ##### for helm v3
 
 ```console
@@ -44,14 +25,14 @@ helm search repo vm/
 The command must display existing helm chart e.g.
 
 ```console
-NAME                          CHART VERSION  APP VERSION DESCRIPTION
-vm/victoria-metrics-agent     0.7.25         v1.65.0     Victoria Metrics Agent - collects metrics from ...
-vm/victoria-metrics-alert     0.4.4          v1.65.0     Victoria Metrics Alert - executes a list of giv...
-vm/victoria-metrics-auth      0.2.27         1.65.0      Victoria Metrics Auth - is a simple auth proxy ...
-vm/victoria-metrics-cluster   0.9.3          1.65.0      Victoria Metrics Cluster version - high-perform...
-vm/victoria-metrics-k8s-stack 0.4.3          1.65.0      Kubernetes monitoring on VictoriaMetrics stack....
-vm/victoria-metrics-operator  0.1.17         0.16.0      Victoria Metrics Operator
-vm/victoria-metrics-single    0.8.4          1.65.0      Victoria Metrics Single version - high-performa...
+NAME                          CHART VERSION APP VERSION DESCRIPTION
+vm/victoria-metrics-agent     0.7.31       	v1.66.2     Victoria Metrics Agent - collects metrics from ...
+vm/victoria-metrics-alert     0.4.7        	v1.66.2     Victoria Metrics Alert - executes a list of giv...
+vm/victoria-metrics-auth      0.2.30       	1.66.2      Victoria Metrics Auth - is a simple auth proxy ...
+vm/victoria-metrics-cluster   0.9.7        	1.66.2      Victoria Metrics Cluster version - high-perform...
+vm/victoria-metrics-k8s-stack 0.5.2        	1.66.2      Kubernetes monitoring on VictoriaMetrics stack....
+vm/victoria-metrics-operator  0.3.0        	0.19.0      Victoria Metrics Operator
+vm/victoria-metrics-single    0.8.8        	1.66.2      Victoria Metrics Single version - high-performa...
 ```
 
 # Installing the chart
@@ -71,12 +52,6 @@ helm install victoria-metrics vm/victoria-metrics-cluster -f values.yaml -n NAME
 ```
 
 Install chart with command:
-
-##### for helm v2
-
-```console
-helm install -n victoria-metrics-cluster vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE
-```
 
 ##### for helm v3
 
@@ -116,7 +91,7 @@ helm uninstall victoria-metrics -n NAMESPACE
 
 # Kubernetes compatibility versions
 
-helm charts tested at kubernetes versions from 1.13 to 1.20
+helm charts tested at kubernetes versions from 1.13 to 1.22.
 
 # List of Charts
 

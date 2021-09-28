@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.8.6](https://img.shields.io/badge/Version-0.8.6-informational?style=flat-square)
+ ![Version: 0.8.8](https://img.shields.io/badge/Version-0.8.8-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -133,6 +133,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
 | server.ingress.hosts | list | `[]` | Array of host objects |
+| server.ingress.pathType | string | `"Prefix"` |  |
 | server.ingress.tls | list | `[]` | Array of TLS objects |
 | server.initContainers | list | `[]` |  |
 | server.livenessProbe.failureThreshold | int | `10` |  |

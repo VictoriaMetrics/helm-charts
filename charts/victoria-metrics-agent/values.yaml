@@ -157,6 +157,11 @@ ingress:
   #   - secretName: vmagent-ingress-tls
   #     hosts:
   #       - vmagent.local
+  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+  # ingressClassName: nginx
+  # -- pathType is only for k8s >= 1.1=
+  pathType: Prefix
 resources:
   {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -506,3 +511,4 @@ config:
           action: replace
           target_label: kubernetes_pod_name
       ## End of COPY
+

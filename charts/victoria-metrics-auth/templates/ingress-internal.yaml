@@ -1,5 +1,10 @@
 {{- if .Values.ingressInternal.enabled }}
-apiVersion: networking.k8s.io/v1beta1
+{{- $ingressApiIsStable := eq (include "vmauth.ingress.isStable" .) "true" -}}
+{{- $ingressSupportsIngressClassName := eq (include "vmauth.ingress.supportsIngressClassName" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "vmauth.ingress.supportsPathType" .) "true" -}}
+{{- $servicePort := .Values.service.servicePort -}}
+{{- $ingressPathType := .Values.ingress.pathType -}}
+apiVersion: {{ include "vmauth.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
 {{- if .Values.ingressInternal.annotations }}
@@ -11,9 +16,12 @@ metadata:
   {{ with .Values.ingressInternal.extraLabels }}
 {{ toYaml . | indent 4 }}
   {{ end }}
-  name: {{ template "chart.fullname" . }}
+  name: {{ template "chart.fullname" . }}-internal
   namespace: {{ .Release.Namespace }}
 spec:
+  {{- if and $ingressSupportsIngressClassName .Values.ingressInternal.ingressClassName }}
+  ingressClassName: {{ .Values.ingressInternal.ingressClassName }}
+  {{- end }}
   rules:
   {{- $serviceName := include "chart.fullname" . }}
   {{- range .Values.ingressInternal.hosts }}
@@ -21,9 +29,19 @@ spec:
     http:
       paths:
         - path: {{ .path }}
+          {{- if $ingressSupportsPathType }}
+          pathType: {{ $ingressPathType }}
+          {{- end }}
           backend:
+            {{- if $ingressApiIsStable }}
+            service:
+              name: {{ $serviceName }}
+              port:
+                number: {{ $servicePort }}
+            {{- else }}
             serviceName: {{ $serviceName }}
             servicePort: {{ .port | default "http"}}
+            {{- end }}
   {{- end -}}
 {{- if .Values.ingressInternal.tls }}
   tls:
