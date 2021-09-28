@@ -91,7 +91,7 @@ helm uninstall victoria-metrics -n NAMESPACE
 
 # Kubernetes compatibility versions
 
-helm charts tested at kubernetes versions from 1.13 to 1.22
+helm charts tested at kubernetes versions from 1.13 to 1.22.
 
 # List of Charts
 
