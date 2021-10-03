@@ -153,7 +153,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.datasource.basicAuth.username | string | `""` |  |
 | server.datasource.url | string | `""` |  |
 | server.enabled | bool | `true` |  |
-| server.env | list | `[]` |  |
+| server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |

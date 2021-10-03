@@ -121,7 +121,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.automountServiceAccountToken | bool | `true` |  |
 | vminsert.containerWorkingDir | string | `""` | Container workdir |
 | vminsert.enabled | bool | `true` | Enable deployment of vminsert component. Deployment is used |
-| vminsert.env | list | `[]` |  |
+| vminsert.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | vminsert.extraArgs."envflag.enable" | string | `"true"` |  |
 | vminsert.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vminsert.extraArgs.loggerFormat | string | `"json"` |  |
@@ -179,7 +179,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.cacheMountPath | string | `"/cache"` | Cache root folder |
 | vmselect.containerWorkingDir | string | `""` | Container workdir |
 | vmselect.enabled | bool | `true` | Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet |
-| vmselect.env | list | `[]` |  |
+| vmselect.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | vmselect.extraArgs."envflag.enable" | string | `"true"` |  |
 | vmselect.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vmselect.extraArgs.loggerFormat | string | `"json"` |  |
@@ -252,7 +252,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.automountServiceAccountToken | bool | `true` |  |
 | vmstorage.containerWorkingDir | string | `""` | Container workdir |
 | vmstorage.enabled | bool | `true` | Enable deployment of vmstorage component. StatefulSet is used |
-| vmstorage.env | list | `[]` |  |
+| vmstorage.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | vmstorage.extraArgs."envflag.enable" | string | `"true"` |  |
 | vmstorage.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vmstorage.extraArgs.loggerFormat | string | `"json"` |  |
@@ -313,7 +313,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.vmbackupmanager.disableMonthly | bool | `false` | disable monthly backups |
 | vmstorage.vmbackupmanager.disableWeekly | bool | `false` | disable weekly backups |
 | vmstorage.vmbackupmanager.enable | bool | `false` | enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages |
-| vmstorage.vmbackupmanager.env | list | `[]` |  |
+| vmstorage.vmbackupmanager.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | vmstorage.vmbackupmanager.eula | bool | `false` | should be true and means that you have the legal right to run a backup manager that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/assets/VM_EULA.pdf |
 | vmstorage.vmbackupmanager.extraArgs."envflag.enable" | string | `"true"` |  |
 | vmstorage.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
