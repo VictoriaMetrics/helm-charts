@@ -269,6 +269,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | deployment.enabled | bool | `true` |  |
 | deployment.strategy | object | `{}` |  |
 | env | list | `[]` |  |
+| extraLabels | object | `{}` |  |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | extraArgs.loggerFormat | string | `"json"` |  |
