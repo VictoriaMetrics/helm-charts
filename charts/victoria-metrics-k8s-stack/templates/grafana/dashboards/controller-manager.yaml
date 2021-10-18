@@ -3,7 +3,7 @@ Generated from 'controller-manager' from https://raw.githubusercontent.com/prome
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled .Values.kubeControllerManager.enabled }}
+{{- if or (and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled .Values.kubeControllerManager.enabled) .Values.grafana.forceDeployDashboards }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

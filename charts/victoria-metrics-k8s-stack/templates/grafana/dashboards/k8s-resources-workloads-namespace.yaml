@@ -3,7 +3,7 @@ Generated from 'k8s-resources-workloads-namespace' from https://raw.githubuserco
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled }}
+{{- if or (and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled ) .Values.grafana.forceDeployDashboards }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -127,7 +127,7 @@ data:
                         "title": "CPU Usage",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -446,7 +446,7 @@ data:
                         "title": "CPU Quota",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "transform": "table",
@@ -582,7 +582,7 @@ data:
                         "title": "Memory Usage",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -901,7 +901,7 @@ data:
                         "title": "Memory Quota",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "transform": "table",
@@ -1222,7 +1222,7 @@ data:
                         "title": "Current Network Usage",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "transform": "table",
@@ -1321,7 +1321,7 @@ data:
                         "title": "Receive Bandwidth",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -1407,7 +1407,7 @@ data:
                         "title": "Transmit Bandwidth",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -1505,7 +1505,7 @@ data:
                         "title": "Average Container Bandwidth by Workload: Received",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -1591,7 +1591,7 @@ data:
                         "title": "Average Container Bandwidth by Workload: Transmitted",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -1689,7 +1689,7 @@ data:
                         "title": "Rate of Received Packets",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -1775,7 +1775,7 @@ data:
                         "title": "Rate of Transmitted Packets",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -1873,7 +1873,7 @@ data:
                         "title": "Rate of Received Packets Dropped",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -1959,7 +1959,7 @@ data:
                         "title": "Rate of Transmitted Packets Dropped",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -2014,7 +2014,7 @@ data:
                         "value": "default"
                     },
                     "hide": 0,
-                    "label": null,
+                    "label": "Data Source",
                     "name": "datasource",
                     "options": [
 
