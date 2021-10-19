@@ -147,6 +147,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.persistentVolume.annotations | object | `{}` | Persistant volume annotations |
 | server.persistentVolume.enabled | bool | `true` | Create/use Persistent Volume Claim for server component. Empty dir if false |
 | server.persistentVolume.existingClaim | string | `""` | Existing Claim name. If defined, PVC must be created manually before volume will be bound |
+| server.persistentVolume.matchLabels | object | `{}` | Bind Persistent Volume by labels. Must match all labels of targeted PV. |
 | server.persistentVolume.mountPath | string | `"/storage"` | Mount path. Server data Persistent Volume mount root path. |
 | server.persistentVolume.size | string | `"16Gi"` | Size of the volume. Better to set the same as resource limit memory property. |
 | server.persistentVolume.storageClass | string | `""` | StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically |
