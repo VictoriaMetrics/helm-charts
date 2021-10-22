@@ -300,6 +300,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podAnnotations | object | `{}` |  |
 | podDisruptionBudget.enabled | bool | `false` |  |
 | podDisruptionBudget.labels | object | `{}` |  |
+| podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
