@@ -3,7 +3,7 @@ Generated from 'node-cluster-rsrc-use' from https://raw.githubusercontent.com/pr
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if or (and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled (index .Values "prometheus-node-exporter" "enabled")) .Values.grafana.forceDeployDashboards }}
+{{- if and .Values.grafana.defaultDashboardsEnabled (index .Values "prometheus-node-exporter" "enabled") }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -986,7 +986,7 @@ data:
                         "value": "Prometheus"
                     },
                     "hide": 0,
-                    "label": null,
+                    "label": "Data Source",
                     "name": "datasource",
                     "options": [
 

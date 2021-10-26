@@ -30,7 +30,7 @@ charts = [
         'destination': '../templates/grafana/dashboards',
         'type': 'yaml'
     },
-    { 
+    {
         'source': 'https://etcd.io/docs/v3.4/op-guide/grafana.json',
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
@@ -185,11 +185,16 @@ def patch_dashboards_json(content):
 
 
 def write_group_to_file(resource_name, content, url, destination):
+    if condition_map.get(resource_name, ""):
+        cond = f'if and .Values.grafana.defaultDashboardsEnabled {condition_map.get(resource_name, "")}'
+    else:
+        cond = f'if .Values.grafana.defaultDashboardsEnabled'
+
     # initialize header
     lines = header % {
         'name': resource_name,
         'url': url,
-        "condition": f'if or (and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled {condition_map.get(resource_name, "")}) .Values.grafana.forceDeployDashboards'.strip(),
+        "condition": cond.strip()
     }
 
     content = patch_dashboards_json(content)

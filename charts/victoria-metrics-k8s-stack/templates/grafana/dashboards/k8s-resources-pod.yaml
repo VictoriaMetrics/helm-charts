@@ -3,7 +3,7 @@ Generated from 'k8s-resources-pod' from https://raw.githubusercontent.com/promet
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if or (and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled ) .Values.grafana.forceDeployDashboards }}
+{{- if .Values.grafana.defaultDashboardsEnabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -2320,7 +2320,7 @@ data:
                     "options": [
 
                     ],
-                    "query": "label_values(kube_pod_info, cluster)",
+                    "query": "label_values(up{job=\"kube-state-metrics\"}, cluster)",
                     "refresh": 2,
                     "regex": "",
                     "sort": 1,
@@ -2347,7 +2347,7 @@ data:
                     "options": [
 
                     ],
-                    "query": "label_values(kube_pod_info{cluster=\"$cluster\"}, namespace)",
+                    "query": "label_values(kube_namespace_created{cluster=\"$cluster\"}, namespace)",
                     "refresh": 2,
                     "regex": "",
                     "sort": 1,

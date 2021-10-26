@@ -3,7 +3,7 @@ Generated from 'proxy' from https://raw.githubusercontent.com/prometheus-operato
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if or (and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled .Values.kubeProxy.enabled) .Values.grafana.forceDeployDashboards }}
+{{- if and .Values.grafana.defaultDashboardsEnabled .Values.kubeProxy.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -1178,7 +1178,7 @@ data:
                     "options": [
 
                     ],
-                    "query": "label_values(kube_pod_info, cluster)",
+                    "query": "label_values(up{job=\"kube-proxy\"}, cluster)",
                     "refresh": 2,
                     "regex": "",
                     "sort": 1,
@@ -1204,7 +1204,7 @@ data:
                     "options": [
 
                     ],
-                    "query": "label_values(kubeproxy_network_programming_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-proxy\"}, instance)",
+                    "query": "label_values(up{job=\"kube-proxy\", cluster=\"$cluster\", job=\"kube-proxy\"}, instance)",
                     "refresh": 2,
                     "regex": "",
                     "sort": 1,

@@ -3,7 +3,7 @@ Generated from 'kubelet' from https://raw.githubusercontent.com/prometheus-opera
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if or (and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled .Values.kubelet.enabled) .Values.grafana.forceDeployDashboards }}
+{{- if and .Values.grafana.defaultDashboardsEnabled .Values.kubelet.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -2195,13 +2195,13 @@ data:
                     "datasource": "$datasource",
                     "hide": 0,
                     "includeAll": true,
-                    "label": null,
+                    "label": "Data Source",
                     "multi": false,
                     "name": "instance",
                     "options": [
 
                     ],
-                    "query": "label_values(kubelet_runtime_operations_total{cluster=\"$cluster\", job=\"kubelet\", metrics_path=\"/metrics\"}, instance)",
+                    "query": "label_values(up{job=\"kubelet\", metrics_path=\"/metrics\",cluster=\"$cluster\"}, instance)",
                     "refresh": 2,
                     "regex": "",
                     "sort": 1,
