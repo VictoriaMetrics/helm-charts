@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.7.31](https://img.shields.io/badge/Version-0.7.31-informational?style=flat-square)
+ ![Version: 0.7.33](https://img.shields.io/badge/Version-0.7.33-informational?style=flat-square)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
@@ -268,13 +268,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | containerWorkingDir | string | `"/"` |  |
 | deployment.enabled | bool | `true` |  |
 | deployment.strategy | object | `{}` |  |
-| env | list | `[]` |  |
-| extraLabels | object | `{}` |  |
+| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | extraArgs.loggerFormat | string | `"json"` |  |
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` |  |
+| extraScrapeConfigs | list | `[]` | Extra scrape configs that will be appended to `config` |
 | extraVolumeMounts | list | `[]` |  |
 | extraVolumes | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
@@ -296,6 +296,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | persistence.enabled | bool | `false` |  |
 | persistence.existingClaim | string | `""` |  |
 | persistence.extraLabels | object | `{}` |  |
+| persistence.matchLabels | object | `{}` | Bind Persistent Volume by labels. Must match all labels of targeted PV. |
 | persistence.size | string | `"10Gi"` |  |
 | podAnnotations | object | `{}` |  |
 | podDisruptionBudget.enabled | bool | `false` |  |

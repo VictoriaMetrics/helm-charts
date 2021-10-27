@@ -39,7 +39,7 @@ server:
     # -- Image repository
     repository: victoriametrics/victoria-metrics
     # -- Image tag
-    tag: v1.66.2
+    tag: v1.67.0
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -137,6 +137,9 @@ server:
     # -- Existing Claim name. If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
 
+    # -- Bind Persistent Volume by labels. Must match all labels of targeted PV.
+    matchLabels: {}
+
     # -- Mount path. Server data Persistent Volume mount root path.
     mountPath: /storage
     # -- Mount subpath
@@ -231,7 +234,7 @@ server:
       # -- vmbackupmanager image repository
       repository: victoriametrics/vmbackupmanager
       # -- vmbackupmanager image tag
-      tag: v1.66.2-enterprise
+      tag: v1.67.0-enterprise
     # -- disable hourly backups
     disableHourly: false
     # -- disable daily backups
@@ -631,3 +634,5 @@ server:
               target_label: kubernetes_pod_name
           ## End of COPY
 
+    # -- Extra scrape configs that will be appended to `server.scrape.config`
+    extraScrapeConfigs: []

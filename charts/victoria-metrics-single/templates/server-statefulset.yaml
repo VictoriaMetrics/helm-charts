@@ -245,5 +245,10 @@ spec:
         storageClassName: "{{ .Values.server.persistentVolume.storageClass }}"
       {{- end }}
       {{- end }}
+      {{- with .Values.server.persistentVolume.matchLabels }}
+        selector:
+          matchLabels:
+            {{- toYaml . | nindent 12 }}
+      {{- end }}
 {{- end }}
 {{- end }}

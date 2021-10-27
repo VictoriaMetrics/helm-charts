@@ -33,6 +33,7 @@ spec:
   ports:
     - name: http
       port: {{ .Values.server.service.servicePort }}
+      targetPort: http
       protocol: TCP
   selector:
     {{- include "vmalert.server.matchLabels" . | nindent 4 }}
