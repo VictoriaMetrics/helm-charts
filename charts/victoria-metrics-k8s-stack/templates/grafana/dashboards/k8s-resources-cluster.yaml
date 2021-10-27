@@ -3,7 +3,7 @@ Generated from 'k8s-resources-cluster' from https://raw.githubusercontent.com/pr
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled }}
+{{- if .Values.grafana.defaultDashboardsEnabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -76,7 +76,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "1 - avg(rate(node_cpu_seconds_total{mode=\"idle\", cluster=\"$cluster\"}[$__rate_interval]))",
+                                "expr": "1 - avg(rate(node_cpu_seconds_total{mode=~\"idle|iowait|steal\", cluster=\"$cluster\"}[$__rate_interval]))",
                                 "format": "time_series",
                                 "instant": true,
                                 "intervalFactor": 2,
@@ -89,7 +89,7 @@ data:
                         "title": "CPU Utilisation",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "singlestat",
@@ -173,7 +173,7 @@ data:
                         "title": "CPU Requests Commitment",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "singlestat",
@@ -257,7 +257,7 @@ data:
                         "title": "CPU Limits Commitment",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "singlestat",
@@ -341,7 +341,7 @@ data:
                         "title": "Memory Utilisation",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "singlestat",
@@ -425,7 +425,7 @@ data:
                         "title": "Memory Requests Commitment",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "singlestat",
@@ -509,7 +509,7 @@ data:
                         "title": "Memory Limits Commitment",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "singlestat",
@@ -607,7 +607,7 @@ data:
                         "title": "CPU Usage",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -935,7 +935,7 @@ data:
                         "title": "CPU Quota",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "transform": "table",
@@ -1034,7 +1034,7 @@ data:
                         "title": "Memory Usage (w/o cache)",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -1362,7 +1362,7 @@ data:
                         "title": "Requests by Namespace",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "transform": "table",
@@ -1664,7 +1664,7 @@ data:
                         "title": "Current Network Usage",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "transform": "table",
@@ -1763,7 +1763,7 @@ data:
                         "title": "Receive Bandwidth",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -1849,7 +1849,7 @@ data:
                         "title": "Transmit Bandwidth",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -1947,7 +1947,7 @@ data:
                         "title": "Average Container Bandwidth by Namespace: Received",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -2033,7 +2033,7 @@ data:
                         "title": "Average Container Bandwidth by Namespace: Transmitted",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -2131,7 +2131,7 @@ data:
                         "title": "Rate of Received Packets",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -2217,7 +2217,7 @@ data:
                         "title": "Rate of Transmitted Packets",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -2315,7 +2315,7 @@ data:
                         "title": "Rate of Received Packets Dropped",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -2401,7 +2401,7 @@ data:
                         "title": "Rate of Transmitted Packets Dropped",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -2500,7 +2500,7 @@ data:
                         "title": "IOPS(Reads+Writes)",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -2586,7 +2586,7 @@ data:
                         "title": "ThroughPut(Read+Write)",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -2890,7 +2890,7 @@ data:
                         "title": "Current Storage IO",
                         "tooltip": {
                             "shared": false,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "transform": "table",
@@ -2946,7 +2946,7 @@ data:
                         "value": "default"
                     },
                     "hide": 0,
-                    "label": null,
+                    "label": "Data Source",
                     "name": "datasource",
                     "options": [
 
