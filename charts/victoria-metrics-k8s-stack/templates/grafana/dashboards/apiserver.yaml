@@ -3,7 +3,7 @@ Generated from 'apiserver' from https://raw.githubusercontent.com/prometheus-ope
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.grafana.enabled .Values.grafana.defaultDashboardsEnabled .Values.kubeApiServer.enabled }}
+{{- if and .Values.grafana.defaultDashboardsEnabled .Values.kubeApiServer.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -1668,7 +1668,7 @@ data:
                     "options": [
 
                     ],
-                    "query": "label_values(apiserver_request_total, cluster)",
+                    "query": "label_values(up{job=\"apiserver\"}, cluster)",
                     "refresh": 2,
                     "regex": "",
                     "sort": 1,
@@ -1694,7 +1694,7 @@ data:
                     "options": [
 
                     ],
-                    "query": "label_values(apiserver_request_total{job=\"apiserver\", cluster=\"$cluster\"}, instance)",
+                    "query": "label_values(up{job=\"apiserver\", cluster=\"$cluster\"}, instance)",
                     "refresh": 2,
                     "regex": "",
                     "sort": 1,

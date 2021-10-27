@@ -7,7 +7,11 @@ metadata:
   labels: {{- include "chart.labels" . | nindent 4 }}
 data:
   scrape.yml: |
-    {{- with .Values.config }}
-    {{ . | toYaml | nindent 4 }}
+    {{- range $k, $v := .Values.config }}
+    {{- if and (eq $k "scrape_configs") ($.Values.extraScrapeConfigs) }}
+    {{ dict $k (concat $v $.Values.extraScrapeConfigs) | toYaml | nindent 4 }}
+    {{- else }}
+    {{ dict $k $v | toYaml | nindent 4 }}
+    {{- end }}
     {{- end }}
 {{- end }}

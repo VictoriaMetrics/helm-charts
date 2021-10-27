@@ -274,6 +274,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraArgs.loggerFormat | string | `"json"` |  |
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` |  |
+| extraScrapeConfigs | list | `[]` | Extra scrape configs that will be appended to `config` |
 | extraVolumeMounts | list | `[]` |  |
 | extraVolumes | list | `[]` |  |
 | fullnameOverride | string | `""` |  |

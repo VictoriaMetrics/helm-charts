@@ -1,4 +1,4 @@
-{{- if and .Values.grafana.enabled .Values.grafana.sidecar.datasources.enabled }}
+{{- if or (and .Values.grafana.enabled .Values.grafana.sidecar.datasources.enabled ) .Values.grafana.forceDeployDatasource }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -13,7 +13,7 @@ metadata:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
 {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 data:
-{{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled }}  
+{{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled }}
   datasource.yaml: |-
     apiVersion: 1
     datasources:
@@ -22,7 +22,7 @@ data:
       url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
       access: proxy
       isDefault: true
-{{- end }}      
+{{- end }}
 {{- if .Values.grafana.sidecar.datasources.createVMReplicasDatasources }}
 {{- range until (int .Values.vmsingle.spec.replicaCount) }}
     - name: VictoriaMetrics-{{ . }}
