@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Auth.
 
- ![Version: 0.2.30](https://img.shields.io/badge/Version-0.2.30-informational?style=flat-square)
+ ![Version: 0.2.32](https://img.shields.io/badge/Version-0.2.32-informational?style=flat-square)
 
 Victoria Metrics Auth - is a simple auth proxy and router for VictoriaMetrics.
 
@@ -103,7 +103,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config | string | `nil` | Config file content. |
 | configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html |
 | containerWorkingDir | string | `"/"` |  |
-| env | list | `[]` | Additional environment variables (ex.: secret tokens) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | extraArgs.loggerFormat | string | `"json"` |  |
@@ -114,7 +114,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmauth"` | Victoria Metrics Auth Docker repository and image name |
-| image.tag | string | `"v1.67.0"` | Tag of Docker image |
+| image.tag | string | `"v1.68.0"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
