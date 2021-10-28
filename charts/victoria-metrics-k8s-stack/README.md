@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.5.4](https://img.shields.io/badge/Version-0.5.4-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.5.5](https://img.shields.io/badge/Version-0.5.5-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -307,6 +307,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.dashboards.default.nodeexporter.revision | int | `22` |  |
 | grafana.defaultDashboardsEnabled | bool | `true` |  |
 | grafana.enabled | bool | `true` |  |
+| grafana.forceDeployDatasource | bool | `false` |  |
 | grafana.ingress.annotations | object | `{}` |  |
 | grafana.ingress.enabled | bool | `false` |  |
 | grafana.ingress.extraPaths | list | `[]` |  |
