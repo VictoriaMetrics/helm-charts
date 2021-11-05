@@ -22,10 +22,15 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  minReadySeconds: {{ .Values.server.minReadySeconds }}
   replicas: {{ .Values.server.replicaCount }}
   selector:
     matchLabels:
       {{- include "vmalert.server.matchLabels" . | nindent 6 }}
+  {{- with .Values.server.strategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       labels:

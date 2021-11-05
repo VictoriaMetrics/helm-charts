@@ -39,7 +39,7 @@ server:
     # minAvailable: 1
     # maxUnavailable: 1
     labels: {}
-    
+
   # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
   env:
     []
@@ -50,6 +50,18 @@ server:
     #       key: password
 
   replicaCount: 1
+
+  # deployment strategy, set to standard k8s default
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+
+  # specifies the minimum number of seconds for which a newly created Pod should be ready without any of its containers crashing/terminating
+  # 0 is the standard k8s default
+  minReadySeconds: 0
+
   # vmalert reads metrics from source, next section represents its configuration. It can be any service which supports
   # MetricsQL or PromQL.
   datasource:
@@ -133,7 +145,7 @@ server:
     # ingressClassName: nginx
     # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
-    
+
   podSecurityContext: {}
   # fsGroup: 2000
 
@@ -209,7 +221,7 @@ alertmanager:
   podSecurityContext: {}
   extraArgs: {}
   # key: value
-  
+
   # external URL, that alertmanager will expose to receivers
   baseURL: ""
   # use existing configmap if specified
