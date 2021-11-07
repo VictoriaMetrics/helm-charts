@@ -8,6 +8,9 @@ metadata:
 {{- end }}
   labels:
     {{- include "victoria-metrics.server.labels" . | nindent 4 }}
+    {{- with .Values.server.extraLabels }}
+    {{ toYaml .}}
+    {{- end }}
   name: {{ template "victoria-metrics.server.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:

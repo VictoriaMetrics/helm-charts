@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.8.10](https://img.shields.io/badge/Version-0.8.10-informational?style=flat-square)
+ ![Version: 0.8.11](https://img.shields.io/badge/Version-0.8.11-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -123,6 +123,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.extraArgs.loggerFormat | string | `"json"` |  |
 | server.extraContainers | list | `[]` |  |
 | server.extraHostPathMounts | list | `[]` |  |
+| server.extraLabels | object | `{}` | Sts/Deploy additional labels |
 | server.extraVolumeMounts | list | `[]` |  |
 | server.extraVolumes | list | `[]` |  |
 | server.fullnameOverride | string | `nil` | Overrides the full name of server component |

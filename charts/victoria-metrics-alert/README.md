@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.4.12](https://img.shields.io/badge/Version-0.4.12-informational?style=flat-square)
+ ![Version: 0.4.13](https://img.shields.io/badge/Version-0.4.13-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
@@ -172,6 +172,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.ingress.pathType | string | `"Prefix"` |  |
 | server.ingress.tls | list | `[]` |  |
 | server.labels | object | `{}` |  |
+| server.minReadySeconds | int | `0` |  |
 | server.name | string | `"server"` |  |
 | server.nameOverride | string | `""` |  |
 | server.nodeSelector | object | `{}` |  |
@@ -195,6 +196,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.service.loadBalancerSourceRanges | list | `[]` |  |
 | server.service.servicePort | int | `8880` |  |
 | server.service.type | string | `"ClusterIP"` |  |
+| server.strategy.rollingUpdate.maxSurge | string | `"25%"` |  |
+| server.strategy.rollingUpdate.maxUnavailable | string | `"25%"` |  |
+| server.strategy.type | string | `"RollingUpdate"` |  |
 | server.tolerations | list | `[]` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automountToken | bool | `true` |  |
