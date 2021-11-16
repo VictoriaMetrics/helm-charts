@@ -13,8 +13,20 @@ metadata:
     {{- if $.Values.grafana.sidecar.dashboards.label }}
     {{ $.Values.grafana.sidecar.dashboards.label }}: "1"
     {{- end }}
+    {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+    {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- end }}
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+    {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+  annotations:
+    {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- end }}
+    
 data:
   vmagent.json: |-
     {
