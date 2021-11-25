@@ -152,6 +152,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
 | extraLabels | object | `{}` | Labels to be added to the all resources |
+| podLabels | object | `{}` | Labels to be added to Pods only |
 | extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` | Overrides the full name of server component |
