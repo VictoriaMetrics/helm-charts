@@ -13,10 +13,11 @@ metadata:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
 {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 data:
-{{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled }}
+{{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled .Values.grafana.additionalDataSources }}
   datasource.yaml: |-
     apiVersion: 1
     datasources:
+{{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled }}
     - name: VictoriaMetrics
       type: prometheus
       url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
@@ -34,5 +35,6 @@ data:
 {{- end }}
 {{- if .Values.grafana.additionalDataSources }}
 {{ tpl (toYaml .Values.grafana.additionalDataSources | indent 4) . }}
+{{- end }}
 {{- end }}
 {{- end }}
