@@ -30,6 +30,9 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "vm-operator.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .Values.podLabels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
