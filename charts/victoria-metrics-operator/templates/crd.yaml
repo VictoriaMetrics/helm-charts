@@ -315,12 +315,14 @@ spec:
                       type: string
                     value:
                       description: 'Variable references $(VAR_NAME) are expanded using
-                        the previous defined environment variables in the container
+                        the previously defined environment variables in the container
                         and any service environment variables. If a variable cannot
                         be resolved, the reference in the input string will be unchanged.
-                        The $(VAR_NAME) syntax can be escaped with a double $$, ie:
-                        $$(VAR_NAME). Escaped references will never be expanded, regardless
-                        of whether the variable exists or not. Defaults to "".'
+                        Double $$ are reduced to a single $, which allows for escaping
+                        the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the
+                        string literal "$(VAR_NAME)". Escaped references will never
+                        be expanded, regardless of whether the variable exists or
+                        not. Defaults to "".'
                       type: string
                   required:
                   - name
@@ -509,9 +511,9 @@ spec:
               nodeScrapeNamespaceSelector:
                 description: NodeScrapeNamespaceSelector defines Namespaces to be
                   selected for VMNodeScrape discovery. Works in combination with Selector.
-                  If both nil - match everything. NamespaceSelector nil - only objects
-                  at VMAgent namespace. Selector nil - only objects at NamespaceSelector
-                  namespaces.
+                  NamespaceSelector nil - only objects at VMAgent namespace. Selector
+                  nil - only objects at NamespaceSelector namespaces. If both nil
+                  - behaviour controlled by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -616,10 +618,10 @@ spec:
                 type: array
               nodeScrapeSelector:
                 description: NodeScrapeSelector defines VMNodeScrape to be selected
-                  for scraping. Works in combination with NamespaceSelector. If both
-                  nil - match everything. NamespaceSelector nil - only objects at
-                  VMAgent namespace. Selector nil - only objects at NamespaceSelector
-                  namespaces.
+                  for scraping. Works in combination with NamespaceSelector. NamespaceSelector
+                  nil - only objects at VMAgent namespace. Selector nil - only objects
+                  at NamespaceSelector namespaces. If both nil - behaviour controlled
+                  by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -731,10 +733,10 @@ spec:
                 type: object
               podScrapeNamespaceSelector:
                 description: PodScrapeNamespaceSelector defines Namespaces to be selected
-                  for VMPodScrape discovery. Works in combination with Selector. If
-                  both nil - match everything. NamespaceSelector nil - only objects
-                  at VMAgent namespace. Selector nil - only objects at NamespaceSelector
-                  namespaces.
+                  for VMPodScrape discovery. Works in combination with Selector. NamespaceSelector
+                  nil - only objects at VMAgent namespace. Selector nil - only objects
+                  at NamespaceSelector namespaces. If both nil - behaviour controlled
+                  by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -839,10 +841,10 @@ spec:
                 type: array
               podScrapeSelector:
                 description: PodScrapeSelector defines PodScrapes to be selected for
-                  target discovery. Works in combination with NamespaceSelector. If
-                  both nil - match everything. NamespaceSelector nil - only objects
-                  at VMAgent namespace. Selector nil - only objects at NamespaceSelector
-                  namespaces.
+                  target discovery. Works in combination with NamespaceSelector. NamespaceSelector
+                  nil - only objects at VMAgent namespace. Selector nil - only objects
+                  at NamespaceSelector namespaces. If both nil - behaviour controlled
+                  by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -897,10 +899,10 @@ spec:
                 type: string
               probeNamespaceSelector:
                 description: ProbeNamespaceSelector defines Namespaces to be selected
-                  for VMProbe discovery. Works in combination with Selector. If both
-                  nil - match everything. NamespaceSelector nil - only objects at
-                  VMAgent namespace. Selector nil - only objects at NamespaceSelector
-                  namespaces.
+                  for VMProbe discovery. Works in combination with Selector. NamespaceSelector
+                  nil - only objects at VMAgent namespace. Selector nil - only objects
+                  at NamespaceSelector namespaces. If both nil - behaviour controlled
+                  by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -1005,9 +1007,10 @@ spec:
                 type: array
               probeSelector:
                 description: ProbeSelector defines VMProbe to be selected for target
-                  probing. Works in combination with NamespaceSelector. If both nil
-                  - match everything. NamespaceSelector nil - only objects at VMAgent
-                  namespace. Selector nil - only objects at NamespaceSelector namespaces.
+                  probing. Works in combination with NamespaceSelector. NamespaceSelector
+                  nil - only objects at VMAgent namespace. Selector nil - only objects
+                  at NamespaceSelector namespaces. If both nil - behaviour controlled
+                  by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -1583,6 +1586,13 @@ spec:
                   common container settings. This defaults to the default PodSecurityContext.
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
+              selectAllByDefault:
+                description: 'SelectAllByDefault changes default behavior for empty
+                  CRD selectors, such ServiceScrapeSelector. with selectAllScrapes:
+                  true and empty serviceScrapeSelector and ServiceScrapeNamespaceSelector
+                  Operator selects all exist serviceScrapes with selectAllScrapes:
+                  false - selects nothing'
+                type: boolean
               serviceAccountName:
                 description: ServiceAccountName is the name of the ServiceAccount
                   to use to run the VMAgent Pods.
@@ -1590,9 +1600,9 @@ spec:
               serviceScrapeNamespaceSelector:
                 description: ServiceScrapeNamespaceSelector Namespaces to be selected
                   for VMServiceScrape discovery. Works in combination with Selector.
-                  If both nil - match everything. NamespaceSelector nil - only objects
-                  at VMAgent namespace. Selector nil - only objects at NamespaceSelector
-                  namespaces.
+                  NamespaceSelector nil - only objects at VMAgent namespace. Selector
+                  nil - only objects at NamespaceSelector namespaces. If both nil
+                  - behaviour controlled by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -1698,9 +1708,9 @@ spec:
               serviceScrapeSelector:
                 description: ServiceScrapeSelector defines ServiceScrapes to be selected
                   for target discovery. Works in combination with NamespaceSelector.
-                  If both nil - match everything. NamespaceSelector nil - only objects
-                  at VMAgent namespace. Selector nil - only objects at NamespaceSelector
-                  namespaces.
+                  NamespaceSelector nil - only objects at VMAgent namespace. Selector
+                  nil - only objects at NamespaceSelector namespaces. If both nil
+                  - behaviour controlled by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -1796,9 +1806,9 @@ spec:
               staticScrapeNamespaceSelector:
                 description: StaticScrapeNamespaceSelector defines Namespaces to be
                   selected for VMStaticScrape discovery. Works in combination with
-                  NamespaceSelector. If both nil - match everything. NamespaceSelector
-                  nil - only objects at VMAgent namespace. Selector nil - only objects
-                  at NamespaceSelector namespaces.
+                  NamespaceSelector. NamespaceSelector nil - only objects at VMAgent
+                  namespace. Selector nil - only objects at NamespaceSelector namespaces.
+                  If both nil - behaviour controlled by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -4720,10 +4730,10 @@ spec:
                 type: array
               configNamespaceSelector:
                 description: ' ConfigNamespaceSelector defines namespace selector
-                  for VMAlertmanagerConfig. Works in combination with Selector. If
-                  both nil - match everything. NamespaceSelector nil - only objects
-                  at VMAlertmanager namespace. Selector nil - only objects at NamespaceSelector
-                  namespaces.'
+                  for VMAlertmanagerConfig. Works in combination with Selector. NamespaceSelector
+                  nil - only objects at VMAlertmanager namespace. Selector nil - only
+                  objects at NamespaceSelector namespaces. If both nil - behaviour
+                  controlled by selectAllByDefault'
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -4782,9 +4792,10 @@ spec:
               configSelector:
                 description: ConfigSelector defines selector for VMAlertmanagerConfig,
                   result config will be merged with with Raw or Secret config. Works
-                  in combination with NamespaceSelector. If both nil - match everything.
-                  NamespaceSelector nil - only objects at VMAlertmanager namespace.
-                  Selector nil - only objects at NamespaceSelector namespaces.
+                  in combination with NamespaceSelector. NamespaceSelector nil - only
+                  objects at VMAlertmanager namespace. Selector nil - only objects
+                  at NamespaceSelector namespaces. If both nil - behaviour controlled
+                  by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -4864,12 +4875,14 @@ spec:
                       type: string
                     value:
                       description: 'Variable references $(VAR_NAME) are expanded using
-                        the previous defined environment variables in the container
+                        the previously defined environment variables in the container
                         and any service environment variables. If a variable cannot
                         be resolved, the reference in the input string will be unchanged.
-                        The $(VAR_NAME) syntax can be escaped with a double $$, ie:
-                        $$(VAR_NAME). Escaped references will never be expanded, regardless
-                        of whether the variable exists or not. Defaults to "".'
+                        Double $$ are reduced to a single $, which allows for escaping
+                        the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the
+                        string literal "$(VAR_NAME)". Escaped references will never
+                        be expanded, regardless of whether the variable exists or
+                        not. Defaults to "".'
                       type: string
                   required:
                   - name
@@ -5085,6 +5098,13 @@ spec:
                   common container settings. This defaults to the default PodSecurityContext.
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
+              selectAllByDefault:
+                description: 'SelectAllByDefault changes default behavior for empty
+                  CRD selectors, such ConfigSelector. with selectAllScrapes: true
+                  and undefined ConfigSelector and ConfigNamespaceSelector Operator
+                  selects all exist alertManagerConfigs with selectAllScrapes: false
+                  - selects nothing'
+                type: boolean
               serviceAccountName:
                 description: ServiceAccountName is the name of the ServiceAccount
                   to use
@@ -5227,14 +5247,51 @@ spec:
                           dataSource:
                             description: 'This field can be used to specify either:
                               * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
-                              * An existing PVC (PersistentVolumeClaim) * An existing
-                              custom resource that implements data population (Alpha)
-                              In order to use custom resource types that implement
-                              data population, the AnyVolumeDataSource feature gate
-                              must be enabled. If the provisioner or an external controller
-                              can support the specified data source, it will create
-                              a new volume based on the contents of the specified
-                              data source.'
+                              * An existing PVC (PersistentVolumeClaim) If the provisioner
+                              or an external controller can support the specified
+                              data source, it will create a new volume based on the
+                              contents of the specified data source. If the AnyVolumeDataSource
+                              feature gate is enabled, this field will always have
+                              the same contents as the DataSourceRef field.'
+                            properties:
+                              apiGroup:
+                                description: APIGroup is the group for the resource
+                                  being referenced. If APIGroup is not specified,
+                                  the specified Kind must be in the core API group.
+                                  For any other third-party types, APIGroup is required.
+                                type: string
+                              kind:
+                                description: Kind is the type of resource being referenced
+                                type: string
+                              name:
+                                description: Name is the name of resource being referenced
+                                type: string
+                            required:
+                            - kind
+                            - name
+                            type: object
+                          dataSourceRef:
+                            description: 'Specifies the object from which to populate
+                              the volume with data, if a non-empty volume is desired.
+                              This may be any local object from a non-empty API group
+                              (non core object) or a PersistentVolumeClaim object.
+                              When this field is specified, volume binding will only
+                              succeed if the type of the specified object matches
+                              some installed volume populator or dynamic provisioner.
+                              This field will replace the functionality of the DataSource
+                              field and as such if both fields are non-empty, they
+                              must have the same value. For backwards compatibility,
+                              both fields (DataSource and DataSourceRef) will be set
+                              to the same value automatically if one of them is empty
+                              and the other is non-empty. There are two important
+                              differences between DataSource and DataSourceRef: *
+                              While DataSource only allows two specific types of objects,
+                              DataSourceRef   allows any non-core object, as well
+                              as PersistentVolumeClaim objects. * While DataSource
+                              ignores disallowed values (dropping them), DataSourceRef   preserves
+                              all values, and generates an error if a disallowed value
+                              is   specified. (Alpha) Using this field requires the
+                              AnyVolumeDataSource feature gate to be enabled.'
                             properties:
                               apiGroup:
                                 description: APIGroup is the group for the resource
@@ -5839,12 +5896,14 @@ spec:
                       type: string
                     value:
                       description: 'Variable references $(VAR_NAME) are expanded using
-                        the previous defined environment variables in the container
+                        the previously defined environment variables in the container
                         and any service environment variables. If a variable cannot
                         be resolved, the reference in the input string will be unchanged.
-                        The $(VAR_NAME) syntax can be escaped with a double $$, ie:
-                        $$(VAR_NAME). Escaped references will never be expanded, regardless
-                        of whether the variable exists or not. Defaults to "".'
+                        Double $$ are reduced to a single $, which allows for escaping
+                        the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the
+                        string literal "$(VAR_NAME)". Escaped references will never
+                        be expanded, regardless of whether the variable exists or
+                        not. Defaults to "".'
                       type: string
                   required:
                   - name
@@ -6506,9 +6565,10 @@ spec:
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
               remoteRead:
-                description: RemoteRead victoria metrics address for loading state
-                  This configuration makes sense only if remoteWrite was configured
-                  before and has been successfully persisted its state.
+                description: RemoteRead Optional URL to read vmalert state (persisted
+                  via RemoteWrite) This configuration only makes sense if alerts state
+                  has been successfully persisted (via RemoteWrite) before. see -remoteRead.url
+                  docs in vmalerts for details. E.g. http://127.0.0.1:8428
                 properties:
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
@@ -6700,7 +6760,10 @@ spec:
                 type: object
               remoteWrite:
                 description: RemoteWrite Optional URL to remote-write compatible storage
-                  where to write timeseriesbased on active alerts. E.g. http://127.0.0.1:8428
+                  to persist vmalert state and rule results to. Rule results will
+                  be persisted according to each rule. Alerts state will be persisted
+                  in the form of time series named ALERTS and ALERTS_FOR_STATE see
+                  -remoteWrite.url docs in vmalerts for details. E.g. http://127.0.0.1:8428
                 properties:
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
@@ -6973,8 +7036,9 @@ spec:
                 type: object
               ruleNamespaceSelector:
                 description: RuleNamespaceSelector to be selected for VMRules discovery.
-                  Works in combination with Selector. If both nil - match everything.
-                  NamespaceSelector nil - only objects at VMAlert namespace.
+                  Works in combination with Selector. If both nil - behaviour controlled
+                  by selectAllByDefault NamespaceSelector nil - only objects at VMAlert
+                  namespace.
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -7029,8 +7093,8 @@ spec:
               ruleSelector:
                 description: RuleSelector selector to select which VMRules to mount
                   for loading alerting rules from. Works in combination with NamespaceSelector.
-                  If both nil - match everything. NamespaceSelector nil - only objects
-                  at VMAlert namespace.
+                  If both nil - behaviour controlled by selectAllByDefault NamespaceSelector
+                  nil - only objects at VMAlert namespace.
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -7092,6 +7156,13 @@ spec:
                   common container settings. This defaults to the default PodSecurityContext.
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
+              selectAllByDefault:
+                description: 'SelectAllByDefault changes default behavior for empty
+                  CRD selectors, such RuleSelector. with selectAllByDefault: true
+                  and empty serviceScrapeSelector and RuleNamespaceSelector Operator
+                  selects all exist serviceScrapes with selectAllByDefault: false
+                  - selects nothing'
+                type: boolean
               serviceAccountName:
                 description: ServiceAccountName is the name of the ServiceAccount
                   to use to run the VMAlert Pods.
@@ -7371,12 +7442,14 @@ spec:
                       type: string
                     value:
                       description: 'Variable references $(VAR_NAME) are expanded using
-                        the previous defined environment variables in the container
+                        the previously defined environment variables in the container
                         and any service environment variables. If a variable cannot
                         be resolved, the reference in the input string will be unchanged.
-                        The $(VAR_NAME) syntax can be escaped with a double $$, ie:
-                        $$(VAR_NAME). Escaped references will never be expanded, regardless
-                        of whether the variable exists or not. Defaults to "".'
+                        Double $$ are reduced to a single $, which allows for escaping
+                        the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the
+                        string literal "$(VAR_NAME)". Escaped references will never
+                        be expanded, regardless of whether the variable exists or
+                        not. Defaults to "".'
                       type: string
                   required:
                   - name
@@ -7508,8 +7581,9 @@ spec:
                                         description: Resource is an ObjectRef to another
                                           Kubernetes resource in the namespace of
                                           the Ingress object. If resource is specified,
-                                          serviceName and servicePort must not be
-                                          specified.
+                                          a service.Name and service.Port must not
+                                          be specified. This is a mutually exclusive
+                                          setting with "Service".
                                         properties:
                                           apiGroup:
                                             description: APIGroup is the group for
@@ -7531,25 +7605,45 @@ spec:
                                         - kind
                                         - name
                                         type: object
-                                      serviceName:
-                                        description: Specifies the name of the referenced
-                                          service.
-                                        type: string
-                                      servicePort:
-                                        anyOf:
-                                        - type: integer
-                                        - type: string
-                                        description: Specifies the port of the referenced
-                                          service.
-                                        x-kubernetes-int-or-string: true
+                                      service:
+                                        description: Service references a Service
+                                          as a Backend. This is a mutually exclusive
+                                          setting with "Resource".
+                                        properties:
+                                          name:
+                                            description: Name is the referenced service.
+                                              The service must exist in the same namespace
+                                              as the Ingress object.
+                                            type: string
+                                          port:
+                                            description: Port of the referenced service.
+                                              A port name or port number is required
+                                              for a IngressServiceBackend.
+                                            properties:
+                                              name:
+                                                description: Name is the name of the
+                                                  port on the Service. This is a mutually
+                                                  exclusive setting with "Number".
+                                                type: string
+                                              number:
+                                                description: Number is the numerical
+                                                  port number (e.g. 80) on the Service.
+                                                  This is a mutually exclusive setting
+                                                  with "Name".
+                                                format: int32
+                                                type: integer
+                                            type: object
+                                        required:
+                                        - name
+                                        type: object
                                     type: object
                                   path:
                                     description: Path is matched against the path
                                       of an incoming request. Currently it can contain
                                       characters disallowed from the conventional
                                       "path" part of a URL as defined by RFC 3986.
-                                      Paths must begin with a '/'. When unspecified,
-                                      all paths from incoming requests are matched.
+                                      Paths must begin with a '/' and must be present
+                                      when using PathType with value "Exact" or "Prefix".
                                     type: string
                                   pathType:
                                     description: 'PathType determines the interpretation
@@ -7570,13 +7664,14 @@ spec:
                                       IngressClass. Implementations can treat this
                                       as a separate PathType   or treat it identically
                                       to Prefix or Exact path types. Implementations
-                                      are required to support all path types. Defaults
-                                      to ImplementationSpecific.'
+                                      are required to support all path types.'
                                     type: string
                                 required:
                                 - backend
+                                - pathType
                                 type: object
                               type: array
+                              x-kubernetes-list-type: atomic
                           required:
                           - paths
                           type: object
@@ -7598,10 +7693,11 @@ spec:
                           items:
                             type: string
                           type: array
+                          x-kubernetes-list-type: atomic
                         secretName:
                           description: SecretName is the name of the secret used to
-                            terminate SSL traffic on 443. Field is left optional to
-                            allow SSL routing based on SNI hostname alone. If the
+                            terminate TLS traffic on port 443. Field is left optional
+                            to allow TLS routing based on SNI hostname alone. If the
                             SNI host in a listener conflicts with the "Host" header
                             field used by an IngressRule, the SNI host is used for
                             termination and value of the Host header is used for routing.
@@ -7793,6 +7889,12 @@ spec:
                   common container settings. This defaults to the default PodSecurityContext.
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
+              selectAllByDefault:
+                description: 'SelectAllByDefault changes default behavior for empty
+                  CRD selectors, such userSelector. with selectAllByDefault: true
+                  and empty userSelector and userNamespaceSelector Operator selects
+                  all exist users with selectAllByDefault: false - selects nothing'
+                type: boolean
               serviceAccountName:
                 description: ServiceAccountName is the name of the ServiceAccount
                   to use to run the VMAuth Pods.
@@ -7899,9 +8001,10 @@ spec:
                 type: array
               userNamespaceSelector:
                 description: UserNamespaceSelector Namespaces to be selected for  VMAuth
-                  discovery. Works in combination with Selector. If both nil - match
-                  everything. NamespaceSelector nil - only objects at VMAuth namespace.
-                  Selector nil - only objects at NamespaceSelector namespaces.
+                  discovery. Works in combination with Selector. NamespaceSelector
+                  nil - only objects at VMAuth namespace. Selector nil - only objects
+                  at NamespaceSelector namespaces. If both nil - behaviour controlled
+                  by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -7946,10 +8049,9 @@ spec:
                 type: object
               userSelector:
                 description: UserSelector defines VMUser to be selected for config
-                  file generation. Works in combination with NamespaceSelector. If
-                  both nil - match everything. NamespaceSelector nil - only objects
-                  at VMAuth namespace. Selector nil - only objects at NamespaceSelector
-                  namespaces.
+                  file generation. Works in combination with NamespaceSelector. NamespaceSelector
+                  nil - only objects at VMAuth namespace. If both nil - behaviour
+                  controlled by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -8191,13 +8293,14 @@ spec:
                           type: string
                         value:
                           description: 'Variable references $(VAR_NAME) are expanded
-                            using the previous defined environment variables in the
-                            container and any service environment variables. If a
-                            variable cannot be resolved, the reference in the input
-                            string will be unchanged. The $(VAR_NAME) syntax can be
-                            escaped with a double $$, ie: $$(VAR_NAME). Escaped references
-                            will never be expanded, regardless of whether the variable
-                            exists or not. Defaults to "".'
+                            using the previously defined environment variables in
+                            the container and any service environment variables. If
+                            a variable cannot be resolved, the reference in the input
+                            string will be unchanged. Double $$ are reduced to a single
+                            $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                            "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                            Escaped references will never be expanded, regardless
+                            of whether the variable exists or not. Defaults to "".'
                           type: string
                       required:
                       - name
@@ -8282,6 +8385,8 @@ spec:
                     - PANIC
                     type: string
                   name:
+                    description: Name is deprecated and will be removed at 0.22.0
+                      release
                     type: string
                   nodeSelector:
                     additionalProperties:
@@ -8354,7 +8459,7 @@ spec:
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
                   replicaCount:
-                    description: ReplicaCount is the expected size of the VMSelect
+                    description: ReplicaCount is the expected size of the VMInsert
                       cluster. The controller will eventually make the size of the
                       running cluster equal to the expected size.
                     format: int32
@@ -8658,13 +8763,14 @@ spec:
                           type: string
                         value:
                           description: 'Variable references $(VAR_NAME) are expanded
-                            using the previous defined environment variables in the
-                            container and any service environment variables. If a
-                            variable cannot be resolved, the reference in the input
-                            string will be unchanged. The $(VAR_NAME) syntax can be
-                            escaped with a double $$, ie: $$(VAR_NAME). Escaped references
-                            will never be expanded, regardless of whether the variable
-                            exists or not. Defaults to "".'
+                            using the previously defined environment variables in
+                            the container and any service environment variables. If
+                            a variable cannot be resolved, the reference in the input
+                            string will be unchanged. Double $$ are reduced to a single
+                            $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                            "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                            Escaped references will never be expanded, regardless
+                            of whether the variable exists or not. Defaults to "".'
                           type: string
                       required:
                       - name
@@ -8733,6 +8839,8 @@ spec:
                     - PANIC
                     type: string
                   name:
+                    description: Name is deprecated and will be removed at 0.22.0
+                      release
                     type: string
                   nodeSelector:
                     additionalProperties:
@@ -9036,14 +9144,56 @@ spec:
                               dataSource:
                                 description: 'This field can be used to specify either:
                                   * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
-                                  * An existing PVC (PersistentVolumeClaim) * An existing
-                                  custom resource that implements data population
-                                  (Alpha) In order to use custom resource types that
-                                  implement data population, the AnyVolumeDataSource
-                                  feature gate must be enabled. If the provisioner
-                                  or an external controller can support the specified
-                                  data source, it will create a new volume based on
-                                  the contents of the specified data source.'
+                                  * An existing PVC (PersistentVolumeClaim) If the
+                                  provisioner or an external controller can support
+                                  the specified data source, it will create a new
+                                  volume based on the contents of the specified data
+                                  source. If the AnyVolumeDataSource feature gate
+                                  is enabled, this field will always have the same
+                                  contents as the DataSourceRef field.'
+                                properties:
+                                  apiGroup:
+                                    description: APIGroup is the group for the resource
+                                      being referenced. If APIGroup is not specified,
+                                      the specified Kind must be in the core API group.
+                                      For any other third-party types, APIGroup is
+                                      required.
+                                    type: string
+                                  kind:
+                                    description: Kind is the type of resource being
+                                      referenced
+                                    type: string
+                                  name:
+                                    description: Name is the name of resource being
+                                      referenced
+                                    type: string
+                                required:
+                                - kind
+                                - name
+                                type: object
+                              dataSourceRef:
+                                description: 'Specifies the object from which to populate
+                                  the volume with data, if a non-empty volume is desired.
+                                  This may be any local object from a non-empty API
+                                  group (non core object) or a PersistentVolumeClaim
+                                  object. When this field is specified, volume binding
+                                  will only succeed if the type of the specified object
+                                  matches some installed volume populator or dynamic
+                                  provisioner. This field will replace the functionality
+                                  of the DataSource field and as such if both fields
+                                  are non-empty, they must have the same value. For
+                                  backwards compatibility, both fields (DataSource
+                                  and DataSourceRef) will be set to the same value
+                                  automatically if one of them is empty and the other
+                                  is non-empty. There are two important differences
+                                  between DataSource and DataSourceRef: * While DataSource
+                                  only allows two specific types of objects, DataSourceRef   allows
+                                  any non-core object, as well as PersistentVolumeClaim
+                                  objects. * While DataSource ignores disallowed values
+                                  (dropping them), DataSourceRef   preserves all values,
+                                  and generates an error if a disallowed value is   specified.
+                                  (Alpha) Using this field requires the AnyVolumeDataSource
+                                  feature gate to be enabled.'
                                 properties:
                                   apiGroup:
                                     description: APIGroup is the group for the resource
@@ -9382,13 +9532,14 @@ spec:
                           type: string
                         value:
                           description: 'Variable references $(VAR_NAME) are expanded
-                            using the previous defined environment variables in the
-                            container and any service environment variables. If a
-                            variable cannot be resolved, the reference in the input
-                            string will be unchanged. The $(VAR_NAME) syntax can be
-                            escaped with a double $$, ie: $$(VAR_NAME). Escaped references
-                            will never be expanded, regardless of whether the variable
-                            exists or not. Defaults to "".'
+                            using the previously defined environment variables in
+                            the container and any service environment variables. If
+                            a variable cannot be resolved, the reference in the input
+                            string will be unchanged. Double $$ are reduced to a single
+                            $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                            "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                            Escaped references will never be expanded, regardless
+                            of whether the variable exists or not. Defaults to "".'
                           type: string
                       required:
                       - name
@@ -9471,6 +9622,8 @@ spec:
                       type: integer
                     type: array
                   name:
+                    description: Name is deprecated and will be removed at 0.22.0
+                      release
                     type: string
                   nodeSelector:
                     additionalProperties:
@@ -9543,7 +9696,7 @@ spec:
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
                   replicaCount:
-                    description: ReplicaCount is the expected size of the VMSelect
+                    description: ReplicaCount is the expected size of the VMStorage
                       cluster. The controller will eventually make the size of the
                       running cluster equal to the expected size.
                     format: int32
@@ -9818,14 +9971,15 @@ spec:
                               type: string
                             value:
                               description: 'Variable references $(VAR_NAME) are expanded
-                                using the previous defined environment variables in
-                                the container and any service environment variables.
+                                using the previously defined environment variables
+                                in the container and any service environment variables.
                                 If a variable cannot be resolved, the reference in
-                                the input string will be unchanged. The $(VAR_NAME)
-                                syntax can be escaped with a double $$, ie: $$(VAR_NAME).
-                                Escaped references will never be expanded, regardless
-                                of whether the variable exists or not. Defaults to
-                                "".'
+                                the input string will be unchanged. Double $$ are
+                                reduced to a single $, which allows for escaping the
+                                $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce
+                                the string literal "$(VAR_NAME)". Escaped references
+                                will never be expanded, regardless of whether the
+                                variable exists or not. Defaults to "".'
                               type: string
                             valueFrom:
                               description: Source for the environment variable's value.
@@ -13579,12 +13733,14 @@ spec:
                       type: string
                     value:
                       description: 'Variable references $(VAR_NAME) are expanded using
-                        the previous defined environment variables in the container
+                        the previously defined environment variables in the container
                         and any service environment variables. If a variable cannot
                         be resolved, the reference in the input string will be unchanged.
-                        The $(VAR_NAME) syntax can be escaped with a double $$, ie:
-                        $$(VAR_NAME). Escaped references will never be expanded, regardless
-                        of whether the variable exists or not. Defaults to "".'
+                        Double $$ are reduced to a single $, which allows for escaping
+                        the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the
+                        string literal "$(VAR_NAME)". Escaped references will never
+                        be expanded, regardless of whether the variable exists or
+                        not. Defaults to "".'
                       type: string
                   required:
                   - name
@@ -13864,13 +14020,48 @@ spec:
                   dataSource:
                     description: 'This field can be used to specify either: * An existing
                       VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
-                      * An existing PVC (PersistentVolumeClaim) * An existing custom
-                      resource that implements data population (Alpha) In order to
-                      use custom resource types that implement data population, the
-                      AnyVolumeDataSource feature gate must be enabled. If the provisioner
+                      * An existing PVC (PersistentVolumeClaim) If the provisioner
                       or an external controller can support the specified data source,
                       it will create a new volume based on the contents of the specified
-                      data source.'
+                      data source. If the AnyVolumeDataSource feature gate is enabled,
+                      this field will always have the same contents as the DataSourceRef
+                      field.'
+                    properties:
+                      apiGroup:
+                        description: APIGroup is the group for the resource being
+                          referenced. If APIGroup is not specified, the specified
+                          Kind must be in the core API group. For any other third-party
+                          types, APIGroup is required.
+                        type: string
+                      kind:
+                        description: Kind is the type of resource being referenced
+                        type: string
+                      name:
+                        description: Name is the name of resource being referenced
+                        type: string
+                    required:
+                    - kind
+                    - name
+                    type: object
+                  dataSourceRef:
+                    description: 'Specifies the object from which to populate the
+                      volume with data, if a non-empty volume is desired. This may
+                      be any local object from a non-empty API group (non core object)
+                      or a PersistentVolumeClaim object. When this field is specified,
+                      volume binding will only succeed if the type of the specified
+                      object matches some installed volume populator or dynamic provisioner.
+                      This field will replace the functionality of the DataSource
+                      field and as such if both fields are non-empty, they must have
+                      the same value. For backwards compatibility, both fields (DataSource
+                      and DataSourceRef) will be set to the same value automatically
+                      if one of them is empty and the other is non-empty. There are
+                      two important differences between DataSource and DataSourceRef:
+                      * While DataSource only allows two specific types of objects,
+                      DataSourceRef   allows any non-core object, as well as PersistentVolumeClaim
+                      objects. * While DataSource ignores disallowed values (dropping
+                      them), DataSourceRef   preserves all values, and generates an
+                      error if a disallowed value is   specified. (Alpha) Using this
+                      field requires the AnyVolumeDataSource feature gate to be enabled.'
                     properties:
                       apiGroup:
                         description: APIGroup is the group for the resource being
@@ -14106,13 +14297,14 @@ spec:
                           type: string
                         value:
                           description: 'Variable references $(VAR_NAME) are expanded
-                            using the previous defined environment variables in the
-                            container and any service environment variables. If a
-                            variable cannot be resolved, the reference in the input
-                            string will be unchanged. The $(VAR_NAME) syntax can be
-                            escaped with a double $$, ie: $$(VAR_NAME). Escaped references
-                            will never be expanded, regardless of whether the variable
-                            exists or not. Defaults to "".'
+                            using the previously defined environment variables in
+                            the container and any service environment variables. If
+                            a variable cannot be resolved, the reference in the input
+                            string will be unchanged. Double $$ are reduced to a single
+                            $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                            "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                            Escaped references will never be expanded, regardless
+                            of whether the variable exists or not. Defaults to "".'
                           type: string
                         valueFrom:
                           description: Source for the environment variable's value.
