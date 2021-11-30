@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square)
+ ![Version: 0.5.1](https://img.shields.io/badge/Version-0.5.1-informational?style=flat-square)
 
 Victoria Metrics Operator
 
@@ -140,7 +140,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| admissionWebhooks | object | `{"caBundle":"","certManager":{"enabled":false,"issuerName":""},"enabled":false,"policy":"Fail"}` | Configures resource validation |
+| admissionWebhooks | object | `{"caBundle":"","certManager":{"enabled":false,"issuer":{}},"enabled":false,"policy":"Fail"}` | Configures resource validation |
 | admissionWebhooks.caBundle | string | `""` | Enables custom ca bundle, if you are not using cert-manager. -- in case of custom ca, you have to create secret - {{chart-name}}-validation -- with keys: tls.key, tls.crt, ca.crt |
 | admissionWebhooks.certManager.enabled | bool | `false` | Enables cert creation and injection by cert-manager. |
 | admissionWebhooks.enabled | bool | `false` | Enables validation webhook. |

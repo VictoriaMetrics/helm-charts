@@ -1,5 +1,5 @@
 {{- if .Values.admissionWebhooks.certManager.enabled -}}
-{{- if not .Values.admissionWebhooks.certManager.issuerName -}}
+{{- if not .Values.admissionWebhooks.certManager.issuer -}}
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
@@ -41,8 +41,10 @@ spec:
   secretName: {{ template "vm-operator.fullname" . }}-validation
   duration: 45800h0m0s
   issuerRef:
-    {{- if .Values.admissionWebhooks.certManager.issuerName }}
-    {{- toYaml .Values.admissionWebhooks.certManager.issuerName | nindent 4 }}
+    {{- if .Values.admissionWebhooks.certManager.issuer }}
+    {{- range $k, $v :=  .Values.admissionWebhooks.certManager.issuer }}
+     {{ $k}}: {{ $v}}
+    {{- end }}
     {{- else }}
     name: {{ template "vm-operator.fullname" . }}-issuer
   {{- end }}
