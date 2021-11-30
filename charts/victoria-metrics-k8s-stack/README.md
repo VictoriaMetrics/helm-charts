@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.5.8](https://img.shields.io/badge/Version-0.5.8-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -137,6 +137,15 @@ Usually, helm upgrade doesn't requires manual actions. But release with CRD upda
 $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
  All CRD manual actions upgrades listed below:
+
+### Upgrade to 0.6.0
+
+ All `CRD` must be update to the lastest version with command:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/master/charts/victoria-metrics-k8s-stack/crds/crd.yaml
+
+```
 
 ### Upgrade to 0.4.0
 
