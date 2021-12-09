@@ -20,13 +20,12 @@ metadata:
     {{- end }}
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
-    {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+    {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
   annotations:
-    {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+    {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
     {{ $key }}: {{ $val | quote }}
     {{- end }}
     {{- end }}
-    
 data:
   vmagent.json: |-
     {
@@ -1512,7 +1511,7 @@ data:
                 "targets": [
                     {
                         "exemplar": true,
-                        "expr": "sum(rate(vm_log_messages_total{job=\"$job\", instance=~\"$instance\"}[5m])) by (level) ",
+                        "expr": "sum(rate(vm_log_messages_total{job=~\"$job\", instance=~\"$instance\"}[5m])) by (level) ",
                         "format": "time_series",
                         "hide": false,
                         "interval": "",
@@ -4413,7 +4412,7 @@ data:
                     "allValue": ".*",
                     "current": {},
                     "datasource": "$ds",
-                    "definition": "label_values(vmagent_remotewrite_requests_total{job=\"$job\", instance=~\"$instance\"}, url)",
+                    "definition": "label_values(vmagent_remotewrite_requests_total{job=~\"$job\", instance=~\"$instance\"}, url)",
                     "description": "The remote write URLs",
                     "error": null,
                     "hide": 0,
@@ -4423,7 +4422,7 @@ data:
                     "name": "url",
                     "options": [],
                     "query": {
-                        "query": "label_values(vmagent_remotewrite_requests_total{job=\"$job\", instance=~\"$instance\"}, url)",
+                        "query": "label_values(vmagent_remotewrite_requests_total{job=~\"$job\", instance=~\"$instance\"}, url)",
                         "refId": "StandardVariableQuery"
                     },
                     "refresh": 1,
