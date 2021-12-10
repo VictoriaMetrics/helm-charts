@@ -23,6 +23,7 @@ data:
       url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
       access: proxy
       isDefault: true
+      jsonData: {{ toYaml .Values.grafana.sidecar.datasources.jsonData | nindent 8 }}
 {{- end }}
 {{- if .Values.grafana.sidecar.datasources.createVMReplicasDatasources }}
 {{- range until (int .Values.vmsingle.spec.replicaCount) }}
@@ -31,6 +32,7 @@ data:
       url: "http://{{ include "victoria-metrics-k8s-stack.vmsingleName" $ }}-{{ . }}.{{ $.Release.Namespace }}.svc:{{ $.Values.vmsingle.spec.port | default 8428 }}"
       access: proxy
       isDefault: false
+      jsonData: {{ toYaml .Values.grafana.sidecar.datasources.jsonData | nindent 8 }}
 {{- end }}
 {{- end }}
 {{- if .Values.grafana.additionalDataSources }}
