@@ -13,8 +13,19 @@ metadata:
     {{- if $.Values.grafana.sidecar.dashboards.label }}
     {{ $.Values.grafana.sidecar.dashboards.label }}: "1"
     {{- end }}
+    {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+    {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- end }}
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+    {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
+  annotations:
+    {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- end }}
 data:
   nodes.json: |-
     {
@@ -89,7 +100,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "(\n  (1 - rate(node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\", instance=\"$instance\"}[$__rate_interval]))\n/ ignoring(cpu) group_left\n  count without (cpu)( node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\", instance=\"$instance\"})\n)\n",
+                                "expr": "(\n  (1 - sum without (mode) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode=~\"idle|iowait|steal\", instance=\"$instance\"}[$__rate_interval])))\n/ ignoring(cpu) group_left\n  count without (cpu, mode) (node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\", instance=\"$instance\"})\n)\n",
                                 "format": "time_series",
                                 "intervalFactor": 5,
                                 "legendFormat": "{{`{{`}}cpu{{`}}`}}",
