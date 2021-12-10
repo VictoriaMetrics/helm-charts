@@ -1,5 +1,5 @@
 {{- /*
-Generated from 'kubernetes-resources' group from https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetes-prometheusRule.yaml
+Generated from 'kubernetes-resources' group from https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetesControlPlane-prometheusRule.yaml
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
@@ -40,7 +40,7 @@ spec:
 {{- end }}
     - alert: KubeMemoryOvercommit
       annotations:
-        description: Cluster has overcommitted memory resource requests for Pods by {{`{{`}} $value {{`}}`}} bytes and cannot tolerate node failure.
+        description: Cluster has overcommitted memory resource requests for Pods by {{`{{`}} $value | humanize {{`}}`}} bytes and cannot tolerate node failure.
         runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/kubememoryovercommit
         summary: Cluster has overcommitted memory resource requests.
       expr: |-
@@ -59,9 +59,9 @@ spec:
         runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/kubecpuquotaovercommit
         summary: Cluster has overcommitted CPU resource requests.
       expr: |-
-        sum(kube_resourcequota{job="kube-state-metrics", type="hard", resource="cpu"})
+        sum(min without(resource) (kube_resourcequota{job="kube-state-metrics", type="hard", resource=~"(cpu|requests.cpu)"}))
           /
-        sum(kube_node_status_allocatable{resource="cpu"})
+        sum(kube_node_status_allocatable{resource="cpu", job="kube-state-metrics"})
           > 1.5
       for: 5m
       labels:
@@ -75,9 +75,9 @@ spec:
         runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/kubememoryquotaovercommit
         summary: Cluster has overcommitted memory resource requests.
       expr: |-
-        sum(kube_resourcequota{job="kube-state-metrics", type="hard", resource="memory"})
+        sum(min without(resource) (kube_resourcequota{job="kube-state-metrics", type="hard", resource=~"(memory|requests.memory)"}))
           /
-        sum(kube_node_status_allocatable{resource="memory",job="kube-state-metrics"})
+        sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"})
           > 1.5
       for: 5m
       labels:

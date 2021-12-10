@@ -1,5 +1,5 @@
 {{- /*
-Generated from 'kubernetes-apps' group from https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetes-prometheusRule.yaml
+Generated from 'kubernetes-apps' group from https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetesControlPlane-prometheusRule.yaml
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
@@ -26,13 +26,10 @@ spec:
     rules:
     - alert: KubePodCrashLooping
       annotations:
-        description: Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} ({{`{{`}} $labels.container {{`}}`}}) is restarting {{`{{`}} printf "%.2f" $value {{`}}`}} times / 10 minutes.
+        description: 'Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} ({{`{{`}} $labels.container {{`}}`}}) is in waiting state (reason: "CrashLoopBackOff").'
         runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/kubepodcrashlooping
         summary: Pod is crash looping.
-      expr: |-
-        increase(kube_pod_container_status_restarts_total{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}[10m]) > 0
-        and
-        kube_pod_container_status_waiting{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"} == 1
+      expr: max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff", job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}[5m]) >= 1
       for: 15m
       labels:
         severity: warning
@@ -196,7 +193,7 @@ spec:
 {{- end }}
     - alert: KubeContainerWaiting
       annotations:
-        description: Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} container {{`{{`}} $labels.container{{`}}`}} has been in waiting state for longer than 1 hour.
+        description: pod/{{`{{`}} $labels.pod {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} on container {{`{{`}} $labels.container{{`}}`}} has been in waiting state for longer than 1 hour.
         runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/kubecontainerwaiting
         summary: Pod container waiting longer than 1 hour
       expr: sum by (namespace, pod, container) (kube_pod_container_status_waiting_reason{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}) > 0
