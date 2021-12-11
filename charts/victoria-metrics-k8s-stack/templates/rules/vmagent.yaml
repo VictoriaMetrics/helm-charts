@@ -86,4 +86,26 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+    - alert: SeriesLimitHourReached
+      annotations:
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=88&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        description: Max series limit set via -remoteWrite.maxHourlySeries flag is close to reaching the max value. Then samples for new time series will be dropped instead of sending them to remote storage systems.
+        summary: Instance {{`{{`}} $labels.instance {{`}}`}} reached 90% of the limit
+      expr: (vmagent_hourly_series_limit_current_series / vmagent_hourly_series_limit_max_series) > 0.9
+      labels:
+        severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: SeriesLimitDayReached
+      annotations:
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=90&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        description: Max series limit set via -remoteWrite.maxDailySeries flag is close to reaching the max value. Then samples for new time series will be dropped instead of sending them to remote storage systems.
+        summary: Instance {{`{{`}} $labels.instance {{`}}`}} reached 90% of the limit
+      expr: (vmagent_daily_series_limit_current_series / vmagent_daily_series_limit_max_series) > 0.9
+      labels:
+        severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}

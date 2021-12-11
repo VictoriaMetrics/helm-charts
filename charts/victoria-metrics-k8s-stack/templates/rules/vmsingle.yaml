@@ -164,7 +164,7 @@ spec:
 {{- end }}
     - alert: LabelsLimitExceededOnIngestion
       annotations:
-        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=74&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=74&var-instance={{`{{`}} $labels.instance {{`}}`}}
         description: "VictoriaMetrics limits the number of labels per each metric with `-maxLabelsPerTimeseries` command-line flag.\n This prevents from ingesting metrics with too many labels. Please verify that `-maxLabelsPerTimeseries` is configured correctly or that clients which send these metrics aren't misbehaving."
         summary: Metrics ingested in ({{`{{`}} $labels.instance {{`}}`}}) are exceeding labels limit
       expr: sum(increase(vm_metrics_with_dropped_labels_total[5m])) by (instance) > 0
