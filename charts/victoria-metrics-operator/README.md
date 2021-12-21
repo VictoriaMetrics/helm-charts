@@ -152,7 +152,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
 | extraLabels | object | `{}` | Labels to be added to the all resources |
-| podLabels | object | `{}` | Labels to be added to Pods only |
 | extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` | Overrides the full name of server component |
@@ -167,6 +166,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | operator.enable_converter_ownership | bool | `false` | Enables ownership reference for converted prometheus-operator objects, it will remove corresponding victoria-metrics objects in case of deletion prometheus one. |
 | operator.psp_auto_creation_enabled | bool | `true` | By default, operator creates psp for its objects. |
 | operator.useCustomConfigReloader | bool | `false` | Enables custom config-reloader, bundled with operator. It should reduce  vmagent and vmauth config sync-time and make it predictable. |
+| podLabels | object | `{}` |  |
 | rbac.create | bool | `true` | Specifies whether the RBAC resources should be created |
 | rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` |  |

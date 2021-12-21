@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.6.3](https://img.shields.io/badge/Version-0.6.3-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -275,6 +275,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.spec.externalURL | string | `""` |  |
 | alertmanager.spec.image.tag | string | `"v0.23.0"` |  |
 | alertmanager.spec.routePrefix | string | `"/"` |  |
+| alertmanager.spec.selectAllByDefault | bool | `true` |  |
 | alertmanager.templateFiles | object | `{}` |  |
 | argocdReleaseOverride | string | `""` | If this chart is used in "Agrocd" with "releaseName" field then -- VMServiceScrapes couldn't select the proper services. -- For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
 | coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"vmServiceScrape":{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}]}}}` | Component scraping coreDns. Use either this or kubeDns |
@@ -325,10 +326,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.ingress.path | string | `"/"` |  |
 | grafana.ingress.pathType | string | `"Prefix"` |  |
 | grafana.ingress.tls | list | `[]` |  |
+| grafana.sidecar.dashboards.additionalDashboardAnnotations | object | `{}` |  |
+| grafana.sidecar.dashboards.additionalDashboardLabels | object | `{}` |  |
 | grafana.sidecar.dashboards.enabled | bool | `true` |  |
 | grafana.sidecar.dashboards.multicluster | bool | `false` |  |
 | grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |
 | grafana.sidecar.datasources.enabled | bool | `true` |  |
+| grafana.sidecar.datasources.jsonData | object | `{}` |  |
 | grafana.vmServiceScrape.enabled | bool | `true` |  |
 | grafana.vmServiceScrape.spec | object | `{}` |  |
 | kube-state-metrics.enabled | bool | `true` |  |
@@ -421,8 +425,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.ingress.tls | list | `[]` |  |
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
-| vmagent.spec.image.tag | string | `"v1.70.0"` |  |
+| vmagent.spec.image.tag | string | `"v1.71.0"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
+| vmagent.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.enabled | bool | `true` |  |
 | vmalert.ingress.annotations | object | `{}` |  |
 | vmalert.ingress.enabled | bool | `false` |  |
@@ -433,7 +438,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.ingress.pathType | string | `"Prefix"` |  |
 | vmalert.ingress.tls | list | `[]` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
-| vmalert.spec.image.tag | string | `"v1.70.0"` |  |
+| vmalert.spec.image.tag | string | `"v1.71.0"` |  |
+| vmalert.spec.selectAllByDefault | bool | `true` |  |
 | vmcluster.enabled | bool | `false` |  |
 | vmcluster.ingress.insert.annotations | object | `{}` |  |
 | vmcluster.ingress.insert.enabled | bool | `false` |  |
@@ -461,24 +467,24 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.ingress.storage.tls | list | `[]` |  |
 | vmcluster.spec.replicationFactor | int | `2` |  |
 | vmcluster.spec.retentionPeriod | string | `"14"` |  |
-| vmcluster.spec.vminsert.image.tag | string | `"v1.70.0-cluster"` |  |
+| vmcluster.spec.vminsert.image.tag | string | `"v1.71.0-cluster"` |  |
 | vmcluster.spec.vminsert.replicaCount | int | `2` |  |
 | vmcluster.spec.vminsert.resources.limits.cpu | string | `"1"` |  |
 | vmcluster.spec.vminsert.resources.limits.memory | string | `"1000Mi"` |  |
 | vmcluster.spec.vminsert.resources.requests.cpu | string | `"0.5"` |  |
 | vmcluster.spec.vminsert.resources.requests.memory | string | `"500Mi"` |  |
 | vmcluster.spec.vmselect.cacheMountPath | string | `"/select-cache"` |  |
-| vmcluster.spec.vmselect.image.tag | string | `"v1.70.0-cluster"` |  |
+| vmcluster.spec.vmselect.image.tag | string | `"v1.71.0-cluster"` |  |
 | vmcluster.spec.vmselect.replicaCount | int | `2` |  |
 | vmcluster.spec.vmselect.resources.limits.cpu | string | `"1"` |  |
 | vmcluster.spec.vmselect.resources.limits.memory | string | `"1000Mi"` |  |
 | vmcluster.spec.vmselect.resources.requests.cpu | string | `"0.5"` |  |
 | vmcluster.spec.vmselect.resources.requests.memory | string | `"500Mi"` |  |
 | vmcluster.spec.vmselect.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"2Gi"` |  |
-| vmcluster.spec.vmstorage.image.tag | string | `"v1.70.0-cluster"` |  |
+| vmcluster.spec.vmstorage.image.tag | string | `"v1.71.0-cluster"` |  |
 | vmcluster.spec.vmstorage.replicaCount | int | `2` |  |
 | vmcluster.spec.vmstorage.resources.limits.cpu | string | `"1"` |  |
 | vmcluster.spec.vmstorage.resources.limits.memory | string | `"1500Mi"` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"image":{"tag":"v1.70.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle | object | `{"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"image":{"tag":"v1.71.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
