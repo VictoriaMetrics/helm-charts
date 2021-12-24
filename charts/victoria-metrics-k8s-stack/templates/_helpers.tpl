@@ -99,6 +99,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Values.vmcluster.enabled -}}
 {{ printf "http://%s-%s.%s.svc:%d/insert/0/prometheus" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default 8480) }}
 {{- end }}
+{{- if .Values.vmInsertEndpoint -}}
+{{ .Values.vmInsertEndpoint }}
+{{- end }}
 {{- end }}
 
 
