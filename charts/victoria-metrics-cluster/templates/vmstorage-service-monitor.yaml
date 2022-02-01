@@ -24,10 +24,17 @@ spec:
       {{- include "victoria-metrics.vmstorage.matchLabels" . | nindent 6 }} 
   endpoints:
     - port: http
+      {{- if .Values.vmstorage.serviceMonitor.scheme }}
+      scheme: {{ .Values.vmstorage.serviceMonitor.scheme }}
+      {{- end }}
       {{- if .Values.vmstorage.serviceMonitor.interval }}
       interval: {{ .Values.vmstorage.serviceMonitor.interval }}
       {{- end }}
       {{- if .Values.vmstorage.serviceMonitor.scrapeTimeout }}
       scrapeTimeout: {{ .Values.vmstorage.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- with .Values.vmstorage.serviceMonitor.tlsConfig }}
+      tlsConfig:
+          {{- toYaml . | nindent 8 }}
       {{- end }}
   {{- end }}
