@@ -24,10 +24,17 @@ spec:
       {{- include "victoria-metrics.server.matchLabels" . | nindent 6 }} 
   endpoints:
     - port: http
+      {{- if .Values.server.serviceMonitor.scheme }}
+      scheme: {{ .Values.server.serviceMonitor.scheme }}
+      {{- end }}
       {{- if .Values.server.serviceMonitor.interval }}
       interval: {{ .Values.server.serviceMonitor.interval }}
       {{- end }}
       {{- if .Values.server.serviceMonitor.scrapeTimeout }}
       scrapeTimeout: {{ .Values.server.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- with .Values.server.serviceMonitor.tlsConfig }}
+      tlsConfig:
+          {{- toYaml . | nindent 8 }}
       {{- end }}
   {{- end }}
