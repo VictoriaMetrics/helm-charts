@@ -37,6 +37,17 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+    - alert: RejectedRemoteWriteDataBlocksAreDropped
+      annotations:
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=79&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        summary: Job "{{`{{`}} $labels.job {{`}}`}}" on instance {{`{{`}} $labels.instance {{`}}`}} drops the rejected by remote-write server data blocks. Check the logs to find the reason for rejects.
+      expr: sum(increase(vmagent_remotewrite_packets_dropped_total[5m])) by (job, instance) > 0
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
     - alert: TooManyScrapeErrors
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=31&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -80,6 +91,30 @@ spec:
         description: "The remote write connection between vmagent \"{{`{{`}} $labels.job {{`}}`}}\" (instance {{`{{`}} $labels.instance {{`}}`}}) and destination \"{{`{{`}} $labels.url {{`}}`}}\" is saturated by more than 90% and vmagent won't be able to keep up.\n This usually means that `-remoteWrite.queues` command-line flag must be increased in order to increase the number of connections per each remote storage."
         summary: Remote write connection from "{{`{{`}} $labels.job {{`}}`}}" (instance {{`{{`}} $labels.instance {{`}}`}}) to {{`{{`}} $labels.url {{`}}`}} is saturated
       expr: rate(vmagent_remotewrite_send_duration_seconds_total[5m]) > 0.9
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: PersistentQueueForWritesIsSaturated
+      annotations:
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=98&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        description: Persistent queue writes for vmagent "{{`{{`}} $labels.job {{`}}`}}" (instance {{`{{`}} $labels.instance {{`}}`}}) are saturated by more than 90% and vmagent won't be able to keep up with flushing data on disk. In this case, consider to decrease load on the vmagent or improve the disk throughput.
+        summary: Persistent queue writes for instance {{`{{`}} $labels.instance {{`}}`}} are saturated
+      expr: rate(vm_persistentqueue_write_duration_seconds_total[5m]) > 0.9
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: PersistentQueueForReadsIsSaturated
+      annotations:
+        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=99&var-instance={{`{{`}} $labels.instance {{`}}`}}
+        description: Persistent queue reads for vmagent "{{`{{`}} $labels.job {{`}}`}}" (instance {{`{{`}} $labels.instance {{`}}`}}) are saturated by more than 90% and vmagent won't be able to keep up with reading data from the disk. In this case, consider to decrease load on the vmagent or improve the disk throughput.
+        summary: Persistent queue reads for instance {{`{{`}} $labels.instance {{`}}`}} are saturated
+      expr: rate(vm_persistentqueue_read_duration_seconds_total[5m]) > 0.9
       for: 15m
       labels:
         severity: warning

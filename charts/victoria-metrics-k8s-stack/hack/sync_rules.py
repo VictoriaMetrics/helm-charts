@@ -98,6 +98,7 @@ alert_condition_map = {
     'NodeExporterDown': '.Values.nodeExporter.enabled',
     'CoreDNSDown': '.Values.kubeDns.enabled',
     'AlertmanagerDown': '.Values.alertmanager.enabled',
+    'KubeProxyDown': '.Values.kubeProxy.enabled',
 }
 
 replacement_map = {
@@ -115,6 +116,10 @@ replacement_map = {
     'http://localhost:3000': {
         'replacement': '{{ index .Values.grafana.ingress.hosts 0 }}',
         'init': ''},
+    'job="alertmanager-main"' : {
+        'replacement': 'job="{{ .Values.alertmanager.name | default (include "victoria-metrics-k8s-stack.fullname" .) }}"',
+        'init': '',
+    },
 }
 
 # standard header

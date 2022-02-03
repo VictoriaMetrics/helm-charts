@@ -16,6 +16,10 @@ stringData:
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlertmanager
 metadata:
+  {{- with .Values.alertmanager.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end  }}
   name: {{ .Values.alertmanager.name | default (include "victoria-metrics-k8s-stack.fullname" .) }}
   namespace: {{ .Release.Namespace }}
   labels: 

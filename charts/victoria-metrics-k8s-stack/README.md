@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.6.7](https://img.shields.io/badge/Version-0.6.7-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.6.8](https://img.shields.io/badge/Version-0.6.8-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -200,6 +200,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| alertmanager.annotations | object | `{}` |  |
 | alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
 | alertmanager.config.global.slack_api_url | string | `"http://slack:30500/"` |  |
 | alertmanager.config.receivers[0].name | string | `"slack-monitoring"` |  |
@@ -414,6 +415,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.name | string | `""` | The name of the service account to use. -- If not set and create is true, a name is generated using the fullname template |
 | victoria-metrics-operator.createCRD | bool | `false` | all values for victoria-metrics-operator helm chart can be specified here |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
+| vmagent.annotations | object | `{}` |  |
 | vmagent.enabled | bool | `true` |  |
 | vmagent.ingress.annotations | object | `{}` |  |
 | vmagent.ingress.enabled | bool | `false` |  |
@@ -428,6 +430,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.spec.image.tag | string | `"v1.72.0"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
 | vmagent.spec.selectAllByDefault | bool | `true` |  |
+| vmalert.annotations | object | `{}` |  |
 | vmalert.enabled | bool | `true` |  |
 | vmalert.ingress.annotations | object | `{}` |  |
 | vmalert.ingress.enabled | bool | `false` |  |
@@ -440,6 +443,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
 | vmalert.spec.image.tag | string | `"v1.72.0"` |  |
 | vmalert.spec.selectAllByDefault | bool | `true` |  |
+| vmcluster.annotations | object | `{}` |  |
 | vmcluster.enabled | bool | `false` |  |
 | vmcluster.ingress.insert.annotations | object | `{}` |  |
 | vmcluster.ingress.insert.enabled | bool | `false` |  |
@@ -487,4 +491,4 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.spec.vmstorage.resources.limits.memory | string | `"1500Mi"` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"image":{"tag":"v1.72.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"image":{"tag":"v1.72.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |

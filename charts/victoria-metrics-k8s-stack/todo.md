@@ -1,11 +1,11 @@
 ### plans
 
-* [ ] VMCluster
+* [x] VMCluster
 * [x] VMSingle
 * [x] VMAgent
 * [x] VMAlert
 * [x] AlertManager
-* [ ] Annotations
+* [x] Annotations
 * [x] ServiceScrapes
   * [x] Nodeexporter
   * [x] Grafana
