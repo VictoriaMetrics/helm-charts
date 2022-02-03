@@ -178,8 +178,10 @@ server:
 
   # Indicates whether the Container is running. If the liveness probe fails, the kubelet kills the Container, and the Container is subjected to its restart policy. If a Container does not provide a liveness probe, the default state is Success.
   livenessProbe:
-    tcpSocket:
-      port: http
+    httpGet:
+      scheme: HTTP
+      path: /health
+      port: 8428
     initialDelaySeconds: 30
     periodSeconds: 30
     timeoutSeconds: 5
