@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.8.15](https://img.shields.io/badge/Version-0.8.15-informational?style=flat-square)
+ ![Version: 0.8.16](https://img.shields.io/badge/Version-0.8.16-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -138,9 +138,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.ingress.tls | list | `[]` | Array of TLS objects |
 | server.initContainers | list | `[]` |  |
 | server.livenessProbe.failureThreshold | int | `10` |  |
+| server.livenessProbe.httpGet.path | string | `"/health"` |  |
+| server.livenessProbe.httpGet.port | int | `8428` |  |
+| server.livenessProbe.httpGet.scheme | string | `"HTTP"` |  |
 | server.livenessProbe.initialDelaySeconds | int | `30` |  |
 | server.livenessProbe.periodSeconds | int | `30` |  |
-| server.livenessProbe.tcpSocket.port | string | `"http"` |  |
 | server.livenessProbe.timeoutSeconds | int | `5` |  |
 | server.name | string | `"server"` | Server container name |
 | server.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
