@@ -107,9 +107,9 @@ VMAlert remotes
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAlertRemotes" -}}
 remoteWrite:
-     url: {{ include "victoria-metrics-k8s-stack.vmInsertEndpoint" . }}
+     url: {{ .Values.vmalert.remoteWriteOverride | default (include "victoria-metrics-k8s-stack.vmInsertEndpoint" .) }}
 remoteRead:
-     url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
+     url: {{ .Values.vmalert.remoteReadOverride  | default (include "victoria-metrics-k8s-stack.vmSelectEndpoint" .) }}
 datasource:
      url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
 notifiers:
@@ -128,8 +128,12 @@ VMAlert spec
 VM Agent remoteWrite
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAgentRemoteWrite" -}}
-remoteWrite:
-    - url: {{ include "victoria-metrics-k8s-stack.vmInsertEndpoint" . }}/api/v1/write
+{{- $addressList := list (dict "url" (printf "%s/%s" (include "victoria-metrics-k8s-stack.vmInsertEndpoint" . ) "api/v1/write")) -}}
+{{- if .Values.vmagent.additionalRemoteWrite -}}
+{{- $addressList = concat $addressList .Values.vmagent.additionalRemoteWrite -}}
+{{- end }}
+{{- $dict := dict "remoteWrite" $addressList  -}}
+{{- $dict | toYaml }}
 {{- end }}
 
 {{/*
