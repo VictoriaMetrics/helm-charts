@@ -35,6 +35,8 @@ spec:
     {{- end }}
       serviceAccountName: {{ template "vmalert.serviceAccountName" . }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
+      securityContext:
+        {{- toYaml .Values.alertmanager.securityContext | nindent 8 }}
       containers:
         - name: {{ template "vmalert.name" . }}-alertmanager
           securityContext:
