@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.6.1](https://img.shields.io/badge/Version-0.6.1-informational?style=flat-square)
+ ![Version: 0.7.1](https://img.shields.io/badge/Version-0.7.1-informational?style=flat-square)
 
 Victoria Metrics Operator
 
@@ -157,7 +157,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.22.1"` | Image tag |
+| image.tag | string | `"v0.23.0"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
 | logLevel | string | `"info"` | VM operator log level -- possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name override |
@@ -170,7 +170,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.create | bool | `true` | Specifies whether the RBAC resources should be created |
 | rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` |  |
-| resources | object | `{"limits":{"cpu":"120m","memory":"320Mi"},"requests":{"cpu":"80m","memory":"120Mi"}}` | Resource object |
+| resources | object | `{}` | Resource object |
 | securityContext | object | `{}` |  |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
