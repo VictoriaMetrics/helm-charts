@@ -107,9 +107,9 @@ VMAlert remotes
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAlertRemotes" -}}
 remoteWrite:
-     url: {{ .Values.vmalert.remoteWriteOverride | default (include "victoria-metrics-k8s-stack.vmInsertEndpoint" .) }}
+     url: {{ include "victoria-metrics-k8s-stack.vmInsertEndpoint" . }}
 remoteRead:
-     url: {{ .Values.vmalert.remoteReadOverride  | default (include "victoria-metrics-k8s-stack.vmSelectEndpoint" .) }}
+     url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
 datasource:
      url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
 notifiers:
@@ -150,7 +150,7 @@ Alermanager spec
 {{- define "victoria-metrics-k8s-stack.alertmanagerSpec" -}}
 {{ omit .Values.alertmanager.spec  "configMaps" "configSecret" | toYaml }}
 configSecret: {{ .Values.alertmanager.spec.configSecret | default (printf "%s-alertmanager" (include "victoria-metrics-k8s-stack.fullname" .)) }}
-{{- if or .Values.alertmanager.spec.configMaps .Values.alertmanager.monzoTemplate.enabled }}
+{{- if or .Values.alertmanager.spec.configMaps .Values.alertmanager.monzoTemplate.enabled .Values.alertmanager.templateFiles }}
 {{- $list := .Values.alertmanager.spec.configMaps | default (list "") }}
 {{- if .Values.alertmanager.monzoTemplate.enabled }}
 {{- $list = append $list (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "alertmanager-monzo-tpl" | trunc 63 | trimSuffix "-") }}
