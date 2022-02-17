@@ -480,8 +480,12 @@ vmalert:
 vmagent:
   enabled: true
   annotations: {}
+  # https://docs.victoriametrics.com/operator/api.html#vmagentremotewritespec
+  # defined spec will be added to the remoteWrite configuration of VMAgent
+  additionalRemoteWrites: []
+    #- url: http://some-remote-write/api/v1/write
   # spec for VMAgent crd
-  # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmagentspec
+  # https://docs.victoriametrics.com/operator/blob/master/docs/api.MD#vmagentspec
   spec:
     selectAllByDefault: true
     image:

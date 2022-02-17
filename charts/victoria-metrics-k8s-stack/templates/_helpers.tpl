@@ -86,18 +86,26 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "victoria-metrics-k8s-stack.vmSelectEndpoint" -}}
 {{- if .Values.vmsingle.enabled -}}
 {{ printf "http://%s.%s.svc:%d" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default 8429) }}
-{{- end }}
-{{- if .Values.vmcluster.enabled -}}
+{{- else if .Values.vmcluster.enabled -}}
 {{ printf "http://%s-%s.%s.svc:%d/select/0/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default 8481) }}
 {{- end }}
 {{- end }}
 
-{{- define "victoria-metrics-k8s-stack.vmInsertEndpoint" -}}
-{{- if .Values.vmsingle.enabled -}}
+{{- define "victoria-metrics-k8s-stack.vmSingleInsertEndpoint" -}}
 {{ printf "http://%s.%s.svc:%d" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default 8429) }}
 {{- end }}
-{{- if .Values.vmcluster.enabled -}}
+{{- define "victoria-metrics-k8s-stack.vmClusterInsertEndpoint" -}}
 {{ printf "http://%s-%s.%s.svc:%d/insert/0/prometheus" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default 8480) }}
+{{- end }}
+
+{{/*
+  for VMAlert remote
+*/}}
+{{- define "victoria-metrics-k8s-stack.vmInsertEndpoint" -}}
+{{- if .Values.vmsingle.enabled -}}
+{{ include "victoria-metrics-k8s-stack.vmSingleInsertEndpoint" . }}
+{{- else if .Values.vmcluster.enabled -}}
+{{ include "victoria-metrics-k8s-stack.vmClusterInsertEndpoint" . }}
 {{- end }}
 {{- end }}
 
@@ -125,11 +133,19 @@ VMAlert spec
 
 
 {{/*
-VM Agent remoteWrite
+VM Agent remoteWrites
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAgentRemoteWrite" -}}
 remoteWrite:
-    - url: {{ include "victoria-metrics-k8s-stack.vmInsertEndpoint" . }}/api/v1/write
+{{- if .Values.vmsingle.enabled }}
+- url: {{ include "victoria-metrics-k8s-stack.vmSingleInsertEndpoint" . }}/api/v1/write
+{{- end }}
+{{- if .Values.vmcluster.enabled }}
+- url: {{  include "victoria-metrics-k8s-stack.vmClusterInsertEndpoint" . }}/api/v1/write
+{{- end }}
+{{ range .Values.vmagent.additionalRemoteWrites }}
+-{{ toYaml . | nindent 2 }}
+{{- end }}
 {{- end }}
 
 {{/*
