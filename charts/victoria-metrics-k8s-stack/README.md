@@ -415,7 +415,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.name | string | `""` | The name of the service account to use. -- If not set and create is true, a name is generated using the fullname template |
 | victoria-metrics-operator.createCRD | bool | `false` | all values for victoria-metrics-operator helm chart can be specified here |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
-| vmagent.additionalRemoteWrites | object | `{}` |  |
+| vmagent.additionalRemoteWrites | list | `[]` |  |
 | vmagent.annotations | object | `{}` |  |
 | vmagent.enabled | bool | `true` |  |
 | vmagent.ingress.annotations | object | `{}` |  |
