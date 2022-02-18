@@ -15,6 +15,12 @@ metadata:
   name: {{ template "victoria-metrics.server.fullname" . }}
 spec:
   clusterIP: None
+  {{- with .Values.server.statefulSet.service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with .Values.server.statefulSet.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
   ports:
     - name: http
       port: {{ .Values.server.statefulSet.service.servicePort }}

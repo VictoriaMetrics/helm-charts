@@ -38,4 +38,10 @@ spec:
   selector:
     {{- include "chart.selectorLabels" . | nindent 4 }}
   type: "{{ .Values.service.type }}"
+  {{- with .Values.service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with .Values.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
 {{- end }}
