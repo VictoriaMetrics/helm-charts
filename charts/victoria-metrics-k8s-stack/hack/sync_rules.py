@@ -117,7 +117,7 @@ replacement_map = {
         'replacement': '{{ index .Values.grafana.ingress.hosts 0 }}',
         'init': ''},
     'job="alertmanager-main"' : {
-        'replacement': 'job="{{ .Values.alertmanager.name | default (include "victoria-metrics-k8s-stack.fullname" .) }}"',
+        'replacement': 'job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}"',
         'init': '',
     },
 }
