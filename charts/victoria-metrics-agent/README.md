@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.7.39](https://img.shields.io/badge/Version-0.7.39-informational?style=flat-square)
+ ![Version: 0.7.41](https://img.shields.io/badge/Version-0.7.41-informational?style=flat-square)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
@@ -304,6 +304,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podDisruptionBudget.labels | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
+| priorityClassName | string | `""` | priority class to be assigned to the pod(s) |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |
