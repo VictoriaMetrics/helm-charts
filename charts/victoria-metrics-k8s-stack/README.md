@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.7.5](https://img.shields.io/badge/Version-0.7.5-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.7.7](https://img.shields.io/badge/Version-0.7.7-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -200,6 +200,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| additionalVictoriaMetricsMap.rule-name.groups[0].name | string | `"my_group"` |  |
+| additionalVictoriaMetricsMap.rule-name.groups[0].rules[0].expr | string | `"100 * my_record"` |  |
+| additionalVictoriaMetricsMap.rule-name.groups[0].rules[0].record | string | `"my_record"` |  |
 | alertmanager.annotations | object | `{}` |  |
 | alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
 | alertmanager.config.global.slack_api_url | string | `"http://slack:30500/"` |  |
