@@ -85,7 +85,10 @@ condition_map = {
     'node-exporter.rules': '.Values.defaultRules.rules.node',
     'node-network': '.Values.defaultRules.rules.network',
     'node.rules': '.Values.defaultRules.rules.node',
-    'vmagent': '.Values.vmagent.enabled'
+    'vmagent': '.Values.vmagent.enabled .Values.defaultRules.rules.vmagent' ,
+    'alertmaanger': '.Values.defaultRules.rules.alertmanager',
+    'vmsingle': '.Values.defaultRules.rules.vmsingle',
+    'vm-health': '.Values.defaultRules.rules.vmhealth'
 }
 
 alert_condition_map = {
