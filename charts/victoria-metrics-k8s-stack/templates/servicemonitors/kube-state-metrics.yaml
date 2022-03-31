@@ -14,6 +14,9 @@ spec:
   endpoints:
   - port: http
     honorLabels: true
+    metricRelabelConfigs:
+      - action: labeldrop
+        regex: (uid|container_id|image_id)
   jobLabel: app.kubernetes.io/name
 {{ else }}
 {{- if not (hasKey (index .Values "kube-state-metrics" "vmServiceScrape" "spec") "endpoints") }}
