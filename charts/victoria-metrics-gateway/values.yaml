@@ -1,0 +1,200 @@
+# Default values for victoria-metrics-gateway.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Number of replicas of vmgateway
+replicaCount: 1
+
+image:
+  # -- Victoria Metrics gateway Docker repository and image name
+  repository: victoriametrics/vmgateway
+  # -- Tag of Docker image
+  tag: v1.75.1-enterprise
+  # -- Pull policy of Docker image
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+containerWorkingDir: "/"
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+  name:
+
+# -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+podDisruptionBudget:
+  enabled: false
+  # minAvailable: 1
+  # maxUnavailable: 1
+  labels: {}
+
+extraArgs:
+  envflag.enable: "true"
+  envflag.prefix: VM_
+  loggerFormat: json
+  # promscrape.maxScrapeSize: "167772160"
+
+# -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
+env: []
+
+# -- Additional hostPath mounts
+extraHostPathMounts: []
+  # - name: certs-dir
+  #   mountPath: /etc/kubernetes/certs
+  #   subPath: ""
+  #   hostPath: /etc/kubernetes/certs
+#   readOnly: true
+
+# -- Extra Volumes for the pod
+extraVolumes: []
+  # - name: example
+  #   configMap:
+#     name: example
+
+# -- Extra Volume Mounts for the container
+extraVolumeMounts: []
+  # - name: example
+#   mountPath: /example
+
+extraContainers:
+  []
+  # - name: config-reloader
+#   image: reloader-image
+
+podSecurityContext: {}
+# fsGroup: 2000
+
+## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+service:
+  enabled: true
+  annotations: {}
+  extraLabels: {}
+  clusterIP: ""
+  ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+  ##
+  externalIPs: []
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  servicePort: 8431
+  type: ClusterIP
+  # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  # externalTrafficPolicy: "local"
+  # healthCheckNodePort: 0
+
+ingress:
+  enabled: false
+  annotations: {}
+  #   kubernetes.io/ingress.class: nginx
+  #   kubernetes.io/tls-acme: 'true'
+
+  extraLabels: {}
+  hosts: []
+  #   - name: vmgateway.local
+  #     path: /
+  #     port: http
+  tls: []
+  #   - secretName: vmgateway-ingress-tls
+  #     hosts:
+  #       - vmgateway.local
+  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+  # ingressClassName: nginx
+  # -- pathType is only for k8s >= 1.1=
+  pathType: Prefix
+
+# -- We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# -- Annotations to be added to the deployment
+annotations: {}
+
+# -- Annotations to be added to pod
+podAnnotations: {}
+
+# -- NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+# -- Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+tolerations: []
+  # - key: "key"
+  #   operator: "Equal|Exists"
+  #   value: "value"
+#   effect: "NoSchedule|PreferNoSchedule"
+
+# -- Affinity configurations
+affinity: {}
+
+serviceMonitor:
+  enabled: false
+  extraLabels: {}
+  annotations: {}
+  #    interval: 15s
+  #    scrapeTimeout: 5s
+  # -- Commented. HTTP scheme to use for scraping.
+  #    scheme: https
+  # -- Commented. TLS configuration to use when scraping the endpoint
+  #    tlsConfig:
+  #      insecureSkipVerify: true
+
+# -- should be true and means that you have the legal right to run a vmgateway
+# that can either be a signed contract or an email with confirmation to run the service in a trial period
+# https://victoriametrics.com/legal/eula/
+eula: false
+
+# -- Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmgateway.html
+configMap: ""
+
+# -- Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting
+cluserMode: false
+
+# -- Access Control configuration. https://docs.victoriametrics.com/vmgateway.html#access-control
+auth:
+  # -- Enable/Disable access-control
+  enable: false
+
+# -- Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway.html#rate-limiter
+rateLimiter:
+  # -- Enable/Disable rate-limiting
+  enable: false
+  datasource:
+    # -- Datasource VictoriaMetrics or vmselects. Required. Example http://victoroametrics:8428 or http://vmselect:8481/select/0/prometheus
+    url: ""
+  # --
+  config: ""
+  # Config Example
+  #  limits:
+  #    - type: queries
+  #      value: 1000
+  #      resolution: minute
+  #    - type: queries
+  #      value: 10000
+  #      resolution: hour
+  #    - type: queries
+  #      value: 10
+  #      resolution: minute
+  #      project_id: 5
+  #      account_id: 1
+
+read:
+  # -- Read endpoint without suffixes, victoriametrics or vmselect. Example http://victoroametrics:8428 or http://vmselect:8481
+  url: ""
+write:
+  # -- Write endpoint without suffixes, victoriametrics or vminsert. Example http://victoroametrics:8428 or http://vminsert:8480
+  url: ""

@@ -1,0 +1,34 @@
+## minimum set of parameters for vmgateway to run it as rate limiter
+eula: true
+clusterMode: true
+rateLimiter:
+  enable: true
+  datasource:
+    url: http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481/select/0/prometheus/
+  config:
+      limits:
+        - type: queries
+          value: 1000
+          resolution: minute
+        - type: queries
+          value: 10000
+          resolution: hour
+        - type: queries
+          value: 10
+          resolution: minute
+          project_id: 5
+          account_id: 1
+read:
+  url: http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481
+write:
+  url:  http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480
+
+## Write Example
+# kubectl port-forward svc/gateway-victoria-metrics-gateway 8431:8431
+# curl 'http://127.0.0.1:8431/insert/0/prometheus/api/v1/import/prometheus' -X POST  -d 'foo{bar="baz1"} 123'
+
+## Read Example
+# kubectl port-forward svc/gateway-victoria-metrics-gateway 8431:8431
+# curl 'http://localhost:8431/select/0/prometheus/api/v1/labels'
+
+
