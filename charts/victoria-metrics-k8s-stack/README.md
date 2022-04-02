@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.7.9](https://img.shields.io/badge/Version-0.7.9-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.7.11](https://img.shields.io/badge/Version-0.7.11-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -200,9 +200,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| additionalVictoriaMetricsMap.rule-name.groups[0].name | string | `"my_group"` |  |
-| additionalVictoriaMetricsMap.rule-name.groups[0].rules[0].expr | string | `"100 * my_record"` |  |
-| additionalVictoriaMetricsMap.rule-name.groups[0].rules[0].record | string | `"my_record"` |  |
+| additionalVictoriaMetricsMap | string | `nil` |  |
 | alertmanager.annotations | object | `{}` |  |
 | alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
 | alertmanager.config.global.slack_api_url | string | `"http://slack:30500/"` |  |
@@ -288,6 +286,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.appNamespacesTarget | string | `".*"` |  |
 | defaultRules.create | bool | `true` |  |
 | defaultRules.labels | object | `{}` | Labels for default rules |
+| defaultRules.rules.alertmanager | bool | `true` |  |
 | defaultRules.rules.etcd | bool | `true` |  |
 | defaultRules.rules.general | bool | `true` |  |
 | defaultRules.rules.k8s | bool | `true` |  |
@@ -305,6 +304,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rules.kubernetesSystem | bool | `true` |  |
 | defaultRules.rules.network | bool | `true` |  |
 | defaultRules.rules.node | bool | `true` |  |
+| defaultRules.rules.vmagent | bool | `true` |  |
+| defaultRules.rules.vmhealth | bool | `true` |  |
+| defaultRules.rules.vmsingle | bool | `true` |  |
 | defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
 | fullnameOverride | string | `""` |  |
 | grafana.additionalDataSources | list | `[]` |  |
