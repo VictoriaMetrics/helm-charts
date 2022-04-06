@@ -1,7 +1,4 @@
 {{- if .Values.ingress.enabled }}
-{{- $ingressApiIsStable := eq (include "vmauth.ingress.isStable" .) "true" -}}
-{{- $ingressSupportsIngressClassName := eq (include "vmauth.ingress.supportsIngressClassName" .) "true" -}}
-{{- $ingressSupportsPathType := eq (include "vmauth.ingress.supportsPathType" .) "true" -}}
 {{- $servicePort := .Values.service.servicePort -}}
 {{- $ingressPathType := .Values.ingress.pathType -}}
 apiVersion: {{ include "vmauth.ingress.apiVersion" . }}
@@ -20,8 +17,8 @@ metadata:
   name: {{ template "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
-  {{- if and $ingressSupportsIngressClassName .Values.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- with .Values.ingress.ingressClassName }}
+  ingressClassName: {{ . }}
   {{- end }}
   rules:
   {{- $serviceName := include "chart.fullname" . }}
@@ -30,19 +27,12 @@ spec:
     http:
       paths:
         - path: {{ .path }}
-          {{- if $ingressSupportsPathType }}
           pathType: {{ $ingressPathType }}
-          {{- end }}
           backend:
-            {{- if $ingressApiIsStable }}
             service:
               name: {{ $serviceName }}
               port:
                 number: {{ $servicePort }}
-            {{- else }}
-            serviceName: {{ $serviceName }}
-            servicePort: {{ .port | default "http"}}
-            {{- end }}
   {{- end -}}
 {{- if .Values.ingress.tls }}
   tls:
