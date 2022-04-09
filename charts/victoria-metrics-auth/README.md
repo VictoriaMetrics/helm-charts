@@ -120,13 +120,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.enabled | bool | `false` |  |
 | ingress.extraLabels | object | `{}` |  |
 | ingress.hosts | list | `[]` |  |
-| ingress.pathType | string | `"Prefix"` |  |
+| ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | ingress.tls | list | `[]` |  |
 | ingressInternal.annotations | object | `{}` |  |
 | ingressInternal.enabled | bool | `false` |  |
 | ingressInternal.extraLabels | object | `{}` |  |
 | ingressInternal.hosts | list | `[]` |  |
-| ingressInternal.pathType | string | `"Prefix"` |  |
+| ingressInternal.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | ingressInternal.tls | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |

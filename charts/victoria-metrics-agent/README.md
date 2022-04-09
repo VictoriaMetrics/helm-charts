@@ -287,7 +287,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.enabled | bool | `false` |  |
 | ingress.extraLabels | object | `{}` |  |
 | ingress.hosts | list | `[]` |  |
-| ingress.pathType | string | `"Prefix"` |  |
+| ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | ingress.tls | list | `[]` |  |
 | multiTenantUrls | list | `[]` |  |
 | nameOverride | string | `""` |  |

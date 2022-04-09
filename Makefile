@@ -1,6 +1,6 @@
 URL=https://victoriametrics.github.io/helm-charts/
-HELM_IMAGE = alpine/helm:3.5.4
-HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.5.0
+HELM_IMAGE = alpine/helm:3.8.1
+HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.8.1
 KNOWN_TARGETS=helm
 
 
@@ -21,6 +21,7 @@ lint:
 	CMD="lint charts/victoria-metrics-single" $(MAKE) helm
 	CMD="lint charts/victoria-metrics-agent -f hack/vmagent-lint-hack.yaml" $(MAKE) helm
 	CMD="lint charts/victoria-metrics-alert -f hack/vmalert-lint-hack.yaml" $(MAKE) helm
+	CMD="lint charts/victoria-metrics-gateway -f hack/vmgateway-cluster-ratelimiting-minimum.yaml" $(MAKE) helm
 	CMD="lint charts/victoria-metrics-auth" $(MAKE) helm
 
 # Package chart into zip file

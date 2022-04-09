@@ -279,7 +279,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.spec.routePrefix | string | `"/"` |  |
 | alertmanager.spec.selectAllByDefault | bool | `true` |  |
 | alertmanager.templateFiles | object | `{}` |  |
-| argocdReleaseOverride | string | `""` | If this chart is used in "Agrocd" with "releaseName" field then -- VMServiceScrapes couldn't select the proper services. -- For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
+| argocdReleaseOverride | string | `""` | For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
 | coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"vmServiceScrape":{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}]}}}` | Component scraping coreDns. Use either this or kubeDns |
 | defaultRules.additionalRuleLabels | object | `{}` | Additional labels for PrometheusRule alerts |
 | defaultRules.annotations | object | `{}` | Annotations for default rules |
@@ -417,7 +417,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | prometheus-node-exporter.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| serviceAccount.name | string | `""` | The name of the service account to use. -- If not set and create is true, a name is generated using the fullname template |
+| serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
+| victoria-metrics-operator | object | `{"createCRD":false,"operator":{"disable_prometheus_converter":true}}` | For possible values refer to https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator#parameters |
 | victoria-metrics-operator.createCRD | bool | `false` | all values for victoria-metrics-operator helm chart can be specified here |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.additionalRemoteWrites | list | `[]` |  |

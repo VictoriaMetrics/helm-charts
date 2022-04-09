@@ -131,14 +131,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.enabled | bool | `false` |  |
 | ingress.extraLabels | object | `{}` |  |
 | ingress.hosts | list | `[]` |  |
-| ingress.pathType | string | `"Prefix"` |  |
+| ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | ingress.tls | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | podSecurityContext | object | `{}` |  |
-| rateLimiter | object | `{"config":"","datasource":{"url":""},"enable":false}` | Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway.html#rate-limiter |
+| rateLimiter | object | `{"config":{},"datasource":{"url":""},"enable":false}` | Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway.html#rate-limiter |
 | rateLimiter.datasource.url | string | `""` | Datasource VictoriaMetrics or vmselects. Required. Example http://victoroametrics:8428 or http://vmselect:8481/select/0/prometheus |
 | rateLimiter.enable | bool | `false` | Enable/Disable rate-limiting |
 | read.url | string | `""` | Read endpoint without suffixes, victoriametrics or vmselect. Example http://victoroametrics:8428 or http://vmselect:8481 |

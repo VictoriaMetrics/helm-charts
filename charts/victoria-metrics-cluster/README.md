@@ -138,8 +138,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.ingress.enabled | bool | `false` | Enable deployment of ingress for vminsert component |
 | vminsert.ingress.extraLabels | object | `{}` |  |
 | vminsert.ingress.hosts | list | `[]` | Array of host objects |
-| vminsert.ingress.pathType | string | `"Prefix"` |  |
-| vminsert.ingress.tls | list | `[]` |  |
+| vminsert.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
+| vminsert.ingress.tls | list | `[]` | Array of TLS objects |
 | vminsert.initContainers | list | `[]` |  |
 | vminsert.name | string | `"vminsert"` | vminsert container name |
 | vminsert.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
@@ -158,7 +158,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.probe.readiness.timeoutSeconds | int | `5` |  |
 | vminsert.replicaCount | int | `2` | Count of vminsert pods |
 | vminsert.resources | object | `{}` | Resource object |
-| vminsert.securityContext | object | `{}` |  |
+| vminsert.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vminsert.service.annotations | object | `{}` | Service annotations |
 | vminsert.service.clusterIP | string | `""` | Service ClusterIP |
 | vminsert.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
@@ -200,8 +200,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.ingress.enabled | bool | `false` | Enable deployment of ingress for vmselect component |
 | vmselect.ingress.extraLabels | object | `{}` |  |
 | vmselect.ingress.hosts | list | `[]` | Array of host objects |
-| vmselect.ingress.pathType | string | `"Prefix"` |  |
-| vmselect.ingress.tls | list | `[]` |  |
+| vmselect.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
+| vmselect.ingress.tls | list | `[]` | Array of TLS objects |
 | vmselect.initContainers | list | `[]` |  |
 | vmselect.name | string | `"vmselect"` | Vmselect container name |
 | vmselect.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
@@ -209,7 +209,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.persistentVolume.annotations | object | `{}` | Persistent volume annotations |
 | vmselect.persistentVolume.enabled | bool | `false` | Create/use Persistent Volume Claim for vmselect component. Empty dir if false. If true, vmselect will create/use a Persistent Volume Claim |
 | vmselect.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmselect.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
-| vmselect.persistentVolume.size | string | `"2Gi"` |  |
+| vmselect.persistentVolume.size | string | `"2Gi"` | Size of the volume. Better to set the same as resource limit memory property |
 | vmselect.persistentVolume.subPath | string | `""` | Mount subpath |
 | vmselect.podAnnotations | object | `{}` | Pod's annotations |
 | vmselect.podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |

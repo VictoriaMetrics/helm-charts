@@ -141,13 +141,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | admissionWebhooks | object | `{"caBundle":"","certManager":{"enabled":false,"issuer":{}},"enabled":false,"policy":"Fail"}` | Configures resource validation |
-| admissionWebhooks.caBundle | string | `""` | Enables custom ca bundle, if you are not using cert-manager. -- in case of custom ca, you have to create secret - {{chart-name}}-validation -- with keys: tls.key, tls.crt, ca.crt |
+| admissionWebhooks.caBundle | string | `""` | with keys: tls.key, tls.crt, ca.crt |
 | admissionWebhooks.certManager.enabled | bool | `false` | Enables cert creation and injection by cert-manager. |
+| admissionWebhooks.certManager.issuer | object | `{}` | If needed, provide own issuer. Operator will create self-signed if empty. |
 | admissionWebhooks.enabled | bool | `false` | Enables validation webhook. |
 | admissionWebhooks.policy | string | `"Fail"` | What to do in case, when operator not available to validate request. |
 | affinity | object | `{}` | Pod affinity |
 | annotations | object | `{}` | Annotations to be added to the all resources |
-| createCRD | bool | `true` | enables CRD creation and management. -- with this option, if you remove this chart, all crd resources will be deleted with it. |
+| createCRD | bool | `true` | with this option, if you remove this chart, all crd resources will be deleted with it. |
 | env | list | `[]` | extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD) |
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
@@ -159,7 +160,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
 | image.tag | string | `"v0.23.3"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
-| logLevel | string | `"info"` | VM operator log level -- possible values: info and error. |
+| logLevel | string | `"info"` | possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name override |
 | nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/ |
 | operator.disable_prometheus_converter | bool | `false` | By default, operator converts prometheus-operator objects. |
@@ -175,4 +176,4 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
-| useLegacyCRD | bool | `false` | uses legacy CRD api v1beta -- it must be enabled for kubernetes version below 1.16 |
+| useLegacyCRD | bool | `false` | it must be enabled for kubernetes version below 1.16 |
