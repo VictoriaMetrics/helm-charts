@@ -282,6 +282,44 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              dnsConfig:
+                description: Specifies the DNS parameters of a pod. Parameters specified
+                  here will be merged to the generated DNS configuration based on
+                  DNSPolicy.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
+                properties:
+                  nameservers:
+                    description: A list of DNS name server IP addresses. This will
+                      be appended to the base nameservers generated from DNSPolicy.
+                      Duplicated nameservers will be removed.
+                    items:
+                      type: string
+                    type: array
+                  options:
+                    description: A list of DNS resolver options. This will be merged
+                      with the base options generated from DNSPolicy. Duplicated entries
+                      will be removed. Resolution options given in Options will override
+                      those that appear in the base DNSPolicy.
+                    items:
+                      description: PodDNSConfigOption defines DNS resolver options
+                        of a pod.
+                      properties:
+                        name:
+                          description: Required.
+                          type: string
+                        value:
+                          type: string
+                      type: object
+                    type: array
+                  searches:
+                    description: A list of DNS search domains for host-name lookup.
+                      This will be appended to the base search paths generated from
+                      DNSPolicy. Duplicated search paths will be removed.
+                    items:
+                      type: string
+                    type: array
+                type: object
               dnsPolicy:
                 description: DNSPolicy set DNS policy for the pod
                 type: string
@@ -1762,6 +1800,13 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+              serviceScrapeSpec:
+                description: ServiceScrapeSpec that will be added to vmselect VMServiceScrape
+                  spec
+                required:
+                - endpoints
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
               serviceSpec:
                 description: ServiceSpec that will be added to vmagent service spec
                 properties:
@@ -1968,6 +2013,11 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+              terminationGracePeriodSeconds:
+                description: TerminationGracePeriodSeconds period for container graceful
+                  termination
+                format: int64
+                type: integer
               tolerations:
                 description: Tolerations If specified, the pod's tolerations.
                 items:
@@ -2524,228 +2574,10 @@ spec:
                             description: A set of arbitrary key/value pairs that provide
                               further detail about the incident.
                             type: object
-                          httpConfig:
+                          http_config:
                             description: HTTP client configuration.
-                            properties:
-                              basic_auth:
-                                description: BasicAuth for the client.
-                                properties:
-                                  password:
-                                    description: The secret in the service scrape
-                                      namespace that contains the password for authentication.
-                                      It must be at them same namespace as CRD
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                  password_file:
-                                    description: PasswordFile defines path to password
-                                      file at disk
-                                    type: string
-                                  username:
-                                    description: The secret in the service scrape
-                                      namespace that contains the username for authentication.
-                                      It must be at them same namespace as CRD
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                type: object
-                              bearer_token_file:
-                                description: BearerTokenFile defines filename for
-                                  bearer token, it must be mounted to pod.
-                                type: string
-                              bearer_token_secret:
-                                description: The secret's key that contains the bearer
-                                  token It must be at them same namespace as CRD
-                                properties:
-                                  key:
-                                    description: The key of the secret to select from.  Must
-                                      be a valid secret key.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the Secret or its
-                                      key must be defined
-                                    type: boolean
-                                required:
-                                - key
-                                type: object
-                              proxyURL:
-                                description: Optional proxy URL.
-                                type: string
-                              tls_config:
-                                description: TLS configuration for the client.
-                                properties:
-                                  ca:
-                                    description: Stuct containing the CA cert to use
-                                      for the targets.
-                                    properties:
-                                      configMap:
-                                        description: ConfigMap containing data to
-                                          use for the targets.
-                                        properties:
-                                          key:
-                                            description: The key to select.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the ConfigMap
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                      secret:
-                                        description: Secret containing data to use
-                                          for the targets.
-                                        properties:
-                                          key:
-                                            description: The key of the secret to
-                                              select from.  Must be a valid secret
-                                              key.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the Secret
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                    type: object
-                                  caFile:
-                                    description: Path to the CA cert in the container
-                                      to use for the targets.
-                                    type: string
-                                  cert:
-                                    description: Struct containing the client cert
-                                      file for the targets.
-                                    properties:
-                                      configMap:
-                                        description: ConfigMap containing data to
-                                          use for the targets.
-                                        properties:
-                                          key:
-                                            description: The key to select.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the ConfigMap
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                      secret:
-                                        description: Secret containing data to use
-                                          for the targets.
-                                        properties:
-                                          key:
-                                            description: The key of the secret to
-                                              select from.  Must be a valid secret
-                                              key.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the Secret
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                    type: object
-                                  certFile:
-                                    description: Path to the client cert file in the
-                                      container for the targets.
-                                    type: string
-                                  insecureSkipVerify:
-                                    description: Disable target certificate validation.
-                                    type: boolean
-                                  keyFile:
-                                    description: Path to the client key file in the
-                                      container for the targets.
-                                    type: string
-                                  keySecret:
-                                    description: Secret containing the client key
-                                      file for the targets.
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                  serverName:
-                                    description: Used to verify the hostname for the
-                                      targets.
-                                    type: string
-                                type: object
                             type: object
+                            x-kubernetes-preserve-unknown-fields: true
                           message:
                             description: Alert text limited to 130 characters.
                             type: string
@@ -2827,226 +2659,8 @@ spec:
                             type: string
                           http_config:
                             description: HTTP client configuration.
-                            properties:
-                              basic_auth:
-                                description: BasicAuth for the client.
-                                properties:
-                                  password:
-                                    description: The secret in the service scrape
-                                      namespace that contains the password for authentication.
-                                      It must be at them same namespace as CRD
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                  password_file:
-                                    description: PasswordFile defines path to password
-                                      file at disk
-                                    type: string
-                                  username:
-                                    description: The secret in the service scrape
-                                      namespace that contains the username for authentication.
-                                      It must be at them same namespace as CRD
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                type: object
-                              bearer_token_file:
-                                description: BearerTokenFile defines filename for
-                                  bearer token, it must be mounted to pod.
-                                type: string
-                              bearer_token_secret:
-                                description: The secret's key that contains the bearer
-                                  token It must be at them same namespace as CRD
-                                properties:
-                                  key:
-                                    description: The key of the secret to select from.  Must
-                                      be a valid secret key.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the Secret or its
-                                      key must be defined
-                                    type: boolean
-                                required:
-                                - key
-                                type: object
-                              proxyURL:
-                                description: Optional proxy URL.
-                                type: string
-                              tls_config:
-                                description: TLS configuration for the client.
-                                properties:
-                                  ca:
-                                    description: Stuct containing the CA cert to use
-                                      for the targets.
-                                    properties:
-                                      configMap:
-                                        description: ConfigMap containing data to
-                                          use for the targets.
-                                        properties:
-                                          key:
-                                            description: The key to select.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the ConfigMap
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                      secret:
-                                        description: Secret containing data to use
-                                          for the targets.
-                                        properties:
-                                          key:
-                                            description: The key of the secret to
-                                              select from.  Must be a valid secret
-                                              key.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the Secret
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                    type: object
-                                  caFile:
-                                    description: Path to the CA cert in the container
-                                      to use for the targets.
-                                    type: string
-                                  cert:
-                                    description: Struct containing the client cert
-                                      file for the targets.
-                                    properties:
-                                      configMap:
-                                        description: ConfigMap containing data to
-                                          use for the targets.
-                                        properties:
-                                          key:
-                                            description: The key to select.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the ConfigMap
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                      secret:
-                                        description: Secret containing data to use
-                                          for the targets.
-                                        properties:
-                                          key:
-                                            description: The key of the secret to
-                                              select from.  Must be a valid secret
-                                              key.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the Secret
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                    type: object
-                                  certFile:
-                                    description: Path to the client cert file in the
-                                      container for the targets.
-                                    type: string
-                                  insecureSkipVerify:
-                                    description: Disable target certificate validation.
-                                    type: boolean
-                                  keyFile:
-                                    description: Path to the client key file in the
-                                      container for the targets.
-                                    type: string
-                                  keySecret:
-                                    description: Secret containing the client key
-                                      file for the targets.
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                  serverName:
-                                    description: Used to verify the hostname for the
-                                      targets.
-                                    type: string
-                                type: object
                             type: object
+                            x-kubernetes-preserve-unknown-fields: true
                           routing_key:
                             description: The secret's key that contains the PagerDuty
                               integration key (when using Events API v2). Either this
@@ -3121,226 +2735,8 @@ spec:
                             type: boolean
                           http_config:
                             description: HTTP client configuration.
-                            properties:
-                              basic_auth:
-                                description: BasicAuth for the client.
-                                properties:
-                                  password:
-                                    description: The secret in the service scrape
-                                      namespace that contains the password for authentication.
-                                      It must be at them same namespace as CRD
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                  password_file:
-                                    description: PasswordFile defines path to password
-                                      file at disk
-                                    type: string
-                                  username:
-                                    description: The secret in the service scrape
-                                      namespace that contains the username for authentication.
-                                      It must be at them same namespace as CRD
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                type: object
-                              bearer_token_file:
-                                description: BearerTokenFile defines filename for
-                                  bearer token, it must be mounted to pod.
-                                type: string
-                              bearer_token_secret:
-                                description: The secret's key that contains the bearer
-                                  token It must be at them same namespace as CRD
-                                properties:
-                                  key:
-                                    description: The key of the secret to select from.  Must
-                                      be a valid secret key.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the Secret or its
-                                      key must be defined
-                                    type: boolean
-                                required:
-                                - key
-                                type: object
-                              proxyURL:
-                                description: Optional proxy URL.
-                                type: string
-                              tls_config:
-                                description: TLS configuration for the client.
-                                properties:
-                                  ca:
-                                    description: Stuct containing the CA cert to use
-                                      for the targets.
-                                    properties:
-                                      configMap:
-                                        description: ConfigMap containing data to
-                                          use for the targets.
-                                        properties:
-                                          key:
-                                            description: The key to select.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the ConfigMap
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                      secret:
-                                        description: Secret containing data to use
-                                          for the targets.
-                                        properties:
-                                          key:
-                                            description: The key of the secret to
-                                              select from.  Must be a valid secret
-                                              key.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the Secret
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                    type: object
-                                  caFile:
-                                    description: Path to the CA cert in the container
-                                      to use for the targets.
-                                    type: string
-                                  cert:
-                                    description: Struct containing the client cert
-                                      file for the targets.
-                                    properties:
-                                      configMap:
-                                        description: ConfigMap containing data to
-                                          use for the targets.
-                                        properties:
-                                          key:
-                                            description: The key to select.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the ConfigMap
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                      secret:
-                                        description: Secret containing data to use
-                                          for the targets.
-                                        properties:
-                                          key:
-                                            description: The key of the secret to
-                                              select from.  Must be a valid secret
-                                              key.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the Secret
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                    type: object
-                                  certFile:
-                                    description: Path to the client cert file in the
-                                      container for the targets.
-                                    type: string
-                                  insecureSkipVerify:
-                                    description: Disable target certificate validation.
-                                    type: boolean
-                                  keyFile:
-                                    description: Path to the client key file in the
-                                      container for the targets.
-                                    type: string
-                                  keySecret:
-                                    description: Secret containing the client key
-                                      file for the targets.
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                  serverName:
-                                    description: Used to verify the hostname for the
-                                      targets.
-                                    type: string
-                                type: object
                             type: object
+                            x-kubernetes-preserve-unknown-fields: true
                           message:
                             description: Notification message.
                             type: string
@@ -3522,226 +2918,8 @@ spec:
                             type: string
                           http_config:
                             description: HTTP client configuration.
-                            properties:
-                              basic_auth:
-                                description: BasicAuth for the client.
-                                properties:
-                                  password:
-                                    description: The secret in the service scrape
-                                      namespace that contains the password for authentication.
-                                      It must be at them same namespace as CRD
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                  password_file:
-                                    description: PasswordFile defines path to password
-                                      file at disk
-                                    type: string
-                                  username:
-                                    description: The secret in the service scrape
-                                      namespace that contains the username for authentication.
-                                      It must be at them same namespace as CRD
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                type: object
-                              bearer_token_file:
-                                description: BearerTokenFile defines filename for
-                                  bearer token, it must be mounted to pod.
-                                type: string
-                              bearer_token_secret:
-                                description: The secret's key that contains the bearer
-                                  token It must be at them same namespace as CRD
-                                properties:
-                                  key:
-                                    description: The key of the secret to select from.  Must
-                                      be a valid secret key.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the Secret or its
-                                      key must be defined
-                                    type: boolean
-                                required:
-                                - key
-                                type: object
-                              proxyURL:
-                                description: Optional proxy URL.
-                                type: string
-                              tls_config:
-                                description: TLS configuration for the client.
-                                properties:
-                                  ca:
-                                    description: Stuct containing the CA cert to use
-                                      for the targets.
-                                    properties:
-                                      configMap:
-                                        description: ConfigMap containing data to
-                                          use for the targets.
-                                        properties:
-                                          key:
-                                            description: The key to select.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the ConfigMap
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                      secret:
-                                        description: Secret containing data to use
-                                          for the targets.
-                                        properties:
-                                          key:
-                                            description: The key of the secret to
-                                              select from.  Must be a valid secret
-                                              key.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the Secret
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                    type: object
-                                  caFile:
-                                    description: Path to the CA cert in the container
-                                      to use for the targets.
-                                    type: string
-                                  cert:
-                                    description: Struct containing the client cert
-                                      file for the targets.
-                                    properties:
-                                      configMap:
-                                        description: ConfigMap containing data to
-                                          use for the targets.
-                                        properties:
-                                          key:
-                                            description: The key to select.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the ConfigMap
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                      secret:
-                                        description: Secret containing data to use
-                                          for the targets.
-                                        properties:
-                                          key:
-                                            description: The key of the secret to
-                                              select from.  Must be a valid secret
-                                              key.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the Secret
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                    type: object
-                                  certFile:
-                                    description: Path to the client cert file in the
-                                      container for the targets.
-                                    type: string
-                                  insecureSkipVerify:
-                                    description: Disable target certificate validation.
-                                    type: boolean
-                                  keyFile:
-                                    description: Path to the client key file in the
-                                      container for the targets.
-                                    type: string
-                                  keySecret:
-                                    description: Secret containing the client key
-                                      file for the targets.
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                  serverName:
-                                    description: Used to verify the hostname for the
-                                      targets.
-                                    type: string
-                                type: object
                             type: object
+                            x-kubernetes-preserve-unknown-fields: true
                           icon_emoji:
                             type: string
                           icon_url:
@@ -3772,6 +2950,63 @@ spec:
                             type: string
                           username:
                             type: string
+                        type: object
+                      type: array
+                    telegram_configs:
+                      items:
+                        properties:
+                          api_url:
+                            description: APIUrl the Telegram API URL i.e. https://api.telegram.org.
+                            type: string
+                          bot_token:
+                            description: BotToken token for the bot https://core.telegram.org/bots/api
+                            properties:
+                              key:
+                                description: The key of the secret to select from.  Must
+                                  be a valid secret key.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                  TODO: Add other useful fields. apiVersion, kind,
+                                  uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the Secret or its key
+                                  must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                          chat_id:
+                            description: ChatID is ID of the chat where to send the
+                              messages.
+                            type: integer
+                          disable_notifications:
+                            description: DisableNotifications
+                            type: boolean
+                          http_config:
+                            description: HTTP client configuration.
+                            type: object
+                            x-kubernetes-preserve-unknown-fields: true
+                          message:
+                            description: Message is templated message
+                            type: string
+                          parse_mode:
+                            description: ParseMode for telegram message, supported
+                              values are MarkdownV2, Markdown, Markdown and empty
+                              string for plain text.
+                            enum:
+                            - MarkdownV2
+                            - Markdown
+                            - Markdown
+                            type: string
+                          send_resolved:
+                            description: SendResolved controls notify about resolved
+                              alerts.
+                            type: boolean
+                        required:
+                        - bot_token
+                        - chat_id
                         type: object
                       type: array
                     victorops_configs:
@@ -3808,7 +3043,7 @@ spec:
                           custom_fields:
                             additionalProperties:
                               type: string
-                            description: Additional custom fields for notification.
+                            description: Adds optional custom fields https://github.com/prometheus/alertmanager/blob/v0.24.0/config/notifiers.go#L537
                             type: object
                           entity_display_name:
                             description: Contains summary of the alerted problem.
@@ -3817,7 +3052,8 @@ spec:
                             description: The HTTP client's configuration.
                             properties:
                               basic_auth:
-                                description: BasicAuth for the client.
+                                description: TODO oAuth2 support BasicAuth for the
+                                  client.
                                 properties:
                                   password:
                                     description: The secret in the service scrape
@@ -4064,226 +3300,8 @@ spec:
                         properties:
                           http_config:
                             description: HTTP client configuration.
-                            properties:
-                              basic_auth:
-                                description: BasicAuth for the client.
-                                properties:
-                                  password:
-                                    description: The secret in the service scrape
-                                      namespace that contains the password for authentication.
-                                      It must be at them same namespace as CRD
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                  password_file:
-                                    description: PasswordFile defines path to password
-                                      file at disk
-                                    type: string
-                                  username:
-                                    description: The secret in the service scrape
-                                      namespace that contains the username for authentication.
-                                      It must be at them same namespace as CRD
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                type: object
-                              bearer_token_file:
-                                description: BearerTokenFile defines filename for
-                                  bearer token, it must be mounted to pod.
-                                type: string
-                              bearer_token_secret:
-                                description: The secret's key that contains the bearer
-                                  token It must be at them same namespace as CRD
-                                properties:
-                                  key:
-                                    description: The key of the secret to select from.  Must
-                                      be a valid secret key.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the Secret or its
-                                      key must be defined
-                                    type: boolean
-                                required:
-                                - key
-                                type: object
-                              proxyURL:
-                                description: Optional proxy URL.
-                                type: string
-                              tls_config:
-                                description: TLS configuration for the client.
-                                properties:
-                                  ca:
-                                    description: Stuct containing the CA cert to use
-                                      for the targets.
-                                    properties:
-                                      configMap:
-                                        description: ConfigMap containing data to
-                                          use for the targets.
-                                        properties:
-                                          key:
-                                            description: The key to select.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the ConfigMap
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                      secret:
-                                        description: Secret containing data to use
-                                          for the targets.
-                                        properties:
-                                          key:
-                                            description: The key of the secret to
-                                              select from.  Must be a valid secret
-                                              key.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the Secret
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                    type: object
-                                  caFile:
-                                    description: Path to the CA cert in the container
-                                      to use for the targets.
-                                    type: string
-                                  cert:
-                                    description: Struct containing the client cert
-                                      file for the targets.
-                                    properties:
-                                      configMap:
-                                        description: ConfigMap containing data to
-                                          use for the targets.
-                                        properties:
-                                          key:
-                                            description: The key to select.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the ConfigMap
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                      secret:
-                                        description: Secret containing data to use
-                                          for the targets.
-                                        properties:
-                                          key:
-                                            description: The key of the secret to
-                                              select from.  Must be a valid secret
-                                              key.
-                                            type: string
-                                          name:
-                                            description: 'Name of the referent. More
-                                              info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                              TODO: Add other useful fields. apiVersion,
-                                              kind, uid?'
-                                            type: string
-                                          optional:
-                                            description: Specify whether the Secret
-                                              or its key must be defined
-                                            type: boolean
-                                        required:
-                                        - key
-                                        type: object
-                                    type: object
-                                  certFile:
-                                    description: Path to the client cert file in the
-                                      container for the targets.
-                                    type: string
-                                  insecureSkipVerify:
-                                    description: Disable target certificate validation.
-                                    type: boolean
-                                  keyFile:
-                                    description: Path to the client key file in the
-                                      container for the targets.
-                                    type: string
-                                  keySecret:
-                                    description: Secret containing the client key
-                                      file for the targets.
-                                    properties:
-                                      key:
-                                        description: The key of the secret to select
-                                          from.  Must be a valid secret key.
-                                        type: string
-                                      name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
-                                        type: string
-                                      optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
-                                        type: boolean
-                                    required:
-                                    - key
-                                    type: object
-                                  serverName:
-                                    description: Used to verify the hostname for the
-                                      targets.
-                                    type: string
-                                type: object
                             type: object
+                            x-kubernetes-preserve-unknown-fields: true
                           max_alerts:
                             description: Maximum number of alerts to be sent per webhook
                               message. When 0, all alerts are included.
@@ -4361,7 +3379,8 @@ spec:
                             description: HTTP client configuration.
                             properties:
                               basic_auth:
-                                description: BasicAuth for the client.
+                                description: TODO oAuth2 support BasicAuth for the
+                                  client.
                                 properties:
                                   password:
                                     description: The secret in the service scrape
@@ -4864,6 +3883,44 @@ spec:
                   for VMAlertmanagerConfig It may be useful if alert doesn't have
                   namespace label for some reason
                 type: boolean
+              dnsConfig:
+                description: Specifies the DNS parameters of a pod. Parameters specified
+                  here will be merged to the generated DNS configuration based on
+                  DNSPolicy.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
+                properties:
+                  nameservers:
+                    description: A list of DNS name server IP addresses. This will
+                      be appended to the base nameservers generated from DNSPolicy.
+                      Duplicated nameservers will be removed.
+                    items:
+                      type: string
+                    type: array
+                  options:
+                    description: A list of DNS resolver options. This will be merged
+                      with the base options generated from DNSPolicy. Duplicated entries
+                      will be removed. Resolution options given in Options will override
+                      those that appear in the base DNSPolicy.
+                    items:
+                      description: PodDNSConfigOption defines DNS resolver options
+                        of a pod.
+                      properties:
+                        name:
+                          description: Required.
+                          type: string
+                        value:
+                          type: string
+                      type: object
+                    type: array
+                  searches:
+                    description: A list of DNS search domains for host-name lookup.
+                      This will be appended to the base search paths generated from
+                      DNSPolicy. Duplicated search paths will be removed.
+                    items:
+                      type: string
+                    type: array
+                type: object
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
@@ -5128,6 +4185,13 @@ spec:
                 description: ServiceAccountName is the name of the ServiceAccount
                   to use
                 type: string
+              serviceScrapeSpec:
+                description: ServiceScrapeSpec that will be added to vmselect VMServiceScrape
+                  spec
+                required:
+                - endpoints
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
               serviceSpec:
                 description: ServiceSpec that will be added to vmalertmanager service
                   spec
@@ -5513,6 +4577,11 @@ spec:
                         type: object
                     type: object
                 type: object
+              terminationGracePeriodSeconds:
+                description: TerminationGracePeriodSeconds period for container graceful
+                  termination
+                format: int64
+                type: integer
               tolerations:
                 description: Tolerations If specified, the pod's tolerations.
                 items:
@@ -5911,6 +4980,44 @@ spec:
                     type: string
                 required:
                 - url
+                type: object
+              dnsConfig:
+                description: Specifies the DNS parameters of a pod. Parameters specified
+                  here will be merged to the generated DNS configuration based on
+                  DNSPolicy.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
+                properties:
+                  nameservers:
+                    description: A list of DNS name server IP addresses. This will
+                      be appended to the base nameservers generated from DNSPolicy.
+                      Duplicated nameservers will be removed.
+                    items:
+                      type: string
+                    type: array
+                  options:
+                    description: A list of DNS resolver options. This will be merged
+                      with the base options generated from DNSPolicy. Duplicated entries
+                      will be removed. Resolution options given in Options will override
+                      those that appear in the base DNSPolicy.
+                    items:
+                      description: PodDNSConfigOption defines DNS resolver options
+                        of a pod.
+                      properties:
+                        name:
+                          description: Required.
+                          type: string
+                        value:
+                          type: string
+                      type: object
+                    type: array
+                  searches:
+                    description: A list of DNS search domains for host-name lookup.
+                      This will be appended to the base search paths generated from
+                      DNSPolicy. Duplicated search paths will be removed.
+                    items:
+                      type: string
+                    type: array
                 type: object
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
@@ -7218,6 +6325,13 @@ spec:
                 description: ServiceAccountName is the name of the ServiceAccount
                   to use to run the VMAlert Pods.
                 type: string
+              serviceScrapeSpec:
+                description: ServiceScrapeSpec that will be added to vmselect VMServiceScrape
+                  spec
+                required:
+                - endpoints
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
               serviceSpec:
                 description: ServiceSpec that will be added to vmalert service spec
                 properties:
@@ -7263,6 +6377,11 @@ spec:
                 description: StartupProbe that will be added to CRD pod
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
+              terminationGracePeriodSeconds:
+                description: TerminationGracePeriodSeconds period for container graceful
+                  termination
+                format: int64
+                type: integer
               tolerations:
                 description: Tolerations If specified, the pod's tolerations.
                 items:
@@ -7473,6 +6592,44 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              dnsConfig:
+                description: Specifies the DNS parameters of a pod. Parameters specified
+                  here will be merged to the generated DNS configuration based on
+                  DNSPolicy.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
+                properties:
+                  nameservers:
+                    description: A list of DNS name server IP addresses. This will
+                      be appended to the base nameservers generated from DNSPolicy.
+                      Duplicated nameservers will be removed.
+                    items:
+                      type: string
+                    type: array
+                  options:
+                    description: A list of DNS resolver options. This will be merged
+                      with the base options generated from DNSPolicy. Duplicated entries
+                      will be removed. Resolution options given in Options will override
+                      those that appear in the base DNSPolicy.
+                    items:
+                      description: PodDNSConfigOption defines DNS resolver options
+                        of a pod.
+                      properties:
+                        name:
+                          description: Required.
+                          type: string
+                        value:
+                          type: string
+                      type: object
+                    type: array
+                  searches:
+                    description: A list of DNS search domains for host-name lookup.
+                      This will be appended to the base search paths generated from
+                      DNSPolicy. Duplicated search paths will be removed.
+                    items:
+                      type: string
+                    type: array
+                type: object
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
@@ -7950,6 +7107,13 @@ spec:
                 description: ServiceAccountName is the name of the ServiceAccount
                   to use to run the VMAuth Pods.
                 type: string
+              serviceScrapeSpec:
+                description: ServiceScrapeSpec that will be added to vmselect VMServiceScrape
+                  spec
+                required:
+                - endpoints
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
               serviceSpec:
                 description: ServiceSpec that will be added to vmsingle service spec
                 properties:
@@ -7995,6 +7159,11 @@ spec:
                 description: StartupProbe that will be added to CRD pod
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
+              terminationGracePeriodSeconds:
+                description: TerminationGracePeriodSeconds period for container graceful
+                  termination
+                format: int64
+                type: integer
               tolerations:
                 description: Tolerations If specified, the pod's tolerations.
                 items:
@@ -8328,6 +7497,44 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  dnsConfig:
+                    description: Specifies the DNS parameters of a pod. Parameters
+                      specified here will be merged to the generated DNS configuration
+                      based on DNSPolicy.
+                    items:
+                      x-kubernetes-preserve-unknown-fields: true
+                    properties:
+                      nameservers:
+                        description: A list of DNS name server IP addresses. This
+                          will be appended to the base nameservers generated from
+                          DNSPolicy. Duplicated nameservers will be removed.
+                        items:
+                          type: string
+                        type: array
+                      options:
+                        description: A list of DNS resolver options. This will be
+                          merged with the base options generated from DNSPolicy. Duplicated
+                          entries will be removed. Resolution options given in Options
+                          will override those that appear in the base DNSPolicy.
+                        items:
+                          description: PodDNSConfigOption defines DNS resolver options
+                            of a pod.
+                          properties:
+                            name:
+                              description: Required.
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
+                      searches:
+                        description: A list of DNS search domains for host-name lookup.
+                          This will be appended to the base search paths generated
+                          from DNSPolicy. Duplicated search paths will be removed.
+                        items:
+                          type: string
+                        type: array
+                    type: object
                   dnsPolicy:
                     description: DNSPolicy sets DNS policy for the pod
                     type: string
@@ -8602,6 +7809,13 @@ spec:
                       PodSecurityContext.
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
+                  serviceScrapeSpec:
+                    description: ServiceScrapeSpec that will be added to vmselect
+                      VMServiceScrape spec
+                    required:
+                    - endpoints
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
                   serviceSpec:
                     description: ServiceSpec that will be added to vminsert service
                       spec
@@ -8648,6 +7862,11 @@ spec:
                     description: StartupProbe that will be added to CRD pod
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
+                  terminationGracePeriodSeconds:
+                    description: TerminationGracePeriodSeconds period for container
+                      graceful termination
+                    format: int64
+                    type: integer
                   tolerations:
                     description: Tolerations If specified, the pod's tolerations.
                     items:
@@ -8798,6 +8017,44 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  dnsConfig:
+                    description: Specifies the DNS parameters of a pod. Parameters
+                      specified here will be merged to the generated DNS configuration
+                      based on DNSPolicy.
+                    items:
+                      x-kubernetes-preserve-unknown-fields: true
+                    properties:
+                      nameservers:
+                        description: A list of DNS name server IP addresses. This
+                          will be appended to the base nameservers generated from
+                          DNSPolicy. Duplicated nameservers will be removed.
+                        items:
+                          type: string
+                        type: array
+                      options:
+                        description: A list of DNS resolver options. This will be
+                          merged with the base options generated from DNSPolicy. Duplicated
+                          entries will be removed. Resolution options given in Options
+                          will override those that appear in the base DNSPolicy.
+                        items:
+                          description: PodDNSConfigOption defines DNS resolver options
+                            of a pod.
+                          properties:
+                            name:
+                              description: Required.
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
+                      searches:
+                        description: A list of DNS search domains for host-name lookup.
+                          This will be appended to the base search paths generated
+                          from DNSPolicy. Duplicated search paths will be removed.
+                        items:
+                          type: string
+                        type: array
+                    type: object
                   dnsPolicy:
                     description: DNSPolicy sets DNS policy for the pod
                     type: string
@@ -9062,6 +8319,13 @@ spec:
                     description: SecurityContext holds pod-level security attributes
                       and common container settings. This defaults to the default
                       PodSecurityContext.
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  serviceScrapeSpec:
+                    description: ServiceScrapeSpec that will be added to vmselect
+                      VMServiceScrape spec
+                    required:
+                    - endpoints
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
                   serviceSpec:
@@ -9465,6 +8729,11 @@ spec:
                             type: object
                         type: object
                     type: object
+                  terminationGracePeriodSeconds:
+                    description: TerminationGracePeriodSeconds period for container
+                      graceful termination
+                    format: int64
+                    type: integer
                   tolerations:
                     description: Tolerations If specified, the pod's tolerations.
                     items:
@@ -9605,6 +8874,44 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  dnsConfig:
+                    description: Specifies the DNS parameters of a pod. Parameters
+                      specified here will be merged to the generated DNS configuration
+                      based on DNSPolicy.
+                    items:
+                      x-kubernetes-preserve-unknown-fields: true
+                    properties:
+                      nameservers:
+                        description: A list of DNS name server IP addresses. This
+                          will be appended to the base nameservers generated from
+                          DNSPolicy. Duplicated nameservers will be removed.
+                        items:
+                          type: string
+                        type: array
+                      options:
+                        description: A list of DNS resolver options. This will be
+                          merged with the base options generated from DNSPolicy. Duplicated
+                          entries will be removed. Resolution options given in Options
+                          will override those that appear in the base DNSPolicy.
+                        items:
+                          description: PodDNSConfigOption defines DNS resolver options
+                            of a pod.
+                          properties:
+                            name:
+                              description: Required.
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
+                      searches:
+                        description: A list of DNS search domains for host-name lookup.
+                          This will be appended to the base search paths generated
+                          from DNSPolicy. Duplicated search paths will be removed.
+                        items:
+                          type: string
+                        type: array
+                    type: object
                   dnsPolicy:
                     description: DNSPolicy sets DNS policy for the pod
                     type: string
@@ -9845,6 +9152,13 @@ spec:
                       PodSecurityContext.
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
+                  serviceScrapeSpec:
+                    description: ServiceScrapeSpec that will be added to vmselect
+                      VMServiceScrape spec
+                    required:
+                    - endpoints
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
                   serviceSpec:
                     description: ServiceSpec that will be create additional service
                       for vmstorage
@@ -9935,6 +9249,8 @@ spec:
                     description: StorageDataPath - path to storage data
                     type: string
                   terminationGracePeriodSeconds:
+                    description: TerminationGracePeriodSeconds period for container
+                      graceful termination
                     format: int64
                     type: integer
                   tolerations:
@@ -13810,6 +13126,44 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              dnsConfig:
+                description: Specifies the DNS parameters of a pod. Parameters specified
+                  here will be merged to the generated DNS configuration based on
+                  DNSPolicy.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
+                properties:
+                  nameservers:
+                    description: A list of DNS name server IP addresses. This will
+                      be appended to the base nameservers generated from DNSPolicy.
+                      Duplicated nameservers will be removed.
+                    items:
+                      type: string
+                    type: array
+                  options:
+                    description: A list of DNS resolver options. This will be merged
+                      with the base options generated from DNSPolicy. Duplicated entries
+                      will be removed. Resolution options given in Options will override
+                      those that appear in the base DNSPolicy.
+                    items:
+                      description: PodDNSConfigOption defines DNS resolver options
+                        of a pod.
+                      properties:
+                        name:
+                          description: Required.
+                          type: string
+                        value:
+                          type: string
+                      type: object
+                    type: array
+                  searches:
+                    description: A list of DNS search domains for host-name lookup.
+                      This will be appended to the base search paths generated from
+                      DNSPolicy. Duplicated search paths will be removed.
+                    items:
+                      type: string
+                    type: array
+                type: object
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
@@ -14062,6 +13416,13 @@ spec:
                 description: ServiceAccountName is the name of the ServiceAccount
                   to use to run the VMSingle Pods.
                 type: string
+              serviceScrapeSpec:
+                description: ServiceScrapeSpec that will be added to vmselect VMServiceScrape
+                  spec
+                required:
+                - endpoints
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
               serviceSpec:
                 description: ServiceSpec that will be added to vmsingle service spec
                 properties:
@@ -14272,6 +13633,39 @@ spec:
                   arg for victoria-metrics binary --storageDataPath, its users responsibility
                   to mount proper device into given path.
                 type: string
+              storageMetadata:
+                description: StorageMeta defines annotations and labels attached to
+                  PVC for given vmsingle CR
+                properties:
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    description: 'Annotations is an unstructured key value map stored
+                      with a resource that may be set by external tools to store and
+                      retrieve arbitrary metadata. They are not queryable and should
+                      be preserved when modifying objects. More info: http://kubernetes.io/docs/user-guide/annotations'
+                    type: object
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: 'Labels Map of string keys and values that can be
+                      used to organize and categorize (scope and select) objects.
+                      May match selectors of replication controllers and services.
+                      More info: http://kubernetes.io/docs/user-guide/labels'
+                    type: object
+                  name:
+                    description: 'Name must be unique within a namespace. Is required
+                      when creating resources, although some resources may allow a
+                      client to request the generation of an appropriate name automatically.
+                      Name is primarily intended for creation idempotence and configuration
+                      definition. Cannot be updated. More info: http://kubernetes.io/docs/user-guide/identifiers#names'
+                    type: string
+                type: object
+              terminationGracePeriodSeconds:
+                description: TerminationGracePeriodSeconds period for container graceful
+                  termination
+                format: int64
+                type: integer
               tolerations:
                 description: Tolerations If specified, the pod's tolerations.
                 items:
