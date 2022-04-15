@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmgateway
 
- ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+ ![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square)
 
 Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
 
@@ -162,5 +162,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
+| serviceMonitor.relabelings | list | `[]` |  |
 | tolerations | list | `[]` | Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | write.url | string | `""` | Write endpoint without suffixes, victoriametrics or vminsert. Example http://victoroametrics:8428 or http://vminsert:8480 |

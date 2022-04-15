@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.8.0](https://img.shields.io/badge/Version-0.8.0-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.8.1](https://img.shields.io/badge/Version-0.8.1-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -396,6 +396,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubelet.spec.bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubelet.spec.honorLabels | bool | `true` |  |
 | kubelet.spec.interval | string | `"30s"` |  |
+| kubelet.spec.metricRelabelConfigs[0].action | string | `"labeldrop"` |  |
+| kubelet.spec.metricRelabelConfigs[0].regex | string | `"(uid)"` |  |
+| kubelet.spec.metricRelabelConfigs[1].action | string | `"labeldrop"` |  |
+| kubelet.spec.metricRelabelConfigs[1].regex | string | `"(id|name|image)"` |  |
+| kubelet.spec.metricRelabelConfigs[2].action | string | `"drop"` |  |
+| kubelet.spec.metricRelabelConfigs[2].regex | string | `"(rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)"` |  |
+| kubelet.spec.metricRelabelConfigs[2].source_labels[0] | string | `"__name__"` |  |
 | kubelet.spec.relabelConfigs[0].action | string | `"labelmap"` |  |
 | kubelet.spec.relabelConfigs[0].regex | string | `"__meta_kubernetes_node_label_(.+)"` |  |
 | kubelet.spec.relabelConfigs[1].sourceLabels[0] | string | `"__metrics_path__"` |  |

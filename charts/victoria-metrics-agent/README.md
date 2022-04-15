@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.7.44](https://img.shields.io/badge/Version-0.7.44-informational?style=flat-square)
+ ![Version: 0.7.46](https://img.shields.io/badge/Version-0.7.46-informational?style=flat-square)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
@@ -328,6 +328,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
+| serviceMonitor.relabelings | list | `[]` |  |
 | statefulset.enabled | bool | `false` |  |
 | statefulset.updateStrategy | object | `{}` |  |
 | tolerations | list | `[]` |  |
