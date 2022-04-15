@@ -704,6 +704,15 @@ kubelet:
       insecureSkipVerify: true
       caFile: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
     bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+    # drop high cardinality label and useless metrics for cadvisor and kubelet
+    metricRelabelConfigs:
+      - action: labeldrop
+        regex: (uid)
+      - action: labeldrop
+        regex: (id|name|image)
+      - action: drop
+        source_labels: [__name__]
+        regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
     relabelConfigs:
       - action: labelmap
         regex: __meta_kubernetes_node_label_(.+)

@@ -12,6 +12,10 @@ spec:
 {{- if empty (index .Values "prometheus-node-exporter" "vmServiceScrape" "spec") }}
   endpoints:
   - port: metrics
+    metricRelabelConfigs:
+      - action: drop
+        source_labels: [ mountpoint ]
+        regex: "/var/lib/kubelet/pods.+"
 {{ else }}
 {{- if not (hasKey (index .Values "prometheus-node-exporter" "vmServiceScrape" "spec") "endpoints") }}
   endpoints:
