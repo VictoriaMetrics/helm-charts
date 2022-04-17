@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.8.22](https://img.shields.io/badge/Version-0.8.22-informational?style=flat-square)
+ ![Version: 0.8.24](https://img.shields.io/badge/Version-0.8.24-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -191,6 +191,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | server.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for server component. This is Prometheus operator object |
 | server.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
+| server.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | server.startupProbe | object | `{}` |  |
 | server.statefulSet.enabled | bool | `true` | Creates statefulset instead of deployment, useful when you want to keep the cache |
 | server.statefulSet.podManagementPolicy | string | `"OrderedReady"` | Deploy order policy for StatefulSet pods |

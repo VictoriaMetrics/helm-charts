@@ -37,4 +37,8 @@ spec:
       tlsConfig:
           {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.serviceMonitor.relabelings }}
+      relabelings:
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
   {{- end }}
