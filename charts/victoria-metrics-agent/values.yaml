@@ -4,7 +4,6 @@
 
 replicaCount: 1
 
-
 # ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 deployment:
   enabled: true
@@ -18,6 +17,11 @@ deployment:
 # ref:  https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
 statefulset:
   enabled: false
+  # -- create cluster of vmagents. See https://docs.victoriametrics.com/vmagent.html#scraping-big-number-of-targets
+  # available since 1.76.1 version https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.76.1
+  cluserMode: false
+  # -- replication factor for vmagent in cluster mode
+  replicationFactor: 1
   # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategy: {}
     # type: RollingUpdate
