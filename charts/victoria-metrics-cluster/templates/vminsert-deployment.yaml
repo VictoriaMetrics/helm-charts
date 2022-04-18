@@ -117,6 +117,12 @@ spec:
             periodSeconds: {{ .Values.vminsert.probe.liveness.periodSeconds }}
             timeoutSeconds: {{ .Values.vminsert.probe.liveness.timeoutSeconds }}
             failureThreshold: {{ .Values.vminsert.probe.liveness.failureThreshold }}
+{{- if .Values.vminsert.extraVolumeMounts }}
+          volumeMounts:
+          {{- with .Values.vminsert.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}
           resources:
 {{ toYaml .Values.vminsert.resources | indent 12 }}
     {{- if .Values.imagePullSecrets }}
@@ -141,3 +147,7 @@ spec:
 {{ toYaml .Values.vminsert.affinity | indent 8 }}
     {{- end }}
 {{- end }}
+      volumes:
+        {{- with .Values.vminsert.extraVolumes }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
