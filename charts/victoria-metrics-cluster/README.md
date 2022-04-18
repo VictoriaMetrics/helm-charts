@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.9.22](https://img.shields.io/badge/Version-0.9.22-informational?style=flat-square)
+ ![Version: 0.9.23](https://img.shields.io/badge/Version-0.9.23-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -126,6 +126,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vminsert.extraArgs.loggerFormat | string | `"json"` |  |
 | vminsert.extraLabels | object | `{}` |  |
+| vminsert.extraVolumeMounts | list | `[]` |  |
+| vminsert.extraVolumes | list | `[]` |  |
 | vminsert.fullnameOverride | string | `""` | Overrides the full name of vminsert component |
 | vminsert.horizontalPodAutoscaler.enabled | bool | `false` | Use HPA for vminsert component |
 | vminsert.horizontalPodAutoscaler.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale the vminsert component |
