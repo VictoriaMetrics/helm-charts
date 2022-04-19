@@ -85,17 +85,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- define "victoria-metrics-k8s-stack.vmSelectEndpoint" -}}
 {{- if .Values.vmsingle.enabled -}}
-{{ printf "http://%s.%s.svc:%d" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default 8429) }}
+{{ printf "http://%s.%s.svc:%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") }}
 {{- else if .Values.vmcluster.enabled -}}
-{{ printf "http://%s-%s.%s.svc:%d/select/0/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default 8481) }}
+{{ printf "http://%s-%s.%s.svc:%s/select/0/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default "8481") }}
 {{- end }}
 {{- end }}
 
 {{- define "victoria-metrics-k8s-stack.vmSingleInsertEndpoint" -}}
-{{ printf "http://%s.%s.svc:%d" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default 8429) }}
+{{ printf "http://%s.%s.svc:%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") }}
 {{- end }}
 {{- define "victoria-metrics-k8s-stack.vmClusterInsertEndpoint" -}}
-{{ printf "http://%s-%s.%s.svc:%d/insert/0/prometheus" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default 8480) }}
+{{ printf "http://%s-%s.%s.svc:%s/insert/0/prometheus" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default "8480") }}
 {{- end }}
 
 {{/*
