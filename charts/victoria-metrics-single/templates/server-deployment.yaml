@@ -56,7 +56,7 @@ spec:
           workingDir: {{ .Values.server.containerWorkingDir }}
           {{- end }}
           args:
-            - {{ printf "%s=%d" "--retentionPeriod" (int .Values.server.retentionPeriod) | quote}}
+            - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.server.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.server.persistentVolume.mountPath | quote}}
           {{- if .Values.server.scrape.enabled }}
             - -promscrape.config=/scrapeconfig/scrape.yml
