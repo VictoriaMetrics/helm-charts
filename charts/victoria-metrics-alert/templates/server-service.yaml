@@ -35,6 +35,9 @@ spec:
       port: {{ .Values.server.service.servicePort }}
       targetPort: http
       protocol: TCP
+      {{- with .Values.server.service.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
   selector:
     {{- include "vmalert.server.matchLabels" . | nindent 4 }}
   type: "{{ .Values.server.service.type }}"

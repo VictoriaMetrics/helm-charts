@@ -35,6 +35,9 @@ spec:
       port: {{ .Values.server.service.servicePort }}
       protocol: TCP
       targetPort: http
+      {{- with .Values.server.service.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
 {{- if .Values.server.extraArgs.graphiteListenAddr }}
     - name: graphite-tcp
       protocol: TCP
