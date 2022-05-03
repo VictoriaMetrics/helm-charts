@@ -370,6 +370,9 @@ vminsert:
     servicePort: 8480
     # -- Service type
     type: ClusterIP
+    # -- Enable UDP port. used if you have "spec.opentsdbListenAddr" specified
+    # -- Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
+    udp: false
   ingress:
     # -- Enable deployment of ingress for vminsert component
     enabled: false
