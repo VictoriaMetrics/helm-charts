@@ -70,7 +70,7 @@ spec:
       port: {{ include "split-host-port" .Values.vminsert.extraArgs.opentsdbHTTPListenAddr }}
       targetPort: opentsdbhttp
 {{- end }}
-{{- if .Values.vminsert.extraArgs.opentsdbListenAddr }}
+{{- if and .Values.vminsert.extraArgs.opentsdbListenAddr ( or .Values.vminsert.service.udp ( ne .Values.vminsert.service.type  "LoadBalancer" ) )}}
     - name: opentsdb-udp
       protocol: UDP
       port: {{ include "split-host-port" .Values.vminsert.extraArgs.opentsdbListenAddr }}
