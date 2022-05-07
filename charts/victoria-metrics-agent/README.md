@@ -329,7 +329,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
 | serviceMonitor.relabelings | list | `[]` |  |
-| statefulset.cluserMode | bool | `false` | create cluster of vmagents. See https://docs.victoriametrics.com/vmagent.html#scraping-big-number-of-targets available since 1.77.0 version https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.0 |
+| statefulset.cluserMode | bool | `false` | create cluster of vmagents. See https://docs.victoriametrics.com/vmagent.html#scraping-big-number-of-targets available since 1.77.1 version https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.1 |
 | statefulset.enabled | bool | `false` |  |
 | statefulset.replicationFactor | int | `1` | replication factor for vmagent in cluster mode |
 | statefulset.updateStrategy | object | `{}` |  |
