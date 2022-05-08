@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.9.23](https://img.shields.io/badge/Version-0.9.23-informational?style=flat-square)
+ ![Version: 0.9.26](https://img.shields.io/badge/Version-0.9.26-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -169,6 +169,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
 | vminsert.service.servicePort | int | `8480` | Service port |
 | vminsert.service.type | string | `"ClusterIP"` | Service type |
+| vminsert.service.udp | bool | `false` | Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/ |
 | vminsert.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | vminsert.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object |
 | vminsert.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
@@ -263,6 +264,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.extraContainers | list | `[]` |  |
 | vmstorage.extraHostPathMounts | list | `[]` |  |
 | vmstorage.extraLabels | object | `{}` |  |
+| vmstorage.extraSecretMounts | list | `[]` |  |
 | vmstorage.extraVolumeMounts | list | `[]` |  |
 | vmstorage.extraVolumes | list | `[]` |  |
 | vmstorage.fullnameOverride | string | `nil` | Overrides the full name of vmstorage component |
@@ -323,6 +325,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.vmbackupmanager.extraArgs."envflag.enable" | string | `"true"` |  |
 | vmstorage.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vmstorage.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
+| vmstorage.vmbackupmanager.extraSecretMounts | list | `[]` |  |
 | vmstorage.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
 | vmstorage.vmbackupmanager.image.tag | string | `"v1.77.1-enterprise"` | vmbackupmanager image tag |
 | vmstorage.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |

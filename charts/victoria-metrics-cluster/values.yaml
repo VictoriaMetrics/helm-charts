@@ -471,6 +471,13 @@ vmstorage:
     # - name: config-reloader
     #   image: reloader-image
 
+  extraSecretMounts:
+    []
+    # - name: secret
+    #  mountPath: /etc/credentials
+    #  subPath: ""
+    #  readOnly: true
+
   initContainers:
     []
     # - name: vmrestore
@@ -640,6 +647,12 @@ vmstorage:
       periodSeconds: 30
       timeoutSeconds: 5
       failureThreshold: 10
+    extraSecretMounts:
+      []
+      # - name: secret
+      #  mountPath: /etc/credentials
+      #  subPath: ""
+      #  readOnly: true
   serviceMonitor:
     # -- Enable deployment of Service Monitor for vmstorage component. This is Prometheus operator object
     enabled: false
