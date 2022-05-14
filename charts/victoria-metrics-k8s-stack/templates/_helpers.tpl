@@ -197,7 +197,3 @@ configMaps:
 {{- end }}
 {{- end }}
 
-{{/*
-VMAlert extra args
-extraArgs:
-*/}}
