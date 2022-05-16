@@ -125,10 +125,30 @@ notifiers:
 {{- end }}
 
 {{/*
+VMAlert templates
+*/}}
+{{- define "victoria-metrics-k8s-stack.vmAlertTemplates" -}}
+{{- if or .Values.vmalert.spec.configMaps .Values.vmalert.templateFiles }}
+{{- $list := .Values.vmalert.spec.configMaps | default (list "") }}
+{{- if .Values.vmalert.templateFiles }}
+{{- $list = append $list (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmalert-extra-tpl" | trunc 63 | trimSuffix "-") }}
+{{- end }}
+configMaps:
+{{- range compact $list }}
+- {{ . }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
 VMAlert spec
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAlertSpec" -}}
-{{ deepCopy .Values.vmalert.spec | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertRemotes" . | fromYaml) | toYaml }}
+{{- $extraArgs := default dict -}}
+{{- if .Values.vmalert.templateFiles -}}
+{{- $_ := set $extraArgs "rule.templates" "/etc/vm/configs/templates/**.tpl" -}}
+{{- end -}}
+{{ deepCopy .Values.vmalert.spec | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertRemotes" . | fromYaml) | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertTemplates" . | fromYaml) | mergeOverwrite (dict "extraArgs" $extraArgs) | toYaml }}
 {{- end }}
 
 
@@ -176,3 +196,4 @@ configMaps:
 {{- end }}
 {{- end }}
 {{- end }}
+
