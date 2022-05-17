@@ -146,7 +146,7 @@ VMAlert spec
 {{- define "victoria-metrics-k8s-stack.vmAlertSpec" -}}
 {{- $extraArgs := default dict -}}
 {{- if .Values.vmalert.templateFiles -}}
-{{- $_ := set $extraArgs "rule.templates" "/etc/vm/configs/templates/**.tpl" -}}
+{{- $_ := set $extraArgs "rule.templates" "/etc/vm/configs/**.tpl" -}}
 {{- end -}}
 {{ deepCopy .Values.vmalert.spec | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertRemotes" . | fromYaml) | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertTemplates" . | fromYaml) | mergeOverwrite (dict "extraArgs" $extraArgs) | toYaml }}
 {{- end }}
