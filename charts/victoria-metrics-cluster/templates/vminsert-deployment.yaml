@@ -20,6 +20,10 @@ spec:
 {{- if not .Values.vminsert.horizontalPodAutoscaler.enabled }}
   replicas: {{ .Values.vminsert.replicaCount }}
 {{- end }}
+  {{- if .Values.vminsert.strategy }}
+  strategy:
+    {{- toYaml .Values.vminsert.strategy | nindent 4 }}
+  {{- end }}
   template:
     metadata:
     {{- if .Values.vminsert.podAnnotations }}
