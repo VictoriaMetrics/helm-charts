@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.9.26](https://img.shields.io/badge/Version-0.9.26-informational?style=flat-square)
+ ![Version: 0.9.27](https://img.shields.io/badge/Version-0.9.27-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -175,7 +175,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vminsert.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vminsert.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
-| vminsert.strategy | object | `{}` | Deployment strategy |
+| vminsert.strategy | object | `{}` |  |
 | vminsert.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs |
 | vminsert.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | vmselect.affinity | object | `{}` | Pod affinity |
@@ -250,7 +250,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.statefulSet.service.annotations | object | `{}` | Headless service annotations |
 | vmselect.statefulSet.service.labels | object | `{}` | Headless service labels |
 | vmselect.statefulSet.service.servicePort | int | `8481` | Headless service port |
-| vmselect.strategy | object | `{}` | Deployment strategy |
+| vmselect.strategy | object | `{}` |  |
 | vmselect.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs |
 | vmselect.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | vmselect.topologySpreadConstraints | list | `[]` | Pod topologySpreadConstraints |
