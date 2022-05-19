@@ -9,7 +9,7 @@ metadata:
 {{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
 data:
 {{- range $file, $template := .Values.vmalert.templateFiles }}
-  templates/{{ $file }}: |-
+  {{ $file }}: |-
      {{- $template | nindent 4 }}
 {{- end }}
 {{- end }}
