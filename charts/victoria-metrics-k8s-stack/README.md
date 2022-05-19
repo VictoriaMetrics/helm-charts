@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.8.3](https://img.shields.io/badge/Version-0.8.3-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -457,6 +457,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
 | vmalert.spec.image.tag | string | `"v1.77.1"` |  |
 | vmalert.spec.selectAllByDefault | bool | `true` |  |
+| vmalert.templateFiles | object | `{}` |  |
 | vmcluster.annotations | object | `{}` |  |
 | vmcluster.enabled | bool | `false` |  |
 | vmcluster.ingress.insert.annotations | object | `{}` |  |
