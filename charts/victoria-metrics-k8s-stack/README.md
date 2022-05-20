@@ -399,7 +399,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubelet.spec.metricRelabelConfigs[0].action | string | `"labeldrop"` |  |
 | kubelet.spec.metricRelabelConfigs[0].regex | string | `"(uid)"` |  |
 | kubelet.spec.metricRelabelConfigs[1].action | string | `"labeldrop"` |  |
-| kubelet.spec.metricRelabelConfigs[1].regex | string | `"(id|name|image)"` |  |
+| kubelet.spec.metricRelabelConfigs[1].regex | string | `"(id|name)"` |  |
 | kubelet.spec.metricRelabelConfigs[2].action | string | `"drop"` |  |
 | kubelet.spec.metricRelabelConfigs[2].regex | string | `"(rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)"` |  |
 | kubelet.spec.metricRelabelConfigs[2].source_labels[0] | string | `"__name__"` |  |
