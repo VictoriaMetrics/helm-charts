@@ -18,8 +18,8 @@ deployment:
 statefulset:
   enabled: false
   # -- create cluster of vmagents. See https://docs.victoriametrics.com/vmagent.html#scraping-big-number-of-targets
-  # available since 1.76.1 version https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.76.1
-  cluserMode: false
+  # available since 1.77.2 version https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.2
+  clusterMode: false
   # -- replication factor for vmagent in cluster mode
   replicationFactor: 1
   # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
@@ -150,6 +150,7 @@ service:
   loadBalancerIP: ""
   loadBalancerSourceRanges: []
   servicePort: 8429
+  # nodePort: 30000
   type: ClusterIP
   # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
   # externalTrafficPolicy: "local"
@@ -400,15 +401,20 @@ config:
           replacement: $1:$2
         - action: labelmap
           regex: __meta_kubernetes_service_label_(.+)
+        - source_labels: [__meta_kubernetes_pod_name]
+          target_label: pod
+        - source_labels: [__meta_kubernetes_pod_container_name]
+          target_label: container
         - source_labels: [__meta_kubernetes_namespace]
-          action: replace
-          target_label: kubernetes_namespace
+          target_label: namespace
         - source_labels: [__meta_kubernetes_service_name]
-          action: replace
-          target_label: kubernetes_name
+          target_label: service
+        - source_labels: [__meta_kubernetes_service_name]
+          target_label: job
+          replacement: ${1}
         - source_labels: [__meta_kubernetes_pod_node_name]
           action: replace
-          target_label: kubernetes_node
+          target_label: node
     # Scrape config for slow service endpoints; same as above, but with a larger
     # timeout and a larger interval
     #
@@ -457,15 +463,20 @@ config:
           replacement: $1:$2
         - action: labelmap
           regex: __meta_kubernetes_service_label_(.+)
+        - source_labels: [__meta_kubernetes_pod_name]
+          target_label: pod
+        - source_labels: [__meta_kubernetes_pod_container_name]
+          target_label: container
         - source_labels: [__meta_kubernetes_namespace]
-          action: replace
-          target_label: kubernetes_namespace
+          target_label: namespace
         - source_labels: [__meta_kubernetes_service_name]
-          action: replace
-          target_label: kubernetes_name
+          target_label: service
+        - source_labels: [__meta_kubernetes_service_name]
+          target_label: job
+          replacement: ${1}
         - source_labels: [__meta_kubernetes_pod_node_name]
           action: replace
-          target_label: kubernetes_node
+          target_label: node
     # Example scrape config for probing services via the Blackbox Exporter.
     #
     # The relabeling allows the actual service scrape endpoint to be configured
@@ -492,9 +503,9 @@ config:
         - action: labelmap
           regex: __meta_kubernetes_service_label_(.+)
         - source_labels: [__meta_kubernetes_namespace]
-          target_label: kubernetes_namespace
+          target_label: namespace
         - source_labels: [__meta_kubernetes_service_name]
-          target_label: kubernetes_name
+          target_label: service
     # Example scrape config for pods
     #
     # The relabeling allows the actual pod scrape endpoint to be configured via the
@@ -527,12 +538,20 @@ config:
           target_label: __address__
         - action: labelmap
           regex: __meta_kubernetes_pod_label_(.+)
-        - source_labels: [__meta_kubernetes_namespace]
-          action: replace
-          target_label: kubernetes_namespace
         - source_labels: [__meta_kubernetes_pod_name]
+          target_label: pod
+        - source_labels: [__meta_kubernetes_pod_container_name]
+          target_label: container
+        - source_labels: [__meta_kubernetes_namespace]
+          target_label: namespace
+        - source_labels: [__meta_kubernetes_service_name]
+          target_label: service
+        - source_labels: [__meta_kubernetes_service_name]
+          target_label: job
+          replacement: ${1}
+        - source_labels: [__meta_kubernetes_pod_node_name]
           action: replace
-          target_label: kubernetes_pod_name
+          target_label: node
       ## End of COPY
 
 # -- Extra scrape configs that will be appended to `config`

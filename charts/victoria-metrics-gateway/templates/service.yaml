@@ -35,6 +35,9 @@ spec:
       port: {{ .Values.service.servicePort }}
       protocol: TCP
       targetPort: http
+      {{- with .Values.service.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
   selector:
     {{- include "chart.selectorLabels" . | nindent 4 }}
   type: "{{ .Values.service.type }}"

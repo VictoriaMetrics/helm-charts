@@ -15,9 +15,9 @@ metadata:
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
-  {{- if .Values.deployment.strategy }}
+  {{- with .Values.deployment.strategy }}
   strategy:
-    {{- toYaml .Values.deployment.strategy | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   selector:
     matchLabels:

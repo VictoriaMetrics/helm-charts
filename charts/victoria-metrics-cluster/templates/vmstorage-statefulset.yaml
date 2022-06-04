@@ -149,6 +149,12 @@ spec:
             - name: vmstorage-volume
               mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
               subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
+            {{- range .Values.vmstorage.vmbackupmanager.extraSecretMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly }}
+            {{- end }}
         {{- end }}
         {{- with .Values.vmstorage.extraContainers }}
         {{- toYaml . | nindent 8 }}

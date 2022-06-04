@@ -95,7 +95,7 @@ vmsingle:
   # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmsinglespec
   spec:
     image:
-      tag: v1.76.1
+      tag: v1.77.2
     retentionPeriod: "14"
     replicaCount: 1
     storage:
@@ -150,7 +150,7 @@ vmcluster:
     replicationFactor: 2
     vmstorage:
       image:
-        tag: v1.76.1-cluster
+        tag: v1.77.2-cluster
       replicaCount: 2
       storageDataPath: "/vm-data"
       storage:
@@ -166,7 +166,7 @@ vmcluster:
         #   memory: 1500Mi
     vmselect:
       image:
-        tag: v1.76.1-cluster
+        tag: v1.77.2-cluster
       replicaCount: 2
       cacheMountPath: "/select-cache"
       storage:
@@ -185,7 +185,7 @@ vmcluster:
         #   memory: "500Mi"
     vminsert:
       image:
-        tag: v1.76.1-cluster
+        tag: v1.77.2-cluster
       replicaCount: 2
       resources:
         {}
@@ -455,8 +455,18 @@ vmalert:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.76.1
+      tag: v1.77.2
     evaluationInterval: 15s
+
+  # extra vmalert annotation templates
+  templateFiles:
+    {}
+    # template_1.tmpl: |-
+    #   {{ define "hello" -}}
+    #   hello, Victoria!
+    #   {{- end }}
+    # template_2.tmpl: ""
+
   ingress:
     enabled: false
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
@@ -505,7 +515,7 @@ vmagent:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.76.1
+      tag: v1.77.2
     scrapeInterval: 25s
     externalLabels:
       cluster: cluster-name
@@ -712,7 +722,7 @@ kubelet:
       - action: labeldrop
         regex: (uid)
       - action: labeldrop
-        regex: (id|name|image)
+        regex: (id|name)
       - action: drop
         source_labels: [__name__]
         regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)

@@ -34,11 +34,16 @@ vmselect:
   enabled: true
   # -- Vmselect container name
   name: vmselect
+  strategy: {}
+   # rollingUpdate:
+   #  maxSurge: 25%
+   #  maxUnavailable: 25%
+   # type: RollingUpdate
   image:
     # -- Image repository
     repository: victoriametrics/vmselect
     # -- Image tag
-    tag: v1.76.1-cluster
+    tag: v1.77.2-cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -252,11 +257,16 @@ vminsert:
   enabled: true
   # -- vminsert container name
   name: vminsert
+  strategy: {}
+   # rollingUpdate:
+   #  maxSurge: 25%
+   #  maxUnavailable: 25%
+   # type: RollingUpdate
   image:
     # -- Image repository
     repository: victoriametrics/vminsert
     # -- Image tag
-    tag: v1.76.1-cluster
+    tag: v1.77.2-cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -370,6 +380,9 @@ vminsert:
     servicePort: 8480
     # -- Service type
     type: ClusterIP
+    # -- Enable UDP port. used if you have "spec.opentsdbListenAddr" specified
+    # -- Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
+    udp: false
   ingress:
     # -- Enable deployment of ingress for vminsert component
     enabled: false
@@ -423,7 +436,7 @@ vmstorage:
     # -- Image repository
     repository: victoriametrics/vmstorage
     # -- Image tag
-    tag: v1.76.1-cluster
+    tag: v1.77.2-cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -467,6 +480,13 @@ vmstorage:
     []
     # - name: config-reloader
     #   image: reloader-image
+
+  extraSecretMounts:
+    []
+    # - name: secret
+    #  mountPath: /etc/credentials
+    #  subPath: ""
+    #  readOnly: true
 
   initContainers:
     []
@@ -594,7 +614,7 @@ vmstorage:
       # -- vmbackupmanager image repository
       repository: victoriametrics/vmbackupmanager
       # -- vmbackupmanager image tag
-      tag: v1.76.1-enterprise
+      tag: v1.77.2-enterprise
     # -- disable hourly backups
     disableHourly: false
     # -- disable daily backups
@@ -637,6 +657,12 @@ vmstorage:
       periodSeconds: 30
       timeoutSeconds: 5
       failureThreshold: 10
+    extraSecretMounts:
+      []
+      # - name: secret
+      #  mountPath: /etc/credentials
+      #  subPath: ""
+      #  readOnly: true
   serviceMonitor:
     # -- Enable deployment of Service Monitor for vmstorage component. This is Prometheus operator object
     enabled: false

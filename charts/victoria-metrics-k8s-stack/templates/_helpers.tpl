@@ -85,17 +85,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- define "victoria-metrics-k8s-stack.vmSelectEndpoint" -}}
 {{- if .Values.vmsingle.enabled -}}
-{{ printf "http://%s.%s.svc:%d" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default 8429) }}
+{{ printf "http://%s.%s.svc:%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") }}
 {{- else if .Values.vmcluster.enabled -}}
-{{ printf "http://%s-%s.%s.svc:%d/select/0/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default 8481) }}
+{{ printf "http://%s-%s.%s.svc:%s/select/0/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default "8481") }}
 {{- end }}
 {{- end }}
 
 {{- define "victoria-metrics-k8s-stack.vmSingleInsertEndpoint" -}}
-{{ printf "http://%s.%s.svc:%d" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default 8429) }}
+{{ printf "http://%s.%s.svc:%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") }}
 {{- end }}
 {{- define "victoria-metrics-k8s-stack.vmClusterInsertEndpoint" -}}
-{{ printf "http://%s-%s.%s.svc:%d/insert/0/prometheus" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default 8480) }}
+{{ printf "http://%s-%s.%s.svc:%s/insert/0/prometheus" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default "8480") }}
 {{- end }}
 
 {{/*
@@ -125,10 +125,30 @@ notifiers:
 {{- end }}
 
 {{/*
+VMAlert templates
+*/}}
+{{- define "victoria-metrics-k8s-stack.vmAlertTemplates" -}}
+{{- if or .Values.vmalert.spec.configMaps .Values.vmalert.templateFiles }}
+{{- $list := .Values.vmalert.spec.configMaps | default (list "") }}
+{{- if .Values.vmalert.templateFiles }}
+{{- $list = append $list (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmalert-extra-tpl" | trunc 63 | trimSuffix "-") }}
+{{- end }}
+configMaps:
+{{- range compact $list }}
+- {{ . }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
 VMAlert spec
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAlertSpec" -}}
-{{ deepCopy .Values.vmalert.spec | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertRemotes" . | fromYaml) | toYaml }}
+{{- $extraArgs := default dict -}}
+{{- if .Values.vmalert.templateFiles -}}
+{{- $_ := set $extraArgs "rule.templates" (print "/etc/vm/configs/" (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmalert-extra-tpl" | trunc 63 | trimSuffix "-" ) "/*.tmpl") -}}
+{{- end -}}
+{{ deepCopy .Values.vmalert.spec | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertRemotes" . | fromYaml) | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertTemplates" . | fromYaml) | mergeOverwrite (dict "extraArgs" $extraArgs) | toYaml }}
 {{- end }}
 
 
@@ -176,3 +196,4 @@ configMaps:
 {{- end }}
 {{- end }}
 {{- end }}
+
