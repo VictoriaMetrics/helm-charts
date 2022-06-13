@@ -256,7 +256,7 @@ config:
       # well as HA API server deployments.
     - job_name: "kubernetes-apiservers"
       kubernetes_sd_configs:
-        - role: endpoints
+        - role: endpointslices
       # Default to scraping over https. If required, just disable this or change to
       # `http`.
       scheme: https
@@ -369,7 +369,7 @@ config:
     # service then set this appropriately.
     - job_name: "kubernetes-service-endpoints"
       kubernetes_sd_configs:
-        - role: endpoints
+        - role: endpointslices
       relabel_configs:
         - action: drop
           source_labels: [__meta_kubernetes_pod_container_init]
@@ -431,7 +431,7 @@ config:
       scrape_interval: 5m
       scrape_timeout: 30s
       kubernetes_sd_configs:
-        - role: endpoints
+        - role: endpointslices
       relabel_configs:
         - action: drop
           source_labels: [__meta_kubernetes_pod_container_init]
