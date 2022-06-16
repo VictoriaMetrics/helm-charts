@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.8.6](https://img.shields.io/badge/Version-0.8.6-informational?style=flat-square)
+ ![Version: 0.8.7](https://img.shields.io/badge/Version-0.8.7-informational?style=flat-square)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
@@ -105,7 +105,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[0].static_configs[0].targets[0] | string | `"localhost:8429"` |  |
 | config.scrape_configs[1].bearer_token_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | config.scrape_configs[1].job_name | string | `"kubernetes-apiservers"` |  |
-| config.scrape_configs[1].kubernetes_sd_configs[0].role | string | `"endpoints"` |  |
+| config.scrape_configs[1].kubernetes_sd_configs[0].role | string | `"endpointslices"` |  |
 | config.scrape_configs[1].relabel_configs[0].action | string | `"keep"` |  |
 | config.scrape_configs[1].relabel_configs[0].regex | string | `"default;kubernetes;https"` |  |
 | config.scrape_configs[1].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
@@ -143,7 +143,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[3].tls_config.ca_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | config.scrape_configs[3].tls_config.insecure_skip_verify | bool | `true` |  |
 | config.scrape_configs[4].job_name | string | `"kubernetes-service-endpoints"` |  |
-| config.scrape_configs[4].kubernetes_sd_configs[0].role | string | `"endpoints"` |  |
+| config.scrape_configs[4].kubernetes_sd_configs[0].role | string | `"endpointslices"` |  |
 | config.scrape_configs[4].relabel_configs[0].action | string | `"drop"` |  |
 | config.scrape_configs[4].relabel_configs[0].regex | bool | `true` |  |
 | config.scrape_configs[4].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_pod_container_init"` |  |
@@ -184,7 +184,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[4].relabel_configs[9].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
 | config.scrape_configs[4].relabel_configs[9].target_label | string | `"namespace"` |  |
 | config.scrape_configs[5].job_name | string | `"kubernetes-service-endpoints-slow"` |  |
-| config.scrape_configs[5].kubernetes_sd_configs[0].role | string | `"endpoints"` |  |
+| config.scrape_configs[5].kubernetes_sd_configs[0].role | string | `"endpointslices"` |  |
 | config.scrape_configs[5].relabel_configs[0].action | string | `"drop"` |  |
 | config.scrape_configs[5].relabel_configs[0].regex | bool | `true` |  |
 | config.scrape_configs[5].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_pod_container_init"` |  |
