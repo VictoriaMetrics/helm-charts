@@ -41,7 +41,7 @@ spec:
             sum(vm_data_size_bytes{type!="indexdb"}) /
             sum(vm_rows{type!="indexdb"})
            )
-        ) < 3 * 24 * 3600
+        ) < 3 * 24 * 3600 > 0
       for: 30m
       labels:
         severity: critical
@@ -94,7 +94,7 @@ spec:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=67&var-instance={{`{{`}} $labels.instance {{`}}`}}
         description: "Logging rate for job \"{{`{{`}} $labels.job {{`}}`}}\" ({{`{{`}} $labels.instance {{`}}`}}) is {{`{{`}} $value {{`}}`}} for last 15m.\n Worth to check logs for specific error messages."
         summary: Too many logs printed for job "{{`{{`}} $labels.job {{`}}`}}" ({{`{{`}} $labels.instance {{`}}`}})
-      expr: sum(increase(vm_log_messages_total{level!="info"}[5m])) by (job, instance) > 0
+      expr: sum(increase(vm_log_messages_total{level="error"}[5m])) by (job, instance) > 0
       for: 15m
       labels:
         severity: warning

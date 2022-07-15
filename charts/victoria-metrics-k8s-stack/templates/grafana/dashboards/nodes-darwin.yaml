@@ -1,5 +1,5 @@
 {{- /*
-Generated from 'nodes' from https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml
+Generated from 'nodes-darwin' from https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
@@ -8,7 +8,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "nodes" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "nodes-darwin" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     {{- if $.Values.grafana.sidecar.dashboards.label }}
     {{ $.Values.grafana.sidecar.dashboards.label }}: "1"
@@ -27,7 +27,7 @@ metadata:
     {{- end }}
     {{- end }}
 data:
-  nodes.json: |-
+  nodes-darwin.json: |-
     {
         "__inputs": [
 
@@ -316,36 +316,43 @@ data:
                         ],
                         "spaceLength": 10,
                         "span": 9,
-                        "stack": true,
+                        "stack": false,
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "(\n  node_memory_MemTotal_bytes{job=\"node-exporter\", instance=\"$instance\"}\n-\n  node_memory_MemFree_bytes{job=\"node-exporter\", instance=\"$instance\"}\n-\n  node_memory_Buffers_bytes{job=\"node-exporter\", instance=\"$instance\"}\n-\n  node_memory_Cached_bytes{job=\"node-exporter\", instance=\"$instance\"}\n)\n",
+                                "expr": "node_memory_total_bytes{job=\"node-exporter\", instance=\"$instance\"}",
                                 "format": "time_series",
                                 "intervalFactor": 2,
-                                "legendFormat": "memory used",
+                                "legendFormat": "Physical Memory",
                                 "refId": "A"
                             },
                             {
-                                "expr": "node_memory_Buffers_bytes{job=\"node-exporter\", instance=\"$instance\"}",
+                                "expr": "(\n    node_memory_internal_bytes{job=\"node-exporter\", instance=\"$instance\"} -\n    node_memory_purgeable_bytes{job=\"node-exporter\", instance=\"$instance\"} +\n    node_memory_wired_bytes{job=\"node-exporter\", instance=\"$instance\"} +\n    node_memory_compressed_bytes{job=\"node-exporter\", instance=\"$instance\"}\n)\n",
                                 "format": "time_series",
                                 "intervalFactor": 2,
-                                "legendFormat": "memory buffers",
+                                "legendFormat": "Memory Used",
                                 "refId": "B"
                             },
                             {
-                                "expr": "node_memory_Cached_bytes{job=\"node-exporter\", instance=\"$instance\"}",
+                                "expr": "(\n    node_memory_internal_bytes{job=\"node-exporter\", instance=\"$instance\"} -\n    node_memory_purgeable_bytes{job=\"node-exporter\", instance=\"$instance\"}\n)\n",
                                 "format": "time_series",
                                 "intervalFactor": 2,
-                                "legendFormat": "memory cached",
+                                "legendFormat": "App Memory",
                                 "refId": "C"
                             },
                             {
-                                "expr": "node_memory_MemFree_bytes{job=\"node-exporter\", instance=\"$instance\"}",
+                                "expr": "node_memory_wired_bytes{job=\"node-exporter\", instance=\"$instance\"}",
                                 "format": "time_series",
                                 "intervalFactor": 2,
-                                "legendFormat": "memory free",
+                                "legendFormat": "Wired Memory",
                                 "refId": "D"
+                            },
+                            {
+                                "expr": "node_memory_compressed_bytes{job=\"node-exporter\", instance=\"$instance\"}",
+                                "format": "time_series",
+                                "intervalFactor": 2,
+                                "legendFormat": "Compressed",
+                                "refId": "E"
                             }
                         ],
                         "thresholds": [
@@ -420,7 +427,7 @@ data:
                         "span": 3,
                         "targets": [
                             {
-                                "expr": "100 -\n(\n  avg(node_memory_MemAvailable_bytes{job=\"node-exporter\", instance=\"$instance\"}) /\n  avg(node_memory_MemTotal_bytes{job=\"node-exporter\", instance=\"$instance\"})\n* 100\n)\n",
+                                "expr": "(\n    (\n      avg(node_memory_internal_bytes{job=\"node-exporter\", instance=\"$instance\"}) -\n      avg(node_memory_purgeable_bytes{job=\"node-exporter\", instance=\"$instance\"}) +\n      avg(node_memory_wired_bytes{job=\"node-exporter\", instance=\"$instance\"}) +\n      avg(node_memory_compressed_bytes{job=\"node-exporter\", instance=\"$instance\"})\n    ) /\n    avg(node_memory_total_bytes{job=\"node-exporter\", instance=\"$instance\"})\n)\n*\n100\n",
                                 "format": "time_series",
                                 "intervalFactor": 2,
                                 "legendFormat": ""
@@ -1023,7 +1030,7 @@ data:
                     "options": [
 
                     ],
-                    "query": "label_values(node_uname_info{job=\"node-exporter\", sysname!=\"Darwin\"}, instance)",
+                    "query": "label_values(node_uname_info{job=\"node-exporter\", sysname=\"Darwin\"}, instance)",
                     "refresh": 2,
                     "regex": "",
                     "sort": 0,
@@ -1067,7 +1074,7 @@ data:
             ]
         },
         "timezone": "utc",
-        "title": "Node Exporter / Nodes",
+        "title": "Node Exporter / MacOS",
         "version": 0
     }
 {{- end }}
