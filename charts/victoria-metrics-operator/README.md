@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.10.2](https://img.shields.io/badge/Version-0.10.2-informational?style=flat-square)
+ ![Version: 0.10.3](https://img.shields.io/badge/Version-0.10.3-informational?style=flat-square)
 
 Victoria Metrics Operator
 
