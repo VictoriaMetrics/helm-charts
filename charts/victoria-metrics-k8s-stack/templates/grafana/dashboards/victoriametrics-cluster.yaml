@@ -36,7 +36,7 @@ data:
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "8.3.2"
+                "version": "8.5.3"
             },
             {
                 "type": "panel",
@@ -67,7 +67,10 @@ data:
             "list": [
                 {
                     "builtIn": 1,
-                    "datasource": "-- Grafana --",
+                    "datasource": {
+                        "type": "datasource",
+                        "uid": "grafana"
+                    },
                     "enable": true,
                     "hide": true,
                     "iconColor": "rgba(0, 211, 255, 1)",
@@ -82,12 +85,12 @@ data:
                 }
             ]
         },
-        "description": "Overview for cluster VictoriaMetrics v1.70.0 or higher",
+        "description": "Overview for cluster VictoriaMetrics v1.77.0 or higher",
         "editable": true,
         "fiscalYearStartMonth": 0,
-        "graphTooltip": 0,
+        "graphTooltip": 1,
         "id": null,
-        "iteration": 1640161142159,
+        "iteration": 1655965688649,
         "links": [
             {
                 "icon": "doc",
@@ -118,6 +121,10 @@ data:
         "panels": [
             {
                 "collapsed": true,
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "P4169E866C3094E38"
+                },
                 "gridPos": {
                     "h": 1,
                     "w": 24,
@@ -141,8 +148,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         }
                                     ]
                                 },
@@ -174,9 +180,10 @@ data:
                             "text": {},
                             "textMode": "auto"
                         },
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(vm_rows{job=~\"$job_storage\", type!=\"indexdb\"})",
                                 "format": "time_series",
@@ -205,8 +212,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         }
                                     ]
                                 },
@@ -238,9 +244,10 @@ data:
                             "text": {},
                             "textMode": "auto"
                         },
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "min(vm_free_disk_space_bytes{job=~\"$job\", instance=~\"$instance\"})",
                                 "format": "time_series",
@@ -270,8 +277,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         }
                                     ]
                                 },
@@ -303,9 +309,10 @@ data:
                             "text": {},
                             "textMode": "auto"
                         },
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(vm_data_size_bytes{job=~\"$job_storage\", type!=\"indexdb\"}) / sum(vm_rows{job=~\"$job_storage\", type!=\"indexdb\"})",
                                 "format": "time_series",
@@ -334,8 +341,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         }
                                     ]
                                 },
@@ -367,9 +373,10 @@ data:
                             "text": {},
                             "textMode": "auto"
                         },
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(vm_allowed_memory_bytes{job=~\"$job\", instance=~\"$instance\"})",
                                 "format": "time_series",
@@ -398,8 +405,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         }
                                     ]
                                 },
@@ -431,9 +437,10 @@ data:
                             "text": {},
                             "textMode": "auto"
                         },
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(vm_rows{job=~\"$job_storage\", type=\"indexdb\"})",
                                 "format": "time_series",
@@ -449,6 +456,7 @@ data:
                     },
                     {
                         "datasource": {
+                            "type": "prometheus",
                             "uid": "$ds"
                         },
                         "description": "Total amount of used disk space",
@@ -462,8 +470,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         }
                                     ]
                                 },
@@ -495,11 +502,15 @@ data:
                             "text": {},
                             "textMode": "auto"
                         },
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "targets": [
                             {
-                                "exemplar": true,
-                                "expr": "sum(vm_data_size_bytes{job=~\"$job_storage\", type!=\"indexdb\"})",
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "exemplar": false,
+                                "expr": "sum(vm_data_size_bytes{job=~\"$job_storage\"})",
                                 "format": "time_series",
                                 "instant": true,
                                 "interval": "",
@@ -526,8 +537,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         }
                                     ]
                                 },
@@ -559,9 +569,10 @@ data:
                             "text": {},
                             "textMode": "auto"
                         },
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(vm_available_cpu_cores{job=~\"$job\", instance=~\"$instance\"})",
                                 "format": "time_series",
@@ -577,6 +588,7 @@ data:
                     },
                     {
                         "datasource": {
+                            "type": "prometheus",
                             "uid": "$ds"
                         },
                         "description": "Total size of available memory for all VM components.",
@@ -590,8 +602,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         }
                                     ]
                                 },
@@ -623,9 +634,10 @@ data:
                             "text": {},
                             "textMode": "auto"
                         },
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(vm_available_memory_bytes{job=~\"$job\", instance=~\"$instance\"})",
                                 "format": "time_series",
@@ -651,67 +663,46 @@ data:
                                 },
                                 "custom": {
                                     "align": "auto",
-                                    "displayMode": "auto"
+                                    "displayMode": "auto",
+                                    "inspect": false,
+                                    "minWidth": 50
                                 },
-                                "decimals": 2,
-                                "displayName": "",
                                 "mappings": [],
                                 "thresholds": {
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
                                             "value": 80
                                         }
                                     ]
-                                },
-                                "unit": "s"
+                                }
                             },
                             "overrides": [
                                 {
                                     "matcher": {
                                         "id": "byName",
-                                        "options": "Value #A"
+                                        "options": "Time"
                                     },
                                     "properties": [
                                         {
-                                            "id": "unit",
-                                            "value": "s"
-                                        },
+                                            "id": "custom.hidden",
+                                            "value": true
+                                        }
+                                    ]
+                                },
+                                {
+                                    "matcher": {
+                                        "id": "byName",
+                                        "options": "Value"
+                                    },
+                                    "properties": [
                                         {
-                                            "id": "decimals",
-                                            "value": 2
-                                        },
-                                        {
-                                            "id": "custom.displayMode",
-                                            "value": "color-background"
-                                        },
-                                        {
-                                            "id": "custom.align"
-                                        },
-                                        {
-                                            "id": "thresholds",
-                                            "value": {
-                                                "mode": "absolute",
-                                                "steps": [
-                                                    {
-                                                        "color": "rgba(245, 54, 54, 0.9)",
-                                                        "value": null
-                                                    },
-                                                    {
-                                                        "color": "rgba(237, 129, 40, 0.89)",
-                                                        "value": 1800
-                                                    },
-                                                    {
-                                                        "color": "rgba(50, 172, 45, 0.97)",
-                                                        "value": 3600
-                                                    }
-                                                ]
-                                            }
+                                            "id": "displayName",
+                                            "value": "Count"
                                         }
                                     ]
                                 }
@@ -723,7 +714,7 @@ data:
                             "x": 0,
                             "y": 5
                         },
-                        "id": 26,
+                        "id": 149,
                         "options": {
                             "footer": {
                                 "fields": "",
@@ -734,56 +725,20 @@ data:
                             },
                             "showHeader": true
                         },
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "targets": [
                             {
                                 "datasource": {
                                     "type": "prometheus",
                                     "uid": "$ds"
                                 },
+                                "editorMode": "code",
                                 "exemplar": false,
-                                "expr": "sort((time() - vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"}) or (up{job=~\"$job\", instance=~\"$instance\"}))",
+                                "expr": "sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"}) by(job, short_version)",
                                 "format": "table",
-                                "hide": false,
                                 "instant": true,
-                                "interval": "",
-                                "legendFormat": "{{`{{`}}instance{{`}}`}}",
+                                "range": false,
                                 "refId": "A"
-                            }
-                        ],
-                        "title": "Uptime",
-                        "transformations": [
-                            {
-                                "id": "sortBy",
-                                "options": {
-                                    "fields": {},
-                                    "sort": [
-                                        {
-                                            "desc": false,
-                                            "field": "Value #A"
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                "id": "organize",
-                                "options": {
-                                    "excludeByName": {
-                                        "Time": true,
-                                        "job": true
-                                    },
-                                    "indexByName": {
-                                        "Time": 0,
-                                        "Value #A": 2,
-                                        "env": 3,
-                                        "instance": 1,
-                                        "job": 4,
-                                        "team": 5
-                                    },
-                                    "renameByName": {
-                                        "Value #A": "uptime"
-                                    }
-                                }
                             }
                         ],
                         "type": "table"
@@ -802,7 +757,7 @@ data:
                             },
                             "overrides": []
                         },
-                        "fill": 1,
+                        "fill": 0,
                         "fillGradient": 0,
                         "gridPos": {
                             "h": 5,
@@ -834,7 +789,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -844,6 +799,7 @@ data:
                         "steppedLine": true,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sort(sum(up{job=~\"$job\", instance=~\"$instance\"}) by (job, instance))",
                                 "format": "time_series",
                                 "instant": false,
@@ -867,12 +823,14 @@ data:
                         },
                         "yaxes": [
                             {
+                                "$$hashKey": "object:1177",
                                 "decimals": 0,
                                 "format": "none",
                                 "logBase": 1,
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:1178",
                                 "format": "short",
                                 "label": "",
                                 "logBase": 1,
@@ -948,7 +906,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "8.5.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -958,8 +916,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": "$ds",
                         "exemplar": true,
-                        "expr": "sum(rate(vm_rows_inserted_total{job=~\"$job\", instance=~\"$instance\"}[5m])) by (type,accountID) > 0 ",
+                        "expr": "sum(rate(vm_rows_inserted_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (type,accountID) > 0 ",
                         "interval": "",
                         "legendFormat": "{{`{{`}}type{{`}}`}}",
                         "refId": "A"
@@ -1042,7 +1001,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "8.5.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1052,7 +1011,8 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
-                        "expr": "sum(rate(vm_http_requests_total{job=~\"$job\", instance=~\"$instance.*\", path!~\"/favicon.ico\"}[5m])) by (path) > 0",
+                        "datasource": "$ds",
+                        "expr": "sum(rate(vm_http_requests_total{job=~\"$job\", instance=~\"$instance.*\", path!~\"/favicon.ico\"}[$__rate_interval])) by (path) > 0",
                         "format": "time_series",
                         "intervalFactor": 1,
                         "legendFormat": "{{`{{`}}path{{`}}`}}",
@@ -1136,7 +1096,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "8.5.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1146,7 +1106,8 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
-                        "expr": "sum(rate(vm_http_request_errors_total{job=~\"$job\", instance=~\"$instance.*\"}[5m])) by (path) > 0",
+                        "datasource": "$ds",
+                        "expr": "sum(rate(vm_http_request_errors_total{job=~\"$job\", instance=~\"$instance.*\"}[$__rate_interval])) by (path) > 0",
                         "format": "time_series",
                         "intervalFactor": 1,
                         "legendFormat": "{{`{{`}}path{{`}}`}}",
@@ -1230,7 +1191,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "8.5.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1240,6 +1201,7 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": "$ds",
                         "expr": "max(vm_request_duration_seconds{job=~\"$job\", instance=~\"$instance\", quantile=~\"(0.5|0.99)\"}) by (path, quantile) > 0",
                         "format": "time_series",
                         "intervalFactor": 1,
@@ -1324,7 +1286,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "8.5.3",
                 "pointradius": 1,
                 "points": false,
                 "renderer": "flot",
@@ -1334,21 +1296,24 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
-                        "expr": "sum(rate(vm_rpc_connection_errors_total{job=~\"$job\",instance=~\"$instance.*\"}[5m]))",
+                        "datasource": "$ds",
+                        "expr": "sum(rate(vm_rpc_connection_errors_total{job=~\"$job\",instance=~\"$instance.*\"}[$__rate_interval]))",
                         "format": "time_series",
                         "intervalFactor": 1,
                         "legendFormat": "Connection",
                         "refId": "A"
                     },
                     {
-                        "expr": "sum(rate(vm_rpc_dial_errors_total{job=~\"$job\",instance=~\"$instance.*\"}[5m]))",
+                        "datasource": "$ds",
+                        "expr": "sum(rate(vm_rpc_dial_errors_total{job=~\"$job\",instance=~\"$instance.*\"}[$__rate_interval]))",
                         "format": "time_series",
                         "intervalFactor": 1,
                         "legendFormat": "Dial",
                         "refId": "B"
                     },
                     {
-                        "expr": "sum(rate(vm_rpc_handshake_errors_total{job=~\"$job\",instance=~\"$instance.*\"}[5m]))",
+                        "datasource": "$ds",
+                        "expr": "sum(rate(vm_rpc_handshake_errors_total{job=~\"$job\",instance=~\"$instance.*\"}[$__rate_interval]))",
                         "format": "time_series",
                         "intervalFactor": 1,
                         "legendFormat": "Handshake",
@@ -1432,7 +1397,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "8.5.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1442,8 +1407,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": "$ds",
                         "exemplar": true,
-                        "expr": "sum(rate(vm_log_messages_total{job=~\"$job\",instance=~\"$instance.*\", level!=\"info\"}[5m])) by (job, level) ",
+                        "expr": "sum(rate(vm_log_messages_total{job=~\"$job\",instance=~\"$instance.*\", level!=\"info\"}[$__rate_interval])) by (job, level) ",
                         "format": "time_series",
                         "hide": false,
                         "interval": "",
@@ -1528,7 +1494,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "8.5.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1538,6 +1504,7 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": "$ds",
                         "exemplar": true,
                         "expr": "sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\"}) by(instance) /\n(\n  sum(vm_free_disk_space_bytes{job=~\"$job_storage\", instance=~\"$instance\"}) by(instance) +\n  sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\"}) by(instance)\n)",
                         "format": "time_series",
@@ -1639,7 +1606,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "8.5.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1649,6 +1616,7 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": "$ds",
                         "expr": "sum(vm_cache_entries{job=~\"$job\", instance=~\"$instance.*\", type=\"storage/hour_metric_ids\"})",
                         "format": "time_series",
                         "intervalFactor": 1,
@@ -1746,7 +1714,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -1756,6 +1724,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}) by (job, instance)",
                                 "interval": "",
@@ -1800,6 +1769,7 @@ data:
                         "dashLength": 10,
                         "dashes": false,
                         "datasource": {
+                            "type": "prometheus",
                             "uid": "$ds"
                         },
                         "description": "RSS share for memory allocated by the process itself. This share cannot be freed by the OS, so it must be taken into account by OOM killer.",
@@ -1839,7 +1809,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -1849,6 +1819,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(process_resident_memory_anon_bytes{job=~\"$job\", instance=~\"$instance\"}) by (job, instance)",
                                 "interval": "",
@@ -1872,12 +1843,14 @@ data:
                         },
                         "yaxes": [
                             {
+                                "$$hashKey": "object:271",
                                 "format": "bytes",
                                 "logBase": 1,
                                 "min": "0",
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:272",
                                 "format": "short",
                                 "logBase": 1,
                                 "show": true
@@ -1931,7 +1904,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -1941,8 +1914,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
-                                "expr": "sum(rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[5m])) by(job, instance)",
+                                "expr": "sum(rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, instance)",
                                 "format": "time_series",
                                 "interval": "",
                                 "intervalFactor": 1,
@@ -1987,9 +1961,10 @@ data:
                         "dashLength": 10,
                         "dashes": false,
                         "datasource": {
+                            "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows average GC duration by instance",
+                        "description": "Shows the CPU usage in the percentage from the limit.",
                         "fieldConfig": {
                             "defaults": {
                                 "links": []
@@ -2005,7 +1980,7 @@ data:
                             "y": 11
                         },
                         "hiddenSeries": false,
-                        "id": 72,
+                        "id": 146,
                         "legend": {
                             "alignAsTable": true,
                             "avg": true,
@@ -2026,7 +2001,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2036,18 +2011,32 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "exemplar": true,
-                                "expr": "sum(rate(go_gc_duration_seconds_sum{job=~\"$job\", instance=~\"$instance\"}[5m])) by(job, instance)\n/\nsum(rate(go_gc_duration_seconds_count{job=~\"$job\", instance=~\"$instance\"}[5m])) by(job, instance)",
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "exemplar": false,
+                                "expr": "sum(rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, instance) / sum(process_cpu_cores_available{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)",
                                 "format": "time_series",
                                 "interval": "",
-                                "intervalFactor": 2,
+                                "intervalFactor": 1,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}})",
                                 "refId": "A"
                             }
                         ],
-                        "thresholds": [],
+                        "thresholds": [
+                            {
+                                "$$hashKey": "object:195",
+                                "colorMode": "critical",
+                                "fill": true,
+                                "line": true,
+                                "op": "gt",
+                                "value": 0.9,
+                                "yaxis": "left"
+                            }
+                        ],
                         "timeRegions": [],
-                        "title": "GC duration ($instance)",
+                        "title": "CPU percentage ($instance)",
                         "tooltip": {
                             "shared": true,
                             "sort": 0,
@@ -2061,12 +2050,14 @@ data:
                         },
                         "yaxes": [
                             {
-                                "format": "s",
+                                "$$hashKey": "object:75",
+                                "format": "percentunit",
                                 "logBase": 1,
                                 "min": "0",
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:76",
                                 "format": "short",
                                 "logBase": 1,
                                 "show": true
@@ -2121,7 +2112,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2136,6 +2127,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(process_open_fds{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)",
                                 "format": "time_series",
@@ -2145,6 +2137,7 @@ data:
                                 "refId": "A"
                             },
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(process_max_fds{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)",
                                 "format": "time_series",
@@ -2194,6 +2187,198 @@ data:
                         "datasource": {
                             "uid": "$ds"
                         },
+                        "description": "Shows average GC duration by instance",
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 0,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 19
+                        },
+                        "hiddenSeries": false,
+                        "id": 72,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": "$ds",
+                                "exemplar": true,
+                                "expr": "sum(rate(go_gc_duration_seconds_sum{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, instance)\n/\nsum(rate(go_gc_duration_seconds_count{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, instance)",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 2,
+                                "legendFormat": "{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}})",
+                                "refId": "A"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "GC duration ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "format": "s",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "uid": "$ds"
+                        },
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 0,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 27
+                        },
+                        "hiddenSeries": false,
+                        "id": 68,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": "$ds",
+                                "exemplar": true,
+                                "expr": "sum(go_goroutines{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 2,
+                                "legendFormat": "{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}})",
+                                "refId": "A"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "Goroutines ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 2,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "decimals": 0,
+                                "format": "short",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "uid": "$ds"
+                        },
                         "description": "Shows the number of bytes read/write from the storage layer.",
                         "fieldConfig": {
                             "defaults": {
@@ -2207,7 +2392,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 19
+                            "y": 27
                         },
                         "hiddenSeries": false,
                         "id": 122,
@@ -2231,7 +2416,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2246,8 +2431,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
-                                "expr": "sum(rate(process_io_storage_read_bytes_total{job=~\"$job_storage\", instance=~\"$instance\"}[5m])) by(instance)",
+                                "expr": "sum(rate(process_io_storage_read_bytes_total{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])) by(instance)",
                                 "format": "time_series",
                                 "hide": false,
                                 "interval": "",
@@ -2256,7 +2442,8 @@ data:
                                 "refId": "A"
                             },
                             {
-                                "expr": "sum(rate(process_io_storage_written_bytes_total{job=~\"$job_storage\", instance=~\"$instance\"}[5m])) by(instance)",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(process_io_storage_written_bytes_total{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])) by(instance)",
                                 "format": "time_series",
                                 "hide": false,
                                 "interval": "",
@@ -2316,185 +2503,6 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 27
-                        },
-                        "hiddenSeries": false,
-                        "id": 68,
-                        "legend": {
-                            "alignAsTable": true,
-                            "avg": true,
-                            "current": true,
-                            "max": true,
-                            "min": false,
-                            "show": true,
-                            "sort": "current",
-                            "sortDesc": true,
-                            "total": false,
-                            "values": true
-                        },
-                        "lines": true,
-                        "linewidth": 1,
-                        "links": [],
-                        "nullPointMode": "null",
-                        "options": {
-                            "alertThreshold": true
-                        },
-                        "percentage": false,
-                        "pluginVersion": "8.0.0",
-                        "pointradius": 2,
-                        "points": false,
-                        "renderer": "flot",
-                        "seriesOverrides": [],
-                        "spaceLength": 10,
-                        "stack": false,
-                        "steppedLine": false,
-                        "targets": [
-                            {
-                                "exemplar": true,
-                                "expr": "sum(go_goroutines{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)",
-                                "format": "time_series",
-                                "interval": "",
-                                "intervalFactor": 2,
-                                "legendFormat": "{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}})",
-                                "refId": "A"
-                            }
-                        ],
-                        "thresholds": [],
-                        "timeRegions": [],
-                        "title": "Goroutines ($instance)",
-                        "tooltip": {
-                            "shared": true,
-                            "sort": 2,
-                            "value_type": "individual"
-                        },
-                        "type": "graph",
-                        "xaxis": {
-                            "mode": "time",
-                            "show": true,
-                            "values": []
-                        },
-                        "yaxes": [
-                            {
-                                "decimals": 0,
-                                "format": "short",
-                                "logBase": 1,
-                                "min": "0",
-                                "show": true
-                            },
-                            {
-                                "format": "short",
-                                "logBase": 1,
-                                "show": true
-                            }
-                        ],
-                        "yaxis": {
-                            "align": false
-                        }
-                    },
-                    {
-                        "aliasColors": {},
-                        "bars": false,
-                        "dashLength": 10,
-                        "dashes": false,
-                        "datasource": {
-                            "uid": "$ds"
-                        },
-                        "fill": 0,
-                        "fillGradient": 0,
-                        "gridPos": {
-                            "h": 8,
-                            "w": 12,
-                            "x": 12,
-                            "y": 27
-                        },
-                        "hiddenSeries": false,
-                        "id": 119,
-                        "legend": {
-                            "alignAsTable": true,
-                            "avg": true,
-                            "current": true,
-                            "max": true,
-                            "min": false,
-                            "show": true,
-                            "sort": "current",
-                            "sortDesc": true,
-                            "total": false,
-                            "values": true
-                        },
-                        "lines": true,
-                        "linewidth": 1,
-                        "nullPointMode": "null",
-                        "options": {
-                            "alertThreshold": true
-                        },
-                        "percentage": false,
-                        "pluginVersion": "8.0.0",
-                        "pointradius": 2,
-                        "points": false,
-                        "renderer": "flot",
-                        "seriesOverrides": [],
-                        "spaceLength": 10,
-                        "stack": false,
-                        "steppedLine": false,
-                        "targets": [
-                            {
-                                "exemplar": true,
-                                "expr": "sum(vm_tcplistener_conns{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)",
-                                "interval": "",
-                                "legendFormat": "{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}})",
-                                "refId": "A"
-                            }
-                        ],
-                        "thresholds": [],
-                        "timeRegions": [],
-                        "title": "TCP connections ($instance)",
-                        "tooltip": {
-                            "shared": true,
-                            "sort": 2,
-                            "value_type": "individual"
-                        },
-                        "type": "graph",
-                        "xaxis": {
-                            "mode": "time",
-                            "show": true,
-                            "values": []
-                        },
-                        "yaxes": [
-                            {
-                                "format": "short",
-                                "logBase": 1,
-                                "show": true
-                            },
-                            {
-                                "format": "short",
-                                "logBase": 1,
-                                "show": true
-                            }
-                        ],
-                        "yaxis": {
-                            "align": false
-                        }
-                    },
-                    {
-                        "aliasColors": {},
-                        "bars": false,
-                        "dashLength": 10,
-                        "dashes": false,
-                        "datasource": {
-                            "uid": "$ds"
-                        },
-                        "fieldConfig": {
-                            "defaults": {
-                                "links": []
-                            },
-                            "overrides": []
-                        },
-                        "fill": 0,
-                        "fillGradient": 0,
-                        "gridPos": {
-                            "h": 8,
-                            "w": 12,
-                            "x": 0,
                             "y": 35
                         },
                         "hiddenSeries": false,
@@ -2519,7 +2527,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2529,6 +2537,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(process_num_threads{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)",
                                 "format": "time_series",
@@ -2587,6 +2596,91 @@ data:
                             "y": 35
                         },
                         "hiddenSeries": false,
+                        "id": 119,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": "$ds",
+                                "exemplar": true,
+                                "expr": "sum(vm_tcplistener_conns{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)",
+                                "interval": "",
+                                "legendFormat": "{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}})",
+                                "refId": "A"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "TCP connections ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 2,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            },
+                            {
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "uid": "$ds"
+                        },
+                        "fill": 0,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 43
+                        },
+                        "hiddenSeries": false,
                         "id": 120,
                         "legend": {
                             "alignAsTable": true,
@@ -2607,7 +2701,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2617,8 +2711,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
-                                "expr": "sum(rate(vm_tcplistener_accepts_total{job=~\"$job\", instance=~\"$instance\"}[5m])) by(job, instance)",
+                                "expr": "sum(rate(vm_tcplistener_accepts_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, instance)",
                                 "interval": "",
                                 "legendFormat": "{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}})",
                                 "refId": "A"
@@ -2692,7 +2787,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 36
+                            "y": 4
                         },
                         "hiddenSeries": false,
                         "id": 102,
@@ -2715,7 +2810,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2730,13 +2825,15 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
-                                "expr": "sum(rate(vm_new_timeseries_created_total{job=~\"$job_storage\", instance=~\"$instance\"}[5m]))",
+                                "expr": "sum(rate(vm_new_timeseries_created_total{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval]))",
                                 "interval": "",
                                 "legendFormat": "churn rate",
                                 "refId": "A"
                             },
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(increase(vm_new_timeseries_created_total{job=~\"$job_storage\", instance=~\"$instance\"}[24h]))",
                                 "hide": false,
@@ -2782,6 +2879,209 @@ data:
                         "dashLength": 10,
                         "dashes": false,
                         "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows the rate of adding new items to the index. It should correlate with `Slow inserts` and `Churn rate` graphs and could help to determine the pressure on indexdb.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 1,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 4
+                        },
+                        "hiddenSeries": false,
+                        "id": 147,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "exemplar": true,
+                                "expr": "sum(rate(vm_indexdb_items_added_total{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval]))",
+                                "interval": "",
+                                "legendFormat": "items",
+                                "refId": "A"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "IndexDB items rate ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "$$hashKey": "object:92",
+                                "format": "short",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "$$hashKey": "object:93",
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "uid": "$ds"
+                        },
+                        "description": "The percentage of slow inserts comparing to total insertion rate during the last 5 minutes. \n\nThe less value is better. If percentage remains high (>10%) during extended periods of time, then it is likely more RAM is needed for optimal handling of the current number of active time series. \n\nIn general, VictoriaMetrics requires ~1KB or RAM per active time series, so it should be easy calculating the required amounts of RAM for the current workload according to capacity planning docs. But the resulting number may be far from the real number because the required amounts of memory depends on may other factors such as the number of labels per time series and the length of label values.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 1,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 12
+                        },
+                        "hiddenSeries": false,
+                        "id": 108,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_slow_row_inserts_total{job=~\"$job_storage\"}[$__rate_interval])) / sum(rate(vm_rows_inserted_total{job=~\"$job_insert\"}[$__rate_interval]))",
+                                "interval": "",
+                                "legendFormat": "slow inserts",
+                                "refId": "A"
+                            }
+                        ],
+                        "thresholds": [
+                            {
+                                "$$hashKey": "object:72",
+                                "colorMode": "critical",
+                                "fill": true,
+                                "line": true,
+                                "op": "gt",
+                                "value": 0.1,
+                                "yaxis": "left"
+                            }
+                        ],
+                        "timeRegions": [],
+                        "title": "Slow inserts",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "$$hashKey": "object:738",
+                                "format": "percentunit",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "$$hashKey": "object:739",
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
                             "uid": "$ds"
                         },
                         "description": "Slow queries according to `search.logSlowQueryDuration` flag, which is `5s` by default.",
@@ -2797,7 +3097,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 36
+                            "y": 12
                         },
                         "hiddenSeries": false,
                         "id": 107,
@@ -2820,7 +3120,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2830,7 +3130,8 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum(rate(vm_slow_queries_total{job=~\"$job_select\", instance=~\"$instance\"}[5m]))",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_slow_queries_total{job=~\"$job_select\", instance=~\"$instance\"}[$__rate_interval]))",
                                 "interval": "",
                                 "legendFormat": "slow queries rate",
                                 "refId": "A"
@@ -2875,199 +3176,6 @@ data:
                         "dashLength": 10,
                         "dashes": false,
                         "datasource": {
-                            "uid": "$ds"
-                        },
-                        "description": "The percentage of slow inserts comparing to total insertion rate during the last 5 minutes. \n\nThe less value is better. If percentage remains high (>50%) during extended periods of time, then it is likely more RAM is needed for optimal handling of the current number of active time series. \n\nIn general, VictoriaMetrics requires ~1KB or RAM per active time series, so it should be easy calculating the required amounts of RAM for the current workload according to capacity planning docs. But the resulting number may be far from the real number because the required amounts of memory depends on may other factors such as the number of labels per time series and the length of label values.",
-                        "fieldConfig": {
-                            "defaults": {
-                                "links": []
-                            },
-                            "overrides": []
-                        },
-                        "fill": 1,
-                        "fillGradient": 0,
-                        "gridPos": {
-                            "h": 8,
-                            "w": 12,
-                            "x": 0,
-                            "y": 44
-                        },
-                        "hiddenSeries": false,
-                        "id": 108,
-                        "legend": {
-                            "alignAsTable": true,
-                            "avg": true,
-                            "current": true,
-                            "max": true,
-                            "min": false,
-                            "show": true,
-                            "sort": "current",
-                            "sortDesc": true,
-                            "total": false,
-                            "values": true
-                        },
-                        "lines": true,
-                        "linewidth": 1,
-                        "nullPointMode": "null",
-                        "options": {
-                            "alertThreshold": true
-                        },
-                        "percentage": false,
-                        "pluginVersion": "8.3.2",
-                        "pointradius": 2,
-                        "points": false,
-                        "renderer": "flot",
-                        "seriesOverrides": [],
-                        "spaceLength": 10,
-                        "stack": false,
-                        "steppedLine": false,
-                        "targets": [
-                            {
-                                "expr": "sum(rate(vm_slow_row_inserts_total{job=~\"$job_storage\"}[5m])) / sum(rate(vm_rows_inserted_total{job=~\"$job_insert\"}[5m]))",
-                                "interval": "",
-                                "legendFormat": "slow inserts",
-                                "refId": "A"
-                            }
-                        ],
-                        "thresholds": [],
-                        "timeRegions": [],
-                        "title": "Slow inserts",
-                        "tooltip": {
-                            "shared": true,
-                            "sort": 0,
-                            "value_type": "individual"
-                        },
-                        "type": "graph",
-                        "xaxis": {
-                            "mode": "time",
-                            "show": true,
-                            "values": []
-                        },
-                        "yaxes": [
-                            {
-                                "$$hashKey": "object:738",
-                                "format": "percentunit",
-                                "logBase": 1,
-                                "min": "0",
-                                "show": true
-                            },
-                            {
-                                "$$hashKey": "object:739",
-                                "format": "short",
-                                "logBase": 1,
-                                "show": true
-                            }
-                        ],
-                        "yaxis": {
-                            "align": false
-                        }
-                    },
-                    {
-                        "aliasColors": {},
-                        "bars": false,
-                        "dashLength": 10,
-                        "dashes": false,
-                        "datasource": {
-                            "uid": "$ds"
-                        },
-                        "description": "VictoriaMetrics limits the number of labels per each metric with `-maxLabelsPerTimeseries` command-line flag.\n\nThis prevents from ingesting metrics with too many labels. The value of `maxLabelsPerTimeseries` must be adjusted for your workload.\n\nWhen limit is exceeded (graph is > 0) - extra labels are dropped, which could result in unexpected identical time series.",
-                        "fieldConfig": {
-                            "defaults": {
-                                "links": []
-                            },
-                            "overrides": []
-                        },
-                        "fill": 1,
-                        "fillGradient": 0,
-                        "gridPos": {
-                            "h": 8,
-                            "w": 12,
-                            "x": 12,
-                            "y": 44
-                        },
-                        "hiddenSeries": false,
-                        "id": 116,
-                        "legend": {
-                            "alignAsTable": true,
-                            "avg": true,
-                            "current": true,
-                            "max": true,
-                            "min": false,
-                            "show": true,
-                            "sort": "current",
-                            "sortDesc": true,
-                            "total": false,
-                            "values": true
-                        },
-                        "lines": true,
-                        "linewidth": 1,
-                        "links": [],
-                        "nullPointMode": "null",
-                        "options": {
-                            "alertThreshold": true
-                        },
-                        "percentage": false,
-                        "pluginVersion": "8.3.2",
-                        "pointradius": 2,
-                        "points": false,
-                        "renderer": "flot",
-                        "seriesOverrides": [],
-                        "spaceLength": 10,
-                        "stack": false,
-                        "steppedLine": false,
-                        "targets": [
-                            {
-                                "exemplar": true,
-                                "expr": "sum(increase(vm_metrics_with_dropped_labels_total{job=~\"$job_insert\", instance=~\"$instance\"}[5m]))",
-                                "format": "time_series",
-                                "hide": false,
-                                "interval": "",
-                                "intervalFactor": 1,
-                                "legendFormat": "metrics with dropped labels",
-                                "refId": "A"
-                            }
-                        ],
-                        "thresholds": [],
-                        "timeRegions": [],
-                        "title": "Labels limit exceeded ($instance)",
-                        "tooltip": {
-                            "shared": true,
-                            "sort": 0,
-                            "value_type": "individual"
-                        },
-                        "type": "graph",
-                        "xaxis": {
-                            "mode": "time",
-                            "show": true,
-                            "values": []
-                        },
-                        "yaxes": [
-                            {
-                                "$$hashKey": "object:1046",
-                                "decimals": 2,
-                                "format": "short",
-                                "logBase": 1,
-                                "min": "0",
-                                "show": true
-                            },
-                            {
-                                "$$hashKey": "object:1047",
-                                "format": "short",
-                                "logBase": 1,
-                                "min": "0",
-                                "show": true
-                            }
-                        ],
-                        "yaxis": {
-                            "align": false
-                        }
-                    },
-                    {
-                        "aliasColors": {},
-                        "bars": false,
-                        "dashLength": 10,
-                        "dashes": false,
-                        "datasource": {
                             "type": "prometheus",
                             "uid": "$ds"
                         },
@@ -3084,7 +3192,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 52
+                            "y": 20
                         },
                         "hiddenSeries": false,
                         "id": 142,
@@ -3114,7 +3222,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 1,
                         "points": false,
                         "renderer": "flot",
@@ -3177,6 +3285,212 @@ data:
                         "dashLength": 10,
                         "dashes": false,
                         "datasource": {
+                            "uid": "$ds"
+                        },
+                        "description": "VictoriaMetrics limits the number of labels per each metric with `-maxLabelsPerTimeseries` command-line flag.\n\nThis prevents from ingesting metrics with too many labels. The value of `maxLabelsPerTimeseries` must be adjusted for your workload.\n\nWhen limit is exceeded (graph is > 0) - extra labels are dropped, which could result in unexpected identical time series.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 1,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 20
+                        },
+                        "hiddenSeries": false,
+                        "id": 116,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": "$ds",
+                                "exemplar": true,
+                                "expr": "sum(increase(vm_metrics_with_dropped_labels_total{job=~\"$job_insert\", instance=~\"$instance\"}[$__rate_interval]))",
+                                "format": "time_series",
+                                "hide": false,
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "metrics with dropped labels",
+                                "refId": "A"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "Labels limit exceeded ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "$$hashKey": "object:1046",
+                                "decimals": 2,
+                                "format": "short",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "$$hashKey": "object:1047",
+                                "format": "short",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Merge assist happens when vmstorage can't keep up with merging parts. This is usually a sign of overload for vmstorage.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 1,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 28
+                        },
+                        "hiddenSeries": false,
+                        "id": 170,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 1,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(increase(vm_assisted_merges_total{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])) by(type, instance) > 0",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "__auto",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "Assisted merges ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "$$hashKey": "object:536",
+                                "format": "short",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "$$hashKey": "object:537",
+                                "format": "short",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
                             "type": "prometheus",
                             "uid": "$ds"
                         },
@@ -3187,7 +3501,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 52
+                            "y": 28
                         },
                         "hiddenSeries": false,
                         "id": 144,
@@ -3210,7 +3524,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -3262,115 +3576,6 @@ data:
                         "yaxis": {
                             "align": false
                         }
-                    },
-                    {
-                        "aliasColors": {},
-                        "bars": false,
-                        "dashLength": 10,
-                        "dashes": false,
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "$ds"
-                        },
-                        "description": "Shows whether background merges were deferred because of not enough of disk space. \n\nBefore starting the data parts merge (improves compression and reduces number of files), VictoriaMetrics estimates if there is enough of disk space for the operation. If panel shows values higher than zero, it means no disk space left for merging operation.\n\nConsider extending the disk size or decreasing retention. ",
-                        "fieldConfig": {
-                            "defaults": {
-                                "links": []
-                            },
-                            "overrides": []
-                        },
-                        "fill": 1,
-                        "fillGradient": 0,
-                        "gridPos": {
-                            "h": 8,
-                            "w": 12,
-                            "x": 0,
-                            "y": 60
-                        },
-                        "hiddenSeries": false,
-                        "id": 145,
-                        "legend": {
-                            "alignAsTable": true,
-                            "avg": true,
-                            "current": true,
-                            "max": true,
-                            "min": false,
-                            "show": true,
-                            "sort": "current",
-                            "sortDesc": true,
-                            "total": false,
-                            "values": true
-                        },
-                        "lines": true,
-                        "linewidth": 1,
-                        "links": [
-                            {
-                                "targetBlank": true,
-                                "title": "Readonly mode",
-                                "url": "https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#readonly-mode"
-                            }
-                        ],
-                        "nullPointMode": "null",
-                        "options": {
-                            "alertThreshold": true
-                        },
-                        "percentage": false,
-                        "pluginVersion": "8.3.2",
-                        "pointradius": 1,
-                        "points": false,
-                        "renderer": "flot",
-                        "seriesOverrides": [],
-                        "spaceLength": 10,
-                        "stack": false,
-                        "steppedLine": false,
-                        "targets": [
-                            {
-                                "datasource": {
-                                    "type": "prometheus",
-                                    "uid": "$ds"
-                                },
-                                "exemplar": true,
-                                "expr": "sum(vm_merge_need_free_disk_space{job=~\"$job_storage\", instance=~\"$instance\"}) by(instance)",
-                                "format": "time_series",
-                                "interval": "",
-                                "intervalFactor": 1,
-                                "legendFormat": "{{`{{`}} instance {{`}}`}}",
-                                "refId": "A"
-                            }
-                        ],
-                        "thresholds": [],
-                        "timeRegions": [],
-                        "title": "Merges deferred by vmstorage ($instance)",
-                        "tooltip": {
-                            "shared": true,
-                            "sort": 0,
-                            "value_type": "individual"
-                        },
-                        "type": "graph",
-                        "xaxis": {
-                            "mode": "time",
-                            "show": true,
-                            "values": []
-                        },
-                        "yaxes": [
-                            {
-                                "$$hashKey": "object:536",
-                                "format": "short",
-                                "logBase": 1,
-                                "min": "0",
-                                "show": true
-                            },
-                            {
-                                "$$hashKey": "object:537",
-                                "format": "short",
-                                "logBase": 1,
-                                "min": "0",
-                                "show": true
-                            }
-                        ],
-                        "yaxis": {
-                            "align": false
-                        }
                     }
                 ],
                 "title": "Troubleshooting",
@@ -3397,7 +3602,7 @@ data:
                         "datasource": {
                             "uid": "$ds"
                         },
-                        "description": "Shows number of pushed and sent rows. \n* `Pushed rows` - rows added to internal inserter buffers before send\n* `Sent rows` - successfully transmitted rows to storage nodes",
+                        "description": "Shows number of pushed and sent rows. \n* `Pushed rows` - rows added to internal inserter buffers before send\n* `Sent rows` - successfully transmitted rows to storage nodes\n\nPlease note, it could be that `Sent > Pushed` because of the replication factor.",
                         "fieldConfig": {
                             "defaults": {
                                 "links": []
@@ -3434,7 +3639,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 1,
                         "points": false,
                         "renderer": "flot",
@@ -3444,6 +3649,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(rate(vm_rpc_rows_pushed_total{job=~\"$job\",instance=~\"$instance\"}[2m]))",
                                 "format": "time_series",
                                 "intervalFactor": 1,
@@ -3451,6 +3657,7 @@ data:
                                 "refId": "B"
                             },
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(rate(vm_rpc_rows_sent_total{job=~\"$job\",instance=~\"$instance\"}[2m]))",
                                 "format": "time_series",
                                 "intervalFactor": 1,
@@ -3536,7 +3743,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 1,
                         "points": false,
                         "renderer": "flot",
@@ -3546,21 +3753,24 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum(rate(vm_rpc_connection_errors_total{job=~\"$job\",instance=~\"$instance\"}[5m]))",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_rpc_connection_errors_total{job=~\"$job\",instance=~\"$instance\"}[$__rate_interval]))",
                                 "format": "time_series",
                                 "intervalFactor": 1,
                                 "legendFormat": "Connection",
                                 "refId": "A"
                             },
                             {
-                                "expr": "sum(rate(vm_rpc_dial_errors_total{job=~\"$job\",instance=~\"$instance\"}[5m]))",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_rpc_dial_errors_total{job=~\"$job\",instance=~\"$instance\"}[$__rate_interval]))",
                                 "format": "time_series",
                                 "intervalFactor": 1,
                                 "legendFormat": "Dial",
                                 "refId": "B"
                             },
                             {
-                                "expr": "sum(rate(vm_rpc_handshake_errors_total{job=~\"$job\",instance=~\"$instance\"}[5m]))",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_rpc_handshake_errors_total{job=~\"$job\",instance=~\"$instance\"}[$__rate_interval]))",
                                 "format": "time_series",
                                 "intervalFactor": 1,
                                 "legendFormat": "Handshake",
@@ -3643,7 +3853,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 1,
                         "points": false,
                         "renderer": "flot",
@@ -3653,8 +3863,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
-                                "expr": "sum(rate(vm_rpc_rows_rerouted_to_here_total{job=~\"$job\", instance=~\"$instance\"}[5m])) by(addr)",
+                                "expr": "sum(rate(vm_rpc_rows_rerouted_to_here_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(addr)",
                                 "format": "time_series",
                                 "interval": "",
                                 "intervalFactor": 1,
@@ -3738,7 +3949,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 1,
                         "points": false,
                         "renderer": "flot",
@@ -3748,8 +3959,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
-                                "expr": "sum(rate(vm_rpc_rows_rerouted_from_here_total{job=~\"$job\", instance=~\"$instance\"}[5m])) by(addr)",
+                                "expr": "sum(rate(vm_rpc_rows_rerouted_from_here_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(addr)",
                                 "format": "time_series",
                                 "interval": "",
                                 "intervalFactor": 1,
@@ -3833,7 +4045,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -3848,11 +4060,13 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_rpc_buf_pending_bytes{job=~\"$job\", instance=~\"$instance\"})",
                                 "legendFormat": "bytes",
                                 "refId": "A"
                             },
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_rpc_rows_pending{job=~\"$job\", instance=~\"$instance\"})",
                                 "legendFormat": "rows",
                                 "refId": "B"
@@ -3934,7 +4148,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -3944,7 +4158,8 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum(rate(vm_tcpdialer_written_bytes_total{job=~\"$job\", instance=~\"$instance\"}[5m])) * 8",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_tcpdialer_written_bytes_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) * 8",
                                 "legendFormat": "network usage",
                                 "refId": "A"
                             }
@@ -4043,7 +4258,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4060,6 +4275,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_cache_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(type)",
                                 "format": "time_series",
                                 "hide": false,
@@ -4068,6 +4284,7 @@ data:
                                 "refId": "A"
                             },
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_allowed_memory_bytes{job=~\"$job\", instance=~\"$instance\"})",
                                 "format": "time_series",
                                 "hide": false,
@@ -4154,7 +4371,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4164,8 +4381,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
-                                "expr": "1 - (\n sum(rate(vm_cache_misses_total{job=~\"$job\", instance=~\"$instance\"}[5m])) by (type) /\n sum(rate(vm_cache_requests_total{job=~\"$job\", instance=~\"$instance\"}[5m])) by (type)\n)",
+                                "expr": "1 - (\n sum(rate(vm_cache_misses_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (type) /\n sum(rate(vm_cache_requests_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (type)\n)",
                                 "format": "time_series",
                                 "hide": false,
                                 "interval": "",
@@ -4269,7 +4487,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4279,7 +4497,8 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum(rate(vm_vminsert_metrics_read_total{job=~\"$job_storage\", instance=~\"$instance\"}[5m])) by(instance)",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_vminsert_metrics_read_total{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])) by(instance)",
                                 "format": "time_series",
                                 "intervalFactor": 1,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}}",
@@ -4333,7 +4552,7 @@ data:
                             },
                             "overrides": []
                         },
-                        "fill": 1,
+                        "fill": 0,
                         "fillGradient": 0,
                         "gridPos": {
                             "h": 8,
@@ -4363,7 +4582,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4373,6 +4592,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "vm_free_disk_space_bytes{job=~\"$job_storage\", instance=~\"$instance\"} / ignoring(path) ((rate(vm_rows_added_to_storage_total{job=~\"$job_storage\", instance=~\"$instance\"}[1d]) - ignoring(type) rate(vm_deduplicated_samples_total{job=~\"$job_storage\", instance=~\"$instance\", type=\"merge\"}[1d])) * scalar(sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\", type!=\"indexdb\"}) / sum(vm_rows{job=~\"$job_storage\", instance=~\"$instance\", type!=\"indexdb\"})))",
                                 "format": "time_series",
                                 "interval": "",
@@ -4397,12 +4617,14 @@ data:
                         },
                         "yaxes": [
                             {
+                                "$$hashKey": "object:87",
                                 "format": "s",
                                 "logBase": 1,
                                 "min": "0",
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:88",
                                 "format": "short",
                                 "logBase": 1,
                                 "show": true
@@ -4457,7 +4679,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4467,6 +4689,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_rows{job=~\"$job_storage\", instance=~\"$instance\", type!=\"indexdb\"}) by(instance)",
                                 "format": "time_series",
                                 "interval": "",
@@ -4553,7 +4776,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4568,6 +4791,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_pending_rows{job=~\"$job_storage\", instance=~\"$instance\", type=\"storage\"})",
                                 "format": "time_series",
                                 "hide": false,
@@ -4576,6 +4800,7 @@ data:
                                 "refId": "A"
                             },
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_pending_rows{job=~\"$job_storage\", instance=~\"$instance\", type=\"indexdb\"})",
                                 "format": "time_series",
                                 "hide": false,
@@ -4662,7 +4887,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4672,6 +4897,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\", type!=\"indexdb\"}) by(instance)",
                                 "format": "time_series",
                                 "intervalFactor": 1,
@@ -4756,7 +4982,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4766,6 +4992,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\", type=\"indexdb\"}) by(instance)",
                                 "format": "time_series",
                                 "intervalFactor": 1,
@@ -4849,7 +5076,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4859,6 +5086,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_active_merges{job=~\"$job_storage\", instance=~\"$instance\"}) by(type)",
                                 "legendFormat": "{{`{{`}}type{{`}}`}}",
                                 "refId": "A"
@@ -4941,7 +5169,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4951,7 +5179,8 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum(rate(vm_rows_merged_total{job=~\"$job_storage\", instance=~\"$instance\"}[5m])) by(type)",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_rows_merged_total{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])) by(type)",
                                 "legendFormat": "{{`{{`}}type{{`}}`}}",
                                 "refId": "A"
                             }
@@ -5027,7 +5256,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -5037,6 +5266,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(vm_rows_ignored_total{job=~\"$job_storage\", instance=~\"$instance\"}) by (reason)",
                                 "interval": "",
@@ -5119,7 +5349,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -5129,6 +5359,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_parts{job=~\"$job_storage\", instance=~\"$instance\"}) by (type)",
                                 "format": "time_series",
                                 "interval": "",
@@ -5212,7 +5443,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -5311,7 +5542,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -5370,6 +5601,246 @@ data:
                                 "show": true
                             },
                             {
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 0,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 7,
+                            "w": 12,
+                            "x": 0,
+                            "y": 55
+                        },
+                        "hiddenSeries": false,
+                        "id": 151,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [
+                            {
+                                "$$hashKey": "object:186",
+                                "alias": "max",
+                                "color": "#C4162A"
+                            }
+                        ],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(rate(process_cpu_seconds_total{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval]))",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "cores used",
+                                "range": true,
+                                "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(process_cpu_cores_available{job=~\"$job_storage\", instance=~\"$instance\"})",
+                                "hide": false,
+                                "legendFormat": "max",
+                                "range": true,
+                                "refId": "B"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "CPU ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "format": "short",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 0,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 7,
+                            "w": 12,
+                            "x": 12,
+                            "y": 55
+                        },
+                        "hiddenSeries": false,
+                        "id": 167,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [
+                            {
+                                "$$hashKey": "object:186",
+                                "alias": "max",
+                                "color": "#C4162A"
+                            }
+                        ],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(process_resident_memory_anon_bytes{job=~\"$job_storage\", instance=~\"$instance\"}) ",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "mem used",
+                                "range": true,
+                                "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(vm_available_memory_bytes{job=~\"$job_storage\", instance=~\"$instance\"})",
+                                "hide": false,
+                                "legendFormat": "max",
+                                "range": true,
+                                "refId": "B"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "Memory ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "$$hashKey": "object:164",
+                                "format": "bytes",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "$$hashKey": "object:165",
                                 "format": "short",
                                 "logBase": 1,
                                 "show": true
@@ -5441,7 +5912,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -5451,7 +5922,8 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum(rate(vm_http_requests_total{job=~\"$job_select\", instance=~\"$instance.*\", path!~\"/favicon.ico\"}[5m])) by (path) > 0",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_http_requests_total{job=~\"$job_select\", instance=~\"$instance.*\", path!~\"/favicon.ico\"}[$__rate_interval])) by (path) > 0",
                                 "format": "time_series",
                                 "intervalFactor": 1,
                                 "legendFormat": "{{`{{`}}path{{`}}`}}",
@@ -5537,7 +6009,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -5553,7 +6025,8 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum(max_over_time(vm_concurrent_queries{job=~\"$job_select\", instance=~\"$instance\"}[1m]))",
+                                "datasource": "$ds",
+                                "expr": "sum(max_over_time(vm_concurrent_select_current{job=~\"$job_select\", instance=~\"$instance\"}[1m]))",
                                 "format": "time_series",
                                 "interval": "",
                                 "intervalFactor": 1,
@@ -5561,6 +6034,7 @@ data:
                                 "refId": "A"
                             },
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_concurrent_select_capacity{job=~\"$job_select\", instance=~\"$instance\"})",
                                 "format": "time_series",
                                 "intervalFactor": 1,
@@ -5620,7 +6094,7 @@ data:
                         "fill": 6,
                         "fillGradient": 0,
                         "gridPos": {
-                            "h": 8,
+                            "h": 7,
                             "w": 24,
                             "x": 0,
                             "y": 16
@@ -5647,7 +6121,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.0.0",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -5662,14 +6136,16 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum(rate(vm_tcplistener_read_bytes_total{job=~\"$job_select\", instance=~\"$instance\"}[5m])) by (instance) * 8 > 0",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_tcplistener_read_bytes_total{job=~\"$job_select\", instance=~\"$instance\"}[$__rate_interval])) by (instance) * 8 > 0",
                                 "format": "time_series",
                                 "intervalFactor": 1,
                                 "legendFormat": "read - {{`{{`}}instance{{`}}`}}",
                                 "refId": "A"
                             },
                             {
-                                "expr": "sum(rate(vm_tcplistener_written_bytes_total{job=~\"$job_select\", instance=~\"$instance\"}[5m])) by (instance) * 8 > 0",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_tcplistener_written_bytes_total{job=~\"$job_select\", instance=~\"$instance\"}[$__rate_interval])) by (instance) * 8 > 0",
                                 "format": "time_series",
                                 "hide": false,
                                 "intervalFactor": 1,
@@ -5698,6 +6174,246 @@ data:
                                 "show": true
                             },
                             {
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 0,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 23
+                        },
+                        "hiddenSeries": false,
+                        "id": 163,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [
+                            {
+                                "$$hashKey": "object:186",
+                                "alias": "max",
+                                "color": "#C4162A"
+                            }
+                        ],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(rate(process_cpu_seconds_total{job=~\"$job_select\", instance=~\"$instance\"}[$__rate_interval]))",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "cores used",
+                                "range": true,
+                                "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(process_cpu_cores_available{job=~\"$job_select\", instance=~\"$instance\"})",
+                                "hide": false,
+                                "legendFormat": "max",
+                                "range": true,
+                                "refId": "B"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "CPU ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "format": "short",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 0,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 23
+                        },
+                        "hiddenSeries": false,
+                        "id": 165,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [
+                            {
+                                "$$hashKey": "object:186",
+                                "alias": "max",
+                                "color": "#C4162A"
+                            }
+                        ],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(process_resident_memory_anon_bytes{job=~\"$job_select\", instance=~\"$instance\"}) ",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "mem used",
+                                "range": true,
+                                "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(vm_available_memory_bytes{job=~\"$job_select\", instance=~\"$instance\"})",
+                                "hide": false,
+                                "legendFormat": "max",
+                                "range": true,
+                                "refId": "B"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "Memory ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "$$hashKey": "object:164",
+                                "format": "bytes",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "$$hashKey": "object:165",
                                 "format": "short",
                                 "logBase": 1,
                                 "show": true
@@ -5745,7 +6461,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 9
+                            "y": 160
                         },
                         "hiddenSeries": false,
                         "id": 97,
@@ -5769,7 +6485,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -5779,7 +6495,8 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum(rate(vm_http_requests_total{job=~\"$job_insert\", instance=~\"$instance.*\", path!~\"/favicon.ico\"}[5m])) by (path) > 0",
+                                "datasource": "$ds",
+                                "expr": "sum(rate(vm_http_requests_total{job=~\"$job_insert\", instance=~\"$instance.*\", path!~\"/favicon.ico\"}[$__rate_interval])) by (path) > 0",
                                 "format": "time_series",
                                 "intervalFactor": 1,
                                 "legendFormat": "{{`{{`}}path{{`}}`}}",
@@ -5839,7 +6556,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 9
+                            "y": 160
                         },
                         "hiddenSeries": false,
                         "id": 99,
@@ -5865,7 +6582,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -5881,6 +6598,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "sum(vm_concurrent_insert_current{job=~\"$job_insert\", instance=~\"$instance\"})",
                                 "format": "time_series",
                                 "interval": "",
@@ -5889,6 +6607,7 @@ data:
                                 "refId": "A"
                             },
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "sum(vm_concurrent_insert_capacity{job=~\"$job_insert\", instance=~\"$instance\"})",
                                 "format": "time_series",
@@ -5954,7 +6673,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 17
+                            "y": 168
                         },
                         "hiddenSeries": false,
                         "id": 90,
@@ -5978,7 +6697,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -5993,7 +6712,7 @@ data:
                                     "uid": "$ds"
                                 },
                                 "exemplar": true,
-                                "expr": "sum(rate(vm_tcplistener_read_bytes_total{job=~\"$job_insert\", instance=~\"$instance\"}[5m])) by (instance) * 8 > 0",
+                                "expr": "sum(rate(vm_tcplistener_read_bytes_total{job=~\"$job_insert\", instance=~\"$instance\"}[$__rate_interval])) by (instance) * 8 > 0",
                                 "format": "time_series",
                                 "interval": "",
                                 "intervalFactor": 1,
@@ -6053,7 +6772,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 17
+                            "y": 168
                         },
                         "hiddenSeries": false,
                         "id": 88,
@@ -6077,7 +6796,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -6087,7 +6806,8 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "histogram_quantile(0.99, sum(increase(vm_rows_per_insert_bucket{job=~\"$job\", instance=~\"$instance\"}[5m])) by (instance, vmrange))",
+                                "datasource": "$ds",
+                                "expr": "histogram_quantile(0.99, sum(increase(vm_rows_per_insert_bucket{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (instance, vmrange))",
                                 "format": "time_series",
                                 "interval": "",
                                 "intervalFactor": 1,
@@ -6149,7 +6869,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 25
+                            "y": 176
                         },
                         "hiddenSeries": false,
                         "id": 139,
@@ -6173,7 +6893,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -6183,6 +6903,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "exemplar": true,
                                 "expr": "rate(vm_rpc_send_duration_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
                                 "format": "time_series",
@@ -6252,13 +6973,13 @@ data:
                             },
                             "overrides": []
                         },
-                        "fill": 1,
+                        "fill": 0,
                         "fillGradient": 0,
                         "gridPos": {
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 25
+                            "y": 176
                         },
                         "hiddenSeries": false,
                         "id": 114,
@@ -6282,7 +7003,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.3.2",
+                        "pluginVersion": "8.5.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -6292,6 +7013,7 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": "$ds",
                                 "expr": "vm_rpc_vmstorage_is_reachable{job=~\"$job\", instance=~\"$instance\"}",
                                 "format": "time_series",
                                 "interval": "",
@@ -6316,6 +7038,7 @@ data:
                         },
                         "yaxes": [
                             {
+                                "$$hashKey": "object:1534",
                                 "decimals": 0,
                                 "format": "short",
                                 "logBase": 1,
@@ -6323,9 +7046,252 @@ data:
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:1535",
                                 "format": "short",
                                 "logBase": 1,
                                 "min": "0",
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 0,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 7,
+                            "w": 12,
+                            "x": 0,
+                            "y": 184
+                        },
+                        "hiddenSeries": false,
+                        "id": 164,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [
+                            {
+                                "$$hashKey": "object:186",
+                                "alias": "max",
+                                "color": "#C4162A"
+                            }
+                        ],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(rate(process_cpu_seconds_total{job=~\"$job_insert\", instance=~\"$instance\"}[$__rate_interval]))",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "cores used",
+                                "range": true,
+                                "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(process_cpu_cores_available{job=~\"$job_insert\", instance=~\"$instance\"})",
+                                "hide": false,
+                                "legendFormat": "max",
+                                "range": true,
+                                "refId": "B"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "CPU ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "$$hashKey": "object:887",
+                                "format": "short",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "$$hashKey": "object:888",
+                                "format": "short",
+                                "logBase": 1,
+                                "show": true
+                            }
+                        ],
+                        "yaxis": {
+                            "align": false
+                        }
+                    },
+                    {
+                        "aliasColors": {},
+                        "bars": false,
+                        "dashLength": 10,
+                        "dashes": false,
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "fieldConfig": {
+                            "defaults": {
+                                "links": []
+                            },
+                            "overrides": []
+                        },
+                        "fill": 0,
+                        "fillGradient": 0,
+                        "gridPos": {
+                            "h": 7,
+                            "w": 12,
+                            "x": 12,
+                            "y": 184
+                        },
+                        "hiddenSeries": false,
+                        "id": 169,
+                        "legend": {
+                            "alignAsTable": true,
+                            "avg": true,
+                            "current": true,
+                            "max": true,
+                            "min": false,
+                            "show": true,
+                            "sort": "current",
+                            "sortDesc": true,
+                            "total": false,
+                            "values": true
+                        },
+                        "lines": true,
+                        "linewidth": 1,
+                        "links": [],
+                        "nullPointMode": "null",
+                        "options": {
+                            "alertThreshold": true
+                        },
+                        "percentage": false,
+                        "pluginVersion": "8.5.3",
+                        "pointradius": 2,
+                        "points": false,
+                        "renderer": "flot",
+                        "seriesOverrides": [
+                            {
+                                "$$hashKey": "object:186",
+                                "alias": "max",
+                                "color": "#C4162A"
+                            }
+                        ],
+                        "spaceLength": 10,
+                        "stack": false,
+                        "steppedLine": false,
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(process_resident_memory_anon_bytes{job=~\"$job_insert\", instance=~\"$instance\"}) ",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "mem used",
+                                "range": true,
+                                "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(vm_available_memory_bytes{job=~\"$job_insert\", instance=~\"$instance\"})",
+                                "hide": false,
+                                "legendFormat": "max",
+                                "range": true,
+                                "refId": "B"
+                            }
+                        ],
+                        "thresholds": [],
+                        "timeRegions": [],
+                        "title": "Memory ($instance)",
+                        "tooltip": {
+                            "shared": true,
+                            "sort": 0,
+                            "value_type": "individual"
+                        },
+                        "type": "graph",
+                        "xaxis": {
+                            "mode": "time",
+                            "show": true,
+                            "values": []
+                        },
+                        "yaxes": [
+                            {
+                                "$$hashKey": "object:164",
+                                "format": "bytes",
+                                "logBase": 1,
+                                "min": "0",
+                                "show": true
+                            },
+                            {
+                                "$$hashKey": "object:165",
+                                "format": "short",
+                                "logBase": 1,
                                 "show": true
                             }
                         ],
@@ -6338,7 +7304,7 @@ data:
                 "type": "row"
             }
         ],
-        "schemaVersion": 33,
+        "schemaVersion": 36,
         "style": "dark",
         "tags": [],
         "templating": {
@@ -6478,6 +7444,17 @@ data:
                     "skipUrlSync": false,
                     "sort": 0,
                     "type": "query"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${ds}"
+                    },
+                    "filters": [],
+                    "hide": 0,
+                    "name": "adhoc",
+                    "skipUrlSync": false,
+                    "type": "adhoc"
                 }
             ]
         },
