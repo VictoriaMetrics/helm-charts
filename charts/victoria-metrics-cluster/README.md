@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.9.29](https://img.shields.io/badge/Version-0.9.29-informational?style=flat-square)
+ ![Version: 0.9.32](https://img.shields.io/badge/Version-0.9.32-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -245,7 +245,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vmselect.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vmselect.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
-| vmselect.statefulSet.enabled | bool | `false` | Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data. Creates statefulset instead of deployment, useful when you want to keep the cache |
+| vmselect.statefulSet.enabled | bool | `false` | Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data. |
 | vmselect.statefulSet.podManagementPolicy | string | `"OrderedReady"` | Deploy order policy for StatefulSet pods |
 | vmselect.statefulSet.service.annotations | object | `{}` | Headless service annotations |
 | vmselect.statefulSet.service.labels | object | `{}` | Headless service labels |
@@ -315,7 +315,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vmstorage.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vmstorage.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
-| vmstorage.tolerations | list | `[]` | Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
+| vmstorage.tolerations | list | `[]` | Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) # |
 | vmstorage.vmbackupmanager.destination | string | `""` | backup destination at S3, GCS or local filesystem. Pod name will be included to path! |
 | vmstorage.vmbackupmanager.disableDaily | bool | `false` | disable daily backups |
 | vmstorage.vmbackupmanager.disableHourly | bool | `false` | disable hourly backups |
