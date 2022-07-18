@@ -172,12 +172,12 @@ webhooks:
       service:
         namespace: {{ .Release.Namespace }}
         name: {{ include "vm-operator.fullname" . }}
-        path: /validate-operator-victoriametrics-com-v1beta1-vmurule
+        path: /validate-operator-victoriametrics-com-v1beta1-vmrule
       {{- if and .Values.admissionWebhooks.caBundle (not .Values.admissionWebhooks.certManager.enabled) }}
       caBundle: {{ .Values.admissionWebhooks.caBundle }}
     {{- end }}
     failurePolicy: {{.Values.admissionWebhooks.policy}}
-    name: vmurule.victoriametrics.com
+    name: vmrule.victoriametrics.com
     admissionReviewVersions: [ "v1", "v1beta1" ]
     sideEffects: None
     rules:
