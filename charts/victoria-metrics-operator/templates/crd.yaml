@@ -42,6 +42,34 @@ spec:
                   of the cluster and will discover API servers automatically and use
                   the pod's CA certificate and bearer token file at /var/run/secrets/kubernetes.io/serviceaccount/.
                 properties:
+                  authorization:
+                    description: Authorization configures generic authorization params
+                    properties:
+                      credentials:
+                        description: Reference to the secret with value for authorization
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                      credentialsFile:
+                        description: File with value for authorization
+                        type: string
+                      type:
+                        description: Type of authorization, default to bearer
+                        type: string
+                    type: object
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
                       basic authentication
@@ -1199,6 +1227,13 @@ spec:
                       required:
                       - key
                       type: object
+                    headers:
+                      description: 'Headers allow configuring custom http headers
+                        Must be in form of semicolon separated header with value e.g.
+                        headerName: headerValue vmagent supports since 1.79.0 version'
+                      items:
+                        type: string
+                      type: array
                     inlineUrlRelabelConfig:
                       description: InlineUrlRelabelConfig defines relabeling config
                         for remoteWriteURL, it can be defined at crd spec.
@@ -1541,6 +1576,11 @@ spec:
                     description: Path to directory where temporary data for remote
                       write component is stored (default vmagent-remotewrite-data)
                     type: string
+                  useMultiTenantMode:
+                    description: Configures vmagent in multi-tenant mode with direct
+                      cluster support docs https://docs.victoriametrics.com/vmagent.html#multitenancy
+                      it's global setting and affects all remote storage configurations
+                    type: boolean
                 type: object
               replicaCount:
                 description: ReplicaCount is the expected size of the VMAgent cluster.
@@ -3373,12 +3413,12 @@ spec:
                             type: string
                           parse_mode:
                             description: ParseMode for telegram message, supported
-                              values are MarkdownV2, Markdown, HTML and empty
+                              values are MarkdownV2, Markdown, Markdown and empty
                               string for plain text.
                             enum:
                             - MarkdownV2
                             - Markdown
-                            - HTML
+                            - Markdown
                             type: string
                           send_resolved:
                             description: SendResolved controls notify about resolved
@@ -4312,11 +4352,11 @@ spec:
               extraArgs:
                 additionalProperties:
                   type: string
-                description: 'ExtraArgs that will be passed to  VMAuth pod for example
-                  remoteWrite.tmpDataPath: /tmp'
+                description: 'ExtraArgs that will be passed to  VMAlertmanager pod
+                  for example log.level: debug'
                 type: object
               extraEnvs:
-                description: ExtraEnvs that will be added to VMAuth pod
+                description: ExtraEnvs that will be added to VMAlertmanager pod
                 items:
                   description: EnvVar represents an environment variable present in
                     a Container.
@@ -7292,6 +7332,10 @@ spec:
                           type: string
                       type: object
                     type: array
+                  host:
+                    description: Host defines ingress host parameter for default rule
+                      It will be used, only if TlsHosts is empty
+                    type: string
                   labels:
                     additionalProperties:
                       type: string
@@ -8473,8 +8517,9 @@ spec:
                       node network namespace
                     type: boolean
                   hpa:
-                    description: EmbeddedHPA embeds HorizontalPodAutoScaler spec v2.
-                      https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/horizontal-pod-autoscaler-v2beta2/
+                    description: Configures horizontal pod autoscaling. Note, enabling
+                      this option disables vmselect to vmselect communication. In
+                      most cases it's not an issue.
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
                   image:
@@ -10115,6 +10160,34 @@ spec:
           spec:
             description: VMNodeScrapeSpec defines specification for VMNodeScrape.
             properties:
+              authorization:
+                description: Authorization with http header Authorization
+                properties:
+                  credentials:
+                    description: Reference to the secret with value for authorization
+                    properties:
+                      key:
+                        description: The key of the secret to select from.  Must be
+                          a valid secret key.
+                        type: string
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
+                        type: string
+                      optional:
+                        description: Specify whether the Secret or its key must be
+                          defined
+                        type: boolean
+                    required:
+                    - key
+                    type: object
+                  credentialsFile:
+                    description: File with value for authorization
+                    type: string
+                  type:
+                    description: Type of authorization, default to bearer
+                    type: string
+                type: object
               basicAuth:
                 description: 'BasicAuth allow an endpoint to authenticate over basic
                   authentication More info: https://prometheus.io/docs/operating/configuration/#endpoints'
@@ -10484,7 +10557,7 @@ spec:
                   type: string
                 type: array
               tlsConfig:
-                description: TLSConfig configuration to use when scraping the node
+                description: TLSConfig specifies TLSConfig configuration parameters.
                 properties:
                   ca:
                     description: Stuct containing the CA cert to use for the targets.
@@ -10609,6 +10682,14 @@ spec:
                     type: boolean
                   disable_keep_alive:
                     type: boolean
+                  headers:
+                    description: 'Headers allows sending custom headers to scrape
+                      targets must be in of semicolon separated header with it''s
+                      value eg: headerName: headerValue vmagent supports since 1.79.0
+                      version'
+                    items:
+                      type: string
+                    type: array
                   metric_relabel_debug:
                     type: boolean
                   proxy_client_config:
@@ -10899,6 +10980,34 @@ spec:
                   description: PodMetricsEndpoint defines a scrapeable endpoint of
                     a Kubernetes Pod serving Prometheus metrics.
                   properties:
+                    authorization:
+                      description: Authorization with http header Authorization
+                      properties:
+                        credentials:
+                          description: Reference to the secret with value for authorization
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                        credentialsFile:
+                          description: File with value for authorization
+                          type: string
+                        type:
+                          description: Type of authorization, default to bearer
+                          type: string
+                      type: object
                     basicAuth:
                       description: 'BasicAuth allow an endpoint to authenticate over
                         basic authentication More info: https://prometheus.io/docs/operating/configuration/#endpoints'
@@ -11370,6 +11479,14 @@ spec:
                           type: boolean
                         disable_keep_alive:
                           type: boolean
+                        headers:
+                          description: 'Headers allows sending custom headers to scrape
+                            targets must be in of semicolon separated header with
+                            it''s value eg: headerName: headerValue vmagent supports
+                            since 1.79.0 version'
+                          items:
+                            type: string
+                          type: array
                         metric_relabel_debug:
                           type: boolean
                         proxy_client_config:
@@ -11703,6 +11820,34 @@ spec:
           spec:
             description: VMProbeSpec contains specification parameters for a Probe.
             properties:
+              authorization:
+                description: Authorization with http header Authorization
+                properties:
+                  credentials:
+                    description: Reference to the secret with value for authorization
+                    properties:
+                      key:
+                        description: The key of the secret to select from.  Must be
+                          a valid secret key.
+                        type: string
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
+                        type: string
+                      optional:
+                        description: Specify whether the Secret or its key must be
+                          defined
+                        type: boolean
+                    required:
+                    - key
+                    type: object
+                  credentialsFile:
+                    description: File with value for authorization
+                    type: string
+                  type:
+                    description: Type of authorization, default to bearer
+                    type: string
+                type: object
               basicAuth:
                 description: 'BasicAuth allow an endpoint to authenticate over basic
                   authentication More info: https://prometheus.io/docs/operating/configuration/#endpoints'
@@ -12226,6 +12371,14 @@ spec:
                     type: boolean
                   disable_keep_alive:
                     type: boolean
+                  headers:
+                    description: 'Headers allows sending custom headers to scrape
+                      targets must be in of semicolon separated header with it''s
+                      value eg: headerName: headerValue vmagent supports since 1.79.0
+                      version'
+                    items:
+                      type: string
+                    type: array
                   metric_relabel_debug:
                     type: boolean
                   proxy_client_config:
@@ -12664,6 +12817,34 @@ spec:
                   description: Endpoint defines a scrapeable endpoint serving Prometheus
                     metrics.
                   properties:
+                    authorization:
+                      description: Authorization with http header Authorization
+                      properties:
+                        credentials:
+                          description: Reference to the secret with value for authorization
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                        credentialsFile:
+                          description: File with value for authorization
+                          type: string
+                        type:
+                          description: Type of authorization, default to bearer
+                          type: string
+                      type: object
                     basicAuth:
                       description: 'BasicAuth allow an endpoint to authenticate over
                         basic authentication More info: https://prometheus.io/docs/operating/configuration/#endpoints'
@@ -13136,6 +13317,14 @@ spec:
                           type: boolean
                         disable_keep_alive:
                           type: boolean
+                        headers:
+                          description: 'Headers allows sending custom headers to scrape
+                            targets must be in of semicolon separated header with
+                            it''s value eg: headerName: headerValue vmagent supports
+                            since 1.79.0 version'
+                          items:
+                            type: string
+                          type: array
                         metric_relabel_debug:
                           type: boolean
                         proxy_client_config:
@@ -14536,6 +14725,34 @@ spec:
                 items:
                   description: TargetEndpoint defines single static target endpoint.
                   properties:
+                    authorization:
+                      description: Authorization with http header Authorization
+                      properties:
+                        credentials:
+                          description: Reference to the secret with value for authorization
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must
+                                be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must
+                                be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                        credentialsFile:
+                          description: File with value for authorization
+                          type: string
+                        type:
+                          description: Type of authorization, default to bearer
+                          type: string
+                      type: object
                     basicAuth:
                       description: 'BasicAuth allow an endpoint to authenticate over
                         basic authentication More info: https://prometheus.io/docs/operating/configuration/#endpoints'
@@ -15010,6 +15227,14 @@ spec:
                           type: boolean
                         disable_keep_alive:
                           type: boolean
+                        headers:
+                          description: 'Headers allows sending custom headers to scrape
+                            targets must be in of semicolon separated header with
+                            it''s value eg: headerName: headerValue vmagent supports
+                            since 1.79.0 version'
+                          items:
+                            type: string
+                          type: array
                         metric_relabel_debug:
                           type: boolean
                         proxy_client_config:
@@ -15304,7 +15529,7 @@ spec:
                   endpoint.
                 type: string
               passwordRef:
-                description: PasswordRef allows to fetch password from user-create
+                description: PasswordRef allows fetching password from user-create
                   secret by its name and key.
                 properties:
                   key:
@@ -15378,6 +15603,24 @@ spec:
                       type: string
                   type: object
                 type: array
+              tokenRef:
+                description: TokenRef allows fetching token from user-created secrets
+                  by its name and key.
+                properties:
+                  key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
+                    type: string
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    type: string
+                  optional:
+                    description: Specify whether the Secret or its key must be defined
+                    type: boolean
+                required:
+                - key
+                type: object
               username:
                 description: UserName basic auth user name for accessing protected
                   endpoint, will be replaced with metadata.name of VMUser if omitted.
