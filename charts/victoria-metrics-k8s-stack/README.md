@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.9.8](https://img.shields.io/badge/Version-0.9.8-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.10.0](https://img.shields.io/badge/Version-0.10.0-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -275,7 +275,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.tls | list | `[]` |  |
 | alertmanager.monzoTemplate.enabled | bool | `true` |  |
 | alertmanager.spec.externalURL | string | `""` |  |
-| alertmanager.spec.image.tag | string | `"v0.23.0"` |  |
+| alertmanager.spec.image.tag | string | `"v0.24.0"` |  |
 | alertmanager.spec.routePrefix | string | `"/"` |  |
 | alertmanager.spec.selectAllByDefault | bool | `true` |  |
 | alertmanager.templateFiles | object | `{}` |  |
