@@ -9,7 +9,7 @@ metadata:
   labels:
     {{- include "victoria-metrics.vminsert.labels" . | nindent 4 }}
     {{- with .Values.vminsert.extraLabels }}
-      {{- toYaml . | indent 4 }}
+      {{- toYaml . | nindent 4 }}
     {{- end }}
   name: {{ template "victoria-metrics.vminsert.fullname" . }}
   namespace: {{ .Release.Namespace }}
@@ -28,12 +28,12 @@ spec:
     metadata:
       {{- with .Values.vminsert.podAnnotations }}
       annotations:
-        {{- toYaml . | indent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "victoria-metrics.vminsert.labels" . | nindent 8 }}
         {{- with .Values.vminsert.extraLabels }}
-          {{- toYaml . | indent 8 }}
+          {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
       {{- with .Values.vminsert.priorityClassName }}
@@ -125,28 +125,27 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          resources:
-          {{- toYaml .Values.vminsert.resources | indent 12 }}
+          resources: {{- toYaml .Values.vminsert.resources | nindent 12 }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{ toYaml . | indent 2 }}
+        {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.vminsert.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | indent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.vminsert.securityContext }}
       securityContext:
-        {{- toYaml . | indent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
       {{- with .Values.vminsert.tolerations }}
       tolerations:
-        {{- toYaml . | indent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.vminsert.affinity }}
       affinity:
-      {{- toYaml .Values.vminsert.affinity | indent 8 }}
+      {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.vminsert.extraVolumes }}
       volumes:
