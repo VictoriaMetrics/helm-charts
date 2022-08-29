@@ -45,8 +45,9 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.server.name }}
-          securityContext:
-            {{- toYaml .Values.server.podSecurityContext | nindent 12 }}
+          {{- with  .Values.server.podSecurityContext }}
+          securityContext: {{- toYaml . | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
           imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
           {{- if .Values.server.containerWorkingDir }}
