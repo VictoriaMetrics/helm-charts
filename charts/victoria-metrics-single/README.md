@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.8.33](https://img.shields.io/badge/Version-0.8.33-informational?style=flat-square)
+ ![Version: 0.8.34](https://img.shields.io/badge/Version-0.8.34-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -152,7 +152,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.persistentVolume.existingClaim | string | `""` | Existing Claim name. If defined, PVC must be created manually before volume will be bound |
 | server.persistentVolume.matchLabels | object | `{}` | Bind Persistent Volume by labels. Must match all labels of targeted PV. |
 | server.persistentVolume.mountPath | string | `"/storage"` | Mount path. Server data Persistent Volume mount root path. |
-| server.persistentVolume.size | string | `"16Gi"` | Size of the volume. Better to set the same as resource limit memory property. |
+| server.persistentVolume.size | string | `"16Gi"` | Size of the volume. Should be calculated based on the metrics you send and retention policy you set. |
 | server.persistentVolume.storageClass | string | `""` | StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically |
 | server.persistentVolume.subPath | string | `""` | Mount subpath |
 | server.podAnnotations | object | `{}` | Pod's annotations |

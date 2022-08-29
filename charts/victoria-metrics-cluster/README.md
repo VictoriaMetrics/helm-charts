@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.9.32](https://img.shields.io/badge/Version-0.9.32-informational?style=flat-square)
+ ![Version: 0.9.34](https://img.shields.io/badge/Version-0.9.34-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
