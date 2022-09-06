@@ -67,6 +67,11 @@ spec:
           ports:
             - name: http
               containerPort: 8481
+          {{- if .Values.vmselect.extraArgs.clusternativeListenAddr }}
+            - name: cluster-tcp
+              protocol: TCP
+              containerPort: {{ include "split-host-port" .Values.vmselect.extraArgs.clusternativeListenAddr }}
+          {{- end }}
           readinessProbe:
             httpGet:
               path: /health
