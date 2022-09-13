@@ -60,11 +60,39 @@ spec:
           args:
             - -rule=/config/alert-rules.yaml
             - -datasource.url={{ .Values.server.datasource.url}}
+            {{- if or .Values.server.datasource.basicAuth.password .Values.server.datasource.basicAuth.username  }}
             - -datasource.basicAuth.password={{ .Values.server.datasource.basicAuth.password}}
             - -datasource.basicAuth.username={{ .Values.server.datasource.basicAuth.username}}
+            {{- end }}
+            {{- with .Values.server.datasource.bearer.token }}
+            - -datasource.bearerToken={{ . }}
+            {{- end }}
+            {{- with .Values.server.datasource.bearer.tokenFile }}
+            - -datasource.bearerTokenFile={{ . }}
+            {{- end }}
             - -notifier.url={{ include "vmalert.alertmanager.url" . }}
-            - -remoteRead.url={{ .Values.server.remote.read.url}}
-            - -remoteWrite.url={{ .Values.server.remote.write.url}}
+            - -remoteRead.url={{ .Values.server.remote.read.url }}
+            {{- if or .Values.server.remote.read.basicAuth.password .Values.server.remote.read.basicAuth.username }}
+            - -remoteRead.basicAuth.password={{ .Values.server.remote.read.basicAuth.password }}
+            - -remoteRead.basicAuth.username={{ .Values.server.remote.read.basicAuth.username }}
+            {{- end }}
+            {{- with .Values.server.remote.read.bearer.token }}
+            - -remoteRead.bearerToken={{ . }}
+            {{- end }}
+            {{- with .Values.server.remote.read.bearer.tokenFile }}
+            - -remoteRead.bearerTokenFile={{ . }}
+            {{- end }}
+            - -remoteWrite.url={{ .Values.server.remote.write.url }}
+             {{- if or .Values.server.remote.write.basicAuth.password .Values.server.remote.write.basicAuth.username  }}
+            - -remoteWrite.basicAuth.password={{ .Values.server.remote.write.basicAuth.password }}
+            - -remoteWrite.basicAuth.username={{ .Values.server.remote.write.basicAuth.username }}
+            {{- end }}
+            {{- with .Values.server.remote.write.bearer.token }}
+            - -remoteWrite.bearerToken={{ . }}
+            {{- end }}
+            {{- with .Values.server.remote.write.bearer.tokenFile }}
+            - -remoteWrite.bearerTokenFile={{ . }}
+            {{- end }}
           {{- range $key, $value := .Values.server.extraArgs }}
               {{- if eq $key "rule" }}
             - -{{ $key }}={{ $value | quote}}
