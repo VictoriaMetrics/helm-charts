@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.4.36](https://img.shields.io/badge/Version-0.4.36-informational?style=flat-square)
+ ![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
@@ -149,8 +149,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.annotations | object | `{}` |  |
 | server.config.alerts.groups | list | `[]` |  |
 | server.configMap | string | `""` |  |
-| server.datasource.basicAuth.password | string | `""` |  |
-| server.datasource.basicAuth.username | string | `""` |  |
+| server.datasource.basicAuth | object | `{"password":"","username":""}` | Basic auth for datasource |
+| server.datasource.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
+| server.datasource.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |
 | server.datasource.url | string | `""` |  |
 | server.enabled | bool | `true` |  |
 | server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
@@ -183,7 +184,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.podLabels | object | `{}` |  |
 | server.podSecurityContext | object | `{}` |  |
 | server.priorityClassName | string | `""` |  |
+| server.remote.read.basicAuth | object | `{"password":"","username":""}` | Basic auth for remote read |
+| server.remote.read.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
+| server.remote.read.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |
 | server.remote.read.url | string | `""` |  |
+| server.remote.write.basicAuth | object | `{"password":"","username":""}` | Basic auth for remote write |
+| server.remote.write.bearer | object | `{"token":"","tokenFile":""}` | Auth based on Bearer token for remote write |
+| server.remote.write.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
+| server.remote.write.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |
 | server.remote.write.url | string | `""` |  |
 | server.replicaCount | int | `1` |  |
 | server.resources | object | `{}` |  |
