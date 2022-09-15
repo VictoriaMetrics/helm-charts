@@ -85,17 +85,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- define "victoria-metrics-k8s-stack.vmSelectEndpoint" -}}
 {{- if .Values.vmsingle.enabled -}}
-{{ printf "http://%s.%s.svc:%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") }}
+{{ printf "http://%s.%s.svc:%s%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "/") }}
 {{- else if .Values.vmcluster.enabled -}}
-{{ printf "http://%s-%s.%s.svc:%s/select/0/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default "8481") }}
+{{ printf "http://%s-%s.%s.svc:%s%s/select/0/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default "8481") (index .Values "vmcluster" "spec" "vmselect" "extraArgs" "http.pathPrefix" | default "/") }}
 {{- end }}
 {{- end }}
 
 {{- define "victoria-metrics-k8s-stack.vmSingleInsertEndpoint" -}}
-{{ printf "http://%s.%s.svc:%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") }}
+{{ printf "http://%s.%s.svc:%s%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "/") }}
 {{- end }}
 {{- define "victoria-metrics-k8s-stack.vmClusterInsertEndpoint" -}}
-{{ printf "http://%s-%s.%s.svc:%s/insert/0/prometheus" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default "8480") }}
+{{ printf "http://%s-%s.%s.svc:%s%s/insert/0/prometheus" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default "8480") (index .Values "vmcluster" "spec" "vminsert" "extraArgs" "http.pathPrefix" | default "/") }}
 {{- end }}
 
 {{/*
