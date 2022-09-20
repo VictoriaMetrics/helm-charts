@@ -35,6 +35,12 @@ spec:
       port: {{ .Values.vmselect.service.servicePort }}
       protocol: TCP
       targetPort: http
+  {{- if .Values.vmselect.extraArgs.clusternativeListenAddr }}
+    - name: cluster-tcp
+      protocol: TCP
+      port: {{ include "split-host-port" .Values.vmselect.extraArgs.clusternativeListenAddr }}
+      targetPort: cluster-tcp
+  {{- end }}
   selector:
     {{- include "victoria-metrics.vmselect.matchLabels" . | nindent 4 }}
   type: "{{ .Values.vmselect.service.type }}"
