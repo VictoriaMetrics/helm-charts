@@ -1,4 +1,4 @@
-# Helm Chart For Victoria Metrics Alert.
+# Helm Chart For Victoria Metrics Alert
 
  ![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square)
 
@@ -99,6 +99,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | alertmanager.baseURL | string | `""` |  |
+| alertmanager.baseURLPrefix | string | `""` |  |
 | alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
 | alertmanager.config.receivers[0].name | string | `"devnull"` |  |
 | alertmanager.config.route.group_by[0] | string | `"alertname"` |  |
@@ -154,7 +155,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.datasource.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |
 | server.datasource.url | string | `""` |  |
 | server.enabled | bool | `true` |  |
-| server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) <https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables> |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
