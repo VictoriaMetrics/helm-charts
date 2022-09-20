@@ -66,15 +66,42 @@ server:
   # MetricsQL or PromQL.
   datasource:
     url: ""
+    # -- Basic auth for datasource
     basicAuth:
       username: ""
       password: ""
+      # -- Auth based on Bearer token for datasource
+    bearer:
+      # -- Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string
+      token: ""
+      # -- Token Auth file with Bearer token. You can use one of token or tokenFile
+      tokenFile: ""
 
   remote:
     write:
       url: ""
+      # -- Basic auth for remote write
+      basicAuth:
+        username: ""
+        password: ""
+      # -- Auth based on Bearer token for remote write
+      bearer:
+        # -- Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string
+        token: ""
+        # -- Token Auth file with Bearer token. You can use one of token or tokenFile
+        tokenFile: ""
     read:
       url: ""
+      # -- Basic auth for remote read
+      basicAuth:
+        username: ""
+        password: ""
+        # -- Auth based on Bearer token for remote read
+      bearer:
+        # -- Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string
+        token: ""
+        # -- Token Auth file with Bearer token. You can use one of token or tokenFile
+        tokenFile: ""
 
   notifier:
     alertmanager:
@@ -97,9 +124,9 @@ server:
   # Extra Volumes for the pod
   extraVolumes:
     []
-     #- name: example
-     #  configMap:
-     #    name: example
+    #- name: example
+    #  configMap:
+    #    name: example
 
   # Extra Volume Mounts for the container
   extraVolumeMounts:
@@ -209,9 +236,9 @@ serviceMonitor:
   relabelings: []
 #    interval: 15s
 #    scrapeTimeout: 5s
-  # -- Commented. HTTP scheme to use for scraping.
+# -- Commented. HTTP scheme to use for scraping.
 #    scheme: https
-  # -- Commented. TLS configuration to use when scraping the endpoint
+# -- Commented. TLS configuration to use when scraping the endpoint
 #    tlsConfig:
 #      insecureSkipVerify: true
 
@@ -235,6 +262,8 @@ alertmanager:
 
   # external URL, that alertmanager will expose to receivers
   baseURL: ""
+  # external URL Prefix, Prefix for the internal routes of web endpoints
+  baseURLPrefix: ""
   # use existing configmap if specified
   # otherwise .config values will be used
   configMap: ""

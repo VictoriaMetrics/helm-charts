@@ -31,6 +31,18 @@ spec:
               kubectl delete vmalertmanagers --all --ignore-not-found=true;
               kubectl delete vmclusters --all --ignore-not-found=true;
       restartPolicy: OnFailure
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
 ---
 {{- if .Values.operator.cleanupSA.create }}
 apiVersion: v1
