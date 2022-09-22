@@ -61,7 +61,7 @@ helm install vmgateway vm/victoria-metrics-gateway -f values.yaml -n NAMESPACE
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'vminsert\|vmselect\|vmstorage'
+kubectl get pods -A | grep 'vmgateway'
 ```
 
 Get the application by running this command:
