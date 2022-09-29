@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmgateway
 
- ![Version: 0.1.14](https://img.shields.io/badge/Version-0.1.14-informational?style=flat-square)
+ ![Version: 0.1.15](https://img.shields.io/badge/Version-0.1.15-informational?style=flat-square)
 
 Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
 
@@ -110,7 +110,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | annotations | object | `{}` | Annotations to be added to the deployment |
 | auth | object | `{"enable":false}` | Access Control configuration. https://docs.victoriametrics.com/vmgateway.html#access-control |
 | auth.enable | bool | `false` | Enable/Disable access-control |
-| cluserMode | bool | `false` | Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting |
+| clusterMode | bool | `false` | Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting |
 | configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmgateway.html |
 | containerWorkingDir | string | `"/"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |

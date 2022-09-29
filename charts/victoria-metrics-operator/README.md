@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.14.2](https://img.shields.io/badge/Version-0.14.2-informational?style=flat-square)
+ ![Version: 0.14.3](https://img.shields.io/badge/Version-0.14.3-informational?style=flat-square)
 
 Victoria Metrics Operator
 
@@ -164,8 +164,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | nameOverride | string | `""` | VM operatror deployment name override |
 | nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/ |
 | operator.disable_prometheus_converter | bool | `false` | By default, operator converts prometheus-operator objects. |
-| operator.prometheus_converter_add_argocd_ignore_annotations | bool | `false` | Compare-options and sync-options for prometheus objects converted by operator for properly use with ArgoCD. |
 | operator.enable_converter_ownership | bool | `false` | Enables ownership reference for converted prometheus-operator objects, it will remove corresponding victoria-metrics objects in case of deletion prometheus one. |
+| operator.prometheus_converter_add_argocd_ignore_annotations | bool | `false` | Compare-options and sync-options for prometheus objects converted by operator for properly use with ArgoCD |
 | operator.psp_auto_creation_enabled | bool | `true` | By default, operator creates psp for its objects. |
 | operator.useCustomConfigReloader | bool | `false` | Enables custom config-reloader, bundled with operator. It should reduce  vmagent and vmauth config sync-time and make it predictable. |
 | podLabels | object | `{}` |  |

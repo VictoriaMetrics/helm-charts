@@ -425,7 +425,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
-| tenant | string | `"0"` | Default tenant for vmagent (remoteWrite), vmalert (remoteWrite,remoteRead,datasource) and grafana(default datasource) |
+| tenant | string | `"0"` |  |
 | victoria-metrics-operator | object | `{"createCRD":false,"operator":{"disable_prometheus_converter":true}}` | For possible values refer to https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator#parameters |
 | victoria-metrics-operator.createCRD | bool | `false` | all values for victoria-metrics-operator helm chart can be specified here |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
