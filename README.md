@@ -103,3 +103,4 @@ helm charts tested at kubernetes versions from 1.13 to 1.22.
 - [Victoria Metrics k8s Stack](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-k8s-stack/README.md)
 - [Victoria Metrics Operator](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-operator/README.md)
 - [Victoria Metrics Single-node](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-single/README.md)
+- [Victoria Metrics](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-gateway/README.md)
