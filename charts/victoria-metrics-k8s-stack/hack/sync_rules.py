@@ -65,6 +65,7 @@ condition_map = {
     'etcd': '.Values.kubeEtcd.enabled .Values.defaultRules.rules.etcd',
     'general.rules': '.Values.defaultRules.rules.general',
     'k8s.rules': '.Values.defaultRules.rules.k8s',
+    'kube-apiserver-burnrate.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverBurnrate',
     'kube-apiserver-availability.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverAvailability',
     'kube-apiserver-slos': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverSlos',
     'kube-apiserver.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserver',

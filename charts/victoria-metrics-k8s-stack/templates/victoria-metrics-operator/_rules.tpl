@@ -7,6 +7,7 @@ rules:
   - "etcd"
   - "general.rules"
   - "k8s.rules"
+  - "kube-apiserver-burnrate.rules"
   - "kube-apiserver-availability.rules"
   - "kube-apiserver-slos"
   - "kube-apiserver.rules"
