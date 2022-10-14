@@ -57,6 +57,9 @@ spec:
             {{ if .Values.alertmanager.baseURL }}
             - --web.external-url={{ .Values.alertmanager.baseURL }}
             {{- end }}
+            {{ if .Values.alertmanager.baseURLPrefix }}
+            - --web.route-prefix={{ .Values.alertmanager.baseURLPrefix }}
+            {{- end }}
             {{- range $key, $value := .Values.alertmanager.extraArgs }}
             - --{{ $key }}={{ $value }}
             {{- end }}
@@ -71,11 +74,19 @@ spec:
                   fieldPath: status.podIP
           readinessProbe:
             httpGet:
+              {{ if .Values.alertmanager.baseURLPrefix }}
+              path: {{ .Values.alertmanager.baseURLPrefix }}/-/ready
+              {{- else}}
               path: /-/ready
+              {{- end }}
               port: web
           livenessProbe:
             httpGet:
+              {{ if .Values.alertmanager.baseURLPrefix }}
+              path: {{ .Values.alertmanager.baseURLPrefix }}/-/healthy
+              {{- else}}
               path: /-/healthy
+              {{- end }}
               port: web
           volumeMounts:
             - name: storage

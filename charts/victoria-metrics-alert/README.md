@@ -99,6 +99,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | alertmanager.baseURL | string | `""` |  |
+| alertmanager.baseURLPrefix | string | `""` |  |
 | alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
 | alertmanager.config.receivers[0].name | string | `"devnull"` |  |
 | alertmanager.config.route.group_by[0] | string | `"alertname"` |  |

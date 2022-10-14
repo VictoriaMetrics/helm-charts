@@ -425,6 +425,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
+| tenant | string | `"0"` |  |
 | victoria-metrics-operator | object | `{"createCRD":false,"operator":{"disable_prometheus_converter":true}}` | For possible values refer to https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator#parameters |
 | victoria-metrics-operator.createCRD | bool | `false` | all values for victoria-metrics-operator helm chart can be specified here |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
@@ -441,7 +442,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.ingress.tls | list | `[]` |  |
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
-| vmagent.spec.image.tag | string | `"v1.81.2"` |  |
+| vmagent.spec.image.tag | string | `"v1.82.1"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
 | vmagent.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.annotations | object | `{}` |  |
@@ -455,7 +456,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.ingress.pathType | string | `"Prefix"` |  |
 | vmalert.ingress.tls | list | `[]` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
-| vmalert.spec.image.tag | string | `"v1.81.2"` |  |
+| vmalert.spec.image.tag | string | `"v1.82.1"` |  |
 | vmalert.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.templateFiles | object | `{}` |  |
 | vmcluster.annotations | object | `{}` |  |
@@ -486,17 +487,17 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.ingress.storage.tls | list | `[]` |  |
 | vmcluster.spec.replicationFactor | int | `2` |  |
 | vmcluster.spec.retentionPeriod | string | `"14"` |  |
-| vmcluster.spec.vminsert.image.tag | string | `"v1.81.2-cluster"` |  |
+| vmcluster.spec.vminsert.image.tag | string | `"v1.82.1-cluster"` |  |
 | vmcluster.spec.vminsert.replicaCount | int | `2` |  |
 | vmcluster.spec.vminsert.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.cacheMountPath | string | `"/select-cache"` |  |
-| vmcluster.spec.vmselect.image.tag | string | `"v1.81.2-cluster"` |  |
+| vmcluster.spec.vmselect.image.tag | string | `"v1.82.1-cluster"` |  |
 | vmcluster.spec.vmselect.replicaCount | int | `2` |  |
 | vmcluster.spec.vmselect.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"2Gi"` |  |
-| vmcluster.spec.vmstorage.image.tag | string | `"v1.81.2-cluster"` |  |
+| vmcluster.spec.vmstorage.image.tag | string | `"v1.82.1-cluster"` |  |
 | vmcluster.spec.vmstorage.replicaCount | int | `2` |  |
 | vmcluster.spec.vmstorage.resources | object | `{}` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"image":{"tag":"v1.81.2"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"image":{"tag":"v1.82.1"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
