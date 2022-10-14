@@ -34,7 +34,7 @@ rules:
   - nonResourceURLs: [ "/metrics" ]
     verbs: [ "get" ]
   {{- end }}
-  {{- if .Values.rbac.pspEnabled  }}
+  {{- if and .Values.rbac.pspEnabled (.Capabilities.APIVersions.Has "policy/v1beta1") }}
   - apiGroups:      ['extensions']
     resources:      ['podsecuritypolicies']
     verbs:          ['use']
