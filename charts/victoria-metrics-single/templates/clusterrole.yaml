@@ -16,6 +16,11 @@ metadata:
 {{- if or .Values.rbac.pspEnabled .Values.server.scrape.enabled }}
 rules:
   {{- if .Values.server.scrape.enabled }}
+  - apiGroups:
+    - discovery.k8s.io
+    resources:
+    - endpointslices
+    verbs: ["get", "list", "watch"]
   - apiGroups: [ "" ]
     resources:
       - nodes

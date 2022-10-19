@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.12.4](https://img.shields.io/badge/Version-0.12.4-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.12.6](https://img.shields.io/badge/Version-0.12.6-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -292,6 +292,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rules.k8s | bool | `true` |  |
 | defaultRules.rules.kubeApiserver | bool | `true` |  |
 | defaultRules.rules.kubeApiserverAvailability | bool | `true` |  |
+| defaultRules.rules.kubeApiserverBurnrate | bool | `true` |  |
 | defaultRules.rules.kubeApiserverSlos | bool | `true` |  |
 | defaultRules.rules.kubePrometheusGeneral | bool | `true` |  |
 | defaultRules.rules.kubePrometheusNodeRecording | bool | `true` |  |
@@ -487,10 +488,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.ingress.storage.tls | list | `[]` |  |
 | vmcluster.spec.replicationFactor | int | `2` |  |
 | vmcluster.spec.retentionPeriod | string | `"14"` |  |
+| vmcluster.spec.vminsert.extraArgs | object | `{}` |  |
 | vmcluster.spec.vminsert.image.tag | string | `"v1.82.1-cluster"` |  |
 | vmcluster.spec.vminsert.replicaCount | int | `2` |  |
 | vmcluster.spec.vminsert.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.cacheMountPath | string | `"/select-cache"` |  |
+| vmcluster.spec.vmselect.extraArgs | object | `{}` |  |
 | vmcluster.spec.vmselect.image.tag | string | `"v1.82.1-cluster"` |  |
 | vmcluster.spec.vmselect.replicaCount | int | `2` |  |
 | vmcluster.spec.vmselect.resources | object | `{}` |  |
@@ -500,4 +503,4 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.spec.vmstorage.resources | object | `{}` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"image":{"tag":"v1.82.1"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.82.1"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
