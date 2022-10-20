@@ -29,7 +29,7 @@ rules:
   - "node-network"
   - "node.rules"
   - "vmagent"
-  - "alertmaanger"
+  - "alertmanager"
   - "vmsingle"
   - "vm-health"
 {{- end }}
