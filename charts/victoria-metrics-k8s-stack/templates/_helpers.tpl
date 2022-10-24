@@ -197,3 +197,36 @@ configMaps:
 {{- end }}
 {{- end }}
 
+
+
+{{ define "vmalertProxyURL" }}
+{{- if .Values.vmalert.enabled }}
+{{- printf "http://vmalert-%s.%s.svc:8080" (include "victoria-metrics-k8s-stack.fullname" . ) .Release.Namespace  -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Single spec
+*/}}
+{{ define "victoria-metrics-k8s-stack.VMSingleSpec" }}
+{{- $extraArgsProxy := default dict -}}
+{{- if .Values.vmalert.enabled }}
+{{- $_ := set $extraArgsProxy "vmalert.proxyURL" (include "vmalertProxyURL" . ) -}}
+{{- end }}
+{{ deepCopy .Values.vmsingle.spec | mergeOverwrite (dict "extraArgs" $extraArgsProxy) | toYaml }}
+{{- end }}
+
+
+{{/*
+Cluster spec
+*/}}
+{{ define "vmselectSpec" }}
+vmselect:
+  extraArgs:
+    vmalert.proxyURL: {{ include "vmalertProxyURL" . | quote }}
+{{- end }}
+
+
+{{ define "victoria-metrics-k8s-stack.VMClusterSpec"}}
+{{ deepCopy .Values.vmcluster.spec | mergeOverwrite ( include "vmselectSpec" . | fromYaml) | toYaml }}
+{{- end }}
