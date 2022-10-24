@@ -21,6 +21,13 @@ spec:
         - name: kubectl
           image: "{{ .Values.operator.kubectlImage.repository }}:{{ .Values.operator.kubectlImage.tag }}"
           imagePullPolicy: "{{ .Values.operator.kubectlImage.pullPolicy }}"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "100m"
+              memory: "56Mi"
           command:
             - /bin/sh
             - -c
