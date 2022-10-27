@@ -204,3 +204,53 @@ Return if ingress supports pathType.
 {{- define "victoria-metrics.ingress.supportsPathType" -}}
   {{- or (eq (include "victoria-metrics.ingress.isStable" .) "true") (and (eq (include "victoria-metrics.ingress.apiVersion" .) "networking.k8s.io/v1beta1")) -}}
 {{- end -}}
+
+
+{{- define "victoria-metrics.storage.hasInitContainer" -}}
+    {{- or (gt (len .Values.vmstorage.initContainers) 0)  .Values.vmstorage.vmbackupmanager.restore.onStart.enabled -}}
+{{- end -}}
+
+{{- define "victoria-metrics.storage.initContiners" -}}
+{{- if eq (include "victoria-metrics.storage.hasInitContainer" . ) "true" -}}
+{{- with .Values.vmstorage.initContainers -}}
+{{ toYaml . }}
+{{- end -}}
+{{- if .Values.vmstorage.vmbackupmanager.restore.onStart.enabled }}
+- name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
+  image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
+  imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
+  args:
+    - restore
+    - {{ printf "%s=%t" "--eula" .Values.vmstorage.vmbackupmanager.eula | quote}}
+    - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
+    {{- range $key, $value := .Values.vmstorage.vmbackupmanager.extraArgs }}
+    - --{{ $key }}={{ $value }}
+    {{- end }}
+  {{- with .Values.vmstorage.vmbackupmanager.resources }}
+  resources: {{ toYaml . | nindent 12 }}
+  {{- end }}
+  env:
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+  {{- with .Values.vmstorage.vmbackupmanager.env }}
+  {{- toYaml . | nindent 12 }}
+  {{- end }}
+  ports:
+    - name: manager-http
+      containerPort: 8300
+  volumeMounts:
+    - name: vmstorage-volume
+      mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
+      subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
+    {{- range .Values.vmstorage.vmbackupmanager.extraSecretMounts }}
+    - name: {{ .name }}
+      mountPath: {{ .mountPath }}
+      subPath: {{ .subPath }}
+    {{- end }}
+{{- end }}
+{{- else -}}
+[]
+{{- end -}}
+{{- end -}}
