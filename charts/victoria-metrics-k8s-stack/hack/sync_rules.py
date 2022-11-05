@@ -25,7 +25,7 @@ def change_style(style, representer):
 
 # Source files list
 charts = [
-        {
+    {
         'source': 'https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/alertmanager-prometheusRule.yaml',
         'destination': '../templates/rules',
     },
@@ -45,7 +45,18 @@ charts = [
         'source': 'https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/nodeExporter-prometheusRule.yaml',
         'destination': '../templates/rules',
     },
-    
+    {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-cluster.yml',
+        'destination': '../templates/rules',
+    },
+    {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-health.yml',
+        'destination': '../templates/rules',
+    },
+    {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-vmagent.yml',
+        'destination': '../templates/rules',
+    },
     {
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts.yml',
         'destination': '../templates/rules',
@@ -86,8 +97,9 @@ condition_map = {
     'node-exporter.rules': '.Values.defaultRules.rules.node',
     'node-network': '.Values.defaultRules.rules.network',
     'node.rules': '.Values.defaultRules.rules.node',
-    'vmagent': '.Values.vmagent.enabled .Values.defaultRules.rules.vmagent' ,
+    'vmagent': '.Values.vmagent.enabled .Values.defaultRules.rules.vmagent',
     'alertmaanger': '.Values.defaultRules.rules.alertmanager',
+    'vmcluster': '.Values.defaultRules.rules.vmcluster',
     'vmsingle': '.Values.defaultRules.rules.vmsingle',
     'vm-health': '.Values.defaultRules.rules.vmhealth'
 }
