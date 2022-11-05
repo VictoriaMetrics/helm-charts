@@ -89,18 +89,6 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: TooManyLogs
-      annotations:
-        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=67&var-instance={{`{{`}} $labels.instance {{`}}`}}
-        description: "Logging rate for job \"{{`{{`}} $labels.job {{`}}`}}\" ({{`{{`}} $labels.instance {{`}}`}}) is {{`{{`}} $value {{`}}`}} for last 15m.\n Worth to check logs for specific error messages."
-        summary: Too many logs printed for job "{{`{{`}} $labels.job {{`}}`}}" ({{`{{`}} $labels.instance {{`}}`}})
-      expr: sum(increase(vm_log_messages_total{level="error"}[5m])) by (job, instance) > 0
-      for: 15m
-      labels:
-        severity: warning
-{{- if .Values.defaultRules.additionalRuleLabels }}
-{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
-{{- end }}
     - alert: RowsRejectedOnIngestion
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=58&var-instance={{`{{`}} $labels.instance {{`}}`}}

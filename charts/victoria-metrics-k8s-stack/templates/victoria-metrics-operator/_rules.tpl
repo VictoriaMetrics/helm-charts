@@ -29,7 +29,8 @@ rules:
   - "node-network"
   - "node.rules"
   - "vmagent"
-  - "alertmanager"
+  - "alertmaanger"
+  - "vmcluster"
   - "vmsingle"
   - "vm-health"
 {{- end }}

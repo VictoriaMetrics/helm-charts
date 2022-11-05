@@ -1,5 +1,5 @@
 {{- /*
-Generated from 'vm-health' group from https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts.yml
+Generated from 'vm-health' group from https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-health.yml
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
@@ -25,9 +25,9 @@ spec:
     rules:
     - alert: TooManyRestarts
       annotations:
-        description: Job {{`{{`}} $labels.job {{`}}`}} has restarted more than twice in the last 15 minutes. It might be crashlooping.
+        description: Job {{`{{`}} $labels.job {{`}}`}} (instance {{`{{`}} $labels.instance {{`}}`}}) has restarted more than twice in the last 15 minutes. It might be crashlooping.
         summary: '{{`{{`}} $labels.job {{`}}`}} too many restarts (instance {{`{{`}} $labels.instance {{`}}`}})'
-      expr: changes(process_start_time_seconds{job=~"victoriametrics|vmagent|vmalert"}[15m]) > 2
+      expr: changes(process_start_time_seconds{job=~"victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert"}[15m]) > 2
       labels:
         severity: critical
 {{- if .Values.defaultRules.additionalRuleLabels }}
@@ -37,7 +37,7 @@ spec:
       annotations:
         description: '{{`{{`}} $labels.instance {{`}}`}} of job {{`{{`}} $labels.job {{`}}`}} has been down for more than 2 minutes.'
         summary: Service {{`{{`}} $labels.job {{`}}`}} is down on {{`{{`}} $labels.instance {{`}}`}}
-      expr: up{job=~"victoriametrics|vmagent|vmalert"} == 0
+      expr: up{job=~"victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert"} == 0
       for: 2m
       labels:
         severity: critical
@@ -74,6 +74,17 @@ spec:
       for: 5m
       labels:
         severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: TooManyLogs
+      annotations:
+        description: "Logging rate for job \"{{`{{`}} $labels.job {{`}}`}}\" ({{`{{`}} $labels.instance {{`}}`}}) is {{`{{`}} $value {{`}}`}} for last 15m.\n Worth to check logs for specific error messages."
+        summary: Too many logs printed for job "{{`{{`}} $labels.job {{`}}`}}" ({{`{{`}} $labels.instance {{`}}`}})
+      expr: sum(increase(vm_log_messages_total{level="error"}[5m])) by (job, instance) > 0
+      for: 15m
+      labels:
+        severity: warning
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
