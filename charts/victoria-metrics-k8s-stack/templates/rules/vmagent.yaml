@@ -1,5 +1,5 @@
 {{- /*
-Generated from 'vmagent' group from https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts.yml
+Generated from 'vmagent' group from https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-vmagent.yml
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
@@ -90,7 +90,7 @@ spec:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/G7Z9GzMGz?viewPanel=84&var-instance={{`{{`}} $labels.instance {{`}}`}}
         description: "The remote write connection between vmagent \"{{`{{`}} $labels.job {{`}}`}}\" (instance {{`{{`}} $labels.instance {{`}}`}}) and destination \"{{`{{`}} $labels.url {{`}}`}}\" is saturated by more than 90% and vmagent won't be able to keep up.\n This usually means that `-remoteWrite.queues` command-line flag must be increased in order to increase the number of connections per each remote storage."
         summary: Remote write connection from "{{`{{`}} $labels.job {{`}}`}}" (instance {{`{{`}} $labels.instance {{`}}`}}) to {{`{{`}} $labels.url {{`}}`}} is saturated
-      expr: rate(vmagent_remotewrite_send_duration_seconds_total[5m]) > 0.9
+      expr: "sum(rate(vmagent_remotewrite_send_duration_seconds_total[5m])) by(job, instance, url) \n> 0.9 * max(vmagent_remotewrite_queues) by(job, instance, url)"
       for: 15m
       labels:
         severity: warning
