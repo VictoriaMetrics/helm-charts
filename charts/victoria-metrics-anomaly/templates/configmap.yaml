@@ -15,10 +15,12 @@ data:
       class: "model.prophet.ProphetModel"
       {{- toYaml .Values.model.prophet | nindent 6 }}
     {{- end }}
+
     {{- if eq .Values.model.enabled "holt_winters" }}
       class: "model.holtwinters.HoltWinters"
       {{- toYaml .Values.model.holt_winters | nindent 6 }}
     {{- end }}
+
     scheduler:
       {{- toYaml .Values.scheduler | nindent 6 }}
     reader:
@@ -46,9 +48,21 @@ data:
         password: "{{ .Values.remote.write.basicAuth.password }}"
       {{ end -}}
       metric_names:
-        anomaly_score: "{{ .Values.remote.write.metric_names.anomaly_score }}"
-        yhat: "{{ .Values.remote.write.metric_names.yhat }}"
+        {{- if eq .Values.model.enabled "zscore" }}
+          anomaly_score: "{{ .Values.metric_names.anomaly_score }}"
+          yhat: "{{ .Values.metric_names.yhat }}"
+        {{- end }}
+        {{- if eq .Values.model.enabled "holtwinters" }}
+          anomaly_score: "{{ .Values.metric_names.anomaly_score }}"
+          yhat: "{{ .Values.metric_names.yhat }}"
+        {{- end }}
+        {{- if eq .Values.model.enabled "holtwinters" }}
+          anomaly_score: "{{ .Values.metric_names.anomaly_score }}"
+          yhat: "{{ .Values.metric_names.yhat }}"
+          yhat_lower: yhat_lower
+          yhat_upper: yhat_upper
+          value: value
+        {{- end }}
       extra_labels:
-        model: "{{ .Values.remote.write.extra_labels.model }}"
-
+        model: "{{ .Values.extra_labels.model | quote }}"
 
