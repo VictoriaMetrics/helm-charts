@@ -113,13 +113,13 @@ eula: false
 remote:
   read:
     url: "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428"
-    tenant: "" # Format: vm_account_id:vm_project_id (for example: 0:0)
+    tenant: "" # -- Format: vm_account_id:vm_project_id (for example: 0:0)
     basicAuth:
       username: ""
       password: ""
   write:
     url: "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428"
-    tenant: "" # Format: vm_account_id:vm_project_id (for example: 0:0)
+    tenant: "" # -- Format: vm_account_id:vm_project_id (for example: 0:0)
     basicAuth:
       username: ""
       password: ""
@@ -149,8 +149,9 @@ model:
     frequency: '1h'
 
 queries:
-  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
-  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'
-  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'
-  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
-  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
+# -- Example of queries which can be used for vmanomaly
+#  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
+#  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'
+#  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'
+#  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
+#  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'

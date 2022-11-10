@@ -1,10 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
-[![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
-[![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
-![Twitter Follow](https://img.shields.io/twitter/follow/VictoriaMetrics?style=social)
-![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/VictoriaMetrics?style=social)
+ ![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square)
 
 Victoria Metrics Anomaly Detection - a service that continuously scans Victoria Metrics time series and detects unexpected changes within data patterns in real-time.
 
@@ -32,7 +28,7 @@ helm repo add vm https://victoriametrics.github.io/helm-charts/
 helm repo update
 ```
 
-List versions of ``vm/victoria-metrics-anomaly` chart available to installation:
+List versions of ``vm/victoria-metrics-anomaly`` chart available to installation:
 
 ##### for helm v3
 
@@ -96,6 +92,7 @@ Generate docs with ``helm-docs`` command.
 
 ```bash
 cd charts/victoria-metrics-anomaly
+
 helm-docs
 ```
 
@@ -105,23 +102,15 @@ The markdown generation is entirely go template driven. The tool parses metadata
 
 The following tables lists the configurable parameters of the chart and their default values.
 
-Change the values according to the need of the environment in ``victoria-metrics-cd charts/victoria-metrics-anomaly/values.yaml`` file.
+Change the values according to the need of the environment in ``victoria-metrics-anomaly/values.yaml`` file.
 
-
-# Section should be updated
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity configurations |
 | annotations | object | `{}` | Annotations to be added to the deployment |
-| auth | object | `{"enable":false}` | Access Control configuration. https://docs.victoriametrics.com/vmgateway.html#access-control |
-| auth.enable | bool | `false` | Enable/Disable access-control |
-| cluserMode | bool | `false` | Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting |
-| configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://docs.victoriametrics.com/vmanomaly.html |
-| containerWorkingDir | string | `"/"` |  |
-| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| containerWorkingDir | string | `"/vmanomaly"` |  |
+| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) |
 | eula | bool | `false` | should be true and means that you have the legal right to run a vmgateway that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/eula/ |
-| extraArgs."envflag.enable" | string | `"true"` |  |
-| extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | extraArgs.loggerFormat | string | `"json"` |  |
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
@@ -129,43 +118,47 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
-| image.repository | string | `"victoriametrics/vmgateway"` | Victoria Metrics gateway Docker repository and image name |
-| image.tag | string | `"v1.75.1-enterprise"` | Tag of Docker image |
+| image.repository | string | `"us-docker.pkg.dev/victoriametrics-test/public/vmanomaly-trial"` | Victoria Metrics anomaly Docker repository and image name |
+| image.tag | string | `"v0.21.0"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.extraLabels | object | `{}` |  |
-| ingress.hosts | list | `[]` |  |
-| ingress.pathType | string | `"Prefix"` |  |
-| ingress.tls | list | `[]` |  |
+| model.enabled | string | `"zscore"` |  |
+| model.holt_winters.frequency | string | `"1h"` |  |
+| model.holt_winters.seasonality | string | `"1d"` |  |
+| model.prophet.interval_width | float | `0.8` |  |
+| model.zscore.z_threshold | float | `2.5` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | podSecurityContext | object | `{}` |  |
-| rateLimiter | object | `{"config":"","datasource":{"url":""},"enable":false}` | Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway.html#rate-limiter |
-| rateLimiter.datasource.url | string | `""` | Datasource VictoriaMetrics or vmselects. Required. Example http://victoroametrics:8428 or http://vmselect:8481/select/0/prometheus |
-| rateLimiter.enable | bool | `false` | Enable/Disable rate-limiting |
-| read.url | string | `""` | Read endpoint without suffixes, victoriametrics or vmselect. Example http://victoroametrics:8428 or http://vmselect:8481 |
-| replicaCount | int | `1` | Number of replicas of vmgateway |
-| resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
+| queries.active_timeseries | string | `"sum(vm_cache_entries{type=\"storage/hour_metric_ids\"})"` |  |
+| queries.churn_rate | string | `"sum(rate(vm_new_timeseries_created_total[5m]))"` |  |
+| queries.ingestion_rate | string | `"sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0"` |  |
+| queries.insertion_rate | string | `"sum(rate(vm_http_requests_total{path=~\"/api/v1/write|.*insert.*\"}[5m])) by (path) > 0"` |  |
+| queries.slow_inserts | string | `"sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))"` |  |
+| remote.read.basicAuth.password | string | `""` |  |
+| remote.read.basicAuth.username | string | `""` |  |
+| remote.read.tenant | string | `""` |  |
+| remote.read.url | string | `"http://single-victoria-metrics-single-server.default.svc.cluster.local:8428"` |  |
+| remote.write.basicAuth.password | string | `""` |  |
+| remote.write.basicAuth.username | string | `""` |  |
+| remote.write.extra_labels.model | string | `"zscore"` |  |
+| remote.write.metric_names.anomaly_score | string | `"anomaly_score"` |  |
+| remote.write.metric_names.yhat | string | `"yhat"` |  |
+| remote.write.tenant | string | `""` |  |
+| remote.write.url | string | `"http://single-victoria-metrics-single-server.default.svc.cluster.local:8428"` |  |
+| resources | object | `{}` |  |
+| scheduler.class | string | `"scheduler.periodic.PeriodicScheduler"` |  |
+| scheduler.fit_every | string | `"1d"` |  |
+| scheduler.fit_window | string | `"7d"` |  |
+| scheduler.infer_every | string | `"10s"` |  |
 | securityContext.runAsGroup | int | `1000` |  |
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
-| service.annotations | object | `{}` |  |
-| service.clusterIP | string | `""` |  |
-| service.enabled | bool | `true` |  |
-| service.externalIPs | list | `[]` |  |
-| service.extraLabels | object | `{}` |  |
-| service.loadBalancerIP | string | `""` |  |
-| service.loadBalancerSourceRanges | list | `[]` |  |
-| service.servicePort | int | `8431` |  |
-| service.type | string | `"ClusterIP"` |  |
-| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
-| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| serviceAccount.name | string | `nil` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| serviceAccount.annotations | object | `{}` |  |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.name | string | `nil` |  |
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
 | tolerations | list | `[]` | Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
-| write.url | string | `""` | Write endpoint without suffixes, victoriametrics or vminsert. Example http://victoroametrics:8428 or http://vminsert:8480 |
