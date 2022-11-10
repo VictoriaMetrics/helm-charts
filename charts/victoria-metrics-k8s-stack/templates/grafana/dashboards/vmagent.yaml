@@ -30,13 +30,13 @@ data:
   vmagent.json: |-
     {
         "__inputs": [],
-        "__elements": [],
+        "__elements": {},
         "__requires": [
             {
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "8.5.3"
+                "version": "9.0.3"
             },
             {
                 "type": "panel",
@@ -64,8 +64,8 @@ data:
             },
             {
                 "type": "panel",
-                "id": "table-old",
-                "name": "Table (old)",
+                "id": "table",
+                "name": "Table",
                 "version": ""
             }
         ],
@@ -91,12 +91,12 @@ data:
                 }
             ]
         },
-        "description": "Overview for VictoriaMetrics vmagent v1.73.0 or higher",
+        "description": "Overview for VictoriaMetrics vmagent v1.80.0 or higher",
         "editable": true,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 1,
         "id": null,
-        "iteration": 1656943336787,
+        "iteration": 1663339589357,
         "links": [
             {
                 "icon": "doc",
@@ -139,8 +139,148 @@ data:
                 },
                 "id": 24,
                 "panels": [],
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Overview",
                 "type": "row"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "$ds"
+                },
+                "description": "Shows the rate of samples scraped from configured targets.",
+                "fieldConfig": {
+                    "defaults": {
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                }
+                            ]
+                        }
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 3,
+                    "w": 4,
+                    "x": 0,
+                    "y": 1
+                },
+                "id": 103,
+                "links": [
+                    {
+                        "title": "Troubleshooting",
+                        "url": "https://docs.victoriametrics.com/vmagent.html#troubleshooting"
+                    }
+                ],
+                "options": {
+                    "colorMode": "value",
+                    "graphMode": "area",
+                    "justifyMode": "auto",
+                    "orientation": "auto",
+                    "reduceOptions": {
+                        "calcs": [
+                            "last"
+                        ],
+                        "fields": "",
+                        "values": false
+                    },
+                    "text": {},
+                    "textMode": "auto"
+                },
+                "pluginVersion": "9.0.3",
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
+                        "editorMode": "code",
+                        "expr": "sum(rate(vm_promscrape_scraped_samples_sum{job=~\"$job\", instance=~\"$instance\", path!~\"/favicon.ico\"}[$__rate_interval]))",
+                        "interval": "",
+                        "legendFormat": "__auto",
+                        "range": true,
+                        "refId": "A"
+                    }
+                ],
+                "title": "Samples scraped/s",
+                "type": "stat"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "$ds"
+                },
+                "description": "Shows the rate of ingested samples",
+                "fieldConfig": {
+                    "defaults": {
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                }
+                            ]
+                        }
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 3,
+                    "w": 4,
+                    "x": 4,
+                    "y": 1
+                },
+                "id": 102,
+                "links": [
+                    {
+                        "title": "Troubleshooting",
+                        "url": "https://docs.victoriametrics.com/vmagent.html#troubleshooting"
+                    }
+                ],
+                "options": {
+                    "colorMode": "value",
+                    "graphMode": "area",
+                    "justifyMode": "auto",
+                    "orientation": "auto",
+                    "reduceOptions": {
+                        "calcs": [
+                            "last"
+                        ],
+                        "fields": "",
+                        "values": false
+                    },
+                    "text": {},
+                    "textMode": "auto"
+                },
+                "pluginVersion": "9.0.3",
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
+                        "editorMode": "code",
+                        "expr": "sum(rate(vm_ingestserver_requests_total{job=~\"$job\", instance=~\"$instance\", path!~\"/favicon.ico\"}[$__rate_interval]))",
+                        "interval": "",
+                        "legendFormat": "__auto",
+                        "range": true,
+                        "refId": "A"
+                    }
+                ],
+                "title": "Samples ingested/s",
+                "type": "stat"
             },
             {
                 "datasource": {
@@ -165,7 +305,7 @@ data:
                 "gridPos": {
                     "h": 3,
                     "w": 4,
-                    "x": 0,
+                    "x": 8,
                     "y": 1
                 },
                 "id": 9,
@@ -184,9 +324,12 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
                         "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"up\"})",
                         "interval": "",
                         "legendFormat": "up",
@@ -223,7 +366,7 @@ data:
                 "gridPos": {
                     "h": 3,
                     "w": 4,
-                    "x": 4,
+                    "x": 12,
                     "y": 1
                 },
                 "id": 72,
@@ -248,9 +391,12 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
                         "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"down\"})",
                         "interval": "",
                         "legendFormat": "up",
@@ -289,7 +435,7 @@ data:
                 "gridPos": {
                     "h": 3,
                     "w": 4,
-                    "x": 8,
+                    "x": 16,
                     "y": 1
                 },
                 "id": 16,
@@ -315,9 +461,12 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
                         "expr": "sum(increase(vm_log_messages_total{job=~\"$job\", instance=~\"$instance\", level!=\"info\"}[30m]))",
                         "interval": "",
                         "legendFormat": "",
@@ -354,8 +503,8 @@ data:
                 },
                 "gridPos": {
                     "h": 3,
-                    "w": 5,
-                    "x": 12,
+                    "w": 4,
+                    "x": 20,
                     "y": 1
                 },
                 "id": 56,
@@ -374,9 +523,12 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
                         "expr": "sum(vm_persistentqueue_bytes_pending{job=~\"$job\", instance=~\"$instance\"})",
                         "interval": "",
                         "legendFormat": "",
@@ -387,92 +539,97 @@ data:
                 "type": "stat"
             },
             {
-                "columns": [],
                 "datasource": {
+                    "type": "prometheus",
                     "uid": "$ds"
                 },
-                "fontSize": "100%",
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "custom": {
+                            "align": "auto",
+                            "displayMode": "auto",
+                            "inspect": false,
+                            "minWidth": 50
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        }
+                    },
+                    "overrides": [
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "Time"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.hidden",
+                                    "value": true
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "Value"
+                            },
+                            "properties": [
+                                {
+                                    "id": "displayName",
+                                    "value": "Count"
+                                }
+                            ]
+                        }
+                    ]
+                },
                 "gridPos": {
-                    "h": 7,
-                    "w": 7,
-                    "x": 17,
-                    "y": 1
+                    "h": 5,
+                    "w": 8,
+                    "x": 0,
+                    "y": 4
                 },
-                "id": 11,
-                "scroll": true,
-                "showHeader": true,
-                "sort": {
-                    "col": 4,
-                    "desc": false
+                "id": 101,
+                "options": {
+                    "footer": {
+                        "fields": "",
+                        "reducer": [
+                            "sum"
+                        ],
+                        "show": false
+                    },
+                    "showHeader": true
                 },
-                "styles": [
-                    {
-                        "alias": "uptime",
-                        "align": "auto",
-                        "colorMode": "cell",
-                        "colors": [
-                            "rgba(245, 54, 54, 0.9)",
-                            "rgba(237, 129, 40, 0.89)",
-                            "rgba(50, 172, 45, 0.97)"
-                        ],
-                        "dateFormat": "YYYY-MM-DD HH:mm:ss",
-                        "decimals": 2,
-                        "mappingType": 1,
-                        "pattern": "Value",
-                        "thresholds": [
-                            "1800",
-                            "3600"
-                        ],
-                        "type": "number",
-                        "unit": "s"
-                    },
-                    {
-                        "alias": "",
-                        "align": "auto",
-                        "colors": [
-                            "rgba(245, 54, 54, 0.9)",
-                            "rgba(237, 129, 40, 0.89)",
-                            "rgba(50, 172, 45, 0.97)"
-                        ],
-                        "dateFormat": "YYYY-MM-DD HH:mm:ss",
-                        "decimals": 2,
-                        "mappingType": 1,
-                        "pattern": "instance",
-                        "thresholds": [],
-                        "type": "string",
-                        "unit": "short"
-                    },
-                    {
-                        "alias": "",
-                        "align": "auto",
-                        "colors": [
-                            "rgba(245, 54, 54, 0.9)",
-                            "rgba(237, 129, 40, 0.89)",
-                            "rgba(50, 172, 45, 0.97)"
-                        ],
-                        "dateFormat": "YYYY-MM-DD HH:mm:ss",
-                        "decimals": 2,
-                        "mappingType": 1,
-                        "pattern": "/.*/",
-                        "thresholds": [],
-                        "type": "hidden",
-                        "unit": "short"
-                    }
-                ],
+                "pluginVersion": "9.0.3",
                 "targets": [
                     {
-                        "expr": "sort((time() - vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"}) or (up{job=~\"$job\", instance=~\"$instance\"}))",
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"}) by(job, short_version)",
                         "format": "table",
-                        "hide": false,
                         "instant": true,
-                        "interval": "",
-                        "legendFormat": "{{`{{`}}instance{{`}}`}}",
+                        "range": false,
                         "refId": "A"
                     }
                 ],
-                "title": "Uptime",
-                "transform": "table",
-                "type": "table-old"
+                "type": "table"
             },
             {
                 "aliasColors": {},
@@ -491,9 +648,9 @@ data:
                 "fill": 0,
                 "fillGradient": 0,
                 "gridPos": {
-                    "h": 4,
-                    "w": 17,
-                    "x": 0,
+                    "h": 5,
+                    "w": 16,
+                    "x": 8,
                     "y": 4
                 },
                 "hiddenSeries": false,
@@ -520,7 +677,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -530,6 +687,9 @@ data:
                 "steppedLine": true,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
                         "expr": "sort(sum(up{job=~\"$job\", instance=~\"$instance\"}) by (job, instance))",
                         "format": "time_series",
                         "instant": false,
@@ -596,7 +756,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 0,
-                    "y": 8
+                    "y": 9
                 },
                 "hiddenSeries": false,
                 "id": 5,
@@ -619,7 +779,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -672,11 +832,13 @@ data:
                 },
                 "yaxes": [
                     {
+                        "$$hashKey": "object:537",
                         "format": "short",
                         "logBase": 1,
                         "show": true
                     },
                     {
+                        "$$hashKey": "object:538",
                         "format": "bytes",
                         "logBase": 1,
                         "show": true
@@ -708,7 +870,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 8
+                    "y": 9
                 },
                 "hiddenSeries": false,
                 "id": 15,
@@ -732,7 +894,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -805,7 +967,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 0,
-                    "y": 16
+                    "y": 17
                 },
                 "hiddenSeries": false,
                 "id": 69,
@@ -835,7 +997,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -947,7 +1109,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 16
+                    "y": 17
                 },
                 "hiddenSeries": false,
                 "id": 17,
@@ -976,7 +1138,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -986,6 +1148,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
                         "exemplar": true,
                         "expr": "sum(vmagent_remotewrite_pending_data_bytes{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}) by (url)",
                         "interval": "",
@@ -1045,7 +1210,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 0,
-                    "y": 24
+                    "y": 25
                 },
                 "hiddenSeries": false,
                 "id": 79,
@@ -1069,7 +1234,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1079,6 +1244,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
                         "exemplar": true,
                         "expr": "sum(rate(vmagent_remotewrite_packets_dropped_total{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}[$__interval])) by(url)",
                         "interval": "",
@@ -1138,7 +1306,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 24
+                    "y": 25
                 },
                 "hiddenSeries": false,
                 "id": 49,
@@ -1168,7 +1336,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1178,6 +1346,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
                         "expr": "sum(increase(vm_persistentqueue_bytes_dropped_total{job=~\"$job\", instance=~\"$instance\"}[$__interval])) by (path)",
                         "interval": "",
                         "legendFormat": "{{`{{`}} path {{`}}`}}",
@@ -1237,7 +1408,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 0,
-                    "y": 32
+                    "y": 33
                 },
                 "hiddenSeries": false,
                 "id": 18,
@@ -1267,7 +1438,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1350,7 +1521,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 32
+                    "y": 33
                 },
                 "hiddenSeries": false,
                 "id": 86,
@@ -1374,7 +1545,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.5.3",
+                "pluginVersion": "9.0.3",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1384,6 +1555,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
                         "exemplar": true,
                         "expr": "sum(rate(vm_log_messages_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (level) ",
                         "format": "time_series",
@@ -1435,7 +1609,7 @@ data:
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 40
+                    "y": 41
                 },
                 "id": 28,
                 "panels": [
@@ -1459,7 +1633,7 @@ data:
                             "h": 7,
                             "w": 12,
                             "x": 0,
-                            "y": 2
+                            "y": 42
                         },
                         "hiddenSeries": false,
                         "id": 48,
@@ -1482,7 +1656,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -1492,6 +1666,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"up\"}) by(type) > 0",
                                 "format": "time_series",
@@ -1551,7 +1728,7 @@ data:
                             "h": 7,
                             "w": 12,
                             "x": 12,
-                            "y": 2
+                            "y": 42
                         },
                         "hiddenSeries": false,
                         "id": 76,
@@ -1574,7 +1751,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -1584,6 +1761,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"down\"}) by(type) > 0",
                                 "format": "time_series",
@@ -1644,7 +1824,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 9
+                            "y": 49
                         },
                         "hiddenSeries": false,
                         "id": 20,
@@ -1667,7 +1847,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -1757,7 +1937,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 9
+                            "y": 49
                         },
                         "hiddenSeries": false,
                         "id": 31,
@@ -1780,7 +1960,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -1881,7 +2061,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 17
+                            "y": 57
                         },
                         "hiddenSeries": false,
                         "id": 46,
@@ -1904,7 +2084,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -1914,6 +2094,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "expr": "histogram_quantile(0.95, sum(rate(vm_promscrape_scrape_response_size_bytes_bucket{job=~\"$job\", instance=~\"$instance\"}[$__interval])) by(vmrange))  ",
                                 "format": "time_series",
                                 "interval": "",
@@ -1921,6 +2104,9 @@ data:
                                 "refId": "A"
                             },
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "expr": "histogram_quantile(0.5, sum(rate(vm_promscrape_scrape_response_size_bytes_bucket{job=~\"$job\", instance=~\"$instance\"}[$__interval])) by(vmrange)) ",
                                 "interval": "",
                                 "legendFormat": "p0.5",
@@ -1977,7 +2163,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 17
+                            "y": 57
                         },
                         "heatmap": {},
                         "hideZeroBuckets": false,
@@ -2019,6 +2205,14 @@ data:
                         "yBucketBound": "auto"
                     }
                 ],
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Scraping",
                 "type": "row"
             },
@@ -2031,7 +2225,7 @@ data:
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 41
+                    "y": 42
                 },
                 "id": 71,
                 "panels": [
@@ -2057,7 +2251,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 3
+                            "y": 66
                         },
                         "hiddenSeries": false,
                         "id": 73,
@@ -2081,7 +2275,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2129,12 +2323,14 @@ data:
                         },
                         "yaxes": [
                             {
+                                "$$hashKey": "object:410",
                                 "format": "short",
                                 "logBase": 1,
                                 "min": "0",
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:411",
                                 "format": "none",
                                 "logBase": 1,
                                 "show": true
@@ -2166,7 +2362,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 3
+                            "y": 66
                         },
                         "hiddenSeries": false,
                         "id": 77,
@@ -2190,7 +2386,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2238,12 +2434,14 @@ data:
                         },
                         "yaxes": [
                             {
+                                "$$hashKey": "object:272",
                                 "format": "short",
                                 "logBase": 1,
                                 "min": "0",
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:273",
                                 "format": "none",
                                 "logBase": 1,
                                 "show": true
@@ -2275,7 +2473,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 11
+                            "y": 74
                         },
                         "hiddenSeries": false,
                         "id": 78,
@@ -2299,7 +2497,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2336,12 +2534,14 @@ data:
                         },
                         "yaxes": [
                             {
+                                "$$hashKey": "object:349",
                                 "format": "short",
                                 "logBase": 1,
                                 "min": "0",
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:350",
                                 "format": "none",
                                 "logBase": 1,
                                 "show": true
@@ -2373,7 +2573,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 11
+                            "y": 74
                         },
                         "hiddenSeries": false,
                         "id": 50,
@@ -2396,7 +2596,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2449,6 +2649,14 @@ data:
                         }
                     }
                 ],
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Ingestion",
                 "type": "row"
             },
@@ -2461,7 +2669,7 @@ data:
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 42
+                    "y": 43
                 },
                 "id": 58,
                 "panels": [
@@ -2487,7 +2695,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 4
+                            "y": 83
                         },
                         "hiddenSeries": false,
                         "id": 60,
@@ -2510,7 +2718,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2536,7 +2744,7 @@ data:
                         "title": "Requests rate ($instance) to ($url)",
                         "tooltip": {
                             "shared": true,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -2547,6 +2755,7 @@ data:
                         },
                         "yaxes": [
                             {
+                                "$$hashKey": "object:720",
                                 "decimals": 2,
                                 "format": "short",
                                 "logBase": 1,
@@ -2554,6 +2763,7 @@ data:
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:721",
                                 "format": "short",
                                 "logBase": 1,
                                 "show": true
@@ -2585,7 +2795,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 4
+                            "y": 83
                         },
                         "hiddenSeries": false,
                         "id": 66,
@@ -2608,7 +2818,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2682,7 +2892,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 12
+                            "y": 91
                         },
                         "hiddenSeries": false,
                         "id": 61,
@@ -2705,7 +2915,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2720,7 +2930,7 @@ data:
                                     "uid": "$ds"
                                 },
                                 "exemplar": true,
-                                "expr": "sum(rate(vmagent_remotewrite_retries_count_total{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}[$__rate_interval])) by(url)",
+                                "expr": "sum(rate(vmagent_remotewrite_retries_count_total{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}[$__rate_interval])) by(url) > 0",
                                 "interval": "",
                                 "legendFormat": "",
                                 "refId": "A"
@@ -2742,12 +2952,14 @@ data:
                         },
                         "yaxes": [
                             {
+                                "$$hashKey": "object:789",
                                 "format": "short",
                                 "logBase": 1,
                                 "min": "0",
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:790",
                                 "format": "short",
                                 "logBase": 1,
                                 "show": true
@@ -2778,7 +2990,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 12
+                            "y": 91
                         },
                         "hiddenSeries": false,
                         "id": 65,
@@ -2801,7 +3013,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2811,6 +3023,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "sum(vmagent_remotewrite_conns{job=~\"$job\", instance=~\"$instance\"}) by (instance)",
                                 "interval": "",
@@ -2867,7 +3082,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 20
+                            "y": 99
                         },
                         "heatmap": {},
                         "hideZeroBuckets": false,
@@ -2879,6 +3094,9 @@ data:
                         "reverseYBuckets": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "buckets_limit(12, prometheus_buckets(sum(rate(vmagent_remotewrite_duration_seconds_bucket{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}[$__interval])) by(vmrange)))",
                                 "format": "heatmap",
@@ -2911,9 +3129,10 @@ data:
                         "dashLength": 10,
                         "dashes": false,
                         "datasource": {
+                            "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows saturation of every connection to remote storage. If the threshold of 0.9sec is reached, then the connection is saturated by more than 90% and vmagent won't be able to keep up. This usually means that `-remoteWrite.queues` command-line flag must be increased in order to increase the number of connections per each remote storage.\n",
+                        "description": "Shows saturation of every connection to remote storage. If the threshold of 90% is reached, then the connection is saturated (busy or slow) by more than 90%, so vmagent won't be able to keep up and can start buffering data. \n\nThis usually means that `-remoteWrite.queues` command-line flag must be increased in order to increase the number of connections per each remote storage.\n",
                         "fieldConfig": {
                             "defaults": {
                                 "links": []
@@ -2926,7 +3145,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 20
+                            "y": 99
                         },
                         "hiddenSeries": false,
                         "id": 84,
@@ -2949,7 +3168,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -2959,8 +3178,12 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
-                                "expr": "sum(rate(vmagent_remotewrite_send_duration_seconds_total{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}[$__rate_interval])) by (instance, url)",
+                                "expr": "sum(rate(vmagent_remotewrite_send_duration_seconds_total{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}[$__rate_interval])) by (instance, url)\n/\nmax(vmagent_remotewrite_queues{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}) by(instance, url)",
                                 "interval": "",
                                 "legendFormat": "",
                                 "refId": "A"
@@ -2973,7 +3196,7 @@ data:
                                 "fill": true,
                                 "line": true,
                                 "op": "gt",
-                                "value": 0.9,
+                                "value": 90,
                                 "yaxis": "left"
                             }
                         ],
@@ -2993,7 +3216,7 @@ data:
                         "yaxes": [
                             {
                                 "$$hashKey": "object:662",
-                                "format": "s",
+                                "format": "percentunit",
                                 "logBase": 1,
                                 "min": "0",
                                 "show": true
@@ -3027,7 +3250,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 28
+                            "y": 107
                         },
                         "heatmap": {},
                         "hideZeroBuckets": false,
@@ -3039,6 +3262,9 @@ data:
                         "reverseYBuckets": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "buckets_limit(12, prometheus_buckets(sum(rate(vmagent_remotewrite_block_size_rows_bucket{job=~\"$job\", instance=~\"$instance\"}[$__interval])) by(vmrange)))",
                                 "format": "heatmap",
@@ -3083,7 +3309,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 28
+                            "y": 107
                         },
                         "heatmap": {},
                         "hideZeroBuckets": false,
@@ -3095,6 +3321,9 @@ data:
                         "reverseYBuckets": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "expr": "buckets_limit(12, prometheus_buckets(sum(rate(vmagent_remotewrite_block_size_bytes_bucket{job=~\"$job\", instance=~\"$instance\"}[$__interval])) by(vmrange)))",
                                 "format": "heatmap",
                                 "interval": "",
@@ -3134,7 +3363,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 36
+                            "y": 115
                         },
                         "hiddenSeries": false,
                         "id": 88,
@@ -3154,7 +3383,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -3164,6 +3393,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "(vmagent_hourly_series_limit_current_series{job=~\"$job\", instance=~\"$instance\"} / vmagent_hourly_series_limit_max_series{job=~\"$job\", instance=~\"$instance\"}) * 100",
                                 "interval": "",
@@ -3171,6 +3403,9 @@ data:
                                 "refId": "A"
                             },
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "vmagent_daily_series_limit_max_series{job=~\"$job\", instance=~\"$instance\"}",
                                 "hide": true,
@@ -3237,7 +3472,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 36
+                            "y": 115
                         },
                         "hiddenSeries": false,
                         "id": 90,
@@ -3257,7 +3492,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -3267,6 +3502,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "(vmagent_daily_series_limit_current_series{job=~\"$job\", instance=~\"$instance\"} / vmagent_daily_series_limit_max_series{job=~\"$job\", instance=~\"$instance\"}) * 100",
                                 "interval": "",
@@ -3274,6 +3512,9 @@ data:
                                 "refId": "A"
                             },
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "vmagent_daily_series_limit_max_series{job=~\"$job\", instance=~\"$instance\"}",
                                 "hide": true,
@@ -3326,6 +3567,14 @@ data:
                         }
                     }
                 ],
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Remote write",
                 "type": "row"
             },
@@ -3339,7 +3588,7 @@ data:
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 43
+                    "y": 44
                 },
                 "id": 94,
                 "panels": [
@@ -3359,7 +3608,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 5
+                            "y": 124
                         },
                         "hiddenSeries": false,
                         "id": 92,
@@ -3383,7 +3632,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -3449,7 +3698,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 5
+                            "y": 124
                         },
                         "hiddenSeries": false,
                         "id": 95,
@@ -3473,7 +3722,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -3545,7 +3794,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 13
+                            "y": 132
                         },
                         "hiddenSeries": false,
                         "id": 98,
@@ -3568,7 +3817,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -3654,7 +3903,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 13
+                            "y": 132
                         },
                         "hiddenSeries": false,
                         "id": 99,
@@ -3677,7 +3926,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -3742,6 +3991,15 @@ data:
                         }
                     }
                 ],
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "datasource",
+                            "uid": "grafana"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Troubleshooting",
                 "type": "row"
             },
@@ -3754,7 +4012,7 @@ data:
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 44
+                    "y": 45
                 },
                 "id": 45,
                 "panels": [
@@ -3767,7 +4025,7 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows the CPU usage per vmagent instance. \nIf you think that usage is abnormal or unexpected pls file an issue and attach CPU profile if possible.",
+                        "description": "Shows the CPU usage percentage per vmagent instance. \nIf you think that usage is abnormal or unexpected, pls file an issue and attach CPU profile if possible.",
                         "fieldConfig": {
                             "defaults": {
                                 "links": []
@@ -3780,7 +4038,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 62
+                            "y": 141
                         },
                         "hiddenSeries": false,
                         "id": 35,
@@ -3810,17 +4068,11 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
-                        "seriesOverrides": [
-                            {
-                                "$$hashKey": "object:77",
-                                "alias": "/Limit.*/",
-                                "color": "#F2495C"
-                            }
-                        ],
+                        "seriesOverrides": [],
                         "spaceLength": 10,
                         "stack": false,
                         "steppedLine": false,
@@ -3831,26 +4083,12 @@ data:
                                     "uid": "$ds"
                                 },
                                 "exemplar": false,
-                                "expr": "sum(rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(instance)",
+                                "expr": "sum(rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(instance) / max(process_cpu_cores_available{job=~\"$job\", instance=~\"$instance\"}) by(instance)",
                                 "format": "time_series",
                                 "interval": "",
                                 "intervalFactor": 1,
                                 "legendFormat": "{{`{{`}}instance{{`}}`}}",
                                 "refId": "A"
-                            },
-                            {
-                                "datasource": {
-                                    "type": "prometheus",
-                                    "uid": "$ds"
-                                },
-                                "exemplar": false,
-                                "expr": "process_cpu_cores_available{job=~\"$job\", instance=~\"$instance\"}",
-                                "format": "time_series",
-                                "hide": false,
-                                "interval": "",
-                                "intervalFactor": 1,
-                                "legendFormat": "Limit ({{`{{`}}instance{{`}}`}})",
-                                "refId": "B"
                             }
                         ],
                         "thresholds": [],
@@ -3858,7 +4096,7 @@ data:
                         "title": "CPU ($instance)",
                         "tooltip": {
                             "shared": true,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -3869,12 +4107,14 @@ data:
                         },
                         "yaxes": [
                             {
-                                "format": "short",
+                                "$$hashKey": "object:912",
+                                "format": "percentunit",
                                 "logBase": 1,
                                 "min": "0",
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:913",
                                 "format": "short",
                                 "logBase": 1,
                                 "show": true
@@ -3905,7 +4145,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 62
+                            "y": 141
                         },
                         "hiddenSeries": false,
                         "id": 37,
@@ -3935,7 +4175,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -3945,6 +4185,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "sum(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}) by (instance)",
                                 "interval": "",
@@ -3952,6 +4195,9 @@ data:
                                 "refId": "A"
                             },
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "exemplar": true,
                                 "expr": "sum(process_resident_memory_anon_bytes{job=~\"$job\", instance=~\"$instance\"}) by (instance)",
                                 "hide": false,
@@ -4012,7 +4258,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 70
+                            "y": 149
                         },
                         "hiddenSeries": false,
                         "id": 81,
@@ -4036,12 +4282,13 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
                         "seriesOverrides": [
                             {
+                                "$$hashKey": "object:1206",
                                 "alias": "read",
                                 "transform": "negative-Y"
                             }
@@ -4051,6 +4298,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "expr": "sum(rate(process_io_storage_read_bytes_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
                                 "format": "time_series",
                                 "hide": false,
@@ -4060,6 +4310,9 @@ data:
                                 "refId": "A"
                             },
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "expr": "sum(rate(process_io_storage_written_bytes_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
                                 "format": "time_series",
                                 "hide": false,
@@ -4085,11 +4338,13 @@ data:
                         },
                         "yaxes": [
                             {
+                                "$$hashKey": "object:1213",
                                 "format": "bytes",
                                 "logBase": 1,
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:1214",
                                 "format": "short",
                                 "logBase": 1,
                                 "min": "0",
@@ -4121,7 +4376,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 70
+                            "y": 149
                         },
                         "hiddenSeries": false,
                         "id": 7,
@@ -4145,7 +4400,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4160,12 +4415,18 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "expr": "sum(rate(vm_tcplistener_read_bytes_total{job=~\"$job\", instance=~\"$instance\"}[$__interval])) * 8\n+ sum(rate(vm_promscrape_conn_bytes_read_total{job=~\"$job\", instance=~\"$instance\"}[$__interval])) * 8",
                                 "interval": "",
                                 "legendFormat": "in",
                                 "refId": "A"
                             },
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "expr": "sum(rate(vmagent_remotewrite_conn_bytes_written_total{job=~\"$job\", instance=~\"$instance\"}[$__interval])) * 8",
                                 "interval": "",
                                 "legendFormat": "out",
@@ -4208,9 +4469,10 @@ data:
                         "dashLength": 10,
                         "dashes": false,
                         "datasource": {
+                            "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Panel shows the number of open file descriptors in the OS.\nReaching the limit of open files can cause various issues and must be prevented.\n\nSee how to change limits here https://medium.com/@muhammadtriwibowo/set-permanently-ulimit-n-open-files-in-ubuntu-4d61064429a",
+                        "description": "Panel shows the percentage of open file descriptors in the OS per instance.\nReaching the limit of open files (100%) can cause various issues and must be prevented.\n\nSee how to change limits here https://medium.com/@muhammadtriwibowo/set-permanently-ulimit-n-open-files-in-ubuntu-4d61064429a",
                         "fieldConfig": {
                             "defaults": {
                                 "links": []
@@ -4223,7 +4485,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 78
+                            "y": 157
                         },
                         "hiddenSeries": false,
                         "id": 83,
@@ -4247,36 +4509,27 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
-                        "seriesOverrides": [
-                            {
-                                "$$hashKey": "object:913",
-                                "alias": "max",
-                                "color": "#C4162A"
-                            }
-                        ],
+                        "seriesOverrides": [],
                         "spaceLength": 10,
                         "stack": false,
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "sum(process_open_fds{job=~\"$job\", instance=~\"$instance\"})",
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "max(process_open_fds{job=~\"$job\", instance=~\"$instance\"}) by(instance) \n/\nmin(process_max_fds{job=~\"$job\", instance=~\"$instance\"}) by(instance)",
                                 "format": "time_series",
                                 "interval": "",
                                 "intervalFactor": 2,
-                                "legendFormat": "open",
+                                "legendFormat": "__auto",
+                                "range": true,
                                 "refId": "A"
-                            },
-                            {
-                                "expr": "min(process_max_fds{job=~\"$job\", instance=~\"$instance\"})",
-                                "format": "time_series",
-                                "interval": "",
-                                "intervalFactor": 2,
-                                "legendFormat": "max",
-                                "refId": "B"
                             }
                         ],
                         "thresholds": [],
@@ -4284,7 +4537,7 @@ data:
                         "title": "Open FDs ($instance)",
                         "tooltip": {
                             "shared": true,
-                            "sort": 0,
+                            "sort": 2,
                             "value_type": "individual"
                         },
                         "type": "graph",
@@ -4295,13 +4548,15 @@ data:
                         },
                         "yaxes": [
                             {
-                                "decimals": 0,
-                                "format": "short",
-                                "logBase": 2,
+                                "$$hashKey": "object:987",
+                                "decimals": 5,
+                                "format": "percentunit",
+                                "logBase": 1,
                                 "min": "0",
                                 "show": true
                             },
                             {
+                                "$$hashKey": "object:988",
                                 "format": "short",
                                 "logBase": 1,
                                 "min": "0",
@@ -4332,7 +4587,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 78
+                            "y": 157
                         },
                         "hiddenSeries": false,
                         "id": 39,
@@ -4356,7 +4611,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4366,6 +4621,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "expr": "sum(go_goroutines{job=~\"$job\", instance=~\"$instance\"}) by(instance)",
                                 "format": "time_series",
                                 "interval": "",
@@ -4426,7 +4684,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 86
+                            "y": 165
                         },
                         "hiddenSeries": false,
                         "id": 43,
@@ -4450,7 +4708,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4460,6 +4718,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "expr": "max(go_gc_duration_seconds{job=~\"$job\", instance=~\"$instance\", quantile=\"1\"}) by(instance)",
                                 "format": "time_series",
                                 "intervalFactor": 2,
@@ -4518,7 +4779,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 86
+                            "y": 165
                         },
                         "hiddenSeries": false,
                         "id": 41,
@@ -4542,7 +4803,7 @@ data:
                             "alertThreshold": true
                         },
                         "percentage": false,
-                        "pluginVersion": "8.5.3",
+                        "pluginVersion": "9.0.3",
                         "pointradius": 2,
                         "points": false,
                         "renderer": "flot",
@@ -4552,6 +4813,9 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
+                                "datasource": {
+                                    "uid": "$ds"
+                                },
                                 "expr": "sum(process_num_threads{job=~\"$job\", instance=~\"$instance\"}) by(instance)",
                                 "format": "time_series",
                                 "intervalFactor": 2,
@@ -4592,6 +4856,14 @@ data:
                         }
                     }
                 ],
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$ds"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Resource usage",
                 "type": "row"
             }
@@ -4607,7 +4879,9 @@ data:
             "list": [
                 {
                     "current": {
-                        "selected": false
+                        "selected": true,
+                        "text": "VictoriaMetrics",
+                        "value": "VictoriaMetrics"
                     },
                     "hide": 0,
                     "includeAll": false,
@@ -4622,14 +4896,14 @@ data:
                     "type": "datasource"
                 },
                 {
-                    "allValue": "",
+                    "allValue": ".*",
                     "current": {},
                     "datasource": {
                         "uid": "$ds"
                     },
                     "definition": "label_values(vm_app_version{version=~\"^vmagent.*\"}, job)",
                     "hide": 0,
-                    "includeAll": false,
+                    "includeAll": true,
                     "multi": true,
                     "name": "job",
                     "options": [],
@@ -4693,6 +4967,17 @@ data:
                     "skipUrlSync": false,
                     "sort": 0,
                     "type": "query"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${ds}"
+                    },
+                    "filters": [],
+                    "hide": 0,
+                    "name": "adhoc",
+                    "skipUrlSync": false,
+                    "type": "adhoc"
                 }
             ]
         },
@@ -4714,7 +4999,7 @@ data:
             ]
         },
         "timezone": "",
-        "title": "vmagent",
+        "title": "VictoriaMetrics - vmagent",
         "uid": "G7Z9GzMGz",
         "version": 1,
         "weekStart": ""
