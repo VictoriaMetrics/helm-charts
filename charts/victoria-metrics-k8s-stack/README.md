@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.12.6](https://img.shields.io/badge/Version-0.12.6-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.12.9](https://img.shields.io/badge/Version-0.12.9-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -415,7 +415,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubelet.spec.tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | kubelet.spec.tlsConfig.insecureSkipVerify | bool | `true` |  |
 | nameOverride | string | `""` |  |
-| operator | object | `{"cleanupCRD":true,"cleanupSA":{"create":true,"name":""},"enabled":true,"kubectlImage":{"pullPolicy":"IfNotPresent","repository":"gcr.io/google_containers/hyperkube","tag":"v1.16.0"}}` | Configures operator CRD |
+| operator | object | `{"cleanupCRD":true,"cleanupSA":{"create":true,"name":""},"enabled":true,"kubectlImage":{"pullPolicy":"IfNotPresent","repository":"gcr.io/google_containers/hyperkube","tag":"v1.18.0"}}` | Configures operator CRD |
 | operator.cleanupCRD | bool | `true` | Tells helm to remove CRD after chart remove |
 | prometheus-node-exporter.enabled | bool | `true` |  |
 | prometheus-node-exporter.extraArgs[0] | string | `"--collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"` |  |
