@@ -1,0 +1,50 @@
+{{- if eq .Values.remote.read.url "" -}}
+{{- fail "remote.read.url datasource URL must be specified" -}}
+{{- end -}}
+{{- if eq .Values.remote.write.url "" -}}
+{{- fail "remote.write.url datasource URL must be specified" -}}
+{{- end -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ include "chart.fullname" . }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "chart.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: model
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          workingDir: {{ .Values.containerWorkingDir }}
+          args:
+            - /etc/config/config.yml
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "chart.fullname" . }}
