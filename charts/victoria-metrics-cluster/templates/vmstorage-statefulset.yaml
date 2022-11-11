@@ -39,9 +39,9 @@ spec:
       schedulerName: "{{ .Values.vmstorage.schedulerName }}"
 {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
-      {{- with .Values.vmstorage.initContainers }}
+      {{- if eq (include "victoria-metrics.storage.hasInitContainer" . ) "true" }}
       initContainers:
-        {{- toYaml . | nindent 8 }}
+        {{- include "victoria-metrics.storage.initContiners" . | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vmstorage.name }}

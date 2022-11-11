@@ -42,9 +42,9 @@ spec:
       schedulerName: "{{ .Values.server.schedulerName }}"
 {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
-      {{- with .Values.server.initContainers }}
+      {{- if eq (include "victoria-metrics.hasInitContainer" . ) "true" -}}
       initContainers:
-        {{- toYaml . | nindent 8 }}
+        {{- include "victoria-metrics.initContiners" . | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.server.name }}
