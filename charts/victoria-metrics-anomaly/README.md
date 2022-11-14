@@ -129,22 +129,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | imagePullSecrets | list | `[]` |  |
 | metric_names.anomaly_score | string | `"anomaly_score"` |  |
 | metric_names.yhat | string | `"yhat"` |  |
-| model.enabled | string | `"zscore"` |  |
+| model.enabled | string | `"holt_winters"` |  |
 | model.holt_winters.frequency | string | `"1h"` |  |
 | model.holt_winters.seasonality | string | `"1d"` |  |
-| model.holt_winters.writer.extra_labels.model | string | `"holtwinters"` |  |
-| model.holt_winters.writer.metric_names.anomaly_score | string | `"anomaly_score"` |  |
-| model.holt_winters.writer.metric_names.yhat | string | `"yhat"` |  |
 | model.prophet.interval_width | float | `0.8` |  |
-| model.prophet.writer.extra_labels.model | string | `"prophet"` |  |
-| model.prophet.writer.metric_names.anomaly_score | string | `"anomaly_score"` |  |
-| model.prophet.writer.metric_names.value | string | `"value"` |  |
-| model.prophet.writer.metric_names.yhat | string | `"yhat"` |  |
-| model.prophet.writer.metric_names.yhat_lower | string | `"yhat_lower"` |  |
-| model.prophet.writer.metric_names.yhat_upper | string | `"yhat_upper"` |  |
-| model.zscore.writer.extra_labels.model | string | `"zscore"` |  |
-| model.zscore.writer.metric_names.anomaly_score | string | `"anomaly_score"` |  |
-| model.zscore.writer.metric_names.yhat | string | `"yhat"` |  |
 | model.zscore.z_threshold | float | `2.5` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
