@@ -50,11 +50,11 @@ data:
           anomaly_score: "{{ .Values.metric_names.anomaly_score }}"
           yhat: "{{ .Values.metric_names.yhat }}"
         {{- end }}
-        {{- if eq .Values.model.enabled "holtwinters" }}
+        {{- if eq .Values.model.enabled "prophet" }}
           anomaly_score: "{{ .Values.metric_names.anomaly_score }}"
           yhat: "{{ .Values.metric_names.yhat }}"
         {{- end }}
-        {{- if eq .Values.model.enabled "holtwinters" }}
+        {{- if eq .Values.model.enabled "holt_winters" }}
           anomaly_score: "{{ .Values.metric_names.anomaly_score }}"
           yhat: "{{ .Values.metric_names.yhat }}"
           yhat_lower: yhat_lower
@@ -62,5 +62,5 @@ data:
           value: value
         {{- end }}
       extra_labels:
-        model: "{{ .Values.extra_labels.model | quote }}"
+        model: "{{ .Values.extra_labels.model }}"
 
