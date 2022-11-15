@@ -112,14 +112,18 @@ eula: false
 
 remote:
   read:
-    url: "" # -- For example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428"
-    tenant: "" # -- Format: vm_account_id:vm_project_id (for example: 0:0). Ref: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy
+    # -- For example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428"
+    url: ""
+    # -- Format: vm_account_id:vm_project_id (for example: 0:0). Ref: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy
+    tenant: ""
     basicAuth:
       username: ""
       password: ""
   write:
-    url: "" # -- For example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428"
-    tenant: "" # -- Format: vm_account_id:vm_project_id (for example: 0:0). Ref: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy
+    # -- For example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428"
+    url: ""
+    # -- Format: vm_account_id:vm_project_id (for example: 0:0). Ref: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy
+    tenant: ""
     basicAuth:
       username: ""
       password: ""
@@ -134,10 +138,12 @@ metric_names:
   anomaly_score: anomaly_score
   yhat: yhat
 extra_labels:
-  model: "" # -- Available options: zscore, prophet, holt_winters
+# -- Available options: zscore, prophet, holt_winters
+  model: "" 
 
 model:
-  enabled: "holt_winters" # -- Available options: zscore, prophet, holt_winters
+# -- Available options: zscore, prophet, holt_winters
+  enabled: "prophet"
 
   zscore:
     z_threshold: 2.5
@@ -149,10 +155,10 @@ model:
     seasonality: '1d'
     frequency: '1h'   
 
-queries:
 # -- Queries example:
 #  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
 #  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'
 #  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'
 #  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
 #  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
+queries: {}
