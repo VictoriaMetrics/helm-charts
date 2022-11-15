@@ -120,7 +120,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
 | extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
-| extra_labels.model | string | `""` |  |
+| extra_labels.model | string | `""` | Available options: zscore, prophet, holt_winters |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"us-docker.pkg.dev/victoriametrics-test/public/vmanomaly-trial"` | Victoria Metrics anomaly Docker repository and image name |
@@ -128,7 +128,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | imagePullSecrets | list | `[]` |  |
 | metric_names.anomaly_score | string | `"anomaly_score"` |  |
 | metric_names.yhat | string | `"yhat"` |  |
-| model.enabled | string | `"holt_winters"` |  |
+| model.enabled | string | `"prophet"` | Available options: zscore, prophet, holt_winters |
 | model.holt_winters.frequency | string | `"1h"` |  |
 | model.holt_winters.seasonality | string | `"1d"` |  |
 | model.prophet.interval_width | float | `0.8` |  |
@@ -138,15 +138,15 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podAnnotations | object | `{}` | Annotations to be added to pod |
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | podSecurityContext | object | `{}` |  |
-| queries | string | `nil` |  |
+| queries | object | `{}` | Queries example:  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))' |
 | remote.read.basicAuth.password | string | `""` |  |
 | remote.read.basicAuth.username | string | `""` |  |
-| remote.read.tenant | string | `""` |  |
-| remote.read.url | string | `""` |  |
+| remote.read.tenant | string | `""` | Format: vm_account_id:vm_project_id (for example: 0:0). Ref: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy |
+| remote.read.url | string | `""` | For example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" |
 | remote.write.basicAuth.password | string | `""` |  |
 | remote.write.basicAuth.username | string | `""` |  |
-| remote.write.tenant | string | `""` |  |
-| remote.write.url | string | `""` |  |
+| remote.write.tenant | string | `""` | Format: vm_account_id:vm_project_id (for example: 0:0). Ref: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy |
+| remote.write.url | string | `""` | For example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" |
 | resources | object | `{}` |  |
 | scheduler.class | string | `"scheduler.periodic.PeriodicScheduler"` |  |
 | scheduler.fit_every | string | `"1d"` |  |
