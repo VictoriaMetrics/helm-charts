@@ -1,6 +1,8 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.9.40](https://img.shields.io/badge/Version-0.9.40-informational?style=flat-square)
+
+![Version: 0.9.42](https://img.shields.io/badge/Version-0.9.42-informational?style=flat-square)
+
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -135,7 +137,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vminsert component |
 | vminsert.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vminsert.image.repository | string | `"victoriametrics/vminsert"` | Image repository |
-| vminsert.image.tag | string | `"v1.83.0-cluster"` | Image tag |
+| vminsert.image.tag | string | `"v1.83.1-cluster"` | Image tag |
 | vminsert.ingress.annotations | object | `{}` | Ingress annotations |
 | vminsert.ingress.enabled | bool | `false` | Enable deployment of ingress for vminsert component |
 | vminsert.ingress.extraLabels | object | `{}` |  |
@@ -200,7 +202,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vmselect component |
 | vmselect.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmselect.image.repository | string | `"victoriametrics/vmselect"` | Image repository |
-| vmselect.image.tag | string | `"v1.83.0-cluster"` | Image tag |
+| vmselect.image.tag | string | `"v1.83.1-cluster"` | Image tag |
 | vmselect.ingress.annotations | object | `{}` | Ingress annotations |
 | vmselect.ingress.enabled | bool | `false` | Enable deployment of ingress for vmselect component |
 | vmselect.ingress.extraLabels | object | `{}` |  |
@@ -272,7 +274,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.fullnameOverride | string | `nil` | Overrides the full name of vmstorage component |
 | vmstorage.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmstorage.image.repository | string | `"victoriametrics/vmstorage"` | Image repository |
-| vmstorage.image.tag | string | `"v1.83.0-cluster"` | Image tag |
+| vmstorage.image.tag | string | `"v1.83.1-cluster"` | Image tag |
 | vmstorage.initContainers | list | `[]` |  |
 | vmstorage.name | string | `"vmstorage"` | vmstorage container name |
 | vmstorage.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
@@ -329,7 +331,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | vmstorage.vmbackupmanager.extraSecretMounts | list | `[]` |  |
 | vmstorage.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| vmstorage.vmbackupmanager.image.tag | string | `"v1.83.0-enterprise"` | vmbackupmanager image tag |
+| vmstorage.vmbackupmanager.image.tag | string | `"v1.83.1-enterprise"` | vmbackupmanager image tag |
 | vmstorage.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
 | vmstorage.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
 | vmstorage.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |
@@ -342,6 +344,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.vmbackupmanager.readinessProbe.periodSeconds | int | `15` |  |
 | vmstorage.vmbackupmanager.readinessProbe.timeoutSeconds | int | `5` |  |
 | vmstorage.vmbackupmanager.resources | object | `{}` |  |
+| vmstorage.vmbackupmanager.restore | object | `{"onStart":{"enabled":false}}` | Allows to enable restore options for pod. Read more: https://docs.victoriametrics.com/vmbackupmanager.html#restore-commands |
 | vmstorage.vmbackupmanager.retention | object | `{"keepLastDaily":2,"keepLastHourly":2,"keepLastMonthly":2,"keepLastWeekly":2}` | backups' retention settings |
 | vmstorage.vmbackupmanager.retention.keepLastDaily | int | `2` | keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off |
 | vmstorage.vmbackupmanager.retention.keepLastHourly | int | `2` | keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off |

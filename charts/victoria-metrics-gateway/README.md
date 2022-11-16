@@ -1,6 +1,7 @@
 # Victoria Metrics Helm Chart for vmgateway
 
- ![Version: 0.1.18](https://img.shields.io/badge/Version-0.1.18-informational?style=flat-square)
+
+ ![Version: 0.1.20](https://img.shields.io/badge/Version-0.1.20-informational?style=flat-square)
 
 Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
 
@@ -125,7 +126,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmgateway"` | Victoria Metrics gateway Docker repository and image name |
-| image.tag | string | `"v1.83.0-enterprise"` | Tag of Docker image |
+| image.tag | string | `"v1.83.1-enterprise"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |

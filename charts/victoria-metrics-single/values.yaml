@@ -40,7 +40,7 @@ server:
     # -- Image repository
     repository: victoriametrics/victoria-metrics
     # -- Image tag
-    tag: v1.83.0
+    tag: v1.83.1
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -239,7 +239,7 @@ server:
       # -- vmbackupmanager image repository
       repository: victoriametrics/vmbackupmanager
       # -- vmbackupmanager image tag
-      tag: v1.83.0-enterprise
+      tag: v1.83.1-enterprise
     # -- disable hourly backups
     disableHourly: false
     # -- disable daily backups
@@ -264,6 +264,11 @@ server:
       envflag.enable: "true"
       envflag.prefix: VM_
       loggerFormat: json
+    # -- Allows to enable restore options for pod.
+    # Read more: https://docs.victoriametrics.com/vmbackupmanager.html#restore-commands
+    restore:
+      onStart:
+        enabled: false
     resources: {}
     # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
     env: []

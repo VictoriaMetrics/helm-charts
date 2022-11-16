@@ -1,6 +1,7 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.8.41](https://img.shields.io/badge/Version-0.8.41-informational?style=flat-square)
+
+ ![Version: 0.8.43](https://img.shields.io/badge/Version-0.8.43-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -129,7 +130,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | server.image.repository | string | `"victoriametrics/victoria-metrics"` | Image repository |
-| server.image.tag | string | `"v1.83.0"` | Image tag |
+| server.image.tag | string | `"v1.83.1"` | Image tag |
 | server.ingress.annotations | object | `{}` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
@@ -212,7 +213,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | server.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| server.vmbackupmanager.image.tag | string | `"v1.83.0-enterprise"` | vmbackupmanager image tag |
+| server.vmbackupmanager.image.tag | string | `"v1.83.1-enterprise"` | vmbackupmanager image tag |
 | server.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
 | server.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
 | server.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |
@@ -225,6 +226,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.readinessProbe.periodSeconds | int | `15` |  |
 | server.vmbackupmanager.readinessProbe.timeoutSeconds | int | `5` |  |
 | server.vmbackupmanager.resources | object | `{}` |  |
+| server.vmbackupmanager.restore | object | `{"onStart":{"enabled":false}}` | Allows to enable restore options for pod. Read more: https://docs.victoriametrics.com/vmbackupmanager.html#restore-commands |
 | server.vmbackupmanager.retention | object | `{"keepLastDaily":2,"keepLastHourly":2,"keepLastMonthly":2,"keepLastWeekly":2}` | backups' retention settings |
 | server.vmbackupmanager.retention.keepLastDaily | int | `2` | keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off |
 | server.vmbackupmanager.retention.keepLastHourly | int | `2` | keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off |

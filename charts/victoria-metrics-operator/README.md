@@ -1,6 +1,7 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.15.0](https://img.shields.io/badge/Version-0.15.0-informational?style=flat-square)
+![Version: 0.16.0](https://img.shields.io/badge/Version-0.16.0-informational?style=flat-square)
+
 
 Victoria Metrics Operator
 
@@ -140,7 +141,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| admissionWebhooks | object | `{"caBundle":"","certManager":{"enabled":false,"issuer":{}},"enabled":false,"policy":"Fail"}` | Configures resource validation |
+| admissionWebhooks | object | `{"caBundle":"","certManager":{"enabled":false,"issuer":{}},"enabled":false,"enabledCRDValidation":{"vmagent":true,"vmalert":true,"vmalertmanager":true,"vmalertmanagerConfig":true,"vmauth":true,"vmcluster":true,"vmrule":true,"vmsingle":true,"vmuser":true},"policy":"Fail"}` | Configures resource validation |
 | admissionWebhooks.caBundle | string | `""` | with keys: tls.key, tls.crt, ca.crt |
 | admissionWebhooks.certManager.enabled | bool | `false` | Enables cert creation and injection by cert-manager. |
 | admissionWebhooks.certManager.issuer | object | `{}` | If needed, provide own issuer. Operator will create self-signed if empty. |
@@ -158,7 +159,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.29.0"` | Image tag |
+| image.tag | string | `"v0.29.1"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
 | logLevel | string | `"info"` | possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name override |
