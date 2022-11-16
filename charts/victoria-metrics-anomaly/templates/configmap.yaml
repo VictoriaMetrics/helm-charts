@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "chart.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "chart.labels" . | nindent 4 }}
+data:
+  config.yml: |
+    model:
+    {{- if eq .Values.model.enabled "zscore" }}
+      class: "model.zscore.ZscoreModel"
+      {{- toYaml .Values.model.zscore | nindent 6 }}
+    {{- end }}
+    {{- if eq .Values.model.enabled "prophet" }}
+      class: "model.prophet.ProphetModel"
+      {{- toYaml .Values.model.prophet | nindent 6 }}
+    {{- end }}
+    {{- if eq .Values.model.enabled "holt_winters" }}
+      class: "model.holtwinters.HoltWinters"
+      {{- toYaml .Values.model.holt_winters | nindent 6 }}
+    {{- end }}
+    scheduler:
+      {{- toYaml .Values.scheduler | nindent 6 }}
+    reader:
+      class: "reader.vm.VmReader"
+      datasource_url: {{ .Values.remote.read.url | quote }}
+      {{ with .Values.remote.read.tenant }}
+      tenant_id: "{{ . }}"
+      {{ end -}}
+      {{ if and .Values.remote.read.basicAuth.username .Values.remote.read.basicAuth.password }}
+      basicAuth:
+        username: "{{ .Values.remote.read.basicAuth.username }}"
+        password: "{{ .Values.remote.read.basicAuth.password }}"
+      {{ end -}}
+      queries:
+        {{- toYaml .Values.queries | nindent 8 }}
+    writer:
+      class: "writer.vm.VmWriter"
+      datasource_url: "{{ .Values.remote.write.url }}"
+      {{ with .Values.remote.write.tenant }}
+      tenant_id: "{{ . }}"
+      {{ end -}}
+      {{ if and .Values.remote.write.basicAuth.username .Values.remote.write.basicAuth.password }}
+      basicAuth:
+        username: "{{ .Values.remote.write.basicAuth.username }}"
+        password: "{{ .Values.remote.write.basicAuth.password }}"
+      {{ end -}}
+      metric_names:
+        {{- if eq .Values.model.enabled "zscore" }}
+        anomaly_score: "{{ .Values.metric_names.anomaly_score }}"
+        yhat: "{{ .Values.metric_names.yhat }}"
+        {{- end }}
+        {{- if eq .Values.model.enabled "holt_winters" }}
+        anomaly_score: "{{ .Values.metric_names.anomaly_score }}"
+        yhat: "{{ .Values.metric_names.yhat }}"
+        {{- end }}
+        {{- if eq .Values.model.enabled "prophet" }}
+        anomaly_score: "{{ .Values.metric_names.anomaly_score }}"
+        yhat: "{{ .Values.metric_names.yhat }}"
+        yhat_lower: yhat_lower
+        yhat_upper: yhat_upper
+        value: value
+        {{- end }}
+      extra_labels:
+        model: "{{ .Values.extra_labels.model }}"
+
