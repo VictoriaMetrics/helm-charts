@@ -23,7 +23,7 @@ lint:
 	CMD="lint charts/victoria-metrics-alert -f hack/vmalert-lint-hack.yaml" $(MAKE) helm
 	CMD="lint charts/victoria-metrics-gateway -f hack/vmgateway-cluster-ratelimiting-minimum.yaml" $(MAKE) helm
 	CMD="lint charts/victoria-metrics-auth" $(MAKE) helm
-	CMD="lint charts/victoria-metrics-anomaly" $(MAKE) helm
+	CMD="lint charts/victoria-metrics-anomaly -f hack/vmanomaly-lint-hack.yaml" $(MAKE) helm
 
 # Package chart into zip file
 package:
