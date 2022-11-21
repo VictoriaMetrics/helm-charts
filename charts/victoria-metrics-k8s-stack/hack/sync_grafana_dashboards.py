@@ -41,13 +41,13 @@ charts = [
         'type': 'json'
     },
     {
-        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json',
+        'name': 'victoriametrics-cluster',
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/cluster/dashboards/victoriametrics-cluster.json',
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
     },
     {
-        'name': 'victoriametrics-cluster',
-        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/cluster/dashboards/victoriametrics.json',
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json',
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
     },
