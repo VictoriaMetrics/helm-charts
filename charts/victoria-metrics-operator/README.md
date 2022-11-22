@@ -1,7 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
-![Version: 0.16.0](https://img.shields.io/badge/Version-0.16.0-informational?style=flat-square)
-
+ ![Version: 0.16.1](https://img.shields.io/badge/Version-0.16.1-informational?style=flat-square)
 
 Victoria Metrics Operator
 
@@ -159,7 +158,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.29.1"` | Image tag |
+| image.tag | string | `"v0.29.2"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
 | logLevel | string | `"info"` | possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name override |

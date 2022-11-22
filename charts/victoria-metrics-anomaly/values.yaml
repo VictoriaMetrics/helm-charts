@@ -6,7 +6,7 @@ image:
   # -- Victoria Metrics anomaly Docker repository and image name
   repository: us-docker.pkg.dev/victoriametrics-test/public/vmanomaly-trial
   # -- Tag of Docker image
-  tag: v0.21.0
+  tag: v0.22.0
   # -- Pull policy of Docker image
   pullPolicy: IfNotPresent
 
@@ -105,25 +105,29 @@ serviceMonitor:
   extraLabels: {}
   annotations: {}
 
-# -- should be true and means that you have the legal right to run a vmgateway
+# -- should be true and means that you have the legal right to run a vmanomaly
 # that can either be a signed contract or an email with confirmation to run the service in a trial period
 # https://victoriametrics.com/legal/eula/
 eula: false
 
 remote:
   read:
-    # -- For example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428"
+    # -- URL for data reading. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481/select/"
     url: ""
-    # -- Format: vm_account_id:vm_project_id (for example: 0:0). Ref: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy
+    # -- When read from VictoriaMetrics cluster. Format: vm_account_id:vm_project_id (for example: 0:0) or vm_account_id (for example 0). See https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy
     tenant: ""
+    # -- Health endpoint. vmanomaly add /health to url if it's empty. You can specify full path when VictoriaMetircs is hidden via vmauth or other proxies/balancers
+    health: ""
     basicAuth:
       username: ""
       password: ""
   write:
-    # -- For example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428"
+    # -- URL for data writing. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/"
     url: ""
-    # -- Format: vm_account_id:vm_project_id (for example: 0:0). Ref: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy
+    # -- When write to VictoriaMetrics cluster. Format: vm_account_id:vm_project_id (for example: 0:0) or vm_account_id (for example 0). See https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy
     tenant: ""
+    # -- Health endpoint. vmanomaly add /health to url if it's empty. You can specify full path when VictoriaMetircs is hidden via vmauth or other proxies/balancers
+    health: ""
     basicAuth:
       username: ""
       password: ""
@@ -134,15 +138,12 @@ scheduler:
   fit_window: "7d"
   infer_every: "10s"
 
-metric_names:
-  anomaly_score: anomaly_score
-  yhat: yhat
-extra_labels:
-# -- Available options: zscore, prophet, holt_winters
-  model: "" 
+## -- List of labels that will be added to generated series by vmanomaly
+extra_labels: {}
 
+## - Supported models by vmanomaly helm chart. vmanomaly supports more models - see https://docs.victoriametrics.com/vmanomaly.html#models
 model:
-# -- Available options: zscore, prophet, holt_winters
+  # -- Available options: zscore, prophet, holt_winters
   enabled: "prophet"
 
   zscore:
@@ -155,10 +156,15 @@ model:
     seasonality: '1d'
     frequency: '1h'   
 
-# -- Queries example:
+# -- Query names and expressions. Required. Examples:
 #  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
 #  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'
 #  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'
 #  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
 #  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
 queries: {}
+#  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
+#  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'
+#  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'
+#  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
+#  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
