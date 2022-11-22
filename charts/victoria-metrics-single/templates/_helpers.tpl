@@ -93,7 +93,7 @@ Defines the name of scrape configuration map
 */}}
 {{- define "victoria-metrics.server.scrape.configname" -}}
 {{- if .Values.server.scrape.configMap -}}
-{{- .Values.configMap -}}
+{{- .Values.server.scrape.configMap -}}
 {{- else -}}
 {{- include "victoria-metrics.server.fullname" . -}}-scrapeconfig
 {{- end -}}
