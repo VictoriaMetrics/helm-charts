@@ -441,7 +441,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.ingress.path | string | `"/"` |  |
 | vmagent.ingress.pathType | string | `"Prefix"` |  |
 | vmagent.ingress.tls | list | `[]` |  |
-| vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
+| vmagent.spec.externalLabels | object | `{}` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
 | vmagent.spec.image.tag | string | `"v1.83.1"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
