@@ -50,21 +50,21 @@ template-local:
 
 # Package chart into zip file
 package:
-	CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) helm
-	CMD="package charts/* -d packages" $(MAKE) helm
+	CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM)
+	CMD="package charts/* -d packages" $(MAKE) $(HELM)
 
 # Create index file (use only for initial setup)
 index:
-	CMD="repo index --url ${URL} ." $(MAKE) helm
+	CMD="repo index --url ${URL} ." $(MAKE) $(HELM)
 
 init:
-	CMD="repo add prometheus-community https://prometheus-community.github.io/helm-charts" $(MAKE) helm
-	CMD="repo add grafana https://grafana.github.io/helm-charts" $(MAKE) helm
-	CMD="repo update" $(MAKE) helm
+	CMD="repo add prometheus-community https://prometheus-community.github.io/helm-charts" $(MAKE) $(HELM)
+	CMD="repo add grafana https://grafana.github.io/helm-charts" $(MAKE) $(HELM)
+	CMD="repo update" $(MAKE) $(HELM)
 
 # Update index file add new version of package into it
 merge:
-	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) helm
+	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) $(HELM)
 
 gen-docs:
 	docker run --rm --name helm-docs  \
