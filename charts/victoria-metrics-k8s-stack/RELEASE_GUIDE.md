@@ -37,4 +37,8 @@ helm template vm-k8s-stack ./charts/victoria-metrics-k8s-stack --output-dir out 
 </div>
 
 7. Test updated chart by installing it to your kubernetes cluster.
-8. Commit the changes and send a [PR](https://github.com/VictoriaMetrics/helm-charts/pulls)
+8. Update docs with
+```console
+helm-docs
+```
+9.  Commit the changes and send a [PR](https://github.com/VictoriaMetrics/helm-charts/pulls)
