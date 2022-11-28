@@ -42,7 +42,7 @@ charts = [
     },
     {
         'name': 'victoriametrics-cluster',
-        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/cluster/dashboards/victoriametrics-cluster.json',
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics-cluster.json',
         'destination': '../templates/grafana/dashboards',
         'type': 'json'
     },
