@@ -69,6 +69,12 @@ defaultRules:
   # -- Additional labels for PrometheusRule alerts
   additionalRuleLabels: {}
 
+## -- Create default dashboards
+defaultDashboardsEnabled: true
+
+## -- Create experimental dashboards
+experimentalDashboardsEnabled: true
+
 # Provide custom recording or alerting rules to be deployed into the cluster.
 additionalVictoriaMetricsMap:
 #    rule-name:
@@ -352,6 +358,31 @@ alertmanager:
           receiver: slack-monitoring
           continue: true
 
+    inhibit_rules:
+      - target_matchers:
+          - severity=~"warning|info"
+        source_matchers:
+          - severity=critical
+        equal:
+          - cluster
+          - namespace
+          - alertname
+      - target_matchers:
+          - severity=info
+        source_matchers:
+          - severity=warning
+        equal:
+          - cluster
+          - namespace
+          - alertname
+      - target_matchers:
+          - severity=info
+        source_matchers:
+          - alertname=InfoInhibitor
+        equal:
+          - cluster
+          - namespace
+
     receivers:
       - name: "slack-monitoring"
         slack_configs:
@@ -455,6 +486,9 @@ alertmanager:
 vmalert:
   annotations: {}
   enabled: true
+
+  # Controls whether VMAlert should use VMAgent or VMInsert as a target for remotewrite
+  remoteWriteVMAgent: false
   # spec for VMAlert crd
   # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmalertspec
   spec:
@@ -513,7 +547,8 @@ vmagent:
   annotations: {}
   # https://docs.victoriametrics.com/operator/api.html#vmagentremotewritespec
   # defined spec will be added to the remoteWrite configuration of VMAgent
-  additionalRemoteWrites: []
+  additionalRemoteWrites:
+    []
     #- url: http://some-remote-write/api/v1/write
   # spec for VMAgent crd
   # https://docs.victoriametrics.com/operator/blob/master/docs/api.MD#vmagentspec
