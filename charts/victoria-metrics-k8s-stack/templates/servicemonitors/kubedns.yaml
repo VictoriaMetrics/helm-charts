@@ -26,7 +26,6 @@ spec:
     {{- end}}
 {{- end }}
 ---
-{{- if .Values.kubeDns.vmServiceScrape.enabled }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
@@ -42,6 +41,5 @@ spec:
   namespaceSelector:
     matchNames:
       - "kube-system"
-{{ omit .Values.kubeDns.vmServiceScrape.spec "selector" "namespaceSelector" | toYaml | indent 2 }}
-{{- end }}
+{{ omit .Values.kubeDns.spec "selector" "namespaceSelector" | toYaml | indent 2 }}
 {{- end }}

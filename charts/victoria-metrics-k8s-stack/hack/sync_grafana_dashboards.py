@@ -90,7 +90,7 @@ condition_map = {
     'victoriametrics-cluster': '.Values.vmcluster.enabled',
     'victoriametrics': '.Values.vmsingle.enabled',
     'vmalert': '.Values.vmalert.enabled',
-    'operator': '.Values.operator.enabled',
+    'operator': '(index .Values "victoria-metrics-operator" "enabled")',
     'k8s-system-coredns': '.Values.experimentalDashboardsEnabled .Values.coreDns.enabled',
     'k8s-system-api-server': '.Values.experimentalDashboardsEnabled .Values.kubeApiServer.enabled',
     'k8s-views-pods': '.Values.experimentalDashboardsEnabled .Values.kubelet.enabled',
