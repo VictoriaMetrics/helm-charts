@@ -70,9 +70,9 @@ data:
         {{- with .Values.extra_labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- if or .Values.monitoring.pull.enable .Values.monitoring.push.endpoint_url }}
+      {{ if or .Values.monitoring.pull.enabled .Values.monitoring.push.endpoint_url }}
       monitoring:
-        {{- if .Values.monitoring.pull.enable }}
+        {{- if .Values.monitoring.pull.enabled }}
         pull:
           {{- toYaml .Values.monitoring.pull | nindent 10 }}
         {{- end }}
