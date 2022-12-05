@@ -183,6 +183,19 @@ $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
  All CRD manual actions upgrades listed below:
 
 
+### Upgrade to 0.13.0
+
+
+- node-exporter starting from version 4.0.0 is using the Kubernetes recommended labels. Therefore you have to delete the daemonset before you upgrade.
+
+```bash
+kubectl delete daemonset -l app=prometheus-node-exporter
+```
+- scrape configuration for kubernetes components was moved from `vmServiceScrape.spec` section to `spec` section. If you previously modified scrape configuration you need to update your `values.yaml`
+
+- `grafana.defaultDashboardsEnabled` was renamed to `defaultDashboardsEnabled` (moved to top level). You may need to update it in your `values.yaml`
+
+
 ### Upgrade to 0.6.0
 
 
