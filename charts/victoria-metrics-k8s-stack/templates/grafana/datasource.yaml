@@ -20,7 +20,8 @@ data:
 {{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled }}
     - name: VictoriaMetrics
       type: prometheus
-      url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
+      {{- $readEndpoint:= (include "victoria-metrics-k8s-stack.vmReadEndpoint" . | fromYaml) }}
+      url: {{ $readEndpoint.url }}
       access: proxy
       isDefault: true
       jsonData: {{ toYaml .Values.grafana.sidecar.datasources.jsonData | nindent 8 }}

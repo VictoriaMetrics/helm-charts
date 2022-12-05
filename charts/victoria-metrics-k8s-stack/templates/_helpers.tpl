@@ -46,11 +46,7 @@ Create the name of the service account to use
 Create the name of service account and clusterRole for cleanup-hook
 */}}
 {{- define "victoria-metrics-k8s-stack.cleanupHookName" -}}
-{{- if .Values.operator.cleanupSA.create }}
-{{- default ("victoria-metrics-k8s-stack-cleanup-hook") .Values.operator.cleanupSA.name }}
-{{- else }}
-{{- default "default" .Values.operator.cleanupSA.name }}
-{{- end }}
+{{- printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "cleanup-hook" | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 
@@ -83,43 +79,38 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 
-{{- define "victoria-metrics-k8s-stack.vmSelectEndpoint" -}}
+{{- define "victoria-metrics-k8s-stack.vmReadEndpoint" -}}
 {{- if .Values.vmsingle.enabled -}}
-{{ printf "http://%s.%s.svc:%s%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "/") }}
+url: {{ printf "http://%s.%s.svc:%s%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "/") }}
 {{- else if .Values.vmcluster.enabled -}}
-{{ printf "http://%s-%s.%s.svc:%s%s/select/%s/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default "8481") (index .Values "vmcluster" "spec" "vmselect" "extraArgs" "http.pathPrefix" | default "/") (.Values.tenant | default "0") }}
+url: {{ printf "http://%s-%s.%s.svc:%s%s/select/%s/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default "8481") (index .Values "vmcluster" "spec" "vmselect" "extraArgs" "http.pathPrefix" | default "/") (.Values.tenant | default "0") }}
+{{- else if .Values.externalVM.read.url -}}
+{{ .Values.externalVM.read | toYaml }}
 {{- end }}
 {{- end }}
 
-{{- define "victoria-metrics-k8s-stack.vmSingleInsertEndpoint" -}}
-{{ printf "http://%s.%s.svc:%s%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "/") }}
-{{- end }}
-{{- define "victoria-metrics-k8s-stack.vmClusterInsertEndpoint" -}}
-{{ printf "http://%s-%s.%s.svc:%s%s/insert/%s/prometheus" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default "8480") (index .Values "vmcluster" "spec" "vminsert" "extraArgs" "http.pathPrefix" | default "/") (.Values.tenant | default "0")  }}
-{{- end }}
-
-{{/*
-  for VMAlert remote
-*/}}
-{{- define "victoria-metrics-k8s-stack.vmInsertEndpoint" -}}
+{{- define "victoria-metrics-k8s-stack.vmWriteEndpoint" -}}
 {{- if .Values.vmsingle.enabled -}}
-{{ include "victoria-metrics-k8s-stack.vmSingleInsertEndpoint" . }}
+url: {{ printf "http://%s.%s.svc:%s%s/api/v1/write" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "") }}
 {{- else if .Values.vmcluster.enabled -}}
-{{ include "victoria-metrics-k8s-stack.vmClusterInsertEndpoint" . }}
+url: {{ printf "http://%s-%s.%s.svc:%s%s/insert/%s/prometheus/api/v1/write" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default "8480") (index .Values "vmcluster" "spec" "vminsert" "extraArgs" "http.pathPrefix" | default "/") (.Values.tenant | default "0")  }}
+{{- else if .Values.externalVM.write.url -}}
+{{ .Values.externalVM.write | toYaml }}
 {{- end }}
 {{- end }}
-
 
 {{/*
 VMAlert remotes 
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAlertRemotes" -}}
 remoteWrite:
-     url: {{ include "victoria-metrics-k8s-stack.vmInsertEndpoint" . }}
-remoteRead:
-     url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
-datasource:
-     url: {{ include "victoria-metrics-k8s-stack.vmSelectEndpoint" . }}
+{{- if or .Values.vmalert.remoteWriteVMAgent }}
+     url: {{ printf "http://%s-%s.%s.svc:9093" "vmagent" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace }}
+{{- else }}
+     {{- include "victoria-metrics-k8s-stack.vmWriteEndpoint" . | nindent 2 }}
+{{- end }}
+remoteRead: {{ include "victoria-metrics-k8s-stack.vmReadEndpoint" . | nindent 2 }}
+datasource: {{ include "victoria-metrics-k8s-stack.vmReadEndpoint" . | nindent 2 }}
 notifiers:
     - url: {{ printf "http://%s-%s.%s.svc:9093" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace }}
 {{- end }}
@@ -148,6 +139,7 @@ VMAlert spec
 {{- if .Values.vmalert.templateFiles -}}
 {{- $_ := set $extraArgs "rule.templates" (print "/etc/vm/configs/" (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmalert-extra-tpl" | trunc 63 | trimSuffix "-" ) "/*.tmpl") -}}
 {{- end -}}
+{{- $_ := set $extraArgs "remoteWrite.disablePathAppend" "true" -}}
 {{ deepCopy .Values.vmalert.spec | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertRemotes" . | fromYaml) | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertTemplates" . | fromYaml) | mergeOverwrite (dict "extraArgs" $extraArgs) | toYaml }}
 {{- end }}
 
@@ -157,14 +149,11 @@ VM Agent remoteWrites
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAgentRemoteWrite" -}}
 remoteWrite:
-{{- if .Values.vmsingle.enabled }}
-- url: {{ include "victoria-metrics-k8s-stack.vmSingleInsertEndpoint" . }}/api/v1/write
-{{- end }}
-{{- if .Values.vmcluster.enabled }}
-- url: {{  include "victoria-metrics-k8s-stack.vmClusterInsertEndpoint" . }}/api/v1/write
-{{- end }}
+{{- if or .Values.vmsingle.enabled .Values.vmcluster.enabled .Values.externalVM.write }}
+- {{ include "victoria-metrics-k8s-stack.vmWriteEndpoint" . | nindent 2 }}
 {{ range .Values.vmagent.additionalRemoteWrites }}
 -{{ toYaml . | nindent 2 }}
+{{- end }}
 {{- end }}
 {{- end }}
 

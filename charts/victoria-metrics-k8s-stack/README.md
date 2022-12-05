@@ -1,10 +1,11 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.12.12](https://img.shields.io/badge/Version-0.12.12-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.13.0](https://img.shields.io/badge/Version-0.13.0-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
-# Title
+* [Overview](#Overview)
+* [Configuration](#Configuration)
 * [Prerequisites](#Prerequisites)
 * [Dependencies](#Dependencies)
 * [Quick Start](#How-to-install)
@@ -12,6 +13,68 @@ Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operato
 * [Version Upgrade](#Upgrade-guide)
 * [Troubleshooting](#Troubleshooting)
 * [Values](#Parameters)
+
+# Overview
+This chart is an All-in-one solution to start monitoring kubernetes cluster.
+It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/tree/master/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
+Also it installs Custom Resources like [VMSingle](https://docs.victoriametrics.com/operator/quick-start.html#vmsingle), [VMCluster](https://docs.victoriametrics.com/operator/quick-start.html#vmcluster), [VMAgent](https://docs.victoriametrics.com/operator/quick-start.html#vmagent), [VMAlert](https://docs.victoriametrics.com/operator/quick-start.html#vmalert).
+
+To enable metrics collection for kubernetes this chart installs multiple scrape configurations for kuberenetes components like kubelet and kube-proxy, etc. Metrics collection is done by [VMAgent](https://docs.victoriametrics.com/operator/quick-start.html#vmagent). So if want to ship metrics to external VictoriaMetrics database you can disable VMSingle installation by setting `vmsingle.enabled` to `false` and setting `vmagent.vmagentSpec.remoteWrite.url` to your external VictoriaMetrics database.
+
+This chart also installs bunch of dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus) project.
+
+![Overview](img/k8s-stack-overview.png)
+
+# Configuration
+
+Configuration of this chart is done through helm values.
+
+## Dependencies
+Dependencies can be enabled or disabled by setting `enabled` to `true` or `false` in `values.yaml` file.
+
+**!Important:** for dependency charts anything that you can find in values.yaml of dependency chart can be configured in this chart under key for that dependency. For example if you want to configure `grafana` you can find all possible configuration options in [values.yaml](https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml) and you should set them in values for this chart under grafana: key. For example if you want to configure `grafana.persistence.enabled` you should set it in values.yaml like this:
+```yaml
+#################################################
+###              dependencies               #####
+#################################################
+# Grafana dependency chart configuration. For possible values refer to https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration
+grafana:
+  enabled: true
+  persistence:
+    type: pvc
+    enabled: false
+```
+
+## VictoriaMetrics components
+This chart installs multiple VictoriaMetrics components using Custom Resources that are managed by [victoria-metrics-operator](https://docs.victoriametrics.com/operator/design.html)
+Each resource can be configured using `spec` of that resource from API docs of [victoria-metrics-operator](https://docs.victoriametrics.com/operator/api.html). For example if you want to configure `VMAgent` you can find all possible configuration options in [API docs](https://docs.victoriametrics.com/operator/api.html#vmagent) and you should set them in values for this chart under `vmagent.spec` key. For example if you want to configure `remoteWrite.url` you should set it in values.yaml like this:
+```yaml
+vmagent:
+  spec:
+    remoteWrite:
+      - url: "https://insert.vmcluster.domain.com/insert/0/prometheus/api/v1/write"
+```
+
+## Rules and dashboards
+This chart by default install multiple dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
+you can disable dashboards with `defaultDashboardsEnabled: false` and `experimentalDashboardsEnabled: false`
+and rules can be configured under `defaultRules`
+
+## Prometheus scrape configs
+This chart installs multiple scrape configurations for kubernetes monitoring. They are configured under `#ServiceMonitors` section in `values.yaml` file. For example if you want to configure scrape config for `kubelet` you should set it in values.yaml like this:
+```yaml
+kubelet:
+  enabled: true
+
+  # -- Enable scraping /metrics/cadvisor from kubelet's service
+  cadvisor: true
+  # -- Enable scraping /metrics/probes from kubelet's service
+  probes: true
+  # spec for VMNodeScrape crd
+  # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmnodescrapespec
+  spec:
+    interval: "30s"
+```
 
 # Prerequisites
 
@@ -26,29 +89,6 @@ helm repo update
 ```
 
 * PV support on underlying infrastructure.
-
-# Chart Details
-
-This chart will do the following:
-
-* Rollout victoria metrics operator, grafana, prometheus-node-exporter and kube-state-metrics helm charts
-* Create VMSingle, VMAgent, VMAlert, VMAlertManager CRDs
-* Configure Grafana for VictoriaMetrics datasource
-* Configure ServiceScrapes for Node Exporter, kube-state-metrics and various kubernetes metrics
-* Install Grafana dashboards for kubernetes monitoring based on [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
-
-## Dependencies
-
-By default this chart installs additional, dependent charts:
-
-- [VictoriaMetrics/victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator)
-- [kubernetes/kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/tree/master/charts/kube-state-metrics)
-- [prometheus-community/prometheus-node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter)
-- [grafana/grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
-
-_See [helm dependency](https://helm.sh/docs/helm/helm_dependency/) for command documentation._
-
-> ATTENTION !!! Default values are inherited from helm charts declared as a dependency in the Chart.yaml file. If you want to change the default values that are inherited, access the documentation and the values.yaml file for each chart to understand the content and create a customized values.yaml file for your need.
 
 # How to install
 
@@ -138,6 +178,17 @@ $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
  All CRD manual actions upgrades listed below:
 
+### Upgrade to 0.13.0
+
+- node-exporter starting from version 4.0.0 is using the Kubernetes recommended labels. Therefore you have to delete the daemonset before you upgrade.
+
+```bash
+kubectl delete daemonset -l app=prometheus-node-exporter
+```
+- scrape configuration for kubernetes components was moved from `vmServiceScrape.spec` section to `spec` section. If you previously modified scrape configuration you need to update your `values.yaml`
+
+- `grafana.defaultDashboardsEnabled` was renamed to `defaultDashboardsEnabled` (moved to top level). You may need to update it in your `values.yaml`
+
 ### Upgrade to 0.6.0
 
  All `CRD` must be update to the lastest version with command:
@@ -204,6 +255,20 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.annotations | object | `{}` |  |
 | alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
 | alertmanager.config.global.slack_api_url | string | `"http://slack:30500/"` |  |
+| alertmanager.config.inhibit_rules[0].equal[0] | string | `"cluster"` |  |
+| alertmanager.config.inhibit_rules[0].equal[1] | string | `"namespace"` |  |
+| alertmanager.config.inhibit_rules[0].equal[2] | string | `"alertname"` |  |
+| alertmanager.config.inhibit_rules[0].source_matchers[0] | string | `"severity=critical"` |  |
+| alertmanager.config.inhibit_rules[0].target_matchers[0] | string | `"severity=~\"warning|info\""` |  |
+| alertmanager.config.inhibit_rules[1].equal[0] | string | `"cluster"` |  |
+| alertmanager.config.inhibit_rules[1].equal[1] | string | `"namespace"` |  |
+| alertmanager.config.inhibit_rules[1].equal[2] | string | `"alertname"` |  |
+| alertmanager.config.inhibit_rules[1].source_matchers[0] | string | `"severity=warning"` |  |
+| alertmanager.config.inhibit_rules[1].target_matchers[0] | string | `"severity=info"` |  |
+| alertmanager.config.inhibit_rules[2].equal[0] | string | `"cluster"` |  |
+| alertmanager.config.inhibit_rules[2].equal[1] | string | `"namespace"` |  |
+| alertmanager.config.inhibit_rules[2].source_matchers[0] | string | `"alertname=InfoInhibitor"` |  |
+| alertmanager.config.inhibit_rules[2].target_matchers[0] | string | `"severity=info"` |  |
 | alertmanager.config.receivers[0].name | string | `"slack-monitoring"` |  |
 | alertmanager.config.receivers[0].slack_configs[0].actions[0].text | string | `"Runbook :green_book:"` |  |
 | alertmanager.config.receivers[0].slack_configs[0].actions[0].type | string | `"button"` |  |
@@ -280,7 +345,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.spec.selectAllByDefault | bool | `true` |  |
 | alertmanager.templateFiles | object | `{}` |  |
 | argocdReleaseOverride | string | `""` | For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
-| coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"vmServiceScrape":{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}]}}}` | Component scraping coreDns. Use either this or kubeDns |
+| coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}]}}` | Component scraping coreDns. Use either this or kubeDns |
+| defaultDashboardsEnabled | bool | `true` |  |
 | defaultRules.additionalRuleLabels | object | `{}` | Additional labels for PrometheusRule alerts |
 | defaultRules.annotations | object | `{}` | Annotations for default rules |
 | defaultRules.appNamespacesTarget | string | `".*"` |  |
@@ -309,6 +375,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rules.vmhealth | bool | `true` |  |
 | defaultRules.rules.vmsingle | bool | `true` |  |
 | defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
+| experimentalDashboardsEnabled | bool | `true` |  |
+| externalVM.read.url | string | `""` |  |
+| externalVM.write.url | string | `""` |  |
 | fullnameOverride | string | `""` |  |
 | grafana.additionalDataSources | list | `[]` |  |
 | grafana.dashboardProviders."dashboardproviders.yaml".apiVersion | int | `1` |  |
@@ -345,7 +414,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kube-state-metrics.enabled | bool | `true` |  |
 | kube-state-metrics.vmServiceScrape.spec | object | `{}` |  |
 | kubeApiServer | object | `{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"https","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"component","namespaceSelector":{"matchNames":["default"]},"selector":{"matchLabels":{"component":"apiserver","provider":"kubernetes"}}}}` | Component scraping the kube api server |
-| kubeControllerManager | object | `{"enabled":true,"endpoints":[],"service":{"enabled":true,"port":10252,"targetPort":10252},"vmServiceScrape":{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"jobLabel"}}}` | Component scraping the kube controller manager |
+| kubeControllerManager | object | `{"enabled":true,"endpoints":[],"service":{"enabled":true,"port":10252,"targetPort":10252},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"jobLabel"}}` | Component scraping the kube controller manager |
 | kubeDns.enabled | bool | `false` |  |
 | kubeDns.service.dnsmasq.port | int | `10054` |  |
 | kubeDns.service.dnsmasq.targetPort | int | `10054` |  |
@@ -353,44 +422,40 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeDns.service.selector.k8s-app | string | `"kube-dns"` |  |
 | kubeDns.service.skydns.port | int | `10055` |  |
 | kubeDns.service.skydns.targetPort | int | `10055` |  |
-| kubeDns.vmServiceScrape.enabled | bool | `true` |  |
-| kubeDns.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeDns.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics-dnsmasq"` |  |
-| kubeDns.vmServiceScrape.spec.endpoints[1].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeDns.vmServiceScrape.spec.endpoints[1].port | string | `"http-metrics-skydns"` |  |
+| kubeDns.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeDns.spec.endpoints[0].port | string | `"http-metrics-dnsmasq"` |  |
+| kubeDns.spec.endpoints[1].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeDns.spec.endpoints[1].port | string | `"http-metrics-skydns"` |  |
 | kubeEtcd.enabled | bool | `true` |  |
 | kubeEtcd.endpoints | list | `[]` |  |
 | kubeEtcd.service.enabled | bool | `true` |  |
 | kubeEtcd.service.port | int | `2379` |  |
 | kubeEtcd.service.targetPort | int | `2379` |  |
-| kubeEtcd.vmServiceScrape.enabled | bool | `true` |  |
-| kubeEtcd.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeEtcd.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
-| kubeEtcd.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
-| kubeEtcd.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
-| kubeEtcd.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| kubeEtcd.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeEtcd.spec.endpoints[0].port | string | `"http-metrics"` |  |
+| kubeEtcd.spec.endpoints[0].scheme | string | `"https"` |  |
+| kubeEtcd.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| kubeEtcd.spec.jobLabel | string | `"jobLabel"` |  |
 | kubeProxy.enabled | bool | `false` |  |
 | kubeProxy.endpoints | list | `[]` |  |
 | kubeProxy.service.enabled | bool | `true` |  |
 | kubeProxy.service.port | int | `10249` |  |
 | kubeProxy.service.targetPort | int | `10249` |  |
-| kubeProxy.vmServiceScrape.enabled | bool | `true` |  |
-| kubeProxy.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeProxy.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
-| kubeProxy.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
-| kubeProxy.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
-| kubeProxy.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| kubeProxy.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeProxy.spec.endpoints[0].port | string | `"http-metrics"` |  |
+| kubeProxy.spec.endpoints[0].scheme | string | `"https"` |  |
+| kubeProxy.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| kubeProxy.spec.jobLabel | string | `"jobLabel"` |  |
 | kubeScheduler.enabled | bool | `true` |  |
 | kubeScheduler.endpoints | list | `[]` |  |
 | kubeScheduler.service.enabled | bool | `true` |  |
 | kubeScheduler.service.port | int | `10251` |  |
 | kubeScheduler.service.targetPort | int | `10251` |  |
-| kubeScheduler.vmServiceScrape.enabled | bool | `true` |  |
-| kubeScheduler.vmServiceScrape.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeScheduler.vmServiceScrape.spec.endpoints[0].port | string | `"http-metrics"` |  |
-| kubeScheduler.vmServiceScrape.spec.endpoints[0].scheme | string | `"https"` |  |
-| kubeScheduler.vmServiceScrape.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
-| kubeScheduler.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| kubeScheduler.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| kubeScheduler.spec.endpoints[0].port | string | `"http-metrics"` |  |
+| kubeScheduler.spec.endpoints[0].scheme | string | `"https"` |  |
+| kubeScheduler.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
+| kubeScheduler.spec.jobLabel | string | `"jobLabel"` |  |
 | kubelet.cadvisor | bool | `true` | Enable scraping /metrics/cadvisor from kubelet's service |
 | kubelet.enabled | bool | `true` |  |
 | kubelet.probes | bool | `true` | Enable scraping /metrics/probes from kubelet's service |
@@ -415,20 +480,22 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubelet.spec.tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | kubelet.spec.tlsConfig.insecureSkipVerify | bool | `true` |  |
 | nameOverride | string | `""` |  |
-| operator | object | `{"cleanupCRD":true,"cleanupSA":{"create":true,"name":""},"enabled":true,"kubectlImage":{"pullPolicy":"IfNotPresent","repository":"gcr.io/google_containers/hyperkube","tag":"v1.18.0"}}` | Configures operator CRD |
-| operator.cleanupCRD | bool | `true` | Tells helm to remove CRD after chart remove |
 | prometheus-node-exporter.enabled | bool | `true` |  |
 | prometheus-node-exporter.extraArgs[0] | string | `"--collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"` |  |
 | prometheus-node-exporter.extraArgs[1] | string | `"--collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"` |  |
 | prometheus-node-exporter.podLabels.jobLabel | string | `"node-exporter"` |  |
 | prometheus-node-exporter.vmServiceScrape.enabled | bool | `true` |  |
+| prometheus-node-exporter.vmServiceScrape.spec.endpoints[0].metricRelabelConfigs[0].action | string | `"drop"` |  |
+| prometheus-node-exporter.vmServiceScrape.spec.endpoints[0].metricRelabelConfigs[0].regex | string | `"/var/lib/kubelet/pods.+"` |  |
+| prometheus-node-exporter.vmServiceScrape.spec.endpoints[0].metricRelabelConfigs[0].source_labels[0] | string | `"mountpoint"` |  |
+| prometheus-node-exporter.vmServiceScrape.spec.endpoints[0].port | string | `"metrics"` |  |
 | prometheus-node-exporter.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
 | tenant | string | `"0"` |  |
-| victoria-metrics-operator | object | `{"createCRD":false,"operator":{"disable_prometheus_converter":true}}` | For possible values refer to https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator#parameters |
-| victoria-metrics-operator.createCRD | bool | `false` | all values for victoria-metrics-operator helm chart can be specified here |
+| victoria-metrics-operator | object | `{"cleanupCRD":true,"cleanupImage":{"pullPolicy":"IfNotPresent","repository":"gcr.io/google_containers/hyperkube","tag":"v1.18.0"},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":true}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars.html |
+| victoria-metrics-operator.cleanupCRD | bool | `true` | Tells helm to remove CRD after chart remove |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.additionalRemoteWrites | list | `[]` |  |
 | vmagent.annotations | object | `{}` |  |
@@ -441,7 +508,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.ingress.path | string | `"/"` |  |
 | vmagent.ingress.pathType | string | `"Prefix"` |  |
 | vmagent.ingress.tls | list | `[]` |  |
-| vmagent.spec.externalLabels | object | `{}` |  |
+| vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
 | vmagent.spec.image.tag | string | `"v1.84.0"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
@@ -456,6 +523,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.ingress.path | string | `"/"` |  |
 | vmalert.ingress.pathType | string | `"Prefix"` |  |
 | vmalert.ingress.tls | list | `[]` |  |
+| vmalert.remoteWriteVMAgent | bool | `false` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
 | vmalert.spec.image.tag | string | `"v1.84.0"` |  |
 | vmalert.spec.selectAllByDefault | bool | `true` |  |
