@@ -1,5 +1,4 @@
-{{- if .Values.vmstorage.enabled -}}
-{{- if .Values.vmstorage.podDisruptionBudget.enabled }}
+{{- if and .Values.vmstorage.enabled .Values.vmstorage.podDisruptionBudget.enabled }}
 {{- if .Capabilities.APIVersions.Has "policy/v1beta1" }}
 apiVersion: policy/v1beta1
 {{- else -}}
@@ -24,5 +23,4 @@ spec:
   selector:
     matchLabels:
       {{- include "victoria-metrics.vmstorage.matchLabels" . | nindent 6 }}
-{{- end }}
 {{- end }}
