@@ -176,7 +176,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vminsert.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vminsert.strategy | object | `{}` |  |
-| vminsert.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs |
+| vminsert.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs |
 | vminsert.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | vmselect.affinity | object | `{}` | Pod affinity |
 | vmselect.annotations | object | `{}` |  |
