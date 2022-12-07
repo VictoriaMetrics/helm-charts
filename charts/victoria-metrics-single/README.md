@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.8.43](https://img.shields.io/badge/Version-0.8.43-informational?style=flat-square)
+ ![Version: 0.8.44](https://img.shields.io/badge/Version-0.8.44-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -157,7 +157,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.persistentVolume.subPath | string | `""` | Mount subpath |
 | server.podAnnotations | object | `{}` | Pod's annotations |
 | server.podLabels | object | `{}` | Pod's additional labels |
-| server.podManagementPolicy | string | `"OrderedReady"` | Pod's management policy  |
+| server.podManagementPolicy | string | `"OrderedReady"` | Pod's management policy |
 | server.podSecurityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | server.priorityClassName | string | `""` | Name of Priority Class |
 | server.readinessProbe.failureThreshold | int | `3` |  |
@@ -211,6 +211,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
+| server.vmbackupmanager.extraVolumeMounts | list | `[]` |  |
 | server.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
 | server.vmbackupmanager.image.tag | string | `"v1.84.0-enterprise"` | vmbackupmanager image tag |
 | server.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |

@@ -131,8 +131,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | model.holt_winters.seasonality | string | `"1d"` |  |
 | model.prophet.interval_width | float | `0.8` |  |
 | model.zscore.z_threshold | float | `2.5` |  |
-| monitoring | object | `{"pull":{"enable":true,"port":8440},"push":{"endpoint_url":"","extra_labels":{"job":"vmanomaly"}}}` | vmanomaly internal monitoring in Prometheus format |
-| monitoring.pull.enable | bool | `true` | if true expose metrics on /metric endpoint |
+| monitoring | object | `{"pull":{"enabled":true,"port":8440},"push":{"endpoint_url":"","extra_labels":{"job":"vmanomaly"}}}` | vmanomaly internal monitoring in Prometheus format |
+| monitoring.pull.enabled | bool | `true` | if true expose metrics on /metric endpoint |
 | monitoring.push.endpoint_url | string | `""` | push metrics on prometheus format if defined |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
