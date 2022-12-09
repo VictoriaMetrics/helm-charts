@@ -1,8 +1,10 @@
 URL=https://victoriametrics.github.io/helm-charts/
 HELM_IMAGE = alpine/helm:3.9.1
 HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.11.0
+CT_IMAGE = quay.io/helmpack/chart-testing:v3.7.1
 KNOWN_TARGETS=helm
 HELM=helm-docker
+CT=ct-docker
 
 helm-docker:
 	docker run --rm --name helm-exec  \
@@ -19,6 +21,21 @@ helm-local:
 	helm \
 		$(CMD)
 
+ct-docker:
+	docker run --rm --name helm-exec  \
+		--user $(shell id -u):$(shell id -g) \
+		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
+		-w /helm-charts \
+		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
+		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
+		-e HELM_DATA_HOME=/helm-charts/.helm/data \
+		--entrypoint 'ct' \
+		$(CT_IMAGE) \
+		$(CMD)
+
+ct-local:
+	ct \
+		$(CMD)
 
 # Run linter for helm chart
 lint:
@@ -40,6 +57,11 @@ template:
 	CMD="template charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml" $(MAKE) $(HELM)
 	CMD="template charts/victoria-metrics-anomaly -f hack/vmanomaly-lint-hack.yaml" $(MAKE) $(HELM)
 
+lint-ct:
+	CMD="lint --config .github/ci/ct.yaml --all" $(MAKE) $(CT)
+
+lint-ct-local:
+	CT="ct-local" $(MAKE) lint-ct
 
 lint-local:
 	HELM="helm-local" $(MAKE) lint
