@@ -6,7 +6,7 @@ image:
   # -- Victoria Metrics anomaly Docker repository and image name
   repository: us-docker.pkg.dev/victoriametrics-test/public/vmanomaly-trial
   # -- Tag of Docker image
-  tag: v0.22.0
+  tag: "" # rewrites Chart.AppVersionv
   # -- Pull policy of Docker image
   pullPolicy: IfNotPresent
 
@@ -151,6 +151,11 @@ model:
 
   prophet:
     interval_width: 0.8
+#    country_holidays: 'US'
+#    seasonalities:
+#      - name: 'hourly'
+#        period: 0.04166666666
+#        fourier_order: 30
 
   holt_winters:
     seasonality: '1d'
@@ -181,3 +186,4 @@ monitoring:
     endpoint_url: ""
     extra_labels:
       job: "vmanomaly"
+  

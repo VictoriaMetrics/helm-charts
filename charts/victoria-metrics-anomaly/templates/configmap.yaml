@@ -18,7 +18,7 @@ data:
     {{- if eq .Values.model.enabled "holt_winters" }}
       class: "model.holtwinters.HoltWinters"
       {{- toYaml .Values.model.holt_winters | nindent 6 }}
-    {{- end }}
+    {{- end }}      
     scheduler:
       {{- toYaml .Values.scheduler | nindent 6 }}
     reader:
@@ -49,27 +49,10 @@ data:
       {{ with .Values.remote.write.health -}}
       health_path: {{ . }}
       {{ end -}}
-      metric_names:
-        {{- if eq .Values.model.enabled "zscore" }}
-        anomaly_score: anomaly_score 
-        yhat: yhat
-        {{- end }}
-        {{- if eq .Values.model.enabled "holt_winters" }}
-        anomaly_score: anomaly_score
-        yhat: yhat
-        {{- end }}
-        {{- if eq .Values.model.enabled "prophet" }}
-        anomaly_score: anomaly_score
-        yhat: yhat
-        yhat_lower: yhat_lower
-        yhat_upper: yhat_upper
-        value: value
-        {{- end }}
-      extra_labels:
-        model: "{{ .Values.model.enabled }}"
-        {{- with .Values.extra_labels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+      metric_format:
+        __name__: "$VAR"
+        query: "$QUERY_KEY"
+        model: {{ .Values.model.enabled }}
       {{ if or .Values.monitoring.pull.enabled .Values.monitoring.push.endpoint_url }}
       monitoring:
         {{- if .Values.monitoring.pull.enabled }}
