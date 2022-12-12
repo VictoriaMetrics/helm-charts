@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
 ![Twitter Follow](https://img.shields.io/twitter/follow/VictoriaMetrics?style=social)
@@ -124,7 +124,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"us-docker.pkg.dev/victoriametrics-test/public/vmanomaly-trial"` | Victoria Metrics anomaly Docker repository and image name |
-| image.tag | string | `"v0.22.0"` | Tag of Docker image |
+| image.tag | string | `""` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | model.enabled | string | `"prophet"` | Available options: zscore, prophet, holt_winters |
 | model.holt_winters.frequency | string | `"1h"` |  |
