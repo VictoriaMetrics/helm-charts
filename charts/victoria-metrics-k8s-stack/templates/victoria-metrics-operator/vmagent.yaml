@@ -21,10 +21,10 @@ spec:
 {{- $serviceName := printf "%s-%s" "vmagent" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- $ingressPathType := .Values.vmagent.ingress.pathType | default "" -}}
 {{- $extraPaths := .Values.vmagent.ingress.extraPaths -}}
-{{- $newAPI := .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" -}}
+{{- $newAPI := .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
 {{- if $newAPI -}}
 apiVersion: networking.k8s.io/v1
-{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1/Ingress" }}
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
 apiVersion: networking.k8s.io/v1beta1
 {{- else }}
 apiVersion: extensions/v1beta1
