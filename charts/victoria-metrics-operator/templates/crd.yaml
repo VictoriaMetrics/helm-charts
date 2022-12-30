@@ -1,9 +1,9 @@
-{{- if and .Values.createCRD (eq .Values.useLegacyCRD false) }}
+{{- if .Values.createCRD }}
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmagents.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -14,7 +14,16 @@ spec:
     singular: vmagent
   scope: Namespaced
   versions:
-  - name: v1beta1
+  - additionalPrinterColumns:
+    - description: current number of shards
+      jsonPath: .status.shards
+      name: Shards Count
+      type: integer
+    - description: current number of replicas
+      jsonPath: .status.replicas
+      name: Replica Count
+      type: integer
+    name: v1beta1
     schema:
       openAPIV3Schema:
         description: VMAgent - is a tiny but brave agent, which helps you collect
@@ -67,6 +76,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       credentialsFile:
                         description: File with value for authorization
                         type: string
@@ -98,6 +108,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       password_file:
                         description: PasswordFile defines path to password file at
                           disk
@@ -122,6 +133,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   bearerToken:
                     description: Bearer token for accessing apiserver.
@@ -158,6 +170,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           secret:
                             description: Secret containing data to use for the targets.
                             properties:
@@ -177,6 +190,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                         type: object
                       caFile:
                         description: Path to the CA cert in the container to use for
@@ -205,6 +219,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           secret:
                             description: Secret containing data to use for the targets.
                             properties:
@@ -224,6 +239,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                         type: object
                       certFile:
                         description: Path to the client cert file in the container
@@ -255,6 +271,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       serverName:
                         description: Used to verify the hostname for the targets.
                         type: string
@@ -284,6 +301,7 @@ spec:
                 required:
                 - key
                 type: object
+                x-kubernetes-map-type: atomic
               affinity:
                 description: Affinity If specified, the pod's scheduling constraints.
                 type: object
@@ -355,6 +373,7 @@ spec:
                           - kind
                           - name
                           type: object
+                          x-kubernetes-map-type: atomic
                         dataSourceRef:
                           description: 'Specifies the object from which to populate
                             the volume with data, if a non-empty volume is desired.
@@ -370,12 +389,12 @@ spec:
                             if one of them is empty and the other is non-empty. There
                             are two important differences between DataSource and DataSourceRef:
                             * While DataSource only allows two specific types of objects,
-                            DataSourceRef   allows any non-core object, as well as
-                            PersistentVolumeClaim objects. * While DataSource ignores
-                            disallowed values (dropping them), DataSourceRef   preserves
-                            all values, and generates an error if a disallowed value
-                            is   specified. (Alpha) Using this field requires the
-                            AnyVolumeDataSource feature gate to be enabled.'
+                            DataSourceRef allows any non-core object, as well as PersistentVolumeClaim
+                            objects. * While DataSource ignores disallowed values
+                            (dropping them), DataSourceRef preserves all values, and
+                            generates an error if a disallowed value is specified.
+                            (Alpha) Using this field requires the AnyVolumeDataSource
+                            feature gate to be enabled.'
                           properties:
                             apiGroup:
                               description: APIGroup is the group for the resource
@@ -393,6 +412,7 @@ spec:
                           - kind
                           - name
                           type: object
+                          x-kubernetes-map-type: atomic
                         resources:
                           description: 'Resources represents the minimum resources
                             the volume should have. If RecoverVolumeExpansionFailure
@@ -471,6 +491,7 @@ spec:
                                 contains only "value". The requirements are ANDed.
                               type: object
                           type: object
+                          x-kubernetes-map-type: atomic
                         storageClassName:
                           description: 'Name of the StorageClass required by the claim.
                             More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
@@ -735,6 +756,7 @@ spec:
                         TODO: Add other useful fields. apiVersion, kind, uid?'
                       type: string
                   type: object
+                  x-kubernetes-map-type: atomic
                 type: array
               initContainers:
                 description: 'InitContainers allows adding initContainers to the pod
@@ -820,8 +842,7 @@ spec:
                   It is advised to review VMAgent release notes to ensure that no
                   incompatible scrape configs are going to break VMAgent after the
                   upgrade. it should be defined as single yaml file. inlineScrapeConfig:
-                  |     - job_name: "prometheus"       static_configs:       - targets:
-                  ["localhost:9090"]'
+                  | - job_name: "prometheus" static_configs: - targets: ["localhost:9090"]'
                 type: string
               insertPorts:
                 description: InsertPorts - additional listen ports for data ingestion.
@@ -917,6 +938,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               nodeScrapeRelabelTemplate:
                 description: NodeScrapeRelabelTemplate defines relabel config, that
                   will be added to each VMNodeScrape. it's useful for adding specific
@@ -1025,6 +1047,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               nodeSelector:
                 additionalProperties:
                   type: string
@@ -1146,6 +1169,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               podScrapeRelabelTemplate:
                 description: PodScrapeRelabelTemplate defines relabel config, that
                   will be added to each VMPodScrape. it's useful for adding specific
@@ -1254,6 +1278,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               podSecurityPolicyName:
                 description: PodSecurityPolicyName - defines name for podSecurityPolicy
                   in case of empty value, prefixedName will be used.
@@ -1312,6 +1337,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               probeScrapeRelabelTemplate:
                 description: ProbeScrapeRelabelTemplate defines relabel config, that
                   will be added to each VMProbeScrape. it's useful for adding specific
@@ -1420,6 +1446,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               readinessGates:
                 description: ReadinessGates defines pod readiness gates
                 items:
@@ -1456,6 +1483,7 @@ spec:
                 required:
                 - key
                 type: object
+                x-kubernetes-map-type: atomic
               remoteWrite:
                 description: 'RemoteWrite list of victoria metrics /some other remote
                   write system for vm it must looks like: http://victoria-metrics-single:8429/api/v1/write
@@ -1488,6 +1516,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         password_file:
                           description: PasswordFile defines path to password file
                             at disk
@@ -1512,6 +1541,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                       type: object
                     bearerTokenSecret:
                       description: Optional bearer auth token to use for -remoteWrite.url
@@ -1531,6 +1561,7 @@ spec:
                       required:
                       - key
                       type: object
+                      x-kubernetes-map-type: atomic
                     headers:
                       description: 'Headers allow configuring custom http headers
                         Must be in form of semicolon separated header with value e.g.
@@ -1625,6 +1656,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -1644,6 +1676,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         client_secret:
                           description: The secret containing the OAuth2 client secret
@@ -1663,6 +1696,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         client_secret_file:
                           description: ClientSecretFile defines path for client secret
                             file.
@@ -1717,6 +1751,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -1736,6 +1771,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         caFile:
                           description: Path to the CA cert in the container to use
@@ -1764,6 +1800,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -1783,6 +1820,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         certFile:
                           description: Path to the client cert file in the container
@@ -1814,6 +1852,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         serverName:
                           description: Used to verify the hostname for the targets.
                           type: string
@@ -1839,6 +1878,7 @@ spec:
                       required:
                       - key
                       type: object
+                      x-kubernetes-map-type: atomic
                   required:
                   - url
                   type: object
@@ -2037,6 +2077,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               serviceScrapeRelabelTemplate:
                 description: ServiceScrapeRelabelTemplate defines relabel config,
                   that will be added to each VMServiceScrape. it's useful for adding
@@ -2145,6 +2186,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               serviceScrapeSpec:
                 description: ServiceScrapeSpec that will be added to vmselect VMServiceScrape
                   spec
@@ -2325,6 +2367,7 @@ spec:
                             - kind
                             - name
                             type: object
+                            x-kubernetes-map-type: atomic
                           dataSourceRef:
                             description: 'Specifies the object from which to populate
                               the volume with data, if a non-empty volume is desired.
@@ -2341,11 +2384,11 @@ spec:
                               and the other is non-empty. There are two important
                               differences between DataSource and DataSourceRef: *
                               While DataSource only allows two specific types of objects,
-                              DataSourceRef   allows any non-core object, as well
-                              as PersistentVolumeClaim objects. * While DataSource
-                              ignores disallowed values (dropping them), DataSourceRef   preserves
+                              DataSourceRef allows any non-core object, as well as
+                              PersistentVolumeClaim objects. * While DataSource ignores
+                              disallowed values (dropping them), DataSourceRef preserves
                               all values, and generates an error if a disallowed value
-                              is   specified. (Alpha) Using this field requires the
+                              is specified. (Alpha) Using this field requires the
                               AnyVolumeDataSource feature gate to be enabled.'
                             properties:
                               apiGroup:
@@ -2364,6 +2407,7 @@ spec:
                             - kind
                             - name
                             type: object
+                            x-kubernetes-map-type: atomic
                           resources:
                             description: 'Resources represents the minimum resources
                               the volume should have. If RecoverVolumeExpansionFailure
@@ -2442,6 +2486,7 @@ spec:
                                   contains only "value". The requirements are ANDed.
                                 type: object
                             type: object
+                            x-kubernetes-map-type: atomic
                           storageClassName:
                             description: 'Name of the StorageClass required by the
                               claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
@@ -2597,6 +2642,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               staticScrapeRelabelTemplate:
                 description: StaticScrapeRelabelTemplate defines relabel config, that
                   will be added to each VMStaticScrape. it's useful for adding specific
@@ -2705,6 +2751,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               terminationGracePeriodSeconds:
                 description: TerminationGracePeriodSeconds period for container graceful
                   termination
@@ -2842,23 +2889,32 @@ spec:
                 format: int32
                 type: integer
               replicas:
-                description: ReplicaCount Total number of non-terminated pods targeted
-                  by this VMAlert cluster (their labels match the selector).
+                description: ReplicaCount Total number of pods targeted by this VMAgent
+                format: int32
+                type: integer
+              selector:
+                description: Selector string form of label value set for autoscaling
+                type: string
+              shards:
+                description: Shards represents total number of vmagent deployments
+                  with uniq scrape targets
                 format: int32
                 type: integer
               unavailableReplicas:
                 description: UnavailableReplicas Total number of unavailable pods
-                  targeted by this VMAlert cluster.
+                  targeted by this VMAgent cluster.
                 format: int32
                 type: integer
               updatedReplicas:
                 description: UpdatedReplicas Total number of non-terminated pods targeted
-                  by this VMAlert cluster that have the desired version spec.
+                  by this VMAgent cluster that have the desired version spec.
                 format: int32
                 type: integer
             required:
             - availableReplicas
             - replicas
+            - selector
+            - shards
             - unavailableReplicas
             - updatedReplicas
             type: object
@@ -2866,13 +2922,17 @@ spec:
     served: true
     storage: true
     subresources:
+      scale:
+        labelSelectorPath: .status.selector
+        specReplicasPath: .spec.shardCount
+        statusReplicasPath: .status.shards
       status: {}
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmalertmanagerconfigs.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -3033,6 +3093,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           auth_secret:
                             description: AuthSecret defines secrent name and key at
                               CRD namespace. It must contain the CRAM-MD5 secret.
@@ -3053,6 +3114,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           auth_username:
                             description: The username to use for authentication.
                             type: string
@@ -3113,6 +3175,7 @@ spec:
                                     required:
                                     - key
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                   secret:
                                     description: Secret containing data to use for
                                       the targets.
@@ -3134,6 +3197,7 @@ spec:
                                     required:
                                     - key
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                 type: object
                               caFile:
                                 description: Path to the CA cert in the container
@@ -3163,6 +3227,7 @@ spec:
                                     required:
                                     - key
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                   secret:
                                     description: Secret containing data to use for
                                       the targets.
@@ -3184,6 +3249,7 @@ spec:
                                     required:
                                     - key
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                 type: object
                               certFile:
                                 description: Path to the client cert file in the container
@@ -3217,6 +3283,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                               serverName:
                                 description: Used to verify the hostname for the targets.
                                 type: string
@@ -3258,6 +3325,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           apiURL:
                             description: The URL to send OpsGenie API requests to.
                             type: string
@@ -3411,6 +3479,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           send_resolved:
                             description: SendResolved controls notify about resolved
                               alerts.
@@ -3437,6 +3506,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           severity:
                             description: Severity of the incident.
                             type: string
@@ -3509,6 +3579,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           url:
                             description: A supplementary URL shown alongside the message.
                             type: string
@@ -3537,6 +3608,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                         type: object
                       type: array
                     slack_configs:
@@ -3612,6 +3684,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           callback_id:
                             type: string
                           channel:
@@ -3705,6 +3778,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           chat_id:
                             description: ChatID is ID of the chat where to send the
                               messages.
@@ -3761,6 +3835,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           api_url:
                             description: The VictorOps API URL.
                             type: string
@@ -3801,6 +3876,7 @@ spec:
                                     required:
                                     - key
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                   password_file:
                                     description: PasswordFile defines path to password
                                       file at disk
@@ -3827,6 +3903,7 @@ spec:
                                     required:
                                     - key
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                 type: object
                               bearer_token_file:
                                 description: BearerTokenFile defines filename for
@@ -3853,6 +3930,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                               proxyURL:
                                 description: Optional proxy URL.
                                 type: string
@@ -3883,6 +3961,7 @@ spec:
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       secret:
                                         description: Secret containing data to use
                                           for the targets.
@@ -3905,6 +3984,7 @@ spec:
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                     type: object
                                   caFile:
                                     description: Path to the CA cert in the container
@@ -3934,6 +4014,7 @@ spec:
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       secret:
                                         description: Secret containing data to use
                                           for the targets.
@@ -3956,6 +4037,7 @@ spec:
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                     type: object
                                   certFile:
                                     description: Path to the client cert file in the
@@ -3989,6 +4071,7 @@ spec:
                                     required:
                                     - key
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                   serverName:
                                     description: Used to verify the hostname for the
                                       targets.
@@ -4061,6 +4144,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                         type: object
                       type: array
                     wechat_configs:
@@ -4093,6 +4177,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           api_url:
                             description: The WeChat API URL.
                             type: string
@@ -4128,6 +4213,7 @@ spec:
                                     required:
                                     - key
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                   password_file:
                                     description: PasswordFile defines path to password
                                       file at disk
@@ -4154,6 +4240,7 @@ spec:
                                     required:
                                     - key
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                 type: object
                               bearer_token_file:
                                 description: BearerTokenFile defines filename for
@@ -4180,6 +4267,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                               proxyURL:
                                 description: Optional proxy URL.
                                 type: string
@@ -4210,6 +4298,7 @@ spec:
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       secret:
                                         description: Secret containing data to use
                                           for the targets.
@@ -4232,6 +4321,7 @@ spec:
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                     type: object
                                   caFile:
                                     description: Path to the CA cert in the container
@@ -4261,6 +4351,7 @@ spec:
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       secret:
                                         description: Secret containing data to use
                                           for the targets.
@@ -4283,6 +4374,7 @@ spec:
                                         required:
                                         - key
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                     type: object
                                   certFile:
                                     description: Path to the client cert file in the
@@ -4316,6 +4408,7 @@ spec:
                                     required:
                                     - key
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                   serverName:
                                     description: Used to verify the hostname for the
                                       targets.
@@ -4412,7 +4505,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmalertmanagers.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -4531,6 +4624,7 @@ spec:
                           - kind
                           - name
                           type: object
+                          x-kubernetes-map-type: atomic
                         dataSourceRef:
                           description: 'Specifies the object from which to populate
                             the volume with data, if a non-empty volume is desired.
@@ -4546,12 +4640,12 @@ spec:
                             if one of them is empty and the other is non-empty. There
                             are two important differences between DataSource and DataSourceRef:
                             * While DataSource only allows two specific types of objects,
-                            DataSourceRef   allows any non-core object, as well as
-                            PersistentVolumeClaim objects. * While DataSource ignores
-                            disallowed values (dropping them), DataSourceRef   preserves
-                            all values, and generates an error if a disallowed value
-                            is   specified. (Alpha) Using this field requires the
-                            AnyVolumeDataSource feature gate to be enabled.'
+                            DataSourceRef allows any non-core object, as well as PersistentVolumeClaim
+                            objects. * While DataSource ignores disallowed values
+                            (dropping them), DataSourceRef preserves all values, and
+                            generates an error if a disallowed value is specified.
+                            (Alpha) Using this field requires the AnyVolumeDataSource
+                            feature gate to be enabled.'
                           properties:
                             apiGroup:
                               description: APIGroup is the group for the resource
@@ -4569,6 +4663,7 @@ spec:
                           - kind
                           - name
                           type: object
+                          x-kubernetes-map-type: atomic
                         resources:
                           description: 'Resources represents the minimum resources
                             the volume should have. If RecoverVolumeExpansionFailure
@@ -4647,6 +4742,7 @@ spec:
                                 contains only "value". The requirements are ANDed.
                               type: object
                           type: object
+                          x-kubernetes-map-type: atomic
                         storageClassName:
                           description: 'Name of the StorageClass required by the claim.
                             More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
@@ -4766,11 +4862,11 @@ spec:
                   type: string
                 type: array
               configNamespaceSelector:
-                description: ' ConfigNamespaceSelector defines namespace selector
-                  for VMAlertmanagerConfig. Works in combination with Selector. NamespaceSelector
+                description: ConfigNamespaceSelector defines namespace selector for
+                  VMAlertmanagerConfig. Works in combination with Selector. NamespaceSelector
                   nil - only objects at VMAlertmanager namespace. Selector nil - only
                   objects at NamespaceSelector namespaces. If both nil - behaviour
-                  controlled by selectAllByDefault'
+                  controlled by selectAllByDefault
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements.
@@ -4813,6 +4909,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               configRawYaml:
                 description: ConfigRawYaml - raw configuration for alertmanager, it
                   helps it to start without secret. priority -> hardcoded ConfigRaw
@@ -4875,6 +4972,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               containers:
                 description: Containers allows injecting additional containers or
                   patching existing containers. This is meant to allow adding an authentication
@@ -5001,6 +5099,7 @@ spec:
                         TODO: Add other useful fields. apiVersion, kind, uid?'
                       type: string
                   type: object
+                  x-kubernetes-map-type: atomic
                 type: array
               initContainers:
                 description: 'InitContainers allows adding initContainers to the pod
@@ -5381,6 +5480,7 @@ spec:
                             - kind
                             - name
                             type: object
+                            x-kubernetes-map-type: atomic
                           dataSourceRef:
                             description: 'Specifies the object from which to populate
                               the volume with data, if a non-empty volume is desired.
@@ -5397,11 +5497,11 @@ spec:
                               and the other is non-empty. There are two important
                               differences between DataSource and DataSourceRef: *
                               While DataSource only allows two specific types of objects,
-                              DataSourceRef   allows any non-core object, as well
-                              as PersistentVolumeClaim objects. * While DataSource
-                              ignores disallowed values (dropping them), DataSourceRef   preserves
+                              DataSourceRef allows any non-core object, as well as
+                              PersistentVolumeClaim objects. * While DataSource ignores
+                              disallowed values (dropping them), DataSourceRef preserves
                               all values, and generates an error if a disallowed value
-                              is   specified. (Alpha) Using this field requires the
+                              is specified. (Alpha) Using this field requires the
                               AnyVolumeDataSource feature gate to be enabled.'
                             properties:
                               apiGroup:
@@ -5420,6 +5520,7 @@ spec:
                             - kind
                             - name
                             type: object
+                            x-kubernetes-map-type: atomic
                           resources:
                             description: 'Resources represents the minimum resources
                               the volume should have. If RecoverVolumeExpansionFailure
@@ -5498,6 +5599,7 @@ spec:
                                   contains only "value". The requirements are ANDed.
                                 type: object
                             type: object
+                            x-kubernetes-map-type: atomic
                           storageClassName:
                             description: 'Name of the StorageClass required by the
                               claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
@@ -5767,7 +5869,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmalerts.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -5861,6 +5963,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       password_file:
                         description: PasswordFile defines path to password file at
                           disk
@@ -5885,6 +5988,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   bearerTokenFilePath:
                     type: string
@@ -5906,6 +6010,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   headers:
                     description: Headers allow configuring custom http headers Must
                       be in form of semicolon separated header with value e.g. headerName:headerValue
@@ -6043,6 +6148,7 @@ spec:
                         TODO: Add other useful fields. apiVersion, kind, uid?'
                       type: string
                   type: object
+                  x-kubernetes-map-type: atomic
                 type: array
               initContainers:
                 description: 'InitContainers allows adding initContainers to the pod
@@ -6126,6 +6232,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       password_file:
                         description: PasswordFile defines path to password file at
                           disk
@@ -6150,6 +6257,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   bearerTokenFilePath:
                     type: string
@@ -6171,6 +6279,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   headers:
                     description: Headers allow configuring custom http headers Must
                       be in form of semicolon separated header with value e.g. headerName:headerValue
@@ -6231,6 +6340,7 @@ spec:
                               only "value". The requirements are ANDed.
                             type: object
                         type: object
+                        x-kubernetes-map-type: atomic
                       namespaceSelector:
                         description: NamespaceSelector is a selector for selecting
                           either all namespaces or a list of namespaces.
@@ -6273,6 +6383,7 @@ spec:
                 required:
                 - key
                 type: object
+                x-kubernetes-map-type: atomic
               notifiers:
                 description: 'Notifiers prometheus alertmanager endpoints. Required
                   at least one of  notifier or notifiers. e.g. http://127.0.0.1:9093
@@ -6314,6 +6425,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         password_file:
                           description: PasswordFile defines path to password file
                             at disk
@@ -6338,6 +6450,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                       type: object
                     bearerTokenFilePath:
                       type: string
@@ -6359,6 +6472,7 @@ spec:
                       required:
                       - key
                       type: object
+                      x-kubernetes-map-type: atomic
                     headers:
                       description: Headers allow configuring custom http headers Must
                         be in form of semicolon separated header with value e.g. headerName:headerValue
@@ -6419,6 +6533,7 @@ spec:
                                 contains only "value". The requirements are ANDed.
                               type: object
                           type: object
+                          x-kubernetes-map-type: atomic
                         namespaceSelector:
                           description: NamespaceSelector is a selector for selecting
                             either all namespaces or a list of namespaces.
@@ -6565,6 +6680,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       password_file:
                         description: PasswordFile defines path to password file at
                           disk
@@ -6589,6 +6705,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   bearerTokenFilePath:
                     type: string
@@ -6610,6 +6727,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   headers:
                     description: Headers allow configuring custom http headers Must
                       be in form of semicolon separated header with value e.g. headerName:headerValue
@@ -6671,6 +6789,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       password_file:
                         description: PasswordFile defines path to password file at
                           disk
@@ -6695,6 +6814,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   bearerTokenFilePath:
                     type: string
@@ -6716,6 +6836,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   concurrency:
                     description: Defines number of readers that concurrently write
                       into remote storage (default 1)
@@ -6867,6 +6988,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               rulePath:
                 description: 'RulePath to the file with alert rules. Supports patterns.
                   Flag can be specified multiple times. Examples: -rule /path/to/file.
@@ -6923,6 +7045,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               runtimeClassName:
                 description: RuntimeClassName - defines runtime class for kubernetes
                   pod. https://kubernetes.io/docs/concepts/containers/runtime-class/
@@ -7167,7 +7290,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmauths.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -7345,6 +7468,7 @@ spec:
                         TODO: Add other useful fields. apiVersion, kind, uid?'
                       type: string
                   type: object
+                  x-kubernetes-map-type: atomic
                 type: array
               ingress:
                 description: Ingress enables ingress configuration for VMAuth.
@@ -7374,27 +7498,26 @@ spec:
                             a network host, as defined by RFC 3986. Note the following
                             deviations from the \"host\" part of the URI as defined
                             in RFC 3986: 1. IPs are not allowed. Currently an IngressRuleValue
-                            can only apply to    the IP in the Spec of the parent
-                            Ingress. 2. The `:` delimiter is not respected because
-                            ports are not allowed. \t  Currently the port of an Ingress
-                            is implicitly :80 for http and \t  :443 for https. Both
-                            these may change in the future. Incoming requests are
-                            matched against the host before the IngressRuleValue.
-                            If the host is unspecified, the Ingress routes all traffic
-                            based on the specified IngressRuleValue. \n Host can be
-                            \"precise\" which is a domain name without the terminating
-                            dot of a network host (e.g. \"foo.bar.com\") or \"wildcard\",
-                            which is a domain name prefixed with a single wildcard
-                            label (e.g. \"*.foo.com\"). The wildcard character '*'
-                            must appear by itself as the first DNS label and matches
-                            only a single label. You cannot have a wildcard label
-                            by itself (e.g. Host == \"*\"). Requests will be matched
-                            against the Host field in the following way: 1. If Host
-                            is precise, the request matches this rule if the http
-                            host header is equal to Host. 2. If Host is a wildcard,
-                            then the request matches this rule if the http host header
-                            is to equal to the suffix (removing the first label) of
-                            the wildcard rule."
+                            can only apply to the IP in the Spec of the parent Ingress.
+                            2. The `:` delimiter is not respected because ports are
+                            not allowed. Currently the port of an Ingress is implicitly
+                            :80 for http and :443 for https. Both these may change
+                            in the future. Incoming requests are matched against the
+                            host before the IngressRuleValue. If the host is unspecified,
+                            the Ingress routes all traffic based on the specified
+                            IngressRuleValue. \n Host can be \"precise\" which is
+                            a domain name without the terminating dot of a network
+                            host (e.g. \"foo.bar.com\") or \"wildcard\", which is
+                            a domain name prefixed with a single wildcard label (e.g.
+                            \"*.foo.com\"). The wildcard character '*' must appear
+                            by itself as the first DNS label and matches only a single
+                            label. You cannot have a wildcard label by itself (e.g.
+                            Host == \"*\"). Requests will be matched against the Host
+                            field in the following way: 1. If Host is precise, the
+                            request matches this rule if the http host header is equal
+                            to Host. 2. If Host is a wildcard, then the request matches
+                            this rule if the http host header is to equal to the suffix
+                            (removing the first label) of the wildcard rule."
                           type: string
                         http:
                           description: 'HTTPIngressRuleValue is a list of http selectors
@@ -7445,6 +7568,7 @@ spec:
                                         - kind
                                         - name
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       service:
                                         description: Service references a Service
                                           as a Backend. This is a mutually exclusive
@@ -7490,19 +7614,19 @@ spec:
                                       of the Path matching. PathType can be one of
                                       the following values: * Exact: Matches the URL
                                       path exactly. * Prefix: Matches based on a URL
-                                      path prefix split by ''/''. Matching is   done
+                                      path prefix split by ''/''. Matching is done
                                       on a path element by element basis. A path element
-                                      refers is the   list of labels in the path split
-                                      by the ''/'' separator. A request is a   match
+                                      refers is the list of labels in the path split
+                                      by the ''/'' separator. A request is a match
                                       for path p if every p is an element-wise prefix
-                                      of p of the   request path. Note that if the
-                                      last element of the path is a substring   of
-                                      the last element in request path, it is not
-                                      a match (e.g. /foo/bar   matches /foo/bar/baz,
-                                      but does not match /foo/barbaz). * ImplementationSpecific:
-                                      Interpretation of the Path matching is up to   the
-                                      IngressClass. Implementations can treat this
-                                      as a separate PathType   or treat it identically
+                                      of p of the request path. Note that if the last
+                                      element of the path is a substring of the last
+                                      element in request path, it is not a match (e.g.
+                                      /foo/bar matches /foo/bar/baz, but does not
+                                      match /foo/barbaz). * ImplementationSpecific:
+                                      Interpretation of the Path matching is up to
+                                      the IngressClass. Implementations can treat
+                                      this as a separate PathType or treat it identically
                                       to Prefix or Exact path types. Implementations
                                       are required to support all path types.'
                                     type: string
@@ -7922,6 +8046,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               userSelector:
                 description: UserSelector defines VMUser to be selected for config
                   file generation. Works in combination with NamespaceSelector. NamespaceSelector
@@ -7969,6 +8094,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               volumeMounts:
                 description: VolumeMounts allows configuration of additional VolumeMounts
                   on the output Deployment definition. VolumeMounts specified will
@@ -8037,7 +8163,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmclusters.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -8110,6 +8236,7 @@ spec:
                         TODO: Add other useful fields. apiVersion, kind, uid?'
                       type: string
                   type: object
+                  x-kubernetes-map-type: atomic
                 type: array
               podSecurityPolicyName:
                 description: PodSecurityPolicyName - defines name for podSecurityPolicy
@@ -8739,6 +8866,7 @@ spec:
                               - kind
                               - name
                               type: object
+                              x-kubernetes-map-type: atomic
                             dataSourceRef:
                               description: 'Specifies the object from which to populate
                                 the volume with data, if a non-empty volume is desired.
@@ -8755,11 +8883,11 @@ spec:
                                 if one of them is empty and the other is non-empty.
                                 There are two important differences between DataSource
                                 and DataSourceRef: * While DataSource only allows
-                                two specific types of objects, DataSourceRef   allows
+                                two specific types of objects, DataSourceRef allows
                                 any non-core object, as well as PersistentVolumeClaim
                                 objects. * While DataSource ignores disallowed values
-                                (dropping them), DataSourceRef   preserves all values,
-                                and generates an error if a disallowed value is   specified.
+                                (dropping them), DataSourceRef preserves all values,
+                                and generates an error if a disallowed value is specified.
                                 (Alpha) Using this field requires the AnyVolumeDataSource
                                 feature gate to be enabled.'
                               properties:
@@ -8781,6 +8909,7 @@ spec:
                               - kind
                               - name
                               type: object
+                              x-kubernetes-map-type: atomic
                             resources:
                               description: 'Resources represents the minimum resources
                                 the volume should have. If RecoverVolumeExpansionFailure
@@ -8860,6 +8989,7 @@ spec:
                                     requirements are ANDed.
                                   type: object
                               type: object
+                              x-kubernetes-map-type: atomic
                             storageClassName:
                               description: 'Name of the StorageClass required by the
                                 claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
@@ -9485,6 +9615,7 @@ spec:
                                 - kind
                                 - name
                                 type: object
+                                x-kubernetes-map-type: atomic
                               dataSourceRef:
                                 description: 'Specifies the object from which to populate
                                   the volume with data, if a non-empty volume is desired.
@@ -9501,13 +9632,13 @@ spec:
                                   automatically if one of them is empty and the other
                                   is non-empty. There are two important differences
                                   between DataSource and DataSourceRef: * While DataSource
-                                  only allows two specific types of objects, DataSourceRef   allows
-                                  any non-core object, as well as PersistentVolumeClaim
+                                  only allows two specific types of objects, DataSourceRef
+                                  allows any non-core object, as well as PersistentVolumeClaim
                                   objects. * While DataSource ignores disallowed values
-                                  (dropping them), DataSourceRef   preserves all values,
-                                  and generates an error if a disallowed value is   specified.
-                                  (Alpha) Using this field requires the AnyVolumeDataSource
-                                  feature gate to be enabled.'
+                                  (dropping them), DataSourceRef preserves all values,
+                                  and generates an error if a disallowed value is
+                                  specified. (Alpha) Using this field requires the
+                                  AnyVolumeDataSource feature gate to be enabled.'
                                 properties:
                                   apiGroup:
                                     description: APIGroup is the group for the resource
@@ -9528,6 +9659,7 @@ spec:
                                 - kind
                                 - name
                                 type: object
+                                x-kubernetes-map-type: atomic
                               resources:
                                 description: 'Resources represents the minimum resources
                                   the volume should have. If RecoverVolumeExpansionFailure
@@ -9609,6 +9741,7 @@ spec:
                                       The requirements are ANDed.
                                     type: object
                                 type: object
+                                x-kubernetes-map-type: atomic
                               storageClassName:
                                 description: 'Name of the StorageClass required by
                                   the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
@@ -9908,6 +10041,7 @@ spec:
                               - kind
                               - name
                               type: object
+                              x-kubernetes-map-type: atomic
                             dataSourceRef:
                               description: 'Specifies the object from which to populate
                                 the volume with data, if a non-empty volume is desired.
@@ -9924,11 +10058,11 @@ spec:
                                 if one of them is empty and the other is non-empty.
                                 There are two important differences between DataSource
                                 and DataSourceRef: * While DataSource only allows
-                                two specific types of objects, DataSourceRef   allows
+                                two specific types of objects, DataSourceRef allows
                                 any non-core object, as well as PersistentVolumeClaim
                                 objects. * While DataSource ignores disallowed values
-                                (dropping them), DataSourceRef   preserves all values,
-                                and generates an error if a disallowed value is   specified.
+                                (dropping them), DataSourceRef preserves all values,
+                                and generates an error if a disallowed value is specified.
                                 (Alpha) Using this field requires the AnyVolumeDataSource
                                 feature gate to be enabled.'
                               properties:
@@ -9950,6 +10084,7 @@ spec:
                               - kind
                               - name
                               type: object
+                              x-kubernetes-map-type: atomic
                             resources:
                               description: 'Resources represents the minimum resources
                                 the volume should have. If RecoverVolumeExpansionFailure
@@ -10029,6 +10164,7 @@ spec:
                                     requirements are ANDed.
                                   type: object
                               type: object
+                              x-kubernetes-map-type: atomic
                             storageClassName:
                               description: 'Name of the StorageClass required by the
                                 claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
@@ -10644,6 +10780,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       customS3Endpoint:
                         description: Custom S3 endpoint for use with S3-compatible
                           storages (e.g. MinIO). S3 is used if not set
@@ -10719,6 +10856,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 fieldRef:
                                   description: 'Selects a field of the pod: supports
                                     metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`,
@@ -10737,6 +10875,7 @@ spec:
                                   required:
                                   - fieldPath
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 resourceFieldRef:
                                   description: 'Selects a resource of the container:
                                     only resources limits and requests (limits.cpu,
@@ -10762,6 +10901,7 @@ spec:
                                   required:
                                   - resource
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 secretKeyRef:
                                   description: Selects a key of a secret in the pod's
                                     namespace
@@ -10783,6 +10923,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                           required:
                           - name
@@ -11017,7 +11158,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmnodescrapes.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -11071,6 +11212,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   credentialsFile:
                     description: File with value for authorization
                     type: string
@@ -11102,6 +11244,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   password_file:
                     description: PasswordFile defines path to password file at disk
                     type: string
@@ -11125,6 +11268,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                 type: object
               bearerTokenFile:
                 description: File to read bearer token for scraping targets.
@@ -11148,6 +11292,7 @@ spec:
                 required:
                 - key
                 type: object
+                x-kubernetes-map-type: atomic
               follow_redirects:
                 description: FollowRedirects controls redirects for scraping.
                 type: boolean
@@ -11247,6 +11392,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       secret:
                         description: Secret containing data to use for the targets.
                         properties:
@@ -11265,6 +11411,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   client_secret:
                     description: The secret containing the OAuth2 client secret
@@ -11284,6 +11431,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   client_secret_file:
                     description: ClientSecretFile defines path for client secret file.
                     type: string
@@ -11440,6 +11588,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               targetLabels:
                 description: TargetLabels transfers labels on the Kubernetes Node
                   onto the target.
@@ -11469,6 +11618,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       secret:
                         description: Secret containing data to use for the targets.
                         properties:
@@ -11487,6 +11637,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   caFile:
                     description: Path to the CA cert in the container to use for the
@@ -11512,6 +11663,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       secret:
                         description: Secret containing data to use for the targets.
                         properties:
@@ -11530,6 +11682,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   certFile:
                     description: Path to the client cert file in the container for
@@ -11560,6 +11713,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   serverName:
                     description: Used to verify the hostname for the targets.
                     type: string
@@ -11613,6 +11767,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           password_file:
                             description: PasswordFile defines path to password file
                               at disk
@@ -11638,6 +11793,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                         type: object
                       bearer_token:
                         description: SecretKeySelector selects a key of a Secret.
@@ -11657,6 +11813,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       bearer_token_file:
                         type: string
                       tls_config:
@@ -11686,6 +11843,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                               secret:
                                 description: Secret containing data to use for the
                                   targets.
@@ -11707,6 +11865,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                             type: object
                           caFile:
                             description: Path to the CA cert in the container to use
@@ -11736,6 +11895,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                               secret:
                                 description: Secret containing data to use for the
                                   targets.
@@ -11757,6 +11917,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                             type: object
                           certFile:
                             description: Path to the client cert file in the container
@@ -11789,6 +11950,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           serverName:
                             description: Used to verify the hostname for the targets.
                             type: string
@@ -11817,7 +11979,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmpodscrapes.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -11903,6 +12065,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         credentialsFile:
                           description: File with value for authorization
                           type: string
@@ -11934,6 +12097,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         password_file:
                           description: PasswordFile defines path to password file
                             at disk
@@ -11958,6 +12122,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                       type: object
                     bearerTokenFile:
                       description: File to read bearer token for scraping targets.
@@ -11983,6 +12148,7 @@ spec:
                       required:
                       - key
                       type: object
+                      x-kubernetes-map-type: atomic
                     follow_redirects:
                       description: FollowRedirects controls redirects for scraping.
                       type: boolean
@@ -12084,6 +12250,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -12103,6 +12270,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         client_secret:
                           description: The secret containing the OAuth2 client secret
@@ -12122,6 +12290,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         client_secret_file:
                           description: ClientSecretFile defines path for client secret
                             file.
@@ -12272,6 +12441,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -12291,6 +12461,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         caFile:
                           description: Path to the CA cert in the container to use
@@ -12319,6 +12490,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -12338,6 +12510,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         certFile:
                           description: Path to the client cert file in the container
@@ -12369,6 +12542,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         serverName:
                           description: Used to verify the hostname for the targets.
                           type: string
@@ -12423,6 +12597,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 password_file:
                                   description: PasswordFile defines path to password
                                     file at disk
@@ -12449,6 +12624,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                             bearer_token:
                               description: SecretKeySelector selects a key of a Secret.
@@ -12469,6 +12645,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             bearer_token_file:
                               type: string
                             tls_config:
@@ -12499,6 +12676,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     secret:
                                       description: Secret containing data to use for
                                         the targets.
@@ -12520,6 +12698,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                                 caFile:
                                   description: Path to the CA cert in the container
@@ -12549,6 +12728,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     secret:
                                       description: Secret containing data to use for
                                         the targets.
@@ -12570,6 +12750,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                                 certFile:
                                   description: Path to the client cert file in the
@@ -12603,6 +12784,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 serverName:
                                   description: Used to verify the hostname for the
                                     targets.
@@ -12675,6 +12857,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
             required:
             - podMetricsEndpoints
             type: object
@@ -12691,7 +12874,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmprobes.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -12705,9 +12888,9 @@ spec:
   - name: v1beta1
     schema:
       openAPIV3Schema:
-        description: ' VMProbe defines a probe for targets, that will be executed
-          with prober,  like blackbox exporter. It helps to monitor reachability of
-          target with various checks.'
+        description: VMProbe defines a probe for targets, that will be executed with
+          prober, like blackbox exporter. It helps to monitor reachability of target
+          with various checks.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -12745,6 +12928,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   credentialsFile:
                     description: File with value for authorization
                     type: string
@@ -12776,6 +12960,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   password_file:
                     description: PasswordFile defines path to password file at disk
                     type: string
@@ -12799,6 +12984,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                 type: object
               bearerTokenFile:
                 description: File to read bearer token for scraping targets.
@@ -12823,6 +13009,7 @@ spec:
                 required:
                 - key
                 type: object
+                x-kubernetes-map-type: atomic
               follow_redirects:
                 description: FollowRedirects controls redirects for scraping.
                 type: boolean
@@ -12862,6 +13049,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       secret:
                         description: Secret containing data to use for the targets.
                         properties:
@@ -12880,6 +13068,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   client_secret:
                     description: The secret containing the OAuth2 client secret
@@ -12899,6 +13088,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   client_secret_file:
                     description: ClientSecretFile defines path for client secret file.
                     type: string
@@ -13067,6 +13257,7 @@ spec:
                               only "value". The requirements are ANDed.
                             type: object
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   staticConfig:
                     description: 'StaticConfig defines static targets which are considers
@@ -13172,6 +13363,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       secret:
                         description: Secret containing data to use for the targets.
                         properties:
@@ -13190,6 +13382,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   caFile:
                     description: Path to the CA cert in the container to use for the
@@ -13215,6 +13408,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       secret:
                         description: Secret containing data to use for the targets.
                         properties:
@@ -13233,6 +13427,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                     type: object
                   certFile:
                     description: Path to the client cert file in the container for
@@ -13263,6 +13458,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   serverName:
                     description: Used to verify the hostname for the targets.
                     type: string
@@ -13316,6 +13512,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           password_file:
                             description: PasswordFile defines path to password file
                               at disk
@@ -13341,6 +13538,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                         type: object
                       bearer_token:
                         description: SecretKeySelector selects a key of a Secret.
@@ -13360,6 +13558,7 @@ spec:
                         required:
                         - key
                         type: object
+                        x-kubernetes-map-type: atomic
                       bearer_token_file:
                         type: string
                       tls_config:
@@ -13389,6 +13588,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                               secret:
                                 description: Secret containing data to use for the
                                   targets.
@@ -13410,6 +13610,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                             type: object
                           caFile:
                             description: Path to the CA cert in the container to use
@@ -13439,6 +13640,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                               secret:
                                 description: Secret containing data to use for the
                                   targets.
@@ -13460,6 +13662,7 @@ spec:
                                 required:
                                 - key
                                 type: object
+                                x-kubernetes-map-type: atomic
                             type: object
                           certFile:
                             description: Path to the client cert file in the container
@@ -13492,6 +13695,7 @@ spec:
                             required:
                             - key
                             type: object
+                            x-kubernetes-map-type: atomic
                           serverName:
                             description: Used to verify the hostname for the targets.
                             type: string
@@ -13541,7 +13745,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmrules.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -13589,6 +13793,14 @@ spec:
                         only with VM datasource. See more details at https://docs.victoriametrics.com#prometheus-querying-api-enhancements
                         Deprecated, use params instead
                       type: object
+                    headers:
+                      description: 'Headers contains optional HTTP headers added to
+                        each rule request Must be in form `header-name: value` For
+                        example: headers: - "CustomHeader: foo" - "CustomHeader2:
+                        bar"'
+                      items:
+                        type: string
+                      type: array
                     interval:
                       description: evaluation interval for group
                       type: string
@@ -13600,6 +13812,10 @@ spec:
                         Labels are commonly used for adding environment or tenant-specific
                         tag.
                       type: object
+                    limit:
+                      description: Limit the number of alerts an alerting rule and
+                        series a recording rule can produce
+                      type: integer
                     name:
                       description: Name of group
                       type: string
@@ -13624,6 +13840,10 @@ spec:
                               type: string
                             description: Annotations will be added to rule configuration
                             type: object
+                          debug:
+                            description: Debug enables logging for rule it useful
+                              for tracking
+                            type: boolean
                           expr:
                             description: Expr is query, that will be evaluated at
                               dataSource
@@ -13674,7 +13894,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmservicescrapes.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -13754,6 +13974,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         credentialsFile:
                           description: File with value for authorization
                           type: string
@@ -13785,6 +14006,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         password_file:
                           description: PasswordFile defines path to password file
                             at disk
@@ -13809,6 +14031,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                       type: object
                     bearerTokenFile:
                       description: File to read bearer token for scraping targets.
@@ -13834,6 +14057,7 @@ spec:
                       required:
                       - key
                       type: object
+                      x-kubernetes-map-type: atomic
                     follow_redirects:
                       description: FollowRedirects controls redirects for scraping.
                       type: boolean
@@ -13935,6 +14159,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -13954,6 +14179,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         client_secret:
                           description: The secret containing the OAuth2 client secret
@@ -13973,6 +14199,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         client_secret_file:
                           description: ClientSecretFile defines path for client secret
                             file.
@@ -14124,6 +14351,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -14143,6 +14371,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         caFile:
                           description: Path to the CA cert in the container to use
@@ -14171,6 +14400,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -14190,6 +14420,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         certFile:
                           description: Path to the client cert file in the container
@@ -14221,6 +14452,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         serverName:
                           description: Used to verify the hostname for the targets.
                           type: string
@@ -14275,6 +14507,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 password_file:
                                   description: PasswordFile defines path to password
                                     file at disk
@@ -14301,6 +14534,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                             bearer_token:
                               description: SecretKeySelector selects a key of a Secret.
@@ -14321,6 +14555,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             bearer_token_file:
                               type: string
                             tls_config:
@@ -14351,6 +14586,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     secret:
                                       description: Secret containing data to use for
                                         the targets.
@@ -14372,6 +14608,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                                 caFile:
                                   description: Path to the CA cert in the container
@@ -14401,6 +14638,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     secret:
                                       description: Secret containing data to use for
                                         the targets.
@@ -14422,6 +14660,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                                 certFile:
                                   description: Path to the client cert file in the
@@ -14455,6 +14694,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 serverName:
                                   description: Used to verify the hostname for the
                                     targets.
@@ -14545,6 +14785,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               targetLabels:
                 description: TargetLabels transfers labels on the Kubernetes Service
                   onto the target.
@@ -14569,7 +14810,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmsingles.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -14744,6 +14985,7 @@ spec:
                         TODO: Add other useful fields. apiVersion, kind, uid?'
                       type: string
                   type: object
+                  x-kubernetes-map-type: atomic
                 type: array
               initContainers:
                 description: 'InitContainers allows adding initContainers to the pod
@@ -15014,6 +15256,7 @@ spec:
                     - kind
                     - name
                     type: object
+                    x-kubernetes-map-type: atomic
                   dataSourceRef:
                     description: 'Specifies the object from which to populate the
                       volume with data, if a non-empty volume is desired. This may
@@ -15028,10 +15271,10 @@ spec:
                       if one of them is empty and the other is non-empty. There are
                       two important differences between DataSource and DataSourceRef:
                       * While DataSource only allows two specific types of objects,
-                      DataSourceRef   allows any non-core object, as well as PersistentVolumeClaim
+                      DataSourceRef allows any non-core object, as well as PersistentVolumeClaim
                       objects. * While DataSource ignores disallowed values (dropping
-                      them), DataSourceRef   preserves all values, and generates an
-                      error if a disallowed value is   specified. (Alpha) Using this
+                      them), DataSourceRef preserves all values, and generates an
+                      error if a disallowed value is specified. (Alpha) Using this
                       field requires the AnyVolumeDataSource feature gate to be enabled.'
                     properties:
                       apiGroup:
@@ -15050,6 +15293,7 @@ spec:
                     - kind
                     - name
                     type: object
+                    x-kubernetes-map-type: atomic
                   resources:
                     description: 'Resources represents the minimum resources the volume
                       should have. If RecoverVolumeExpansionFailure feature is enabled
@@ -15124,6 +15368,7 @@ spec:
                           "value". The requirements are ANDed.
                         type: object
                     type: object
+                    x-kubernetes-map-type: atomic
                   storageClassName:
                     description: 'Name of the StorageClass required by the claim.
                       More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
@@ -15263,6 +15508,7 @@ spec:
                     required:
                     - key
                     type: object
+                    x-kubernetes-map-type: atomic
                   customS3Endpoint:
                     description: Custom S3 endpoint for use with S3-compatible storages
                       (e.g. MinIO). S3 is used if not set
@@ -15335,6 +15581,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             fieldRef:
                               description: 'Selects a field of the pod: supports metadata.name,
                                 metadata.namespace, `metadata.labels[''<KEY>'']`,
@@ -15353,6 +15600,7 @@ spec:
                               required:
                               - fieldPath
                               type: object
+                              x-kubernetes-map-type: atomic
                             resourceFieldRef:
                               description: 'Selects a resource of the container: only
                                 resources limits and requests (limits.cpu, limits.memory,
@@ -15377,6 +15625,7 @@ spec:
                               required:
                               - resource
                               type: object
+                              x-kubernetes-map-type: atomic
                             secretKeyRef:
                               description: Selects a key of a secret in the pod's
                                 namespace
@@ -15397,6 +15646,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                       required:
                       - name
@@ -15625,7 +15875,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmstaticscrapes.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -15690,6 +15940,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         credentialsFile:
                           description: File with value for authorization
                           type: string
@@ -15721,6 +15972,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         password_file:
                           description: PasswordFile defines path to password file
                             at disk
@@ -15745,6 +15997,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                       type: object
                     bearerTokenFile:
                       description: File to read bearer token for scraping targets.
@@ -15770,6 +16023,7 @@ spec:
                       required:
                       - key
                       type: object
+                      x-kubernetes-map-type: atomic
                     follow_redirects:
                       description: FollowRedirects controls redirects for scraping.
                       type: boolean
@@ -15876,6 +16130,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -15895,6 +16150,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         client_secret:
                           description: The secret containing the OAuth2 client secret
@@ -15914,6 +16170,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         client_secret_file:
                           description: ClientSecretFile defines path for client secret
                             file.
@@ -16062,6 +16319,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -16081,6 +16339,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         caFile:
                           description: Path to the CA cert in the container to use
@@ -16109,6 +16368,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             secret:
                               description: Secret containing data to use for the targets.
                               properties:
@@ -16128,6 +16388,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                         certFile:
                           description: Path to the client cert file in the container
@@ -16159,6 +16420,7 @@ spec:
                           required:
                           - key
                           type: object
+                          x-kubernetes-map-type: atomic
                         serverName:
                           description: Used to verify the hostname for the targets.
                           type: string
@@ -16213,6 +16475,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 password_file:
                                   description: PasswordFile defines path to password
                                     file at disk
@@ -16239,6 +16502,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                             bearer_token:
                               description: SecretKeySelector selects a key of a Secret.
@@ -16259,6 +16523,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             bearer_token_file:
                               type: string
                             tls_config:
@@ -16289,6 +16554,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     secret:
                                       description: Secret containing data to use for
                                         the targets.
@@ -16310,6 +16576,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                                 caFile:
                                   description: Path to the CA cert in the container
@@ -16339,6 +16606,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     secret:
                                       description: Secret containing data to use for
                                         the targets.
@@ -16360,6 +16628,7 @@ spec:
                                       required:
                                       - key
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                                 certFile:
                                   description: Path to the client cert file in the
@@ -16393,6 +16662,7 @@ spec:
                                   required:
                                   - key
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 serverName:
                                   description: Used to verify the hostname for the
                                     targets.
@@ -16428,7 +16698,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.2
+    controller-gen.kubebuilder.io/version: v0.10.0
   name: vmusers.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -16492,6 +16762,7 @@ spec:
                 required:
                 - key
                 type: object
+                x-kubernetes-map-type: atomic
               targetRefs:
                 description: TargetRefs - reference to endpoints, which user may access.
                 items:
@@ -16567,6 +16838,7 @@ spec:
                 required:
                 - key
                 type: object
+                x-kubernetes-map-type: atomic
               username:
                 description: UserName basic auth user name for accessing protected
                   endpoint, will be replaced with metadata.name of VMUser if omitted.
