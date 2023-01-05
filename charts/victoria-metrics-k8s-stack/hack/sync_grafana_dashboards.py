@@ -61,6 +61,9 @@ sources_json = [
     {
         'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json',
     },
+    {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json',
+    },
 ]
 # Source files list
 sources_yaml = [
