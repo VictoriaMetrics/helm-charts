@@ -125,6 +125,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.extraArgs."envflag.enable" | string | `"true"` |  |
 | vminsert.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vminsert.extraArgs.loggerFormat | string | `"json"` |  |
+| vminsert.extraContainers | list | `[]` |  |
 | vminsert.extraLabels | object | `{}` |  |
 | vminsert.extraVolumeMounts | list | `[]` |  |
 | vminsert.extraVolumes | list | `[]` |  |
