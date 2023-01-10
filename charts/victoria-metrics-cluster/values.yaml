@@ -174,6 +174,8 @@ vmselect:
     loadBalancerSourceRanges: []
     # -- Service port
     servicePort: 8481
+    # -- Target port
+    targetPort: http
     # -- Service type
     type: ClusterIP
   ingress:
@@ -324,6 +326,11 @@ vminsert:
     # - name: example
     #   mountPath: /example
 
+  extraContainers:
+    []
+    # - name: config-reloader
+    #   image: reloader-image
+
   initContainers:
     []
     # - name: example
@@ -379,6 +386,8 @@ vminsert:
     loadBalancerSourceRanges: []
     # -- Service port
     servicePort: 8480
+    # -- Target port
+    targetPort: http
     # -- Service type
     type: ClusterIP
     # -- Enable UDP port. used if you have "spec.opentsdbListenAddr" specified

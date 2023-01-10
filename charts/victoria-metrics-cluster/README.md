@@ -125,6 +125,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.extraArgs."envflag.enable" | string | `"true"` |  |
 | vminsert.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vminsert.extraArgs.loggerFormat | string | `"json"` |  |
+| vminsert.extraContainers | list | `[]` |  |
 | vminsert.extraLabels | object | `{}` |  |
 | vminsert.extraVolumeMounts | list | `[]` |  |
 | vminsert.extraVolumes | list | `[]` |  |
@@ -168,6 +169,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.service.loadBalancerIP | string | `""` | Service load balancer IP |
 | vminsert.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
 | vminsert.service.servicePort | int | `8480` | Service port |
+| vminsert.service.targetPort | string | http | Service port |
 | vminsert.service.type | string | `"ClusterIP"` | Service type |
 | vminsert.service.udp | bool | `false` | Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/ |
 | vminsert.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
@@ -239,6 +241,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.service.loadBalancerIP | string | `""` | Service load balacner IP |
 | vmselect.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
 | vmselect.service.servicePort | int | `8481` | Service port |
+| vmselect.service.targetPort | string | http | Service port |
 | vmselect.service.type | string | `"ClusterIP"` | Service type |
 | vmselect.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | vmselect.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operator object |
