@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.5.11](https://img.shields.io/badge/Version-0.5.11-informational?style=flat-square)
+ ![Version: 0.5.13](https://img.shields.io/badge/Version-0.5.13-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
