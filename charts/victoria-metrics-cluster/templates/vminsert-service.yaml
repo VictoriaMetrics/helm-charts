@@ -35,6 +35,12 @@ spec:
       port: {{ .Values.vminsert.service.servicePort }}
       protocol: TCP
       targetPort: {{ .Values.vminsert.service.targetPort }}
+{{- range .Values.vminsert.service.extraPorts }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      protocol: TCP
+      targetPort: {{ .targetPort }}
+{{- end }}
 {{- if .Values.vminsert.extraArgs.clusternativeListenAddr }}
     - name: cluster-tcp
       protocol: TCP

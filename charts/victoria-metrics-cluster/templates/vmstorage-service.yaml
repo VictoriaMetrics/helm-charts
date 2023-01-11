@@ -28,6 +28,12 @@ spec:
       targetPort: vminsert
       protocol: TCP
       name: vminsert
+  {{- range .Values.vmstorage.service.extraPorts }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      protocol: TCP
+      targetPort: {{ .targetPort }}
+  {{- end }}
   selector:
     {{- include "victoria-metrics.vmstorage.matchLabels" . | nindent 4 }}
 {{- end -}}
