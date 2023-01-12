@@ -1,0 +1,58 @@
+# Example extra values files to add an auth proxy sidecar container
+---
+extraContainers: &extraContainers
+  - name: vmauth
+    securityContext:
+      {}
+    image: "victoriametrics/vmauth:latest"
+    workingDir: /
+    args:
+      - -auth.config=/config/auth.yml
+      - -envflag.enable=true
+      - -envflag.prefix=VM_
+      - -loggerFormat=json
+    imagePullPolicy: IfNotPresent
+    ports:
+      - name: proxy
+        containerPort: 8427
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: proxy
+      initialDelaySeconds: 5
+      periodSeconds: 15
+    livenessProbe:
+      tcpSocket:
+        port: proxy
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+    volumeMounts:
+      - name: auth-config
+        mountPath: /config
+    resources:
+      {}
+
+vminsert:
+  extraContainers: *extraContainers
+  extraVolumes:
+  - name: auth-config
+    secret:
+      secretName: vminsert-auth-config
+  service:
+    extraPorts:
+    - name: proxy
+      port: 8427
+      targetPort: proxy
+
+vmselect:
+  extraContainers: *extraContainers
+  extraVolumes:
+  - name: auth-config
+    secret:
+      secretName: vmselect-auth-config
+  service:
+    extraPorts:
+    - name: proxy
+      port: 8427
+      targetPort: proxy
