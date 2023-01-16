@@ -33,6 +33,11 @@ spec:
         - name: model
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           workingDir: {{ .Values.containerWorkingDir }}
+          {{- if and .Values.monitoring.pull.enabled .Values.monitoring.pull.port }}
+          ports:
+            - containerPort: {{ .Values.monitoring.pull.port }}
+              name: metrics
+          {{- end }}
           args:
             - /etc/config/config.yml
           securityContext:
