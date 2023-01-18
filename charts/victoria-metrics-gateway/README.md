@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmgateway
 
- ![Version: 0.1.27](https://img.shields.io/badge/Version-0.1.27-informational?style=flat-square)
+ ![Version: 0.1.28](https://img.shields.io/badge/Version-0.1.28-informational?style=flat-square)
 
 Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
 
