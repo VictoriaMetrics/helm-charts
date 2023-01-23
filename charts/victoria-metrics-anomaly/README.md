@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
 ![Twitter Follow](https://img.shields.io/twitter/follow/VictoriaMetrics?style=social)
@@ -139,7 +139,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podAnnotations | object | `{}` | Annotations to be added to pod |
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | podSecurityContext | object | `{}` |  |
-| queries | object | `{}` | Query names and expressions. Required. Examples:  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))' |
+| queries | object | `{}` | Query names and expressions. Required. Examples: |
 | remote.read.basicAuth.password | string | `""` |  |
 | remote.read.basicAuth.username | string | `""` |  |
 | remote.read.health | string | `""` | Health endpoint. vmanomaly add /health to url if it's empty. You can specify full path when VictoriaMetircs is hidden via vmauth or other proxies/balancers |
