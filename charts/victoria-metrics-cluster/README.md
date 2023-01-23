@@ -165,6 +165,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.service.annotations | object | `{}` | Service annotations |
 | vminsert.service.clusterIP | string | `""` | Service ClusterIP |
 | vminsert.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
+| vminsert.service.extraServicePorts | list | `[]` | Extra service ports |
 | vminsert.service.labels | object | `{}` | Service labels |
 | vminsert.service.loadBalancerIP | string | `""` | Service load balancer IP |
 | vminsert.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
@@ -237,6 +238,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.service.annotations | object | `{}` | Service annotations |
 | vmselect.service.clusterIP | string | `""` | Service ClusterIP |
 | vmselect.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips](https://kubernetes.io/docs/user-guide/services/#external-ips) |
+| vmselect.service.extraServicePorts | list | `[]` | Extra service ports |
 | vmselect.service.labels | object | `{}` | Service labels |
 | vmselect.service.loadBalancerIP | string | `""` | Service load balacner IP |
 | vmselect.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
@@ -308,6 +310,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.retentionPeriod | int | `1` | Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month |
 | vmstorage.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vmstorage.service.annotations | object | `{}` | Service annotations |
+| vmstorage.service.extraServicePorts | list | `[]` | Extra service ports |
 | vmstorage.service.labels | object | `{}` | Service labels |
 | vmstorage.service.servicePort | int | `8482` | Service port |
 | vmstorage.service.vminsertPort | int | `8400` | Port for accepting connections from vminsert |
