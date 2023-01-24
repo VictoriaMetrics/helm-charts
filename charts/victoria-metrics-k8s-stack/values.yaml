@@ -712,7 +712,10 @@ grafana:
 # prometheus-node-exporter dependency chart configuration. For possible values refer to https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/values.yaml
 prometheus-node-exporter:
   enabled: true
-
+  podAnnotations:
+    prometheus.io/port: "9100"
+    prometheus.io/scrape: "true"
+    
   ## all values for prometheus-node-exporter helm chart can be specified here
   podLabels:
     ## Add the 'node-exporter' label to be used by serviceMonitor to match standard common usage in rules and grafana dashboards
@@ -739,6 +742,10 @@ prometheus-node-exporter:
 # kube-state-metrics dependency chart configuration. For possible values refer to https://github.com/kubernetes/kube-state-metrics/blob/master/charts/kube-state-metrics/values.yaml
 kube-state-metrics:
   enabled: true
+  podAnnotations:
+    prometheus.io/port: "8080"
+    prometheus.io/scrape: "true"
+    
   ## all values for kube-state-metrics helm chart can be specified here
 
   # spec for VMServiceScrape crd
