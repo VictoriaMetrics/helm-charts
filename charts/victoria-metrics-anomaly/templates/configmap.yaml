@@ -54,16 +54,15 @@ data:
         query: "$QUERY_KEY"
         model: {{ .Values.model.enabled }}
       {{ if or .Values.monitoring.pull.enabled .Values.monitoring.push.endpoint_url }}
-      monitoring:
-        {{- if .Values.monitoring.pull.enabled }}
-        pull:
-          enable: {{ .Values.monitoring.pull.enabled }}
-          {{- $v := deepCopy .Values.monitoring.pull }}
-          {{- unset $v "enabled" | toYaml | nindent 10 }}
-        {{- end }}
-        {{- if .Values.monitoring.push.endpoint_url }}
-        push:
-          {{- toYaml .Values.monitoring.push | nindent 10 }}
-        {{- end }}
+    monitoring:
+      {{- if .Values.monitoring.pull.enabled }}
+      pull:
+        enable: {{ .Values.monitoring.pull.enabled }}
+        {{- $v := deepCopy .Values.monitoring.pull }}
+        {{- unset $v "enabled" | toYaml | nindent 10 }}
       {{- end }}
-
+      {{- if .Values.monitoring.push.endpoint_url }}
+      push:
+        {{- toYaml .Values.monitoring.push | nindent 10 }}
+      {{- end }}
+    {{- end }}
