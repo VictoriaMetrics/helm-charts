@@ -89,6 +89,9 @@ spec:
             {{- if .Values.admissionWebhooks.enabled }}
             - --webhook.enable=true
             {{- end }}
+            {{- range $key, $value := .Values.extraArgs }}
+            - -{{ $key }}={{ $value }}
+            {{- end }}
           command:
             - manager
           ports:

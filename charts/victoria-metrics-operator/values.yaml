@@ -5,7 +5,7 @@ image:
   # -- Image repository
   repository: victoriametrics/operator
   # -- Image tag
-  tag: v0.30.3
+  tag: v0.30.4
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
@@ -81,6 +81,8 @@ tolerations: []
 
 # -- Pod affinity
 affinity: {}
+# -- operator container additional commandline arguments
+extraArgs: {}
 
 # -- extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD)
 env: []
@@ -139,3 +141,10 @@ admissionWebhooks:
     enabled: false
     # --If needed, provide own issuer. Operator will create self-signed if empty.
     issuer: {}
+
+# -- configures monitoring with serviceScrape. VMServiceScrape must be pre-installed
+serviceMonitor:
+  enabled: false
+  extraLabels: { }
+  annotations: { }
+  relabelings: [ ]

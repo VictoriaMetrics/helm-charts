@@ -1,0 +1,43 @@
+{{- if .Values.serviceMonitor.enabled -}}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: {{ template "vm-operator.fullname" . }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+{{ include "vm-operator.labels" . | indent 4 }}
+{{- with .Values.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- with .Values.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  selector:
+    matchLabels:
+        app.kubernetes.io/name: {{ include "vm-operator.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+  endpoints:
+    - port: http
+      {{- if .Values.serviceMonitor.scheme }}
+      scheme: {{ .Values.serviceMonitor.scheme }}
+      {{- end }}
+      {{- if .Values.serviceMonitor.interval }}
+      interval: {{ .Values.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- with .Values.serviceMonitor.tlsConfig }}
+      tlsConfig:
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.serviceMonitor.relabelings }}
+      relabelings:
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ $.Release.Namespace }}
+{{- end }}
