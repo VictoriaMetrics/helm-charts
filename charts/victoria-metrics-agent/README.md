@@ -326,6 +326,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |
+| rbac.namespaced | bool | `false` | if true and `rbac.enabled`, will deploy a Role/Rolebinding instead of a ClusterRole/ClusterRoleBinding |
 | rbac.pspEnabled | bool | `true` |  |
 | remoteWriteUrls | list | `[]` |  |
 | replicaCount | int | `1` |  |
