@@ -140,6 +140,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | podSecurityContext | object | `{}` |  |
 | queries | object | `{}` | Query names and expressions. Required. Examples:  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))' |
+| sampling_period | string | `{{scheduler.infer_every}}` | E.g. "1m", sampling rate param for composing /query_range request |
 | remote.read.basicAuth.password | string | `""` |  |
 | remote.read.basicAuth.username | string | `""` |  |
 | remote.read.health | string | `""` | Health endpoint. vmanomaly add /health to url if it's empty. You can specify full path when VictoriaMetircs is hidden via vmauth or other proxies/balancers |
@@ -152,9 +153,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | remote.write.url | string | `""` | URL for data writing. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/" |
 | resources | object | `{}` |  |
 | scheduler.class | string | `"scheduler.periodic.PeriodicScheduler"` |  |
-| scheduler.fit_every | string | `"1d"` |  |
-| scheduler.fit_window | string | `"7d"` |  |
-| scheduler.infer_every | string | `"10s"` |  |
+| scheduler.fit_every | string | `"1h"` |  |
+| scheduler.fit_window | string | `"14d"` |  |
+| scheduler.infer_every | string | `"1m"` |  |
 | securityContext.runAsGroup | int | `1000` |  |
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
