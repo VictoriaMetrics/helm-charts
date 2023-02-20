@@ -9,7 +9,7 @@ Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
 * [Prerequisites](#prerequisites)
 * [Chart Details](#chart-details)
 * [How to Install](#how-to-install)
-* [How to Uninstall]##how-to-uninstall)
+* [How to Uninstall](#how-to-uninstall)
 * [How to use JWT signature verification](#how-to-use-jwt-signature-verification)
 * [Documentation of Helm Chart](#documentation-of-helm-chart)
 
