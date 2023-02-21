@@ -71,6 +71,16 @@ spec:
             - -datasource.bearerTokenFile={{ . }}
             {{- end }}
             - -notifier.url={{ include "vmalert.alertmanager.url" . }}
+            {{- if or .Values.server.notifier.alertmanager.basicAuth.password .Values.server.notifier.alertmanager.basicAuth.username }}
+            - -notifier.basicAuth.password={{ .Values.server.notifier.alertmanager.basicAuth.password }}
+            - -notifier.basicAuth.username={{ .Values.server.notifier.alertmanager.basicAuth.username }}
+            {{- end }}
+            {{- with .Values.server.notifier.alertmanager.bearer.token }}
+            - -notifier.bearerToken={{ . }}
+            {{- end }}
+            {{- with .Values.server.notifier.alertmanager.bearer.tokenFile }}
+            - -notifier.bearerTokenFile={{ . }}
+            {{- end }}
             - -remoteRead.url={{ .Values.server.remote.read.url }}
             {{- if or .Values.server.remote.read.basicAuth.password .Values.server.remote.read.basicAuth.username }}
             - -remoteRead.basicAuth.password={{ .Values.server.remote.read.basicAuth.password }}
