@@ -99,9 +99,10 @@ helm charts tested at kubernetes versions from 1.13 to 1.22.
 
 - [Victoria Metrics Agent](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-agent)
 - [Victoria Metrics Alert](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-alert)
+- [Victoria Metrics Anomaly](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-anomaly/README.md)
 - [Victoria Metrics Auth](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-auth/README.md)
 - [Victoria Metrics Cluster](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-cluster/README.md)
+- [Victoria Metrics Gateway](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-gateway/README.md)
 - [Victoria Metrics k8s Stack](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-k8s-stack/README.md)
 - [Victoria Metrics Operator](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-operator/README.md)
 - [Victoria Metrics Single-node](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-single/README.md)
-- [Victoria Metrics Gateway](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-gateway/README.md)
