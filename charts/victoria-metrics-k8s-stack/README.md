@@ -392,6 +392,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.dashboards.default.nodeexporter.gnetId | int | `1860` |  |
 | grafana.dashboards.default.nodeexporter.revision | int | `22` |  |
 | grafana.defaultDashboardsEnabled | bool | `true` |  |
+| grafana.defaultDashboardsTimezone | string | `"utc"` |  |
 | grafana.enabled | bool | `true` |  |
 | grafana.forceDeployDatasource | bool | `false` |  |
 | grafana.ingress.annotations | object | `{}` |  |

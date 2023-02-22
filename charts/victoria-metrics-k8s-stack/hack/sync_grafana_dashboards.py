@@ -3,6 +3,7 @@
 from ast import operator
 from faulthandler import enable
 import json
+import re
 import textwrap
 from os import makedirs, path
 
@@ -218,6 +219,11 @@ def patch_dashboards_json(content):
     return content
 
 
+def patch_json_set_timezone_as_variable(content):
+    # content is no more in json format, so we have to replace using regex
+    return re.sub(r'"timezone"\s*:\s*"(?:\\.|[^\"])*"', '"timezone": "\{\{ .Values.grafana.defaultDashboardsTimezone \}\}"', content, flags=re.IGNORECASE)
+
+
 def write_group_to_file(resource_name, content, url, destination):
     if condition_map.get(resource_name, ""):
         cond = f'if and .Values.defaultDashboardsEnabled {condition_map.get(resource_name, "")}'
@@ -232,6 +238,7 @@ def write_group_to_file(resource_name, content, url, destination):
     }
 
     content = patch_dashboards_json(content)
+    content = patch_json_set_timezone_as_variable(content)
 
     filename_struct = {resource_name + '.json': (LiteralStr(content))}
     # rules themselves
