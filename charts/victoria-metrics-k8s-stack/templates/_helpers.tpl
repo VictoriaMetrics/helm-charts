@@ -171,17 +171,25 @@ Alermanager spec
 {{- define "victoria-metrics-k8s-stack.alertmanagerSpec" -}}
 {{ omit .Values.alertmanager.spec  "configMaps" "configSecret" | toYaml }}
 configSecret: {{ .Values.alertmanager.spec.configSecret | default (printf "%s-alertmanager" (include "victoria-metrics-k8s-stack.fullname" .)) }}
-{{- if or .Values.alertmanager.spec.configMaps .Values.alertmanager.monzoTemplate.enabled .Values.alertmanager.templateFiles }}
-{{- $list := .Values.alertmanager.spec.configMaps | default (list "") }}
+{{- if .Values.alertmanager.spec.configMaps }}
+configMaps:
+{{- range compact .Values.alertmanager.spec.configMaps }}
+- {{ . }}
+{{- end }}
+{{- end }}
+{{- if or .Values.alertmanager.monzoTemplate.enabled .Values.alertmanager.templateFiles }}
+templates:
+{{- $monzoTplConfigMap := printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "alertmanager-monzo-tpl" | trunc 63 | trimSuffix "-" }}
 {{- if .Values.alertmanager.monzoTemplate.enabled }}
-{{- $list = append $list (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "alertmanager-monzo-tpl" | trunc 63 | trimSuffix "-") }}
+- name: {{ $monzoTplConfigMap }}
+  key: monzo.tmpl
 {{- end }}
 {{- if .Values.alertmanager.templateFiles }}
-{{- $list = append $list (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "alertmanager-extra-tpl" | trunc 63 | trimSuffix "-") }}
+{{- $extraTplConfigMap := printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "alertmanager-extra-tpl" | trunc 63 | trimSuffix "-" }}
+{{- range $key, $value := .Values.alertmanager.templateFiles }}
+- name: {{ $extraTplConfigMap }}
+  key: {{ $key }}
 {{- end }}
-configMaps:
-{{- range compact $list }}
-- {{ . }}
 {{- end }}
 {{- end }}
 {{- end }}
