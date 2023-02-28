@@ -305,7 +305,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.enabled | bool | `false` |  |
 | ingress.extraLabels | object | `{}` |  |
 | ingress.hosts | list | `[]` |  |
-| ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
+| ingress.pathType | string | `"Prefix"` |  |
 | ingress.tls | list | `[]` |  |
 | multiTenantUrls | list | `[]` |  |
 | nameOverride | string | `""` |  |
@@ -328,6 +328,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.extraLabels | object | `{}` |  |
 | rbac.namespaced | bool | `false` | if true and `rbac.enabled`, will deploy a Role/Rolebinding instead of a ClusterRole/ClusterRoleBinding |
 | rbac.pspEnabled | bool | `true` |  |
+| remoteWriteTlsInsecure | list | `[]` |  |
 | remoteWriteUrls | list | `[]` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |

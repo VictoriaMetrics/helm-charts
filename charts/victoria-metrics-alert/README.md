@@ -116,7 +116,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.enabled | bool | `false` |  |
 | alertmanager.ingress.extraLabels | object | `{}` |  |
 | alertmanager.ingress.hosts | list | `[]` |  |
-| alertmanager.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
+| alertmanager.ingress.pathType | string | `"Prefix"` |  |
 | alertmanager.ingress.tls | list | `[]` |  |
 | alertmanager.nodeSelector | object | `{}` |  |
 | alertmanager.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
@@ -171,7 +171,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.ingress.enabled | bool | `false` |  |
 | server.ingress.extraLabels | object | `{}` |  |
 | server.ingress.hosts | list | `[]` |  |
-| server.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
+| server.ingress.pathType | string | `"Prefix"` |  |
 | server.ingress.tls | list | `[]` |  |
 | server.labels | object | `{}` |  |
 | server.minReadySeconds | int | `0` |  |
