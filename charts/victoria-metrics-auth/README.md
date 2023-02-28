@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Auth.
 
- ![Version: 0.2.73](https://img.shields.io/badge/Version-0.2.73-informational?style=flat-square)
+ ![Version: 0.2.74](https://img.shields.io/badge/Version-0.2.74-informational?style=flat-square)
 
 Victoria Metrics Auth - is a simple auth proxy and router for VictoriaMetrics.
 
