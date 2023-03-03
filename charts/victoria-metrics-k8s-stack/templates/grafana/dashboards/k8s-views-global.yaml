@@ -178,7 +178,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "avg(1-rate(node_cpu_seconds_total{mode=\"idle\"}[$__rate_interval]))",
+                        "expr": "avg(1-rate(node_cpu_seconds_total{mode=\"idle\", job=\"node-exporter\"}[$__rate_interval]))",
                         "interval": "",
                         "legendFormat": "Real",
                         "range": true,
@@ -274,7 +274,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes)",
+                        "expr": "sum(node_memory_MemTotal_bytes{job=\"node-exporter\"} - node_memory_MemAvailable_bytes{job=\"node-exporter\"}) / sum(node_memory_MemTotal_bytes{job=\"node-exporter\"})",
                         "interval": "",
                         "legendFormat": "Real",
                         "range": true,
@@ -720,7 +720,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(1-rate(node_cpu_seconds_total{mode=\"idle\"}[$__rate_interval]))",
+                        "expr": "sum(1-rate(node_cpu_seconds_total{mode=\"idle\", job=\"node-exporter\"}[$__rate_interval]))",
                         "interval": "",
                         "legendFormat": "Real",
                         "range": true,
@@ -819,7 +819,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)",
+                        "expr": "sum(node_memory_MemTotal_bytes{job=\"node-exporter\"} - node_memory_MemAvailable_bytes{job=\"node-exporter\"})",
                         "interval": "",
                         "legendFormat": "Real",
                         "range": true,
@@ -1035,7 +1035,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "avg(1-rate(node_cpu_seconds_total{mode=\"idle\"}[$__rate_interval]))",
+                        "expr": "avg(1-rate(node_cpu_seconds_total{mode=\"idle\", job=\"node-exporter\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "CPU usage in %",
                         "refId": "A"
@@ -1139,7 +1139,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes)",
+                        "expr": "sum(node_memory_MemTotal_bytes{job=\"node-exporter\"} - node_memory_MemAvailable_bytes{job=\"node-exporter\"}) / sum(node_memory_MemTotal_bytes{job=\"node-exporter\"})",
                         "interval": "$resolution",
                         "legendFormat": "Memory usage in %",
                         "range": true,
@@ -1445,13 +1445,13 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "avg(1-rate(node_cpu_seconds_total{mode=\"idle\"}[$__rate_interval])) by (instance)",
+                        "expr": "avg(1-rate(node_cpu_seconds_total{mode=\"idle\", job=\"node-exporter\"}[$__rate_interval])) by (instance)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} node {{`}}`}}",
                         "refId": "A"
                     }
                 ],
-                "title": "CPU Utilization by node",
+                "title": "CPU Utilization by instance",
                 "type": "timeseries"
             },
             {
@@ -1546,14 +1546,14 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) by (instance)",
+                        "expr": "sum(node_memory_MemTotal_bytes{job=\"node-exporter\"} - node_memory_MemAvailable_bytes{job=\"node-exporter\"}) by (instance)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} node{{`}}`}}",
                         "range": true,
                         "refId": "A"
                     }
                 ],
-                "title": "Memory Utilization by node",
+                "title": "Memory Utilization by instance",
                 "type": "timeseries"
             },
             {
@@ -1659,7 +1659,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(container_network_receive_bytes_total[$__rate_interval]))",
+                        "expr": "sum(rate(node_network_receive_bytes_total{job=\"node-exporter\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Total received bytes",
                         "range": true,
@@ -1672,7 +1672,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "- sum(rate(container_network_transmit_bytes_total[$__rate_interval]))",
+                        "expr": "- sum(rate(node_network_transmit_bytes_total{job=\"node-exporter\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Total transmitted bytes",
                         "range": true,
@@ -1768,7 +1768,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(container_network_receive_packets_dropped_total[$__rate_interval]))",
+                        "expr": "sum(rate(node_network_receive_drop_total{job=\"node-exporter\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Packets dropped (receive)",
                         "range": true,
@@ -1781,7 +1781,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "- sum(rate(container_network_transmit_packets_dropped_total[$__rate_interval]))",
+                        "expr": "- sum(rate(node_network_transmit_drop_total{job=\"node-exporter\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Packets dropped (transmit)",
                         "range": true,
@@ -1864,8 +1864,8 @@ data:
                         "showLegend": false
                     },
                     "tooltip": {
-                        "mode": "single",
-                        "sort": "none"
+                        "mode": "multi",
+                        "sort": "desc"
                     }
                 },
                 "pluginVersion": "8.3.3",
@@ -1973,8 +1973,8 @@ data:
                         "showLegend": false
                     },
                     "tooltip": {
-                        "mode": "single",
-                        "sort": "none"
+                        "mode": "multi",
+                        "sort": "desc"
                     }
                 },
                 "pluginVersion": "8.3.3",
@@ -1986,9 +1986,9 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(container_network_receive_bytes_total[$__rate_interval])) by (node)",
+                        "expr": "sum(rate(node_network_receive_bytes_total{job=\"node-exporter\"}[$__rate_interval])) by (instance)",
                         "interval": "$resolution",
-                        "legendFormat": "Received bytes in {{`{{`}} node {{`}}`}}",
+                        "legendFormat": "Received bytes in {{`{{`}} instance {{`}}`}}",
                         "range": true,
                         "refId": "A"
                     },
@@ -1998,15 +1998,15 @@ data:
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
-                        "expr": "- sum(rate(container_network_transmit_bytes_total[$__rate_interval])) by (node)",
+                        "expr": "- sum(rate(node_network_transmit_bytes_total{job=\"node-exporter\"}[$__rate_interval])) by (instance)",
                         "hide": false,
                         "interval": "$resolution",
-                        "legendFormat": "Transmitted bytes in {{`{{`}} node {{`}}`}}",
+                        "legendFormat": "Transmitted bytes in {{`{{`}} instance {{`}}`}}",
                         "range": true,
                         "refId": "B"
                     }
                 ],
-                "title": "Network Received by node",
+                "title": "Network Received by instance",
                 "type": "timeseries"
             }
         ],
@@ -2094,7 +2094,7 @@ data:
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "Kubernetes / Views / Global",
         "uid": "k8s_views_global",
-        "version": 20,
+        "version": 22,
         "weekStart": ""
     }
 {{- end }}

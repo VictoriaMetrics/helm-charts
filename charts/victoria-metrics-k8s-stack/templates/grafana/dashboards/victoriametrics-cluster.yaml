@@ -99,10 +99,23 @@ data:
                     "iconColor": "red",
                     "name": "alerts",
                     "titleFormat": "{{`{{`}}alertname{{`}}`}}"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$ds"
+                    },
+                    "enable": true,
+                    "expr": "sum(vm_app_version{job=~\"$job\"}) by(short_version) unless (sum(vm_app_version{job=~\"$job\"} offset 20m) by(short_version))",
+                    "hide": true,
+                    "iconColor": "dark-blue",
+                    "name": "version change",
+                    "textFormat": "{{`{{`}}short_version{{`}}`}}",
+                    "titleFormat": "Version change"
                 }
             ]
         },
-        "description": "Overview for cluster VictoriaMetrics v1.83.0 or higher",
+        "description": "Overview for cluster VictoriaMetrics v1.86.0 or higher",
         "editable": true,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 1,
@@ -209,7 +222,7 @@ data:
                             "uid": "$ds"
                         },
                         "exemplar": true,
-                        "expr": "sum(vm_rows{job=~\"$job_storage\", type!=\"indexdb\"})",
+                        "expr": "sum(vm_rows{job=~\"$job_storage\", type!~\"indexdb.*\"})",
                         "format": "time_series",
                         "instant": true,
                         "interval": "",
@@ -629,7 +642,7 @@ data:
                             "uid": "$ds"
                         },
                         "exemplar": true,
-                        "expr": "sum(vm_data_size_bytes{job=~\"$job_storage\", type!=\"indexdb\"}) / sum(vm_rows{job=~\"$job_storage\", type!=\"indexdb\"})",
+                        "expr": "sum(vm_data_size_bytes{job=~\"$job_storage\"}) / sum(vm_rows{job=~\"$job_storage\"})",
                         "format": "time_series",
                         "instant": true,
                         "interval": "",
@@ -1642,8 +1655,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1659,7 +1671,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 14
+                            "y": 30
                         },
                         "id": 66,
                         "links": [],
@@ -1754,8 +1766,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1771,7 +1782,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 14
+                            "y": 30
                         },
                         "id": 138,
                         "links": [],
@@ -1865,8 +1876,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1882,7 +1892,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 22
+                            "y": 38
                         },
                         "id": 64,
                         "links": [],
@@ -1972,8 +1982,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2002,7 +2011,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 22
+                            "y": 38
                         },
                         "id": 122,
                         "links": [],
@@ -2110,8 +2119,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2143,7 +2151,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 30
+                            "y": 46
                         },
                         "id": 117,
                         "links": [],
@@ -2231,8 +2239,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2248,7 +2255,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 30
+                            "y": 46
                         },
                         "id": 119,
                         "options": {
@@ -2336,8 +2343,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2353,7 +2359,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 38
+                            "y": 54
                         },
                         "id": 68,
                         "links": [],
@@ -2441,8 +2447,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2458,7 +2463,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 38
+                            "y": 54
                         },
                         "id": 120,
                         "options": {
@@ -2546,8 +2551,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2563,7 +2567,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 46
+                            "y": 62
                         },
                         "id": 70,
                         "links": [],
@@ -2705,7 +2709,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 15
+                            "y": 31
                         },
                         "id": 102,
                         "options": {
@@ -2819,7 +2823,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 15
+                            "y": 31
                         },
                         "id": 108,
                         "options": {
@@ -2920,7 +2924,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 23
+                            "y": 39
                         },
                         "id": 142,
                         "links": [
@@ -3031,7 +3035,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 23
+                            "y": 39
                         },
                         "id": 107,
                         "options": {
@@ -3130,7 +3134,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 31
+                            "y": 47
                         },
                         "id": 170,
                         "links": [],
@@ -3236,7 +3240,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 31
+                            "y": 47
                         },
                         "id": 116,
                         "links": [],
@@ -3338,7 +3342,7 @@ data:
                             "h": 9,
                             "w": 12,
                             "x": 0,
-                            "y": 39
+                            "y": 55
                         },
                         "id": 144,
                         "options": {
@@ -3441,7 +3445,7 @@ data:
                             "h": 9,
                             "w": 12,
                             "x": 12,
-                            "y": 39
+                            "y": 55
                         },
                         "id": 58,
                         "links": [],
@@ -3545,7 +3549,7 @@ data:
                             "h": 7,
                             "w": 24,
                             "x": 0,
-                            "y": 48
+                            "y": 64
                         },
                         "id": 183,
                         "options": {
@@ -3693,7 +3697,7 @@ data:
                             "h": 9,
                             "w": 12,
                             "x": 0,
-                            "y": 5
+                            "y": 21
                         },
                         "id": 76,
                         "links": [],
@@ -3809,7 +3813,7 @@ data:
                             "h": 9,
                             "w": 12,
                             "x": 12,
-                            "y": 5
+                            "y": 21
                         },
                         "id": 86,
                         "links": [],
@@ -3934,7 +3938,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 14
+                            "y": 30
                         },
                         "id": 80,
                         "links": [],
@@ -4039,7 +4043,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 14
+                            "y": 30
                         },
                         "id": 78,
                         "links": [],
@@ -4155,7 +4159,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 22
+                            "y": 38
                         },
                         "id": 82,
                         "options": {
@@ -4262,7 +4266,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 22
+                            "y": 38
                         },
                         "id": 74,
                         "options": {
@@ -4364,7 +4368,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -4466,7 +4471,7 @@ data:
                                     {
                                         "targetBlank": true,
                                         "title": "Drilldown",
-                                        "url": "/d/oS7Bi_0Wz?viewPanel=196&${__url_time_range}${__all_variables}"
+                                        "url": "/d/oS7Bi_0Wz?viewPanel=196&${__url_time_range}&${__all_variables}"
                                     }
                                 ],
                                 "mappings": [],
@@ -4475,7 +4480,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -4521,7 +4527,7 @@ data:
                                     "uid": "$ds"
                                 },
                                 "editorMode": "code",
-                                "expr": "min(vm_free_disk_space_bytes{job=~\"$job_storage\", instance=~\"$instance\"} \n/ \nignoring(path) (\n    (\n        rate(vm_rows_added_to_storage_total{job=~\"$job_storage\", instance=~\"$instance\"}[1d])\n        - \n        ignoring(type) rate(vm_deduplicated_samples_total{job=~\"$job_storage\", instance=~\"$instance\", type=\"merge\"}[1d])\n    ) * scalar(\n            sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\", type!=\"indexdb\"})\n            / \n            sum(vm_rows{job=~\"$job_storage\", instance=~\"$instance\", type!=\"indexdb\"})\n            )\n))",
+                                "expr": "min(vm_free_disk_space_bytes{job=~\"$job_storage\", instance=~\"$instance\"} \n/ \nignoring(path) (\n    (\n        rate(vm_rows_added_to_storage_total{job=~\"$job_storage\", instance=~\"$instance\"}[1d])\n        - \n        ignoring(type) rate(vm_deduplicated_samples_total{job=~\"$job_storage\", instance=~\"$instance\", type=\"merge\"}[1d])\n    ) * scalar(\n            sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\", type!~\"indexdb.*\"})\n            / \n            sum(vm_rows{job=~\"$job_storage\", instance=~\"$instance\", type!~\"indexdb.*\"})\n            )\n))",
                                 "format": "time_series",
                                 "interval": "",
                                 "intervalFactor": 1,
@@ -4587,7 +4593,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -4665,12 +4672,12 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": false,
-                                "expr": "avg(\n    rate(process_cpu_seconds_total{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    process_cpu_cores_available{job=~\"$job_storage\", instance=~\"$instance\"}\n)",
+                                "expr": "median(\n    rate(process_cpu_seconds_total{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    process_cpu_cores_available{job=~\"$job_storage\", instance=~\"$instance\"}\n)",
                                 "format": "time_series",
                                 "hide": false,
                                 "interval": "",
                                 "intervalFactor": 1,
-                                "legendFormat": "avg",
+                                "legendFormat": "median",
                                 "range": true,
                                 "refId": "C"
                             }
@@ -4732,7 +4739,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -4810,12 +4818,12 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": true,
-                                "expr": "avg(\n    max_over_time(process_resident_memory_bytes{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    vm_available_memory_bytes{job=~\"$job_storage\", instance=~\"$instance\"}\n)",
+                                "expr": "median(\n    max_over_time(process_resident_memory_bytes{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    vm_available_memory_bytes{job=~\"$job_storage\", instance=~\"$instance\"}\n)",
                                 "format": "time_series",
                                 "hide": false,
                                 "interval": "",
                                 "intervalFactor": 1,
-                                "legendFormat": "avg",
+                                "legendFormat": "median",
                                 "range": true,
                                 "refId": "C"
                             }
@@ -4869,7 +4877,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -4972,7 +4981,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5041,7 +5051,7 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": true,
-                                "expr": "max(\n    max_over_time(vm_concurrent_addrows_current{job=~\"$job_storage\", \n    instance=~\"$instance\"}[$__rate_interval])\n)",
+                                "expr": "max(\n    max_over_time(vm_concurrent_insert_current{job=~\"$job_storage\", \n    instance=~\"$instance\"}[$__rate_interval])\n)",
                                 "interval": "",
                                 "legendFormat": "current",
                                 "range": true,
@@ -5054,7 +5064,7 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": true,
-                                "expr": "min(vm_concurrent_addrows_capacity{job=~\"$job_storage\", instance=~\"$instance\"})",
+                                "expr": "min(vm_concurrent_insert_capacity{job=~\"$job_storage\", instance=~\"$instance\"})",
                                 "hide": false,
                                 "interval": "",
                                 "legendFormat": "max",
@@ -5114,7 +5124,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5217,7 +5228,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5276,7 +5288,7 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows amount of on-disk space occupied by data points.",
+                        "description": "Shows the percentage of used disk space. It is recommended to have at least 20% of free disk space for the best performance.",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
@@ -5289,7 +5301,7 @@ data:
                                     "axisPlacement": "auto",
                                     "barAlignment": 0,
                                     "drawStyle": "line",
-                                    "fillOpacity": 10,
+                                    "fillOpacity": 0,
                                     "gradientMode": "none",
                                     "hideFrom": {
                                         "legend": false,
@@ -5306,20 +5318,27 @@ data:
                                     "spanNulls": false,
                                     "stacking": {
                                         "group": "A",
-                                        "mode": "normal"
+                                        "mode": "none"
                                     },
                                     "thresholdsStyle": {
-                                        "mode": "off"
+                                        "mode": "line"
                                     }
                                 },
-                                "links": [],
+                                "links": [
+                                    {
+                                        "targetBlank": true,
+                                        "title": "Drilldown",
+                                        "url": "/d/oS7Bi_0Wz?viewPanel=200&var-ds=$ds&var-instance=$instance&${__url_time_range}"
+                                    }
+                                ],
                                 "mappings": [],
                                 "min": 0,
                                 "thresholds": {
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5327,7 +5346,7 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "bytes"
+                                "unit": "percentunit"
                             },
                             "overrides": []
                         },
@@ -5337,7 +5356,7 @@ data:
                             "x": 0,
                             "y": 37
                         },
-                        "id": 18,
+                        "id": 20,
                         "links": [],
                         "options": {
                             "legend": {
@@ -5354,7 +5373,7 @@ data:
                             },
                             "tooltip": {
                                 "mode": "multi",
-                                "sort": "none"
+                                "sort": "desc"
                             }
                         },
                         "pluginVersion": "9.1.0",
@@ -5365,15 +5384,43 @@ data:
                                     "uid": "$ds"
                                 },
                                 "editorMode": "code",
-                                "expr": "sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\", type!=\"indexdb\"}) ",
+                                "expr": "max(\n    sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance) /\n    (\n        sum(vm_free_disk_space_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance) +\n        sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)\n    ) \n)",
                                 "format": "time_series",
                                 "intervalFactor": 1,
-                                "legendFormat": "disk usage",
+                                "legendFormat": "max",
                                 "range": true,
                                 "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "min(\n    sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance) /\n    (\n        sum(vm_free_disk_space_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance) +\n        sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)\n    ) \n)",
+                                "format": "time_series",
+                                "hide": false,
+                                "intervalFactor": 1,
+                                "legendFormat": "min",
+                                "range": true,
+                                "refId": "B"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "median(\n    sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance) /\n    (\n        sum(vm_free_disk_space_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance) +\n        sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)\n    ) \n)",
+                                "format": "time_series",
+                                "hide": false,
+                                "intervalFactor": 1,
+                                "legendFormat": "median",
+                                "range": true,
+                                "refId": "C"
                             }
                         ],
-                        "title": "Disk space usage (datapoints) ($instance)",
+                        "title": "Disk space usage %  ($instance)",
                         "type": "timeseries"
                     },
                     {
@@ -5424,7 +5471,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5487,7 +5535,7 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows amount of on-disk space occupied by inverted index.",
+                        "description": "Shows the percentage of used disk space by type: datapoints or indexdb. Normally, indexdb takes much less space comparing to datapoints. But with high churn rate the size of the indexdb could grow significantly.\n\nThe sum of the % can be > 100% since panel shows max % per-job and per-instance. It means different instance can have different ratio between datapoints and indexdb size.",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
@@ -5500,7 +5548,7 @@ data:
                                     "axisPlacement": "auto",
                                     "barAlignment": 0,
                                     "drawStyle": "line",
-                                    "fillOpacity": 10,
+                                    "fillOpacity": 0,
                                     "gradientMode": "none",
                                     "hideFrom": {
                                         "legend": false,
@@ -5517,28 +5565,31 @@ data:
                                     "spanNulls": false,
                                     "stacking": {
                                         "group": "A",
-                                        "mode": "normal"
+                                        "mode": "none"
                                     },
                                     "thresholdsStyle": {
-                                        "mode": "off"
+                                        "mode": "line"
                                     }
                                 },
-                                "links": [],
+                                "links": [
+                                    {
+                                        "targetBlank": true,
+                                        "title": "Drilldown",
+                                        "url": "/d/oS7Bi_0Wz?viewPanel=201&var-ds=$ds&var-instance=$instance&${__url_time_range}"
+                                    }
+                                ],
                                 "mappings": [],
                                 "min": 0,
                                 "thresholds": {
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
-                                        },
-                                        {
-                                            "color": "red",
-                                            "value": 80
+                                            "color": "green",
+                                            "value": null
                                         }
                                     ]
                                 },
-                                "unit": "bytes"
+                                "unit": "percentunit"
                             },
                             "overrides": []
                         },
@@ -5548,7 +5599,7 @@ data:
                             "x": 0,
                             "y": 45
                         },
-                        "id": 20,
+                        "id": 202,
                         "links": [],
                         "options": {
                             "legend": {
@@ -5565,7 +5616,7 @@ data:
                             },
                             "tooltip": {
                                 "mode": "multi",
-                                "sort": "none"
+                                "sort": "desc"
                             }
                         },
                         "pluginVersion": "9.1.0",
@@ -5576,15 +5627,29 @@ data:
                                     "uid": "$ds"
                                 },
                                 "editorMode": "code",
-                                "expr": "sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\", type=\"indexdb\"})",
+                                "expr": "max(\n    sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\", type=~\"indexdb.*\"}) by(job, instance)\n    / \n    sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)\n)",
                                 "format": "time_series",
                                 "intervalFactor": 1,
-                                "legendFormat": "disk usage",
+                                "legendFormat": "indexdb",
                                 "range": true,
                                 "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "max(\n    sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\", type!~\"indexdb.*\"}) by(job, instance)\n    / \n    sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)\n)",
+                                "format": "time_series",
+                                "hide": false,
+                                "intervalFactor": 1,
+                                "legendFormat": "datapoints",
+                                "range": true,
+                                "refId": "B"
                             }
                         ],
-                        "title": "Disk space usage (index)  ($instance)",
+                        "title": "Disk space usage % by type  ($instance)",
                         "type": "timeseries"
                     },
                     {
@@ -5635,7 +5700,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5770,7 +5836,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5785,7 +5852,7 @@ data:
                         "gridPos": {
                             "h": 8,
                             "w": 12,
-                            "x": 12,
+                            "x": 0,
                             "y": 53
                         },
                         "id": 135,
@@ -5892,8 +5959,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -5909,7 +5975,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 82
+                            "y": 98
                         },
                         "id": 92,
                         "links": [],
@@ -5999,8 +6065,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -6036,7 +6101,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 82
+                            "y": 98
                         },
                         "id": 95,
                         "links": [],
@@ -6142,8 +6207,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -6159,7 +6223,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 90
+                            "y": 106
                         },
                         "id": 163,
                         "links": [],
@@ -6221,12 +6285,12 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": true,
-                                "expr": "avg(\n    rate(process_cpu_seconds_total{job=~\"$job_select\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    process_cpu_cores_available{job=~\"$job_select\", instance=~\"$instance\"}\n)",
+                                "expr": "median(\n    rate(process_cpu_seconds_total{job=~\"$job_select\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    process_cpu_cores_available{job=~\"$job_select\", instance=~\"$instance\"}\n)",
                                 "format": "time_series",
                                 "hide": false,
                                 "interval": "",
                                 "intervalFactor": 1,
-                                "legendFormat": "avg",
+                                "legendFormat": "median",
                                 "range": true,
                                 "refId": "C"
                             }
@@ -6287,8 +6351,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -6304,7 +6367,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 90
+                            "y": 106
                         },
                         "id": 165,
                         "links": [],
@@ -6366,12 +6429,12 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": true,
-                                "expr": "avg(\n    max_over_time(process_resident_memory_bytes{job=~\"$job_select\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    vm_available_memory_bytes{job=~\"$job_select\", instance=~\"$instance\"}\n)",
+                                "expr": "median(\n    max_over_time(process_resident_memory_bytes{job=~\"$job_select\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    vm_available_memory_bytes{job=~\"$job_select\", instance=~\"$instance\"}\n)",
                                 "format": "time_series",
                                 "hide": false,
                                 "interval": "",
                                 "intervalFactor": 1,
-                                "legendFormat": "avg",
+                                "legendFormat": "median",
                                 "range": true,
                                 "refId": "C"
                             }
@@ -6428,8 +6491,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -6445,7 +6507,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 98
+                            "y": 114
                         },
                         "id": 178,
                         "links": [],
@@ -6536,8 +6598,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -6553,7 +6614,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 98
+                            "y": 114
                         },
                         "id": 180,
                         "links": [],
@@ -6660,7 +6721,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 106
+                            "y": 122
                         },
                         "id": 179,
                         "links": [],
@@ -6767,7 +6828,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 106
+                            "y": 122
                         },
                         "id": 181,
                         "links": [],
@@ -6806,7 +6867,7 @@ data:
                                 "refId": "A"
                             }
                         ],
-                        "title": "Datapoints scanned per series ($instance)",
+                        "title": "Datapoints scanned per query ($instance)",
                         "type": "timeseries"
                     },
                     {
@@ -6885,7 +6946,7 @@ data:
                             "h": 8,
                             "w": 24,
                             "x": 0,
-                            "y": 114
+                            "y": 130
                         },
                         "id": 93,
                         "links": [],
@@ -7021,7 +7082,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 8
+                            "y": 24
                         },
                         "id": 97,
                         "links": [],
@@ -7067,7 +7128,7 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows the max number of ongoing insertions.\n* `max` - equal to number of CPU * 4 by default. May be configured with `maxConcurrentInserts` flag;\n* `current` - current number of goroutines busy with processing requests.\n\n`-maxConcurrentInserts` limits the number of insert requests which may be actively processed at any given point in time. All the other insert requests are queued for up to `-insert.maxQueueDuration` in the hope they will get a chance to be processed. This queue is used mostly for absorbing spikes for incoming insert request rate.\n\nWhen `current` hits `max` constantly, it means vminsert node is overloaded and requires more CPU or higher limits.",
+                        "description": "Shows the max number of ongoing insertions.\n* `max` - equal to number of CPU * 2 by default. May be configured with `maxConcurrentInserts` flag;\n* `current` - current number of goroutines busy with processing requests.\n\n`-maxConcurrentInserts` limits the number of insert requests which may be actively processed at any given point in time. All the other insert requests are queued for up to `-insert.maxQueueDuration` in the hope they will get a chance to be processed. This queue is used mostly for absorbing spikes for incoming insert request rate.\n\nWhen `current` hits `max` constantly, it means vminsert node is overloaded and requires more CPU or higher limits.",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
@@ -7147,7 +7208,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 8
+                            "y": 24
                         },
                         "id": 99,
                         "links": [],
@@ -7271,7 +7332,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 16
+                            "y": 32
                         },
                         "id": 185,
                         "links": [],
@@ -7333,12 +7394,12 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": true,
-                                "expr": "avg(\n    rate(process_cpu_seconds_total{job=~\"$job_insert\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    process_cpu_cores_available{job=~\"$job_insert\", instance=~\"$instance\"}\n)",
+                                "expr": "median(\n    rate(process_cpu_seconds_total{job=~\"$job_insert\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    process_cpu_cores_available{job=~\"$job_insert\", instance=~\"$instance\"}\n)",
                                 "format": "time_series",
                                 "hide": false,
                                 "interval": "",
                                 "intervalFactor": 1,
-                                "legendFormat": "avg",
+                                "legendFormat": "median",
                                 "range": true,
                                 "refId": "C"
                             }
@@ -7415,7 +7476,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 16
+                            "y": 32
                         },
                         "id": 187,
                         "links": [],
@@ -7477,12 +7538,12 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": true,
-                                "expr": "avg(\n    max_over_time(process_resident_memory_bytes{job=~\"$job_insert\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    vm_available_memory_bytes{job=~\"$job_insert\", instance=~\"$instance\"}\n)",
+                                "expr": "median(\n    max_over_time(process_resident_memory_bytes{job=~\"$job_insert\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    vm_available_memory_bytes{job=~\"$job_insert\", instance=~\"$instance\"}\n)",
                                 "format": "time_series",
                                 "hide": false,
                                 "interval": "",
                                 "intervalFactor": 1,
-                                "legendFormat": "avg",
+                                "legendFormat": "median",
                                 "range": true,
                                 "refId": "C"
                             }
@@ -7553,7 +7614,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 24
+                            "y": 40
                         },
                         "id": 90,
                         "links": [],
@@ -7661,7 +7722,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 24
+                            "y": 40
                         },
                         "id": 88,
                         "links": [],
@@ -7768,7 +7829,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 32
+                            "y": 48
                         },
                         "id": 139,
                         "links": [],
@@ -7875,7 +7936,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 32
+                            "y": 48
                         },
                         "id": 114,
                         "links": [],
@@ -7941,10 +8002,15 @@ data:
                         },
                         "id": 198,
                         "options": {
+                            "code": {
+                                "language": "plaintext",
+                                "showLineNumbers": false,
+                                "showMiniMap": false
+                            },
                             "content": "Drilldown row is used by other panels on the dashboard to show more detailed metrics per-instance.",
                             "mode": "markdown"
                         },
-                        "pluginVersion": "9.1.0",
+                        "pluginVersion": "9.2.6",
                         "transparent": true,
                         "type": "text"
                     },
@@ -7996,7 +8062,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         }
                                     ]
                                 },
@@ -8097,7 +8164,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         }
                                     ]
                                 },
@@ -8198,7 +8266,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         }
                                     ]
                                 },
@@ -8301,7 +8370,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -8347,7 +8417,7 @@ data:
                                     "uid": "$ds"
                                 },
                                 "editorMode": "code",
-                                "expr": "vm_free_disk_space_bytes{job=~\"$job_storage\", instance=~\"$instance\"} \n/ \nignoring(path) (\n    (\n        rate(vm_rows_added_to_storage_total{job=~\"$job_storage\", instance=~\"$instance\"}[1d])\n        - \n        ignoring(type) rate(vm_deduplicated_samples_total{job=~\"$job_storage\", instance=~\"$instance\", type=\"merge\"}[1d])\n    ) * scalar(\n            sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\", type!=\"indexdb\"})\n            / \n            sum(vm_rows{job=~\"$job_storage\", instance=~\"$instance\", type!=\"indexdb\"})\n            )\n)",
+                                "expr": "vm_free_disk_space_bytes{job=~\"$job_storage\", instance=~\"$instance\"} \n/ \nignoring(path) (\n    (\n        rate(vm_rows_added_to_storage_total{job=~\"$job_storage\", instance=~\"$instance\"}[1d])\n        - \n        ignoring(type) rate(vm_deduplicated_samples_total{job=~\"$job_storage\", instance=~\"$instance\", type=\"merge\"}[1d])\n    ) * scalar(\n            sum(vm_data_size_bytes{job=~\"$job_storage\", instance=~\"$instance\", type!~\"indexdb.*\"})\n            / \n            sum(vm_rows{job=~\"$job_storage\", instance=~\"$instance\", type!~\"indexdb.*\"})\n            )\n)",
                                 "format": "time_series",
                                 "interval": "",
                                 "intervalFactor": 1,
@@ -8357,6 +8427,224 @@ data:
                             }
                         ],
                         "title": "Storage full ETA ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows the percentage of used disk space. It is recommended to have at least 20% of free disk space for the best performance.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "line"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        }
+                                    ]
+                                },
+                                "unit": "decbytes"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 26
+                        },
+                        "id": 200,
+                        "links": [],
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true,
+                                "sortBy": "Last *",
+                                "sortDesc": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.1.0",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)",
+                                "format": "time_series",
+                                "intervalFactor": 1,
+                                "legendFormat": "",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Disk space usage ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "line"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        }
+                                    ]
+                                },
+                                "unit": "decbytes"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 26
+                        },
+                        "id": 201,
+                        "links": [],
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true,
+                                "sortBy": "Last *",
+                                "sortDesc": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.1.0",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\", type=~\"indexdb.*\"}) by(job, instance)",
+                                "format": "time_series",
+                                "intervalFactor": 1,
+                                "legendFormat": "{{`{{`}}job{{`}}`}}:{{`{{`}}instance{{`}}`}} (indexdb)",
+                                "range": true,
+                                "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\", type!~\"indexdb.*\"}) by(job, instance)",
+                                "format": "time_series",
+                                "hide": false,
+                                "intervalFactor": 1,
+                                "legendFormat": "{{`{{`}}job{{`}}`}}:{{`{{`}}instance{{`}}`}} (datapoints)",
+                                "range": true,
+                                "refId": "B"
+                            }
+                        ],
+                        "title": "Disk space usage by type ($instance)",
                         "type": "timeseries"
                     }
                 ],
@@ -8372,9 +8660,9 @@ data:
             "list": [
                 {
                     "current": {
-                        "selected": false,
-                        "text": "VictoriaMetrics - cluster",
-                        "value": "VictoriaMetrics - cluster"
+                        "selected": true,
+                        "text": "VictoriaMetrics",
+                        "value": "VictoriaMetrics"
                     },
                     "hide": 0,
                     "includeAll": false,
@@ -8394,81 +8682,6 @@ data:
                         "type": "prometheus",
                         "uid": "$ds"
                     },
-                    "definition": "label_values(vm_app_version{version=~\"^vminsert.*\"}, job)",
-                    "hide": 2,
-                    "includeAll": false,
-                    "multi": false,
-                    "name": "job_insert",
-                    "options": [],
-                    "query": {
-                        "query": "label_values(vm_app_version{version=~\"^vminsert.*\"}, job)",
-                        "refId": "VictoriaMetrics-job_insert-Variable-Query"
-                    },
-                    "refresh": 1,
-                    "regex": "",
-                    "skipUrlSync": false,
-                    "sort": 0,
-                    "tagValuesQuery": "",
-                    "tagsQuery": "",
-                    "type": "query",
-                    "useTags": false
-                },
-                {
-                    "current": {},
-                    "datasource": {
-                        "type": "prometheus",
-                        "uid": "$ds"
-                    },
-                    "definition": "label_values(vm_app_version{version=~\"^vmselect.*\"}, job)",
-                    "hide": 2,
-                    "includeAll": false,
-                    "multi": false,
-                    "name": "job_select",
-                    "options": [],
-                    "query": {
-                        "query": "label_values(vm_app_version{version=~\"^vmselect.*\"}, job)",
-                        "refId": "VictoriaMetrics-job_select-Variable-Query"
-                    },
-                    "refresh": 1,
-                    "regex": "",
-                    "skipUrlSync": false,
-                    "sort": 0,
-                    "tagValuesQuery": "",
-                    "tagsQuery": "",
-                    "type": "query",
-                    "useTags": false
-                },
-                {
-                    "current": {},
-                    "datasource": {
-                        "type": "prometheus",
-                        "uid": "$ds"
-                    },
-                    "definition": "label_values(vm_app_version{version=~\"^vmstorage.*\"}, job)",
-                    "hide": 2,
-                    "includeAll": false,
-                    "multi": false,
-                    "name": "job_storage",
-                    "options": [],
-                    "query": {
-                        "query": "label_values(vm_app_version{version=~\"^vmstorage.*\"}, job)",
-                        "refId": "VictoriaMetrics-job_storage-Variable-Query"
-                    },
-                    "refresh": 1,
-                    "regex": "",
-                    "skipUrlSync": false,
-                    "sort": 0,
-                    "tagValuesQuery": "",
-                    "tagsQuery": "",
-                    "type": "query",
-                    "useTags": false
-                },
-                {
-                    "current": {},
-                    "datasource": {
-                        "type": "prometheus",
-                        "uid": "$ds"
-                    },
                     "definition": "label_values(vm_app_version{version=~\"^vm(insert|select|storage).*\"}, job)",
                     "hide": 0,
                     "includeAll": true,
@@ -8478,6 +8691,81 @@ data:
                     "query": {
                         "query": "label_values(vm_app_version{version=~\"^vm(insert|select|storage).*\"}, job)",
                         "refId": "VictoriaMetrics-job-Variable-Query"
+                    },
+                    "refresh": 1,
+                    "regex": "",
+                    "skipUrlSync": false,
+                    "sort": 0,
+                    "tagValuesQuery": "",
+                    "tagsQuery": "",
+                    "type": "query",
+                    "useTags": false
+                },
+                {
+                    "current": {},
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$ds"
+                    },
+                    "definition": "label_values(vm_app_version{job=~\"$job\", version=~\"^vminsert.*\"}, job)",
+                    "hide": 2,
+                    "includeAll": false,
+                    "multi": false,
+                    "name": "job_insert",
+                    "options": [],
+                    "query": {
+                        "query": "label_values(vm_app_version{job=~\"$job\", version=~\"^vminsert.*\"}, job)",
+                        "refId": "StandardVariableQuery"
+                    },
+                    "refresh": 1,
+                    "regex": "",
+                    "skipUrlSync": false,
+                    "sort": 0,
+                    "tagValuesQuery": "",
+                    "tagsQuery": "",
+                    "type": "query",
+                    "useTags": false
+                },
+                {
+                    "current": {},
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$ds"
+                    },
+                    "definition": "label_values(vm_app_version{job=~\"$job\", version=~\"^vmselect.*\"}, job)",
+                    "hide": 2,
+                    "includeAll": false,
+                    "multi": false,
+                    "name": "job_select",
+                    "options": [],
+                    "query": {
+                        "query": "label_values(vm_app_version{job=~\"$job\", version=~\"^vmselect.*\"}, job)",
+                        "refId": "StandardVariableQuery"
+                    },
+                    "refresh": 1,
+                    "regex": "",
+                    "skipUrlSync": false,
+                    "sort": 0,
+                    "tagValuesQuery": "",
+                    "tagsQuery": "",
+                    "type": "query",
+                    "useTags": false
+                },
+                {
+                    "current": {},
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$ds"
+                    },
+                    "definition": "label_values(vm_app_version{job=~\"$job\", version=~\"^vmstorage.*\"}, job)",
+                    "hide": 2,
+                    "includeAll": false,
+                    "multi": false,
+                    "name": "job_storage",
+                    "options": [],
+                    "query": {
+                        "query": "label_values(vm_app_version{job=~\"$job\", version=~\"^vmstorage.*\"}, job)",
+                        "refId": "StandardVariableQuery"
                     },
                     "refresh": 1,
                     "regex": "",
