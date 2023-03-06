@@ -135,8 +135,12 @@ spec:
         name: cache-volume
         {{- if .Values.vmselect.persistentVolume.annotations }}
         annotations:
-    {{ toYaml .Values.vmselect.persistentVolume.annotations | indent 10 }}
-    {{- end }}
+        {{ toYaml .Values.vmselect.persistentVolume.annotations | indent 10 }}
+        {{- end }}
+        {{- if .Values.vmstorage.persistentVolume.labels }}
+        labels:
+        {{ toYaml .Values.vmstorage.persistentVolume.labels | indent 10 }}
+        {{- end }}
       spec:
         accessModes:
         {{ toYaml .Values.vmselect.persistentVolume.accessModes | indent 10 }}

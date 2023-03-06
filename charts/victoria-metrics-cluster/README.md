@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.9.56](https://img.shields.io/badge/Version-0.9.56-informational?style=flat-square)
+ ![Version: 0.9.57](https://img.shields.io/badge/Version-0.9.57-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -217,6 +217,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.persistentVolume.annotations | object | `{}` | Persistent volume annotations |
 | vmselect.persistentVolume.enabled | bool | `false` | Create/use Persistent Volume Claim for vmselect component. Empty dir if false. If true, vmselect will create/use a Persistent Volume Claim |
 | vmselect.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmselect.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
+| vmselect.persistentVolume.labels | object | `{}` | Persistent volume labels |
 | vmselect.persistentVolume.size | string | `"2Gi"` | Size of the volume. Better to set the same as resource limit memory property |
 | vmselect.persistentVolume.subPath | string | `""` | Mount subpath |
 | vmselect.podAnnotations | object | `{}` | Pod's annotations |
@@ -285,6 +286,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.persistentVolume.annotations | object | `{}` | Persistent volume annotations |
 | vmstorage.persistentVolume.enabled | bool | `true` | Create/use Persistent Volume Claim for vmstorage component. Empty dir if false. If true,  vmstorage will create/use a Persistent Volume Claim |
 | vmstorage.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
+| vmstorage.persistentVolume.labels | object | `{}` | Persistent volume labels |
 | vmstorage.persistentVolume.mountPath | string | `"/storage"` | Data root path. Vmstorage data Persistent Volume mount root path |
 | vmstorage.persistentVolume.size | string | `"8Gi"` | Size of the volume. Better to set the same as resource limit memory property |
 | vmstorage.persistentVolume.storageClass | string | `""` | Storage class name. Will be empty if not setted |
