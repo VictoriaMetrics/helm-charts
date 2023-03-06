@@ -38,8 +38,8 @@ spec:
             ignoring(type) rate(vm_deduplicated_samples_total{type="merge"}[1d])
            )
           * scalar(
-            sum(vm_data_size_bytes{type!="indexdb"}) /
-            sum(vm_rows{type!="indexdb"})
+            sum(vm_data_size_bytes{type!~"indexdb.*"}) /
+            sum(vm_rows{type!~"indexdb.*"})
            )
         ) < 3 * 24 * 3600 > 0
       for: 30m
@@ -82,10 +82,11 @@ spec:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=59&var-instance={{`{{`}} $labels.instance {{`}}`}}
         description: "The limit of concurrent flushes on instance {{`{{`}} $labels.instance {{`}}`}} is equal to number of CPUs.\n When VictoriaMetrics constantly hits the limit it means that storage is overloaded and requires more CPU."
         summary: VictoriaMetrics on instance {{`{{`}} $labels.instance {{`}}`}} is constantly hitting concurrent flushes limit
-      expr: avg_over_time(vm_concurrent_addrows_current[1m]) >= vm_concurrent_addrows_capacity
+      expr: avg_over_time(vm_concurrent_insert_current[1m]) >= vm_concurrent_insert_capacity
       for: 15m
       labels:
         severity: warning
+        show_at: dashboard
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
