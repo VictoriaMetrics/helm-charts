@@ -27,9 +27,6 @@ def change_style(style, representer):
 
 sources_json = [
     {
-        'source': 'https://etcd.io/docs/v3.4/op-guide/grafana.json',
-    },
-    {
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json',
     },
     {
@@ -45,9 +42,6 @@ sources_json = [
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/operator.json',
     },
     {
-        'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json',
-    },
-    {
         'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json',
     },
     {
@@ -57,14 +51,14 @@ sources_json = [
         'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json',
     },
     {
-        'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json',
-    },
-    {
         'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json',
     },
     {
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json',
     },
+    {
+        'source': 'https://raw.githubusercontent.com/rfmoz/grafana-dashboards/master/prometheus/node-exporter-full.json',
+    }
 ]
 # Source files list
 sources_yaml = [
@@ -73,9 +67,9 @@ sources_yaml = [
     },
 ]
 
-skip_list = [
-    "prometheus.json",
-    "prometheus-remote-write.json"
+allow_dashboards_list = [
+    "alertmanager-overview.json",
+    "grafana-overview.json",
 ]
 
 dashboards_destination = "../templates/grafana/dashboards"
@@ -291,7 +285,7 @@ def main():
         groups = yaml_text['items']
         for group in groups:
             for resource, content in group['data'].items():
-                if resource in skip_list:
+                if resource not in allow_dashboards_list:
                     continue
                 write_group_to_file(resource.replace('.json', ''), content, src['source'], dashboards_destination)
        
