@@ -105,7 +105,7 @@ VMAlert remotes
 {{- define "victoria-metrics-k8s-stack.vmAlertRemotes" -}}
 remoteWrite:
 {{- if or .Values.vmalert.remoteWriteVMAgent }}
-     url: {{ printf "http://%s-%s.%s.svc:9093" "vmagent" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace }}
+     url: {{ printf "http://%s-%s.%s.svc:8429" "vmagent" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace }}
 {{- else }}
      {{- include "victoria-metrics-k8s-stack.vmWriteEndpoint" . | nindent 2 }}
 {{- end }}
