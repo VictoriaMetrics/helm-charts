@@ -56,6 +56,10 @@ spec:
           args:
           {{- if not .Values.vminsert.suppresStorageFQDNsRender }}
             {{- include "victoria-metrics.vminsert.vmstorage-pod-fqdn" . | nindent 12 }}
+          {{- else }}
+          {{- range $vmstorageNode := .Values.vminsert.vmstorageNodes }}
+            - --storageNode={{ $vmstorageNode }}
+          {{- end }}
           {{- end }}
           {{- range $key, $value := .Values.vminsert.extraArgs }}
             - --{{ $key }}={{ $value }}

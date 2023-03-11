@@ -57,6 +57,10 @@ spec:
             - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
           {{- if not .Values.vmselect.suppresStorageFQDNsRender }}
           {{- include "victoria-metrics.vmselect.vmstorage-pod-fqdn" . | nindent 12 }}
+          {{- else }}
+          {{- range $vmstorageNode := .Values.vmselect.vmstorageNodes }}
+            - --storageNode={{ $vmstorageNode }}
+          {{- end }}
           {{- end }}
           {{- range $key, $value := .Values.vmselect.extraArgs }}
             - --{{ $key }}={{ $value }}
