@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.5.19](https://img.shields.io/badge/Version-0.5.19-informational?style=flat-square)
+ ![Version: 0.5.20](https://img.shields.io/badge/Version-0.5.20-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
@@ -137,7 +137,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.service.annotations | object | `{}` |  |
 | alertmanager.service.port | int | `9093` |  |
 | alertmanager.service.type | string | `"ClusterIP"` |  |
-| alertmanager.tag | string | `"v0.20.0"` |  |
+| alertmanager.tag | string | `"v0.25.0"` |  |
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
 | imagePullSecrets | list | `[]` |  |
