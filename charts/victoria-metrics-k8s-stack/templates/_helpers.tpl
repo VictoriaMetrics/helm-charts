@@ -132,6 +132,15 @@ configMaps:
 {{- end -}}
 
 {{/*
+VMAlert externalLabels
+*/}}
+{{- define "victoria-metrics-k8s-stack.vmAlertExternalLabels" -}}
+{{- if .Values.vmalert.spec.externalLabels }}
+{{- tpl (toYaml .Values.vmalert.spec.externalLabels | nindent 2) . }}
+{{- end }}
+{{- end -}}
+
+{{/*
 VMAlert spec
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAlertSpec" -}}
@@ -140,6 +149,7 @@ VMAlert spec
 {{- $_ := set $extraArgs "rule.templates" (print "/etc/vm/configs/" (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmalert-extra-tpl" | trunc 63 | trimSuffix "-" ) "/*.tmpl") -}}
 {{- end -}}
 {{- $_ := set $extraArgs "remoteWrite.disablePathAppend" "true" -}}
+{{- $_ := set .Values.vmalert.spec "externalLabels" (include "victoria-metrics-k8s-stack.vmAlertExternalLabels" . | fromYaml) -}}
 {{ deepCopy .Values.vmalert.spec | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertRemotes" . | fromYaml) | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertTemplates" . | fromYaml) | mergeOverwrite (dict "extraArgs" $extraArgs) | toYaml }}
 {{- end }}
 
