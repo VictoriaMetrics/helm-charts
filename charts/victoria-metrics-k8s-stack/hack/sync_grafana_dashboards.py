@@ -55,9 +55,6 @@ sources_json = [
     },
     {
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json',
-    },
-    {
-        'source': 'https://raw.githubusercontent.com/rfmoz/grafana-dashboards/master/prometheus/node-exporter-full.json',
     }
 ]
 # Source files list
