@@ -76,6 +76,15 @@ kubelet:
     interval: "30s"
 ```
 
+## Disable automatic PSP creation for operator
+
+In order to disable automatic creation of PSP by operator set:
+```
+victoria-metrics-operator:
+    operator:
+        psp_auto_creation_enabled: false
+```
+
 # Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
