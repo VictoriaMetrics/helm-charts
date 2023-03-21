@@ -180,6 +180,8 @@ vmselect:
     targetPort: http
     # -- Service type
     type: ClusterIP
+    # -- Adds the optional appProtocol field to the service. This allows the service to work with Istio protocol-selection. Documentation: https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/
+    appProtocol: ""
   ingress:
     # -- Enable deployment of ingress for vmselect component
     enabled: false
@@ -259,6 +261,8 @@ vmselect:
 #      insecureSkipVerify: true
     # -- Service Monitor relabelings
     relabelings: []
+    # -- (bool) Optional. Whether to enable or disable HTTP2. Documentation: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.ServiceMonitorSpec
+    enableHttp2: null
 
 vminsert:
   # -- Enable deployment of vminsert component. Deployment is used
@@ -400,6 +404,8 @@ vminsert:
     # -- Enable UDP port. used if you have "spec.opentsdbListenAddr" specified
     # -- Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
     udp: false
+    # -- Adds the optional appProtocol field to the service. This allows the service to work with Istio protocol-selection. Documentation: https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/
+    appProtocol: ""
   ingress:
     # -- Enable deployment of ingress for vminsert component
     enabled: false
@@ -443,6 +449,8 @@ vminsert:
 #      insecureSkipVerify: true
     # -- Service Monitor relabelings
     relabelings: []
+    # -- (bool) Optional. Whether to enable or disable HTTP2. Documentation: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.ServiceMonitorSpec
+    enableHttp2: null
 
 vmstorage:
   # -- Enable deployment of vmstorage component. StatefulSet is used
@@ -606,6 +614,8 @@ vmstorage:
     vmselectPort: 8401
     # -- Extra service ports
     extraServicePorts: []
+    # -- Adds the optional appProtocol field to the service. This allows the service to work with Istio protocol-selection. Documentation: https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/
+    appProtocol: ""
   # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60
   probe:
@@ -709,3 +719,5 @@ vmstorage:
 #      insecureSkipVerify: true
     # -- Service Monitor relabelings
     relabelings: []
+    # -- (bool) Optional. Whether to enable or disable HTTP2. Documentation: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.ServiceMonitorSpec
+    enableHttp2: null

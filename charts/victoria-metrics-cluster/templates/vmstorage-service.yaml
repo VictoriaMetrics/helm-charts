@@ -20,19 +20,31 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- with .Values.vmstorage.service.appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
     - port: {{ .Values.vmstorage.service.vmselectPort }}
       targetPort: vmselect
       protocol: TCP
       name: vmselect
+      {{- with .Values.vmstorage.service.appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
     - port: {{ .Values.vmstorage.service.vminsertPort }}
       targetPort: vminsert
       protocol: TCP
       name: vminsert
+      {{- with .Values.vmstorage.service.appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
   {{- range .Values.vmstorage.service.extraPorts }}
     - name: {{ .name }}
       port: {{ .port }}
       protocol: TCP
       targetPort: {{ .targetPort }}
+      {{- with .appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
   {{- end }}
   selector:
     {{- include "victoria-metrics.vmstorage.matchLabels" . | nindent 4 }}

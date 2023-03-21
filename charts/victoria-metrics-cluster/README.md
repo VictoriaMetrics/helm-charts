@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.9.61](https://img.shields.io/badge/Version-0.9.61-informational?style=flat-square)
+ ![Version: 0.9.62](https://img.shields.io/badge/Version-0.9.62-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -163,6 +163,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.resources | object | `{}` | Resource object |
 | vminsert.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vminsert.service.annotations | object | `{}` | Service annotations |
+| vminsert.service.appProtocol | string | `""` | Adds the optional appProtocol field to the service. This allows the service to work with Istio protocol-selection. Documentation: https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/ |
 | vminsert.service.clusterIP | string | `""` | Service ClusterIP |
 | vminsert.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
 | vminsert.service.extraServicePorts | list | `[]` | Extra service ports |
@@ -174,6 +175,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.service.type | string | `"ClusterIP"` | Service type |
 | vminsert.service.udp | bool | `false` | Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/ |
 | vminsert.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
+| vminsert.serviceMonitor.enableHttp2 | bool | `nil` | Optional. Whether to enable or disable HTTP2. Documentation: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.ServiceMonitorSpec |
 | vminsert.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object |
 | vminsert.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vminsert.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
@@ -237,6 +239,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.resources | object | `{}` | Resource object |
 | vmselect.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
 | vmselect.service.annotations | object | `{}` | Service annotations |
+| vmselect.service.appProtocol | string | `""` | Adds the optional appProtocol field to the service. This allows the service to work with Istio protocol-selection. Documentation: https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/ |
 | vmselect.service.clusterIP | string | `""` | Service ClusterIP |
 | vmselect.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips](https://kubernetes.io/docs/user-guide/services/#external-ips) |
 | vmselect.service.extraServicePorts | list | `[]` | Extra service ports |
@@ -247,6 +250,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.service.targetPort | string | `"http"` | Target port |
 | vmselect.service.type | string | `"ClusterIP"` | Service type |
 | vmselect.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
+| vmselect.serviceMonitor.enableHttp2 | bool | `nil` | Optional. Whether to enable or disable HTTP2. Documentation: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.ServiceMonitorSpec |
 | vmselect.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operator object |
 | vmselect.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vmselect.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
@@ -312,12 +316,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.retentionPeriod | int | `1` | Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month |
 | vmstorage.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vmstorage.service.annotations | object | `{}` | Service annotations |
+| vmstorage.service.appProtocol | string | `""` | Adds the optional appProtocol field to the service. This allows the service to work with Istio protocol-selection. Documentation: https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/ |
 | vmstorage.service.extraServicePorts | list | `[]` | Extra service ports |
 | vmstorage.service.labels | object | `{}` | Service labels |
 | vmstorage.service.servicePort | int | `8482` | Service port |
 | vmstorage.service.vminsertPort | int | `8400` | Port for accepting connections from vminsert |
 | vmstorage.service.vmselectPort | int | `8401` | Port for accepting connections from vmselect |
 | vmstorage.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
+| vmstorage.serviceMonitor.enableHttp2 | bool | `nil` | Optional. Whether to enable or disable HTTP2. Documentation: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.ServiceMonitorSpec |
 | vmstorage.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmstorage component. This is Prometheus operator object |
 | vmstorage.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vmstorage.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |

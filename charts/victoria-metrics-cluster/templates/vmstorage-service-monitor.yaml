@@ -41,4 +41,7 @@ spec:
       relabelings:
           {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if (kindIs "bool" .Values.vmstorage.serviceMonitor.enableHttp2) }}
+      enableHttp2: {{ .Values.vmstorage.serviceMonitor.enableHttp2 }}
+      {{- end }}
   {{- end }}

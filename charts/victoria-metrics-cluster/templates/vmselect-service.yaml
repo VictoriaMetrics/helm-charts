@@ -35,11 +35,17 @@ spec:
       port: {{ .Values.vmselect.service.servicePort }}
       protocol: TCP
       targetPort: {{ .Values.vmselect.service.targetPort }}
+      {{- with .Values.vmselect.service.appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
   {{- range .Values.vmselect.service.extraPorts }}
     - name: {{ .name }}
       port: {{ .port }}
       protocol: TCP
       targetPort: {{ .targetPort }}
+      {{- with .appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
   {{- end }}
   {{- if .Values.vmselect.extraArgs.clusternativeListenAddr }}
     - name: cluster-tcp
