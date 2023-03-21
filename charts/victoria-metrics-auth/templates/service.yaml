@@ -38,6 +38,9 @@ spec:
       {{- with .Values.service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
+      {{- with .Values.service.appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
   selector:
     {{- include "chart.selectorLabels" . | nindent 4 }}
   type: "{{ .Values.service.type }}"

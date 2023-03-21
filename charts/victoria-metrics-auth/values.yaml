@@ -100,6 +100,8 @@ service:
   # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
   # externalTrafficPolicy: "local"
   # healthCheckNodePort: 0
+  # -- Adds the optional appProtocol field to the service. This allows the service to work with Istio protocol-selection. Documentation: https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/
+  appProtocol: ""
 
 ingress:
   enabled: false
@@ -183,6 +185,8 @@ serviceMonitor:
   # -- Commented. TLS configuration to use when scraping the endpoint
 #    tlsConfig:
 #      insecureSkipVerify: true
+  # -- (bool) Optional. Whether to enable or disable HTTP2. Documentation: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.ServiceMonitorSpec
+  enableHttp2: null
 
 # -- Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html.
 # Configuration in the given secret must be stored under `auth.yml` key.

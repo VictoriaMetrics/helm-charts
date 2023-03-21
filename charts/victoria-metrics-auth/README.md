@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Auth.
 
- ![Version: 0.2.80](https://img.shields.io/badge/Version-0.2.80-informational?style=flat-square)
+ ![Version: 0.2.81](https://img.shields.io/badge/Version-0.2.81-informational?style=flat-square)
 
 Victoria Metrics Auth - is a simple auth proxy and router for VictoriaMetrics.
 
@@ -140,6 +140,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | secretName | string | `""` | Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html. Configuration in the given secret must be stored under `auth.yml` key. |
 | securityContext | object | `{}` |  |
 | service.annotations | object | `{}` |  |
+| service.appProtocol | string | `""` | Adds the optional appProtocol field to the service. This allows the service to work with Istio protocol-selection. Documentation: https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/ |
 | service.clusterIP | string | `""` |  |
 | service.enabled | bool | `true` |  |
 | service.externalIPs | list | `[]` |  |
@@ -152,6 +153,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `nil` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | serviceMonitor.annotations | object | `{}` |  |
+| serviceMonitor.enableHttp2 | bool | `nil` | Optional. Whether to enable or disable HTTP2. Documentation: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.ServiceMonitorSpec |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
 | serviceMonitor.relabelings | list | `[]` |  |
