@@ -12,7 +12,7 @@ metadata:
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
-{{- if and .Values.rbac.pspEnabled (.Capabilities.APIVersions.Has "policy/v1beta1") }}
+{{- if and .Values.rbac.pspEnabled (.Capabilities.APIVersions.Has "policy/v1beta1/PodSecurityPolicy") }}
 rules:
   - apiGroups:      ['extensions']
     resources:      ['podsecuritypolicies']
