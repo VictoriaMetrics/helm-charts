@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Fetch alerting and aggregation rules from provided urls into this chart."""
+import json
 import textwrap
 from os import makedirs
 
+import _jsonnet
 import requests
 import yaml
 from yaml.representer import SafeRepresenter
@@ -62,8 +64,9 @@ charts = [
         'destination': '../templates/rules',
     },
     {
-        'source': 'https://etcd.io/docs/v3.4/op-guide/etcd3_alert.rules.yml',
+        'source': 'https://raw.githubusercontent.com/etcd-io/etcd/main/contrib/mixin/mixin.libsonnet',
         'destination': '../templates/rules',
+        'is_mixin': True,
     }
 ]
 
@@ -318,7 +321,10 @@ def main():
             print(f"Skipping the file, response code {response.status_code} not equals 200")
             continue
         raw_text = response.text
-        yaml_text = yaml.full_load(raw_text)
+        if chart.get('is_mixin'):
+            yaml_text = json.loads(_jsonnet.evaluate_snippet(chart['source'], raw_text + '.prometheusAlerts'))
+        else:
+            yaml_text = yaml.full_load(raw_text)
 
         # etcd workaround, their file don't have spec level
         groups = yaml_text['spec']['groups'] if yaml_text.get('spec') else yaml_text['groups']
