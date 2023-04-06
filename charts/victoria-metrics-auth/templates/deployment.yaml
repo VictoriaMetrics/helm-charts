@@ -92,8 +92,13 @@ spec:
     {{- end }}
       volumes:
         - name: config
+          {{- if .Values.configMap }}
+          configMap:
+            name: {{ .Values.configMap }}
+          {{- else }}
           secret:
             secretName: {{ include "chart.fullname" .}}
+          {{- end }}
       {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
