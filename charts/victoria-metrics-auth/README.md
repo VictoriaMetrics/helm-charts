@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Auth.
 
- ![Version: 0.2.76](https://img.shields.io/badge/Version-0.2.76-informational?style=flat-square)
+ ![Version: 0.2.79](https://img.shields.io/badge/Version-0.2.79-informational?style=flat-square)
 
 Victoria Metrics Auth - is a simple auth proxy and router for VictoriaMetrics.
 
@@ -113,7 +113,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmauth"` | Victoria Metrics Auth Docker repository and image name |
-| image.tag | string | `"v1.89.1"` | Tag of Docker image |
+| image.tag | string | `"v1.90.0"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
