@@ -6,7 +6,8 @@ kind: Secret
 metadata:
   name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-alertmanager
   namespace: {{ .Release.Namespace }}
-  labels: 
+  labels:
+    alertmanager.config/checksum: {{ join "" .Values.alertmanager.config | sha256sum | trunc 63 | quote }}
     app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-alertmanager
 {{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
 stringData:
