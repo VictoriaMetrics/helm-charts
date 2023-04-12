@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: kube-state-metrics
+      app.kubernetes.io/name: {{ include "kube-state-metrics.name" (index .Subcharts "kube-state-metrics") }}
       app.kubernetes.io/instance: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
 {{- if empty (index .Values "kube-state-metrics" "vmServiceScrape" "spec") }}
   endpoints:
