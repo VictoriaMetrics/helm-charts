@@ -68,6 +68,13 @@ See the history of versions of ``vmalert`` application with command.
 helm history vmalert -n NAMESPACE
 ```
 
+## HA configuration for Alertmanager
+
+There is no option on this chart to set up Alertmanager with [HA mode](https://github.com/prometheus/alertmanager#high-availability).
+To enable the HA configuration, you can use:
+- [VictoriaMetrics Operator](https://docs.victoriametrics.com/operator/VictoriaMetrics-Operator.html)
+- official [Alertmanager Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager)
+
 # How to uninstall
 
 Remove application with command.
@@ -131,7 +138,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.podMetadata.labels | object | `{}` |  |
 | alertmanager.podSecurityContext | object | `{}` |  |
 | alertmanager.priorityClassName | string | `""` |  |
-| alertmanager.replicaCount | int | `1` |  |
 | alertmanager.resources | object | `{}` |  |
 | alertmanager.retention | string | `"120h"` |  |
 | alertmanager.service.annotations | object | `{}` |  |
