@@ -4782,7 +4782,8 @@ spec:
                   continue:
                     description: Continue indicating whether an alert should continue
                       matching subsequent sibling nodes. It will always be true for
-                      the first-level route.
+                      the first-level route if disableRouteContinueEnforce for vmalertmanager
+                      not set.
                     type: boolean
                   group_by:
                     description: List of labels to group by.
@@ -4817,7 +4818,7 @@ spec:
                     pattern: '[0-9]+(ms|s|m|h)'
                     type: string
                   routes:
-                    description: RawRoutes alertmanager nested routes https://prometheus.io/docs/alerting/latest/configuration/#route
+                    description: Child routes. https://prometheus.io/docs/alerting/latest/configuration/#route
                     items:
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
@@ -5397,6 +5398,10 @@ spec:
                 description: DisableNamespaceMatcher disables namespace label matcher
                   for VMAlertmanagerConfig It may be useful if alert doesn't have
                   namespace label for some reason
+                type: boolean
+              disableRouteContinueEnforce:
+                description: DisableRouteContinueEnforce cancel the behavior for VMAlertmanagerConfig
+                  that always enforce first-level route continue to true
                 type: boolean
               dnsConfig:
                 description: Specifies the DNS parameters of a pod. Parameters specified
