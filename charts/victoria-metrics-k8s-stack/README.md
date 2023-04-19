@@ -526,6 +526,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.ingress.tls | list | `[]` |  |
 | vmalert.remoteWriteVMAgent | bool | `false` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
+| vmalert.spec.externalLabels | object | `{}` |  |
 | vmalert.spec.image.tag | string | `"v1.90.0"` |  |
 | vmalert.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.templateFiles | object | `{}` |  |
