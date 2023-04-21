@@ -134,9 +134,9 @@ remote:
 
 scheduler:
   class: "scheduler.periodic.PeriodicScheduler"
-  fit_every: "1d"
-  fit_window: "7d"
-  infer_every: "10s"
+  fit_every: "2h"
+  fit_window: "14d"
+  infer_every: "1m"
 
 ## -- List of labels that will be added to generated series by vmanomaly
 extra_labels: {}
@@ -150,7 +150,7 @@ model:
     z_threshold: 2.5
 
   prophet:
-    interval_width: 0.8
+    interval_width: 0.98
 #    country_holidays: 'US'
 #    seasonalities:
 #      - name: 'hourly'
@@ -159,7 +159,7 @@ model:
 
   holt_winters:
     seasonality: '1d'
-    frequency: '1h'   
+    frequency: '1h'
 
 # -- Query names and expressions. Required. Examples:
 #  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
@@ -179,11 +179,9 @@ monitoring:
   # /metrics server.
   pull:
     # -- if true expose metrics on /metric endpoint
-    enabled: true
     port: 8440
   push:
     # -- push metrics on prometheus format if defined
-    endpoint_url: ""
+    url: ""
     extra_labels:
-      job: "vmanomaly"
-  
+      job: "vmanomaly-push"
