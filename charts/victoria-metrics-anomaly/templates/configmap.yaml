@@ -18,7 +18,7 @@ data:
     {{- if eq .Values.model.enabled "holt_winters" }}
       class: "model.holtwinters.HoltWinters"
       {{- toYaml .Values.model.holt_winters | nindent 6 }}
-    {{- end }}      
+    {{- end }}
     scheduler:
       {{- toYaml .Values.scheduler | nindent 6 }}
     reader:
@@ -36,6 +36,7 @@ data:
       {{ end -}}
       queries:
         {{- toYaml .Values.queries | nindent 8 }}
+      sampling_period: "{{ .Values.samplingPeriod }}"
     writer:
       class: "writer.vm.VmWriter"
       datasource_url: "{{ .Values.remote.write.url }}"
