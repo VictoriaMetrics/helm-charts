@@ -106,6 +106,8 @@ spec:
         - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
           image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
           imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
+          securityContext:
+            {{- toYaml .Values.vmstorage.podSecurityContext | nindent 12 }}
           args:
             - {{ printf "%s=%t" "--eula" .Values.vmstorage.vmbackupmanager.eula | quote}}
             - {{ printf "%s=%t" "--disableHourly" .Values.vmstorage.vmbackupmanager.disableHourly | quote}}

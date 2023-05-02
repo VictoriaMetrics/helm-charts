@@ -170,6 +170,9 @@ spec:
           {{- with .Values.server.vmbackupmanager.resources }}
           resources: {{ toYaml . | nindent 12  }}
           {{- end }}
+          {{- with  .Values.server.podSecurityContext }}
+          securityContext: {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with $.Values.server.vmbackupmanager.livenessProbe }}
           livenessProbe: {{- toYaml . | nindent 12 }}
           {{- end }}
