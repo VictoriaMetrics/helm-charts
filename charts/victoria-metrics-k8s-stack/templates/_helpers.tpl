@@ -57,6 +57,22 @@ Create the name for VMSingle
 {{- .Values.vmsingle.name | default (printf "vmsingle-%s" (include "victoria-metrics-k8s-stack.fullname" .))}}
 {{- end }}
 
+{{/*
+Create the name for VMCluster and its components
+*/}}
+{{- define "victoria-metrics-k8s-stack.vmclusterName" -}}
+{{ .Values.vmcluster.name | default (include "victoria-metrics-k8s-stack.fullname" .) }}
+{{- end }}
+{{- define "victoria-metrics-k8s-stack.vmstorageName" -}}
+{{- printf "%s-%s" "vmstorage" (include "victoria-metrics-k8s-stack.vmclusterName" $) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- define "victoria-metrics-k8s-stack.vmselectName" -}}
+{{- printf "%s-%s" "vmselect" (include "victoria-metrics-k8s-stack.vmclusterName" $) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- define "victoria-metrics-k8s-stack.vminsertName" -}}
+{{- printf "%s-%s" "vminsert" (include "victoria-metrics-k8s-stack.vmclusterName" $) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
 
 {{/*
 Common labels
@@ -83,7 +99,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Values.vmsingle.enabled -}}
 url: {{ printf "http://%s.%s.svc:%s%s" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "/") }}
 {{- else if .Values.vmcluster.enabled -}}
-url: {{ printf "http://%s-%s.%s.svc:%s%s/select/%s/prometheus" "vmselect" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default "8481") (index .Values "vmcluster" "spec" "vmselect" "extraArgs" "http.pathPrefix" | default "") (.Values.tenant | default "0") }}
+url: {{ printf "http://%s.%s.svc:%s%s/select/%s/prometheus" (include "victoria-metrics-k8s-stack.vmselectName" .) .Release.Namespace (.Values.vmcluster.spec.vmselect.port | default "8481") (index .Values "vmcluster" "spec" "vmselect" "extraArgs" "http.pathPrefix" | default "") (.Values.tenant | default "0") }}
 {{- else if .Values.externalVM.read.url -}}
 {{ .Values.externalVM.read | toYaml }}
 {{- end }}
@@ -93,7 +109,7 @@ url: {{ printf "http://%s-%s.%s.svc:%s%s/select/%s/prometheus" "vmselect" (inclu
 {{- if .Values.vmsingle.enabled -}}
 url: {{ printf "http://%s.%s.svc:%s%s/api/v1/write" (include "victoria-metrics-k8s-stack.vmsingleName" .) .Release.Namespace (.Values.vmsingle.spec.port | default "8429") (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "") }}
 {{- else if .Values.vmcluster.enabled -}}
-url: {{ printf "http://%s-%s.%s.svc:%s%s/insert/%s/prometheus/api/v1/write" "vminsert" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default "8480") (index .Values "vmcluster" "spec" "vminsert" "extraArgs" "http.pathPrefix" | default "") (.Values.tenant | default "0")  }}
+url: {{ printf "http://%s.%s.svc:%s%s/insert/%s/prometheus/api/v1/write" (include "victoria-metrics-k8s-stack.vminsertName" .) .Release.Namespace (.Values.vmcluster.spec.vminsert.port | default "8480") (index .Values "vmcluster" "spec" "vminsert" "extraArgs" "http.pathPrefix" | default "") (.Values.tenant | default "0")  }}
 {{- else if .Values.externalVM.write.url -}}
 {{ .Values.externalVM.write | toYaml }}
 {{- end }}
