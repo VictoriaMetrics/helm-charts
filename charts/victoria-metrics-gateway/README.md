@@ -1,9 +1,17 @@
 # Victoria Metrics Helm Chart for vmgateway
 
-
- ![Version: 0.1.20](https://img.shields.io/badge/Version-0.1.20-informational?style=flat-square)
+ ![Version: 0.1.35](https://img.shields.io/badge/Version-0.1.35-informational?style=flat-square)
 
 Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
+
+# Table of Content
+
+* [Prerequisites](#prerequisites)
+* [Chart Details](#chart-details)
+* [How to Install](#how-to-install)
+* [How to Uninstall](#how-to-uninstall)
+* [How to use JWT signature verification](#how-to-use-jwt-signature-verification)
+* [Documentation of Helm Chart](#documentation-of-helm-chart)
 
 # Prerequisites
 
@@ -85,6 +93,57 @@ Remove application with command.
 helm uninstall vmgateway -n NAMESPACE
 ```
 
+# How to use [JWT signature verification](https://docs.victoriametrics.com/vmgateway.html#jwt-signature-verification)
+
+Kubernetes best-practice is to store sensitive configuration parts in secrets. For example, 2 keys will be stored as:
+```yaml
+apiVersion: v1
+data:
+  key: "<<KEY_DATA>>"
+kind: Secret
+metadata:
+  name: key1
+---
+apiVersion: v1
+data:
+  key: "<<KEY_DATA>>"
+kind: Secret
+metadata:
+  name: key2
+```
+
+In order to use those secrets it is needed to:
+- mount secrets into pod
+- provide flag pointing to secret on disk
+
+Here is an example `values.yml` file configuration to achieve this:
+```yaml
+auth:
+  enable: true
+
+extraVolumes:
+  - name: key1
+    secret:
+      secretName: key1
+  - name: key2
+    secret:
+      secretName: key2
+
+extraVolumeMounts:
+  - name: key1
+    mountPath: /key1
+  - name: key2
+    mountPath: /key2
+
+extraArgs:
+  envflag.enable: "true"
+  envflag.prefix: VM_
+  loggerFormat: json
+  auth.publicKeyFiles: "/key1/key,/key2/key"
+```
+Note that in this configuration all secret keys will be mounted and accessible to pod.
+Please, refer to [this](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#secretvolumesource-v1-core) doc to see all available secret source options.
+
 # Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
@@ -126,7 +185,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmgateway"` | Victoria Metrics gateway Docker repository and image name |
-| image.tag | string | `"v1.83.1-enterprise"` | Tag of Docker image |
+| image.tag | string | `"v1.90.0-enterprise"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |

@@ -44,14 +44,14 @@ vmselect:
     # -- Image repository
     repository: victoriametrics/vmselect
     # -- Image tag
-    tag: v1.83.1-cluster
+    tag: v1.90.0-cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
   priorityClassName: ""
   # -- Overrides the full name of vmselect component
   fullnameOverride: ""
-  # -- Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs
+  # -- Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs
   suppresStorageFQDNsRender: false
   automountServiceAccountToken: true
   # Extra command line arguments for vmselect component
@@ -89,12 +89,12 @@ vmselect:
 
   # Additional hostPath mounts
   extraHostPathMounts:
-   []
-   # - name: certs-dir
-   #   mountPath: /etc/kubernetes/certs
-   #   subPath: ""
-   #   hostPath: /etc/kubernetes/certs
-   #   readOnly: true
+    []
+    # - name: certs-dir
+    #   mountPath: /etc/kubernetes/certs
+    #   subPath: ""
+    #   hostPath: /etc/kubernetes/certs
+    #   readOnly: true
 
   # Extra Volumes for the pod
   extraVolumes:
@@ -168,12 +168,16 @@ vmselect:
     clusterIP: ""
     # -- Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips](https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
+    # -- Extra service ports
+    extraServicePorts: []
     # -- Service load balacner IP
     loadBalancerIP: ""
     # -- Load balancer source range
     loadBalancerSourceRanges: []
     # -- Service port
     servicePort: 8481
+    # -- Target port
+    targetPort: http
     # -- Service type
     type: ClusterIP
   ingress:
@@ -223,6 +227,9 @@ vmselect:
     # -- Persistent volume annotations
     annotations: {}
 
+    # -- Persistent volume labels
+    labels: {}
+
     # -- Existing Claim name. Requires vmselect.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
 
@@ -267,7 +274,7 @@ vminsert:
     # -- Image repository
     repository: victoriametrics/vminsert
     # -- Image tag
-    tag: v1.83.1-cluster
+    tag: v1.90.0-cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -283,7 +290,7 @@ vminsert:
   extraLabels: {}
   # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
   env: []
-  # -- Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs
+  # -- Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs
   suppresStorageFQDNsRender: false
   automountServiceAccountToken: true
 
@@ -323,6 +330,11 @@ vminsert:
     []
     # - name: example
     #   mountPath: /example
+
+  extraContainers:
+    []
+    # - name: config-reloader
+    #   image: reloader-image
 
   initContainers:
     []
@@ -373,12 +385,16 @@ vminsert:
     clusterIP: ""
     # -- Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
+    # -- Extra service ports
+    extraServicePorts: []
     # -- Service load balancer IP
     loadBalancerIP: ""
     # -- Load balancer source range
     loadBalancerSourceRanges: []
     # -- Service port
     servicePort: 8480
+    # -- Target port
+    targetPort: http
     # -- Service type
     type: ClusterIP
     # -- Enable UDP port. used if you have "spec.opentsdbListenAddr" specified
@@ -437,7 +453,7 @@ vmstorage:
     # -- Image repository
     repository: victoriametrics/vmstorage
     # -- Image tag
-    tag: v1.83.1-cluster
+    tag: v1.90.0-cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -540,6 +556,8 @@ vmstorage:
       - ReadWriteOnce
     # -- Persistent volume annotations
     annotations: {}
+    # -- Persistent volume labels
+    labels: {}
     # -- Storage class name. Will be empty if not setted
     storageClass: ""
     # --  Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound
@@ -586,6 +604,8 @@ vmstorage:
     vminsertPort: 8400
     # -- Port for accepting connections from vmselect
     vmselectPort: 8401
+    # -- Extra service ports
+    extraServicePorts: []
   # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60
   probe:
@@ -615,7 +635,7 @@ vmstorage:
       # -- vmbackupmanager image repository
       repository: victoriametrics/vmbackupmanager
       # -- vmbackupmanager image tag
-      tag: v1.83.1-enterprise
+      tag: v1.90.0-enterprise
     # -- disable hourly backups
     disableHourly: false
     # -- disable daily backups

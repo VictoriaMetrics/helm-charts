@@ -9,7 +9,7 @@ image:
   # -- Victoria Metrics Auth Docker repository and image name
   repository: victoriametrics/vmauth
   # -- Tag of Docker image
-  tag: v1.83.1
+  tag: v1.90.0
   # -- Pull policy of Docker image
   pullPolicy: IfNotPresent
 
@@ -184,8 +184,9 @@ serviceMonitor:
 #    tlsConfig:
 #      insecureSkipVerify: true
 
-# -- Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html
-configMap: ""
+# -- Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html.
+# Configuration in the given secret must be stored under `auth.yml` key.
+secretName: ""
 
 # -- Config file content.
 config:

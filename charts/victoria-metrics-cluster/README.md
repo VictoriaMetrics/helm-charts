@@ -1,8 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
-
-![Version: 0.9.42](https://img.shields.io/badge/Version-0.9.42-informational?style=flat-square)
-
+ ![Version: 0.9.61](https://img.shields.io/badge/Version-0.9.61-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -127,6 +125,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.extraArgs."envflag.enable" | string | `"true"` |  |
 | vminsert.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vminsert.extraArgs.loggerFormat | string | `"json"` |  |
+| vminsert.extraContainers | list | `[]` |  |
 | vminsert.extraLabels | object | `{}` |  |
 | vminsert.extraVolumeMounts | list | `[]` |  |
 | vminsert.extraVolumes | list | `[]` |  |
@@ -137,7 +136,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vminsert component |
 | vminsert.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vminsert.image.repository | string | `"victoriametrics/vminsert"` | Image repository |
-| vminsert.image.tag | string | `"v1.83.1-cluster"` | Image tag |
+| vminsert.image.tag | string | `"v1.90.0-cluster"` | Image tag |
 | vminsert.ingress.annotations | object | `{}` | Ingress annotations |
 | vminsert.ingress.enabled | bool | `false` | Enable deployment of ingress for vminsert component |
 | vminsert.ingress.extraLabels | object | `{}` |  |
@@ -166,10 +165,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.service.annotations | object | `{}` | Service annotations |
 | vminsert.service.clusterIP | string | `""` | Service ClusterIP |
 | vminsert.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
+| vminsert.service.extraServicePorts | list | `[]` | Extra service ports |
 | vminsert.service.labels | object | `{}` | Service labels |
 | vminsert.service.loadBalancerIP | string | `""` | Service load balancer IP |
 | vminsert.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
 | vminsert.service.servicePort | int | `8480` | Service port |
+| vminsert.service.targetPort | string | `"http"` | Target port |
 | vminsert.service.type | string | `"ClusterIP"` | Service type |
 | vminsert.service.udp | bool | `false` | Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/ |
 | vminsert.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
@@ -178,7 +179,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vminsert.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vminsert.strategy | object | `{}` |  |
-| vminsert.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs |
+| vminsert.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs |
 | vminsert.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | vmselect.affinity | object | `{}` | Pod affinity |
 | vmselect.annotations | object | `{}` |  |
@@ -202,7 +203,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vmselect component |
 | vmselect.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmselect.image.repository | string | `"victoriametrics/vmselect"` | Image repository |
-| vmselect.image.tag | string | `"v1.83.1-cluster"` | Image tag |
+| vmselect.image.tag | string | `"v1.90.0-cluster"` | Image tag |
 | vmselect.ingress.annotations | object | `{}` | Ingress annotations |
 | vmselect.ingress.enabled | bool | `false` | Enable deployment of ingress for vmselect component |
 | vmselect.ingress.extraLabels | object | `{}` |  |
@@ -216,6 +217,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.persistentVolume.annotations | object | `{}` | Persistent volume annotations |
 | vmselect.persistentVolume.enabled | bool | `false` | Create/use Persistent Volume Claim for vmselect component. Empty dir if false. If true, vmselect will create/use a Persistent Volume Claim |
 | vmselect.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmselect.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
+| vmselect.persistentVolume.labels | object | `{}` | Persistent volume labels |
 | vmselect.persistentVolume.size | string | `"2Gi"` | Size of the volume. Better to set the same as resource limit memory property |
 | vmselect.persistentVolume.subPath | string | `""` | Mount subpath |
 | vmselect.podAnnotations | object | `{}` | Pod's annotations |
@@ -237,10 +239,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.service.annotations | object | `{}` | Service annotations |
 | vmselect.service.clusterIP | string | `""` | Service ClusterIP |
 | vmselect.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips](https://kubernetes.io/docs/user-guide/services/#external-ips) |
+| vmselect.service.extraServicePorts | list | `[]` | Extra service ports |
 | vmselect.service.labels | object | `{}` | Service labels |
 | vmselect.service.loadBalancerIP | string | `""` | Service load balacner IP |
 | vmselect.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
 | vmselect.service.servicePort | int | `8481` | Service port |
+| vmselect.service.targetPort | string | `"http"` | Target port |
 | vmselect.service.type | string | `"ClusterIP"` | Service type |
 | vmselect.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | vmselect.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operator object |
@@ -253,7 +257,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.statefulSet.service.labels | object | `{}` | Headless service labels |
 | vmselect.statefulSet.service.servicePort | int | `8481` | Headless service port |
 | vmselect.strategy | object | `{}` |  |
-| vmselect.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--stroageNodes`, they can be re-defined in exrtaArgs |
+| vmselect.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs |
 | vmselect.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | vmselect.topologySpreadConstraints | list | `[]` | Pod topologySpreadConstraints |
 | vmstorage.affinity | object | `{}` | Pod affinity |
@@ -274,7 +278,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.fullnameOverride | string | `nil` | Overrides the full name of vmstorage component |
 | vmstorage.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmstorage.image.repository | string | `"victoriametrics/vmstorage"` | Image repository |
-| vmstorage.image.tag | string | `"v1.83.1-cluster"` | Image tag |
+| vmstorage.image.tag | string | `"v1.90.0-cluster"` | Image tag |
 | vmstorage.initContainers | list | `[]` |  |
 | vmstorage.name | string | `"vmstorage"` | vmstorage container name |
 | vmstorage.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
@@ -282,6 +286,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.persistentVolume.annotations | object | `{}` | Persistent volume annotations |
 | vmstorage.persistentVolume.enabled | bool | `true` | Create/use Persistent Volume Claim for vmstorage component. Empty dir if false. If true,  vmstorage will create/use a Persistent Volume Claim |
 | vmstorage.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
+| vmstorage.persistentVolume.labels | object | `{}` | Persistent volume labels |
 | vmstorage.persistentVolume.mountPath | string | `"/storage"` | Data root path. Vmstorage data Persistent Volume mount root path |
 | vmstorage.persistentVolume.size | string | `"8Gi"` | Size of the volume. Better to set the same as resource limit memory property |
 | vmstorage.persistentVolume.storageClass | string | `""` | Storage class name. Will be empty if not setted |
@@ -307,6 +312,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.retentionPeriod | int | `1` | Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month |
 | vmstorage.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vmstorage.service.annotations | object | `{}` | Service annotations |
+| vmstorage.service.extraServicePorts | list | `[]` | Extra service ports |
 | vmstorage.service.labels | object | `{}` | Service labels |
 | vmstorage.service.servicePort | int | `8482` | Service port |
 | vmstorage.service.vminsertPort | int | `8400` | Port for accepting connections from vminsert |
@@ -331,7 +337,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | vmstorage.vmbackupmanager.extraSecretMounts | list | `[]` |  |
 | vmstorage.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| vmstorage.vmbackupmanager.image.tag | string | `"v1.83.1-enterprise"` | vmbackupmanager image tag |
+| vmstorage.vmbackupmanager.image.tag | string | `"v1.90.0-enterprise"` | vmbackupmanager image tag |
 | vmstorage.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
 | vmstorage.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
 | vmstorage.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |

@@ -4,7 +4,8 @@
 
 {{ template "chart.description" . }}
 
-# Title
+* [Overview](#Overview)
+* [Configuration](#Configuration)
 * [Prerequisites](#Prerequisites)
 * [Dependencies](#Dependencies)
 * [Quick Start](#How-to-install)
@@ -13,6 +14,69 @@
 * [Troubleshooting](#Troubleshooting)
 * [Values](#Parameters)
 
+
+# Overview
+This chart is an All-in-one solution to start monitoring kubernetes cluster.
+It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/tree/master/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
+Also it installs Custom Resources like [VMSingle](https://docs.victoriametrics.com/operator/quick-start.html#vmsingle), [VMCluster](https://docs.victoriametrics.com/operator/quick-start.html#vmcluster), [VMAgent](https://docs.victoriametrics.com/operator/quick-start.html#vmagent), [VMAlert](https://docs.victoriametrics.com/operator/quick-start.html#vmalert).
+
+To enable metrics collection for kubernetes this chart installs multiple scrape configurations for kuberenetes components like kubelet and kube-proxy, etc. Metrics collection is done by [VMAgent](https://docs.victoriametrics.com/operator/quick-start.html#vmagent). So if want to ship metrics to external VictoriaMetrics database you can disable VMSingle installation by setting `vmsingle.enabled` to `false` and setting `vmagent.vmagentSpec.remoteWrite.url` to your external VictoriaMetrics database.
+
+This chart also installs bunch of dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus) project.
+
+![Overview](img/k8s-stack-overview.png)
+
+
+# Configuration
+
+Configuration of this chart is done through helm values. 
+
+## Dependencies
+Dependencies can be enabled or disabled by setting `enabled` to `true` or `false` in `values.yaml` file.
+
+**!Important:** for dependency charts anything that you can find in values.yaml of dependency chart can be configured in this chart under key for that dependency. For example if you want to configure `grafana` you can find all possible configuration options in [values.yaml](https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml) and you should set them in values for this chart under grafana: key. For example if you want to configure `grafana.persistence.enabled` you should set it in values.yaml like this:
+```yaml
+#################################################
+###              dependencies               #####
+#################################################
+# Grafana dependency chart configuration. For possible values refer to https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration
+grafana:
+  enabled: true
+  persistence:
+    type: pvc
+    enabled: false
+```
+
+## VictoriaMetrics components
+This chart installs multiple VictoriaMetrics components using Custom Resources that are managed by [victoria-metrics-operator](https://docs.victoriametrics.com/operator/design.html)
+Each resource can be configured using `spec` of that resource from API docs of [victoria-metrics-operator](https://docs.victoriametrics.com/operator/api.html). For example if you want to configure `VMAgent` you can find all possible configuration options in [API docs](https://docs.victoriametrics.com/operator/api.html#vmagent) and you should set them in values for this chart under `vmagent.spec` key. For example if you want to configure `remoteWrite.url` you should set it in values.yaml like this:
+```yaml
+vmagent:
+  spec:
+    remoteWrite:
+      - url: "https://insert.vmcluster.domain.com/insert/0/prometheus/api/v1/write"
+```
+
+## Rules and dashboards
+This chart by default install multiple dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
+you can disable dashboards with `defaultDashboardsEnabled: false` and `experimentalDashboardsEnabled: false`
+and rules can be configured under `defaultRules`
+
+## Prometheus scrape configs
+This chart installs multiple scrape configurations for kubernetes monitoring. They are configured under `#ServiceMonitors` section in `values.yaml` file. For example if you want to configure scrape config for `kubelet` you should set it in values.yaml like this:
+```yaml
+kubelet:
+  enabled: true
+
+  # -- Enable scraping /metrics/cadvisor from kubelet's service
+  cadvisor: true
+  # -- Enable scraping /metrics/probes from kubelet's service
+  probes: true
+  # spec for VMNodeScrape crd
+  # https://docs.victoriametrics.com/operator/api.html#vmnodescrapespec
+  spec:
+    interval: "30s" 
+```
 
 # Prerequisites
 
@@ -27,32 +91,6 @@ helm repo update
 ```
 
 * PV support on underlying infrastructure.
-
-
-# Chart Details
-
-This chart will do the following:
-
-* Rollout victoria metrics operator, grafana, prometheus-node-exporter and kube-state-metrics helm charts
-* Create VMSingle, VMAgent, VMAlert, VMAlertManager CRDs 
-* Configure Grafana for VictoriaMetrics datasource
-* Configure ServiceScrapes for Node Exporter, kube-state-metrics and various kubernetes metrics
-* Install Grafana dashboards for kubernetes monitoring based on [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
-
-## Dependencies
-
-By default this chart installs additional, dependent charts:
-
-- [VictoriaMetrics/victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator)
-- [kubernetes/kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/tree/master/charts/kube-state-metrics)
-- [prometheus-community/prometheus-node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter)
-- [grafana/grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
-
-
-_See [helm dependency](https://helm.sh/docs/helm/helm_dependency/) for command documentation._
-
-
-> ATTENTION !!! Default values are inherited from helm charts declared as a dependency in the Chart.yaml file. If you want to change the default values that are inherited, access the documentation and the values.yaml file for each chart to understand the content and create a customized values.yaml file for your need.
 
 
 # How to install
@@ -143,6 +181,19 @@ Usually, helm upgrade doesn't requires manual actions. But release with CRD upda
 $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
  All CRD manual actions upgrades listed below:
+
+
+### Upgrade to 0.13.0
+
+
+- node-exporter starting from version 4.0.0 is using the Kubernetes recommended labels. Therefore you have to delete the daemonset before you upgrade.
+
+```bash
+kubectl delete daemonset -l app=prometheus-node-exporter
+```
+- scrape configuration for kubernetes components was moved from `vmServiceScrape.spec` section to `spec` section. If you previously modified scrape configuration you need to update your `values.yaml`
+
+- `grafana.defaultDashboardsEnabled` was renamed to `defaultDashboardsEnabled` (moved to top level). You may need to update it in your `values.yaml`
 
 
 ### Upgrade to 0.6.0

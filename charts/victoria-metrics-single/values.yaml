@@ -40,7 +40,7 @@ server:
     # -- Image repository
     repository: victoriametrics/victoria-metrics
     # -- Image tag
-    tag: v1.83.1
+    tag: v1.90.0
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -154,7 +154,7 @@ server:
   podLabels: {}
   # -- Pod's annotations
   podAnnotations: {}
-  # -- Pod's management policy 
+  # -- Pod's management policy
   podManagementPolicy: OrderedReady
 
   # -- Resource object. Ref: [http://kubernetes.io/docs/user-guide/compute-resources/](http://kubernetes.io/docs/user-guide/compute-resources/
@@ -239,7 +239,7 @@ server:
       # -- vmbackupmanager image repository
       repository: victoriametrics/vmbackupmanager
       # -- vmbackupmanager image tag
-      tag: v1.83.1-enterprise
+      tag: v1.90.0-enterprise
     # -- disable hourly backups
     disableHourly: false
     # -- disable daily backups
@@ -264,6 +264,11 @@ server:
       envflag.enable: "true"
       envflag.prefix: VM_
       loggerFormat: json
+    # Extra Volume Mounts for the container
+    extraVolumeMounts:
+      []
+      # - name: example
+      #   mountPath: /example
     # -- Allows to enable restore options for pod.
     # Read more: https://docs.victoriametrics.com/vmbackupmanager.html#restore-commands
     restore:

@@ -98,8 +98,10 @@ spec:
             timeoutSeconds: 5
           {{- if $isVolumes }}
           volumeMounts:
+          {{- if .Values.rateLimiter.enable }}
             - name: config
               mountPath: /config
+          {{- end }}
           {{- range .Values.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}

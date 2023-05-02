@@ -5,16 +5,13 @@ image:
   # -- Image repository
   repository: victoriametrics/operator
   # -- Image tag
-  tag: v0.29.1
+  tag: v0.33.0
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
 # -- enables CRD creation and management.
 # -- with this option, if you remove this chart, all crd resources will be deleted with it.
 createCRD: true
-# -- uses legacy CRD api v1beta
-# -- it must be enabled for kubernetes version below 1.16
-useLegacyCRD: false
 
 replicaCount: 1
 
@@ -44,8 +41,9 @@ podLabels: {}
 # -- Annotations to be added to the all resources
 annotations: {}
 
-securityContext:
-  {}
+podSecurityContext: {}
+securityContext: {}
+
 operator:
   # -- By default, operator converts prometheus-operator objects.
   disable_prometheus_converter: false
@@ -60,6 +58,10 @@ operator:
   # It should reduce  vmagent and vmauth config sync-time and make it predictable.
   useCustomConfigReloader: false
 
+# By default, the operator will watch all the namespaces
+# If you want to override this behavior, specify the namespace it needs to watch separated by a comma.
+# Ex: my_namespace1,my_namespace2
+watchNamespace: ""
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -68,7 +70,8 @@ serviceAccount:
   name: ""
 
 # -- Resource object
-resources: {}
+resources:
+  {}
   # limits:
   #   cpu: 120m
   #   memory: 320Mi
@@ -84,9 +87,12 @@ tolerations: []
 
 # -- Pod affinity
 affinity: {}
+# -- operator container additional commandline arguments
+extraArgs: {}
 
 # -- extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD)
-env: []
+env:
+  []
   # - name: VM_VMSINGLEDEFAULT_VERSION
   #   value: v1.43.0
 
@@ -142,3 +148,10 @@ admissionWebhooks:
     enabled: false
     # --If needed, provide own issuer. Operator will create self-signed if empty.
     issuer: {}
+
+# -- configures monitoring with serviceScrape. VMServiceScrape must be pre-installed
+serviceMonitor:
+  enabled: false
+  extraLabels: {}
+  annotations: {}
+  relabelings: []

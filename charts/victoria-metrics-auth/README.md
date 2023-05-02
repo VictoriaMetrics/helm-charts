@@ -1,7 +1,6 @@
 # Helm Chart For Victoria Metrics Auth.
 
-
-![Version: 0.2.62](https://img.shields.io/badge/Version-0.2.62-informational?style=flat-square)
+ ![Version: 0.2.80](https://img.shields.io/badge/Version-0.2.80-informational?style=flat-square)
 
 Victoria Metrics Auth - is a simple auth proxy and router for VictoriaMetrics.
 
@@ -102,7 +101,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | affinity | object | `{}` | Affinity configurations |
 | annotations | object | `{}` | Annotations to be added to the deployment |
 | config | string | `nil` | Config file content. |
-| configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html |
 | containerWorkingDir | string | `"/"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | extraArgs."envflag.enable" | string | `"true"` |  |
@@ -115,7 +113,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmauth"` | Victoria Metrics Auth Docker repository and image name |
-| image.tag | string | `"v1.83.1"` | Tag of Docker image |
+| image.tag | string | `"v1.90.0"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
@@ -139,6 +137,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` | Number of replicas of vmauth |
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
+| secretName | string | `""` | Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html. Configuration in the given secret must be stored under `auth.yml` key. |
 | securityContext | object | `{}` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |

@@ -34,7 +34,13 @@ spec:
     - name: http
       port: {{ .Values.vmselect.service.servicePort }}
       protocol: TCP
-      targetPort: http
+      targetPort: {{ .Values.vmselect.service.targetPort }}
+  {{- range .Values.vmselect.service.extraPorts }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      protocol: TCP
+      targetPort: {{ .targetPort }}
+  {{- end }}
   {{- if .Values.vmselect.extraArgs.clusternativeListenAddr }}
     - name: cluster-tcp
       protocol: TCP

@@ -1,8 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
-
-![Version: 0.8.21](https://img.shields.io/badge/Version-0.8.21-informational?style=flat-square)
-
+ ![Version: 0.8.37](https://img.shields.io/badge/Version-0.8.37-informational?style=flat-square)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
@@ -328,6 +326,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |
+| rbac.namespaced | bool | `false` | if true and `rbac.enabled`, will deploy a Role/Rolebinding instead of a ClusterRole/ClusterRoleBinding |
 | rbac.pspEnabled | bool | `true` |  |
 | remoteWriteUrls | list | `[]` |  |
 | replicaCount | int | `1` |  |

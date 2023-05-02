@@ -93,7 +93,11 @@ spec:
       volumes:
         - name: config
           secret:
+          {{- if .Values.secretName }}
+            secretName: {{ .Values.secretName }}
+          {{- else }}
             secretName: {{ include "chart.fullname" .}}
+          {{- end }}
       {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:

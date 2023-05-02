@@ -1,8 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
-
-![Version: 0.5.3](https://img.shields.io/badge/Version-0.5.3-informational?style=flat-square)
-
+ ![Version: 0.5.23](https://img.shields.io/badge/Version-0.5.23-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
@@ -70,6 +68,13 @@ See the history of versions of ``vmalert`` application with command.
 helm history vmalert -n NAMESPACE
 ```
 
+## HA configuration for Alertmanager
+
+There is no option on this chart to set up Alertmanager with [HA mode](https://github.com/prometheus/alertmanager#high-availability).
+To enable the HA configuration, you can use:
+- [VictoriaMetrics Operator](https://docs.victoriametrics.com/operator/VictoriaMetrics-Operator.html)
+- official [Alertmanager Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager)
+
 # How to uninstall
 
 Remove application with command.
@@ -133,13 +138,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.podMetadata.labels | object | `{}` |  |
 | alertmanager.podSecurityContext | object | `{}` |  |
 | alertmanager.priorityClassName | string | `""` |  |
-| alertmanager.replicaCount | int | `1` |  |
 | alertmanager.resources | object | `{}` |  |
 | alertmanager.retention | string | `"120h"` |  |
 | alertmanager.service.annotations | object | `{}` |  |
 | alertmanager.service.port | int | `9093` |  |
 | alertmanager.service.type | string | `"ClusterIP"` |  |
-| alertmanager.tag | string | `"v0.20.0"` |  |
+| alertmanager.tag | string | `"v0.25.0"` |  |
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
 | imagePullSecrets | list | `[]` |  |
@@ -180,6 +184,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.name | string | `"server"` |  |
 | server.nameOverride | string | `""` |  |
 | server.nodeSelector | object | `{}` |  |
+| server.notifier.alertmanager.basicAuth | object | `{"password":"","username":""}` | Basic auth for alertmanager |
+| server.notifier.alertmanager.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
+| server.notifier.alertmanager.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |
 | server.notifier.alertmanager.url | string | `""` |  |
 | server.podAnnotations | object | `{}` |  |
 | server.podDisruptionBudget.enabled | bool | `false` |  |

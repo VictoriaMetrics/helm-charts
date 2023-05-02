@@ -1,9 +1,8 @@
-{{- if and .Values.rbac.pspEnabled (.Capabilities.APIVersions.Has "policy/v1beta1") }}
+{{- if and .Values.rbac.pspEnabled (.Capabilities.APIVersions.Has "policy/v1beta1/PodSecurityPolicy") }}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: {{ template "vmalert.server.fullname" . }}
-  namespace: {{ .Release.Namespace }}
   labels:
   {{- include "vmalert.server.labels" . | nindent 4 }}
 {{- with .Values.rbac.extraLabels }}

@@ -170,6 +170,9 @@ spec:
           {{- with .Values.server.vmbackupmanager.resources }}
           resources: {{ toYaml . | nindent 12  }}
           {{- end }}
+          {{- with  .Values.server.podSecurityContext }}
+          securityContext: {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with $.Values.server.vmbackupmanager.livenessProbe }}
           livenessProbe: {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -186,6 +189,9 @@ spec:
             - name: server-volume
               mountPath: {{ .Values.server.persistentVolume.mountPath }}
               subPath: {{ .Values.server.persistentVolume.subPath }}
+          {{- with .Values.server.vmbackupmanager.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         {{- end }}
       {{- with .Values.server.extraContainers }}
       {{- toYaml . | nindent 8 }}

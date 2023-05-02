@@ -1,24 +1,27 @@
 nameOverride: ""
 fullnameOverride: ""
 tenant: "0"
+# -- If this chart is used in "Argocd" with "releaseName" field then
+# -- VMServiceScrapes couldn't select the proper services.
+# -- For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME'
+argocdReleaseOverride: ""
 
-# -- Configures operator CRD
-operator:
+# -- victoria-metrics-operator dependency chart configuration.
+# -- For possible values refer to https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator#parameters
+# -- also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars.html
+victoria-metrics-operator:
   enabled: true
   # -- Tells helm to remove CRD after chart remove
   cleanupCRD: true
-  cleanupSA:
-    create: true
-    name: ""
-  kubectlImage:
+  cleanupImage:
     repository: gcr.io/google_containers/hyperkube
     tag: v1.18.0
     pullPolicy: IfNotPresent
 
-# -- If this chart is used in "Agrocd" with "releaseName" field then
-# -- VMServiceScrapes couldn't select the proper services.
-# -- For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME'
-argocdReleaseOverride: ""
+  createCRD: false # we disable crd creation by operator chart as we create them in this chart
+  operator:
+    # -- By default, operator converts prometheus-operator objects.
+    disable_prometheus_converter: true
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -69,6 +72,12 @@ defaultRules:
   # -- Additional labels for PrometheusRule alerts
   additionalRuleLabels: {}
 
+## -- Create default dashboards
+defaultDashboardsEnabled: true
+
+## -- Create experimental dashboards
+experimentalDashboardsEnabled: true
+
 # Provide custom recording or alerting rules to be deployed into the cluster.
 additionalVictoriaMetricsMap:
 #    rule-name:
@@ -78,26 +87,29 @@ additionalVictoriaMetricsMap:
 #       - record: my_record
 #         expr: 100 * my_record
 
-##############
+externalVM:
+  read:
+    url: ""
+    # bearerTokenSecret:
+    #   name: dbaas-read-access-token
+    #   key: bearerToken
+  write:
+    url: ""
+    # bearerTokenSecret:
+    #   name: dbaas-read-access-token
+    #   key: bearerToken
 
-# -- victoria-metrics-operator dependency chart configuration.
-# -- For possible values refer to https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator#parameters
-victoria-metrics-operator:
-  # -- all values for victoria-metrics-operator helm chart can be specified here
-  createCRD: false
-  operator:
-    # -- By default, operator converts prometheus-operator objects.
-    disable_prometheus_converter: true
+##############
 
 # -- Configures vmsingle params
 vmsingle:
   annotations: {}
   enabled: true
   # spec for VMSingle crd
-  # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmsinglespec
+  # https://docs.victoriametrics.com/operator/api.html#vmsinglespec
   spec:
     image:
-      tag: v1.83.1
+      tag: v1.90.0
     retentionPeriod: "14"
     replicaCount: 1
     extraArgs: {}
@@ -146,14 +158,14 @@ vmsingle:
 vmcluster:
   enabled: false
   annotations: {}
-  # spec for VMSingle crd
-  # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmclusterspec
+  # spec for VMCluster crd
+  # https://docs.victoriametrics.com/operator/api.html#vmclusterspec
   spec:
     retentionPeriod: "14"
     replicationFactor: 2
     vmstorage:
       image:
-        tag: v1.83.1-cluster
+        tag: v1.90.0-cluster
       replicaCount: 2
       storageDataPath: "/vm-data"
       storage:
@@ -169,7 +181,7 @@ vmcluster:
         #   memory: 1500Mi
     vmselect:
       image:
-        tag: v1.83.1-cluster
+        tag: v1.90.0-cluster
       replicaCount: 2
       cacheMountPath: "/select-cache"
       extraArgs: {}
@@ -189,7 +201,7 @@ vmcluster:
         #   memory: "500Mi"
     vminsert:
       image:
-        tag: v1.83.1-cluster
+        tag: v1.90.0-cluster
       replicaCount: 2
       extraArgs: {}
       resources:
@@ -312,11 +324,11 @@ alertmanager:
   enabled: true
   annotations: {}
   # spec for VMAlertmanager crd
-  # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmalertmanagerspec
+  # https://docs.victoriametrics.com/operator/api.html#vmalertmanagerspec
   spec:
     selectAllByDefault: true
     image:
-      tag: v0.24.0
+      tag: v0.25.0
     externalURL: ""
     routePrefix: /
 
@@ -351,6 +363,31 @@ alertmanager:
             - severity=~"info|warning|critical"
           receiver: slack-monitoring
           continue: true
+
+    inhibit_rules:
+      - target_matchers:
+          - severity=~"warning|info"
+        source_matchers:
+          - severity=critical
+        equal:
+          - cluster
+          - namespace
+          - alertname
+      - target_matchers:
+          - severity=info
+        source_matchers:
+          - severity=warning
+        equal:
+          - cluster
+          - namespace
+          - alertname
+      - target_matchers:
+          - severity=info
+        source_matchers:
+          - alertname=InfoInhibitor
+        equal:
+          - cluster
+          - namespace
 
     receivers:
       - name: "slack-monitoring"
@@ -455,13 +492,19 @@ alertmanager:
 vmalert:
   annotations: {}
   enabled: true
+
+  # Controls whether VMAlert should use VMAgent or VMInsert as a target for remotewrite
+  remoteWriteVMAgent: false
   # spec for VMAlert crd
-  # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmalertspec
+  # https://docs.victoriametrics.com/operator/api.html#vmalertspec
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.83.1
+      tag: v1.90.0
     evaluationInterval: 15s
+
+    # External labels to add to all generated recording rules and alerts
+    externalLabels: {}
 
   # extra vmalert annotation templates
   templateFiles:
@@ -513,14 +556,15 @@ vmagent:
   annotations: {}
   # https://docs.victoriametrics.com/operator/api.html#vmagentremotewritespec
   # defined spec will be added to the remoteWrite configuration of VMAgent
-  additionalRemoteWrites: []
+  additionalRemoteWrites:
+    []
     #- url: http://some-remote-write/api/v1/write
   # spec for VMAgent crd
-  # https://docs.victoriametrics.com/operator/blob/master/docs/api.MD#vmagentspec
+  # https://docs.victoriametrics.com/operator/api.html#vmagentspec
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.83.1
+      tag: v1.90.0
     scrapeInterval: 25s
     externalLabels:
       cluster: cluster-name
@@ -624,6 +668,8 @@ grafana:
 
   defaultDashboardsEnabled: true
 
+  defaultDashboardsTimezone: utc
+
   ingress:
     enabled: false
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
@@ -661,11 +707,11 @@ grafana:
     #      - grafana.domain.com
 
   vmServiceScrape:
-    # wheter we should create a service scrape resource for node-exporter
+    # wheter we should create a service scrape resource for grafana
     enabled: true
 
     # spec for VMServiceScrape crd
-    # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
+    # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
     spec: {}
 
 # prometheus-node-exporter dependency chart configuration. For possible values refer to https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/values.yaml
@@ -686,23 +732,30 @@ prometheus-node-exporter:
     enabled: true
 
     # spec for VMServiceScrape crd
-    # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
+    # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
     spec:
       jobLabel: jobLabel
-
+      endpoints:
+        - port: metrics
+          metricRelabelConfigs:
+            - action: drop
+              source_labels: [mountpoint]
+              regex: "/var/lib/kubelet/pods.+"
 # kube-state-metrics dependency chart configuration. For possible values refer to https://github.com/kubernetes/kube-state-metrics/blob/master/charts/kube-state-metrics/values.yaml
 kube-state-metrics:
   enabled: true
   ## all values for kube-state-metrics helm chart can be specified here
 
   # spec for VMServiceScrape crd
-  # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
+  # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
   vmServiceScrape:
     spec: {}
 
   #TODO: selector override for kube-state-metrics deployed separatelly
 
-## Service Monitors
+#################################################
+###              Service Monitors           #####
+#################################################
 ## Component scraping the kubelets
 kubelet:
   enabled: true
@@ -712,7 +765,7 @@ kubelet:
   # -- Enable scraping /metrics/probes from kubelet's service
   probes: true
   # spec for VMNodeScrape crd
-  # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmnodescrapespec
+  # https://docs.victoriametrics.com/operator/api.html#vmnodescrapespec
   spec:
     scheme: "https"
     honorLabels: true
@@ -743,7 +796,7 @@ kubelet:
 kubeApiServer:
   enabled: true
   # spec for VMServiceScrape crd
-  # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
+  # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
   spec:
     endpoints:
       - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -778,26 +831,24 @@ kubeControllerManager:
   ##
   service:
     enabled: true
-    port: 10252
-    targetPort: 10252
+    port: 10257
+    targetPort: 10257
     # selector:
     #   component: kube-controller-manager
 
-  vmServiceScrape:
-    enabled: true
-    # spec for VMServiceScrape crd
-    # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
-    spec:
-      jobLabel: jobLabel
-      endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          # bearerTokenSecret:
-          #   key: ""
-          port: http-metrics
-          scheme: https
-          tlsConfig:
-            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            serverName: kubernetes
+  # spec for VMServiceScrape crd
+  # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
+  spec:
+    jobLabel: jobLabel
+    endpoints:
+      - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+        # bearerTokenSecret:
+        #   key: ""
+        port: http-metrics
+        scheme: https
+        tlsConfig:
+          caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          serverName: kubernetes
 
 # -Component scraping kubeDns. Use either this or coreDns
 kubeDns:
@@ -812,16 +863,14 @@ kubeDns:
       targetPort: 10055
     selector:
       k8s-app: kube-dns
-  vmServiceScrape:
-    enabled: true
-    # spec for VMServiceScrape crd
-    # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
-    spec:
-      endpoints:
-        - port: http-metrics-dnsmasq
-          bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-        - port: http-metrics-skydns
-          bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  # spec for VMServiceScrape crd
+  # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
+  spec:
+    endpoints:
+      - port: http-metrics-dnsmasq
+        bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+      - port: http-metrics-skydns
+        bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
 
 # -- Component scraping coreDns. Use either this or kubeDns
 coreDns:
@@ -833,14 +882,12 @@ coreDns:
     selector:
       k8s-app: kube-dns
 
-  vmServiceScrape:
-    enabled: true
-    # spec for VMServiceScrape crd
-    # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
-    spec:
-      endpoints:
-        - port: http-metrics
-          bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  # spec for VMServiceScrape crd
+  # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
+  spec:
+    endpoints:
+      - port: http-metrics
+        bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
 
 ## Component scraping etcd
 ##
@@ -863,20 +910,18 @@ kubeEtcd:
     # selector:
     #   component: etcd
 
-  vmServiceScrape:
-    enabled: true
-    # spec for VMServiceScrape crd
-    # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
-    spec:
-      jobLabel: jobLabel
-      endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          # bearerTokenSecret:
-          #   key: ""
-          port: http-metrics
-          scheme: https
-          tlsConfig:
-            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  # spec for VMServiceScrape crd
+  # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
+  spec:
+    jobLabel: jobLabel
+    endpoints:
+      - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+        # bearerTokenSecret:
+        #   key: ""
+        port: http-metrics
+        scheme: https
+        tlsConfig:
+          caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
 ## Component scraping kube scheduler
 ##
@@ -899,20 +944,18 @@ kubeScheduler:
     # selector:
     #   component: kube-scheduler
 
-  vmServiceScrape:
-    enabled: true
-    # spec for VMServiceScrape crd
-    # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
-    spec:
-      jobLabel: jobLabel
-      endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          # bearerTokenSecret:
-          #   key: ""
-          port: http-metrics
-          scheme: https
-          tlsConfig:
-            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  # spec for VMServiceScrape crd
+  # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
+  spec:
+    jobLabel: jobLabel
+    endpoints:
+      - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+        # bearerTokenSecret:
+        #   key: ""
+        port: http-metrics
+        scheme: https
+        tlsConfig:
+          caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
 ## Component scraping kube proxy
 ##
@@ -933,17 +976,15 @@ kubeProxy:
     # selector:
     #   k8s-app: kube-proxy
 
-  vmServiceScrape:
-    enabled: true
-    # spec for VMServiceScrape crd
-    # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmservicescrapespec
-    spec:
-      jobLabel: jobLabel
-      endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          # bearerTokenSecret:
-          #   key: ""
-          port: http-metrics
-          scheme: https
-          tlsConfig:
-            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  # spec for VMServiceScrape crd
+  # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
+  spec:
+    jobLabel: jobLabel
+    endpoints:
+      - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+        # bearerTokenSecret:
+        #   key: ""
+        port: http-metrics
+        scheme: https
+        tlsConfig:
+          caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt

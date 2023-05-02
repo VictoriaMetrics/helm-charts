@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Fetch dashboards from provided urls into this chart."""
+from ast import operator
+from faulthandler import enable
 import json
+import re
 import textwrap
 from os import makedirs, path
 
@@ -22,46 +25,51 @@ def change_style(style, representer):
 
     return new_representer
 
-
-# Source files list
-charts = [
-    {
-        'source': 'https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml',
-        'destination': '../templates/grafana/dashboards',
-        'type': 'yaml'
-    },
-    {
-        'source': 'https://etcd.io/docs/v3.4/op-guide/grafana.json',
-        'destination': '../templates/grafana/dashboards',
-        'type': 'json'
-    },
+sources_json = [
     {
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json',
-        'destination': '../templates/grafana/dashboards',
-        'type': 'json'
     },
     {
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json',
-        'destination': '../templates/grafana/dashboards',
-        'type': 'json'
     },
     {
-        'name': 'victoriametrics-cluster',
-        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/cluster/dashboards/victoriametrics.json',
-        'destination': '../templates/grafana/dashboards',
-        'type': 'json'
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics-cluster.json',
     },
     {
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmalert.json',
-        'destination': '../templates/grafana/dashboards',
-        'type': 'json'
+    },
+    {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/operator.json',
+    },
+    {
+        'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json',
+    },
+    {
+        'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json',
+    },
+    {
+        'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json',
+    },
+    {
+        'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json',
+    },
+    {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json',
     }
 ]
-
-skip_list = [
-    "prometheus.json",
-    "prometheus-remote-write.json"
+# Source files list
+sources_yaml = [
+    {
+        'source': 'https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml',
+    },
 ]
+
+allow_dashboards_list = [
+    "alertmanager-overview.json",
+    "grafana-overview.json",
+]
+
+dashboards_destination = "../templates/grafana/dashboards"
 
 # Additional conditions map
 condition_map = {
@@ -76,7 +84,14 @@ condition_map = {
     'node-cluster-rsrc-use': '(index .Values "prometheus-node-exporter" "enabled")',
     'victoriametrics-cluster': '.Values.vmcluster.enabled',
     'victoriametrics': '.Values.vmsingle.enabled',
-    'vmalert': '.Values.vmalert.enabled'
+    'vmalert': '.Values.vmalert.enabled',
+    'operator': '(index .Values "victoria-metrics-operator" "enabled")',
+    'k8s-system-coredns': '.Values.experimentalDashboardsEnabled .Values.coreDns.enabled',
+    'k8s-system-api-server': '.Values.experimentalDashboardsEnabled .Values.kubeApiServer.enabled',
+    'k8s-views-pods': '.Values.experimentalDashboardsEnabled .Values.kubelet.enabled',
+    'k8s-views-nodes': '.Values.experimentalDashboardsEnabled .Values.kubelet.enabled',
+    'k8s-views-namespace': '.Values.experimentalDashboardsEnabled .Values.kubelet.enabled',
+    'k8s-views-global': '.Values.experimentalDashboardsEnabled .Values.kubelet.enabled',
 }
 
 # standard header
@@ -195,11 +210,16 @@ def patch_dashboards_json(content):
     return content
 
 
+def patch_json_set_timezone_as_variable(content):
+    # content is no more in json format, so we have to replace using regex
+    return re.sub(r'"timezone"\s*:\s*"(?:\\.|[^\"])*"', '"timezone": "\{\{ .Values.grafana.defaultDashboardsTimezone \}\}"', content, flags=re.IGNORECASE)
+
+
 def write_group_to_file(resource_name, content, url, destination):
     if condition_map.get(resource_name, ""):
-        cond = f'if and .Values.grafana.defaultDashboardsEnabled {condition_map.get(resource_name, "")}'
+        cond = f'if and .Values.defaultDashboardsEnabled {condition_map.get(resource_name, "")}'
     else:
-        cond = f'if .Values.grafana.defaultDashboardsEnabled'
+        cond = f'if .Values.defaultDashboardsEnabled'
 
     # initialize header
     lines = header % {
@@ -209,6 +229,7 @@ def write_group_to_file(resource_name, content, url, destination):
     }
 
     content = patch_dashboards_json(content)
+    content = patch_json_set_timezone_as_variable(content)
 
     filename_struct = {resource_name + '.json': (LiteralStr(content))}
     # rules themselves
@@ -233,32 +254,38 @@ def write_group_to_file(resource_name, content, url, destination):
 def main():
     init_yaml_styles()
     # read the rules, create a new template file per group
-    for chart in charts:
-        print("Generating dashboards from %s" % chart['source'])
-        response = requests.get(chart['source'])
+    for src in sources_json:
+        print("Generating dashboards from %s" % src['source'])
+        response = requests.get(src['source'])
         if response.status_code != 200:
             print('Skipping the file, response code %s not equals 200' % response.status_code)
             continue
         raw_text = response.text
+        json_text = json.loads(raw_text)
+        # is it already a dashboard structure or is it nested (etcd case)?
+        flat_structure = bool(json_text.get('annotations'))
+        if flat_structure:
+            resource = src.get('name', path.basename(src['source']).replace('.json', ''))
+            write_group_to_file(resource, json.dumps(json_text, indent=4), src['source'], dashboards_destination)
+        else:
+            for resource, content in json_text.items():
+                write_group_to_file(resource.replace('.json', ''), json.dumps(content, indent=4), src['source'], dashboards_destination)
 
-        if chart['type'] == 'yaml':
-            yaml_text = yaml.full_load(raw_text)
-            groups = yaml_text['items']
-            for group in groups:
-                for resource, content in group['data'].items():
-                    if resource in skip_list:
-                        continue
-                    write_group_to_file(resource.replace('.json', ''), content, chart['source'], chart['destination'])
-        elif chart['type'] == 'json':
-            json_text = json.loads(raw_text)
-            # is it already a dashboard structure or is it nested (etcd case)?
-            flat_structure = bool(json_text.get('annotations'))
-            if flat_structure:
-                resource = chart.get('name', path.basename(chart['source']).replace('.json', ''))
-                write_group_to_file(resource, json.dumps(json_text, indent=4), chart['source'], chart['destination'])
-            else:
-                for resource, content in json_text.items():
-                    write_group_to_file(resource.replace('.json', ''), json.dumps(content, indent=4), chart['source'], chart['destination'])
+    for src in sources_yaml:
+        print("Generating dashboards from %s" % src['source'])
+        response = requests.get(src['source'])
+        if response.status_code != 200:
+            print('Skipping the file, response code %s not equals 200' % response.status_code)
+            continue
+        raw_text = response.text
+        yaml_text = yaml.full_load(raw_text)
+        groups = yaml_text['items']
+        for group in groups:
+            for resource, content in group['data'].items():
+                if resource not in allow_dashboards_list:
+                    continue
+                write_group_to_file(resource.replace('.json', ''), content, src['source'], dashboards_destination)
+       
     print("Finished")
 
 

@@ -93,7 +93,7 @@ Defines the name of scrape configuration map
 */}}
 {{- define "victoria-metrics.server.scrape.configname" -}}
 {{- if .Values.server.scrape.configMap -}}
-{{- .Values.configMap -}}
+{{- .Values.server.scrape.configMap -}}
 {{- else -}}
 {{- include "victoria-metrics.server.fullname" . -}}-scrapeconfig
 {{- end -}}
@@ -143,7 +143,7 @@ Return if ingress supports pathType.
 {{ toYaml . }}
 {{- end -}}
 {{- if .Values.server.vmbackupmanager.restore.onStart.enabled }}
-- name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
+- name: {{ template "victoria-metrics.name" . }}-vmbackupmanager-restore
   image: "{{ .Values.server.vmbackupmanager.image.repository }}:{{ .Values.server.vmbackupmanager.image.tag }}"
   imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
   args:
@@ -166,6 +166,9 @@ Return if ingress supports pathType.
     - name: server-volume
       mountPath: {{ .Values.server.persistentVolume.mountPath }}
       subPath: {{ .Values.server.persistentVolume.subPath }}
+  {{- with .Values.server.vmbackupmanager.extraVolumeMounts }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end -}}
 {{- else -}}
 []
