@@ -308,7 +308,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.probe.readiness.periodSeconds | int | `15` |  |
 | vmstorage.probe.readiness.timeoutSeconds | int | `5` |  |
 | vmstorage.replicaCount | int | `2` | Count of vmstorage pods |
-| vmstorage.resources | object | `{}` | Resource object. Ref: [http://kubernetes.io/docs/user-guide/compute-resources/](http://kubernetes.io/docs/user-guide/compute-resources/) |
+| vmstorage.resources | object | `{}` | Resource object. Ref: [https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | vmstorage.retentionPeriod | int | `1` | Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month |
 | vmstorage.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vmstorage.service.annotations | object | `{}` | Service annotations |
