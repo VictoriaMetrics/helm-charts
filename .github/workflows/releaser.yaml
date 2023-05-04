@@ -1,0 +1,42 @@
+name: "Helm Chart Release"
+on:
+  push:
+    tags:
+      - v*.*.*
+
+env:
+  HELM_VERSION: 3.9.2
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install helm
+        uses: yokawasa/action-setup-kube-tools@v0.9.2
+        with:
+          setup-tools: |
+            helmv3
+          helm: "${{ env.HELM_VERSION }}"
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Prepare chart
+        run: |
+          find charts/*/Chart.yaml -exec sh -c 'sed "s/^version: .*$/version: ${{ github.ref_name }}/g" $1 1<> $1' -- {} \;
+          make package
+          make index
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.5.0
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
