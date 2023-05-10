@@ -1,4 +1,6 @@
 {{- if .Values.serviceMonitor.enabled -}}
+{{- $mergedVMServiceScrapeAnnotations := mustMerge .Values.serviceMonitor.annotations .Values.annotations -}}
+{{- $mergedVMServiceScrapeLabels := mustMerge .Values.serviceMonitor.extraLabels .Values.extraLabels -}}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
@@ -6,10 +8,10 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
 {{ include "vm-operator.labels" . | indent 4 }}
-{{- with .Values.extraLabels }}
+{{- with $mergedVMServiceScrapeLabels }}
 {{ toYaml . | indent 4 }}
 {{- end }}
-{{- with .Values.annotations }}
+{{- with $mergedVMServiceScrapeAnnotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
