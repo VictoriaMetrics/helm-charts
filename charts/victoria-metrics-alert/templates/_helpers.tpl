@@ -127,6 +127,87 @@ http://{{- include "vmalert.alertmanager.fullname" . -}}:9093
 {{- end -}}
 {{- end -}}
 
+{{- define "vmalert.alertmanager.urls" -}}
+{{- $urls := list -}}
+{{- with (include "vmalert.alertmanager.url" .) -}}
+{{- $urls = append $urls . -}}
+{{- end -}}
+{{- range .Values.server.notifiers }}
+    {{- if not (eq .alertmanager.url "") -}}
+        {{- $urls = append $urls .alertmanager.url -}}
+    {{- end -}}
+{{- end -}}
+{{- join "," $urls }}
+{{- end -}}
+
+{{- define "vmalert.alertmanager.passwords" -}}
+{{- $password := list -}}
+{{- if .Values.alertmanager.enabled -}}
+{{- $password = append $password "" -}}
+{{- end -}}
+{{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+{{- range $notifiers }}
+    {{- if and (not (eq .alertmanager.url "")) .alertmanager.basicAuth .alertmanager.basicAuth.password -}}
+        {{- $password = append $password .alertmanager.basicAuth.password -}}
+    {{- end -}}
+{{- end -}}
+{{ include "_vmalert.optionalPrintList" $password }}
+{{- end -}}
+
+{{- define "vmalert.alertmanager.usernames" -}}
+{{- $usernames := list -}}
+{{- if .Values.alertmanager.enabled -}}
+{{- $usernames = append $usernames "" -}}
+{{- end -}}
+{{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+{{- range $notifiers }}
+    {{- if and  (not (eq .alertmanager.url "")) .alertmanager.basicAuth .alertmanager.basicAuth.username -}}
+        {{- $usernames = append $usernames .alertmanager.basicAuth.username -}}
+    {{- end -}}
+{{- end -}}
+{{ include "_vmalert.optionalPrintList" $usernames }}
+{{- end -}}
+
+{{- define "vmalert.alertmanager.bearerTokens" -}}
+{{- $tokens := list -}}
+{{- if .Values.alertmanager.enabled -}}
+{{- $tokens = append $tokens "" -}}
+{{- end -}}
+{{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+{{- range $notifiers }}
+    {{- if and (not (eq .alertmanager.url "")) .alertmanager.bearer .alertmanager.bearer.token -}}
+        {{- $tokens = append $tokens .alertmanager.bearer.token -}}
+    {{- end -}}
+{{- end -}}
+{{ include "_vmalert.optionalPrintList" $tokens }}
+{{- end -}}
+
+
+{{- define "vmalert.alertmanager.bearerTokenFiles" -}}
+{{- $files := list -}}
+{{- if .Values.alertmanager.enabled -}}
+{{- $files = append $files "" -}}
+{{- end -}}
+{{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+{{- range $notifiers }}
+    {{- if and  (not (eq .alertmanager.url "")) .alertmanager.bearer .alertmanager.bearer.tokenFile -}}
+        {{- $files = append $files .alertmanager.bearer.tokenFile -}}
+    {{- end -}}
+{{- end -}}
+{{ include "_vmalert.optionalPrintList" $files }}
+{{- end -}}
+
+{{- define "_vmalert.optionalPrintList" }}
+{{- $str := join "," . -}}
+{{- $cleared := $str | replace "," "" | trim -}}
+{{- if eq $cleared "" -}}
+{{ $cleared }}
+{{- else -}}
+{{ $str }}
+{{- end -}}
+{{- end -}}
+
+
 {{/*
 Return the appropriate apiVersion for ingress.
 */}}

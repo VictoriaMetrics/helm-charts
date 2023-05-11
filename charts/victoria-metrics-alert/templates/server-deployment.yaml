@@ -4,8 +4,8 @@
 {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
 {{- end -}}
 {{- end -}}
-{{- if and (not .Values.alertmanager.enabled) (eq .Values.server.notifier.alertmanager.url "") -}}
-{{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or enable Alertmanager in values file" -}}
+{{- if (eq (include "vmalert.alertmanager.urls" . ) "") -}}
+{{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or server.notifiers or enable Alertmanager in values file" -}}
 {{- end -}}
 {{- if eq .Values.server.datasource.url "" -}}
 {{- fail "server.datasource.url datasource URL must be specified" -}}
@@ -70,15 +70,17 @@ spec:
             {{- with .Values.server.datasource.bearer.tokenFile }}
             - -datasource.bearerTokenFile={{ . }}
             {{- end }}
-            - -notifier.url={{ include "vmalert.alertmanager.url" . }}
-            {{- if or .Values.server.notifier.alertmanager.basicAuth.password .Values.server.notifier.alertmanager.basicAuth.username }}
-            - -notifier.basicAuth.password={{ .Values.server.notifier.alertmanager.basicAuth.password }}
-            - -notifier.basicAuth.username={{ .Values.server.notifier.alertmanager.basicAuth.username }}
+            - -notifier.url={{ include "vmalert.alertmanager.urls" . }}
+            {{- with (include "vmalert.alertmanager.passwords" .) }}
+            - -notifier.basicAuth.password={{ . }}
             {{- end }}
-            {{- with .Values.server.notifier.alertmanager.bearer.token }}
+            {{- with (include "vmalert.alertmanager.usernames" .) }}
+            - -notifier.basicAuth.username={{ . }}
+            {{- end }}
+            {{- with (include "vmalert.alertmanager.bearerTokens" .) }}
             - -notifier.bearerToken={{ . }}
             {{- end }}
-            {{- with .Values.server.notifier.alertmanager.bearer.tokenFile }}
+            {{- with (include "vmalert.alertmanager.bearerTokenFiles" .) }}
             - -notifier.bearerTokenFile={{ . }}
             {{- end }}
             - -remoteRead.url={{ .Values.server.remote.read.url }}

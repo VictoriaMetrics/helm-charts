@@ -1,10 +1,10 @@
 URL=https://victoriametrics.github.io/helm-charts/
-HELM_IMAGE = alpine/helm:3.9.1
+HELM_IMAGE = alpine/helm:3.11.3
 HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.11.0
 CT_IMAGE = quay.io/helmpack/chart-testing:v3.7.1
 KNOWN_TARGETS=helm
-HELM=helm-docker
-CT=ct-docker
+HELM?=helm-docker
+CT?=ct-docker
 
 helm-docker:
 	docker run --rm --name helm-exec  \
@@ -95,4 +95,3 @@ gen-docs:
 		-w /helm-charts \
 		$(HELM_DOCS_IMAGE) \
 		helm-docs
-
