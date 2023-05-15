@@ -147,8 +147,12 @@ http://{{- include "vmalert.alertmanager.fullname" . -}}:9093
 {{- end -}}
 {{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
 {{- range $notifiers }}
-    {{- if and (not (eq .alertmanager.url "")) .alertmanager.basicAuth .alertmanager.basicAuth.password -}}
-        {{- $password = append $password .alertmanager.basicAuth.password -}}
+    {{- if not (eq .alertmanager.url "") -}}
+        {{- if and .alertmanager.basicAuth .alertmanager.basicAuth.password -}}
+            {{- $password = append $password .alertmanager.basicAuth.password -}}
+        {{- else -}}
+            {{- $password = append $password "" -}}
+        {{- end -}}
     {{- end -}}
 {{- end -}}
 {{ include "_vmalert.optionalPrintList" $password }}
@@ -161,8 +165,12 @@ http://{{- include "vmalert.alertmanager.fullname" . -}}:9093
 {{- end -}}
 {{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
 {{- range $notifiers }}
-    {{- if and  (not (eq .alertmanager.url "")) .alertmanager.basicAuth .alertmanager.basicAuth.username -}}
-        {{- $usernames = append $usernames .alertmanager.basicAuth.username -}}
+    {{- if not (eq .alertmanager.url "") -}}
+        {{- if and .alertmanager.basicAuth .alertmanager.basicAuth.username -}}
+            {{- $usernames = append $usernames .alertmanager.basicAuth.username -}}
+        {{- else -}}
+            {{- $usernames = append $usernames "" -}}
+        {{- end -}}
     {{- end -}}
 {{- end -}}
 {{ include "_vmalert.optionalPrintList" $usernames }}
@@ -175,8 +183,12 @@ http://{{- include "vmalert.alertmanager.fullname" . -}}:9093
 {{- end -}}
 {{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
 {{- range $notifiers }}
-    {{- if and (not (eq .alertmanager.url "")) .alertmanager.bearer .alertmanager.bearer.token -}}
-        {{- $tokens = append $tokens .alertmanager.bearer.token -}}
+    {{- if not (eq .alertmanager.url "") -}}
+        {{- if and .alertmanager.bearer .alertmanager.bearer.token -}}
+            {{- $tokens = append $tokens .alertmanager.bearer.token -}}
+        {{- else -}}
+            {{- $tokens = append $tokens "" -}}
+        {{- end -}}
     {{- end -}}
 {{- end -}}
 {{ include "_vmalert.optionalPrintList" $tokens }}
@@ -190,8 +202,12 @@ http://{{- include "vmalert.alertmanager.fullname" . -}}:9093
 {{- end -}}
 {{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
 {{- range $notifiers }}
-    {{- if and  (not (eq .alertmanager.url "")) .alertmanager.bearer .alertmanager.bearer.tokenFile -}}
-        {{- $files = append $files .alertmanager.bearer.tokenFile -}}
+    {{- if not (eq .alertmanager.url "") -}}
+        {{- if and .alertmanager.bearer .alertmanager.bearer.tokenFile -}}
+            {{- $files = append $files .alertmanager.bearer.tokenFile -}}
+        {{- else -}}
+            {{- $files = append $files "" -}}
+        {{- end -}}
     {{- end -}}
 {{- end -}}
 {{ include "_vmalert.optionalPrintList" $files }}
