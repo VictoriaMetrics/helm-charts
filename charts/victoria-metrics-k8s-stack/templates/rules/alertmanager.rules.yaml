@@ -3,7 +3,7 @@ Generated from 'alertmanager.rules' group from https://raw.githubusercontent.com
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.defaultRules.create  }}
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.alertmanager }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
@@ -31,7 +31,7 @@ spec:
       expr: |-
         # Without max_over_time, failed scrapes could create false negatives, see
         # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
-        max_over_time(alertmanager_config_last_reload_successful{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring"}[5m]) == 0
+        max_over_time(alertmanager_config_last_reload_successful{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}[5m]) == 0
       for: 10m
       labels:
         severity: critical
@@ -46,9 +46,9 @@ spec:
       expr: |-
         # Without max_over_time, failed scrapes could create false negatives, see
         # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
-          max_over_time(alertmanager_cluster_members{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring"}[5m])
+          max_over_time(alertmanager_cluster_members{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}[5m])
         < on (namespace,service) group_left
-          count by (namespace,service) (max_over_time(alertmanager_cluster_members{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring"}[5m]))
+          count by (namespace,service) (max_over_time(alertmanager_cluster_members{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}[5m]))
       for: 15m
       labels:
         severity: critical
@@ -62,9 +62,9 @@ spec:
         summary: An Alertmanager instance failed to send notifications.
       expr: |-
         (
-          rate(alertmanager_notifications_failed_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring"}[5m])
+          rate(alertmanager_notifications_failed_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}[5m])
         /
-          rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring"}[5m])
+          rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}[5m])
         )
         > 0.01
       for: 5m
@@ -80,9 +80,9 @@ spec:
         summary: All Alertmanager instances in a cluster failed to send notifications to a critical integration.
       expr: |-
         min by (namespace,service, integration) (
-          rate(alertmanager_notifications_failed_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring", integration=~`.*`}[5m])
+          rate(alertmanager_notifications_failed_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}", integration=~`.*`}[5m])
         /
-          rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring", integration=~`.*`}[5m])
+          rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}", integration=~`.*`}[5m])
         )
         > 0.01
       for: 5m
@@ -98,9 +98,9 @@ spec:
         summary: All Alertmanager instances in a cluster failed to send notifications to a non-critical integration.
       expr: |-
         min by (namespace,service, integration) (
-          rate(alertmanager_notifications_failed_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring", integration!~`.*`}[5m])
+          rate(alertmanager_notifications_failed_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}", integration!~`.*`}[5m])
         /
-          rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring", integration!~`.*`}[5m])
+          rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}", integration!~`.*`}[5m])
         )
         > 0.01
       for: 5m
@@ -116,7 +116,7 @@ spec:
         summary: Alertmanager instances within the same cluster have different configurations.
       expr: |-
         count by (namespace,service) (
-          count_values by (namespace,service) ("config_hash", alertmanager_config_hash{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring"})
+          count_values by (namespace,service) ("config_hash", alertmanager_config_hash{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"})
         )
         != 1
       for: 20m
@@ -133,11 +133,11 @@ spec:
       expr: |-
         (
           count by (namespace,service) (
-            avg_over_time(up{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring"}[5m]) < 0.5
+            avg_over_time(up{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}[5m]) < 0.5
           )
         /
           count by (namespace,service) (
-            up{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring"}
+            up{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}
           )
         )
         >= 0.5
@@ -155,11 +155,11 @@ spec:
       expr: |-
         (
           count by (namespace,service) (
-            changes(process_start_time_seconds{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring"}[10m]) > 4
+            changes(process_start_time_seconds{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}[10m]) > 4
           )
         /
           count by (namespace,service) (
-            up{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="monitoring"}
+            up{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}
           )
         )
         >= 0.5
