@@ -76,8 +76,9 @@ condition_map = {
     'etcd': '.Values.kubeEtcd.enabled .Values.defaultRules.rules.etcd',
     'general.rules': '.Values.defaultRules.rules.general',
     'k8s.rules': '.Values.defaultRules.rules.k8s',
-    'kube-apiserver-burnrate.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverBurnrate',
     'kube-apiserver-availability.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverAvailability',
+    'kube-apiserver-burnrate.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverBurnrate',
+    'kube-apiserver-histogram.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverHistogram',
     'kube-apiserver-slos': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverSlos',
     'kube-apiserver.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserver',
     'kube-prometheus-general.rules': '.Values.defaultRules.rules.kubePrometheusGeneral',
@@ -98,7 +99,7 @@ condition_map = {
     'node-network': '.Values.defaultRules.rules.network',
     'node.rules': '.Values.defaultRules.rules.node',
     'vmagent': '.Values.vmagent.enabled .Values.defaultRules.rules.vmagent',
-    'alertmaanger': '.Values.defaultRules.rules.alertmanager',
+    'alertmanager.rules': '.Values.defaultRules.rules.alertmanager',
     'vmcluster': '.Values.defaultRules.rules.vmcluster',
     'vmsingle': '.Values.defaultRules.rules.vmsingle',
     'vm-health': '.Values.defaultRules.rules.vmhealth'
@@ -132,8 +133,13 @@ replacement_map = {
     'http://localhost:3000': {
         'replacement': '{{ index .Values.grafana.ingress.hosts 0 }}',
         'init': ''},
-    'job="alertmanager-main"' : {
+    'job="alertmanager-main"': {
         'replacement': 'job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}"',
+        'init': '',
+    },
+    'namespace="monitoring"': {
+        'replacement': 'namespace="{{ .Release.Namespace }}"',
+        'limitGroup': ['alertmanager.rules'],
         'init': '',
     },
 }
