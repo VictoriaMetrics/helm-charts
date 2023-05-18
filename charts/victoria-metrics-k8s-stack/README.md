@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.14.17](https://img.shields.io/badge/Version-0.14.17-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.14.19](https://img.shields.io/badge/Version-0.14.19-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -359,6 +359,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rules.kubeApiserver | bool | `true` |  |
 | defaultRules.rules.kubeApiserverAvailability | bool | `true` |  |
 | defaultRules.rules.kubeApiserverBurnrate | bool | `true` |  |
+| defaultRules.rules.kubeApiserverHistogram | bool | `true` |  |
 | defaultRules.rules.kubeApiserverSlos | bool | `true` |  |
 | defaultRules.rules.kubePrometheusGeneral | bool | `true` |  |
 | defaultRules.rules.kubePrometheusNodeRecording | bool | `true` |  |
