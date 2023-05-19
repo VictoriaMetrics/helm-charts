@@ -121,7 +121,11 @@ spec:
               containerPort: 8880
           readinessProbe:
             httpGet:
+            {{- if index  .Values.server.extraArgs "http.pathPrefix" }}
+              path: {{ trimSuffix "/" (index .Values.server.extraArgs "http.pathPrefix") }}/health
+            {{- else }}
               path: /health
+            {{- end }}
               port: http
             initialDelaySeconds: 5
             periodSeconds: 15

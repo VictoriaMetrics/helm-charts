@@ -74,7 +74,11 @@ spec:
           {{- end }}
           readinessProbe:
             httpGet:
+            {{- if index  .Values.vmselect.extraArgs "http.pathPrefix" }}
+              path: {{ trimSuffix "/" (index .Values.vmselect.extraArgs "http.pathPrefix") }}/health
+            {{- else }}
               path: /health
+            {{- end }}
               port: http
             initialDelaySeconds: {{ .Values.vmselect.probe.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vmselect.probe.readiness.periodSeconds }}
