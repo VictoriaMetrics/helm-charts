@@ -51,10 +51,8 @@ spec:
           {{- if .Values.vminsert.containerWorkingDir }}
           workingDir: {{ .Values.vminsert.containerWorkingDir }}
           {{- end }}
-          {{- with .Values.vminsert.podSecurityContext }}
           securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- toYaml .Values.vminsert.podSecurityContext | nindent 12 }}
           args:
           {{- if not .Values.vminsert.suppresStorageFQDNsRender }}
             {{- include "victoria-metrics.vminsert.vmstorage-pod-fqdn" . | nindent 12 }}
