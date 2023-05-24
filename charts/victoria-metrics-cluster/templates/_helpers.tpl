@@ -216,7 +216,7 @@ Return if ingress supports pathType.
 {{ toYaml . }}
 {{- end -}}
 {{- if .Values.vmstorage.vmbackupmanager.restore.onStart.enabled }}
-- name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
+- name: {{ template "victoria-metrics.name" . }}-vmbackupmanager-restore
   image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
   imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
   args:
