@@ -51,8 +51,10 @@ spec:
           {{- if .Values.vmselect.containerWorkingDir }}
           workingDir: {{ .Values.vmselect.containerWorkingDir }}
           {{- end }}
+          {{- with .Values.vmselect.podSecurityContext }}
           securityContext:
-            {{- toYaml .Values.vmselect.podSecurityContext | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           args:
             - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
           {{- if not .Values.vmselect.suppresStorageFQDNsRender }}
