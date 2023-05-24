@@ -8432,6 +8432,38 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              unauthorizedAccessConfig:
+                description: UnauthorizedAccessConfig configures access for un authorized
+                  users
+                items:
+                  description: VMAuthUnauthorizedPath defines url_map for unauthorized
+                    access
+                  properties:
+                    ip_filters:
+                      description: IPFilters defines filter for src ip address enterprise
+                        only
+                      properties:
+                        allow_list:
+                          items:
+                            type: string
+                          type: array
+                        deny_list:
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    src_paths:
+                      description: Paths src request paths
+                      items:
+                        type: string
+                      type: array
+                    url_prefix:
+                      description: URLs defines url_prefix for dst routing
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                type: array
               userNamespaceSelector:
                 description: UserNamespaceSelector Namespaces to be selected for  VMAuth
                   discovery. Works in combination with Selector. NamespaceSelector
@@ -8698,6 +8730,10 @@ spec:
                     description: Affinity If specified, the pod's scheduling constraints.
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
+                  clusterNativeListenPort:
+                    description: 'ClusterNativePort for multi-level cluster setup.
+                      More details: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multi-level-cluster-setup'
+                    type: string
                   configMaps:
                     description: ConfigMaps is a list of ConfigMaps in the same namespace
                       as the VMSelect object, which shall be mounted into the VMSelect
@@ -9534,6 +9570,10 @@ spec:
                           type: object
                       type: object
                     type: array
+                  clusterNativeListenPort:
+                    description: 'ClusterNativePort for multi-level cluster setup.
+                      More details: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multi-level-cluster-setup'
+                    type: string
                   configMaps:
                     description: ConfigMaps is a list of ConfigMaps in the same namespace
                       as the VMSelect object, which shall be mounted into the VMSelect
@@ -12622,6 +12662,11 @@ spec:
                       - key
                       type: object
                       x-kubernetes-map-type: atomic
+                    filterRunning:
+                      description: FilterRunning applies filter with pod status ==
+                        running it prevents from scrapping metrics at failed or succeed
+                        state pods. enabled by default
+                      type: boolean
                     follow_redirects:
                       description: FollowRedirects controls redirects for scraping.
                       type: boolean
@@ -14348,6 +14393,14 @@ spec:
                     name:
                       description: Name of group
                       type: string
+                    notifier_headers:
+                      description: 'NotifierHeaders contains optional HTTP headers
+                        added to each alert request which will send to notifier Must
+                        be in form `header-name: value` For example: headers: - "CustomHeader:
+                        foo" - "CustomHeader2: bar"'
+                      items:
+                        type: string
+                      type: array
                     params:
                       additionalProperties:
                         items:
@@ -17542,6 +17595,12 @@ spec:
                 description: BearerToken Authorization header value for accessing
                   protected endpoint.
                 type: string
+              default_url:
+                description: DefaultURLs backend url for non-matching paths filter
+                  usually used for default backend with error message
+                items:
+                  type: string
+                type: array
               generatePassword:
                 description: GeneratePassword instructs operator to generate password
                   for user if spec.password if empty.
@@ -17606,6 +17665,19 @@ spec:
                       items:
                         type: string
                       type: array
+                    ip_filters:
+                      description: IPFilters defines per target src ip filters supported
+                        only with enterprise version of vmauth https://docs.victoriametrics.com/vmauth.html#ip-filters
+                      properties:
+                        allow_list:
+                          items:
+                            type: string
+                          type: array
+                        deny_list:
+                          items:
+                            type: string
+                          type: array
+                      type: object
                     paths:
                       description: Paths - matched path to route.
                       items:
@@ -17618,8 +17690,12 @@ spec:
                         url:
                           description: URL http url for given staticRef.
                           type: string
-                      required:
-                      - url
+                        urls:
+                          description: URLs allows setting multiple urls for load-balancing
+                            at vmauth-side.
+                          items:
+                            type: string
+                          type: array
                       type: object
                     target_path_suffix:
                       description: QueryParams []string `json:"queryParams,omitempty"`
