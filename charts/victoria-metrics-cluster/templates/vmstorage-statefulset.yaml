@@ -50,10 +50,8 @@ spec:
           {{- if .Values.vmstorage.containerWorkingDir }}
           workingDir: {{ .Values.vmstorage.containerWorkingDir }}
           {{- end }}
-          {{- with .Values.vmstorage.podSecurityContext }}
           securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- toYaml .Values.vmstorage.podSecurityContext | nindent 12 }}
           args:
             - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.vmstorage.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
