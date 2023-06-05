@@ -219,6 +219,9 @@ Return if ingress supports pathType.
 - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager-restore
   image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
   imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
+  {{- with .Values.vmstorage.podSecurityContext }}
+  securityContext:  {{ toYaml . | nindent 4 }}
+  {{- end }}
   args:
     - restore
     - {{ printf "%s=%t" "--eula" .Values.vmstorage.vmbackupmanager.eula | quote}}
@@ -227,7 +230,7 @@ Return if ingress supports pathType.
     - --{{ $key }}={{ $value }}
     {{- end }}
   {{- with .Values.vmstorage.vmbackupmanager.resources }}
-  resources: {{ toYaml . | nindent 12 }}
+  resources: {{ toYaml . | nindent 4 }}
   {{- end }}
   env:
     - name: POD_NAME
@@ -235,7 +238,7 @@ Return if ingress supports pathType.
         fieldRef:
           fieldPath: metadata.name
   {{- with .Values.vmstorage.vmbackupmanager.env }}
-  {{- toYaml . | nindent 12 }}
+  {{- toYaml . | nindent 4 }}
   {{- end }}
   ports:
     - name: manager-http
