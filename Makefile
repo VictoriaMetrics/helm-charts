@@ -69,11 +69,26 @@ lint-local:
 template-local:
 	HELM="helm-local" $(MAKE) template
 
+package-chart:
+	if [ "$(CHART)" = "victoria-metrics-k8s-stack" ]; then \
+		CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM); \
+    fi; \
+    CMD="package charts/$(CHART) -d packages" $(MAKE) $(HELM)
+
+package-new-chart-version:
+	@VERSION=$$(grep -m 1 -o 'version: .*' charts/"$$CHART"/Chart.yaml | cut -d ' ' -f 2); \
+	FILENAME="packages/$$CHART-$$VERSION.tgz"; \
+	if ! test -f "$$FILENAME"; then \
+		$(MAKE) package-chart CHART=$$CHART; \
+	else \
+		echo "No need to package $$FILENAME already exists"; \
+	fi
 
 # Package chart into zip file
 package:
-	CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM)
-	CMD="package charts/* -d packages" $(MAKE) $(HELM)
+	@for CHART in $$(ls charts/); do \
+  		$(MAKE) package-new-chart-version CHART=$$CHART; \
+	done
 
 # Create index file (use only for initial setup)
 index:
@@ -95,3 +110,5 @@ gen-docs:
 		-w /helm-charts \
 		$(HELM_DOCS_IMAGE) \
 		helm-docs
+
+
