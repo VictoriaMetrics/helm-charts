@@ -6,10 +6,10 @@ remote:
     url: http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/
 queries:
   active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
-  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'
-  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'
-  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
-  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
+  churn_rate: 'sum(rate(vm_new_timeseries_created_total))'
+  ingestion_rate: 'sum(rate(vm_rows_inserted_total)) by (type,accountID) > 0'
+  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"})) by (path) > 0'
+  slow_inserts: 'sum(rate(vm_slow_row_inserts_total)) / sum(rate(vm_rows_inserted_total))'
 
 monitoring:
   pull:
@@ -18,5 +18,4 @@ monitoring:
   push:
     endpoint_url: "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/"
     extra_labels:
-      job: "vmanomaly"
-
+      job: "vmanomaly-push"

@@ -4,9 +4,9 @@
 
 image:
   # -- Victoria Metrics anomaly Docker repository and image name
-  repository: us-docker.pkg.dev/victoriametrics-test/public/vmanomaly-trial
+  repository: us-docker.pkg.dev/victoriametrics-test/vmanomaly/vmanomaly
   # -- Tag of Docker image
-  tag: "" # rewrites Chart.AppVersionv
+  tag: "" # rewrites Chart.AppVersion
   # -- Pull policy of Docker image
   pullPolicy: IfNotPresent
 
@@ -134,9 +134,9 @@ remote:
 
 scheduler:
   class: "scheduler.periodic.PeriodicScheduler"
-  fit_every: "1d"
-  fit_window: "7d"
-  infer_every: "10s"
+  fit_every: "1h"
+  fit_window: "14d"
+  infer_every: "1m"
 
 ## -- List of labels that will be added to generated series by vmanomaly
 extra_labels: {}
@@ -150,16 +150,12 @@ model:
     z_threshold: 2.5
 
   prophet:
-    interval_width: 0.8
+    interval_width: 0.98
 #    country_holidays: 'US'
-#    seasonalities:
-#      - name: 'hourly'
-#        period: 0.04166666666
-#        fourier_order: 30
 
   holt_winters:
     seasonality: '1d'
-    frequency: '1h'   
+    frequency: '1m'
 
 # -- Query names and expressions. Required. Examples:
 #  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
@@ -185,5 +181,4 @@ monitoring:
     # -- push metrics on prometheus format if defined
     endpoint_url: ""
     extra_labels:
-      job: "vmanomaly"
-  
+      job: "vmanomaly-push"
