@@ -115,7 +115,7 @@ remote:
     # -- URL for data reading. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481/select/"
     url: ""
     # -- When read from VictoriaMetrics cluster. Format: vm_account_id:vm_project_id (for example: 0:0) or vm_account_id (for example 0). See https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy
-    tenant: ""
+    tenant_id: ""
     # -- Health endpoint. vmanomaly add /health to url if it's empty. You can specify full path when VictoriaMetircs is hidden via vmauth or other proxies/balancers
     health: ""
     basicAuth:
@@ -134,9 +134,9 @@ remote:
 
 scheduler:
   class: "scheduler.periodic.PeriodicScheduler"
-  fit_every: "1d"
-  fit_window: "7d"
-  infer_every: "10s"
+  fit_every: "2h"
+  fit_window: "14d"
+  infer_every: "1m"
 
 ## -- List of labels that will be added to generated series by vmanomaly
 extra_labels: {}
@@ -150,7 +150,7 @@ model:
     z_threshold: 2.5
 
   prophet:
-    interval_width: 0.8
+    interval_width: 0.98
 #    country_holidays: 'US'
 #    seasonalities:
 #      - name: 'hourly'
@@ -159,7 +159,7 @@ model:
 
   holt_winters:
     seasonality: '1d'
-    frequency: '1h'   
+    frequency: '1h'
 
 # -- Query names and expressions. Required. Examples:
 #  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
@@ -173,17 +173,15 @@ queries: {}
 #  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'
 #  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
 #  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
-
+samplingPeriod: "1m"
 # -- vmanomaly internal monitoring in Prometheus format
 monitoring:
   # /metrics server.
   pull:
     # -- if true expose metrics on /metric endpoint
-    enabled: true
     port: 8440
   push:
     # -- push metrics on prometheus format if defined
-    endpoint_url: ""
+    url: ""
     extra_labels:
-      job: "vmanomaly"
-  
+      job: "vmanomaly-push"
