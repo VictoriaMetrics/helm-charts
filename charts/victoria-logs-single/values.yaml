@@ -2,12 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-rbac:
-  # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
-  pspEnabled: true
-  extraLabels: {}
-  # annotations: {}
-
 # -- Print chart notes
 printNotes: true
 
@@ -173,9 +167,19 @@ server:
     #timeoutSeconds: 5
 
   # -- Security context to be added to server pods
-  securityContext: {}
+  securityContext:
+    fsGroup: 2000
+
   # -- Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+
   ingress:
     # -- Enable deployment of ingress for server component
     enabled: false
