@@ -46,6 +46,7 @@ lint:
 	CMD="lint charts/victoria-metrics-gateway -f hack/vmgateway-cluster-ratelimiting-minimum.yaml" $(MAKE) $(HELM)
 	CMD="lint charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml" $(MAKE) $(HELM)
 	CMD="lint charts/victoria-metrics-anomaly -f hack/vmanomaly-lint-hack.yaml" $(MAKE) $(HELM)
+	CMD="lint charts/victoria-logs-single -f hack/vlsingle-lint-hack.yaml" $(MAKE) $(HELM)
 
 # Run template for helm charts
 template:
@@ -56,6 +57,7 @@ template:
 	CMD="template charts/victoria-metrics-gateway -f hack/vmgateway-cluster-ratelimiting-minimum.yaml" $(MAKE) $(HELM)
 	CMD="template charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml" $(MAKE) $(HELM)
 	CMD="template charts/victoria-metrics-anomaly -f hack/vmanomaly-lint-hack.yaml" $(MAKE) $(HELM)
+	CMD="template charts/victoria-logs-single -f hack/vlsingle-lint-hack.yaml" $(MAKE) $(HELM)
 
 lint-ct:
 	CMD="lint --config .github/ci/ct.yaml --all" $(MAKE) $(CT)
@@ -69,11 +71,30 @@ lint-local:
 template-local:
 	HELM="helm-local" $(MAKE) template
 
+package-chart:
+	if [ "$(CHART)" = "victoria-metrics-k8s-stack" ]; then \
+		CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM); \
+    fi; \
+    if [ "$(CHART)" = "victoria-logs-single" ]; then \
+		echo "victoria-logs-single package not yet supported"; \
+	else \
+		CMD="package charts/$(CHART) -d packages" $(MAKE) $(HELM); \
+    fi
+
+package-new-chart-version:
+	@VERSION=$$(grep -m 1 -o 'version: .*' charts/"$$CHART"/Chart.yaml | cut -d ' ' -f 2); \
+	FILENAME="packages/$$CHART-$$VERSION.tgz"; \
+	if ! test -f "$$FILENAME"; then \
+		$(MAKE) package-chart CHART=$$CHART; \
+	else \
+		echo "No need to package $$FILENAME already exists"; \
+	fi
 
 # Package chart into zip file
 package:
-	CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM)
-	CMD="package charts/* -d packages" $(MAKE) $(HELM)
+	@for CHART in $$(ls charts/); do \
+  		$(MAKE) package-new-chart-version CHART=$$CHART; \
+	done
 
 # Create index file (use only for initial setup)
 index:

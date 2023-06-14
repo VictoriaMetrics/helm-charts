@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square)
+![Version: 0.3.2](https://img.shields.io/badge/Version-0.3.2-informational?style=flat-square)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
 ![Twitter Follow](https://img.shields.io/twitter/follow/VictoriaMetrics?style=social)
@@ -129,11 +129,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | model.enabled | string | `"prophet"` | Available options: zscore, prophet, holt_winters |
 | model.holt_winters.frequency | string | `"1h"` |  |
 | model.holt_winters.seasonality | string | `"1d"` |  |
-| model.prophet.interval_width | float | `0.8` |  |
+| model.prophet.interval_width | float | `0.98` |  |
 | model.zscore.z_threshold | float | `2.5` |  |
-| monitoring | object | `{"pull":{"enabled":true,"port":8440},"push":{"endpoint_url":"","extra_labels":{"job":"vmanomaly"}}}` | vmanomaly internal monitoring in Prometheus format |
-| monitoring.pull.enabled | bool | `true` | if true expose metrics on /metric endpoint |
-| monitoring.push.endpoint_url | string | `""` | push metrics on prometheus format if defined |
+| monitoring | object | `{"pull":{"port":8440},"push":{"extra_labels":{"job":"vmanomaly-push"},"url":""}}` | vmanomaly internal monitoring in Prometheus format |
+| monitoring.pull.port | int | `8440` | if true expose metrics on /metric endpoint |
+| monitoring.push.url | string | `""` | push metrics on prometheus format if defined |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
@@ -143,7 +143,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | remote.read.basicAuth.password | string | `""` |  |
 | remote.read.basicAuth.username | string | `""` |  |
 | remote.read.health | string | `""` | Health endpoint. vmanomaly add /health to url if it's empty. You can specify full path when VictoriaMetircs is hidden via vmauth or other proxies/balancers |
-| remote.read.tenant | string | `""` | When read from VictoriaMetrics cluster. Format: vm_account_id:vm_project_id (for example: 0:0) or vm_account_id (for example 0). See https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy |
+| remote.read.tenant_id | string | `""` | When read from VictoriaMetrics cluster. Format: vm_account_id:vm_project_id (for example: 0:0) or vm_account_id (for example 0). See https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy |
 | remote.read.url | string | `""` | URL for data reading. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481/select/" |
 | remote.write.basicAuth.password | string | `""` |  |
 | remote.write.basicAuth.username | string | `""` |  |
@@ -151,10 +151,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | remote.write.tenant | string | `""` | When write to VictoriaMetrics cluster. Format: vm_account_id:vm_project_id (for example: 0:0) or vm_account_id (for example 0). See https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy |
 | remote.write.url | string | `""` | URL for data writing. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/" |
 | resources | object | `{}` |  |
+| samplingPeriod | string | `"1m"` |  |
 | scheduler.class | string | `"scheduler.periodic.PeriodicScheduler"` |  |
-| scheduler.fit_every | string | `"1d"` |  |
-| scheduler.fit_window | string | `"7d"` |  |
-| scheduler.infer_every | string | `"10s"` |  |
+| scheduler.fit_every | string | `"2h"` |  |
+| scheduler.fit_window | string | `"14d"` |  |
+| scheduler.infer_every | string | `"1m"` |  |
 | securityContext.runAsGroup | int | `1000` |  |
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
