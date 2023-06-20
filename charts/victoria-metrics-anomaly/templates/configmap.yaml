@@ -54,5 +54,15 @@ data:
         __name__: "$VAR"
         query: "$QUERY_KEY"
         model: {{ .Values.model.enabled }}
+    {{ if or .Values.monitoring.pull.enabled .Values.monitoring.push.url }}
     monitoring:
-      {{- toYaml .Values.monitoring | nindent 8 }}
+    {{- if .Values.monitoring.pull.enabled }}
+      pull:
+        {{- $v := deepCopy .Values.monitoring.pull }}
+        {{- unset $v "enabled" | toYaml | nindent 6 }}
+      {{- end }}
+      {{- if .Values.monitoring.push.url }}
+      push:
+        {{- toYaml .Values.monitoring.push | nindent 6 }}
+      {{- end }}
+    {{- end }}

@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 0.3.2](https://img.shields.io/badge/Version-0.3.2-informational?style=flat-square)
+![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
 ![Twitter Follow](https://img.shields.io/twitter/follow/VictoriaMetrics?style=social)
@@ -131,8 +131,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | model.holt_winters.seasonality | string | `"1d"` |  |
 | model.prophet.interval_width | float | `0.98` |  |
 | model.zscore.z_threshold | float | `2.5` |  |
-| monitoring | object | `{"pull":{"port":8440},"push":{"extra_labels":{"job":"vmanomaly-push"},"url":""}}` | vmanomaly internal monitoring in Prometheus format |
-| monitoring.pull.port | int | `8440` | if true expose metrics on /metric endpoint |
+| monitoring | object | `{"pull":{"enabled":false,"port":8440},"push":{"extra_labels":{"job":"vmanomaly-push"},"url":""}}` | vmanomaly internal monitoring in Prometheus format |
+| monitoring.pull.enabled | bool | `false` | if true expose metrics on /metrics endpoint |
+| monitoring.pull.port | int | `8440` | port for /metrics endpoint |
 | monitoring.push.url | string | `""` | push metrics on prometheus format if defined |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
