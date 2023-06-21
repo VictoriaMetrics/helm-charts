@@ -15,6 +15,27 @@
 This chart will do the following:
 
 * Rollout Victoria Logs Single.
+* (optional) Rollout [fluentbit](https://fluentbit.io/) to collect logs from pods.
+
+Charts allows to configure logs collection from Kubernetes pods to VictoriaLogs.
+In order to do that you need to enable fluentbit and adjust `Host` address for fluentbit [output](https://docs.fluentbit.io/manual/pipeline/outputs/http) plugin:
+```yaml
+fluent-bit:
+  enabled: true
+  config:
+    outputs: |
+      [OUTPUT]
+          Name http
+          Match kube.*
+          Host vlogs-victoria-logs-single-server
+          port 9428
+          compress gzip
+          uri /insert/jsonline/?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date
+          format json_lines
+          json_date_format iso8601
+          header AccountID 0
+          header ProjectID 0
+```
 
 # How to install
 

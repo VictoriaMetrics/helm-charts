@@ -1,7 +1,13 @@
-apiVersion: v1
+apiVersion: v2
 appVersion: v0.0.0
 description: Victoria Logs Single version - high-performance, cost-effective and scalable logs storage
 name: victoria-logs-single
 version: 0.0.1
 sources:
 - https://github.com/VictoriaMetrics/helm-charts
+
+dependencies:
+- name: fluent-bit
+  version: "0.31.0"
+  repository: "https://fluent.github.io/helm-charts"
+  condition: fluentbit.enabled
