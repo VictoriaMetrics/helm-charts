@@ -1,6 +1,6 @@
 # Victoria Logs Helm Chart for Single Version
 
- ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+ ![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square)
 
 Victoria Logs Single version - high-performance, cost-effective and scalable logs storage
 
@@ -15,6 +15,27 @@ Victoria Logs Single version - high-performance, cost-effective and scalable log
 This chart will do the following:
 
 * Rollout Victoria Logs Single.
+* (optional) Rollout [fluentbit](https://fluentbit.io/) to collect logs from pods.
+
+Charts allows to configure logs collection from Kubernetes pods to VictoriaLogs.
+In order to do that you need to enable fluentbit and adjust `Host` address for fluentbit [output](https://docs.fluentbit.io/manual/pipeline/outputs/http) plugin:
+```yaml
+fluent-bit:
+  enabled: true
+  config:
+    outputs: |
+      [OUTPUT]
+          Name http
+          Match kube.*
+          Host vlogs-victoria-logs-single-server
+          port 9428
+          compress gzip
+          uri /insert/jsonline/?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date
+          format json_lines
+          json_date_format iso8601
+          header AccountID 0
+          header ProjectID 0
+```
 
 # How to install
 
@@ -106,11 +127,22 @@ Change the values according to the need of the environment in ``victoria-logs-si
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| fluent-bit.config.filters | string | `"[FILTER]\n    Name kubernetes\n    Match kube.*\n    Merge_Log On\n    Keep_Log On\n    K8S-Logging.Parser On\n    K8S-Logging.Exclude On\n[FILTER]\n    Name                nest\n    Match               *\n    Wildcard            pod_name\n    Operation lift\n    Nested_under kubernetes\n    Add_prefix   kubernetes_\n"` |  |
+| fluent-bit.config.outputs | string | `"[OUTPUT]\n    Name http\n    Match kube.*\n    Host vlogs-victoria-logs-single-server\n    port 9428\n    compress gzip\n    uri /insert/jsonline/?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date\n    format json_lines\n    json_date_format iso8601\n    header AccountID 0\n    header ProjectID 0\n"` | Note that Host must be replaced to match your VictoriaLogs service name Default format is: {{release_name}}-victoria-logs-single-server |
+| fluent-bit.daemonSetVolumeMounts[0].mountPath | string | `"/var/log"` |  |
+| fluent-bit.daemonSetVolumeMounts[0].name | string | `"varlog"` |  |
+| fluent-bit.daemonSetVolumeMounts[1].mountPath | string | `"/var/lib/docker/containers"` |  |
+| fluent-bit.daemonSetVolumeMounts[1].name | string | `"varlibdockercontainers"` |  |
+| fluent-bit.daemonSetVolumeMounts[1].readOnly | bool | `true` |  |
+| fluent-bit.daemonSetVolumes[0].hostPath.path | string | `"/var/log"` |  |
+| fluent-bit.daemonSetVolumes[0].name | string | `"varlog"` |  |
+| fluent-bit.daemonSetVolumes[1].hostPath.path | string | `"/var/lib/docker/containers"` |  |
+| fluent-bit.daemonSetVolumes[1].name | string | `"varlibdockercontainers"` |  |
+| fluent-bit.enabled | bool | `false` | Enable deployment of fluent-bit |
+| fluent-bit.resources | object | `{}` |  |
 | podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | podDisruptionBudget.extraLabels | object | `{}` |  |
 | printNotes | bool | `true` | Print chart notes |
-| rbac.extraLabels | object | `{}` |  |
-| rbac.pspEnabled | bool | `true` |  |
 | server.affinity | object | `{}` | Pod affinity |
 | server.containerWorkingDir | string | `""` | Container workdir |
 | server.enabled | bool | `true` | Enable deployment of server component. Deployed as StatefulSet |
@@ -155,7 +187,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.podAnnotations | object | `{}` | Pod's annotations |
 | server.podLabels | object | `{}` | Pod's additional labels |
 | server.podManagementPolicy | string | `"OrderedReady"` | Pod's management policy |
-| server.podSecurityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| server.podSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | server.priorityClassName | string | `""` | Name of Priority Class |
 | server.readinessProbe.failureThreshold | int | `3` |  |
 | server.readinessProbe.httpGet.path | string | `"/health"` |  |
@@ -165,7 +197,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.readinessProbe.timeoutSeconds | int | `5` |  |
 | server.resources | object | `{}` | Resource object. Ref: [http://kubernetes.io/docs/user-guide/compute-resources/](http://kubernetes.io/docs/user-guide/compute-resources/ |
 | server.retentionPeriod | int | `1` | Data retention period in month |
-| server.securityContext | object | `{}` | Security context to be added to server pods |
+| server.securityContext | object | `{"fsGroup":2000}` | Security context to be added to server pods |
 | server.service.annotations | object | `{}` | Service annotations |
 | server.service.clusterIP | string | `""` | Service ClusterIP |
 | server.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
