@@ -21,7 +21,7 @@ server:
     # -- Image repository
     repository: victoriametrics/victoria-logs
     # -- Image tag
-    tag: ""
+    tag: "v0.1.0-victorialogs"
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -296,10 +296,10 @@ fluent-bit:
       [OUTPUT]
           Name http
           Match kube.*
-          Host vlogs-victoria-logs-single-server
+          Host {{release}}-victoria-logs-single-server
           port 9428
           compress gzip
-          uri /insert/jsonline/?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date
+          uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date
           format json_lines
           json_date_format iso8601
           header AccountID 0
