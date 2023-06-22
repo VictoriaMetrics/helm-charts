@@ -296,7 +296,7 @@ fluent-bit:
       [OUTPUT]
           Name http
           Match kube.*
-          Host {{release}}-victoria-logs-single-server
+          Host {{ .Release.Name }}-victoria-logs-single-server
           port 9428
           compress gzip
           uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date
