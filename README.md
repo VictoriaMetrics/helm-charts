@@ -97,6 +97,7 @@ helm charts tested at kubernetes versions from 1.13 to 1.22.
 
 # List of Charts
 
+- [Victoria Logs Single-Node](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-logs-single)
 - [Victoria Metrics Agent](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-agent)
 - [Victoria Metrics Alert](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-alert)
 - [Victoria Metrics Anomaly](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-anomaly/README.md)
