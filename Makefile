@@ -76,10 +76,9 @@ package-chart:
 		CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM); \
     fi; \
     if [ "$(CHART)" = "victoria-logs-single" ]; then \
-		echo "victoria-logs-single package not yet supported"; \
-	else \
-		CMD="package charts/$(CHART) -d packages" $(MAKE) $(HELM); \
-    fi
+		CMD="dependency update charts/victoria-logs-single" $(MAKE) $(HELM); \
+    fi; \
+	CMD="package charts/$(CHART) -d packages" $(MAKE) $(HELM); \
 
 package-new-chart-version:
 	@VERSION=$$(grep -m 1 -o 'version: .*' charts/"$$CHART"/Chart.yaml | cut -d ' ' -f 2); \
