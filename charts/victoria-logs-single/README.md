@@ -1,6 +1,6 @@
 # Victoria Logs Helm Chart for Single Version
 
- ![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square)
+ ![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
 
 Victoria Logs Single version - high-performance, cost-effective and scalable logs storage
 
@@ -17,25 +17,13 @@ This chart will do the following:
 * Rollout Victoria Logs Single.
 * (optional) Rollout [fluentbit](https://fluentbit.io/) to collect logs from pods.
 
-Charts allows to configure logs collection from Kubernetes pods to VictoriaLogs.
-In order to do that you need to enable fluentbit and adjust `Host` address for fluentbit [output](https://docs.fluentbit.io/manual/pipeline/outputs/http) plugin:
+Chart allows to configure logs collection from Kubernetes pods to VictoriaLogs.
+In order to do that you need to enable fluentbit:
 ```yaml
 fluent-bit:
   enabled: true
-  config:
-    outputs: |
-      [OUTPUT]
-          Name http
-          Match kube.*
-          Host vlogs-victoria-logs-single-server
-          port 9428
-          compress gzip
-          uri /insert/jsonline/?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date
-          format json_lines
-          json_date_format iso8601
-          header AccountID 0
-          header ProjectID 0
 ```
+By default, fluentbit will forward logs to VictoriaLogs installation deployed by this chart.
 
 # How to install
 
@@ -128,7 +116,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | fluent-bit.config.filters | string | `"[FILTER]\n    Name kubernetes\n    Match kube.*\n    Merge_Log On\n    Keep_Log On\n    K8S-Logging.Parser On\n    K8S-Logging.Exclude On\n[FILTER]\n    Name                nest\n    Match               *\n    Wildcard            pod_name\n    Operation lift\n    Nested_under kubernetes\n    Add_prefix   kubernetes_\n"` |  |
-| fluent-bit.config.outputs | string | `"[OUTPUT]\n    Name http\n    Match kube.*\n    Host vlogs-victoria-logs-single-server\n    port 9428\n    compress gzip\n    uri /insert/jsonline/?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date\n    format json_lines\n    json_date_format iso8601\n    header AccountID 0\n    header ProjectID 0\n"` | Note that Host must be replaced to match your VictoriaLogs service name Default format is: {{release_name}}-victoria-logs-single-server |
+| fluent-bit.config.outputs | string | `"[OUTPUT]\n    Name http\n    Match kube.*\n    Host {{ .Release.Name }}-victoria-logs-single-server\n    port 9428\n    compress gzip\n    uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date\n    format json_lines\n    json_date_format iso8601\n    header AccountID 0\n    header ProjectID 0\n"` | Note that Host must be replaced to match your VictoriaLogs service name Default format is: {{release_name}}-victoria-logs-single-server |
 | fluent-bit.daemonSetVolumeMounts[0].mountPath | string | `"/var/log"` |  |
 | fluent-bit.daemonSetVolumeMounts[0].name | string | `"varlog"` |  |
 | fluent-bit.daemonSetVolumeMounts[1].mountPath | string | `"/var/lib/docker/containers"` |  |
@@ -158,7 +146,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | server.image.repository | string | `"victoriametrics/victoria-logs"` | Image repository |
-| server.image.tag | string | `""` | Image tag |
+| server.image.tag | string | `"v0.1.0-victorialogs"` | Image tag |
 | server.ingress.annotations | string | `nil` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
