@@ -96,8 +96,8 @@ package:
 	done
 
 # Create index file (use only for initial setup)
-index:
-	CMD="repo index --url ${URL} ." $(MAKE) $(HELM)
+#index:
+#	CMD="repo index --url ${URL} ." $(MAKE) $(HELM)
 
 init:
 	CMD="repo add prometheus-community https://prometheus-community.github.io/helm-charts" $(MAKE) $(HELM)
