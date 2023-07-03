@@ -6510,7 +6510,8 @@ spec:
                   value will always be the namespace of the object that is being created.
                 type: string
               evaluationInterval:
-                description: EvaluationInterval how often evalute rules by default
+                description: EvaluationInterval defines how often to evaluate rules
+                  by default
                 pattern: '[0-9]+(ms|s|m|h)'
                 type: string
               externalLabels:
@@ -12049,6 +12050,9 @@ spec:
                 type: integer
               scheme:
                 description: HTTP scheme to use for scraping.
+                enum:
+                - http
+                - https
                 type: string
               scrape_interval:
                 description: ScrapeInterval is the same as Interval and has priority
@@ -12945,6 +12949,9 @@ spec:
                       type: integer
                     scheme:
                       description: HTTP scheme to use for scraping.
+                      enum:
+                      - http
+                      - https
                       type: string
                     scrape_interval:
                       description: ScrapeInterval is the same as Interval and has
@@ -14294,6 +14301,9 @@ spec:
                     type: string
                   scheme:
                     description: HTTP scheme to use for scraping. Defaults to `http`.
+                    enum:
+                    - http
+                    - https
                     type: string
                   url:
                     description: Mandatory URL of the prober.
@@ -14918,6 +14928,9 @@ spec:
                       type: integer
                     scheme:
                       description: HTTP scheme to use for scraping.
+                      enum:
+                      - http
+                      - https
                       type: string
                     scrape_interval:
                       description: ScrapeInterval is the same as Interval and has
@@ -15431,7 +15444,12 @@ spec:
     singular: vmsingle
   scope: Namespaced
   versions:
-  - name: v1beta1
+  - additionalPrinterColumns:
+    - description: Current status of single node
+      jsonPath: .status.singleStatus
+      name: Status
+      type: string
+    name: v1beta1
     schema:
       openAPIV3Schema:
         description: VMSingle  is fast, cost-effective and scalable time-series database.
@@ -16675,27 +16693,32 @@ spec:
             properties:
               availableReplicas:
                 description: AvailableReplicas Total number of available pods (ready
-                  for at least minReadySeconds) targeted by this VMAlert cluster.
+                  for at least minReadySeconds) targeted by this VMSingle.
                 format: int32
                 type: integer
+              reason:
+                type: string
               replicas:
                 description: ReplicaCount Total number of non-terminated pods targeted
-                  by this VMAlert cluster (their labels match the selector).
+                  by this VMSingle.
                 format: int32
                 type: integer
+              singleStatus:
+                type: string
               unavailableReplicas:
                 description: UnavailableReplicas Total number of unavailable pods
-                  targeted by this VMAlert cluster.
+                  targeted by this VMSingle.
                 format: int32
                 type: integer
               updatedReplicas:
                 description: UpdatedReplicas Total number of non-terminated pods targeted
-                  by this VMAlert cluster that have the desired version spec.
+                  by this VMSingle.
                 format: int32
                 type: integer
             required:
             - availableReplicas
             - replicas
+            - singleStatus
             - unavailableReplicas
             - updatedReplicas
             type: object
@@ -17140,6 +17163,9 @@ spec:
                       type: integer
                     scheme:
                       description: HTTP scheme to use for scraping.
+                      enum:
+                      - http
+                      - https
                       type: string
                     scrape_interval:
                       description: ScrapeInterval is the same as Interval and has
@@ -17153,6 +17179,7 @@ spec:
                       description: Targets static targets addresses in form of ["192.122.55.55:9100","some-name:9100"].
                       items:
                         type: string
+                      minItems: 1
                       type: array
                     tlsConfig:
                       description: TLSConfig configuration to use when scraping the
