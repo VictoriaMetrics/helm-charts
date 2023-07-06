@@ -21,7 +21,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: node-exporter
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: node-exporter
     rules:
     - alert: NodeFilesystemSpaceFillingUp
       annotations:
@@ -215,7 +221,7 @@ spec:
 {{- end }}
     - alert: NodeClockSkewDetected
       annotations:
-        description: Clock on {{`{{`}} $labels.instance {{`}}`}} is out of sync by more than 300s. Ensure NTP is configured correctly on this host.
+        description: Clock on {{`{{`}} $labels.instance {{`}}`}} is out of sync by more than 0.05s. Ensure NTP is configured correctly on this host.
         runbook_url: {{ .Values.defaultRules.runbookUrl }}/node/nodeclockskewdetected
         summary: Clock skew detected.
       expr: |-

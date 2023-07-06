@@ -22,7 +22,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: kubernetes-apps
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: kubernetes-apps
     rules:
     - alert: KubePodCrashLooping
       annotations:
@@ -85,6 +91,20 @@ spec:
             ==
           0
         )
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: KubeDeploymentRolloutStuck
+      annotations:
+        description: Rollout of deployment {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} is not progressing for longer than 15 minutes.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/kubedeploymentrolloutstuck
+        summary: Deployment rollout is not progressing.
+      expr: |-
+        kube_deployment_status_condition{condition="Progressing", status="false",job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}
+        != 0
       for: 15m
       labels:
         severity: warning

@@ -21,7 +21,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: kubernetes-system-controller-manager
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: kubernetes-system-controller-manager
     rules:
 {{- if .Values.kubeControllerManager.enabled }}
     - alert: KubeControllerManagerDown

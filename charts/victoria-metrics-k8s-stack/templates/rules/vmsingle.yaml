@@ -21,7 +21,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - concurrency: 2
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} concurrency: 2
     interval: 30s
     name: vmsingle
     rules:
@@ -137,7 +143,7 @@ spec:
     - alert: TooHighSlowInsertsRate
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=68&var-instance={{`{{`}} $labels.instance {{`}}`}}
-        description: High rate of slow inserts on "{{`{{`}} $labels.instance {{`}}`}}" may be a sign of resource exhaustion for the current load. It is likely more RAM is needed for optimal handling of the current number of active time series.
+        description: High rate of slow inserts on "{{`{{`}} $labels.instance {{`}}`}}" may be a sign of resource exhaustion for the current load. It is likely more RAM is needed for optimal handling of the current number of active time series. See also https://github.com/VictoriaMetrics/VictoriaMetrics/issues/3976#issuecomment-1476883183
         summary: Percentage of slow inserts is more than 5% on "{{`{{`}} $labels.instance {{`}}`}}" for the last 15m
       expr: |-
         (

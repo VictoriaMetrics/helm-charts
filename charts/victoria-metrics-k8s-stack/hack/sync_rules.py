@@ -168,7 +168,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  -'''
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }}'''
 
 
 def init_yaml_styles():

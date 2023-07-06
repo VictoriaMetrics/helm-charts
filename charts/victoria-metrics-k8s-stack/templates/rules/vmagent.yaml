@@ -21,7 +21,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - concurrency: 2
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} concurrency: 2
     interval: 30s
     name: vmagent
     rules:

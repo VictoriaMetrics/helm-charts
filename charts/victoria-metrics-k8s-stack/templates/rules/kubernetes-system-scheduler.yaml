@@ -21,7 +21,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: kubernetes-system-scheduler
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: kubernetes-system-scheduler
     rules:
 {{- if .Values.kubeScheduler.enabled }}
     - alert: KubeSchedulerDown

@@ -22,7 +22,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: kubernetes-storage
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: kubernetes-storage
     rules:
     - alert: KubePersistentVolumeFillingUp
       annotations:
