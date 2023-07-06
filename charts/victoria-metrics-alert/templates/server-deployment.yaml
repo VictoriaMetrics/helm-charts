@@ -4,8 +4,8 @@
 {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
 {{- end -}}
 {{- end -}}
-{{- if (eq (include "vmalert.alertmanager.urls" . ) "") -}}
-{{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or server.notifiers or enable Alertmanager in values file" -}}
+{{- if and (eq (include "vmalert.alertmanager.urls" . ) "") (eq .Values.server.notifier.alertmanager.config "") -}}
+{{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or server.notifiers or server.notifier.alertmanager.config or enable Alertmanager in values file" -}}
 {{- end -}}
 {{- if eq .Values.server.datasource.url "" -}}
 {{- fail "server.datasource.url datasource URL must be specified" -}}
@@ -70,6 +70,9 @@ spec:
             {{- with .Values.server.datasource.bearer.tokenFile }}
             - -datasource.bearerTokenFile={{ . }}
             {{- end }}
+            {{- if .Values.server.notifier.alertmanager.config }}
+            - -notifier.config={{ .Values.server.notifier.alertmanager.config }}
+            {{- else }}
             - -notifier.url={{ include "vmalert.alertmanager.urls" . }}
             {{- with (include "vmalert.alertmanager.passwords" .) }}
             - -notifier.basicAuth.password={{ . }}
@@ -82,6 +85,7 @@ spec:
             {{- end }}
             {{- with (include "vmalert.alertmanager.bearerTokenFiles" .) }}
             - -notifier.bearerTokenFile={{ . }}
+            {{- end }}
             {{- end }}
             - -remoteRead.url={{ .Values.server.remote.read.url }}
             {{- if or .Values.server.remote.read.basicAuth.password .Values.server.remote.read.basicAuth.username }}
