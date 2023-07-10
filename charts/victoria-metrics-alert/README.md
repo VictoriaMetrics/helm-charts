@@ -184,7 +184,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.name | string | `"server"` |  |
 | server.nameOverride | string | `""` |  |
 | server.nodeSelector | object | `{}` |  |
-| server.notifier | object | `{"alertmanager":{"basicAuth":{"password":"","username":""},"bearer":{"token":"","tokenFile":""},"url":"","config":""}}` | Notifier to use for alerts. Multiple notifiers can be enabled by using `notifiers` section |
+| server.notifier | object | `{"alertmanager":{"basicAuth":{"password":"","username":""},"bearer":{"token":"","tokenFile":""},"url":""},"config":""}` | Notifier to use for alerts. Multiple notifiers can be enabled by using `notifiers` section |
 | server.notifier.config | object | `""` | Path to configuration file for notifiers |
 | server.notifier.alertmanager.basicAuth | object | `{"password":"","username":""}` | Basic auth for alertmanager |
 | server.notifier.alertmanager.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |

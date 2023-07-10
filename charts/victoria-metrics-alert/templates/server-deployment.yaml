@@ -4,7 +4,7 @@
 {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
 {{- end -}}
 {{- end -}}
-{{- if and (eq (include "vmalert.alertmanager.urls" . ) "") (eq .Values.server.notifier.alertmanager.config "") -}}
+{{- if and (eq (include "vmalert.alertmanager.urls" . ) "") (eq .Values.server.notifier.config "") -}}
 {{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or server.notifiers or server.notifier.alertmanager.config or enable Alertmanager in values file" -}}
 {{- end -}}
 {{- if eq .Values.server.datasource.url "" -}}
@@ -70,8 +70,8 @@ spec:
             {{- with .Values.server.datasource.bearer.tokenFile }}
             - -datasource.bearerTokenFile={{ . }}
             {{- end }}
-            {{- if .Values.server.notifier.alertmanager.config }}
-            - -notifier.config={{ .Values.server.notifier.alertmanager.config }}
+            {{- if .Values.server.notifier.config }}
+            - -notifier.config={{ .Values.server.notifier.config }}
             {{- else }}
             - -notifier.url={{ include "vmalert.alertmanager.urls" . }}
             {{- with (include "vmalert.alertmanager.passwords" .) }}
