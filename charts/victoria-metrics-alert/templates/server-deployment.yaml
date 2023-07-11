@@ -4,8 +4,8 @@
 {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
 {{- end -}}
 {{- end -}}
-{{- if and (eq (include "vmalert.alertmanager.urls" . ) "") (eq .Values.server.notifier.config "") -}}
-{{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or server.notifiers or server.notifier.config or enable Alertmanager in values file" -}}
+{{- if and (eq (include "vmalert.alertmanager.urls" . ) "") (empty .Values.server.notifier.config) (eq .Values.server.notifier.configPath "") -}}
+{{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or server.notifiers or server.notifier.config or server.notifier.configPath or enable Alertmanager in values file" -}}
 {{- end -}}
 {{- if eq .Values.server.datasource.url "" -}}
 {{- fail "server.datasource.url datasource URL must be specified" -}}
@@ -70,8 +70,10 @@ spec:
             {{- with .Values.server.datasource.bearer.tokenFile }}
             - -datasource.bearerTokenFile={{ . }}
             {{- end }}
-            {{- if .Values.server.notifier.config }}
-            - -notifier.config={{ .Values.server.notifier.config }}
+            {{- if .Values.server.notifier.configPath }}
+            - -notifier.config={{ .Values.server.notifier.configPath }}
+            {{- else if .Values.server.notifier.config }}
+            - -notifier.config=/config/notifier.yaml
             {{- else }}
             - -notifier.url={{ include "vmalert.alertmanager.urls" . }}
             {{- with (include "vmalert.alertmanager.passwords" .) }}
@@ -173,8 +175,14 @@ spec:
     {{- end }}
       volumes:
         - name: alerts-config
-          configMap:
-            name: {{ include "vmalert.server.configname" . }}
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "vmalert.server.configname" . }}
+              {{- if and .Values.server.notifier.config (eq .Values.server.notifier.configPath "") }}
+              - configMap:
+                  name: {{ include "vmalert.notifier.configname" . }}
+              {{- end }}
         {{- range .Values.server.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:

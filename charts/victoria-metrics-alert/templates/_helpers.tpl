@@ -80,6 +80,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 {{- end -}}
 
+{{- define "vmalert.notifier.configname" -}}
+{{- include "vmalert.server.fullname" . -}}-notifier-config
+{{- end -}}
+
 {{/*
 Create the name of the service account to use
 */}}

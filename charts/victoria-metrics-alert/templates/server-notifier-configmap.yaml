@@ -1,0 +1,11 @@
+{{- if and .Values.server.notifier.config (eq .Values.server.notifier.configPath "") }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vmalert.notifier.configname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "vmalert.server.labels" . | nindent 4 }}
+data:
+  notifier.yaml: |
+{{ toYaml .Values.server.notifier.config | indent 4 }}
+{{- end }}

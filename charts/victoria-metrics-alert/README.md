@@ -184,8 +184,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.name | string | `"server"` |  |
 | server.nameOverride | string | `""` |  |
 | server.nodeSelector | object | `{}` |  |
-| server.notifier | object | `{"alertmanager":{"basicAuth":{"password":"","username":""},"bearer":{"token":"","tokenFile":""},"url":""},"config":""}` | Notifier to use for alerts. Multiple notifiers can be enabled by using `notifiers` section |
-| server.notifier.config | object | `""` | Path to configuration file for notifiers |
+| server.notifier | object | `{"alertmanager":{"basicAuth":{"password":"","username":""},"bearer":{"token":"","tokenFile":""},"url":""},"config":{},"configPath":""}` | Notifier to use for alerts. Multiple notifiers can be enabled by using `notifiers` section |
+| server.notifier.config | object | `{}` | Path to configuration file for notifiers |
+| server.notifier.configPath | object | `""` | Path to configuration file for notifiers (injected externally) |
 | server.notifier.alertmanager.basicAuth | object | `{"password":"","username":""}` | Basic auth for alertmanager |
 | server.notifier.alertmanager.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
 | server.notifier.alertmanager.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |
