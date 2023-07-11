@@ -81,7 +81,13 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "vmalert.notifier.configname" -}}
+{{- if .Values.server.notifier.existingSecret -}}
+{{- .Values.server.notifier.existingSecret -}}
+{{- else if .Values.server.notifier.configMap -}}
+{{- .Values.server.notifier.configMap -}}
+{{- else -}}
 {{- include "vmalert.server.fullname" . -}}-notifier-config
+{{- end -}}
 {{- end -}}
 
 {{/*

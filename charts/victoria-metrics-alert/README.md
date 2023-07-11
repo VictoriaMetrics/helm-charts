@@ -184,9 +184,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.name | string | `"server"` |  |
 | server.nameOverride | string | `""` |  |
 | server.nodeSelector | object | `{}` |  |
-| server.notifier | object | `{"alertmanager":{"basicAuth":{"password":"","username":""},"bearer":{"token":"","tokenFile":""},"url":""},"config":{},"configPath":""}` | Notifier to use for alerts. Multiple notifiers can be enabled by using `notifiers` section |
-| server.notifier.config | object | `{}` | Path to configuration file for notifiers |
-| server.notifier.configPath | object | `""` | Path to configuration file for notifiers (injected externally) |
+| server.notifier | object | `{"alertmanager":{"basicAuth":{"password":"","username":""},"bearer":{"token":"","tokenFile":""},"url":""},"config":{},"configMap":""}` | Notifier to use for alerts. Multiple notifiers can be enabled by using `notifiers` section |
+| server.notifier.config | object | `{}` | Configuration for notifiers |
+| server.notifier.configMap | object | `""` | Path to an existing configuration file for notifiers from Kubernetes ConfigMap. It has precedence over `config`. |
+| server.notifier.configMapKey | object | `"notifier.yaml"` | Key name of `server.notifier.configMap` |
+| server.notifier.existingSecret | object | `""` | Path to an existing configuration file for notifiers from Kubernetes Secret. It has precedence over `configMap`. |
+| server.notifier.existingSecretKey | object | `"notifier.yaml"` | Key name of `server.notifier.existingSecret` |
 | server.notifier.alertmanager.basicAuth | object | `{"password":"","username":""}` | Basic auth for alertmanager |
 | server.notifier.alertmanager.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
 | server.notifier.alertmanager.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |

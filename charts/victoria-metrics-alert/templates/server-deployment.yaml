@@ -4,8 +4,8 @@
 {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
 {{- end -}}
 {{- end -}}
-{{- if and (eq (include "vmalert.alertmanager.urls" . ) "") (empty .Values.server.notifier.config) (eq .Values.server.notifier.configPath "") -}}
-{{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or server.notifiers or server.notifier.config or server.notifier.configPath or enable Alertmanager in values file" -}}
+{{- if and (eq (include "vmalert.alertmanager.urls" . ) "") (empty .Values.server.notifier.config) (empty .Values.server.notifier.configMap) (empty .Values.server.notifier.existingSecret) -}}
+{{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or server.notifiers or server.notifier.config or server.notifier.configMap or server.notifier.existingSecret or enable Alertmanager in values file" -}}
 {{- end -}}
 {{- if eq .Values.server.datasource.url "" -}}
 {{- fail "server.datasource.url datasource URL must be specified" -}}
@@ -70,8 +70,10 @@ spec:
             {{- with .Values.server.datasource.bearer.tokenFile }}
             - -datasource.bearerTokenFile={{ . }}
             {{- end }}
-            {{- if .Values.server.notifier.configPath }}
-            - -notifier.config={{ .Values.server.notifier.configPath }}
+            {{- if .Values.server.notifier.existingSecret }}
+            - -notifier.config=/config/{{ .Values.server.notifier.existingSecretKey }}
+            {{- else if .Values.server.notifier.configMap }}
+            - -notifier.config=/config/{{ .Values.server.notifier.configMapKey }}
             {{- else if .Values.server.notifier.config }}
             - -notifier.config=/config/notifier.yaml
             {{- else }}
@@ -179,7 +181,11 @@ spec:
             sources:
               - configMap:
                   name: {{ include "vmalert.server.configname" . }}
-              {{- if and .Values.server.notifier.config (eq .Values.server.notifier.configPath "") }}
+              {{- if and .Values.server.notifier.existingSecret }}
+              - secret:
+                  name: {{ include "vmalert.notifier.configname" . }}
+              {{- end }}
+              {{- if and .Values.server.notifier.configMap (empty .Values.server.notifier.existingSecret) }}
               - configMap:
                   name: {{ include "vmalert.notifier.configname" . }}
               {{- end }}
