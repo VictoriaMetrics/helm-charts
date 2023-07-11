@@ -78,6 +78,7 @@ spec:
             - -notifier.config=/config/notifier.yaml
             {{- else }}
             - -notifier.url={{ include "vmalert.alertmanager.urls" . }}
+            {{- end }}
             {{- with (include "vmalert.alertmanager.passwords" .) }}
             - -notifier.basicAuth.password={{ . }}
             {{- end }}
@@ -89,7 +90,6 @@ spec:
             {{- end }}
             {{- with (include "vmalert.alertmanager.bearerTokenFiles" .) }}
             - -notifier.bearerTokenFile={{ . }}
-            {{- end }}
             {{- end }}
             - -remoteRead.url={{ .Values.server.remote.read.url }}
             {{- if or .Values.server.remote.read.basicAuth.password .Values.server.remote.read.basicAuth.username }}
