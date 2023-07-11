@@ -54,7 +54,7 @@ spec:
           securityContext:
             {{- toYaml .Values.vminsert.podSecurityContext | nindent 12 }}
           args:
-          {{- if not .Values.vminsert.suppresStorageFQDNsRender }}
+          {{- if not (or .Values.vminsert.suppresStorageFQDNsRender .Values.vminsert.suppressStorageFQDNsRender) }}
             {{- include "victoria-metrics.vminsert.vmstorage-pod-fqdn" . | nindent 12 }}
           {{- end }}
           {{- range $key, $value := .Values.vminsert.extraArgs }}
