@@ -167,6 +167,17 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range $constraint := . }}
+      - {{ toYaml $constraint | nindent 8 | trim }}
+          {{- if not $constraint.labelSelector }}
+        labelSelector:
+          matchLabels:
+            {{- include "chart.selectorLabels" $ | nindent 12 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
       volumes:
       {{- if not .Values.persistence.enabled }}
         - name: tmpdata
