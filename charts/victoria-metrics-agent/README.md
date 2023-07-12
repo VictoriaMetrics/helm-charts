@@ -353,3 +353,4 @@ Change the values according to the need of the environment in ``victoria-metrics
 | statefulset.replicationFactor | int | `1` | replication factor for vmagent in cluster mode |
 | statefulset.updateStrategy | object | `{}` |  |
 | tolerations | list | `[]` |  |
+| topologySpreadConstraints | list | `[]` |  |
