@@ -206,3 +206,4 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.statefulSet.service.servicePort | int | `9428` | Headless service port |
 | server.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
 | server.tolerations | list | `[]` | Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
+| imagePullSecrets | list | `[]` |  |
