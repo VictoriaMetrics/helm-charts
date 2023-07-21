@@ -45,7 +45,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.server.name }}
-          {{- with  .Values.server.podSecurityContext }}
+          {{- with  .Values.server.securityContext }}
           securityContext: {{- toYaml . | nindent 12 }}
           {{- end }}
           image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
@@ -170,7 +170,7 @@ spec:
           {{- with .Values.server.vmbackupmanager.resources }}
           resources: {{ toYaml . | nindent 12  }}
           {{- end }}
-          {{- with  .Values.server.podSecurityContext }}
+          {{- with  .Values.server.securityContext }}
           securityContext: {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with $.Values.server.vmbackupmanager.livenessProbe }}
@@ -204,9 +204,9 @@ spec:
       nodeSelector:
 {{ toYaml .Values.server.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.server.securityContext }}
+    {{- if .Values.server.podSecurityContext }}
       securityContext:
-{{ toYaml .Values.server.securityContext | indent 8 }}
+{{ toYaml .Values.server.podSecurityContext | indent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.server.tolerations }}
