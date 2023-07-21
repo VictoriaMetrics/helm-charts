@@ -43,14 +43,6 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Create the name of service account and clusterRole for cleanup-hook
-*/}}
-{{- define "victoria-metrics-k8s-stack.cleanupHookName" -}}
-{{- printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "cleanup-hook" | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
-
-{{/*
 Create the name for VMSingle
 */}}
 {{- define "victoria-metrics-k8s-stack.vmsingleName" -}}
