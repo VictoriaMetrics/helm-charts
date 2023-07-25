@@ -51,7 +51,7 @@ spec:
             {{- toYaml .Values.vmselect.podSecurityContext | nindent 12 }}
           args:
             - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
-          {{- if not .Values.vmselect.suppresStorageFQDNsRender }}
+          {{- if not (or .Values.vmselect.suppressStorageFQDNsRender .Values.vmselect.suppresStorageFQDNsRender) }}
           {{- include "victoria-metrics.vmselect.vmstorage-pod-fqdn" . | nindent 12 }}
           {{- end }}
           {{- include "victoria-metrics.vmselect.vmselect-pod-fqdn" . | nindent 12 -}}
