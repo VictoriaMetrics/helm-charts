@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.6.3](https://img.shields.io/badge/Version-0.6.3-informational?style=flat-square)
+ ![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
@@ -195,6 +195,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.podLabels | object | `{}` |  |
 | server.podSecurityContext | object | `{}` |  |
 | server.priorityClassName | string | `""` |  |
+| server.probe.liveness.failureThreshold | int | `3` |  |
+| server.probe.liveness.initialDelaySeconds | int | `5` |  |
+| server.probe.liveness.periodSeconds | int | `15` |  |
+| server.probe.liveness.timeoutSeconds | int | `5` |  |
+| server.probe.readiness.failureThreshold | int | `3` |  |
+| server.probe.readiness.initialDelaySeconds | int | `5` |  |
+| server.probe.readiness.periodSeconds | int | `15` |  |
+| server.probe.readiness.timeoutSeconds | int | `5` |  |
 | server.remote.read.basicAuth | object | `{"password":"","username":""}` | Basic auth for remote read |
 | server.remote.read.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
 | server.remote.read.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |

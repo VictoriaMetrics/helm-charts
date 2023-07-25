@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.8.63](https://img.shields.io/badge/Version-0.8.63-informational?style=flat-square)
+ ![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -107,6 +107,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | automountServiceAccountToken | bool | `true` |  |
+| extraObjects | list | `[]` | Add extra specs dynamically to this chart |
 | podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | podDisruptionBudget.extraLabels | object | `{}` |  |
 | printNotes | bool | `true` | Print chart notes |
@@ -129,7 +130,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | server.image.repository | string | `"victoriametrics/victoria-metrics"` | Image repository |
-| server.image.tag | string | `"v1.91.2"` | Image tag |
+| server.image.tag | string | `"v1.91.3"` | Image tag |
 | server.ingress.annotations | object | `{}` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
@@ -213,7 +214,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | server.vmbackupmanager.extraVolumeMounts | list | `[]` |  |
 | server.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| server.vmbackupmanager.image.tag | string | `"v1.91.2-enterprise"` | vmbackupmanager image tag |
+| server.vmbackupmanager.image.tag | string | `"v1.91.3-enterprise"` | vmbackupmanager image tag |
 | server.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
 | server.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
 | server.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |

@@ -49,6 +49,19 @@ server:
     #     secretKeyRef:
     #       name: auth_secret
     #       key: password
+    
+  # Readiness & Liveness probes
+  probe:
+    readiness:
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
+    liveness:
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
 
   replicaCount: 1
 

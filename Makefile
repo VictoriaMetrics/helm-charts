@@ -7,9 +7,11 @@ HELM?=helm-docker
 CT?=ct-docker
 
 helm-docker:
+	mkdir -p .helm/cache
 	docker run --rm --name helm-exec  \
 		--user $(shell id -u):$(shell id -g) \
 		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
+		--mount type=bind,src="$(shell pwd)/.github/ci/helm-repos.yaml",dst=/helm-charts/.helm/config/repositories.yaml \
 		-w /helm-charts \
 		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
 		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
@@ -22,9 +24,11 @@ helm-local:
 		$(CMD)
 
 ct-docker:
+	mkdir -p .helm/cache
 	docker run --rm --name helm-exec  \
 		--user $(shell id -u):$(shell id -g) \
 		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
+		--mount type=bind,src="$(shell pwd)/.github/ci/helm-repos.yaml",dst=/helm-charts/.helm/config/repositories.yaml \
 		-w /helm-charts \
 		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
 		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
@@ -37,8 +41,11 @@ ct-local:
 	ct \
 		$(CMD)
 
+helm-repo-update:
+	CMD="repo update" $(MAKE) $(HELM)
+
 # Run linter for helm chart
-lint:
+lint: helm-repo-update
 	CMD="lint charts/victoria-metrics-cluster -f hack/vmcluster-template-hack.yaml" $(MAKE) $(HELM)
 	CMD="lint charts/victoria-metrics-single -f hack/vmsingle-lint-hack.yaml" $(MAKE) $(HELM)
 	CMD="lint charts/victoria-metrics-agent -f hack/vmagent-lint-hack.yaml" $(MAKE) $(HELM)
@@ -46,10 +53,11 @@ lint:
 	CMD="lint charts/victoria-metrics-gateway -f hack/vmgateway-cluster-ratelimiting-minimum.yaml" $(MAKE) $(HELM)
 	CMD="lint charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml" $(MAKE) $(HELM)
 	CMD="lint charts/victoria-metrics-anomaly -f hack/vmanomaly-lint-hack.yaml" $(MAKE) $(HELM)
+	CMD="dependency build charts/victoria-logs-single" $(MAKE) $(HELM)
 	CMD="lint charts/victoria-logs-single -f hack/vlsingle-lint-hack.yaml" $(MAKE) $(HELM)
 
 # Run template for helm charts
-template:
+template: helm-repo-update
 	CMD="template charts/victoria-metrics-cluster -f hack/vmcluster-template-hack.yaml" $(MAKE) $(HELM)
 	CMD="template charts/victoria-metrics-single -f hack/vmsingle-lint-hack.yaml" $(MAKE) $(HELM)
 	CMD="template charts/victoria-metrics-agent -f hack/vmagent-lint-hack.yaml" $(MAKE) $(HELM)
@@ -57,6 +65,7 @@ template:
 	CMD="template charts/victoria-metrics-gateway -f hack/vmgateway-cluster-ratelimiting-minimum.yaml" $(MAKE) $(HELM)
 	CMD="template charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml" $(MAKE) $(HELM)
 	CMD="template charts/victoria-metrics-anomaly -f hack/vmanomaly-lint-hack.yaml" $(MAKE) $(HELM)
+	CMD="dependency build charts/victoria-logs-single" $(MAKE) $(HELM)
 	CMD="template charts/victoria-logs-single -f hack/vlsingle-lint-hack.yaml" $(MAKE) $(HELM)
 
 lint-ct:

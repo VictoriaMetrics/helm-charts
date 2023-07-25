@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.8.40](https://img.shields.io/badge/Version-0.8.40-informational?style=flat-square)
+ ![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
@@ -105,7 +105,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[0].static_configs[0].targets[0] | string | `"localhost:8429"` |  |
 | config.scrape_configs[1].bearer_token_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | config.scrape_configs[1].job_name | string | `"kubernetes-apiservers"` |  |
-| config.scrape_configs[1].kubernetes_sd_configs[0].role | string | `"endpointslices"` |  |
+| config.scrape_configs[1].kubernetes_sd_configs[0].role | string | `"endpoints"` |  |
 | config.scrape_configs[1].relabel_configs[0].action | string | `"keep"` |  |
 | config.scrape_configs[1].relabel_configs[0].regex | string | `"default;kubernetes;https"` |  |
 | config.scrape_configs[1].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
@@ -293,6 +293,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` |  |
 | extraLabels | object | `{}` |  |
+| extraObjects | list | `[]` |  |
 | extraScrapeConfigs | list | `[]` | Extra scrape configs that will be appended to `config` |
 | extraVolumeMounts | list | `[]` |  |
 | extraVolumes | list | `[]` |  |
@@ -353,3 +354,4 @@ Change the values according to the need of the environment in ``victoria-metrics
 | statefulset.replicationFactor | int | `1` | replication factor for vmagent in cluster mode |
 | statefulset.updateStrategy | object | `{}` |  |
 | tolerations | list | `[]` |  |
+| topologySpreadConstraints | list | `[]` |  |
