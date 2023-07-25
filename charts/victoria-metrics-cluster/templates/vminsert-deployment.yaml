@@ -52,7 +52,7 @@ spec:
           workingDir: {{ .Values.vminsert.containerWorkingDir }}
           {{- end }}
           securityContext:
-            {{- toYaml .Values.vminsert.podSecurityContext | nindent 12 }}
+            {{- toYaml .Values.vminsert.securityContext | nindent 12 }}
           args:
           {{- if not (or .Values.vminsert.suppresStorageFQDNsRender .Values.vminsert.suppressStorageFQDNsRender) }}
             {{- include "victoria-metrics.vminsert.vmstorage-pod-fqdn" . | nindent 12 }}
@@ -141,7 +141,7 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.vminsert.securityContext }}
+      {{- with .Values.vminsert.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
