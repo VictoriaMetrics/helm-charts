@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.10.0](https://img.shields.io/badge/Version-0.10.0-informational?style=flat-square)
+ ![Version: 0.10.2](https://img.shields.io/badge/Version-0.10.2-informational?style=flat-square)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -134,7 +134,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vminsert component |
 | vminsert.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vminsert.image.repository | string | `"victoriametrics/vminsert"` | Image repository |
-| vminsert.image.tag | string | `"v1.91.3-cluster"` | Image tag |
+| vminsert.image.tag | string | `"v1.92.0-cluster"` | Image tag |
 | vminsert.ingress.annotations | object | `{}` | Ingress annotations |
 | vminsert.ingress.enabled | bool | `false` | Enable deployment of ingress for vminsert component |
 | vminsert.ingress.extraLabels | object | `{}` |  |
@@ -177,7 +177,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vminsert.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vminsert.strategy | object | `{}` |  |
-| vminsert.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs |
+| vminsert.suppressStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs |
 | vminsert.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | vmselect.affinity | object | `{}` | Pod affinity |
 | vmselect.annotations | object | `{}` |  |
@@ -201,7 +201,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vmselect component |
 | vmselect.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmselect.image.repository | string | `"victoriametrics/vmselect"` | Image repository |
-| vmselect.image.tag | string | `"v1.91.3-cluster"` | Image tag |
+| vmselect.image.tag | string | `"v1.92.0-cluster"` | Image tag |
 | vmselect.ingress.annotations | object | `{}` | Ingress annotations |
 | vmselect.ingress.enabled | bool | `false` | Enable deployment of ingress for vmselect component |
 | vmselect.ingress.extraLabels | object | `{}` |  |
@@ -255,7 +255,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.statefulSet.service.labels | object | `{}` | Headless service labels |
 | vmselect.statefulSet.service.servicePort | int | `8481` | Headless service port |
 | vmselect.strategy | object | `{}` |  |
-| vmselect.suppresStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs |
+| vmselect.suppressStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs |
 | vmselect.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | vmselect.topologySpreadConstraints | list | `[]` | Pod topologySpreadConstraints |
 | vmstorage.affinity | object | `{}` | Pod affinity |
@@ -276,7 +276,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.fullnameOverride | string | `nil` | Overrides the full name of vmstorage component |
 | vmstorage.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmstorage.image.repository | string | `"victoriametrics/vmstorage"` | Image repository |
-| vmstorage.image.tag | string | `"v1.91.3-cluster"` | Image tag |
+| vmstorage.image.tag | string | `"v1.92.0-cluster"` | Image tag |
 | vmstorage.initContainers | list | `[]` |  |
 | vmstorage.name | string | `"vmstorage"` | vmstorage container name |
 | vmstorage.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
@@ -335,7 +335,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | vmstorage.vmbackupmanager.extraSecretMounts | list | `[]` |  |
 | vmstorage.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| vmstorage.vmbackupmanager.image.tag | string | `"v1.91.3-enterprise"` | vmbackupmanager image tag |
+| vmstorage.vmbackupmanager.image.tag | string | `"v1.92.0-enterprise"` | vmbackupmanager image tag |
 | vmstorage.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
 | vmstorage.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
 | vmstorage.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |
