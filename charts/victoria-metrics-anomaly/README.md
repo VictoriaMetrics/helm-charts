@@ -126,6 +126,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | image.repository | string | `"us-docker.pkg.dev/victoriametrics-test/public/vmanomaly-trial"` | Victoria Metrics anomaly Docker repository and image name |
 | image.tag | string | `""` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | License key configuration for vmanomaly. See https://docs.victoriametrics.com/vmanomaly.html#licensing Required starting from 1.5.0. |
+| license.key | string | `""` | License key for vmanomaly |
+| license.secret | object | `{"key":"","name":""}` | Use existing secret with license key for vmanomaly |
+| license.secret.key | string | `""` | Key in secret with license key |
+| license.secret.name | string | `""` | Existing secret name |
 | model.enabled | string | `"prophet"` | Available options: zscore, prophet, holt_winters |
 | model.holt_winters.frequency | string | `"1h"` |  |
 | model.holt_winters.seasonality | string | `"1d"` |  |
