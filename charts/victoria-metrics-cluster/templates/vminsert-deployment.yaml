@@ -154,6 +154,10 @@ spec:
       affinity:
       {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.vminsert.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .Values.vminsert.topologySpreadConstraints | indent 8 }}
+      {{- end }}
       {{- with .Values.vminsert.extraVolumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

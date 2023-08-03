@@ -184,6 +184,10 @@ spec:
       affinity:
 {{ toYaml .Values.vmstorage.affinity | indent 8 }}
     {{- end }}
+     {{- if .Values.vmstorage.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .Values.vmstorage.topologySpreadConstraints | indent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.vmstorage.terminationGracePeriodSeconds }}
       volumes:
         {{- with .Values.vmstorage.extraVolumes }}
