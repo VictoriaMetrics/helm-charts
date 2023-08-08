@@ -179,6 +179,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.strategy | object | `{}` |  |
 | vminsert.suppressStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs |
 | vminsert.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
+| vminsert.topologySpreadConstraints | list | `[]` | Pod topologySpreadConstraints |
 | vmselect.affinity | object | `{}` | Pod affinity |
 | vmselect.annotations | object | `{}` |  |
 | vmselect.automountServiceAccountToken | bool | `true` |  |
@@ -286,7 +287,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
 | vmstorage.persistentVolume.labels | object | `{}` | Persistent volume labels |
 | vmstorage.persistentVolume.mountPath | string | `"/storage"` | Data root path. Vmstorage data Persistent Volume mount root path |
-| vmstorage.persistentVolume.size | string | `"8Gi"` | Size of the volume. Better to set the same as resource limit memory property |
+| vmstorage.persistentVolume.size | string | `"8Gi"` | Size of the volume. |
 | vmstorage.persistentVolume.storageClass | string | `""` | Storage class name. Will be empty if not setted |
 | vmstorage.persistentVolume.subPath | string | `""` | Mount subpath |
 | vmstorage.podAnnotations | object | `{}` | Pod's annotations |
@@ -322,6 +323,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vmstorage.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
 | vmstorage.tolerations | list | `[]` | Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) # |
+| vmstorage.topologySpreadConstraints | list | `[]` | Pod topologySpreadConstraints |
 | vmstorage.vmbackupmanager.destination | string | `""` | backup destination at S3, GCS or local filesystem. Pod name will be included to path! |
 | vmstorage.vmbackupmanager.disableDaily | bool | `false` | disable daily backups |
 | vmstorage.vmbackupmanager.disableHourly | bool | `false` | disable hourly backups |
