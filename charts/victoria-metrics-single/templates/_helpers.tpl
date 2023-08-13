@@ -153,7 +153,7 @@ Return if ingress supports pathType.
     {{- range $key, $value := .Values.server.vmbackupmanager.extraArgs }}
     - --{{ $key }}={{ $value }}
     {{- end }}
-  {{- with  .Values.server.podSecurityContext }}
+  {{- with  .Values.server.securityContext }}
   securityContext: {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- with .Values.server.vmbackupmanager.resources }}

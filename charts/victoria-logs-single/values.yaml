@@ -168,17 +168,17 @@ server:
 
   # -- Security context to be added to server pods
   securityContext:
-    fsGroup: 2000
-
-  # -- Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    readOnlyRootFilesystem: true
     allowPrivilegeEscalation: false
     capabilities:
       drop:
         - ALL
+    readOnlyRootFilesystem: true
+
+  # -- Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  podSecurityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
 
   ingress:
     # -- Enable deployment of ingress for server component

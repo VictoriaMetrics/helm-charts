@@ -51,7 +51,7 @@ spec:
           workingDir: {{ .Values.vmstorage.containerWorkingDir }}
           {{- end }}
           securityContext:
-            {{- toYaml .Values.vmstorage.podSecurityContext | nindent 12 }}
+            {{- toYaml .Values.vmstorage.securityContext | nindent 12 }}
           args:
             - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.vmstorage.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
@@ -106,7 +106,7 @@ spec:
         - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
           image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
           imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
-          {{- with .Values.vmstorage.podSecurityContext }}
+          {{- with .Values.vmstorage.securityContext }}
           securityContext:
             {{- toYaml .  | nindent 12 }}
           {{- end }}
@@ -171,9 +171,9 @@ spec:
       nodeSelector:
 {{ toYaml .Values.vmstorage.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.vmstorage.securityContext }}
+    {{- if .Values.vmstorage.podSecurityContext }}
       securityContext:
-{{ toYaml .Values.vmstorage.securityContext | indent 8 }}
+{{ toYaml .Values.vmstorage.podSecurityContext | indent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.vmstorage.tolerations }}
@@ -184,6 +184,10 @@ spec:
       affinity:
 {{ toYaml .Values.vmstorage.affinity | indent 8 }}
     {{- end }}
+     {{- if .Values.vmstorage.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .Values.vmstorage.topologySpreadConstraints | indent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.vmstorage.terminationGracePeriodSeconds }}
       volumes:
         {{- with .Values.vmstorage.extraVolumes }}
