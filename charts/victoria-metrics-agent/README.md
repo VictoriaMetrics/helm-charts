@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square)
+ ![Version: 0.9.3](https://img.shields.io/badge/Version-0.9.3-informational?style=flat-square)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
