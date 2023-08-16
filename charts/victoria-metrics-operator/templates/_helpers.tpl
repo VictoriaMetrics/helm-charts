@@ -43,11 +43,18 @@ Create the name of the service account
 {{- end -}}
 
 {{/*
+Selector labels
+*/}}
+{{- define "vm-operator.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "vm-operator.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{/*
 Create unified labels for vm-operator components
 */}}
 {{- define "vm-operator.labels" -}}
-app.kubernetes.io/name: {{ include "vm-operator.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{- include "vm-operator.selectorLabels" . }}
 helm.sh/chart: {{ include "vm-operator.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}

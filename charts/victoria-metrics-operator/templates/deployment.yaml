@@ -19,8 +19,7 @@ spec:
   replicas: {{.Values.replicaCount}}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "vm-operator.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "vm-operator.selectorLabels" . | nindent 6 }}
   template:
     metadata:
 {{- with .Values.annotations }}
@@ -28,11 +27,10 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
       labels:
-        app.kubernetes.io/name: {{ include "vm-operator.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-{{- with .Values.podLabels }}
-{{ toYaml . | indent 8 }}
-{{- end }}
+        {{- include "vm-operator.selectorLabels" . | nindent 8}}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -126,6 +124,17 @@ spec:
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range $constraint := .Values.topologySpreadConstraints }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+          {{- if not $constraint.labelSelector }}
+          labelSelector:
+            matchLabels:
+              {{- include "vm-operator.selectorLabels" $ | nindent 14 }}
+          {{- end }}
+        {{- end }}
     {{- end }}
     {{- with .Values.tolerations }}
       tolerations:
