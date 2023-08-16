@@ -182,5 +182,5 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | serviceMonitor | object | `{"annotations":{},"enabled":false,"extraLabels":{},"relabelings":[]}` | configures monitoring with serviceScrape. VMServiceScrape must be pre-installed |
 | tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
-| topologySpreadConstraints | object | `{}` | Pod Topology Spread Constraints. Ref: [https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
+| topologySpreadConstraints | list | `[]` | Pod Topology Spread Constraints. Ref: [https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
 | watchNamespace | string | `""` |  |
