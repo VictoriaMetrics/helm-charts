@@ -1,14 +1,16 @@
 # Helm Chart For Victoria Metrics Alert.
 
  ![Version: 0.7.3](https://img.shields.io/badge/Version-0.7.3-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
+[![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
-# Prerequisites
+## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
 
-# How to install
+## How to install
 
 Access a Kubernetes cluster.
 
@@ -21,8 +23,6 @@ helm repo update
 ```
 
 List versions of ``vm/victoria-metrics-alert`` chart available to installation:
-
-##### for helm v3
 
 ```console
 helm search repo vm/victoria-metrics-alert -l
@@ -43,8 +43,6 @@ helm install vmalert vm/victoria-metrics-alert -f values.yaml -n NAMESPACE --deb
 ```
 
 Install chart with command:
-
-##### for helm v3
 
 ```console
 helm install vmalert vm/victoria-metrics-alert -f values.yaml -n NAMESPACE
@@ -75,7 +73,7 @@ To enable the HA configuration, you can use:
 - [VictoriaMetrics Operator](https://docs.victoriametrics.com/operator/VictoriaMetrics-Operator.html)
 - official [Alertmanager Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager)
 
-# How to uninstall
+## How to uninstall
 
 Remove application with command.
 
@@ -83,7 +81,7 @@ Remove application with command.
 helm uninstall vmalert -n NAMESPACE
 ```
 
-# Documentation of Helm Chart
+## Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
 
@@ -97,7 +95,7 @@ helm-docs
 
 The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-# Parameters
+## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
 

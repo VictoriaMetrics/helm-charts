@@ -80,29 +80,32 @@ lint-local:
 template-local:
 	HELM="helm-local" $(MAKE) template
 
-package-chart:
-	if [ "$(CHART)" = "victoria-metrics-k8s-stack" ]; then \
-		CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM); \
-    fi; \
-    if [ "$(CHART)" = "victoria-logs-single" ]; then \
-		CMD="dependency update charts/victoria-logs-single" $(MAKE) $(HELM); \
-    fi; \
-	CMD="package charts/$(CHART) -d packages" $(MAKE) $(HELM); \
-
-package-new-chart-version:
-	@VERSION=$$(grep -m 1 -o 'version: .*' charts/"$$CHART"/Chart.yaml | cut -d ' ' -f 2); \
-	FILENAME="packages/$$CHART-$$VERSION.tgz"; \
-	if ! test -f "$$FILENAME"; then \
-		$(MAKE) package-chart CHART=$$CHART; \
-	else \
-		echo "No need to package $$FILENAME already exists"; \
-	fi
-
+# DEPRECATED: use release action instead
+#package-chart:
+#	if [ "$(CHART)" = "victoria-metrics-k8s-stack" ]; then \
+#		CMD="dependency update charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM); \
+#    fi; \
+#    if [ "$(CHART)" = "victoria-logs-single" ]; then \
+#		CMD="dependency update charts/victoria-logs-single" $(MAKE) $(HELM); \
+#    fi; \
+#	CMD="package charts/$(CHART) -d packages" $(MAKE) $(HELM); \
+#
+# DEPRECATED: use release action instead
+#package-new-chart-version:
+#	@VERSION=$$(grep -m 1 -o 'version: .*' charts/"$$CHART"/Chart.yaml | cut -d ' ' -f 2); \
+#	FILENAME="packages/$$CHART-$$VERSION.tgz"; \
+#	if ! test -f "$$FILENAME"; then \
+#		$(MAKE) package-chart CHART=$$CHART; \
+#	else \
+#		echo "No need to package $$FILENAME already exists"; \
+#	fi
+#
+# DEPRECATED: use release action instead
 # Package chart into zip file
-package:
-	@for CHART in $$(ls charts/); do \
-  		$(MAKE) package-new-chart-version CHART=$$CHART; \
-	done
+#package:
+#	@for CHART in $$(ls charts/); do \
+#  		$(MAKE) package-new-chart-version CHART=$$CHART; \
+#	done
 
 # Create index file (use only for initial setup)
 #index:
@@ -113,9 +116,10 @@ init:
 	CMD="repo add grafana https://grafana.github.io/helm-charts" $(MAKE) $(HELM)
 	CMD="repo update" $(MAKE) $(HELM)
 
+# DEPRECATED: use release action instead
 # Update index file add new version of package into it
-merge:
-	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) $(HELM)
+#merge:
+#	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) $(HELM)
 
 gen-docs:
 	docker run --rm --name helm-docs  \

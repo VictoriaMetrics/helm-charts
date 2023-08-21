@@ -1,16 +1,16 @@
 # Helm Chart For Victoria Metrics Operator.
 
 {{ template "chart.typeBadge" . }} {{ template "chart.versionBadge" . }}
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-operator)
 
 {{ template "chart.description" . }}
 
-# Prerequisites
+## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
-
 * PV support on underlying infrastructure.
 
-# Upgrade guide
+## Upgrade guide
 
  During release an issue with helm CRD was discovered. So for upgrade from version less then 0.1.3 you have to two options:
  1) use helm management for CRD, enabled by default.
@@ -19,11 +19,14 @@
 If you choose helm management, following steps must be done before upgrade:
 
 1) define namespace and helm release name variables
+
 ```
 export NAMESPACE=default
 export RELEASE_NAME=operator
 ```
+
 execute kubectl commands:
+
 ```
 kubectl get crd  | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl label crd {} app.kubernetes.io/managed-by=Helm --overwrite
 kubectl get crd  | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl annotate crd {} meta.helm.sh/release-namespace="$NAMESPACE" meta.helm.sh/release-name="$RELEASE_NAME"  --overwrite
@@ -31,13 +34,13 @@ kubectl get crd  | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubec
 
 run helm upgrade command.
 
-# Chart Details
+## Chart Details
 
 This chart will do the following:
 
 * Rollout victoria metrics operator
 
-# How to install
+## How to install
 
 Access a Kubernetes cluster.
 
@@ -50,8 +53,6 @@ helm repo update
 ```
 
 List versions of ``vm/victoria-metrics-operator`` chart available to installation:
-
-##### for helm v3
 
 ```console
 helm search repo vm/victoria-metrics-operator -l
@@ -72,8 +73,6 @@ helm install vmoperator vm/victoria-metrics-operator -f values.yaml -n NAMESPACE
 ```
 
 Install chart with command:
-
-##### for helm v3
 
 ```console
 helm install vmoperator vm/victoria-metrics-operator -f values.yaml -n NAMESPACE
@@ -97,7 +96,7 @@ See the history of versions of ``vmoperator`` application with command.
 helm history vmoperator -n NAMESPACE
 ```
 
-# How to uninstall
+## How to uninstall
 
 Remove application with command.
 
@@ -105,7 +104,7 @@ Remove application with command.
 helm uninstall vmoperator -n NAMESPACE
 ```
 
-# Validation webhook
+## Validation webhook
 
   Its possible to use validation of created resources with operator. For now, you need cert-manager to easily certificate management https://cert-manager.io/docs/
 
@@ -118,7 +117,7 @@ admissionWebhooks:
     enabled: true
 ```
 
-# Documentation of Helm Chart
+## Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
 
@@ -132,7 +131,7 @@ helm-docs
 
 The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-# Parameters
+## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
 
