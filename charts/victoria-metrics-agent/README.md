@@ -129,6 +129,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[2].tls_config.ca_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | config.scrape_configs[2].tls_config.insecure_skip_verify | bool | `true` |  |
 | config.scrape_configs[3].bearer_token_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| config.scrape_configs[3].honorTimestamps | bool | `false` |  |
 | config.scrape_configs[3].job_name | string | `"kubernetes-nodes-cadvisor"` |  |
 | config.scrape_configs[3].kubernetes_sd_configs[0].role | string | `"node"` |  |
 | config.scrape_configs[3].relabel_configs[0].action | string | `"labelmap"` |  |

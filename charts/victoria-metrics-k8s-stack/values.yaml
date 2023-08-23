@@ -790,7 +790,9 @@ kubelet:
         targetLabel: metrics_path
       - targetLabel: "job"
         replacement: "kubelet"
-
+    # ignore timestamps of cadvisor's metrics by default
+    # more info here https://github.com/VictoriaMetrics/VictoriaMetrics/issues/4697#issuecomment-1656540535
+    honorTimestamps: false
 # -- Component scraping the kube api server
 kubeApiServer:
   enabled: true
