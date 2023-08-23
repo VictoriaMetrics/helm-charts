@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 0.3.5](https://img.shields.io/badge/Version-0.3.5-informational?style=flat-square)
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-anomaly)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
@@ -123,6 +123,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | image.repository | string | `"us-docker.pkg.dev/victoriametrics-test/public/vmanomaly-trial"` | Victoria Metrics anomaly Docker repository and image name |
 | image.tag | string | `""` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | License key configuration for vmanomaly. See https://docs.victoriametrics.com/vmanomaly.html#licensing Required starting from v1.5.0. |
+| license.key | string | `""` | License key for vmanomaly |
+| license.secret | object | `{"key":"","name":""}` | Use existing secret with license key for vmanomaly |
+| license.secret.key | string | `""` | Key in secret with license key |
+| license.secret.name | string | `""` | Existing secret name |
 | model.enabled | string | `"prophet"` | Available options: zscore, prophet, holt_winters |
 | model.holt_winters.frequency | string | `"1h"` |  |
 | model.holt_winters.seasonality | string | `"1d"` |  |
