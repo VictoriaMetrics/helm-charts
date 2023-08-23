@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.17.4](https://img.shields.io/badge/Version-0.17.4-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.17.5](https://img.shields.io/badge/Version-0.17.5-informational?style=flat-square)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -348,6 +348,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.templateFiles | object | `{}` |  |
 | argocdReleaseOverride | string | `""` | For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
 | coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}]}}` | Component scraping coreDns. Use either this or kubeDns |
+| crds.enabled | bool | `true` |  |
 | defaultDashboardsEnabled | bool | `true` |  |
 | defaultRules.additionalRuleLabels | object | `{}` | Additional labels for PrometheusRule alerts |
 | defaultRules.annotations | object | `{}` | Annotations for default rules |
@@ -464,6 +465,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubelet.probes | bool | `true` | Enable scraping /metrics/probes from kubelet's service |
 | kubelet.spec.bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubelet.spec.honorLabels | bool | `true` |  |
+| kubelet.spec.honorTimestamps | bool | `false` |  |
 | kubelet.spec.interval | string | `"30s"` |  |
 | kubelet.spec.metricRelabelConfigs[0].action | string | `"labeldrop"` |  |
 | kubelet.spec.metricRelabelConfigs[0].regex | string | `"(uid)"` |  |
@@ -513,7 +515,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.ingress.tls | list | `[]` |  |
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
-| vmagent.spec.image.tag | string | `"v1.93.0"` |  |
+| vmagent.spec.image.tag | string | `"v1.93.1"` |  |
 | vmagent.spec.scrapeInterval | string | `"25s"` |  |
 | vmagent.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.annotations | object | `{}` |  |
@@ -529,7 +531,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.remoteWriteVMAgent | bool | `false` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
 | vmalert.spec.externalLabels | object | `{}` |  |
-| vmalert.spec.image.tag | string | `"v1.93.0"` |  |
+| vmalert.spec.image.tag | string | `"v1.93.1"` |  |
 | vmalert.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.templateFiles | object | `{}` |  |
 | vmcluster.annotations | object | `{}` |  |
@@ -561,18 +563,18 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.spec.replicationFactor | int | `2` |  |
 | vmcluster.spec.retentionPeriod | string | `"14"` |  |
 | vmcluster.spec.vminsert.extraArgs | object | `{}` |  |
-| vmcluster.spec.vminsert.image.tag | string | `"v1.93.0-cluster"` |  |
+| vmcluster.spec.vminsert.image.tag | string | `"v1.93.1-cluster"` |  |
 | vmcluster.spec.vminsert.replicaCount | int | `2` |  |
 | vmcluster.spec.vminsert.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.cacheMountPath | string | `"/select-cache"` |  |
 | vmcluster.spec.vmselect.extraArgs | object | `{}` |  |
-| vmcluster.spec.vmselect.image.tag | string | `"v1.93.0-cluster"` |  |
+| vmcluster.spec.vmselect.image.tag | string | `"v1.93.1-cluster"` |  |
 | vmcluster.spec.vmselect.replicaCount | int | `2` |  |
 | vmcluster.spec.vmselect.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"2Gi"` |  |
-| vmcluster.spec.vmstorage.image.tag | string | `"v1.93.0-cluster"` |  |
+| vmcluster.spec.vmstorage.image.tag | string | `"v1.93.1-cluster"` |  |
 | vmcluster.spec.vmstorage.replicaCount | int | `2` |  |
 | vmcluster.spec.vmstorage.resources | object | `{}` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.93.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.93.1"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |

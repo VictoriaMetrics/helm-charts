@@ -110,7 +110,7 @@ vmsingle:
   # https://docs.victoriametrics.com/operator/api.html#vmsinglespec
   spec:
     image:
-      tag: v1.93.0
+      tag: v1.93.1
     retentionPeriod: "14"
     replicaCount: 1
     extraArgs: {}
@@ -166,7 +166,7 @@ vmcluster:
     replicationFactor: 2
     vmstorage:
       image:
-        tag: v1.93.0-cluster
+        tag: v1.93.1-cluster
       replicaCount: 2
       storageDataPath: "/vm-data"
       storage:
@@ -182,7 +182,7 @@ vmcluster:
         #   memory: 1500Mi
     vmselect:
       image:
-        tag: v1.93.0-cluster
+        tag: v1.93.1-cluster
       replicaCount: 2
       cacheMountPath: "/select-cache"
       extraArgs: {}
@@ -202,7 +202,7 @@ vmcluster:
         #   memory: "500Mi"
     vminsert:
       image:
-        tag: v1.93.0-cluster
+        tag: v1.93.1-cluster
       replicaCount: 2
       extraArgs: {}
       resources:
@@ -501,7 +501,7 @@ vmalert:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.93.0
+      tag: v1.93.1
     evaluationInterval: 15s
 
     # External labels to add to all generated recording rules and alerts
@@ -565,7 +565,7 @@ vmagent:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.93.0
+      tag: v1.93.1
     scrapeInterval: 20s
     externalLabels:
       cluster: cluster-name
@@ -790,7 +790,9 @@ kubelet:
         targetLabel: metrics_path
       - targetLabel: "job"
         replacement: "kubelet"
-
+    # ignore timestamps of cadvisor's metrics by default
+    # more info here https://github.com/VictoriaMetrics/VictoriaMetrics/issues/4697#issuecomment-1656540535
+    honorTimestamps: false
 # -- Component scraping the kube api server
 kubeApiServer:
   enabled: true
