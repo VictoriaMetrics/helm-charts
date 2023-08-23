@@ -1,14 +1,16 @@
 # Helm Chart For Victoria Metrics Agent.
 
  ![Version: 0.9.4](https://img.shields.io/badge/Version-0.9.4-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-agent)
+[![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
-# Prerequisites
+## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
 
-# How to install
+## How to install
 
 Access a Kubernetes cluster.
 
@@ -21,8 +23,6 @@ helm repo update
 ```
 
 List versions of ``vm/victoria-metrics-agent`` chart available to installation:
-
-##### for helm v3
 
 ```console
 helm search repo vm/victoria-metrics-agent -l
@@ -43,8 +43,6 @@ helm install vmagent vm/victoria-metrics-agent -f values.yaml -n NAMESPACE --deb
 ```
 
 Install chart with command:
-
-##### for helm v3
 
 ```console
 helm install vmagent vm/victoria-metrics-agent -f values.yaml -n NAMESPACE
@@ -68,7 +66,7 @@ See the history of versions of ``vmagent`` application with command.
 helm history vmagent -n NAMESPACE
 ```
 
-# How to uninstall
+## How to uninstall
 
 Remove application with command.
 
@@ -76,7 +74,7 @@ Remove application with command.
 helm uninstall vmagent -n NAMESPACE
 ```
 
-# Documentation of Helm Chart
+## Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
 
@@ -90,7 +88,7 @@ helm-docs
 
 The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-# Parameters
+## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
 
@@ -129,6 +127,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[2].tls_config.ca_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | config.scrape_configs[2].tls_config.insecure_skip_verify | bool | `true` |  |
 | config.scrape_configs[3].bearer_token_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| config.scrape_configs[3].honorTimestamps | bool | `false` |  |
 | config.scrape_configs[3].job_name | string | `"kubernetes-nodes-cadvisor"` |  |
 | config.scrape_configs[3].kubernetes_sd_configs[0].role | string | `"node"` |  |
 | config.scrape_configs[3].relabel_configs[0].action | string | `"labelmap"` |  |

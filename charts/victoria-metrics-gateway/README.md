@@ -1,6 +1,8 @@
 # Victoria Metrics Helm Chart for vmgateway
 
  ![Version: 0.1.43](https://img.shields.io/badge/Version-0.1.43-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-gateway)
+[![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
 Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
 
@@ -13,19 +15,18 @@ Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
 * [How to use JWT signature verification](#how-to-use-jwt-signature-verification)
 * [Documentation of Helm Chart](#documentation-of-helm-chart)
 
-# Prerequisites
+## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
-
 * PV support on underlying infrastructure
 
-# Chart Details
+## Chart Details
 
 This chart will do the following:
 
 * Rollout victoria metrics gateway
 
-# How to install
+## How to install
 
 Access a Kubernetes cluster.
 
@@ -38,8 +39,6 @@ helm repo update
 ```
 
 List versions of ``vm/victoria-metrics-gateway`` chart available to installation:
-
-##### for helm v3
 
 ```console
 helm search repo vm/victoria-metrics-gateway -l
@@ -60,8 +59,6 @@ helm install vmgateway vm/victoria-metrics-gateway -f values.yaml -n NAMESPACE -
 ```
 
 Install chart with command:
-
-##### for helm v3
 
 ```console
 helm install vmgateway vm/victoria-metrics-gateway -f values.yaml -n NAMESPACE
@@ -85,7 +82,7 @@ See the history of versions of ``vmgateway`` application with command.
 helm history vmgateway -n NAMESPACE
 ```
 
-# How to uninstall
+## How to uninstall
 
 Remove application with command.
 
@@ -144,7 +141,7 @@ extraArgs:
 Note that in this configuration all secret keys will be mounted and accessible to pod.
 Please, refer to [this](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#secretvolumesource-v1-core) doc to see all available secret source options.
 
-# Documentation of Helm Chart
+## Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
 
@@ -158,7 +155,7 @@ helm-docs
 
 The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-# Parameters
+## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
 
