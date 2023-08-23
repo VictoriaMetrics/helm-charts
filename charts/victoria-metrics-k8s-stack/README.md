@@ -465,6 +465,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubelet.probes | bool | `true` | Enable scraping /metrics/probes from kubelet's service |
 | kubelet.spec.bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubelet.spec.honorLabels | bool | `true` |  |
+| kubelet.spec.honorTimestamps | bool | `false` |  |
 | kubelet.spec.interval | string | `"30s"` |  |
 | kubelet.spec.metricRelabelConfigs[0].action | string | `"labeldrop"` |  |
 | kubelet.spec.metricRelabelConfigs[0].regex | string | `"(uid)"` |  |
