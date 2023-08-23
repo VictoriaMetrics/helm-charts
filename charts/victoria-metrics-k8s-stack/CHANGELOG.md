@@ -9,6 +9,15 @@
 
 - TODO
 
+## 0.17.5
+
+**Release date:** 2023-08-23
+
+![AppVersion: v1.93.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+* Update VictoriaMetrics components from v1.93.0 to v1.93.1
+
 ## 0.17.4 
 
 **Release date:** 2023-08-12

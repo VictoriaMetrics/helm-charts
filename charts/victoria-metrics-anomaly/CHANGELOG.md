@@ -9,6 +9,15 @@
 
 - TODO
 
+## 0.4.0
+
+**Release date:** 2023-08-21
+
+![AppVersion: v1.93.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+* add ability to provide license key
+
 ## 0.3.5 
 
 **Release date:** 2023-06-22
