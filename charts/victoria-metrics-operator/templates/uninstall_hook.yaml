@@ -3,26 +3,25 @@
 "helm.sh/hook-weight": "-5"
 "helm.sh/hook-delete-policy": hook-succeeded
 {{- end }}
-{{- if (index .Values "victoria-metrics-operator" "enabled") }}
-{{- if (index .Values "victoria-metrics-operator" "cleanupCRD") }}
+{{- if .Values.cleanupCRD }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+  name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
-  labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+  labels: {{ include "vm-operator.labels" . | nindent 4 }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 spec:
   template:
     metadata:
       name: "{{ .Release.Name }}"
-      labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 8 }}
+      labels: {{ include "vm-operator.labels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+      serviceAccountName: {{ include "vm-operator.cleanupHookName" . }}
       containers:
         - name: kubectl
-          image: "{{ (index .Values "victoria-metrics-operator" "cleanupImage" "repository") }}:{{ (index .Values "victoria-metrics-operator" "cleanupImage" "tag") }}"
-          imagePullPolicy: "{{ (index .Values "victoria-metrics-operator" "cleanupImage" "pullPolicy") }}"
+          image: "{{ (index .Values "cleanupImage" "repository") }}:{{ (index .Values "cleanupImage" "tag") }}"
+          imagePullPolicy: "{{ (index .Values "cleanupImage" "pullPolicy") }}"
           resources:
             limits:
               cpu: "500m"
@@ -56,33 +55,33 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+  name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
-  labels: {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+  labels: {{- include "vm-operator.labels" . | nindent 4 }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+  name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
-  labels: {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+  labels: {{- include "vm-operator.labels" . | nindent 4 }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+  name: {{ include "vm-operator.cleanupHookName" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+    name: {{ include "vm-operator.cleanupHookName" . }}
     namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.cleanupHookName" . }}
+  name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
-  labels: {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+  labels: {{- include "vm-operator.labels" . | nindent 4 }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 rules:
   - apiGroups: ["operator.victoriametrics.com"]
@@ -95,4 +94,4 @@ rules:
     verbs: ["get", "list", "watch","delete"]
 ---
 {{- end }}
-{{- end }}
+

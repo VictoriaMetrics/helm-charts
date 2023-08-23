@@ -13,6 +13,13 @@ image:
 # -- with this option, if you remove this chart, all crd resources will be deleted with it.
 createCRD: true
 
+# -- Tells helm to clean up vm cr resources when uninstalling
+cleanupCRD: false
+cleanupImage:
+  repository: gcr.io/google_containers/hyperkube
+  tag: v1.18.0
+  pullPolicy: IfNotPresent
+
 replicaCount: 1
 
 # -- Secret to pull images
@@ -59,7 +66,7 @@ operator:
   useCustomConfigReloader: false
 
 # By default, the operator will watch all the namespaces
-# If you want to override this behavior, specify the namespace. 
+# If you want to override this behavior, specify the namespace.
 # Operator supports only single namespace for watching.
 watchNamespace: ""
 

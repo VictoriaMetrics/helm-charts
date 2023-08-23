@@ -7,6 +7,7 @@
 ![AppVersion: **APP_VERSION**](https://img.shields.io/static/v1?label=AppVersion&message=**APP_VERSION**&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
+* Move `cleanupCRD` option to victoria-metrics-operator chart (#593)
 * Disable `honorTimestamps` for cadvisor scrape job by default (#617)
 
 ## 0.17.5

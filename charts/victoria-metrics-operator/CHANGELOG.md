@@ -8,8 +8,9 @@
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
 * Added `topologySpreadConstraints` for the operator + a small refactoring (#611) 
-* fix vm operator appVersion (#589) 
+* Fix vm operator appVersion (#589)
 * Fixes operator doc description
+* Add `cleanupCRD` option to clean up vm cr resources when uninstalling (#593)
 
 ## 0.24.1 
 
