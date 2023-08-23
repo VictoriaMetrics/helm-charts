@@ -1,0 +1,55 @@
+name: "Update docs"
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'README.md'
+      - 'charts/**/README.md'
+      - 'charts/**/README.md.gotmpl'
+      - '**/README.md'
+      - '**/README.md.gotmpl'
+      - '.github/workflows/update-docs.yaml'
+
+jobs:
+  publish-readme:
+    permissions:
+      contents: write
+      id-token: write
+
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: Generate docs
+        run:
+          make gen-docs
+
+      - name: Copy docs
+        run: |
+          cp -f README.md ${{ runner.temp }}/README.md
+          for readme in $(find charts/*/README.md)
+          do
+            mkdir -p $(dirname ${{ runner.temp }}/$readme)
+            cp -f $readme ${{ runner.temp }}/$readme
+          done
+      - name: Checkout to pages
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+
+      - name: Synchronize docs
+        run: |
+          cp -f ${{ runner.temp }}/README.md .
+          cp -fr ${{ runner.temp }}/charts ./
+          git add README.md
+          git add charts/*/README.md
+          git commit --signoff -m "Synchronize docs"
+          git push
