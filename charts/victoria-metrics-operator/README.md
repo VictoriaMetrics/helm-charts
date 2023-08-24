@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.24.1](https://img.shields.io/badge/Version-0.24.1-informational?style=flat-square)
+ ![Version: 0.25.0](https://img.shields.io/badge/Version-0.25.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-operator)
 
 Victoria Metrics Operator
@@ -147,6 +147,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | admissionWebhooks.policy | string | `"Fail"` | What to do in case, when operator not available to validate request. |
 | affinity | object | `{}` | Pod affinity |
 | annotations | object | `{}` | Annotations to be added to the all resources |
+| cleanupCRD | bool | `false` | Tells helm to clean up vm cr resources when uninstalling |
+| cleanupImage.pullPolicy | string | `"IfNotPresent"` |  |
+| cleanupImage.repository | string | `"gcr.io/google_containers/hyperkube"` |  |
+| cleanupImage.tag | string | `"v1.18.0"` |  |
 | createCRD | bool | `true` | with this option, if you remove this chart, all crd resources will be deleted with it. |
 | env | list | `[]` | extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD) |
 | extraArgs | object | `{}` | operator container additional commandline arguments |
@@ -158,7 +162,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.35.1"` | Image tag |
+| image.tag | string | `"v0.36.0"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
 | logLevel | string | `"info"` | possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name override |
