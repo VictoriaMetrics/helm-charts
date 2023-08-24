@@ -2,12 +2,12 @@
 
 ## Next Release
 
-**Release date:** 2023-08-24
+**Release date:** TBD
 
-![AppVersion: v1.93.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.1&color=success&logo=)
+![AppVersion: **APP_VERSION**](https://img.shields.io/static/v1?label=AppVersion&message=**APP_VERSION**&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifacthub-repo.yml charts hack index.yaml packages Disable `honorTimestamps` for cadvisor scrape job by default (#617)
+* Disable `honorTimestamps` for cadvisor scrape job by default (#617)
 
 ## 0.9.4
 
@@ -16,44 +16,44 @@ CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifact
 ![AppVersion: v1.93.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifacthub-repo.yml charts hack index.yaml packages Update VictoriaMetrics components from v1.93.0 to v1.93.1
+* Update VictoriaMetrics components from v1.93.0 to v1.93.1
 
-## 0.9.3
+## 0.9.3 
 
 **Release date:** 2023-08-12
 
 ![AppVersion: v1.93.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifacthub-repo.yml charts hack index.yaml packages Update VictoriaMetrics components from v1.92.1 to v1.93.0
+* Update VictoriaMetrics components from v1.92.1 to v1.93.0
 
-## 0.9.2
+## 0.9.2 
 
 **Release date:** 2023-07-28
 
 ![AppVersion: v1.92.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.92.1&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifacthub-repo.yml charts hack index.yaml packages Update VictoriaMetrics components from v1.92.0 to v1.92.1 (#599)
+* Update VictoriaMetrics components from v1.92.0 to v1.92.1 (#599) 
 
-## 0.9.1
+## 0.9.1 
 
 **Release date:** 2023-07-27
 
 ![AppVersion: v1.92.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.92.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifacthub-repo.yml charts hack index.yaml packages Update VictoriaMetrics components from v1.91.3 to v1.92.0
-CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifacthub-repo.yml charts hack index.yaml packages make package merge gen-docs
+* Update VictoriaMetrics components from v1.91.3 to v1.92.0 
+* make package merge gen-docs
 
-## 0.9.0
+## 0.9.0 
 
 **Release date:** 2023-07-13
 
 ![AppVersion: v1.91.3](https://img.shields.io/static/v1?label=AppVersion&message=v1.91.3&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifacthub-repo.yml charts hack index.yaml packages bump version of agent, alert, auth, cluster, single
-CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifacthub-repo.yml charts hack index.yaml packages feat(vmagent): Add support for topologySpreadConstraints field (#583)
-CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifacthub-repo.yml charts hack index.yaml packages Feat: Add custom objects to vma helm charts (#558)
-CHANGELOG.md CONTRIBUTING.md LICENSE Makefile README.md REQUIREMENTS.md artifacthub-repo.yml charts hack index.yaml packages fix(vmagent): Use endpoints instead of endpointslices on kubernetes-apiservers (#574)
+* bump version of agent, alert, auth, cluster, single 
+* feat(vmagent): Add support for topologySpreadConstraints field (#583) 
+* Feat: Add custom objects to vma helm charts (#558) 
+* fix(vmagent): Use endpoints instead of endpointslices on kubernetes-apiservers (#574)
