@@ -500,7 +500,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
 | tenant | string | `"0"` |  |
 | victoria-metrics-operator | object | `{"cleanupCRD":true,"cleanupImage":{"pullPolicy":"IfNotPresent","repository":"gcr.io/google_containers/hyperkube","tag":"v1.18.0"},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":true}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars.html |
-| victoria-metrics-operator.cleanupCRD | bool | `true` | Tells helm to remove CRD after chart remove |
+| victoria-metrics-operator.cleanupCRD | bool | `true` | Tells helm to clean up vm cr resources when uninstalling  |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.additionalRemoteWrites | list | `[]` |  |
 | vmagent.annotations | object | `{}` |  |
@@ -516,7 +516,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
 | vmagent.spec.image.tag | string | `"v1.93.1"` |  |
-| vmagent.spec.scrapeInterval | string | `"25s"` |  |
+| vmagent.spec.scrapeInterval | string | `"20s"` |  |
 | vmagent.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.annotations | object | `{}` |  |
 | vmalert.enabled | bool | `true` |  |
