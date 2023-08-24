@@ -1,10 +1,19 @@
 # CHANGELOG for `victoria-metrics-agent` helm-chart
 
-## Next Release
+## Next release
 
 **Release date:** TBD
 
 ![AppVersion: **APP_VERSION**](https://img.shields.io/static/v1?label=AppVersion&message=**APP_VERSION**&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- TODO
+
+## 0.9.5
+
+**Release date:** 2023-08-24
+
+![AppVersion: v1.93.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.1&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
 * Disable `honorTimestamps` for cadvisor scrape job by default (#617)

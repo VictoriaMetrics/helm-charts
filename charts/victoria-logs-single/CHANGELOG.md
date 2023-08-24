@@ -1,6 +1,6 @@
 # CHANGELOG for `victoria-logs-single` helm-chart
 
-## Next Release 
+## Next release
 
 **Release date:** TBD
 

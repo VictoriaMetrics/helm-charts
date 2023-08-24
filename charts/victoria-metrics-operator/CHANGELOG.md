@@ -7,7 +7,16 @@
 ![AppVersion: **APP_VERSION**](https://img.shields.io/static/v1?label=AppVersion&message=**APP_VERSION**&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-* Added `topologySpreadConstraints` for the operator + a small refactoring (#611) 
+- TODO
+
+## 0.25.0
+
+**Release date:** 2023-08-24
+
+![AppVersion: 0.36.0](https://img.shields.io/static/v1?label=AppVersion&message=0.36.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+* Added `topologySpreadConstraints` for the operator + a small refactoring (#611)
 * Fix vm operator appVersion (#589)
 * Fixes operator doc description
 * Add `cleanupCRD` option to clean up vm cr resources when uninstalling (#593)

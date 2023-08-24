@@ -1,6 +1,6 @@
 # CHANGELOG for `victoria-metrics-anomaly` helm-chart
 
-## Next Release
+## Next release
 
 **Release date:** TBD
 
