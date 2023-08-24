@@ -11,6 +11,7 @@
 * Fix vm operator appVersion (#589)
 * Fixes operator doc description
 * Add `cleanupCRD` option to clean up vm cr resources when uninstalling (#593)
+* Bump operator version to [v0.36.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.36.0)
 
 ## 0.24.1 
 
