@@ -1,6 +1,6 @@
 # CHANGELOG for `victoria-metrics-gateway` helm-chart
 
-## Next Release
+## Next release
 
 **Release date:** TBD
 
