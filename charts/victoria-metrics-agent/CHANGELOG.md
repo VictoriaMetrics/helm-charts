@@ -7,7 +7,7 @@
 ![AppVersion: **APP_VERSION**](https://img.shields.io/static/v1?label=AppVersion&message=**APP_VERSION**&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-- TODO
+* fix `honor_timestamps` field for cadvisor scrape job (#626)
 
 ## 0.9.5
 
