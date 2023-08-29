@@ -9,6 +9,7 @@
 
 * Move `cleanupCRD` option to victoria-metrics-operator chart (#593)
 * Disable `honorTimestamps` for cadvisor scrape job by default (#617)
+* Add `grafanaOperatorDashboardsFormat` option (#615)
 
 ## 0.17.5
 
