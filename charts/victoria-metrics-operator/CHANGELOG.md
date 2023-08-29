@@ -7,7 +7,7 @@
 ![AppVersion: **APP_VERSION**](https://img.shields.io/static/v1?label=AppVersion&message=**APP_VERSION**&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-- TODO
+- `psp_auto_creation_enabled` for operator is disabled by default
 
 ## 0.25.0
 
