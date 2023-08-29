@@ -9,6 +9,7 @@
 
 * Move `cleanupCRD` option to victoria-metrics-operator chart (#593)
 * Disable `honorTimestamps` for cadvisor scrape job by default (#617)
+* For vmalert all replicas of alertmanager are added to notifiers (only if alertmanager is enabled) (#619)
 
 ## 0.17.5
 
