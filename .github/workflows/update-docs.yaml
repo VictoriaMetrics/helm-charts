@@ -24,10 +24,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.VM_BOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.VM_BOT_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Generate docs
         run:
           make gen-docs
@@ -40,6 +44,7 @@ jobs:
             mkdir -p $(dirname ${{ runner.temp }}/$readme)
             cp -f $readme ${{ runner.temp }}/$readme
           done
+
       - name: Checkout to pages
         uses: actions/checkout@v3
         with:
@@ -47,9 +52,13 @@ jobs:
 
       - name: Synchronize docs
         run: |
+          export VM_GIT_BRANCH_NAME="docs-update-$(date +%s)"
+          git checkout -b "${VM_GIT_BRANCH_NAME}"
           cp -f ${{ runner.temp }}/README.md .
           cp -fr ${{ runner.temp }}/charts ./
           git add README.md
           git add charts/*/README.md
-          git commit --signoff -m "Synchronize docs"
-          git push
+          git commit -m "Synchronize docs"
+          git push origin ${VM_GIT_BRANCH_NAME}
+          gh pr create -f
+          gh pr merge ${VM_GIT_BRANCH_NAME} --auto --squash --delete-branch

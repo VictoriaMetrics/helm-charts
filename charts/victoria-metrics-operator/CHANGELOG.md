@@ -1,4 +1,4 @@
-# CHANGELOG for `victoria-metrics-k8s-stack` helm-chart
+# CHANGELOG for `victoria-metrics-operator` helm-chart
 
 ## Next release
 
@@ -7,6 +7,7 @@
 ![AppVersion: **APP_VERSION**](https://img.shields.io/static/v1?label=AppVersion&message=**APP_VERSION**&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
+- Bump operator version to [v0.37.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.37.0)
 - `psp_auto_creation_enabled` for operator is disabled by default
 
 ## 0.25.0

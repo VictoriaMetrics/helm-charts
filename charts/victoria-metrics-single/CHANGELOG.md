@@ -1,4 +1,4 @@
-# CHANGELOG for `victoria-metrics-k8s-stack` helm-chart
+# CHANGELOG for `victoria-metrics-single` helm-chart
 
 ## Next release
 

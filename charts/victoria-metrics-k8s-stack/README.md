@@ -415,6 +415,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.datasources.jsonData | object | `{}` |  |
 | grafana.vmServiceScrape.enabled | bool | `true` |  |
 | grafana.vmServiceScrape.spec | object | `{}` |  |
+| grafanaOperatorDashboardsFormat.enabled | bool | `false` |  |
+| grafanaOperatorDashboardsFormat.instanceSelector.matchLabels.dashboards | string | `"grafana"` |  |
 | kube-state-metrics.enabled | bool | `true` |  |
 | kube-state-metrics.vmServiceScrape.spec | object | `{}` |  |
 | kubeApiServer | object | `{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"https","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"component","namespaceSelector":{"matchNames":["default"]},"selector":{"matchLabels":{"component":"apiserver","provider":"kubernetes"}}}}` | Component scraping the kube api server |
