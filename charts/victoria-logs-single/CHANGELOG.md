@@ -11,15 +11,6 @@
 
 ## 0.3.0
 
-**Release date:** 2023-08-30
-
-![AppVersion: v0.3.0-victorialogs](https://img.shields.io/static/v1?label=AppVersion&message=v0.3.0-victorialogs&color=success&logo=)
-![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
-
-- TODO
-
-## 0.3.0
-
 **Release date:** 2023-08-15
 
 ![AppVersion: v0.3.0-victorialogs](https://img.shields.io/static/v1?label=AppVersion&message=v0.3.0-victorialogs&color=success&logo=)
