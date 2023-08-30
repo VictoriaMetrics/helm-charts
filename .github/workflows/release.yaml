@@ -57,36 +57,44 @@ jobs:
         run: |
           for changelog in $(find charts/*/CHANGELOG.md)
           do
+              if grep -q "^## Next release$" $changelog
+              then
+                echo "Processing $changelog"
+              else
+                echo "ERROR: Not found 'Next release' section in $changelog"
+                exit 1
+              fi
+              
               # Useful variables
-              export RN_CONTENT="$(awk '/^## Next release/{flag=1;next}/^## /{flag=0}flag' $changelog | awk 'NF {p=1} p')"
-              export RN_FILE="$(dirname $changelog)/RELEASE_NOTES.md"
               export CHART_FILE="$(dirname $changelog)/Chart.yaml"
               export APP_VERSION="$(yq -M '.appVersion' $CHART_FILE)"
               export CHART_VERSION="$(yq -M '.version' $CHART_FILE)"
-          
+              
               # If version already released
               if grep -q "^## $CHART_VERSION$" $changelog
               then
                 echo "There is nothing to release for $changelog"
               else
-                # Release notes file
-                echo "# Release notes for version $CHART_VERSION" > $RN_FILE
-                echo "" >> $RN_FILE
-                echo $RN_CONTENT >> $RN_FILE
-                echo "" >> $RN_FILE 
-          
-                # ArtifactHub annotation in Chart.yaml file
-                yq -M -i eval '.annotations["artifacthub.io/update"] = strenv(RN_CONTENT)' $CHART_FILE
-          
                 # Update release date and app version in CHANGELOG
                 sed -i -e "s/^\*\*Release date:\*\* TBD$/**Release date:** $(date -I)/g" $changelog
                 sed -i -e "s/\*\*APP_VERSION\*\*/$APP_VERSION/g" $changelog
+                
+                # Release notes file
+                export RN_FILE="$(dirname $changelog)/RELEASE_NOTES.md"
+                export RN_CONTENT="$(awk '/^## Next release/{flag=1;next}/^## /{flag=0}flag' $changelog | awk 'NF {p=1} p')"
+                echo "# Release notes for version $CHART_VERSION" > $RN_FILE
+                echo "" >> $RN_FILE
+                echo "$RN_CONTENT" >> $RN_FILE
+                echo "" >> $RN_FILE 
+                
+                # ArtifactHub annotation in Chart.yaml file
+                yq -M -i eval '.annotations["artifacthub.io/changes"] = strenv(RN_CONTENT)' $CHART_FILE
           
                 # Update chart version in CHANGELOG
                 cp $changelog $changelog.copy
                 : > $changelog
                 while read -r line; do 
-                  echo $line >> $changelog
+                  echo "$line" >> $changelog
                   if [[ $line == "## Next release" ]]
                   then
                     echo "" >> $changelog
