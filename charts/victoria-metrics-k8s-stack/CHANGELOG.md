@@ -11,6 +11,7 @@
 * Disable `honorTimestamps` for cadvisor scrape job by default (#617)
 * For vmalert all replicas of alertmanager are added to notifiers (only if alertmanager is enabled) (#619)
 * Add `grafanaOperatorDashboardsFormat` option (#615)
+* Fix query expression for memory calculation in `k8s-views-global` dashboard (#636)
 
 ## 0.17.5
 
