@@ -101,6 +101,21 @@ Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
 {{- %(condition)s }}
+{{- if .Values.grafanaOperatorDashboardsFormat.enabled }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%%s-%%s" (include "victoria-metrics-k8s-stack.fullname" $) "%(name)s" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+spec:
+  {{- with .Values.grafanaOperatorDashboardsFormat.instanceSelector }}
+  instanceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- else }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -116,7 +131,7 @@ metadata:
     {{- end }}
     {{- end }}
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
-{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
     {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
   annotations:
     {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
@@ -124,6 +139,7 @@ metadata:
     {{- end }}
     {{- end }}
 data:
+{{- end }}
 '''
 
 
@@ -231,9 +247,9 @@ def write_group_to_file(resource_name, content, url, destination):
     content = patch_dashboards_json(content)
     content = patch_json_set_timezone_as_variable(content)
 
-    filename_struct = {resource_name + '.json': (LiteralStr(content))}
     # rules themselves
-    lines += yaml_str_repr(filename_struct)
+    lines += '  {{ if not .Values.grafanaOperatorDashboardsFormat.enabled }}' + resource_name + '.{{ end }}json:'
+    lines += yaml_str_repr((LiteralStr(content)))
 
     # footer
     lines += '{{- end }}'

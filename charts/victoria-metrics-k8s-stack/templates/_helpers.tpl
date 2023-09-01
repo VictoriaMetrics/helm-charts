@@ -43,14 +43,6 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Create the name of service account and clusterRole for cleanup-hook
-*/}}
-{{- define "victoria-metrics-k8s-stack.cleanupHookName" -}}
-{{- printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "cleanup-hook" | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
-
-{{/*
 Create the name for VMSingle
 */}}
 {{- define "victoria-metrics-k8s-stack.vmsingleName" -}}
@@ -127,8 +119,13 @@ remoteWrite:
 {{- end }}
 remoteRead: {{ include "victoria-metrics-k8s-stack.vmReadEndpoint" . | nindent 2 }}
 datasource: {{ include "victoria-metrics-k8s-stack.vmReadEndpoint" . | nindent 2 }}
+{{- if .Values.alertmanager.enabled }}
+{{- $alertManagerReplicas := .Values.alertmanager.spec.replicaCount | default 1 }}
 notifiers:
-    - url: {{ printf "http://%s-%s.%s.svc:9093" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace }}
+    {{- range $n := until (int $alertManagerReplicas) }}
+    - url: {{ printf "http://%s-%s-%d.%s-%s.%s.svc:9093" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" $) $n "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" $) $.Release.Namespace }}
+    {{- end }}
+{{- end }}
 {{- end }}
 
 {{/*

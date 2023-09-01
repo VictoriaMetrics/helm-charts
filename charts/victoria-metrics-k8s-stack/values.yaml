@@ -11,7 +11,7 @@ argocdReleaseOverride: ""
 # -- also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars.html
 victoria-metrics-operator:
   enabled: true
-  # -- Tells helm to remove CRD after chart remove
+  # -- Tells helm to clean up vm cr resources when uninstalling 
   cleanupCRD: true
   cleanupImage:
     repository: gcr.io/google_containers/hyperkube
@@ -79,6 +79,13 @@ defaultDashboardsEnabled: true
 ## -- Create experimental dashboards
 experimentalDashboardsEnabled: true
 
+## -- Create dashboards as CRDs (reuqires grafana-operator to be installed)
+grafanaOperatorDashboardsFormat:
+  enabled: false
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+
 # Provide custom recording or alerting rules to be deployed into the cluster.
 additionalVictoriaMetricsMap:
 #    rule-name:
@@ -110,7 +117,7 @@ vmsingle:
   # https://docs.victoriametrics.com/operator/api.html#vmsinglespec
   spec:
     image:
-      tag: v1.93.1
+      tag: v1.93.2
     retentionPeriod: "14"
     replicaCount: 1
     extraArgs: {}
@@ -166,7 +173,7 @@ vmcluster:
     replicationFactor: 2
     vmstorage:
       image:
-        tag: v1.93.1-cluster
+        tag: v1.93.2-cluster
       replicaCount: 2
       storageDataPath: "/vm-data"
       storage:
@@ -182,7 +189,7 @@ vmcluster:
         #   memory: 1500Mi
     vmselect:
       image:
-        tag: v1.93.1-cluster
+        tag: v1.93.2-cluster
       replicaCount: 2
       cacheMountPath: "/select-cache"
       extraArgs: {}
@@ -202,7 +209,7 @@ vmcluster:
         #   memory: "500Mi"
     vminsert:
       image:
-        tag: v1.93.1-cluster
+        tag: v1.93.2-cluster
       replicaCount: 2
       extraArgs: {}
       resources:
@@ -501,7 +508,7 @@ vmalert:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.93.1
+      tag: v1.93.2
     evaluationInterval: 15s
 
     # External labels to add to all generated recording rules and alerts
@@ -565,8 +572,8 @@ vmagent:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.93.1
-    scrapeInterval: 25s
+      tag: v1.93.2
+    scrapeInterval: 20s
     externalLabels:
       cluster: cluster-name
     extraArgs:
@@ -790,7 +797,9 @@ kubelet:
         targetLabel: metrics_path
       - targetLabel: "job"
         replacement: "kubelet"
-
+    # ignore timestamps of cadvisor's metrics by default
+    # more info here https://github.com/VictoriaMetrics/VictoriaMetrics/issues/4697#issuecomment-1656540535
+    honorTimestamps: false
 # -- Component scraping the kube api server
 kubeApiServer:
   enabled: true
