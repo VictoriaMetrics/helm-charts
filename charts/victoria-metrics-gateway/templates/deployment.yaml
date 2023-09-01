@@ -20,7 +20,7 @@
 {{- end -}}
 {{- $isHost := gt (len .Values.extraHostPathMounts) 0 -}}
 {{- $isExtraVolumes := or $isHost (gt (len .Values.extraVolumes) 0)  -}}
-{{- $isVolumes := or $isExtraVolumes .Values.rateLimiter.enable -}}
+{{- $isVolumes := or $isExtraVolumes .Values.rateLimiter.enable (and .Values.license.secret.name .Values.license.secret.key) -}}
 
 apiVersion: apps/v1
 kind: Deployment
@@ -77,6 +77,9 @@ spec:
           {{- range $key, $value := .Values.extraArgs }}
             - -{{ $key }}={{ $value }}
           {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -111,6 +114,7 @@ spec:
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
+          {{- include "chart.license.mount" . | nindent 12 }}
           {{- end }}
           {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
@@ -150,4 +154,5 @@ spec:
       {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "chart.license.volume" . | nindent 8 }}
     {{- end }}

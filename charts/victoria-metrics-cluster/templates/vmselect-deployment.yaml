@@ -61,6 +61,9 @@ spec:
           {{- range $key, $value := .Values.vmselect.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
           {{- with .Values.vmselect.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
@@ -103,6 +106,7 @@ spec:
           {{- with .Values.vmselect.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
           resources:
             {{- with .Values.vmselect.resources }}
             {{- toYaml . | nindent 12 }}
@@ -146,4 +150,5 @@ spec:
             {{- else }}
           emptyDir: {}
             {{- end -}}
+        {{- include "chart.license.volume" . | nindent 8 }}
 {{- end }}
