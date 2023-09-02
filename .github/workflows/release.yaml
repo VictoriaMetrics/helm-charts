@@ -75,20 +75,23 @@ jobs:
               then
                 echo "There is nothing to release for $changelog"
               else
-                # Update release date and app version in CHANGELOG
-                sed -i -e "s/^\*\*Release date:\*\* TBD$/**Release date:** $(date -I)/g" $changelog
-                sed -i -e "s/\*\*APP_VERSION\*\*/$APP_VERSION/g" $changelog
-                
                 # Release notes file
                 export RN_FILE="$(dirname $changelog)/RELEASE_NOTES.md"
                 export RN_CONTENT="$(awk '/^## Next release/{flag=1;next}/^## /{flag=0}flag' $changelog | awk 'NF {p=1} p')"
+          
+                # ArtifactHub annotation in Chart.yaml file
+                yq -M -i eval '.annotations["artifacthub.io/changes"] = strenv(RN_CONTENT)' $CHART_FILE
+          
+                # Create release notes
                 echo "# Release notes for version $CHART_VERSION" > $RN_FILE
+                echo "" >> $RN_FILE
+                echo "**Release date:** $(date -I)" >> $RN_FILE
+                echo "" >> $RN_FILE
+                echo "![AppVersion: $APP_VERSION](https://img.shields.io/static/v1?label=AppVersion&message=$APP_VERSION&color=success&logo=)" >> $RN_FILE
+                echo "![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)" >> $RN_FILE
                 echo "" >> $RN_FILE
                 echo "$RN_CONTENT" >> $RN_FILE
                 echo "" >> $RN_FILE 
-                
-                # ArtifactHub annotation in Chart.yaml file
-                yq -M -i eval '.annotations["artifacthub.io/changes"] = strenv(RN_CONTENT)' $CHART_FILE
           
                 # Update chart version in CHANGELOG
                 cp $changelog $changelog.copy
@@ -98,14 +101,14 @@ jobs:
                   if [[ $line == "## Next release" ]]
                   then
                     echo "" >> $changelog
-                    echo "**Release date:** TBD" >> $changelog
-                    echo "" >> $changelog
-                    echo "![AppVersion: **APP_VERSION**](https://img.shields.io/static/v1?label=AppVersion&message=**APP_VERSION**&color=success&logo=)" >> $changelog
-                    echo "![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)" >> $changelog
-                    echo "" >> $changelog
                     echo "- TODO" >> $changelog
                     echo "" >> $changelog
                     echo "## $CHART_VERSION" >> $changelog
+                    echo "" >> $changelog
+                    echo "**Release date:** $(date -I)" >> $changelog
+                    echo "" >> $changelog
+                    echo "![AppVersion: $APP_VERSION](https://img.shields.io/static/v1?label=AppVersion&message=$APP_VERSION&color=success&logo=)" >> $changelog
+                    echo "![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)" >> $changelog
                   fi 
                 done < $changelog.copy
                 rm $changelog.copy

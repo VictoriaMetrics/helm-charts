@@ -2,12 +2,7 @@
 
 ## Next release
 
-**Release date:** TBD
-
-![AppVersion: **APP_VERSION**](https://img.shields.io/static/v1?label=AppVersion&message=**APP_VERSION**&color=success&logo=)
-![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
-
-- TODO
+- Bump version of vmauth to `v1.93.3`
 
 ## 0.3.4
 
@@ -18,7 +13,7 @@
 
 * Update VictoriaMetrics components from v1.93.0 to v1.93.1
 
-## 0.3.3 
+## 0.3.3
 
 **Release date:** 2023-08-12
 
@@ -27,7 +22,7 @@
 
 * Update VictoriaMetrics components from v1.92.1 to v1.93.0
 
-## 0.3.2 
+## 0.3.2
 
 **Release date:** 2023-07-28
 
@@ -36,7 +31,7 @@
 
 * Update VictoriaMetrics components from v1.92.0 to v1.92.1 (#599)
 
-## 0.3.1 
+## 0.3.1
 
 **Release date:** 2023-07-27
 
@@ -45,12 +40,12 @@
 
 * Update VictoriaMetrics components from v1.91.3 to v1.92.0
 
-## 0.3.0 
+## 0.3.0
 
 **Release date:** 2023-07-13
 
 ![AppVersion: v1.91.3](https://img.shields.io/static/v1?label=AppVersion&message=v1.91.3&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-* bump version of agent, alert, auth, cluster, single 
-* charts/victoria-metrics-auth: add support of specifying extra labels (#577) 
+* bump version of agent, alert, auth, cluster, single
+* charts/victoria-metrics-auth: add support of specifying extra labels (#577)
