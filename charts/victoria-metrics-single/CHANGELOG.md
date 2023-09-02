@@ -2,12 +2,8 @@
 
 ## Next release
 
-**Release date:** TBD
-
-![AppVersion: **APP_VERSION**](https://img.shields.io/static/v1?label=AppVersion&message=**APP_VERSION**&color=success&logo=)
-![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
-
-- TODO
+- Bump version of Victoria Metrics to `v1.93.3`
+- Fixed `kubeVersion` in `Chart.yaml`
 
 ## 0.9.5
 
