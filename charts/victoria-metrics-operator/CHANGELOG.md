@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.26.1
+
+**Release date:** 2023-09-04
+
+![AppVersion: 0.37.1](https://img.shields.io/static/v1?label=AppVersion&message=0.37.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Bump version of Victoria Metrics operator to `v0.37.1`
 
 ## 0.26.0

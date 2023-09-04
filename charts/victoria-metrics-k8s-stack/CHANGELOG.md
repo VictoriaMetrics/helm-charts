@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.17.6
+
+**Release date:** 2023-09-04
+
+![AppVersion: v1.93.3](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Move `cleanupCRD` option to victoria-metrics-operator chart (#593)
 - Disable `honorTimestamps` for cadvisor scrape job by default (#617)
 - For vmalert all replicas of alertmanager are added to notifiers (only if alertmanager is enabled) (#619)
