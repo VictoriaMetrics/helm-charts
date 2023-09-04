@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.9.8
+
+**Release date:** 2023-09-04
+
+![AppVersion: v1.93.3](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Bump version of vmagent to `v1.93.3`
 
 ## 0.9.6
