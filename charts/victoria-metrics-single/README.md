@@ -204,7 +204,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.disableWeekly | bool | `false` | disable weekly backups |
 | server.vmbackupmanager.enable | bool | `false` | enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages |
 | server.vmbackupmanager.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
-| server.vmbackupmanager.eula | bool | `false` | should be true and means that you have the legal right to run a backup manager that can either be a signed contract or an email with confirmation to run the service in a trial period # https://victoriametrics.com/legal/eula/ |
+| server.vmbackupmanager.eula | bool | `false` | should be true and means that you have the legal right to run a backup manager that can either be a signed contract or an email with confirmation to run the service in a trial period # https://victoriametrics.com/legal/esa/ |
 | server.vmbackupmanager.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
