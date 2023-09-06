@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Updated CRDs for operator
 
 ## 0.26.1
 
