@@ -9,6 +9,15 @@
 - Update grafana dashboards
 - Add `make` commands `sync-rules` and `sync-dashboards`
 
+## 0.17.7
+
+**Release date:** 2023-09-07
+
+![AppVersion: v1.93.3](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Bump version of operator helm-chart to `0.26.2`
+
 ## 0.17.6
 
 **Release date:** 2023-09-04
