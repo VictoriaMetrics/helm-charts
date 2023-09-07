@@ -2,7 +2,12 @@
 
 ## Next release
 
-- TODO
+- Bump version of `grafana` helm-chart to `6.59.*`
+- Bump version of `prometheus-node-exporter` helm-chart to `4.23.*`
+- Bump version of `kube-state-metrics` helm-chart to `0.59.*`
+- Update alerting rules
+- Update grafana dashboards
+- Add `make` commands `sync-rules` and `sync-dashboards`
 
 ## 0.17.6
 

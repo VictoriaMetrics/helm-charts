@@ -168,7 +168,7 @@ data:
                     },
                     "textMode": "value_and_name"
                 },
-                "pluginVersion": "9.2.4",
+                "pluginVersion": "10.0.1",
                 "targets": [
                     {
                         "datasource": {
@@ -216,7 +216,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -311,7 +311,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -405,7 +405,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -499,7 +499,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -553,7 +553,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "avg(rate(coredns_dns_request_size_bytes_sum{instance=~\"$instance\",proto=\"$protocol\"}[$__rate_interval])) by (proto)",
+                        "expr": "sum(rate(coredns_dns_request_size_bytes_sum{instance=~\"$instance\",proto=\"$protocol\"}[$__rate_interval])) by (proto) / sum(rate(coredns_dns_request_size_bytes_count{instance=~\"$instance\",proto=\"$protocol\"}[$__rate_interval])) by (proto)",
                         "interval": "$resolution",
                         "legendFormat": "average $protocol packet size",
                         "refId": "A"
@@ -593,7 +593,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -687,7 +687,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -781,7 +781,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -875,7 +875,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -969,7 +969,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1074,7 +1074,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1198,7 +1198,7 @@ data:
                         "unit": "s"
                     }
                 },
-                "pluginVersion": "9.3.1",
+                "pluginVersion": "10.0.1",
                 "targets": [
                     {
                         "datasource": {
@@ -1277,7 +1277,7 @@ data:
                         "unit": "s"
                     }
                 },
-                "pluginVersion": "9.3.1",
+                "pluginVersion": "10.0.1",
                 "targets": [
                     {
                         "datasource": {
@@ -1356,7 +1356,7 @@ data:
                         "unit": "decbytes"
                     }
                 },
-                "pluginVersion": "9.3.1",
+                "pluginVersion": "10.0.1",
                 "targets": [
                     {
                         "datasource": {
@@ -1435,7 +1435,7 @@ data:
                         "unit": "decbytes"
                     }
                 },
-                "pluginVersion": "9.3.1",
+                "pluginVersion": "10.0.1",
                 "targets": [
                     {
                         "datasource": {
@@ -1455,7 +1455,7 @@ data:
             }
         ],
         "refresh": "30s",
-        "schemaVersion": 37,
+        "schemaVersion": 38,
         "style": "dark",
         "tags": [
             "Kubernetes",
@@ -1599,7 +1599,7 @@ data:
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "Kubernetes / System / CoreDNS",
         "uid": "k8s_system_coredns",
-        "version": 11,
+        "version": 13,
         "weekStart": ""
     }
 {{- end }}

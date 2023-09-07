@@ -77,19 +77,6 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: ConcurrentFlushesHitTheLimit
-      annotations:
-        dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=59&var-instance={{`{{`}} $labels.instance {{`}}`}}
-        description: "The limit of concurrent flushes on instance {{`{{`}} $labels.instance {{`}}`}} is equal to number of CPUs.\n When VictoriaMetrics constantly hits the limit it means that storage is overloaded and requires more CPU."
-        summary: VictoriaMetrics on instance {{`{{`}} $labels.instance {{`}}`}} is constantly hitting concurrent flushes limit
-      expr: avg_over_time(vm_concurrent_insert_current[1m]) >= vm_concurrent_insert_capacity
-      for: 15m
-      labels:
-        severity: warning
-        show_at: dashboard
-{{- if .Values.defaultRules.additionalRuleLabels }}
-{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
-{{- end }}
     - alert: RowsRejectedOnIngestion
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=58&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -137,7 +124,7 @@ spec:
     - alert: TooHighSlowInsertsRate
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=68&var-instance={{`{{`}} $labels.instance {{`}}`}}
-        description: High rate of slow inserts on "{{`{{`}} $labels.instance {{`}}`}}" may be a sign of resource exhaustion for the current load. It is likely more RAM is needed for optimal handling of the current number of active time series.
+        description: High rate of slow inserts on "{{`{{`}} $labels.instance {{`}}`}}" may be a sign of resource exhaustion for the current load. It is likely more RAM is needed for optimal handling of the current number of active time series. See also https://github.com/VictoriaMetrics/VictoriaMetrics/issues/3976#issuecomment-1476883183
         summary: Percentage of slow inserts is more than 5% on "{{`{{`}} $labels.instance {{`}}`}}" for the last 15m
       expr: |-
         (
