@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Bump version of operator helm-chart to `0.26.2`
 
 ## 0.17.6
 
