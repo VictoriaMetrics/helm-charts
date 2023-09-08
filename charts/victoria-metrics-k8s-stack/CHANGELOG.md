@@ -8,6 +8,7 @@
 - Update alerting rules
 - Update grafana dashboards
 - Add `make` commands `sync-rules` and `sync-dashboards`
+- Add support of VictoriaMetrics datasource
 
 ## 0.17.7
 

@@ -396,6 +396,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.dashboards.default.nodeexporter.gnetId | int | `1860` |  |
 | grafana.dashboards.default.nodeexporter.revision | int | `22` |  |
 | grafana.defaultDashboardsTimezone | string | `"utc"` |  |
+| grafana.defaultDatasourceType | string | `"prometheus"` |  |
 | grafana.enabled | bool | `true` |  |
 | grafana.forceDeployDatasource | bool | `false` |  |
 | grafana.ingress.annotations | object | `{}` |  |
@@ -412,6 +413,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.dashboards.multicluster | bool | `false` |  |
 | grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |
 | grafana.sidecar.datasources.enabled | bool | `true` |  |
+| grafana.sidecar.datasources.initDatasources | bool | `true` |  |
 | grafana.sidecar.datasources.jsonData | object | `{}` |  |
 | grafana.vmServiceScrape.enabled | bool | `true` |  |
 | grafana.vmServiceScrape.spec | object | `{}` |  |

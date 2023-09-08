@@ -240,3 +240,27 @@ vmselect:
 {{ define "victoria-metrics-k8s-stack.VMClusterSpec"}}
 {{ tpl (deepCopy .Values.vmcluster.spec | mergeOverwrite ( include "vmselectSpec" . | fromYaml) | toYaml) . }}
 {{- end }}
+
+{{/*
+VictoriaMetrics Datasource
+*/}}
+{{ define "victoria-metrics-k8s-stack.VMDataSource"}}
+{{- $vmDSPluginEnabled := false }}
+{{- if .Values.grafana.plugins }}
+{{- range $value := .Values.grafana.plugins }}
+{{- if (contains "victoriametrics-datasource" $value) }}
+{{- $vmDSPluginEnabled = true }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- $vmAllowUnsigned := contains "victoriametrics-datasource" (dig "grafana.ini" "plugins" "allow_loading_unsigned_plugins" "" .Values.grafana) }}
+{{- if (and $vmDSPluginEnabled $vmAllowUnsigned) }}
+    - name: VictoriaMetrics (DS)
+      type: victoriametrics-datasource
+      {{- $readEndpoint:= (include "victoria-metrics-k8s-stack.vmReadEndpoint" . | fromYaml) }}
+      url: {{ $readEndpoint.url }}
+      access: proxy
+      isDefault: false
+      jsonData: {{ toYaml .Values.grafana.sidecar.datasources.jsonData | nindent 8 }}
+{{- end }}
+{{- end }}
