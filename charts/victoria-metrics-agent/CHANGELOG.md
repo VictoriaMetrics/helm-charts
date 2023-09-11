@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.9.9
+
+**Release date:** 2023-09-11
+
+![AppVersion: v1.93.4](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.4&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Bump version of VM components to [v1.93.4](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.93.4)
 
 ## 0.9.8
