@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Bump version of operator to [v0.38.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.38.0)
 
 ## 0.26.2
 
