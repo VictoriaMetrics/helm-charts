@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix `extraPorts` field for services in values.yaml (#659)
 
 ## 0.17.7
 
