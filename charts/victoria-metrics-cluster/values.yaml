@@ -286,6 +286,7 @@ vminsert:
     envflag.enable: "true"
     envflag.prefix: VM_
     loggerFormat: json
+    relabelConfig: /etc/relabelConfig.yml
   annotations: {}
   extraLabels: {}
   # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
@@ -319,17 +320,26 @@ vminsert:
     metrics: []
 
   # Extra Volumes for the pod
-  extraVolumes:
-    []
+  extraVolumes:        
+    # []
     # - name: example
     #   configMap:
     #     name: example
-
+    - name: relabelconfig-volume
+      configMap:
+        name: vminsert-relabelconfig
+        items:
+        - key: relabelConfig.yml
+          path: relabelConfig.yml
+          mode: 0755
+  
   # Extra Volume Mounts for the container
   extraVolumeMounts:
-    []
+    # []
     # - name: example
     #   mountPath: /example
+    - name: relabelconfig-volume
+      mountPath: /etc
 
   extraContainers:
     []
@@ -445,6 +455,12 @@ vminsert:
 #      insecureSkipVerify: true
     # -- Service Monitor relabelings
     relabelings: []
+
+  relabelConfigs:
+    # []
+    - action: keep
+      source_labels: [role1, dc, env, cluster_name]
+      regex: ”*;*;*;*;*”
 
 vmstorage:
   # -- Enable deployment of vmstorage component. StatefulSet is used

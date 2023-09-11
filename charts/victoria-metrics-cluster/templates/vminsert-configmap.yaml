@@ -1,0 +1,17 @@
+{{- if hasKey .Values.vminsert.extraArgs "relabelConfig" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    {{- include "victoria-metrics.vminsert.labels" . | nindent 4 }}
+{{- with .Values.vminsert.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+  name: vminsert-relabelconfig
+  namespace: {{ .Release.Namespace }}
+data:
+  relabelConfig.yml: |
+{{- with .Values.vminsert.relabelConfigs }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- end -}}
