@@ -4,6 +4,15 @@
 
 - TODO
 
+## 0.27.0
+
+**Release date:** 2023-09-11
+
+![AppVersion: 0.38.0](https://img.shields.io/static/v1?label=AppVersion&message=0.38.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Bump version of operator to [v0.38.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.38.0)
+
 ## 0.26.2
 
 **Release date:** 2023-09-07
