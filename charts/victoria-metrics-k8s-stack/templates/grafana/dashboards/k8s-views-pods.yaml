@@ -117,7 +117,7 @@ data:
             ]
         },
         "description": "This is a modern 'Pods View' dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes",
-        "editable": true,
+        "editable": false,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 1,
         "links": [],
@@ -126,7 +126,7 @@ data:
             {
                 "collapsed": false,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
@@ -140,7 +140,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -151,7 +151,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -191,15 +191,16 @@ data:
                     },
                     "textMode": "name"
                 },
-                "pluginVersion": "9.2.4",
+                "pluginVersion": "10.1.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
-                        "exemplar": true,
+                        "exemplar": false,
                         "expr": "kube_pod_info{namespace=\"$namespace\", pod=\"$pod\"}",
+                        "instant": true,
                         "interval": "",
                         "legendFormat": "{{`{{`}} created_by_kind {{`}}`}}: {{`{{`}} created_by_name {{`}}`}}",
                         "refId": "A"
@@ -210,11 +211,17 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
                     "defaults": {
+                        "links": [
+                            {
+                                "title": "",
+                                "url": "/d/k8s_views_nodes/kubernetes-views-nodes?var-datasource=${datasource}&var-node=${__data.fields.node}"
+                            }
+                        ],
                         "mappings": [],
                         "thresholds": {
                             "mode": "absolute",
@@ -250,14 +257,16 @@ data:
                     },
                     "textMode": "name"
                 },
-                "pluginVersion": "9.2.4",
+                "pluginVersion": "10.1.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "exemplar": false,
                         "expr": "kube_pod_info{namespace=\"$namespace\", pod=\"$pod\"}",
+                        "instant": true,
                         "interval": "",
                         "legendFormat": "{{`{{`}} node {{`}}`}}",
                         "refId": "A"
@@ -268,7 +277,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -308,14 +317,16 @@ data:
                     },
                     "textMode": "name"
                 },
-                "pluginVersion": "9.2.4",
+                "pluginVersion": "10.1.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "exemplar": false,
                         "expr": "kube_pod_info{namespace=\"$namespace\", pod=\"$pod\"}",
+                        "instant": true,
                         "interval": "",
                         "legendFormat": "{{`{{`}} pod_ip {{`}}`}}",
                         "refId": "A"
@@ -325,23 +336,310 @@ data:
                 "type": "stat"
             },
             {
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "${datasource}"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "rgb(255, 255, 255)",
+                                    "value": null
+                                }
+                            ]
+                        },
+                        "unit": "none"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 2,
+                    "w": 5,
+                    "x": 0,
+                    "y": 3
+                },
+                "id": 52,
+                "options": {
+                    "colorMode": "none",
+                    "graphMode": "none",
+                    "justifyMode": "auto",
+                    "orientation": "auto",
+                    "reduceOptions": {
+                        "calcs": [
+                            "mean"
+                        ],
+                        "fields": "",
+                        "values": false
+                    },
+                    "textMode": "name"
+                },
+                "pluginVersion": "10.1.0",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "kube_pod_info{namespace=\"$namespace\", pod=\"$pod\", priority_class!=\"\"}",
+                        "format": "time_series",
+                        "instant": true,
+                        "interval": "",
+                        "legendFormat": "{{`{{`}} priority_class {{`}}`}}",
+                        "range": false,
+                        "refId": "A"
+                    }
+                ],
+                "title": "Priority Class",
+                "type": "stat"
+            },
+            {
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "${datasource}"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                }
+                            ]
+                        },
+                        "unit": "none"
+                    },
+                    "overrides": [
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "Burstable"
+                            },
+                            "properties": [
+                                {
+                                    "id": "color",
+                                    "value": {
+                                        "fixedColor": "red",
+                                        "mode": "fixed"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "BestEffort"
+                            },
+                            "properties": [
+                                {
+                                    "id": "color",
+                                    "value": {
+                                        "fixedColor": "orange",
+                                        "mode": "fixed"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "gridPos": {
+                    "h": 2,
+                    "w": 7,
+                    "x": 5,
+                    "y": 3
+                },
+                "id": 53,
+                "options": {
+                    "colorMode": "value",
+                    "graphMode": "none",
+                    "justifyMode": "auto",
+                    "orientation": "auto",
+                    "reduceOptions": {
+                        "calcs": [],
+                        "fields": "",
+                        "values": false
+                    },
+                    "textMode": "name"
+                },
+                "pluginVersion": "10.1.0",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "kube_pod_status_qos_class{namespace=\"$namespace\", pod=\"$pod\"} > 0",
+                        "instant": true,
+                        "interval": "",
+                        "legendFormat": "{{`{{`}} qos_class {{`}}`}}",
+                        "refId": "A"
+                    }
+                ],
+                "title": "QOS Class",
+                "type": "stat"
+            },
+            {
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "${datasource}"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "text",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 1
+                                }
+                            ]
+                        },
+                        "unit": "none"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 2,
+                    "w": 6,
+                    "x": 12,
+                    "y": 3
+                },
+                "id": 56,
+                "options": {
+                    "colorMode": "value",
+                    "graphMode": "none",
+                    "justifyMode": "auto",
+                    "orientation": "auto",
+                    "reduceOptions": {
+                        "calcs": [],
+                        "fields": "",
+                        "values": false
+                    },
+                    "textMode": "name"
+                },
+                "pluginVersion": "10.1.0",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "kube_pod_container_status_last_terminated_reason{namespace=\"$namespace\", pod=\"$pod\"}",
+                        "instant": true,
+                        "interval": "",
+                        "legendFormat": "{{`{{`}} reason {{`}}`}}",
+                        "refId": "A"
+                    }
+                ],
+                "title": "Last Terminated Reason",
+                "type": "stat"
+            },
+            {
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "${datasource}"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "text",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 1
+                                },
+                                {
+                                    "color": "#EAB839",
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        "unit": "none"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 2,
+                    "w": 6,
+                    "x": 18,
+                    "y": 3
+                },
+                "id": 57,
+                "options": {
+                    "colorMode": "value",
+                    "graphMode": "none",
+                    "justifyMode": "auto",
+                    "orientation": "auto",
+                    "reduceOptions": {
+                        "calcs": [],
+                        "fields": "",
+                        "values": true
+                    },
+                    "textMode": "value"
+                },
+                "pluginVersion": "10.1.0",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "kube_pod_container_status_last_terminated_exitcode{namespace=\"$namespace\", pod=\"$pod\"}",
+                        "instant": true,
+                        "interval": "",
+                        "legendFormat": "__auto",
+                        "range": false,
+                        "refId": "A"
+                    }
+                ],
+                "title": "Last Terminated Exit Code",
+                "type": "stat"
+            },
+            {
                 "collapsed": false,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 3
+                    "y": 5
                 },
                 "id": 47,
                 "panels": [],
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -352,7 +650,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -390,7 +688,7 @@ data:
                     "h": 8,
                     "w": 3,
                     "x": 0,
-                    "y": 4
+                    "y": 6
                 },
                 "id": 39,
                 "options": {
@@ -405,15 +703,16 @@ data:
                     "showThresholdLabels": false,
                     "showThresholdMarkers": true
                 },
-                "pluginVersion": "9.2.4",
+                "pluginVersion": "10.1.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}[$__rate_interval])) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", unit=\"core\"})",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}[$__rate_interval])) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\"})",
                         "instant": true,
                         "interval": "$resolution",
                         "legendFormat": "Requests",
@@ -425,7 +724,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -459,7 +758,7 @@ data:
                     "h": 8,
                     "w": 3,
                     "x": 3,
-                    "y": 4
+                    "y": 6
                 },
                 "id": 48,
                 "options": {
@@ -474,15 +773,16 @@ data:
                     "showThresholdLabels": false,
                     "showThresholdMarkers": true
                 },
-                "pluginVersion": "9.2.4",
+                "pluginVersion": "10.1.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}[$__rate_interval])) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", unit=\"core\"})",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}[$__rate_interval])) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\"})",
                         "instant": true,
                         "interval": "$resolution",
                         "legendFormat": "Limits",
@@ -494,7 +794,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -532,7 +832,7 @@ data:
                     "h": 8,
                     "w": 3,
                     "x": 6,
-                    "y": 4
+                    "y": 6
                 },
                 "id": 40,
                 "options": {
@@ -547,15 +847,15 @@ data:
                     "showThresholdLabels": false,
                     "showThresholdMarkers": true
                 },
-                "pluginVersion": "9.2.4",
+                "pluginVersion": "10.1.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": false,
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", unit=\"byte\"})",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\"})",
                         "instant": true,
                         "interval": "$resolution",
                         "legendFormat": "Requests",
@@ -567,7 +867,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -601,7 +901,7 @@ data:
                     "h": 8,
                     "w": 3,
                     "x": 9,
-                    "y": 4
+                    "y": 6
                 },
                 "id": 49,
                 "options": {
@@ -616,15 +916,15 @@ data:
                     "showThresholdLabels": false,
                     "showThresholdMarkers": true
                 },
-                "pluginVersion": "9.2.4",
+                "pluginVersion": "10.1.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": false,
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", unit=\"byte\"}) ",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\"}) ",
                         "instant": true,
                         "interval": "$resolution",
                         "legendFormat": "Limits",
@@ -636,17 +936,21 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
                     "defaults": {
                         "custom": {
                             "align": "auto",
-                            "displayMode": "auto",
+                            "cellOptions": {
+                                "type": "auto"
+                            },
                             "filterable": false,
-                            "inspect": false
+                            "inspect": false,
+                            "minWidth": 100
                         },
+                        "decimals": 4,
                         "mappings": [],
                         "thresholds": {
                             "mode": "absolute",
@@ -669,6 +973,10 @@ data:
                                 {
                                     "id": "unit",
                                     "value": "bytes"
+                                },
+                                {
+                                    "id": "decimals",
+                                    "value": 2
                                 }
                             ]
                         },
@@ -681,6 +989,10 @@ data:
                                 {
                                     "id": "unit",
                                     "value": "bytes"
+                                },
+                                {
+                                    "id": "decimals",
+                                    "value": 2
                                 }
                             ]
                         },
@@ -693,6 +1005,10 @@ data:
                                 {
                                     "id": "unit",
                                     "value": "bytes"
+                                },
+                                {
+                                    "id": "decimals",
+                                    "value": 2
                                 }
                             ]
                         }
@@ -702,11 +1018,13 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 4
+                    "y": 6
                 },
                 "id": 38,
                 "options": {
+                    "cellHeight": "sm",
                     "footer": {
+                        "countRows": false,
                         "fields": "",
                         "reducer": [
                             "sum"
@@ -716,15 +1034,16 @@ data:
                     "showHeader": true,
                     "sortBy": []
                 },
-                "pluginVersion": "9.2.4",
+                "pluginVersion": "10.1.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", unit=\"core\"}) by (container)",
+                        "expr": "sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\"}) by (container)",
                         "format": "table",
                         "instant": true,
                         "interval": "",
@@ -734,11 +1053,12 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", unit=\"core\"}) by (container)",
+                        "expr": "sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\"}) by (container)",
                         "format": "table",
                         "instant": true,
                         "interval": "",
@@ -748,11 +1068,12 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", unit=\"byte\"}) by (container)",
+                        "expr": "sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\"}) by (container)",
                         "format": "table",
                         "instant": true,
                         "interval": "",
@@ -761,11 +1082,12 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", unit=\"byte\"}) by (container)",
+                        "expr": "sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\"}) by (container)",
                         "format": "table",
                         "instant": true,
                         "interval": "",
@@ -774,12 +1096,12 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"POD\"}[$__rate_interval])) by (container)",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"\"}[$__rate_interval])) by (container)",
                         "format": "table",
                         "hide": false,
                         "instant": true,
@@ -789,12 +1111,12 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"POD\"}) by (container)",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"\"}) by (container)",
                         "format": "table",
                         "hide": false,
                         "instant": true,
@@ -896,7 +1218,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -918,6 +1240,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -925,7 +1248,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -970,7 +1293,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 0,
-                    "y": 12
+                    "y": 14
                 },
                 "id": 50,
                 "options": {
@@ -989,12 +1312,12 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", unit=\"core\"}) by (container)",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\"}) by (container)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} container {{`}}`}}  REQUESTS",
                         "range": true,
@@ -1002,11 +1325,11 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", unit=\"core\"}) by (container)",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\"}) by (container)",
                         "hide": false,
                         "legendFormat": "{{`{{`}} container {{`}}`}}  LIMITS",
                         "range": true,
@@ -1018,7 +1341,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1041,6 +1364,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineStyle": {
                                 "fill": "solid"
@@ -1051,7 +1375,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1096,7 +1420,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 12
+                    "y": 14
                 },
                 "id": 30,
                 "options": {
@@ -1115,12 +1439,12 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}) by (container) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", unit=\"byte\"}) by (container)",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}) by (container) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\"}) by (container)",
                         "interval": "",
                         "legendFormat": "{{`{{`}} container {{`}}`}} REQUESTS",
                         "range": true,
@@ -1128,11 +1452,11 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}) by (container) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", unit=\"byte\"}) by (container)",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}) by (container) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\"}) by (container)",
                         "hide": false,
                         "legendFormat": "{{`{{`}} container {{`}}`}} LIMITS",
                         "range": true,
@@ -1144,7 +1468,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1166,6 +1490,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -1173,7 +1498,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1182,6 +1507,7 @@ data:
                                 "mode": "off"
                             }
                         },
+                        "decimals": 4,
                         "mappings": [],
                         "thresholds": {
                             "mode": "absolute",
@@ -1224,12 +1550,16 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 0,
-                    "y": 20
+                    "y": 22
                 },
                 "id": 29,
                 "options": {
                     "legend": {
-                        "calcs": [],
+                        "calcs": [
+                            "min",
+                            "max",
+                            "mean"
+                        ],
                         "displayMode": "table",
                         "placement": "right",
                         "showLegend": true
@@ -1243,13 +1573,15 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"POD\"}[$__rate_interval])) by (container)",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"\"}[$__rate_interval])) by (container)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} container {{`}}`}}",
+                        "range": true,
                         "refId": "A"
                     }
                 ],
@@ -1258,7 +1590,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1280,6 +1612,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineStyle": {
                                 "fill": "solid"
@@ -1290,7 +1623,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1299,6 +1632,7 @@ data:
                                 "mode": "off"
                             }
                         },
+                        "decimals": 2,
                         "mappings": [],
                         "thresholds": {
                             "mode": "absolute",
@@ -1321,9 +1655,249 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 20
+                    "y": 22
                 },
                 "id": 51,
+                "options": {
+                    "legend": {
+                        "calcs": [
+                            "min",
+                            "max",
+                            "mean"
+                        ],
+                        "displayMode": "table",
+                        "placement": "right",
+                        "showLegend": true
+                    },
+                    "tooltip": {
+                        "mode": "multi",
+                        "sort": "desc"
+                    }
+                },
+                "pluginVersion": "8.3.3",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"\"}) by (container)",
+                        "interval": "",
+                        "legendFormat": "{{`{{`}} container {{`}}`}}",
+                        "range": true,
+                        "refId": "A"
+                    }
+                ],
+                "title": "Memory Usage by container",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "${datasource}"
+                },
+                "description": "",
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        },
+                        "custom": {
+                            "axisCenteredZero": false,
+                            "axisColorMode": "text",
+                            "axisLabel": "SECONDS",
+                            "axisPlacement": "auto",
+                            "barAlignment": 0,
+                            "drawStyle": "line",
+                            "fillOpacity": 25,
+                            "gradientMode": "opacity",
+                            "hideFrom": {
+                                "legend": false,
+                                "tooltip": false,
+                                "viz": false
+                            },
+                            "insertNulls": false,
+                            "lineInterpolation": "smooth",
+                            "lineStyle": {
+                                "fill": "solid"
+                            },
+                            "lineWidth": 2,
+                            "pointSize": 5,
+                            "scaleDistribution": {
+                                "type": "linear"
+                            },
+                            "showPoints": "never",
+                            "spanNulls": false,
+                            "stacking": {
+                                "group": "A",
+                                "mode": "none"
+                            },
+                            "thresholdsStyle": {
+                                "mode": "off"
+                            }
+                        },
+                        "decimals": 2,
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        },
+                        "unit": "s"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 30
+                },
+                "id": 59,
+                "options": {
+                    "legend": {
+                        "calcs": [
+                            "min",
+                            "max",
+                            "mean"
+                        ],
+                        "displayMode": "table",
+                        "placement": "right",
+                        "showLegend": true,
+                        "sortBy": "Max",
+                        "sortDesc": true
+                    },
+                    "tooltip": {
+                        "mode": "single",
+                        "sort": "none"
+                    }
+                },
+                "pluginVersion": "8.3.3",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=~\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"\"}[$__rate_interval])) by (container)",
+                        "interval": "$resolution",
+                        "legendFormat": "{{`{{`}} container {{`}}`}}",
+                        "range": true,
+                        "refId": "A"
+                    }
+                ],
+                "title": "CPU Throttled seconds by container",
+                "type": "timeseries"
+            },
+            {
+                "collapsed": false,
+                "gridPos": {
+                    "h": 1,
+                    "w": 24,
+                    "x": 0,
+                    "y": 38
+                },
+                "id": 62,
+                "panels": [],
+                "title": "Kubernetes",
+                "type": "row"
+            },
+            {
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "${datasource}"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "fixedColor": "blue",
+                            "mode": "thresholds"
+                        },
+                        "custom": {
+                            "axisCenteredZero": false,
+                            "axisColorMode": "text",
+                            "axisLabel": "Percent",
+                            "axisPlacement": "auto",
+                            "barAlignment": 0,
+                            "drawStyle": "line",
+                            "fillOpacity": 25,
+                            "gradientMode": "opacity",
+                            "hideFrom": {
+                                "legend": false,
+                                "tooltip": false,
+                                "viz": false
+                            },
+                            "insertNulls": false,
+                            "lineInterpolation": "smooth",
+                            "lineStyle": {
+                                "fill": "solid"
+                            },
+                            "lineWidth": 2,
+                            "pointSize": 5,
+                            "scaleDistribution": {
+                                "type": "linear"
+                            },
+                            "showPoints": "never",
+                            "spanNulls": false,
+                            "stacking": {
+                                "group": "A",
+                                "mode": "none"
+                            },
+                            "thresholdsStyle": {
+                                "mode": "area"
+                            }
+                        },
+                        "mappings": [],
+                        "max": 1,
+                        "min": 0,
+                        "thresholds": {
+                            "mode": "percentage",
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 20
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 30
+                                },
+                                {
+                                    "color": "#EAB839",
+                                    "value": 70
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        },
+                        "unit": "none"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 39
+                },
+                "id": 60,
                 "options": {
                     "legend": {
                         "calcs": [],
@@ -1340,37 +1914,154 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"POD\"}) by (container)",
+                        "expr": "sum(increase(container_oom_events_total{namespace=\"${namespace}\", pod=\"${pod}\", container!=\"\"}[$__rate_interval])) by (container)",
                         "interval": "",
                         "legendFormat": "{{`{{`}} container {{`}}`}}",
+                        "range": true,
                         "refId": "A"
                     }
                 ],
-                "title": "Memory Usage by container",
+                "title": "OOM Events by container",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "${datasource}"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "fixedColor": "blue",
+                            "mode": "thresholds"
+                        },
+                        "custom": {
+                            "axisCenteredZero": false,
+                            "axisColorMode": "text",
+                            "axisLabel": "Percent",
+                            "axisPlacement": "auto",
+                            "barAlignment": 0,
+                            "drawStyle": "line",
+                            "fillOpacity": 25,
+                            "gradientMode": "opacity",
+                            "hideFrom": {
+                                "legend": false,
+                                "tooltip": false,
+                                "viz": false
+                            },
+                            "insertNulls": false,
+                            "lineInterpolation": "smooth",
+                            "lineStyle": {
+                                "fill": "solid"
+                            },
+                            "lineWidth": 2,
+                            "pointSize": 5,
+                            "scaleDistribution": {
+                                "type": "linear"
+                            },
+                            "showPoints": "never",
+                            "spanNulls": false,
+                            "stacking": {
+                                "group": "A",
+                                "mode": "none"
+                            },
+                            "thresholdsStyle": {
+                                "mode": "area"
+                            }
+                        },
+                        "mappings": [],
+                        "max": 1,
+                        "min": 0,
+                        "thresholds": {
+                            "mode": "percentage",
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": null
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 20
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 30
+                                },
+                                {
+                                    "color": "#EAB839",
+                                    "value": 70
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        },
+                        "unit": "none"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 39
+                },
+                "id": 61,
+                "options": {
+                    "legend": {
+                        "calcs": [],
+                        "displayMode": "table",
+                        "placement": "right",
+                        "showLegend": true
+                    },
+                    "tooltip": {
+                        "mode": "multi",
+                        "sort": "desc"
+                    }
+                },
+                "pluginVersion": "8.3.3",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=~\"${namespace}\", pod=\"${pod}\", container!=\"\"}[$__rate_interval])) by (container)",
+                        "interval": "",
+                        "legendFormat": "{{`{{`}} container {{`}}`}}",
+                        "range": true,
+                        "refId": "A"
+                    }
+                ],
+                "title": "Container Restarts by container",
                 "type": "timeseries"
             },
             {
                 "collapsed": false,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 28
+                    "y": 47
                 },
                 "id": 45,
                 "panels": [],
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -1381,7 +2072,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1403,6 +2094,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -1410,7 +2102,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1441,7 +2133,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 0,
-                    "y": 29
+                    "y": 48
                 },
                 "id": 31,
                 "options": {
@@ -1460,7 +2152,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
@@ -1471,7 +2163,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
@@ -1486,7 +2178,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1508,6 +2200,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -1515,7 +2208,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1546,7 +2239,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 29
+                    "y": 48
                 },
                 "id": 34,
                 "options": {
@@ -1565,7 +2258,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
@@ -1576,7 +2269,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
@@ -1591,7 +2284,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1613,6 +2306,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -1620,7 +2314,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1634,8 +2328,7 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green",
-                                    "value": null
+                                    "color": "green"
                                 },
                                 {
                                     "color": "red",
@@ -1651,7 +2344,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 0,
-                    "y": 37
+                    "y": 56
                 },
                 "id": 36,
                 "options": {
@@ -1670,7 +2363,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
@@ -1681,7 +2374,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
@@ -1696,7 +2389,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1718,6 +2411,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -1725,7 +2419,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1739,8 +2433,7 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green",
-                                    "value": null
+                                    "color": "green"
                                 },
                                 {
                                     "color": "red",
@@ -1756,7 +2449,7 @@ data:
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 37
+                    "y": 56
                 },
                 "id": 37,
                 "options": {
@@ -1775,7 +2468,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
@@ -1786,7 +2479,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
@@ -1801,11 +2494,12 @@ data:
             }
         ],
         "refresh": "30s",
-        "schemaVersion": 37,
+        "schemaVersion": 38,
         "style": "dark",
         "tags": [
             "Kubernetes",
-            "Prometheus"
+            "Prometheus",
+            "vm-k8s-stack"
         ],
         "templating": {
             "list": [
@@ -1819,8 +2513,10 @@ data:
                     "includeAll": false,
                     "multi": false,
                     "name": "datasource",
-                    "options": [],
-                    "query": "prometheus",
+                    "options": [
+
+                    ],
+                    "query": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "queryValue": "",
                     "refresh": 1,
                     "regex": "",
@@ -1842,7 +2538,9 @@ data:
                     "includeAll": false,
                     "multi": false,
                     "name": "namespace",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(kube_pod_info, namespace)",
                         "refId": "Prometheus-namespace-Variable-Query"
@@ -1871,7 +2569,9 @@ data:
                     "includeAll": false,
                     "multi": false,
                     "name": "pod",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(kube_pod_info{namespace=\"$namespace\"}, pod)",
                         "refId": "Prometheus-pod-Variable-Query"
@@ -1938,11 +2638,13 @@ data:
             "from": "now-1h",
             "to": "now"
         },
-        "timepicker": {},
+        "timepicker": {
+
+        },
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "Kubernetes / Views / Pods",
         "uid": "k8s_views_pods",
-        "version": 15,
+        "version": 22,
         "weekStart": ""
     }
 {{- end }}

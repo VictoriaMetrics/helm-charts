@@ -52,7 +52,7 @@ data:
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "9.2.6"
+                "version": "9.2.7"
             },
             {
                 "type": "datasource",
@@ -111,17 +111,29 @@ data:
                         "uid": "$ds"
                     },
                     "enable": true,
-                    "expr": "sum(vm_app_version{job=~\"$job\"}) by(short_version) unless (sum(vm_app_version{job=~\"$job\"} offset 20m) by(short_version))",
+                    "expr": "sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"}) by(short_version) unless (sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"} offset 20m) by(short_version))",
                     "hide": true,
                     "iconColor": "dark-blue",
                     "name": "version",
                     "textFormat": "{{`{{`}}short_version{{`}}`}}",
                     "titleFormat": "Version change"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$ds"
+                    },
+                    "enable": true,
+                    "expr": "sum(changes(vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"})) by(job, instance)",
+                    "hide": true,
+                    "iconColor": "dark-yellow",
+                    "name": "restarts",
+                    "textFormat": "{{`{{`}}job{{`}}`}}:{{`{{`}}instance{{`}}`}} restarted"
                 }
             ]
         },
         "description": "Overview for VictoriaMetrics vmagent v1.80.0 or higher",
-        "editable": true,
+        "editable": false,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 1,
         "id": null,
@@ -169,7 +181,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the rate of samples scraped from configured targets.",
@@ -216,11 +228,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -236,7 +248,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the rate of ingested samples",
@@ -283,15 +295,15 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
-                        "expr": "sum(rate(vm_ingestserver_requests_total{job=~\"$job\", instance=~\"$instance\", path!~\"/favicon.ico\"}[$__rate_interval]))",
+                        "expr": "sum(rate(vmagent_rows_inserted_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
                         "interval": "",
                         "legendFormat": "__auto",
                         "range": true,
@@ -303,7 +315,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows total number of all configured scrape targets in state \"up\".\n\nSee `http://vmagent-host:8429/targets` to get list of all targets. \n",
@@ -344,11 +356,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"up\"})",
@@ -362,7 +374,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows total number of all configured scrape targets in state \"down\".\n\nSee `http://vmagent-host:8429/targets` to get list of all targets. \n",
@@ -413,11 +425,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"down\"})",
@@ -431,7 +443,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows number of generated  error messages in  logs over last 30m. Non-zero value may be a sign of connectivity or missconfiguration errors.",
@@ -485,11 +497,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "expr": "sum(increase(vm_log_messages_total{job=~\"$job\", instance=~\"$instance\", level!=\"info\"}[30m]))",
@@ -503,7 +515,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Persistent queue size shows size of pending samples in bytes which hasn't been flushed to remote storage yet. \nIncreasing of value might be a sign of connectivity issues. In such cases, vmagent starts to flush pending data on disk with attempt to send it later once connection is restored.",
@@ -549,11 +561,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "expr": "sum(vm_persistentqueue_bytes_pending{job=~\"$job\", instance=~\"$instance\"})",
@@ -567,7 +579,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -640,11 +652,11 @@ data:
                     },
                     "showHeader": true
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -660,7 +672,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -746,7 +758,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -764,7 +776,7 @@ data:
             {
                 "collapsed": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "gridPos": {
@@ -778,7 +790,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "refId": "A"
@@ -789,7 +801,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows in/out samples rate including push and pull models. \n\nThe out-rate could be different to in-rate because of replication or additional timeseries added by vmagent for every scraped target.\n\nClick on the line and choose Drilldown to show CPU usage per instance\n",
@@ -894,11 +906,11 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
-                        "expr": "sum(rate(vm_promscrape_scraped_samples_sum{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)\n+ sum(rate(vmagent_rows_inserted_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)",
+                        "expr": "sum(rate({__name__=~\"vmagent_rows_inserted_total|vm_promscrape_scraped_samples_sum\", job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)",
                         "hide": false,
                         "interval": "",
                         "legendFormat": "in {{`{{`}}job{{`}}`}}",
@@ -907,7 +919,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -923,7 +935,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the persistent queue size of pending samples in bytes >2MB which hasn't been flushed to remote storage yet. \n\nIncreasing of value might be a sign of connectivity issues. In such cases, vmagent starts to flush pending data on disk with attempt to send it later once connection is restored.\n\nRemote write URLs are hidden by default but might be unveiled once `-remoteWrite.showURL` is set to true.\n\nClick on the line and choose Drilldown to show CPU usage per instance.\n",
@@ -1023,7 +1035,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1040,7 +1052,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the rate of logging the messages by their level. Unexpected spike in rate is a good reason to check logs.",
@@ -1129,7 +1141,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1149,7 +1161,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows rate of dropped samples from persistent queue. VMagent drops samples from queue if in-memory and on-disk queues are full and it is unable to flush them to remote storage.\nThe max size of on-disk queue is configured by `-remoteWrite.maxDiskUsagePerURL` flag.",
@@ -1242,7 +1254,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1258,7 +1270,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the rate of requests served by vmagent HTTP server.",
@@ -1345,7 +1357,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1361,7 +1373,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Errors rate shows rate for multiple metrics that track possible errors in vmagent, such as network or parsing errors.",
@@ -1454,7 +1466,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1466,7 +1478,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1478,7 +1490,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1490,7 +1502,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1502,7 +1514,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1519,7 +1531,7 @@ data:
             {
                 "collapsed": true,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "gridPos": {
@@ -2337,7 +2349,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "refId": "A"
@@ -2349,7 +2361,7 @@ data:
             {
                 "collapsed": true,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
@@ -2406,8 +2418,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2509,8 +2520,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2615,8 +2625,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "transparent",
-                                            "value": null
+                                            "color": "transparent"
                                         },
                                         {
                                             "color": "red",
@@ -2721,8 +2730,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "transparent",
-                                            "value": null
+                                            "color": "transparent"
                                         },
                                         {
                                             "color": "red",
@@ -2826,8 +2834,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2932,8 +2939,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -3043,8 +3049,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -3147,8 +3152,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -3222,8 +3226,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -3330,7 +3333,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -3342,7 +3345,7 @@ data:
             {
                 "collapsed": true,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "gridPos": {
@@ -4017,7 +4020,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "refId": "A"
@@ -4029,7 +4032,7 @@ data:
             {
                 "collapsed": true,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "gridPos": {
@@ -4088,7 +4091,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -4104,7 +4108,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 46
+                            "y": 38
                         },
                         "id": 73,
                         "links": [],
@@ -4133,7 +4137,7 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": true,
-                                "expr": "sum(rate(vm_ingestserver_requests_total{job=~\"$job\", instance=~\"$instance\", path!~\"/favicon.ico\"}[$__rate_interval])) by(job, type, net) > 0",
+                                "expr": "sum(rate(vm_ingestserver_requests_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, type, net) > 0",
                                 "interval": "",
                                 "legendFormat": "{{`{{`}}net{{`}}`}}: {{`{{`}} type {{`}}`}} ({{`{{`}}job{{`}}`}})",
                                 "range": true,
@@ -4154,6 +4158,227 @@ data:
                             }
                         ],
                         "title": "Requests rate  ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows the rate of rows ingested in vmagent via push protocols.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 38
+                        },
+                        "id": 131,
+                        "links": [],
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.2.6",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(rate(vmagent_rows_inserted_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, type) > 0",
+                                "interval": "",
+                                "legendFormat": "{{`{{`}} type {{`}}`}} ({{`{{`}}job{{`}}`}})",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Rows rate  ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows how many concurrent inserts are taking place.\n\nIf the number of concurrent inserts hitting the `limit` or is close to the `limit` constantly - it might be a sign of a resource shortage.\n\n If vmagent's CPU usage and remote write connection saturation are at normal level, it might be that `-maxConcurrentInserts` cmd-line flag need to be increased.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 46
+                        },
+                        "id": 130,
+                        "links": [],
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.2.6",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "max_over_time(vm_concurrent_insert_current{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
+                                "interval": "",
+                                "legendFormat": "{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}})",
+                                "range": true,
+                                "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "min(vm_concurrent_insert_capacity{job=~\"$job\", instance=~\"$instance\"}) by(job)",
+                                "interval": "",
+                                "legendFormat": "limit ({{`{{`}}job{{`}}`}})",
+                                "range": true,
+                                "refId": "B"
+                            }
+                        ],
+                        "title": "Concurrent inserts ($instance)",
                         "type": "timeseries"
                     },
                     {
@@ -4204,7 +4429,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -4272,7 +4498,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "refId": "A"
@@ -4284,7 +4510,7 @@ data:
             {
                 "collapsed": true,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "gridPos": {
@@ -4360,7 +4586,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 47
+                            "y": 55
                         },
                         "id": 60,
                         "options": {
@@ -4462,7 +4688,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 47
+                            "y": 55
                         },
                         "id": 66,
                         "options": {
@@ -4564,7 +4790,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 55
+                            "y": 63
                         },
                         "id": 61,
                         "options": {
@@ -4666,7 +4892,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 55
+                            "y": 63
                         },
                         "id": 65,
                         "options": {
@@ -4767,7 +4993,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 63
+                            "y": 71
                         },
                         "id": 88,
                         "options": {
@@ -4865,7 +5091,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 63
+                            "y": 71
                         },
                         "id": 84,
                         "options": {
@@ -4966,7 +5192,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 71
+                            "y": 79
                         },
                         "id": 90,
                         "options": {
@@ -5004,7 +5230,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "refId": "A"
@@ -5632,7 +5858,8 @@ data:
         "style": "dark",
         "tags": [
             "vmagent",
-            "victoriametrics"
+            "victoriametrics",
+            "vm-k8s-stack"
         ],
         "templating": {
             "list": [
@@ -5646,8 +5873,10 @@ data:
                     "includeAll": false,
                     "multi": false,
                     "name": "ds",
-                    "options": [],
-                    "query": "prometheus",
+                    "options": [
+
+                    ],
+                    "query": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "queryValue": "",
                     "refresh": 1,
                     "regex": "",
@@ -5656,7 +5885,9 @@ data:
                 },
                 {
                     "allValue": "",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -5666,7 +5897,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "job",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{version=~\"^vmagent.*\"}, job)",
                         "refId": "VictoriaMetrics-job-Variable-Query"
@@ -5682,7 +5915,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -5692,7 +5927,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "instance",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{job=~\"$job\"}, instance)",
                         "refId": "VictoriaMetrics-instance-Variable-Query"
@@ -5708,7 +5945,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -5719,7 +5958,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "url",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vmagent_remotewrite_requests_total{job=~\"$job\", instance=~\"$instance\"}, url)",
                         "refId": "StandardVariableQuery"
@@ -5735,7 +5976,9 @@ data:
                         "type": "prometheus",
                         "uid": "$ds"
                     },
-                    "filters": [],
+                    "filters": [
+
+                    ],
                     "hide": 0,
                     "name": "adhoc",
                     "skipUrlSync": false,

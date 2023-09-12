@@ -52,7 +52,7 @@ data:
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "9.2.6"
+                "version": "9.2.7"
             },
             {
                 "type": "datasource",
@@ -105,17 +105,29 @@ data:
                         "uid": "$ds"
                     },
                     "enable": true,
-                    "expr": "sum(vm_app_version{job=~\"$job\"}) by(short_version) unless (sum(vm_app_version{job=~\"$job\"} offset 20m) by(short_version))",
+                    "expr": "sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"}) by(short_version) unless (sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"} offset 20m) by(short_version))",
                     "hide": true,
                     "iconColor": "dark-blue",
                     "name": "version",
                     "textFormat": "{{`{{`}}short_version{{`}}`}}",
                     "titleFormat": "Version change"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$ds"
+                    },
+                    "enable": true,
+                    "expr": "sum(changes(vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"})) by(job, instance)",
+                    "hide": true,
+                    "iconColor": "dark-yellow",
+                    "name": "restarts",
+                    "textFormat": "{{`{{`}}job{{`}}`}}:{{`{{`}}instance{{`}}`}} restarted"
                 }
             ]
         },
         "description": "Overview for VictoriaMetrics vmalert v1.83.0 or higher",
-        "editable": true,
+        "editable": false,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 1,
         "id": null,
@@ -174,7 +186,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows if the last configuration update was successful. \"Not Ok\" means there was an unsuccessful attempt to update the configuration due to some error. Check the log for details.",
@@ -238,11 +250,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "exemplar": false,
@@ -257,7 +269,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the total number of loaded alerting rules across selected instances and groups.",
@@ -298,11 +310,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "exemplar": false,
@@ -317,7 +329,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the total number of loaded recording rules across selected instances and groups.",
@@ -358,11 +370,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "exemplar": false,
@@ -377,7 +389,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the total number of errors generated by recording/alerting rules for selected instances and groups.",
@@ -422,11 +434,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "exemplar": false,
@@ -441,7 +453,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows number of Recording Rules which produce no data.\n\n Usually it means that such rules are misconfigured, since they give no output during the evaluation.\nPlease check if rule's expression is correct and it is working as expected.",
@@ -486,11 +498,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -507,7 +519,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -580,11 +592,11 @@ data:
                     },
                     "showHeader": true
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -600,7 +612,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -686,7 +698,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -705,7 +717,7 @@ data:
             {
                 "collapsed": false,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
@@ -719,7 +731,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -730,7 +742,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the number of fired alerts by job.",
@@ -816,7 +828,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -833,7 +845,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Top $topk groups by evaluation duration. Shows groups that take the most of time during the evaluation across all instances.\n\nThe panel uses MetricsQL functions and may not work with Prometheus.",
@@ -919,7 +931,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -936,7 +948,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows how many requests (executions) per second vmalert sends to the configured datasource.",
@@ -1020,7 +1032,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1037,7 +1049,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the error rate while executing configured rules. Non-zero value means there are some issues with existing rules. Check the logs to get more details.",
@@ -1121,7 +1133,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1138,7 +1150,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -1216,11 +1228,11 @@ data:
                         }
                     ]
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1266,7 +1278,7 @@ data:
             {
                 "collapsed": true,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
@@ -1277,6 +1289,230 @@ data:
                 },
                 "id": 43,
                 "panels": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "The precentage of used RSS memory\n\nIf you think that usage is abnormal or unexpected, please file an issue and attach memory profile if possible.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "percentunit"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 33
+                        },
+                        "id": 37,
+                        "links": [
+                            {
+                                "targetBlank": true,
+                                "title": "Profiling",
+                                "url": "https://docs.victoriametrics.com/vmagent.html#profiling"
+                            }
+                        ],
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true,
+                                "sortBy": "Last *",
+                                "sortDesc": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "none"
+                            }
+                        },
+                        "pluginVersion": "9.2.6",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": false,
+                                "expr": "max(\n    max_over_time(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    vm_available_memory_bytes{job=~\"$job\", instance=~\"$instance\"}\n) by(job)",
+                                "interval": "",
+                                "legendFormat": "__auto",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Memory usage % ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Amount of used RSS memory\n\nIf you think that usage is abnormal or unexpected, please file an issue and attach memory profile if possible.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "bytes"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 33
+                        },
+                        "id": 57,
+                        "links": [
+                            {
+                                "targetBlank": true,
+                                "title": "Profiling",
+                                "url": "https://docs.victoriametrics.com/vmagent.html#profiling"
+                            }
+                        ],
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true,
+                                "sortBy": "Last *",
+                                "sortDesc": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "none"
+                            }
+                        },
+                        "pluginVersion": "9.2.6",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": false,
+                                "expr": "max(\n    max_over_time(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])\n) by(job)",
+                                "interval": "",
+                                "legendFormat": "{{`{{`}}job{{`}}`}}",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Memory usage ($instance)",
+                        "type": "timeseries"
+                    },
                     {
                         "datasource": {
                             "type": "prometheus",
@@ -1342,7 +1578,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 35
+                            "y": 41
                         },
                         "id": 35,
                         "links": [
@@ -1396,7 +1632,7 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Amount of used memory\n\nResident memory shows share which can be freed by OS when needed.\n\nAnonymous shows share for memory allocated by the process itself. This share cannot be freed by the OS, so it must be taken into account by OOM killer.\n\nIf you think that usage is abnormal or unexpected, please file an issue and attach memory profile if possible.",
+                        "description": "Shows the max number of CPU cores used  by a `job` and the corresponding limit.",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
@@ -1448,7 +1684,7 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "percentunit"
+                                "unit": "short"
                             },
                             "overrides": []
                         },
@@ -1456,9 +1692,9 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 35
+                            "y": 41
                         },
-                        "id": 37,
+                        "id": 56,
                         "links": [
                             {
                                 "targetBlank": true,
@@ -1481,7 +1717,7 @@ data:
                             },
                             "tooltip": {
                                 "mode": "multi",
-                                "sort": "none"
+                                "sort": "desc"
                             }
                         },
                         "pluginVersion": "9.2.6",
@@ -1493,14 +1729,32 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": false,
-                                "expr": "max(\n    max_over_time(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    vm_available_memory_bytes{job=~\"$job\", instance=~\"$instance\"}\n) by(job)",
+                                "expr": "max(rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)",
+                                "format": "time_series",
                                 "interval": "",
-                                "legendFormat": "__auto",
+                                "intervalFactor": 1,
+                                "legendFormat": "{{`{{`}}job{{`}}`}}",
                                 "range": true,
                                 "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": false,
+                                "expr": "min(process_cpu_cores_available{job=~\"$job\", instance=~\"$instance\"}) by(job)",
+                                "format": "time_series",
+                                "hide": false,
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "limit ({{`{{`}}job{{`}}`}})",
+                                "range": true,
+                                "refId": "B"
                             }
                         ],
-                        "title": "Memory usage % ($instance)",
+                        "title": "CPU usage ($instance)",
                         "type": "timeseries"
                     },
                     {
@@ -1569,7 +1823,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 43
+                            "y": 49
                         },
                         "id": 39,
                         "links": [],
@@ -1675,7 +1929,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 43
+                            "y": 49
                         },
                         "id": 41,
                         "links": [],
@@ -1719,7 +1973,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -1731,7 +1985,7 @@ data:
             {
                 "collapsed": true,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
@@ -1788,8 +2042,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1891,8 +2144,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1994,8 +2246,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2098,8 +2349,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2198,8 +2448,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2257,7 +2506,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -2269,7 +2518,7 @@ data:
             {
                 "collapsed": true,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
@@ -2326,8 +2575,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2429,8 +2677,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2531,8 +2778,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2590,7 +2836,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -2654,8 +2900,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2747,8 +2992,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2804,22 +3048,25 @@ data:
         "style": "dark",
         "tags": [
             "victoriametrics",
-            "vmalert"
+            "vmalert",
+            "vm-k8s-stack"
         ],
         "templating": {
             "list": [
                 {
                     "current": {
-                        "selected": true,
-                        "text": "VictoriaMetrics",
-                        "value": "VictoriaMetrics"
+                        "selected": false,
+                        "text": "VictoriaMetrics - cluster",
+                        "value": "VictoriaMetrics - cluster"
                     },
                     "hide": 0,
                     "includeAll": false,
                     "multi": false,
                     "name": "ds",
-                    "options": [],
-                    "query": "prometheus",
+                    "options": [
+
+                    ],
+                    "query": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "queryValue": "",
                     "refresh": 1,
                     "regex": "",
@@ -2827,7 +3074,9 @@ data:
                     "type": "datasource"
                 },
                 {
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -2837,7 +3086,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "job",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{version=~\"^vmalert.*\"}, job)",
                         "refId": "StandardVariableQuery"
@@ -2850,7 +3101,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -2860,7 +3113,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "instance",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{job=~\"$job\"}, instance)",
                         "refId": "StandardVariableQuery"
@@ -2873,7 +3128,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -2883,7 +3140,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "group",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vmalert_iteration_duration_seconds{job=~\"$job\", instance=~\"$instance\"}, group)",
                         "refId": "StandardVariableQuery"
@@ -2896,7 +3155,7 @@ data:
                 },
                 {
                     "current": {
-                        "selected": true,
+                        "selected": false,
                         "text": "5",
                         "value": "5"
                     },
@@ -2946,7 +3205,9 @@ data:
                         "type": "prometheus",
                         "uid": "$ds"
                     },
-                    "filters": [],
+                    "filters": [
+
+                    ],
                     "hide": 0,
                     "name": "adhoc",
                     "skipUrlSync": false,
@@ -2958,7 +3219,9 @@ data:
             "from": "now-3h",
             "to": "now"
         },
-        "timepicker": {},
+        "timepicker": {
+
+        },
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "VictoriaMetrics - vmalert",
         "uid": "LzldHAVnz",

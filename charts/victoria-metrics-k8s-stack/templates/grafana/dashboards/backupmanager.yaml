@@ -108,7 +108,7 @@ data:
             ]
         },
         "description": "Overview for VictoriaMetrics backupmanager v1.85.3 or higher",
-        "editable": true,
+        "editable": false,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 0,
         "id": null,
@@ -130,7 +130,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -176,7 +176,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -193,7 +193,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Status of last backup operation.",
@@ -250,7 +250,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -265,7 +265,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Number of backups stored in remote storage.",
@@ -312,7 +312,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -327,7 +327,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Space used in remote storage.",
@@ -375,7 +375,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -390,7 +390,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "",
@@ -451,7 +451,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -466,7 +466,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Status of last retention run.\n\nRetention is a process of removing old backups from remote storage.",
@@ -523,7 +523,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -538,7 +538,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -598,7 +598,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -613,7 +613,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -695,7 +695,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -736,7 +736,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -818,7 +818,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1705,7 +1705,9 @@ data:
         "refresh": "1m",
         "schemaVersion": 36,
         "style": "dark",
-        "tags": [],
+        "tags": [
+            "vm-k8s-stack"
+        ],
         "templating": {
             "list": [
                 {
@@ -1718,8 +1720,10 @@ data:
                     "includeAll": false,
                     "multi": false,
                     "name": "ds",
-                    "options": [],
-                    "query": "prometheus",
+                    "options": [
+
+                    ],
+                    "query": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "queryValue": "",
                     "refresh": 1,
                     "regex": "",
@@ -1728,7 +1732,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "uid": "$ds"
                     },
@@ -1737,7 +1743,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "job",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{version=~\"^vmbackupmanager.*\"}, job)",
                         "refId": "StandardVariableQuery"
@@ -1753,7 +1761,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "uid": "$ds"
                     },
@@ -1762,7 +1772,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "instance",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{job=~\"$job\"}, instance)",
                         "refId": "VictoriaMetrics-instance-Variable-Query"
@@ -1781,7 +1793,9 @@ data:
                         "type": "prometheus",
                         "uid": "$ds"
                     },
-                    "filters": [],
+                    "filters": [
+
+                    ],
                     "hide": 0,
                     "name": "adhoc",
                     "skipUrlSync": false,
@@ -1793,7 +1807,9 @@ data:
             "from": "now-7d",
             "to": "now"
         },
-        "timepicker": {},
+        "timepicker": {
+
+        },
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "VictoriaMetrics - backupmanager",
         "uid": "gF-lxRdVz",

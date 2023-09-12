@@ -27,7 +27,7 @@ spec:
       annotations:
         description: Job {{`{{`}} $labels.job {{`}}`}} (instance {{`{{`}} $labels.instance {{`}}`}}) has restarted more than twice in the last 15 minutes. It might be crashlooping.
         summary: '{{`{{`}} $labels.job {{`}}`}} too many restarts (instance {{`{{`}} $labels.instance {{`}}`}})'
-      expr: changes(process_start_time_seconds{job=~"victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert"}[15m]) > 2
+      expr: changes(process_start_time_seconds{job=~"victoriametrics.*|vmselect.*|vminsert.*|vmstorage.*|vmagent.*|vmalert.*|vmsingle.*|vmalertmanager.*"}[15m]) > 2
       labels:
         severity: critical
 {{- if .Values.defaultRules.additionalRuleLabels }}
@@ -37,7 +37,7 @@ spec:
       annotations:
         description: '{{`{{`}} $labels.instance {{`}}`}} of job {{`{{`}} $labels.job {{`}}`}} has been down for more than 2 minutes.'
         summary: Service {{`{{`}} $labels.job {{`}}`}} is down on {{`{{`}} $labels.instance {{`}}`}}
-      expr: up{job=~"victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert"} == 0
+      expr: up{job=~"victoriametrics.*|vmselect.*|vminsert.*|vmstorage.*|vmagent.*|vmalert.*|vmsingle.*|vmalertmanager.*"} == 0
       for: 2m
       labels:
         severity: critical
@@ -58,8 +58,8 @@ spec:
     - alert: TooHighMemoryUsage
       annotations:
         description: Too high memory usage may result into multiple issues such as OOMs or degraded performance. Consider to either increase available memory or decrease the load on the process.
-        summary: It is more than 90% of memory used by "{{`{{`}} $labels.job {{`}}`}}"("{{`{{`}} $labels.instance {{`}}`}}") during the last 5m
-      expr: (process_resident_memory_anon_bytes / vm_available_memory_bytes) > 0.9
+        summary: It is more than 80% of memory used by "{{`{{`}} $labels.job {{`}}`}}"("{{`{{`}} $labels.instance {{`}}`}}") during the last 5m
+      expr: (process_resident_memory_anon_bytes / vm_available_memory_bytes) > 0.8
       for: 5m
       labels:
         severity: critical
@@ -82,6 +82,28 @@ spec:
         description: "Logging rate for job \"{{`{{`}} $labels.job {{`}}`}}\" ({{`{{`}} $labels.instance {{`}}`}}) is {{`{{`}} $value {{`}}`}} for last 15m.\n Worth to check logs for specific error messages."
         summary: Too many logs printed for job "{{`{{`}} $labels.job {{`}}`}}" ({{`{{`}} $labels.instance {{`}}`}})
       expr: sum(increase(vm_log_messages_total{level="error"}[5m])) by (job, instance) > 0
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: TooManyTSIDMisses
+      annotations:
+        description: "The rate of TSID misses during query lookups is too high for \"{{`{{`}} $labels.job {{`}}`}}\" ({{`{{`}} $labels.instance {{`}}`}}).\n Make sure you're running VictoriaMetrics of v1.85.3 or higher.\n Related issue https://github.com/VictoriaMetrics/VictoriaMetrics/issues/3502"
+        summary: Too many TSID misses for job "{{`{{`}} $labels.job {{`}}`}}" ({{`{{`}} $labels.instance {{`}}`}})
+      expr: sum(rate(vm_missing_tsids_for_metric_id_total[5m])) by (job, instance) > 0
+      for: 10m
+      labels:
+        severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: ConcurrentInsertsHitTheLimit
+      annotations:
+        description: "The limit of concurrent inserts on instance {{`{{`}} $labels.instance {{`}}`}} depends on the number of CPUs.\n Usually, when component constantly hits the limit it is likely the component is overloaded and requires more CPU. In some cases for components like vmagent or vminsert the alert might trigger if there are too many clients making write attempts. If vmagent's or vminsert's CPU usage and network saturation are at normal level, then it might be worth adjusting `-maxConcurrentInserts` cmd-line flag."
+        summary: '{{`{{`}} $labels.job {{`}}`}} on instance {{`{{`}} $labels.instance {{`}}`}} is constantly hitting concurrent inserts limit'
+      expr: avg_over_time(vm_concurrent_insert_current[1m]) >= vm_concurrent_insert_capacity
       for: 15m
       labels:
         severity: warning

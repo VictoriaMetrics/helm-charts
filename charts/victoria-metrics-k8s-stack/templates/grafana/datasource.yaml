@@ -26,6 +26,7 @@ data:
       isDefault: true
       jsonData: {{ toYaml .Values.grafana.sidecar.datasources.jsonData | nindent 8 }}
 {{- end }}
+{{- include "victoria-metrics-k8s-stack.VMDataSource" . }}
 {{- if .Values.grafana.sidecar.datasources.createVMReplicasDatasources }}
 {{- range until (int .Values.vmsingle.spec.replicaCount) }}
     - name: VictoriaMetrics-{{ . }}

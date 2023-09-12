@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.17.8](https://img.shields.io/badge/Version-0.17.8-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.18.0](https://img.shields.io/badge/Version-0.18.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -396,6 +396,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.dashboards.default.nodeexporter.gnetId | int | `1860` |  |
 | grafana.dashboards.default.nodeexporter.revision | int | `22` |  |
 | grafana.defaultDashboardsTimezone | string | `"utc"` |  |
+| grafana.defaultDatasourceType | string | `"prometheus"` |  |
 | grafana.enabled | bool | `true` |  |
 | grafana.forceDeployDatasource | bool | `false` |  |
 | grafana.ingress.annotations | object | `{}` |  |
@@ -412,6 +413,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.dashboards.multicluster | bool | `false` |  |
 | grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |
 | grafana.sidecar.datasources.enabled | bool | `true` |  |
+| grafana.sidecar.datasources.initDatasources | bool | `true` |  |
 | grafana.sidecar.datasources.jsonData | object | `{}` |  |
 | grafana.vmServiceScrape.enabled | bool | `true` |  |
 | grafana.vmServiceScrape.spec | object | `{}` |  |

@@ -169,30 +169,47 @@ def yaml_str_repr(struct, indent=2):
     return text
 
 
+def replace_ds_type_in_panel(panel):
+    if 'datasource' in panel:
+        if 'type' in panel['datasource']:
+            panel['datasource']['type'] = '__VM_DEFAULT_DATASOURCE__'
+    for target in panel.get('targets', []):
+        if 'datasource' in target:
+            if 'type' in target['datasource']:
+                target['datasource']['type'] = '__VM_DEFAULT_DATASOURCE__'
+
 def patch_dashboards_json(content):
     try:
         content_struct = json.loads(content)
 
         ## multicluster
         overwrite_list = []
-        for variable in content_struct['templating']['list']:
-            if variable['name'] == 'cluster':
-                variable['hide'] = ':multicluster:'
-            overwrite_list.append(variable)
+        if 'templating' in content_struct:
+            for variable in content_struct['templating'].get('list', []):
+                if variable.get('name', '') == 'cluster':
+                    variable['hide'] = ':multicluster:'
+                if variable.get('type', '') == 'datasource' and variable.get('query', '') == 'prometheus':
+                    variable['query'] = '__VM_DEFAULT_DATASOURCE__'
+                overwrite_list.append(variable)
         content_struct['templating']['list'] = overwrite_list
 
         ## make dashboards readonly
         content_struct['editable'] = False
 
         ## add common tag
-        content_struct['tags'].append('vm-k8s-stack')
+        if 'tags' in content_struct:
+            content_struct['tags'].append('vm-k8s-stack')
 
         ## fix drilldown links. see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/659
-        for row in content_struct['rows']:
-            for panel in row['panels']:
+        for row in content_struct.get('rows', []):
+            for panel in row.get('panels', []):
+                replace_ds_type_in_panel(panel)
                 for style in panel.get('styles', []):
                     if 'linkUrl' in style and style['linkUrl'].startswith('./d'):
                         style['linkUrl'] = style['linkUrl'].replace('./d', '/d')
+
+        for panel in content_struct.get('panels', []):
+            replace_ds_type_in_panel(panel)
 
         content_array = []
         original_content_lines = content.split('\n')
@@ -220,8 +237,8 @@ def patch_dashboards_json(content):
                 '\{\{ if .Values.grafana.sidecar.dashboards.multicluster \}\}0\{\{ else \}\}2\{\{ end \}\}',
                 content[multicluster + 15:]
             ))
-    except (ValueError, KeyError):
-        pass
+    except (ValueError, KeyError) as err:
+        print("Cannot update dashboard content: ", err)
 
     return content
 
@@ -253,6 +270,9 @@ def write_group_to_file(resource_name, content, url, destination):
 
     # footer
     lines += '{{- end }}'
+
+    # replace placeholders with datasource type variable
+    lines = lines.replace("__VM_DEFAULT_DATASOURCE__", '{{ default \"prometheus\" .Values.grafana.defaultDatasourceType }}')
 
     filename = resource_name + '.yaml'
     new_filename = "%s/%s" % (destination, filename)
