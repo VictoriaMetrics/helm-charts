@@ -123,7 +123,7 @@ init:
 #	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) $(HELM)
 
 gen-docs:
-	docker run --rm --name helm-docs  \
+	docker run --rm \
 		--user $(shell id -u):$(shell id -g) \
 		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
 		-w /helm-charts \
@@ -132,18 +132,20 @@ gen-docs:
 
 # Synchronize alerting rules in charts/victoria-metrics-k8s-stack/templates/rules
 sync-rules:
-	docker run --rm --name sync-rules \
+	docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
 		--mount type=bind,src="$(shell pwd)/charts/victoria-metrics-k8s-stack",dst=/k8s-stack \
 		-w /k8s-stack/hack/ \
 		$(PYTHON_IMAGE) sh -c "\
-			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt && python3 sync_rules.py \
+			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_rules.py \
 		"
 
 # Synchronize grafana dashboards in charts/victoria-metrics-k8s-stack/templates/grafana/dashboards
 sync-dashboards:
-	docker run --rm --name sync-rules \
+	docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
 		--mount type=bind,src="$(shell pwd)/charts/victoria-metrics-k8s-stack",dst=/k8s-stack \
 		-w /k8s-stack/hack/ \
 		$(PYTHON_IMAGE) sh -c "\
-			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt && python3 sync_grafana_dashboards.py \
+			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_grafana_dashboards.py \
 		"
