@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.18.0
+
+**Release date:** 2023-09-12
+
+![AppVersion: v1.93.4](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.4&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Bump version of `grafana` helm-chart to `6.59.*`
 - Bump version of `prometheus-node-exporter` helm-chart to `4.23.*`
 - Bump version of `kube-state-metrics` helm-chart to `0.59.*`
