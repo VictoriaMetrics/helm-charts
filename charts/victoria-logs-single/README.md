@@ -1,6 +1,6 @@
 # Victoria Logs Helm Chart for Single Version
 
- ![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square)
+ ![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-single)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -113,6 +113,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| extraObjects | list | `[]` |  |
 | fluent-bit.config.filters | string | `"[FILTER]\n    Name kubernetes\n    Match kube.*\n    Merge_Log On\n    Keep_Log On\n    K8S-Logging.Parser On\n    K8S-Logging.Exclude On\n[FILTER]\n    Name                nest\n    Match               *\n    Wildcard            pod_name\n    Operation lift\n    Nested_under kubernetes\n    Add_prefix   kubernetes_\n"` |  |
 | fluent-bit.config.outputs | string | `"[OUTPUT]\n    Name http\n    Match kube.*\n    Host {{ .Release.Name }}-victoria-logs-single-server\n    port 9428\n    compress gzip\n    uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date\n    format json_lines\n    json_date_format iso8601\n    header AccountID 0\n    header ProjectID 0\n"` | Note that Host must be replaced to match your VictoriaLogs service name Default format is: {{release_name}}-victoria-logs-single-server |
 | fluent-bit.daemonSetVolumeMounts[0].mountPath | string | `"/var/log"` |  |

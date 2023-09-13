@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+* added: extraObjects: [] for dynamic supportive objects configuration
 
 ## 0.3.0
 
