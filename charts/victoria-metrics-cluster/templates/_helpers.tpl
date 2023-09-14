@@ -257,3 +257,18 @@ Return if ingress supports pathType.
 []
 {{- end -}}
 {{- end -}}
+
+{{- define "victoria-metrics.insert.relabelConfigMap" -}}
+- name: relabelconfig-volume
+  configMap:
+    name: vminsert-relabelconfig
+    items:
+    - key: relabelConfig.yml
+      path: relabelConfig.yml
+      mode: 0755
+{{- end -}}
+
+{{- define "victoria-metrics.insert.relabelConfigMount" -}}
+- name: relabelconfig-volume
+  mountPath: /etc
+{{- end -}}

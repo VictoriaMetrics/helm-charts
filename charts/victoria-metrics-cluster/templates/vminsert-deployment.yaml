@@ -60,6 +60,9 @@ spec:
           {{- range $key, $value := .Values.vminsert.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
+          {{- if gt (len .Values.vminsert.relabelConfig) 0 }}
+            - --relabelConfig=/etc/relabelConfig.yml
+          {{- end }}
           {{- with .Values.vminsert.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
@@ -129,6 +132,14 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if gt (len .Values.vminsert.relabelConfig) 0 }}
+          {{- if gt (len .Values.vminsert.extraVolumes) 0 }}
+            {{- include "victoria-metrics.insert.relabelConfigMount" . | nindent 12 }}
+          {{ else }}
+          volumes:
+            {{- include "victoria-metrics.insert.relabelConfigMount" . | nindent 12 }}
+          {{- end }}
+          {{- end }}
           resources: {{- toYaml .Values.vminsert.resources | nindent 12 }}
         {{- with .Values.vminsert.extraContainers }}
         {{- toYaml . | nindent 8 }}
@@ -161,5 +172,13 @@ spec:
       {{- with .Values.vminsert.extraVolumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if gt (len .Values.vminsert.relabelConfig) 0 }}
+      {{- if gt (len .Values.vminsert.extraVolumes) 0 }}
+        {{- include "victoria-metrics.insert.relabelConfigMap" . | nindent 8 }}
+      {{ else }}
+      volumes:
+        {{- include "victoria-metrics.insert.relabelConfigMap" . | nindent 8 }}
+      {{- end }}
       {{- end }}
 {{- end }}

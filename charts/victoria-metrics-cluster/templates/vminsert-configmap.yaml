@@ -1,4 +1,4 @@
-{{- if hasKey .Values.vminsert.extraArgs "relabelConfig" }}
+{{- if gt (len .Values.vminsert.relabelConfig) 0 }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -11,7 +11,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   relabelConfig.yml: |
-{{- with .Values.vminsert.relabelConfigs }}
+{{- with .Values.vminsert.relabelConfig }}
 {{ toYaml . | indent 4 }}
 {{- end }}
 {{- end -}}
