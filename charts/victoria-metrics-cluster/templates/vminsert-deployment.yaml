@@ -30,6 +30,14 @@ spec:
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if gt (len .Values.vminsert.relabelConfig) 0 }}
+      {{- if gt (len .Values.vminsert.podAnnotations) 0 }}
+        checksum/config: {{ include (print $.Template.BasePath "/vminsert-configmap.yaml") . | sha256sum }}
+      {{ else }}
+      annotations :
+        checksum/config: {{ include (print $.Template.BasePath "/vminsert-configmap.yaml") . | sha256sum }}
+      {{- end }}
+      {{- end }}
       labels:
         {{- include "victoria-metrics.vminsert.labels" . | nindent 8 }}
         {{- with .Values.vminsert.extraLabels }}
@@ -133,11 +141,11 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- if gt (len .Values.vminsert.relabelConfig) 0 }}
-          {{- if gt (len .Values.vminsert.extraVolumes) 0 }}
+          {{- if gt (len .Values.vminsert.extraVolumeMounts) 0 }}
             {{- include "victoria-metrics.insert.relabelConfigMount" . | nindent 12 }}
           {{ else }}
-          volumes:
-            {{- include "victoria-metrics.insert.relabelConfigMount" . | nindent 12 }}
+          volumeMounts:
+            {{- include "victoria-metrics.insert.relabelConfigMount" . | nindent 12 }}  
           {{- end }}
           {{- end }}
           resources: {{- toYaml .Values.vminsert.resources | nindent 12 }}
