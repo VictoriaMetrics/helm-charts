@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.1
+
+**Release date:** 2023-09-13
+
+![AppVersion: v0.3.0-victorialogs](https://img.shields.io/static/v1?label=AppVersion&message=v0.3.0-victorialogs&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 * added: extraObjects: [] for dynamic supportive objects configuration
 
 ## 0.3.0
