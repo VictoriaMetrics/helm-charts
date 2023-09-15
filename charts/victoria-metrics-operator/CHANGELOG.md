@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix `relabelConfigs` for operator's VMServiceScrape (#624)
 
 ## 0.27.0
 
