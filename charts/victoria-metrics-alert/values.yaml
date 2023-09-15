@@ -13,8 +13,6 @@ serviceAccount:
   # mount API token to pod directly
   automountToken: true
 
-imagePullSecrets: []
-
 rbac:
   create: true
   # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
@@ -32,6 +30,7 @@ server:
     pullPolicy: IfNotPresent
   nameOverride: ""
   fullnameOverride: ""
+  imagePullSecrets: []
 
   ## See `kubectl explain poddisruptionbudget.spec` for more
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
