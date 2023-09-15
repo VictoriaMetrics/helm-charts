@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix misplaced `imagePullSecrets` for server (#675)
 
 ## 0.7.7
 
