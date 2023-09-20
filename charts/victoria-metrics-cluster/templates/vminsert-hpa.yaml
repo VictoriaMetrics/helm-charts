@@ -22,4 +22,8 @@ spec:
     name: {{ template "victoria-metrics.vminsert.fullname" . }}
   metrics:
 {{ toYaml .Values.vminsert.horizontalPodAutoscaler.metrics | indent 4 }}
+{{- if .Values.vminsert.horizontalPodAutoscaler.behavior }}
+  behavior:
+{{ toYaml .Values.vminsert.horizontalPodAutoscaler.behavior | indent 4 }}
+{{- end -}}
 {{- end -}}
