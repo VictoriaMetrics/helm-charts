@@ -12,6 +12,7 @@
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
 - Support `behavior` setting in horizontal pod autoscalers for vminsert and vmselect (#679)
+- Bump version of VM components to [v1.93.5](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.93.5)
 
 ## 0.10.8
 
