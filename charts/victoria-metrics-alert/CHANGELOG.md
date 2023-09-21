@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.7.8
+
+**Release date:** 2023-09-21
+
+![AppVersion: v1.93.5](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.5&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Fix misplaced `imagePullSecrets` for server (#675)
 
 ## 0.7.7

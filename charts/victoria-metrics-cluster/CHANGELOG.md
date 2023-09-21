@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.10.9
+
+**Release date:** 2023-09-21
+
+![AppVersion: v1.93.5](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.5&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Support `behavior` setting in horizontal pod autoscalers for vminsert and vmselect (#679)
 
 ## 0.10.8
