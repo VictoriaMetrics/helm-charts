@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.9.9](https://img.shields.io/badge/Version-0.9.9-informational?style=flat-square)
+ ![Version: 0.9.10](https://img.shields.io/badge/Version-0.9.10-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-agent)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -249,12 +249,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[7].relabel_configs[0].action | string | `"drop"` |  |
 | config.scrape_configs[7].relabel_configs[0].regex | bool | `true` |  |
 | config.scrape_configs[7].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_pod_container_init"` |  |
-| config.scrape_configs[7].relabel_configs[10].replacement | string | `"${1}"` |  |
-| config.scrape_configs[7].relabel_configs[10].source_labels[0] | string | `"__meta_kubernetes_service_name"` |  |
-| config.scrape_configs[7].relabel_configs[10].target_label | string | `"job"` |  |
-| config.scrape_configs[7].relabel_configs[11].action | string | `"replace"` |  |
-| config.scrape_configs[7].relabel_configs[11].source_labels[0] | string | `"__meta_kubernetes_pod_node_name"` |  |
-| config.scrape_configs[7].relabel_configs[11].target_label | string | `"node"` |  |
 | config.scrape_configs[7].relabel_configs[1].action | string | `"keep_if_equal"` |  |
 | config.scrape_configs[7].relabel_configs[1].source_labels[0] | string | `"__meta_kubernetes_pod_annotation_prometheus_io_port"` |  |
 | config.scrape_configs[7].relabel_configs[1].source_labels[1] | string | `"__meta_kubernetes_pod_container_port_number"` |  |
@@ -279,8 +273,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[7].relabel_configs[7].target_label | string | `"container"` |  |
 | config.scrape_configs[7].relabel_configs[8].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
 | config.scrape_configs[7].relabel_configs[8].target_label | string | `"namespace"` |  |
-| config.scrape_configs[7].relabel_configs[9].source_labels[0] | string | `"__meta_kubernetes_service_name"` |  |
-| config.scrape_configs[7].relabel_configs[9].target_label | string | `"service"` |  |
+| config.scrape_configs[7].relabel_configs[9].action | string | `"replace"` |  |
+| config.scrape_configs[7].relabel_configs[9].source_labels[0] | string | `"__meta_kubernetes_pod_node_name"` |  |
+| config.scrape_configs[7].relabel_configs[9].target_label | string | `"node"` |  |
 | configMap | string | `""` |  |
 | containerWorkingDir | string | `"/"` |  |
 | deployment.enabled | bool | `true` |  |
