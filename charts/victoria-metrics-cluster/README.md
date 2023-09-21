@@ -126,6 +126,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.extraVolumeMounts | list | `[]` |  |
 | vminsert.extraVolumes | list | `[]` |  |
 | vminsert.fullnameOverride | string | `""` | Overrides the full name of vminsert component |
+| vminsert.horizontalPodAutoscaler.behavior | object | `{}` | Behavior settings for scaling by the HPA |
 | vminsert.horizontalPodAutoscaler.enabled | bool | `false` | Use HPA for vminsert component |
 | vminsert.horizontalPodAutoscaler.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale the vminsert component |
 | vminsert.horizontalPodAutoscaler.metrics | list | `[]` | Metric for HPA to use to scale the vminsert component |
@@ -194,6 +195,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.extraVolumeMounts | list | `[]` |  |
 | vmselect.extraVolumes | list | `[]` |  |
 | vmselect.fullnameOverride | string | `""` | Overrides the full name of vmselect component |
+| vmselect.horizontalPodAutoscaler.behavior | object | `{}` | Behavior settings for scaling by the HPA |
 | vmselect.horizontalPodAutoscaler.enabled | bool | `false` | Use HPA for vmselect component |
 | vmselect.horizontalPodAutoscaler.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale the vmselect component |
 | vmselect.horizontalPodAutoscaler.metrics | list | `[]` | Metric for HPA to use to scale the vmselect component |

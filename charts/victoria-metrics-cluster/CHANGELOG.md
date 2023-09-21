@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Support `behavior` setting in horizontal pod autoscalers for vminsert and vmselect (#679)
 
 ## 0.10.8
 
