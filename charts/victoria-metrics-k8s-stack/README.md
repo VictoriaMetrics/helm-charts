@@ -504,7 +504,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
 | tenant | string | `"0"` |  |
 | victoria-metrics-operator | object | `{"cleanupCRD":true,"cleanupImage":{"pullPolicy":"IfNotPresent","repository":"gcr.io/google_containers/hyperkube","tag":"v1.18.0"},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":true}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars.html |
-| victoria-metrics-operator.cleanupCRD | bool | `true` | Tells helm to clean up vm cr resources when uninstalling  |
+| victoria-metrics-operator.cleanupCRD | bool | `true` | Tells helm to clean up vm cr resources when uninstalling |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.additionalRemoteWrites | list | `[]` |  |
 | vmagent.annotations | object | `{}` |  |
