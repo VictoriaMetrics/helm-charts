@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix behavior of `vmalert.remoteWriteVMAgent` - remoteWrite.url for VMAlert is correctly generated considering endpoint, name, port and http.pathPrefix of VMAgent
 
 ## 0.18.1
 
