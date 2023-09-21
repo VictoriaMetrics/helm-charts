@@ -144,7 +144,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.tag | string | `"v0.25.0"` |  |
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
-| imagePullSecrets | list | `[]` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |
@@ -171,6 +170,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.image.pullPolicy | string | `"IfNotPresent"` |  |
 | server.image.repository | string | `"victoriametrics/vmalert"` |  |
 | server.image.tag | string | `""` |  |
+| server.imagePullSecrets | list | `[]` |  |
 | server.ingress.annotations | object | `{}` |  |
 | server.ingress.enabled | bool | `false` |  |
 | server.ingress.extraLabels | object | `{}` |  |
