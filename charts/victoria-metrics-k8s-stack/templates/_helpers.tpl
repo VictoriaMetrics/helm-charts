@@ -113,7 +113,7 @@ VMAlert remotes
 {{- define "victoria-metrics-k8s-stack.vmAlertRemotes" -}}
 remoteWrite:
 {{- if or .Values.vmalert.remoteWriteVMAgent }}
-     url: {{ printf "http://%s-%s.%s.svc:8429" "vmagent" (include "victoria-metrics-k8s-stack.fullname" .) .Release.Namespace }}
+     url: {{ printf "http://vmagent-%s.%s.svc:%s%s/api/v1/write" (.Values.vmagent.name | default (include "victoria-metrics-k8s-stack.fullname" .)) .Release.Namespace (.Values.vmagent.spec.port | default "8429") (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "") }}
 {{- else }}
      {{- include "victoria-metrics-k8s-stack.vmWriteEndpoint" . | nindent 2 }}
 {{- end }}
