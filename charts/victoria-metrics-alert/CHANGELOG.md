@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix vmalert notifier address if builtin alertmanager is enabled and using baseURLPrefix.
 
 ## 0.7.8
 

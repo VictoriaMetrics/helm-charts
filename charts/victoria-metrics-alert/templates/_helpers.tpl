@@ -119,9 +119,13 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 {{- end -}}
 
+
+{{/*
+Create base alertmanager url for notifers
+*/}}
 {{- define "vmalert.alertmanager.url" -}}
 {{- if .Values.alertmanager.enabled -}}
-http://{{- include "vmalert.alertmanager.fullname" . -}}:9093
+http://{{- include "vmalert.alertmanager.fullname" . -}}:9093{{ .Values.alertmanager.baseURLPrefix }}
 {{- else -}}
 {{- .Values.server.notifier.alertmanager.url -}}
 {{- end -}}
