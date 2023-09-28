@@ -103,6 +103,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | clusterDomainSuffix | string | `"cluster.local"` | k8s cluster domain suffix, uses for building storage pods' FQDN. Ref: [https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/) |
+| extraObjects | list | `[]` | Add extra specs dynamically to this chart |
 | extraSecrets | list | `[]` |  |
 | printNotes | bool | `true` |  |
 | rbac.create | bool | `true` |  |
