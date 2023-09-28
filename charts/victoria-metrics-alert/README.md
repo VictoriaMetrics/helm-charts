@@ -144,6 +144,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.tag | string | `"v0.25.0"` |  |
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
+| extraObjects | list | `[]` | Add extra specs dynamically to this chart |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |

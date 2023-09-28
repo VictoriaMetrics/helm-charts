@@ -107,6 +107,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
 | extraLabels | object | `{}` | Labels to be added to the deployment and pods |
+| extraObjects | list | `[]` | Add extra specs dynamically to this chart |
 | extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` |  |

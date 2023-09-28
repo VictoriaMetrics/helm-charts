@@ -2,6 +2,7 @@
 
 ## Next release
 
+- Add `extraObjects` which to allow deploying additional resources with the chart release (#689)
 - Fix vmalert notifier address if builtin alertmanager is enabled and using baseURLPrefix.
 
 ## 0.7.8
