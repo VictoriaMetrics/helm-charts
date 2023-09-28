@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.18.2
+
+**Release date:** 2023-09-28
+
+![AppVersion: v1.93.5](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.5&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Fix behavior of `vmalert.remoteWriteVMAgent` - remoteWrite.url for VMAlert is correctly generated considering endpoint, name, port and http.pathPrefix of VMAgent
 
 ## 0.18.1

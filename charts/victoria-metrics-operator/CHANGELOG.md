@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.27.1
+
+**Release date:** 2023-09-28
+
+![AppVersion: 0.38.0](https://img.shields.io/static/v1?label=AppVersion&message=0.38.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Fix `relabelConfigs` for operator's VMServiceScrape (#624)
 
 ## 0.27.0
