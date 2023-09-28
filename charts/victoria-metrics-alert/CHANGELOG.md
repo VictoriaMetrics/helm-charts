@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Add `extraObjects` which to allow deploying additional resources with the chart release (#689)
 
 ## 0.7.8
 
