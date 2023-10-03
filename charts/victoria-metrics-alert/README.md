@@ -145,6 +145,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | License key configuration for VictoriaMetrics enterprise. See https://docs.victoriametrics.com/enterprise.html Supported starting from VictoriaMetrics v1.94.0 |
+| license.key | string | `""` | License key |
+| license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
+| license.secret.key | string | `""` | Key in secret with license key |
+| license.secret.name | string | `""` | Existing secret name |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |

@@ -104,6 +104,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | automountServiceAccountToken | bool | `true` |  |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | License key configuration for VictoriaMetrics enterprise. See https://docs.victoriametrics.com/enterprise.html Supported starting from VictoriaMetrics v1.94.0 |
+| license.key | string | `""` | License key |
+| license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
+| license.secret.key | string | `""` | Key in secret with license key |
+| license.secret.name | string | `""` | Existing secret name |
 | podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | podDisruptionBudget.extraLabels | object | `{}` |  |
 | printNotes | bool | `true` | Print chart notes |
