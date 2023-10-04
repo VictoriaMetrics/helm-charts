@@ -55,9 +55,18 @@ helm.sh/chart: {{ include "victoria-metrics.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "victoria-metrics.common.podLabels" -}}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
 {{- define "victoria-metrics.vmstorage.labels" -}}
 {{ include "victoria-metrics.vmstorage.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
+{{- end -}}
+
+{{- define "victoria-metrics.vmstorage.podLabels" -}}
+{{ include "victoria-metrics.vmstorage.matchLabels" . }}
+{{ include "victoria-metrics.common.podLabels" . }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmstorage.matchLabels" -}}
@@ -70,6 +79,11 @@ app: {{ .Values.vmstorage.name }}
 {{ include "victoria-metrics.common.metaLabels" . }}
 {{- end -}}
 
+{{- define "victoria-metrics.vmselect.podLabels" -}}
+{{ include "victoria-metrics.vmselect.matchLabels" . }}
+{{ include "victoria-metrics.common.podLabels" . }}
+{{- end -}}
+
 {{- define "victoria-metrics.vmselect.matchLabels" -}}
 app: {{ .Values.vmselect.name }}
 {{ include "victoria-metrics.common.matchLabels" . }}
@@ -78,6 +92,11 @@ app: {{ .Values.vmselect.name }}
 {{- define "victoria-metrics.vminsert.labels" -}}
 {{ include "victoria-metrics.vminsert.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
+{{- end -}}
+
+{{- define "victoria-metrics.vminsert.podLabels" -}}
+{{ include "victoria-metrics.vminsert.matchLabels" . }}
+{{ include "victoria-metrics.common.podLabels" . }}
 {{- end -}}
 
 {{- define "victoria-metrics.vminsert.matchLabels" -}}
