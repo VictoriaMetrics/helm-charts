@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.11.1
+
+**Release date:** 2023-10-04
+
+![AppVersion: v1.93.5](https://img.shields.io/static/v1?label=AppVersion&message=v1.93.5&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - From pod labels removed dynamic label `helm.sh/chart` to avoid restarting every time the chart is updated without changing the pods parameters. **Note that this time it will cause the pods to restart** (#695)
 
 ## 0.11.0
