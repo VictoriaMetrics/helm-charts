@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.2
+
+**Release date:** 2023-10-04
+
+![AppVersion: v0.4.1-victorialogs](https://img.shields.io/static/v1?label=AppVersion&message=v0.4.1-victorialogs&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - bump version of vlogs single to [0.4.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.4.1-victorialogs)
 
 ## 0.3.1
