@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Add support of providing enterprise license key for VictoriaMetrics enterprise. See [these docs](https://docs.victoriametrics.com/enterprise.html) for details.
 
 ## 0.9.8
 
