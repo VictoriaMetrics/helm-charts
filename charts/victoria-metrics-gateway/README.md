@@ -190,6 +190,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.hosts | list | `[]` |  |
 | ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | ingress.tls | list | `[]` |  |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
+| license.key | string | `""` | License key |
+| license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
+| license.secret.key | string | `""` | Key in secret with license key |
+| license.secret.name | string | `""` | Existing secret name |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
