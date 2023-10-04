@@ -69,6 +69,9 @@ spec:
           {{- range $key, $value := .Values.extraArgs }}
             - -{{ $key }}={{ $value }}
           {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http

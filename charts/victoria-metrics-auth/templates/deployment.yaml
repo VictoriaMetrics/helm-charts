@@ -48,6 +48,9 @@ spec:
           {{- range $key, $value := .Values.extraArgs }}
             - -{{ $key }}={{ $value }}
           {{- end }}
+          {{- with (include "vmauth.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -83,6 +86,7 @@ spec:
           {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "vmauth.license.mount" . | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
         {{- with .Values.extraContainers }}
@@ -116,3 +120,4 @@ spec:
       {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "vmauth.license.volume" . | nindent 8 }}

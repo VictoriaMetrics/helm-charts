@@ -58,6 +58,9 @@ spec:
           {{- range $key, $value := .Values.vmstorage.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8482
@@ -102,6 +105,7 @@ spec:
           {{- with .Values.vmstorage.extraVolumeMounts }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
         {{- if .Values.vmstorage.vmbackupmanager.enable }}
         - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
           image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
@@ -126,6 +130,9 @@ spec:
             - "--snapshot.deleteURL=http://localhost:8482/snapshot/delete"
             {{- range $key, $value := .Values.vmstorage.vmbackupmanager.extraArgs }}
             - --{{ $key }}={{ $value }}
+            {{- end }}
+            {{- with (include "chart.license.flag" .) }}
+              - {{ . }}
             {{- end }}
           {{- with .Values.vmstorage.vmbackupmanager.resources }}
           resources: {{ toYaml . | nindent 12 }}
@@ -159,6 +166,7 @@ spec:
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
             {{- end }}
+            {{- include "chart.license.mount" . | nindent 12 }}
         {{- end }}
         {{- with .Values.vmstorage.extraContainers }}
         {{- toYaml . | nindent 8 }}
@@ -203,6 +211,7 @@ spec:
             claimName: {{ .Values.vmstorage.persistentVolume.existingClaim }}
         {{- end }}
         {{- end }}
+        {{- include "chart.license.volume" . | nindent 8 }}
   {{- if and .Values.vmstorage.persistentVolume.enabled (not .Values.vmstorage.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
     - metadata:

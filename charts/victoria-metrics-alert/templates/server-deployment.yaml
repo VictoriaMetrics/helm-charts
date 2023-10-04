@@ -112,6 +112,9 @@ spec:
             - -{{ $key }}={{ $value }}
             {{- end }}
           {{- end }}
+          {{- with (include "vmalert.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           {{- with .Values.server.env }}
           env: {{ toYaml . | nindent 10 }}
@@ -148,8 +151,9 @@ spec:
               readOnly: {{ .readOnly }}
             {{- end }}
             {{- with .Values.server.extraVolumeMounts }}
-          {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- include "vmalert.license.mount" . | nindent 12 }}
           resources:
             {{- toYaml .Values.server.resources | nindent 12 }}
         {{- with .Values.server.extraContainers }}
@@ -180,6 +184,7 @@ spec:
             path: {{ .hostPath }}
         {{- end }}
         {{- with .Values.server.extraVolumes }}
-      {{- toYaml . | nindent 8 }}
-  {{- end }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- include "vmalert.license.volume" . | nindent 8 }}
 {{- end -}}

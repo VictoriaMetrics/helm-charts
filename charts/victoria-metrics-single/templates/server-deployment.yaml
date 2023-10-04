@@ -64,6 +64,9 @@ spec:
           {{- range $key, $value := .Values.server.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
+          {{- with (include "victoria-metrics.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
           {{- with .Values.server.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
@@ -145,6 +148,7 @@ spec:
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
           {{- with .Values.server.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -169,6 +173,9 @@ spec:
             {{- range $key, $value := .Values.server.vmbackupmanager.extraArgs }}
             - --{{ $key }}={{ $value }}
             {{- end }}
+            {{- with (include "victoria-metrics.license.flag" .) }}
+            - {{ . }}
+            {{- end }}
           {{- with .Values.server.vmbackupmanager.resources }}
           resources: {{ toYaml . | nindent 12  }}
           {{- end }}
@@ -191,6 +198,7 @@ spec:
           {{- with .Values.server.vmbackupmanager.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
         {{- end }}
         {{- with .Values.server.extraContainers }}
         {{- toYaml . | nindent 8 }}
@@ -232,4 +240,5 @@ spec:
 {{- else }}
         emptyDir: {}
 {{- end }}
+      {{- include "chart.license.volume" . | nindent 8 }}
 {{- end }}
