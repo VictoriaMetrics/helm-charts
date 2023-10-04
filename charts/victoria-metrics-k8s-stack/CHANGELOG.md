@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Update dependencies: [victoria-metrics-operator -> 0.27.2](https://github.com/VictoriaMetrics/helm-charts/releases/tag/victoria-metrics-operator-0.27.2), prometheus-node-exporter -> 4.23.2, grafana -> 6.59.5.   
 
 ## 0.18.3
 
