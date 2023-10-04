@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- bump version of vlogs single to [0.4.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.4.1-victorialogs)
 
 ## 0.3.1
 

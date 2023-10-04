@@ -2,6 +2,7 @@
 
 ## Next release
 
+- bump version of VM components to [v1.94.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.94.0)
 - Add support of providing enterprise license key for VictoriaMetrics enterprise. See [these docs](https://docs.victoriametrics.com/enterprise.html) for details.
 
 ## 0.9.8
