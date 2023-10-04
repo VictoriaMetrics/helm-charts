@@ -177,3 +177,39 @@ Return if ingress supports pathType.
 []
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return license flag if necessary.
+*/}}
+{{- define "victoria-metrics.license.flag" -}}
+{{- if .Values.license.key -}}
+-license={{ .Values.license.key }}
+{{- end }}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+-license-file=/etc/vm-license-key
+{{- end -}}
+{{- end -}}
+
+
+{{/*
+Return license volume mount
+*/}}
+{{- define "victoria-metrics.license.volume" -}}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+- name: license-key
+  secret:
+    secretName: {{ .Values.license.secret.name }}
+    key: {{ .Values.license.secret.key }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return license volume mount for container
+*/}}
+{{- define "victoria-metrics.license.mount" -}}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+- name: license-key
+  mountPath: /etc/vm-license-key
+  readOnly: true
+{{- end -}}
+{{- end -}}

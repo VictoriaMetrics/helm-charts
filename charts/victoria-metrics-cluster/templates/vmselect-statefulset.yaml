@@ -58,6 +58,9 @@ spec:
           {{- range $key, $value := .Values.vmselect.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
           {{- with .Values.vmselect.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
@@ -98,6 +101,7 @@ spec:
           {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.vmselect.resources }}
+          {{- include "chart.license.mount" . | nindent 12 }}
           resources:
           {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -137,6 +141,7 @@ spec:
       - name: cache-volume
         emptyDir: {}
       {{- end }}
+      {{- include "chart.license.volume" . | nindent 8 }}
   {{- if .Values.vmselect.persistentVolume.enabled }}
   volumeClaimTemplates:
     - metadata:

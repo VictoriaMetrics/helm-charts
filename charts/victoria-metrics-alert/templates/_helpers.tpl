@@ -261,3 +261,39 @@ Return if ingress supports pathType.
 {{- define "vmalert.ingress.supportsPathType" -}}
   {{- or (eq (include "vmalert.ingress.isStable" .) "true") (and (eq (include "vmalert.ingress.apiVersion" .) "networking.k8s.io/v1beta1")) -}}
 {{- end -}}
+
+{{/*
+Return license flag if necessary.
+*/}}
+{{- define "vmalert.license.flag" -}}
+{{- if .Values.license.key -}}
+-license={{ .Values.license.key }}
+{{- end }}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+-license-file=/etc/vm-license-key
+{{- end -}}
+{{- end -}}
+
+
+{{/*
+Return license volume mount
+*/}}
+{{- define "vmalert.license.volume" -}}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+- name: license-key
+  secret:
+    secretName: {{ .Values.license.secret.name }}
+    key: {{ .Values.license.secret.key }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return license volume mount for container
+*/}}
+{{- define "vmalert.license.mount" -}}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+- name: license-key
+  mountPath: /etc/vm-license-key
+  readOnly: true
+{{- end -}}
+{{- end -}}
