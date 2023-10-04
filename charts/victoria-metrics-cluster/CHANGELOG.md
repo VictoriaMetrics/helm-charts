@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- From pod labels removed dynamic label `helm.sh/chart` to avoid restarting every time the chart is updated without changing the pods parameters. **Note that this time it will cause the pods to restart** (#695)
 
 ## 0.11.0
 
