@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Add license enforcement for vmbackupmanager in order to avoid running it without enterprise license key. See [these docs](https://docs.victoriametrics.com/enterprise.html) for details.
+- Fix license flags not being passed to vmsingle when using StatefulSet.
 
 ## 0.9.9
 

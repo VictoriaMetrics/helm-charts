@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Add license enforcement for vmbackupmanager in order to avoid running it without enterprise license key. See [these docs](https://docs.victoriametrics.com/enterprise.html) for details.
 
 ## 0.11.2
 

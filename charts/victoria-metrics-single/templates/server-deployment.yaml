@@ -1,4 +1,5 @@
 {{- if and .Values.server.enabled (not .Values.server.statefulSet.enabled) -}}
+{{ include "victoria-metrics.vmbackupmanager.enforce_license" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -148,7 +149,7 @@ spec:
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
           {{- end }}
-          {{- include "chart.license.mount" . | nindent 12 }}
+          {{- include "victoria-metrics.license.mount" . | nindent 12 }}
           {{- with .Values.server.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -198,7 +199,7 @@ spec:
           {{- with .Values.server.vmbackupmanager.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- include "chart.license.mount" . | nindent 12 }}
+          {{- include "victoria-metrics.license.mount" . | nindent 12 }}
         {{- end }}
         {{- with .Values.server.extraContainers }}
         {{- toYaml . | nindent 8 }}
@@ -240,5 +241,5 @@ spec:
 {{- else }}
         emptyDir: {}
 {{- end }}
-      {{- include "chart.license.volume" . | nindent 8 }}
+      {{- include "victoria-metrics.license.volume" . | nindent 8 }}
 {{- end }}
