@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.27.3
+
+**Release date:** 2023-10-08
+
+![AppVersion: 0.39.0](https://img.shields.io/static/v1?label=AppVersion&message=0.39.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Added endpointslices permissions to operator roles (#708)
 
 ## 0.27.2
