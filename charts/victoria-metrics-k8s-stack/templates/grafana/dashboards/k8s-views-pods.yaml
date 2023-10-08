@@ -8,14 +8,28 @@ https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metri
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ coalesce .Values.grafanaOperatorDashboardsFormat.namespace .Release.Namespace }}
   name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "k8s-views-pods" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
     {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+  {{- with .Values.grafanaOperatorDashboardsFormat.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   {{- with .Values.grafanaOperatorDashboardsFormat.instanceSelector }}
   instanceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
+  allowCrossNamespaceImport: {{ . }}
+  {{- end }}
+  {{- with .Values.grafanaOperatorDashboardsFormat.folder }}
+  folder: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.grafanaOperatorDashboardsFormat.datasources }}
+  datasources:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- else }}
