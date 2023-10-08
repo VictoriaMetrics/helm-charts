@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Update operator chart to [v0.27.3](https://github.com/VictoriaMetrics/helm-charts/releases/tag/victoria-metrics-operator-0.27.3) for fixing [#708](https://github.com/VictoriaMetrics/helm-charts/issues/708)
 
 ## 0.18.4
 
