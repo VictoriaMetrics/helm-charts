@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added endpointslices permissions to operator roles (#708)
 
 ## 0.27.2
 
