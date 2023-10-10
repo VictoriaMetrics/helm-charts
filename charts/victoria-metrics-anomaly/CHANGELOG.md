@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Add an options to override default `metric_format` for remote write configuration of vmanomaly.
 
 ## 0.4.0
 

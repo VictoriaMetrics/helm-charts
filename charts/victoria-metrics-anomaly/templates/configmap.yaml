@@ -51,8 +51,8 @@ data:
       health_path: {{ . }}
       {{ end -}}
       metric_format:
-        __name__: "$VAR"
-        query: "$QUERY_KEY"
+        __name__: {{ .Values.remote.write.metric_format.name }}
+        "{{ .Values.remote.write.metric_format.query_key }}": "$QUERY_KEY"
         model: {{ .Values.model.enabled }}
     {{ if or .Values.monitoring.pull.enabled .Values.monitoring.push.url }}
     monitoring:
