@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.4.1
+
+**Release date:** 2023-10-10
+
+![AppVersion: v1.5.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.5.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Add an options to override default `metric_format` for remote write configuration of vmanomaly.
 
 ## 0.4.0
