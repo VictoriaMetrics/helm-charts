@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.3
+
+**Release date:** 2023-10-10
+
+![AppVersion: v0.4.1-victorialogs](https://img.shields.io/static/v1?label=AppVersion&message=v0.4.1-victorialogs&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Add `kubernetes_container_name` into default [stream fields](https://docs.victoriametrics.com/VictoriaLogs/keyConcepts.html#stream-fields) configuration `fluent-bit`.
 
 ## 0.3.2
