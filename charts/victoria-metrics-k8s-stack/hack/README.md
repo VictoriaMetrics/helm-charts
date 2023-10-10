@@ -20,3 +20,4 @@ Currently following imported:
 
 - [prometheus-operator/kube-prometheus dashboards](https://github.com/prometheus-operator/kube-prometheus/tree/master/manifests/grafana-deployment.yaml)
 - [etcd-io/website dashboard](https://etcd.io/docs/v3.1/op-guide/grafana.json)
+- [dotdc/grafana-dashboards-kubernetes](https://github.com/dotdc/grafana-dashboards-kubernetes)
