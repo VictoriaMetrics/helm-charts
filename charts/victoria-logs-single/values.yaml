@@ -299,7 +299,7 @@ fluent-bit:
           Host {{ .Release.Name }}-victoria-logs-single-server
           port 9428
           compress gzip
-          uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name&_msg_field=log&_time_field=date
+          uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name,kubernetes_container_name&_msg_field=log&_time_field=date
           format json_lines
           json_date_format iso8601
           header AccountID 0

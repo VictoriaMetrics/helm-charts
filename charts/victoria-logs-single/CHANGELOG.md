@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Add `kubernetes_container_name` into default [stream fields](https://docs.victoriametrics.com/VictoriaLogs/keyConcepts.html#stream-fields) configuration `fluent-bit`.
 
 ## 0.3.2
 
