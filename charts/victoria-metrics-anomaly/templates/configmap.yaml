@@ -52,7 +52,7 @@ data:
       {{ end -}}
       metric_format:
         __name__: {{ .Values.remote.write.metric_format.name }}
-        query: {{ .Values.remote.write.metric_format.query }}
+        "{{ .Values.remote.write.metric_format.query_key }}": "$QUERY_KEY"
         model: {{ .Values.model.enabled }}
     {{ if or .Values.monitoring.pull.enabled .Values.monitoring.push.url }}
     monitoring:
