@@ -312,3 +312,16 @@ Return license volume mount for container
   readOnly: true
 {{- end -}}
 {{- end -}}
+
+{{/*
+Enforce license for vmbackupmanager
+*/}}
+{{- define "chart.vmbackupmanager.enforce_license" -}}
+{{ if and .Values.vmstorage.vmbackupmanager.enable (not (or .Values.vmstorage.vmbackupmanager.eula .Values.license.key .Values.license.secret.name)) }}
+{{ fail `Pass -eula command-line flag or valid license at .Values.license if you have an enterprise license for running this software.
+  See https://victoriametrics.com/legal/esa/ for details.
+  Documentation - https://docs.victoriametrics.com/enterprise.html
+  for more information, visit https://victoriametrics.com/products/enterprise/
+  To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/`}}
+{{- end -}}
+{{- end -}}
