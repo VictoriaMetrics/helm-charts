@@ -128,11 +128,11 @@ spec:
             periodSeconds: {{ .Values.vminsert.probe.liveness.periodSeconds }}
             timeoutSeconds: {{ .Values.vminsert.probe.liveness.timeoutSeconds }}
             failureThreshold: {{ .Values.vminsert.probe.liveness.failureThreshold }}
-          {{- with .Values.vminsert.extraVolumeMounts }}
           volumeMounts:
+          {{- with .Values.vminsert.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
-            {{- include "chart.license.mount" . | nindent 12 }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
           resources: {{- toYaml .Values.vminsert.resources | nindent 12 }}
         {{- with .Values.vminsert.extraContainers }}
         {{- toYaml . | nindent 8 }}

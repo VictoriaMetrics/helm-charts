@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Fix deployment `volumeMounts` when providing enterprise license key for VictoriaMetrics enterprise. See [this pr](https://github.com/VictoriaMetrics/helm-charts/pull/734) for details.
+
 
 ## 0.1.49
 
