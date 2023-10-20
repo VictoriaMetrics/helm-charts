@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix deployment `volumeMounts` when providing enterprise license key for VictoriaMetrics enterprise.
 
 ## 0.1.49
 
