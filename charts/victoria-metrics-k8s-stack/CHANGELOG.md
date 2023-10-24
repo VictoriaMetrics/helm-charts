@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix kube scheduler default scraping port from 10251 to 10259, Kubernetes changed it since 1.23.0. See [this pr](https://github.com/VictoriaMetrics/helm-charts/pull/736) for details.
 
 ## 0.18.5
 
