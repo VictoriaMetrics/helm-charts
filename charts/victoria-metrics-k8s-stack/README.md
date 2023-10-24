@@ -346,7 +346,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.spec.routePrefix | string | `"/"` |  |
 | alertmanager.spec.selectAllByDefault | bool | `true` |  |
 | alertmanager.templateFiles | object | `{}` |  |
-| argocdReleaseOverride | string | `""` | For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
+| argocdReleaseOverride | string | `""` | If this chart is used in "Argocd" with "releaseName" field then -- VMServiceScrapes couldn't select the proper services. -- For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
 | coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}]}}` | Component scraping coreDns. Use either this or kubeDns |
 | crds.enabled | bool | `true` |  |
 | defaultDashboardsEnabled | bool | `true` |  |
@@ -457,8 +457,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeScheduler.enabled | bool | `true` |  |
 | kubeScheduler.endpoints | list | `[]` |  |
 | kubeScheduler.service.enabled | bool | `true` |  |
-| kubeScheduler.service.port | int | `10251` |  |
-| kubeScheduler.service.targetPort | int | `10251` |  |
+| kubeScheduler.service.port | int | `10259` |  |
+| kubeScheduler.service.targetPort | int | `10259` |  |
 | kubeScheduler.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubeScheduler.spec.endpoints[0].port | string | `"http-metrics"` |  |
 | kubeScheduler.spec.endpoints[0].scheme | string | `"https"` |  |
@@ -501,9 +501,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | prometheus-node-exporter.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
+| serviceAccount.name | string | `""` | The name of the service account to use. -- If not set and create is true, a name is generated using the fullname template |
 | tenant | string | `"0"` |  |
-| victoria-metrics-operator | object | `{"cleanupCRD":true,"cleanupImage":{"pullPolicy":"IfNotPresent","repository":"gcr.io/google_containers/hyperkube","tag":"v1.18.0"},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":true}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars.html |
+| victoria-metrics-operator | object | `{"cleanupCRD":true,"cleanupImage":{"pullPolicy":"IfNotPresent","repository":"gcr.io/google_containers/hyperkube","tag":"v1.18.0"},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":true}}` | victoria-metrics-operator dependency chart configuration. -- For possible values refer to https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator#parameters -- also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars.html |
 | victoria-metrics-operator.cleanupCRD | bool | `true` | Tells helm to clean up vm cr resources when uninstalling |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.additionalRemoteWrites | list | `[]` |  |
@@ -581,4 +581,19 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.spec.vmstorage.resources | object | `{}` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.94.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle.annotations | object | `{}` |  |
+| vmsingle.enabled | bool | `true` |  |
+| vmsingle.ingress.annotations | object | `{}` |  |
+| vmsingle.ingress.enabled | bool | `false` |  |
+| vmsingle.ingress.extraPaths | list | `[]` |  |
+| vmsingle.ingress.hosts[0] | string | `"vmsingle.domain.com"` |  |
+| vmsingle.ingress.labels | object | `{}` |  |
+| vmsingle.ingress.path | string | `"/"` |  |
+| vmsingle.ingress.pathType | string | `"Prefix"` |  |
+| vmsingle.ingress.tls | list | `[]` |  |
+| vmsingle.spec.extraArgs | object | `{}` |  |
+| vmsingle.spec.image.tag | string | `"v1.94.0"` |  |
+| vmsingle.spec.replicaCount | int | `1` |  |
+| vmsingle.spec.retentionPeriod | string | `"14"` |  |
+| vmsingle.spec.storage.accessModes[0] | string | `"ReadWriteOnce"` |  |
+| vmsingle.spec.storage.resources.requests.storage | string | `"20Gi"` |  |
