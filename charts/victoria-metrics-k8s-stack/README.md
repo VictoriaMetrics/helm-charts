@@ -457,8 +457,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeScheduler.enabled | bool | `true` |  |
 | kubeScheduler.endpoints | list | `[]` |  |
 | kubeScheduler.service.enabled | bool | `true` |  |
-| kubeScheduler.service.port | int | `10251` |  |
-| kubeScheduler.service.targetPort | int | `10251` |  |
+| kubeScheduler.service.port | int | `10259` |  |
+| kubeScheduler.service.targetPort | int | `10259` |  |
 | kubeScheduler.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubeScheduler.spec.endpoints[0].port | string | `"http-metrics"` |  |
 | kubeScheduler.spec.endpoints[0].scheme | string | `"https"` |  |
