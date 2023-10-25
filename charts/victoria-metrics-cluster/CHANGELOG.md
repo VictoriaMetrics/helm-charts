@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.11.4
+
+**Release date:** 2023-10-25
+
+![AppVersion: v1.94.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.94.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Fix deployment `volumeMounts` when providing enterprise license key for VictoriaMetrics enterprise. See [this pr](https://github.com/VictoriaMetrics/helm-charts/pull/734) for details.
 
 ## 0.11.3
