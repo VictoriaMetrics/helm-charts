@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-informational?style=flat-square)
+![Version: 0.4.2](https://img.shields.io/badge/Version-0.4.2-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-anomaly)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
@@ -145,16 +145,21 @@ Change the values according to the need of the environment in ``victoria-metrics
 | queries | object | `{}` | Query names and expressions. Required. Examples:  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))' |
 | remote.read.basicAuth.password | string | `""` |  |
 | remote.read.basicAuth.username | string | `""` |  |
+| remote.read.bearer_token | string | `""` | Bearer token to use for authentication |
+| remote.read.extra_filters | list | `[]` | List of extra filters to apply to all queries. See: https://docs.victoriametrics.com/#prometheus-querying-api-enhancements |
 | remote.read.health | string | `""` | Health endpoint. vmanomaly add /health to url if it's empty. You can specify full path when VictoriaMetircs is hidden via vmauth or other proxies/balancers |
 | remote.read.tenant_id | string | `""` | When read from VictoriaMetrics cluster. Format: vm_account_id:vm_project_id (for example: 0:0) or vm_account_id (for example 0). See https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy |
 | remote.read.url | string | `""` | URL for data reading. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481/select/" |
+| remote.read.verify_tls | bool | `true` | Whether to verify TLS certificates when connecting to read endpoint |
 | remote.write.basicAuth.password | string | `""` |  |
 | remote.write.basicAuth.username | string | `""` |  |
+| remote.write.bearer_token | string | `""` | Bearer token to use for authentication |
 | remote.write.health | string | `""` | Health endpoint. vmanomaly add /health to url if it's empty. You can specify full path when VictoriaMetircs is hidden via vmauth or other proxies/balancers |
 | remote.write.metric_format.name | string | `"$VAR"` |  |
 | remote.write.metric_format.query_key | string | `"query"` |  |
 | remote.write.tenant | string | `""` | When write to VictoriaMetrics cluster. Format: vm_account_id:vm_project_id (for example: 0:0) or vm_account_id (for example 0). See https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#multitenancy |
 | remote.write.url | string | `""` | URL for data writing. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/" |
+| remote.write.verify_tls | bool | `true` | Whether to verify TLS certificates when connecting to write endpoint |
 | resources | object | `{}` |  |
 | samplingPeriod | string | `"1m"` |  |
 | scheduler.class | string | `"scheduler.periodic.PeriodicScheduler"` |  |

@@ -31,8 +31,16 @@ data:
       user: "{{ .Values.remote.read.basicAuth.username }}"
       password: "{{ .Values.remote.read.basicAuth.password }}"
       {{ end -}}
+      {{ with .Values.remote.read.bearer_token -}}
+      bearer_token: {{ . | quote }}
+      {{ end -}}
       {{ with .Values.remote.read.health -}}
       health_path: {{.}}
+      {{ end -}}
+      verify_tls: {{ .Values.remote.read.verify_tls }}
+      {{ with .Values.remote.read.extra_filters }}
+      extra_filters:
+        {{-  . | toYaml | nindent 8 }}
       {{ end -}}
       queries:
         {{- toYaml .Values.queries | nindent 8 }}
@@ -47,9 +55,13 @@ data:
       user: "{{ .Values.remote.write.basicAuth.username }}"
       password: "{{ .Values.remote.write.basicAuth.password }}"
       {{ end -}}
+      {{- with .Values.remote.write.bearer_token -}}
+      bearer_token: {{ . | quote }}
+      {{ end -}}
       {{ with .Values.remote.write.health -}}
       health_path: {{ . }}
       {{ end -}}
+      verify_tls: {{ .Values.remote.write.verify_tls }}
       metric_format:
         __name__: {{ .Values.remote.write.metric_format.name }}
         "{{ .Values.remote.write.metric_format.query_key }}": "$QUERY_KEY"

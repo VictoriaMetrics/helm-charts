@@ -2,7 +2,9 @@
 
 ## Next release
 
-- TODO
+- Add options to use `bearer_token` for reader and writer authentication.
+- Add `verify_tls` option to bypass TLS verification for reader and writer.
+- Add `extra_filters` option to supply additional filters to enforce for reader queries.
 
 ## 0.4.1
 
