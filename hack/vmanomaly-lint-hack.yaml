@@ -2,8 +2,17 @@ eula: true
 remote:
   read:
     url: http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481/select/
+    verify_tls: true
+    basicAuth:
+      username: asdf
+      password: asdf
+    extra_filters:
+      - '{cluster!=""}'
+      - '{job!=""}'
   write:
     url: http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/
+    verify_tls: false
+    bearer_token: asdf
 queries:
   active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
   churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'
