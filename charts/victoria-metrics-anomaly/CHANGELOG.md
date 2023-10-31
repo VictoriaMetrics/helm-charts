@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.5.0
+
+**Release date:** 2023-10-31
+
+![AppVersion: v1.6.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.6.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Add options to use `bearer_token` for reader and writer authentication.
 - Add `verify_tls` option to bypass TLS verification for reader and writer.
 - Add `extra_filters` option to supply additional filters to enforce for reader queries.
