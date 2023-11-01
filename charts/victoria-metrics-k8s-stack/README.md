@@ -354,6 +354,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.annotations | object | `{}` | Annotations for default rules |
 | defaultRules.appNamespacesTarget | string | `".*"` |  |
 | defaultRules.create | bool | `true` |  |
+| defaultRules.disabled | object | `{}` |  |
 | defaultRules.labels | object | `{}` | Labels for default rules |
 | defaultRules.rules.alertmanager | bool | `true` |  |
 | defaultRules.rules.etcd | bool | `true` |  |
