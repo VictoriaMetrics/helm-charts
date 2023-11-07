@@ -21,7 +21,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: kube-scheduler.rules
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: kube-scheduler.rules
     rules:
     - expr: histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_duration_seconds_bucket{job="kube-scheduler"}[5m])) without(instance, pod))
       labels:

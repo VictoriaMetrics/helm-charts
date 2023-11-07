@@ -21,29 +21,40 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: vm-health
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: vm-health
     rules:
+{{- if not (.Values.defaultRules.disabled.TooManyRestarts | default false) }}
     - alert: TooManyRestarts
       annotations:
         description: Job {{`{{`}} $labels.job {{`}}`}} (instance {{`{{`}} $labels.instance {{`}}`}}) has restarted more than twice in the last 15 minutes. It might be crashlooping.
         summary: '{{`{{`}} $labels.job {{`}}`}} too many restarts (instance {{`{{`}} $labels.instance {{`}}`}})'
-      expr: changes(process_start_time_seconds{job=~"victoriametrics.*|vmselect.*|vminsert.*|vmstorage.*|vmagent.*|vmalert.*|vmsingle.*|vmalertmanager.*"}[15m]) > 2
+      expr: changes(process_start_time_seconds{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth).*"}[15m]) > 2
       labels:
         severity: critical
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.ServiceDown | default false) }}
     - alert: ServiceDown
       annotations:
         description: '{{`{{`}} $labels.instance {{`}}`}} of job {{`{{`}} $labels.job {{`}}`}} has been down for more than 2 minutes.'
         summary: Service {{`{{`}} $labels.job {{`}}`}} is down on {{`{{`}} $labels.instance {{`}}`}}
-      expr: up{job=~"victoriametrics.*|vmselect.*|vminsert.*|vmstorage.*|vmagent.*|vmalert.*|vmsingle.*|vmalertmanager.*"} == 0
+      expr: up{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth).*"} == 0
       for: 2m
       labels:
         severity: critical
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.ProcessNearFDLimits | default false) }}
     - alert: ProcessNearFDLimits
       annotations:
         description: Exhausting OS file descriptors limit can cause severe degradation of the process. Consider to increase the limit as fast as possible.
@@ -55,17 +66,21 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.TooHighMemoryUsage | default false) }}
     - alert: TooHighMemoryUsage
       annotations:
         description: Too high memory usage may result into multiple issues such as OOMs or degraded performance. Consider to either increase available memory or decrease the load on the process.
-        summary: It is more than 80% of memory used by "{{`{{`}} $labels.job {{`}}`}}"("{{`{{`}} $labels.instance {{`}}`}}") during the last 5m
-      expr: (process_resident_memory_anon_bytes / vm_available_memory_bytes) > 0.8
+        summary: It is more than 80% of memory used by "{{`{{`}} $labels.job {{`}}`}}"("{{`{{`}} $labels.instance {{`}}`}}")
+      expr: (min_over_time(process_resident_memory_anon_bytes[10m]) / vm_available_memory_bytes) > 0.8
       for: 5m
       labels:
         severity: critical
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.TooHighCPUUsage | default false) }}
     - alert: TooHighCPUUsage
       annotations:
         description: Too high CPU usage may be a sign of insufficient resources and make process unstable. Consider to either increase available CPU resources or decrease the load on the process.
@@ -77,6 +92,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.TooManyLogs | default false) }}
     - alert: TooManyLogs
       annotations:
         description: "Logging rate for job \"{{`{{`}} $labels.job {{`}}`}}\" ({{`{{`}} $labels.instance {{`}}`}}) is {{`{{`}} $value {{`}}`}} for last 15m.\n Worth to check logs for specific error messages."
@@ -88,6 +105,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.TooManyTSIDMisses | default false) }}
     - alert: TooManyTSIDMisses
       annotations:
         description: "The rate of TSID misses during query lookups is too high for \"{{`{{`}} $labels.job {{`}}`}}\" ({{`{{`}} $labels.instance {{`}}`}}).\n Make sure you're running VictoriaMetrics of v1.85.3 or higher.\n Related issue https://github.com/VictoriaMetrics/VictoriaMetrics/issues/3502"
@@ -99,6 +118,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.ConcurrentInsertsHitTheLimit | default false) }}
     - alert: ConcurrentInsertsHitTheLimit
       annotations:
         description: "The limit of concurrent inserts on instance {{`{{`}} $labels.instance {{`}}`}} depends on the number of CPUs.\n Usually, when component constantly hits the limit it is likely the component is overloaded and requires more CPU. In some cases for components like vmagent or vminsert the alert might trigger if there are too many clients making write attempts. If vmagent's or vminsert's CPU usage and network saturation are at normal level, then it might be worth adjusting `-maxConcurrentInserts` cmd-line flag."
@@ -109,5 +130,6 @@ spec:
         severity: warning
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}

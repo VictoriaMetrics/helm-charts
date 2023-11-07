@@ -21,7 +21,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: node-exporter.rules
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: node-exporter.rules
     rules:
     - expr: |-
         count without (cpu, mode) (

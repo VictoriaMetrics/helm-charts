@@ -22,8 +22,15 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: kubernetes-storage
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: kubernetes-storage
     rules:
+{{- if not (.Values.defaultRules.disabled.KubePersistentVolumeFillingUp | default false) }}
     - alert: KubePersistentVolumeFillingUp
       annotations:
         description: The PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} is only {{`{{`}} $value | humanizePercentage {{`}}`}} free.
@@ -47,6 +54,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.KubePersistentVolumeFillingUp | default false) }}
     - alert: KubePersistentVolumeFillingUp
       annotations:
         description: Based on recent sampling, the PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} is expected to fill up within four days. Currently {{`{{`}} $value | humanizePercentage {{`}}`}} is available.
@@ -72,6 +81,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.KubePersistentVolumeInodesFillingUp | default false) }}
     - alert: KubePersistentVolumeInodesFillingUp
       annotations:
         description: The PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} only has {{`{{`}} $value | humanizePercentage {{`}}`}} free inodes.
@@ -95,6 +106,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.KubePersistentVolumeInodesFillingUp | default false) }}
     - alert: KubePersistentVolumeInodesFillingUp
       annotations:
         description: Based on recent sampling, the PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} is expected to run out of inodes within four days. Currently {{`{{`}} $value | humanizePercentage {{`}}`}} of its inodes are free.
@@ -120,6 +133,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.KubePersistentVolumeErrors | default false) }}
     - alert: KubePersistentVolumeErrors
       annotations:
         description: The persistent volume {{`{{`}} $labels.persistentvolume {{`}}`}} has status {{`{{`}} $labels.phase {{`}}`}}.
@@ -131,5 +146,6 @@ spec:
         severity: critical
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}

@@ -21,9 +21,16 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: kubernetes-system-scheduler
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: kubernetes-system-scheduler
     rules:
 {{- if .Values.kubeScheduler.enabled }}
+{{- if not (.Values.defaultRules.disabled.KubeSchedulerDown | default false) }}
     - alert: KubeSchedulerDown
       annotations:
         description: KubeScheduler has disappeared from Prometheus target discovery.
@@ -35,6 +42,7 @@ spec:
         severity: critical
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -21,8 +21,15 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: kube-apiserver-slos
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: kube-apiserver-slos
     rules:
+{{- if not (.Values.defaultRules.disabled.KubeAPIErrorBudgetBurn | default false) }}
     - alert: KubeAPIErrorBudgetBurn
       annotations:
         description: The API server is burning too much error budget.
@@ -40,6 +47,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.KubeAPIErrorBudgetBurn | default false) }}
     - alert: KubeAPIErrorBudgetBurn
       annotations:
         description: The API server is burning too much error budget.
@@ -57,6 +66,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.KubeAPIErrorBudgetBurn | default false) }}
     - alert: KubeAPIErrorBudgetBurn
       annotations:
         description: The API server is burning too much error budget.
@@ -74,6 +85,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.KubeAPIErrorBudgetBurn | default false) }}
     - alert: KubeAPIErrorBudgetBurn
       annotations:
         description: The API server is burning too much error budget.
@@ -90,5 +103,6 @@ spec:
         short: 6h
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}

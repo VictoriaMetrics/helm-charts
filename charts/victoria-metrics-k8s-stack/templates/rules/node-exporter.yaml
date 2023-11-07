@@ -21,8 +21,15 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: node-exporter
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: node-exporter
     rules:
+{{- if not (.Values.defaultRules.disabled.NodeFilesystemSpaceFillingUp | default false) }}
     - alert: NodeFilesystemSpaceFillingUp
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left and is filling up.
@@ -42,6 +49,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeFilesystemSpaceFillingUp | default false) }}
     - alert: NodeFilesystemSpaceFillingUp
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left and is filling up fast.
@@ -61,6 +70,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeFilesystemAlmostOutOfSpace | default false) }}
     - alert: NodeFilesystemAlmostOutOfSpace
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left.
@@ -78,6 +89,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeFilesystemAlmostOutOfSpace | default false) }}
     - alert: NodeFilesystemAlmostOutOfSpace
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left.
@@ -95,6 +108,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeFilesystemFilesFillingUp | default false) }}
     - alert: NodeFilesystemFilesFillingUp
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left and is filling up.
@@ -114,6 +129,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeFilesystemFilesFillingUp | default false) }}
     - alert: NodeFilesystemFilesFillingUp
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left and is filling up fast.
@@ -133,6 +150,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeFilesystemAlmostOutOfFiles | default false) }}
     - alert: NodeFilesystemAlmostOutOfFiles
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left.
@@ -150,6 +169,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeFilesystemAlmostOutOfFiles | default false) }}
     - alert: NodeFilesystemAlmostOutOfFiles
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left.
@@ -167,6 +188,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeNetworkReceiveErrs | default false) }}
     - alert: NodeNetworkReceiveErrs
       annotations:
         description: '{{`{{`}} $labels.instance {{`}}`}} interface {{`{{`}} $labels.device {{`}}`}} has encountered {{`{{`}} printf "%.0f" $value {{`}}`}} receive errors in the last two minutes.'
@@ -179,6 +202,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeNetworkTransmitErrs | default false) }}
     - alert: NodeNetworkTransmitErrs
       annotations:
         description: '{{`{{`}} $labels.instance {{`}}`}} interface {{`{{`}} $labels.device {{`}}`}} has encountered {{`{{`}} printf "%.0f" $value {{`}}`}} transmit errors in the last two minutes.'
@@ -191,6 +216,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeHighNumberConntrackEntriesUsed | default false) }}
     - alert: NodeHighNumberConntrackEntriesUsed
       annotations:
         description: '{{`{{`}} $value | humanizePercentage {{`}}`}} of conntrack entries are used.'
@@ -202,6 +229,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeTextFileCollectorScrapeError | default false) }}
     - alert: NodeTextFileCollectorScrapeError
       annotations:
         description: Node Exporter text file collector on {{`{{`}} $labels.instance {{`}}`}} failed to scrape.
@@ -213,6 +242,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeClockSkewDetected | default false) }}
     - alert: NodeClockSkewDetected
       annotations:
         description: Clock at {{`{{`}} $labels.instance {{`}}`}} is out of sync by more than 0.05s. Ensure NTP is configured correctly on this host.
@@ -236,6 +267,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeClockNotSynchronising | default false) }}
     - alert: NodeClockNotSynchronising
       annotations:
         description: Clock at {{`{{`}} $labels.instance {{`}}`}} is not synchronising. Ensure NTP is configured on this host.
@@ -251,6 +284,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeRAIDDegraded | default false) }}
     - alert: NodeRAIDDegraded
       annotations:
         description: RAID array '{{`{{`}} $labels.device {{`}}`}}' at {{`{{`}} $labels.instance {{`}}`}} is in degraded state due to one or more disks failures. Number of spare drives is insufficient to fix issue automatically.
@@ -263,6 +298,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeRAIDDiskFailure | default false) }}
     - alert: NodeRAIDDiskFailure
       annotations:
         description: At least one device in RAID array at {{`{{`}} $labels.instance {{`}}`}} failed. Array '{{`{{`}} $labels.device {{`}}`}}' needs attention and possibly a disk swap.
@@ -274,6 +311,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeFileDescriptorLimit | default false) }}
     - alert: NodeFileDescriptorLimit
       annotations:
         description: File descriptors limit at {{`{{`}} $labels.instance {{`}}`}} is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
@@ -289,6 +328,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeFileDescriptorLimit | default false) }}
     - alert: NodeFileDescriptorLimit
       annotations:
         description: File descriptors limit at {{`{{`}} $labels.instance {{`}}`}} is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
@@ -304,6 +345,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeCPUHighUsage | default false) }}
     - alert: NodeCPUHighUsage
       annotations:
         description: 'CPU usage at {{`{{`}} $labels.instance {{`}}`}} has been above 90% for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
@@ -318,6 +361,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeSystemSaturation | default false) }}
     - alert: NodeSystemSaturation
       annotations:
         description: 'System load per core at {{`{{`}} $labels.instance {{`}}`}} has been above 2 for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}.
@@ -336,6 +381,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeMemoryMajorPagesFaults | default false) }}
     - alert: NodeMemoryMajorPagesFaults
       annotations:
         description: 'Memory major pages are occurring at very high rate at {{`{{`}} $labels.instance {{`}}`}}, 500 major page faults per second for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}.
@@ -352,6 +399,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeMemoryHighUtilization | default false) }}
     - alert: NodeMemoryHighUtilization
       annotations:
         description: 'Memory is filling up at {{`{{`}} $labels.instance {{`}}`}}, has been above 90% for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
@@ -366,6 +415,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeDiskIOSaturation | default false) }}
     - alert: NodeDiskIOSaturation
       annotations:
         description: 'Disk IO queue (aqu-sq) is high on {{`{{`}} $labels.device {{`}}`}} at {{`{{`}} $labels.instance {{`}}`}}, has been above 10 for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}.
@@ -382,6 +433,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.NodeSystemdServiceFailed | default false) }}
     - alert: NodeSystemdServiceFailed
       annotations:
         description: Systemd service {{`{{`}} $labels.name {{`}}`}} has entered failed state at {{`{{`}} $labels.instance {{`}}`}}
@@ -393,5 +446,6 @@ spec:
         severity: warning
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}

@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Support adding extra group parameters for default vmrules.
 
 ## 0.18.6
 
