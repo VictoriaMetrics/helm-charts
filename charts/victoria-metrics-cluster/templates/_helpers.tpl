@@ -110,13 +110,13 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "victoria-metrics.vmstorage.fullname" -}}
 {{- if .Values.vmstorage.fullnameOverride -}}
-{{- .Values.vmstorage.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- .Values.vmstorage.fullnameOverride | trunc 60 | trimSuffix "-" -}}
 {{- else -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" .Release.Name .Values.vmstorage.name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" .Release.Name .Values.vmstorage.name | trunc 60 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s-%s" .Release.Name $name .Values.vmstorage.name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.vmstorage.name | trunc 60 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
