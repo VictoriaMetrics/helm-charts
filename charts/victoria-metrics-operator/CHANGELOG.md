@@ -2,7 +2,7 @@
 
 ## Next release
 
-- Add `extraObjects` to allow deploying additional resources with the chart release.
+- Add `extraObjects` to allow deploying additional resources with the chart release. (#751)
 
 ## 0.27.3
 
