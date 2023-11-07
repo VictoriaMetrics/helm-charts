@@ -2,7 +2,7 @@
 
 ## Next release
 
-- Support adding extra group parameters for default vmrules.
+- Support adding extra group parameters for default vmrules. (#752)
 
 ## 0.18.6
 
