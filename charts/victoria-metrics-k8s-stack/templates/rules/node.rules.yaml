@@ -21,7 +21,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: node.rules
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: node.rules
     rules:
     - expr: |-
         topk by(cluster, namespace, pod) (1,

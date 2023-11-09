@@ -21,10 +21,18 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - concurrency: 2
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} concurrency: 2
     interval: 30s
     name: vmcluster
     rules:
+{{- if not (.Values.defaultRules.disabled.DiskRunsOutOfSpaceIn3Days | default false) }}
+{{- if not (.Values.defaultRules.disabled.DiskRunsOutOfSpace | default false) }}
     - alert: DiskRunsOutOfSpaceIn3Days
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=113&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -48,6 +56,9 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.DiskRunsOutOfSpace | default false) }}
     - alert: DiskRunsOutOfSpace
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=200&var-instance={{`{{`}} $labels.instance {{`}}`}}"
@@ -65,6 +76,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.RequestErrorsToAPI | default false) }}
     - alert: RequestErrorsToAPI
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=52&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -78,6 +91,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.RPCErrors | default false) }}
     - alert: RPCErrors
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=44&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -98,6 +113,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.RowsRejectedOnIngestion | default false) }}
     - alert: RowsRejectedOnIngestion
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=135&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -110,6 +127,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.TooHighChurnRate | default false) }}
     - alert: TooHighChurnRate
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=102
@@ -127,6 +146,9 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.TooHighChurnRate | default false) }}
+{{- if not (.Values.defaultRules.disabled.TooHighChurnRate24h | default false) }}
     - alert: TooHighChurnRate24h
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=102
@@ -142,6 +164,9 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.TooHighSlowInsertsRate | default false) }}
     - alert: TooHighSlowInsertsRate
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=108
@@ -159,6 +184,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.ProcessNearFDLimits | default false) }}
     - alert: ProcessNearFDLimits
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=117&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -171,6 +198,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.LabelsLimitExceededOnIngestion | default false) }}
     - alert: LabelsLimitExceededOnIngestion
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=116&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -183,6 +212,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.VminsertVmstorageConnectionIsSaturated | default false) }}
     - alert: VminsertVmstorageConnectionIsSaturated
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/oS7Bi_0Wz?viewPanel=139&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -195,5 +226,6 @@ spec:
         show_at: dashboard
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}

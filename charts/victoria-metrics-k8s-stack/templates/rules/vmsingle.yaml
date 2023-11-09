@@ -21,10 +21,18 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - concurrency: 2
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} concurrency: 2
     interval: 30s
     name: vmsingle
     rules:
+{{- if not (.Values.defaultRules.disabled.DiskRunsOutOfSpaceIn3Days | default false) }}
+{{- if not (.Values.defaultRules.disabled.DiskRunsOutOfSpace | default false) }}
     - alert: DiskRunsOutOfSpaceIn3Days
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=73&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -48,6 +56,9 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.DiskRunsOutOfSpace | default false) }}
     - alert: DiskRunsOutOfSpace
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=53&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -65,6 +76,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.RequestErrorsToAPI | default false) }}
     - alert: RequestErrorsToAPI
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=35&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -77,6 +90,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.RowsRejectedOnIngestion | default false) }}
     - alert: RowsRejectedOnIngestion
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=58&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -89,6 +104,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.TooHighChurnRate | default false) }}
     - alert: TooHighChurnRate
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=66&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -106,6 +123,9 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.TooHighChurnRate | default false) }}
+{{- if not (.Values.defaultRules.disabled.TooHighChurnRate24h | default false) }}
     - alert: TooHighChurnRate24h
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=66&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -121,6 +141,9 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.TooHighSlowInsertsRate | default false) }}
     - alert: TooHighSlowInsertsRate
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=68&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -138,6 +161,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.LabelsLimitExceededOnIngestion | default false) }}
     - alert: LabelsLimitExceededOnIngestion
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=74&var-instance={{`{{`}} $labels.instance {{`}}`}}
@@ -149,5 +174,6 @@ spec:
         severity: warning
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}

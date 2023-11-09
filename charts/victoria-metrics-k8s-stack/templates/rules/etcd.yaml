@@ -21,8 +21,15 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: etcd
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: etcd
     rules:
+{{- if not (.Values.defaultRules.disabled.etcdInsufficientMembers | default false) }}
     - alert: etcdInsufficientMembers
       annotations:
         message: 'etcd cluster "{{`{{`}} $labels.job {{`}}`}}": insufficient members ({{`{{`}} $value {{`}}`}}).'
@@ -33,6 +40,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdNoLeader | default false) }}
     - alert: etcdNoLeader
       annotations:
         message: 'etcd cluster "{{`{{`}} $labels.job {{`}}`}}": member {{`{{`}} $labels.instance {{`}}`}} has no leader.'
@@ -43,6 +52,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdHighNumberOfLeaderChanges | default false) }}
     - alert: etcdHighNumberOfLeaderChanges
       annotations:
         message: 'etcd cluster "{{`{{`}} $labels.job {{`}}`}}": instance {{`{{`}} $labels.instance {{`}}`}} has seen {{`{{`}} $value {{`}}`}} leader changes within the last hour.'
@@ -53,6 +64,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdHighNumberOfFailedGRPCRequests | default false) }}
     - alert: etcdHighNumberOfFailedGRPCRequests
       annotations:
         message: 'etcd cluster "{{`{{`}} $labels.job {{`}}`}}": {{`{{`}} $value {{`}}`}}% of requests for {{`{{`}} $labels.grpc_method {{`}}`}} failed on etcd instance {{`{{`}} $labels.instance {{`}}`}}.'
@@ -67,6 +80,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdHighNumberOfFailedGRPCRequests | default false) }}
     - alert: etcdHighNumberOfFailedGRPCRequests
       annotations:
         message: 'etcd cluster "{{`{{`}} $labels.job {{`}}`}}": {{`{{`}} $value {{`}}`}}% of requests for {{`{{`}} $labels.grpc_method {{`}}`}} failed on etcd instance {{`{{`}} $labels.instance {{`}}`}}.'
@@ -81,6 +96,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdGRPCRequestsSlow | default false) }}
     - alert: etcdGRPCRequestsSlow
       annotations:
         message: 'etcd cluster "{{`{{`}} $labels.job {{`}}`}}": gRPC requests to {{`{{`}} $labels.grpc_method {{`}}`}} are taking {{`{{`}} $value {{`}}`}}s on etcd instance {{`{{`}} $labels.instance {{`}}`}}.'
@@ -93,6 +110,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdMemberCommunicationSlow | default false) }}
     - alert: etcdMemberCommunicationSlow
       annotations:
         message: 'etcd cluster "{{`{{`}} $labels.job {{`}}`}}": member communication with {{`{{`}} $labels.To {{`}}`}} is taking {{`{{`}} $value {{`}}`}}s on etcd instance {{`{{`}} $labels.instance {{`}}`}}.'
@@ -105,6 +124,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdHighNumberOfFailedProposals | default false) }}
     - alert: etcdHighNumberOfFailedProposals
       annotations:
         message: 'etcd cluster "{{`{{`}} $labels.job {{`}}`}}": {{`{{`}} $value {{`}}`}} proposal failures within the last hour on etcd instance {{`{{`}} $labels.instance {{`}}`}}.'
@@ -115,6 +136,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdHighFsyncDurations | default false) }}
     - alert: etcdHighFsyncDurations
       annotations:
         message: 'etcd cluster "{{`{{`}} $labels.job {{`}}`}}": 99th percentile fync durations are {{`{{`}} $value {{`}}`}}s on etcd instance {{`{{`}} $labels.instance {{`}}`}}.'
@@ -127,6 +150,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdHighCommitDurations | default false) }}
     - alert: etcdHighCommitDurations
       annotations:
         message: 'etcd cluster "{{`{{`}} $labels.job {{`}}`}}": 99th percentile commit durations {{`{{`}} $value {{`}}`}}s on etcd instance {{`{{`}} $labels.instance {{`}}`}}.'
@@ -139,6 +164,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdHighNumberOfFailedHTTPRequests | default false) }}
     - alert: etcdHighNumberOfFailedHTTPRequests
       annotations:
         message: '{{`{{`}} $value {{`}}`}}% of requests for {{`{{`}} $labels.method {{`}}`}} failed on etcd instance {{`{{`}} $labels.instance {{`}}`}}'
@@ -151,6 +178,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdHighNumberOfFailedHTTPRequests | default false) }}
     - alert: etcdHighNumberOfFailedHTTPRequests
       annotations:
         message: '{{`{{`}} $value {{`}}`}}% of requests for {{`{{`}} $labels.method {{`}}`}} failed on etcd instance {{`{{`}} $labels.instance {{`}}`}}.'
@@ -163,6 +192,8 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.etcdHTTPRequestsSlow | default false) }}
     - alert: etcdHTTPRequestsSlow
       annotations:
         message: etcd instance {{`{{`}} $labels.instance {{`}}`}} HTTP requests to {{`{{`}} $labels.method {{`}}`}} are slow.
@@ -174,5 +205,6 @@ spec:
         severity: warning
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}

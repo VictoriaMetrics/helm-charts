@@ -21,7 +21,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: k8s.rules
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: k8s.rules
     rules:
     - expr: |-
         sum by (cluster, namespace, pod, container) (
