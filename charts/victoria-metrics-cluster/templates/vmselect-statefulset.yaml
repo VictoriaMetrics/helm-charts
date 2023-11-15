@@ -73,6 +73,7 @@ spec:
               containerPort: {{ include "split-host-port" .Values.vmselect.extraArgs.clusternativeListenAddr }}
           {{- end }}
           readinessProbe:
+            {{- if not .Values.vmselect.probe.readiness.custom }}
             httpGet:
             {{- if index  .Values.vmselect.extraArgs "http.pathPrefix" }}
               path: {{ trimSuffix "/" (index .Values.vmselect.extraArgs "http.pathPrefix") }}/health
@@ -80,11 +81,18 @@ spec:
               path: /health
             {{- end }}
               port: http
+            {{- else }}
+              {{- toYaml .Values.vmselect.probe.readiness.custom | nindent 12 }}
+            {{- end }}
             initialDelaySeconds: 5
             periodSeconds: 15
           livenessProbe:
+            {{- if not .Values.vmselect.probe.liveness.custom }}
             tcpSocket:
               port: http
+            {{- else }}
+              {{- toYaml .Values.vmselect.probe.liveness.custom | nindent 12 }}
+            {{- end }}
             initialDelaySeconds: 5
             periodSeconds: 15
             timeoutSeconds: 5
