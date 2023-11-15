@@ -356,6 +356,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.create | bool | `true` |  |
 | defaultRules.disabled | object | `{}` |  |
 | defaultRules.labels | object | `{}` | Labels for default rules |
+| defaultRules.params | object | `{}` | Optional HTTP URL parameters added to each rule request |
 | defaultRules.rules.alertmanager | bool | `true` |  |
 | defaultRules.rules.etcd | bool | `true` |  |
 | defaultRules.rules.general | bool | `true` |  |
