@@ -2,6 +2,7 @@
 
 ## Next release
 
+- bump version of VM components to [v1.95.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.95.0)
 - Support adding extra group parameters for default vmrules. (#752)
 
 ## 0.18.6

@@ -2,6 +2,7 @@
 
 ## Next release
 
+- bump version of VM operator to [0.39.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.39.2)
 - Add `extraObjects` to allow deploying additional resources with the chart release. (#751)
 
 ## 0.27.4
