@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix `notifier.url` check, as it's only needed when alerting rule is used. (#767)
 
 ## 0.8.3
 
