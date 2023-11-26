@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Properly use variable from values file for Grafana datasource type [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/769) 
 
 ## 0.18.8
 
