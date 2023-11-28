@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Skip deleting victoriametrics CRD resources when uninstall release.
 
 ## 0.27.6
 
