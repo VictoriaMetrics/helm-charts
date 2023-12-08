@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Sync CRD resources with operator [v0.39.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.39.3).
 
 ## 0.27.7
 
