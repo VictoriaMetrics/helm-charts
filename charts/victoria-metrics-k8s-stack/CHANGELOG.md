@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.18.9
+
+**Release date:** 2023-12-08
+
+![AppVersion: v1.95.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.95.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Properly use variable from values file for Grafana datasource type. (#769)
 - Update dashboards from upstream sources. (#780)
 

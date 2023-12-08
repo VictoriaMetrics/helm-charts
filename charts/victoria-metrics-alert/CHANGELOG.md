@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.8.4
+
+**Release date:** 2023-12-08
+
+![AppVersion: v1.95.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.95.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - fix `notifier.url` check, as it's only needed when alerting rule is used. (#767)
 
 ## 0.8.3
