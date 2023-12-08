@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix `vminsert` configuration for volumes when using `extraVolumes`. 
 
 ## 0.11.6
 

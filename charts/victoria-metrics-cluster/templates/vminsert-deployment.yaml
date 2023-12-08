@@ -162,9 +162,11 @@ spec:
       topologySpreadConstraints:
 {{ toYaml .Values.vminsert.topologySpreadConstraints | indent 8 }}
       {{- end }}
-      {{- with .Values.vminsert.extraVolumes }}
+      {{- if or (and .Values.license.secret.name .Values.license.secret.key) .Values.vminsert.extraVolumes }}
       volumes:
+        {{- with .Values.vminsert.extraVolumes }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
         {{- include "chart.license.volume" . | nindent 8 }}
       {{- end }}
 {{- end }}
