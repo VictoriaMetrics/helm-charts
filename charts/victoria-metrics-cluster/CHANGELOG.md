@@ -2,7 +2,16 @@
 
 ## Next release
 
-- Fix `vminsert` configuration for volumes when using `extraVolumes`. 
+- TODO
+
+## 0.11.7
+
+**Release date:** 2023-12-08
+
+![AppVersion: v1.95.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.95.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Fix `vminsert` configuration for volumes when using `extraVolumes`.
 
 ## 0.11.6
 
