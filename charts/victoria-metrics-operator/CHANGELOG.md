@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.27.8
+
+**Release date:** 2023-12-08
+
+![AppVersion: 0.39.3](https://img.shields.io/static/v1?label=AppVersion&message=0.39.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Sync CRD resources with operator [v0.39.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.39.3).
 
 ## 0.27.7
