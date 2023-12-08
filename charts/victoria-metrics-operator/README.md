@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.27.7](https://img.shields.io/badge/Version-0.27.7-informational?style=flat-square)
+ ![Version: 0.27.8](https://img.shields.io/badge/Version-0.27.8-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-operator)
 
 Victoria Metrics Operator
