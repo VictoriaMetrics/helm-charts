@@ -2,8 +2,8 @@
 
 ## Next release
 
-- Properly use variable from values file for Grafana datasource type [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/769)
-- Update dashboards from upstream sources.
+- Properly use variable from values file for Grafana datasource type. (#769)
+- Update dashboards from upstream sources. (#780)
 
 ## 0.18.8
 
