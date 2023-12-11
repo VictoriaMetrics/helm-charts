@@ -419,6 +419,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.datasources.jsonData | object | `{}` |  |
 | grafana.vmServiceScrape.enabled | bool | `true` |  |
 | grafana.vmServiceScrape.spec | object | `{}` |  |
+| grafanaOperatorDashboardsFormat.allowCrossNamespaceImport | bool | `false` |  |
 | grafanaOperatorDashboardsFormat.enabled | bool | `false` |  |
 | grafanaOperatorDashboardsFormat.instanceSelector.matchLabels.dashboards | string | `"grafana"` |  |
 | kube-state-metrics.enabled | bool | `true` |  |
