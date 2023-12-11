@@ -9,10 +9,9 @@ CT?=ct-docker
 
 helm-docker:
 	mkdir -p .helm/cache
-	docker run --rm --name helm-exec  \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
-		--mount type=bind,src="$(shell pwd)/.github/ci/helm-repos.yaml",dst=/helm-charts/.helm/config/repositories.yaml \
+	./container_run.sh --name helm-exec  \
+		--volume "$(shell pwd):/helm-charts" \
+		--volume "$(shell pwd)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml" \
 		-w /helm-charts \
 		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
 		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
@@ -26,10 +25,9 @@ helm-local:
 
 ct-docker:
 	mkdir -p .helm/cache
-	docker run --rm --name helm-exec  \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
-		--mount type=bind,src="$(shell pwd)/.github/ci/helm-repos.yaml",dst=/helm-charts/.helm/config/repositories.yaml \
+	./container_run.sh --name helm-exec  \
+		--volume "$(shell pwd):/helm-charts" \
+		--volume "$(shell pwd)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml" \
 		-w /helm-charts \
 		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
 		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
@@ -123,18 +121,16 @@ init:
 #	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) $(HELM)
 
 gen-docs:
-	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
+	./container_run.sh \
+		--volume "$(shell pwd):/helm-charts" \
 		-w /helm-charts \
 		$(HELM_DOCS_IMAGE) \
 		helm-docs
 
 # Synchronize alerting rules in charts/victoria-metrics-k8s-stack/templates/rules
 sync-rules:
-	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)/charts/victoria-metrics-k8s-stack",dst=/k8s-stack \
+	./container_run.sh \
+		--volume "$(shell pwd)/charts/victoria-metrics-k8s-stack:/k8s-stack" \
 		-w /k8s-stack/hack/ \
 		$(PYTHON_IMAGE) sh -c "\
 			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_rules.py \
@@ -142,9 +138,8 @@ sync-rules:
 
 # Synchronize grafana dashboards in charts/victoria-metrics-k8s-stack/templates/grafana/dashboards
 sync-dashboards:
-	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)/charts/victoria-metrics-k8s-stack",dst=/k8s-stack \
+	./container_run.sh \
+		--volume "$(shell pwd)/charts/victoria-metrics-k8s-stack:/k8s-stack" \
 		-w /k8s-stack/hack/ \
 		$(PYTHON_IMAGE) sh -c "\
 			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_grafana_dashboards.py \
