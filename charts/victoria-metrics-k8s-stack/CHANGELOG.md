@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Add optional allowCrossNamespaceImport to GrafanaDashboard(s) (#788)
 
 ## 0.18.9
 

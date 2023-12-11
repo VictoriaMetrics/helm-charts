@@ -115,6 +115,9 @@ spec:
   instanceSelector:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- if .Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
+  allowCrossNamespaceImport: true
+  {{- end }}
 {{- else }}
 apiVersion: v1
 kind: ConfigMap
