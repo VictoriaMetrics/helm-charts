@@ -9,15 +9,15 @@ CT?=ct-docker
 CONTAINER ?= docker
 
 ifeq ($(CONTAINER),docker)
-	CONTAINER_USER_OPTION = --user $(shell id -u):$(shell id -g)
-	CONTAINER_VOLUME_OPTION_SUFFIX =
+    CONTAINER_USER_OPTION = --user $(shell id -u):$(shell id -g)
+    CONTAINER_VOLUME_OPTION_SUFFIX =
 else
-	ifeq ($(CONTAINER),podman)
-    	CONTAINER_USER_OPTION =
-    	CONTAINER_VOLUME_OPTION_SUFFIX = :z
-	else
-	    $(error CONTAINER values currently supported are: docker, podman)
-	endif
+    ifeq ($(CONTAINER),podman)
+        CONTAINER_USER_OPTION =
+        CONTAINER_VOLUME_OPTION_SUFFIX = :z
+    else
+        $(error CONTAINER values currently supported are: docker, podman)
+    endif
 endif
 
 helm-docker:
