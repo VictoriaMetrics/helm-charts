@@ -6,13 +6,26 @@ CT_IMAGE = quay.io/helmpack/chart-testing:v3.7.1
 KNOWN_TARGETS=helm
 HELM?=helm-docker
 CT?=ct-docker
+CONTAINER ?= docker
+
+ifeq ($(CONTAINER),docker)
+	CONTAINER_USER_OPTION = --user $(shell id -u):$(shell id -g)
+	CONTAINER_VOLUME_OPTION_SUFFIX =
+else
+	ifeq ($(CONTAINER),podman)
+    	CONTAINER_USER_OPTION =
+    	CONTAINER_VOLUME_OPTION_SUFFIX = :z
+	else
+	    $(error CONTAINER values currently supported are: docker, podman)
+	endif
+endif
 
 helm-docker:
 	mkdir -p .helm/cache
-	docker run --rm --name helm-exec  \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
-		--mount type=bind,src="$(shell pwd)/.github/ci/helm-repos.yaml",dst=/helm-charts/.helm/config/repositories.yaml \
+	$(CONTAINER) run --rm --name helm-exec  \
+		$(CONTAINER_USER_OPTION) \
+		--volume "$(shell pwd):/helm-charts$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(shell pwd)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
 		-w /helm-charts \
 		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
 		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
@@ -26,10 +39,10 @@ helm-local:
 
 ct-docker:
 	mkdir -p .helm/cache
-	docker run --rm --name helm-exec  \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
-		--mount type=bind,src="$(shell pwd)/.github/ci/helm-repos.yaml",dst=/helm-charts/.helm/config/repositories.yaml \
+	$(CONTAINER) run --rm --name helm-exec  \
+		$(CONTAINER_USER_OPTION) \
+		--volume "$(shell pwd):/helm-charts$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(shell pwd)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
 		-w /helm-charts \
 		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
 		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
@@ -123,18 +136,18 @@ init:
 #	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) $(HELM)
 
 gen-docs:
-	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)",dst=/helm-charts \
+	$(CONTAINER) run --rm \
+		$(CONTAINER_USER_OPTION) \
+		--volume "$(shell pwd):/helm-charts$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
 		-w /helm-charts \
 		$(HELM_DOCS_IMAGE) \
 		helm-docs
 
 # Synchronize alerting rules in charts/victoria-metrics-k8s-stack/templates/rules
 sync-rules:
-	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)/charts/victoria-metrics-k8s-stack",dst=/k8s-stack \
+	$(CONTAINER) run --rm \
+		$(CONTAINER_USER_OPTION) \
+		--volume "$(shell pwd)/charts/victoria-metrics-k8s-stack:/k8s-stack$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
 		-w /k8s-stack/hack/ \
 		$(PYTHON_IMAGE) sh -c "\
 			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_rules.py \
@@ -142,9 +155,9 @@ sync-rules:
 
 # Synchronize grafana dashboards in charts/victoria-metrics-k8s-stack/templates/grafana/dashboards
 sync-dashboards:
-	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)/charts/victoria-metrics-k8s-stack",dst=/k8s-stack \
+	$(CONTAINER) run --rm \
+		$(CONTAINER_USER_OPTION) \
+		--volume "$(shell pwd)/charts/victoria-metrics-k8s-stack:/k8s-stack$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
 		-w /k8s-stack/hack/ \
 		$(PYTHON_IMAGE) sh -c "\
 			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_grafana_dashboards.py \
