@@ -6,12 +6,16 @@ CT_IMAGE = quay.io/helmpack/chart-testing:v3.7.1
 KNOWN_TARGETS=helm
 HELM?=helm-docker
 CT?=ct-docker
+DOCKER ?= docker
+DOCKER_USER_OPTION ?= --user $(shell id -u):$(shell id -g)
+DOCKER_VOLUME_OPTION_SUFFIX ?=
 
 helm-docker:
 	mkdir -p .helm/cache
-	./container_run.sh --name helm-exec  \
-		--volume "$(shell pwd):/helm-charts" \
-		--volume "$(shell pwd)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml" \
+	$(DOCKER) run --rm --name helm-exec  \
+		$(DOCKER_USER_OPTION) \
+		--volume "$(shell pwd):/helm-charts$(DOCKER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(shell pwd)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml$(DOCKER_VOLUME_OPTION_SUFFIX)" \
 		-w /helm-charts \
 		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
 		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
@@ -25,9 +29,10 @@ helm-local:
 
 ct-docker:
 	mkdir -p .helm/cache
-	./container_run.sh --name helm-exec  \
-		--volume "$(shell pwd):/helm-charts" \
-		--volume "$(shell pwd)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml" \
+	$(DOCKER) run --rm --name helm-exec  \
+		$(DOCKER_USER_OPTION) \
+		--volume "$(shell pwd):/helm-charts$(DOCKER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(shell pwd)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml$(DOCKER_VOLUME_OPTION_SUFFIX)" \
 		-w /helm-charts \
 		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
 		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
@@ -121,16 +126,18 @@ init:
 #	CMD="repo index --url ${URL} --merge index.yaml ." $(MAKE) $(HELM)
 
 gen-docs:
-	./container_run.sh \
-		--volume "$(shell pwd):/helm-charts" \
+	$(DOCKER) run --rm \
+		$(DOCKER_USER_OPTION) \
+		--volume "$(shell pwd):/helm-charts$(DOCKER_VOLUME_OPTION_SUFFIX)" \
 		-w /helm-charts \
 		$(HELM_DOCS_IMAGE) \
 		helm-docs
 
 # Synchronize alerting rules in charts/victoria-metrics-k8s-stack/templates/rules
 sync-rules:
-	./container_run.sh \
-		--volume "$(shell pwd)/charts/victoria-metrics-k8s-stack:/k8s-stack" \
+	$(DOCKER) run --rm \
+		$(DOCKER_USER_OPTION) \
+		--volume "$(shell pwd)/charts/victoria-metrics-k8s-stack:/k8s-stack$(DOCKER_VOLUME_OPTION_SUFFIX)" \
 		-w /k8s-stack/hack/ \
 		$(PYTHON_IMAGE) sh -c "\
 			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_rules.py \
@@ -138,8 +145,9 @@ sync-rules:
 
 # Synchronize grafana dashboards in charts/victoria-metrics-k8s-stack/templates/grafana/dashboards
 sync-dashboards:
-	./container_run.sh \
-		--volume "$(shell pwd)/charts/victoria-metrics-k8s-stack:/k8s-stack" \
+	$(DOCKER) run --rm \
+		$(DOCKER_USER_OPTION) \
+		--volume "$(shell pwd)/charts/victoria-metrics-k8s-stack:/k8s-stack$(DOCKER_VOLUME_OPTION_SUFFIX)" \
 		-w /k8s-stack/hack/ \
 		$(PYTHON_IMAGE) sh -c "\
 			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_grafana_dashboards.py \
