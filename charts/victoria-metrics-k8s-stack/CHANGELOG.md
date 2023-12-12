@@ -2,6 +2,7 @@
 
 ## Next release
 
+- bump version of VM components to [v1.96.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.96.0)
 - Add optional allowCrossNamespaceImport to GrafanaDashboard(s) (#788)
 
 ## 0.18.9
