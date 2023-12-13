@@ -73,7 +73,6 @@ Return license volume mount
 - name: license-key
   secret:
     secretName: {{ .Values.license.secret.name }}
-    key: {{ .Values.license.secret.key }}
 {{- end -}}
 {{- end -}}
 
