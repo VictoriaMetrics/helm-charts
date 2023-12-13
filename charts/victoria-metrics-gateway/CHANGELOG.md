@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Fix configuration of volume mount for license key referenced by using secret.
+- Fix `vmbackupmanager` flags configuration when providing license key via secret. 
 
 ## 0.1.53
 
