@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix configuration of volume mount for license key referenced by using secret.
 
 ## 0.9.13
 
