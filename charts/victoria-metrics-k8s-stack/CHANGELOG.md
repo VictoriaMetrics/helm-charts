@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix missing `.Values.defaultRules.rules.vmcluster` value. See [#801](https://github.com/VictoriaMetrics/helm-charts/pull/801) by @MemberIT.
 
 ## 0.18.10
 
