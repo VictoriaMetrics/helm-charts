@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.18.11
+
+**Release date:** 2023-12-15
+
+![AppVersion: v1.96.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.96.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Fix missing `.Values.defaultRules.rules.vmcluster` value. See [#801](https://github.com/VictoriaMetrics/helm-charts/pull/801) by @MemberIT.
 
 ## 0.18.10

@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.18.10](https://img.shields.io/badge/Version-0.18.10-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.18.11](https://img.shields.io/badge/Version-0.18.11-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -378,9 +378,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rules.network | bool | `true` |  |
 | defaultRules.rules.node | bool | `true` |  |
 | defaultRules.rules.vmagent | bool | `true` |  |
+| defaultRules.rules.vmcluster | bool | `true` |  |
 | defaultRules.rules.vmhealth | bool | `true` |  |
 | defaultRules.rules.vmsingle | bool | `true` |  |
-| defaultRules.rules.vmcluster | bool | `true` |  |
 | defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
 | experimentalDashboardsEnabled | bool | `true` |  |
 | externalVM.read.url | string | `""` |  |
