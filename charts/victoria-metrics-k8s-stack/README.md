@@ -380,6 +380,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rules.vmagent | bool | `true` |  |
 | defaultRules.rules.vmhealth | bool | `true` |  |
 | defaultRules.rules.vmsingle | bool | `true` |  |
+| defaultRules.rules.vmcluster | bool | `true` |  |
 | defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
 | experimentalDashboardsEnabled | bool | `true` |  |
 | externalVM.read.url | string | `""` |  |
