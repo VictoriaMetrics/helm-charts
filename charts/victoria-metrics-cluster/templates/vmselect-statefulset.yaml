@@ -19,7 +19,7 @@ spec:
     matchLabels:
       {{- include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
   replicas: {{ .Values.vmselect.replicaCount }}
-  podManagementPolicy: {{ .Values.vmselect.podManagementPolicy }}
+  podManagementPolicy: {{ .Values.vmselect.statefulSet.podManagementPolicy }}
   template:
     metadata:
     {{- if .Values.vmselect.podAnnotations }}
