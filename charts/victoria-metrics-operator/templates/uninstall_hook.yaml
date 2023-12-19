@@ -18,6 +18,10 @@ spec:
       labels: {{ include "vm-operator.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "vm-operator.cleanupHookName" . }}
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
       containers:
         - name: kubectl
           image: "{{ (index .Values "cleanupImage" "repository") }}:{{ (index .Values "cleanupImage" "tag") }}"
