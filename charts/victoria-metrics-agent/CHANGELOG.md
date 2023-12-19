@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Add init containers for deployment and statefulset. See [#806](https://github.com/VictoriaMetrics/helm-charts/pull/806) by @MemberIT.
 
 ## 0.9.15
 
