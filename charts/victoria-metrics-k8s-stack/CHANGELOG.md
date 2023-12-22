@@ -5,6 +5,8 @@
 - Moved dashboards templating logic out of sync script to Helm template
 - Allow to disable default grafana datasource
 - Synchronize Etcd dashboards and rules with mixin provided by Etcd
+- Add alerting rules for VictoriaMetrics operator.
+- Updated alerting rules for VictoriaMetrics components.
 
 ## 0.24.5
 
@@ -181,8 +183,6 @@
 
 ![AppVersion: v1.100.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.100.1&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
-
-- TODO
 
 ## 0.21.0
 

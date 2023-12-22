@@ -43,6 +43,7 @@ rules = [
     "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-health.yml",
     "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-vmagent.yml",
     "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts.yml",
+    "https://raw.githubusercontent.com/VictoriaMetrics/operator/master/config/alerting/vmoperator-rules.yaml",
     "https://raw.githubusercontent.com/etcd-io/etcd/main/contrib/mixin/mixin.libsonnet",
 ]
 
