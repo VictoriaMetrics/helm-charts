@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- - Fix helm lint when ingress resources enabled - split templates of resources per kind. See [#820](https://github.com/VictoriaMetrics/helm-charts/pull/820) by @MemberIT.
 
 ## 0.18.11
 
