@@ -110,6 +110,7 @@ spec:
               containerPort: {{ include "split-host-port" .Values.vminsert.extraArgs.opentsdbListenAddr }}
           {{- end }}
           readinessProbe:
+            {{- if not .Values.vminsert.probe.readiness.custom }}
             httpGet:
             {{- if index  .Values.vminsert.extraArgs "http.pathPrefix" }}
               path: {{ trimSuffix "/" (index .Values.vminsert.extraArgs "http.pathPrefix") }}/health
@@ -117,13 +118,20 @@ spec:
               path: /health
             {{- end }}
               port: http
+            {{- else }}
+              {{- toYaml .Values.vminsert.probe.readiness.custom | nindent 12 }}
+            {{- end }}
             initialDelaySeconds: {{ .Values.vminsert.probe.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vminsert.probe.readiness.periodSeconds }}
             timeoutSeconds: {{ .Values.vminsert.probe.readiness.timeoutSeconds }}
             failureThreshold: {{ .Values.vminsert.probe.readiness.failureThreshold }}
           livenessProbe:
+            {{- if not .Values.vminsert.probe.liveness.custom }}
             tcpSocket:
               port: http
+            {{- else }}
+              {{- toYaml .Values.vminsert.probe.liveness.custom | nindent 12 }}
+            {{- end }}
             initialDelaySeconds: {{ .Values.vminsert.probe.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vminsert.probe.liveness.periodSeconds }}
             timeoutSeconds: {{ .Values.vminsert.probe.liveness.timeoutSeconds }}
