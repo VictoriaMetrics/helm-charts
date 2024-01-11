@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Switch probes scheme to `HTTPS` if vminsert and vmselect enabled tls in extraArgs.
 
 ## 0.11.10
 

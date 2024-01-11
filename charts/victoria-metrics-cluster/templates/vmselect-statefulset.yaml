@@ -80,11 +80,21 @@ spec:
               path: /health
             {{- end }}
               port: http
+            {{- if .Values.vmselect.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: 5
             periodSeconds: 15
           livenessProbe:
             tcpSocket:
               port: http
+            {{- if .Values.vmselect.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: 5
             periodSeconds: 15
             timeoutSeconds: 5

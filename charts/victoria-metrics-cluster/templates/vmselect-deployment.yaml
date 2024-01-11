@@ -83,6 +83,11 @@ spec:
               path: /health
             {{- end }}
               port: http
+            {{- if .Values.vmselect.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: {{ .Values.vmselect.probe.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vmselect.probe.readiness.periodSeconds }}
             timeoutSeconds: {{ .Values.vmselect.probe.readiness.timeoutSeconds }}
@@ -90,6 +95,11 @@ spec:
           livenessProbe:
             tcpSocket:
               port: http
+            {{- if .Values.vmselect.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: {{ .Values.vmselect.probe.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vmselect.probe.liveness.periodSeconds }}
             timeoutSeconds: {{ .Values.vmselect.probe.liveness.timeoutSeconds }}
