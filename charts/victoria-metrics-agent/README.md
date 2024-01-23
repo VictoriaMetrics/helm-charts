@@ -281,6 +281,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | deployment.enabled | bool | `true` |  |
 | deployment.strategy | object | `{}` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| envFrom | list | `[]` | Additional environment variables by referencing secrets or configmaps |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | extraArgs.loggerFormat | string | `"json"` |  |
