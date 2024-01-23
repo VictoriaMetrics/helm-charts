@@ -109,6 +109,12 @@ spec:
               protocol: UDP
               containerPort: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
           {{- end }}
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
