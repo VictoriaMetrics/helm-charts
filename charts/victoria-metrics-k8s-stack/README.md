@@ -347,7 +347,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.spec.selectAllByDefault | bool | `true` |  |
 | alertmanager.templateFiles | object | `{}` |  |
 | argocdReleaseOverride | string | `""` | For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
-| coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}]}}` | Component scraping coreDns. Use either this or kubeDns |
+| coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}],"jobLabel":"jobLabel"}}` | Component scraping coreDns. Use either this or kubeDns |
 | crds.enabled | bool | `true` |  |
 | defaultDashboardsEnabled | bool | `true` |  |
 | defaultRules.additionalRuleLabels | object | `{}` | Additional labels for PrometheusRule alerts |
