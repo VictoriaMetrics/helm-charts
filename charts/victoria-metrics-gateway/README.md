@@ -8,12 +8,15 @@ Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
 
 # Table of Content
 
-* [Prerequisites](#prerequisites)
-* [Chart Details](#chart-details)
-* [How to Install](#how-to-install)
-* [How to Uninstall](#how-to-uninstall)
-* [How to use JWT signature verification](#how-to-use-jwt-signature-verification)
-* [Documentation of Helm Chart](#documentation-of-helm-chart)
+- [Victoria Metrics Helm Chart for vmgateway](#victoria-metrics-helm-chart-for-vmgateway)
+- [Table of Content](#table-of-content)
+  - [Prerequisites](#prerequisites)
+  - [Chart Details](#chart-details)
+  - [How to install](#how-to-install)
+  - [How to uninstall](#how-to-uninstall)
+- [How to use JWT signature verification](#how-to-use-jwt-signature-verification)
+  - [Documentation of Helm Chart](#documentation-of-helm-chart)
+  - [Parameters](#parameters)
 
 ## Prerequisites
 
@@ -171,6 +174,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmgateway.html |
 | containerWorkingDir | string | `"/"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| envFrom | list | `[]` | Additional environment variables by referencing secrets or configmaps |
 | eula | bool | `false` | should be true and means that you have the legal right to run a vmgateway that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/esa/ |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |

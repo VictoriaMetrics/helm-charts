@@ -69,6 +69,12 @@ spec:
               containerPort: 8400
             - name: vmselect
               containerPort: 8401
+          {{- if .Values.vmstorage.envFrom }}
+          envFrom:
+            {{- with .Values.vmstorage.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.vmstorage.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}

@@ -66,6 +66,9 @@ vmselect:
   extraLabels: {}
   # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
   env: []
+  envFrom: []
+    #- configMapRef:
+    #    name: special-config
 
   # Readiness & Liveness probes
   probe:
@@ -295,6 +298,10 @@ vminsert:
   extraLabels: {}
   # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
   env: []
+  envFrom: []
+    #- configMapRef:
+    #    name: special-config
+
   # -- Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs
   suppressStorageFQDNsRender: false
   automountServiceAccountToken: true
@@ -472,6 +479,10 @@ vmstorage:
   automountServiceAccountToken: true
   # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
   env: []
+  envFrom: []
+    #- configMapRef:
+    #    name: special-config
+
   # -- Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month
   retentionPeriod: 1
   # Additional vmstorage container arguments. Extra command line arguments for vmstorage component
