@@ -2,6 +2,7 @@
 
 ## Next release
 
+- bump version of VM components to [v1.97.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.97.1)
 - Switch probes scheme to `HTTPS` if vminsert and vmselect enabled tls in extraArgs.
 
 ## 0.11.10
