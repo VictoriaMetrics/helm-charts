@@ -111,7 +111,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | annotations | object | `{}` | Annotations to be added to the deployment |
 | containerWorkingDir | string | `"/vmanomaly"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) |
-| envFrom | list | `[]` | Additional environment variables by referencing secrets or configmaps |
+| envFrom | list | `[]` |  |
 | eula | bool | `false` | should be true and means that you have the legal right to run a vmanomaly that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/esa/ |
 | extraArgs.loggerFormat | string | `"json"` |  |
 | extraContainers | list | `[]` |  |

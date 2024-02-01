@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmgateway
 
- ![Version: 0.1.54](https://img.shields.io/badge/Version-0.1.54-informational?style=flat-square)
+ ![Version: 0.1.55](https://img.shields.io/badge/Version-0.1.55-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-gateway)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -171,7 +171,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmgateway.html |
 | containerWorkingDir | string | `"/"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
-| envFrom | list | `[]` | Additional environment variables by referencing secrets or configmaps |
+| envFrom | list | `[]` |  |
 | eula | bool | `false` | should be true and means that you have the legal right to run a vmgateway that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/esa/ |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
@@ -183,7 +183,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmgateway"` | Victoria Metrics gateway Docker repository and image name |
-| image.tag | string | `"v1.96.0-enterprise"` | Tag of Docker image |
+| image.tag | string | `"v1.97.1-enterprise"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |

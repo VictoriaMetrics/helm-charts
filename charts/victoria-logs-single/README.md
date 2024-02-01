@@ -134,7 +134,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.containerWorkingDir | string | `""` | Container workdir |
 | server.enabled | bool | `true` | Enable deployment of server component. Deployed as StatefulSet |
 | server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
-| server.envFrom | list | `[]` | Additional environment variables by referencing secrets or configmaps |
+| server.envFrom | list | `[]` |  |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |

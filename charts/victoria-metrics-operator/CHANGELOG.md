@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.27.11
+
+**Release date:** 2024-02-01
+
+![AppVersion: 0.41.1](https://img.shields.io/static/v1?label=AppVersion&message=0.41.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - bump version of VM operator to [0.41.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.41.1)
 
 ## 0.27.10

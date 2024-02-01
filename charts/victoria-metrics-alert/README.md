@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.8.6](https://img.shields.io/badge/Version-0.8.6-informational?style=flat-square)
+ ![Version: 0.8.7](https://img.shields.io/badge/Version-0.8.7-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -165,7 +165,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.datasource.url | string | `""` |  |
 | server.enabled | bool | `true` |  |
 | server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
-| server.envFrom | list | `[]` | Additional environment variables by referencing secrets or configmaps |
+| server.envFrom | list | `[]` |  |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
