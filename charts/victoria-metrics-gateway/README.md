@@ -8,15 +8,12 @@ Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
 
 # Table of Content
 
-- [Victoria Metrics Helm Chart for vmgateway](#victoria-metrics-helm-chart-for-vmgateway)
-- [Table of Content](#table-of-content)
-  - [Prerequisites](#prerequisites)
-  - [Chart Details](#chart-details)
-  - [How to install](#how-to-install)
-  - [How to uninstall](#how-to-uninstall)
-- [How to use JWT signature verification](#how-to-use-jwt-signature-verification)
-  - [Documentation of Helm Chart](#documentation-of-helm-chart)
-  - [Parameters](#parameters)
+* [Prerequisites](#prerequisites)
+* [Chart Details](#chart-details)
+* [How to Install](#how-to-install)
+* [How to Uninstall](#how-to-uninstall)
+* [How to use JWT signature verification](#how-to-use-jwt-signature-verification)
+* [Documentation of Helm Chart](#documentation-of-helm-chart)
 
 ## Prerequisites
 
