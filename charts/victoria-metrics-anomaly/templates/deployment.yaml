@@ -43,6 +43,15 @@ spec:
           {{- with (include "chart.license.flag" .) }}
             - {{ . }}
           {{- end}}
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- with .Values.env }}
+          env: {{ toYaml . | nindent 10 }}
+          {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}

@@ -66,6 +66,12 @@ spec:
           {{- with (include "victoria-metrics.license.flag" .) }}
             - {{ . }}
           {{- end }}
+          {{- if .Values.server.envFrom }}
+          envFrom:
+            {{- with .Values.server.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.server.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}

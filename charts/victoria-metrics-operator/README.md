@@ -153,6 +153,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | cleanupImage.tag | string | `"v1.18.0"` |  |
 | createCRD | bool | `true` | with this option, if you remove this chart, all crd resources will be deleted with it. |
 | env | list | `[]` | extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD) |
+| envFrom | list | `[]` | Additional environment variables by referencing secrets or configmaps |
 | extraArgs | object | `{}` | operator container additional commandline arguments |
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
