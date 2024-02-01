@@ -124,6 +124,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.containerWorkingDir | string | `""` | Container workdir |
 | vminsert.enabled | bool | `true` | Enable deployment of vminsert component. Deployment is used |
 | vminsert.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| vminsert.envFrom | list | `[]` |  |
 | vminsert.extraArgs."envflag.enable" | string | `"true"` |  |
 | vminsert.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vminsert.extraArgs.loggerFormat | string | `"json"` |  |
@@ -192,6 +193,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.containerWorkingDir | string | `""` | Container workdir |
 | vmselect.enabled | bool | `true` | Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet |
 | vmselect.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| vmselect.envFrom | list | `[]` |  |
 | vmselect.extraArgs."envflag.enable" | string | `"true"` |  |
 | vmselect.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vmselect.extraArgs.loggerFormat | string | `"json"` |  |
@@ -271,6 +273,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.containerWorkingDir | string | `""` | Container workdir |
 | vmstorage.enabled | bool | `true` | Enable deployment of vmstorage component. StatefulSet is used |
 | vmstorage.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| vmstorage.envFrom | list | `[]` |  |
 | vmstorage.extraArgs."envflag.enable" | string | `"true"` |  |
 | vmstorage.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vmstorage.extraArgs.loggerFormat | string | `"json"` |  |
