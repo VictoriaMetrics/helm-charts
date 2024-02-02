@@ -2,16 +2,7 @@
 
 ## Next release
 
-- TODO
-
-## 1.0.0
-
-**Release date:** 2024-02-01
-
-![AppVersion: v1.9.2](https://img.shields.io/static/v1?label=AppVersion&message=v1.9.2&color=success&logo=)
-![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
-
-- Add ability to render vmanomaly config as is via `vmanomalyConfig`.
+- Add ability to render full vmanomaly config via `config` parameter.
 - vmanomaly image moving to DockerHub
 
 ## 0.5.0
