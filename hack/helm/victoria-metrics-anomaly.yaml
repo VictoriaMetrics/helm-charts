@@ -1,7 +1,7 @@
 eula: true
 config:
   reader:
-    url: http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481/select/
+    datasource_url: http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481/select/
     queries:
       active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
       churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'
@@ -9,7 +9,7 @@ config:
       insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
       slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
   writer:
-    url: http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/
+    datasource_url: http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/
 
 
   monitoring:
