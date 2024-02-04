@@ -135,11 +135,6 @@ spec:
           livenessProbe:
             tcpSocket:
               port: http
-            {{- if .Values.vminsert.extraArgs.tls }}
-              scheme: HTTPS
-            {{- else }}
-              scheme: HTTP
-            {{- end }}
             initialDelaySeconds: {{ .Values.vminsert.probe.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vminsert.probe.liveness.periodSeconds }}
             timeoutSeconds: {{ .Values.vminsert.probe.liveness.timeoutSeconds }}
