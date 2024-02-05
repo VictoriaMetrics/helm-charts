@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Remove unsupported `scheme` field under `livenessProbe.tcpSocket`. See [#844](https://github.com/VictoriaMetrics/helm-charts/pull/844) by @MisguidedEmails.
 
 ## 0.11.11
 
