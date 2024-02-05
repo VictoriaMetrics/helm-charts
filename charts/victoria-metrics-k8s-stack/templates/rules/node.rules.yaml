@@ -8,7 +8,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "node.rules" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "node.rules" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
@@ -38,8 +38,8 @@ spec:
     - expr: |-
         count by (cluster, node) (
           node_cpu_seconds_total{mode="idle",job="node-exporter"}
-          * on (namespace, pod) group_left(node)
-          topk by(namespace, pod) (1, node_namespace_pod:kube_pod_info:)
+          * on (cluster, namespace, pod) group_left(node)
+          topk by(cluster, namespace, pod) (1, node_namespace_pod:kube_pod_info:)
         )
       record: node:node_num_cpu:sum
     - expr: |-

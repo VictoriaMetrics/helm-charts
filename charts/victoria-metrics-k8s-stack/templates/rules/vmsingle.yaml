@@ -8,7 +8,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "vmsingle" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "vmsingle" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
@@ -63,12 +63,12 @@ spec:
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=53&var-instance={{`{{`}} $labels.instance {{`}}`}}
         description: "Disk utilisation on instance {{`{{`}} $labels.instance {{`}}`}} is more than 80%.\n Having less than 20% of free disk space could cripple merges processes and overall performance. Consider to limit the ingestion rate, decrease retention or scale the disk space if possible."
-        summary: Instance {{`{{`}} $labels.instance {{`}}`}} will run out of disk space soon
+        summary: Instance {{`{{`}} $labels.instance {{`}}`}} (job={{`{{`}} $labels.job {{`}}`}}) will run out of disk space soon
       expr: |-
-        sum(vm_data_size_bytes) by(instance) /
+        sum(vm_data_size_bytes) by(job, instance) /
         (
-         sum(vm_free_disk_space_bytes) by(instance) +
-         sum(vm_data_size_bytes) by(instance)
+         sum(vm_free_disk_space_bytes) by(job, instance) +
+         sum(vm_data_size_bytes) by(job, instance)
         ) > 0.8
       for: 30m
       labels:
@@ -97,7 +97,7 @@ spec:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=58&var-instance={{`{{`}} $labels.instance {{`}}`}}
         description: 'VM is rejecting to ingest rows on "{{`{{`}} $labels.instance {{`}}`}}" due to the following reason: "{{`{{`}} $labels.reason {{`}}`}}"'
         summary: Some rows are rejected on "{{`{{`}} $labels.instance {{`}}`}}" on ingestion attempt
-      expr: sum(rate(vm_rows_ignored_total[5m])) by (instance, reason) > 0
+      expr: rate(vm_rows_ignored_total[5m]) > 0
       for: 15m
       labels:
         severity: warning
@@ -168,7 +168,7 @@ spec:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=74&var-instance={{`{{`}} $labels.instance {{`}}`}}
         description: "VictoriaMetrics limits the number of labels per each metric with `-maxLabelsPerTimeseries` command-line flag.\n This prevents from ingesting metrics with too many labels. Please verify that `-maxLabelsPerTimeseries` is configured correctly or that clients which send these metrics aren't misbehaving."
         summary: Metrics ingested in ({{`{{`}} $labels.instance {{`}}`}}) are exceeding labels limit
-      expr: sum(increase(vm_metrics_with_dropped_labels_total[5m])) by (instance) > 0
+      expr: increase(vm_metrics_with_dropped_labels_total[5m]) > 0
       for: 15m
       labels:
         severity: warning

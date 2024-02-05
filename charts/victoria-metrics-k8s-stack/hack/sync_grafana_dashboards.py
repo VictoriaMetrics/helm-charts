@@ -106,7 +106,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%%s-%%s" (include "victoria-metrics-k8s-stack.fullname" $) "%(name)s" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%%s-%%s" (include "victoria-metrics-k8s-stack.fullname" $) "%(name)s" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
     {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
