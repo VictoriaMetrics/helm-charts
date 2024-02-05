@@ -622,8 +622,6 @@ spec:
                 description: Specifies the DNS parameters of a pod. Parameters specified
                   here will be merged to the generated DNS configuration based on
                   DNSPolicy.
-                items:
-                  x-kubernetes-preserve-unknown-fields: true
                 properties:
                   nameservers:
                     description: A list of DNS name server IP addresses. This will
@@ -656,6 +654,8 @@ spec:
                       type: string
                     type: array
                 type: object
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
               dnsPolicy:
                 description: DNSPolicy set DNS policy for the pod
                 type: string
@@ -6617,8 +6617,6 @@ spec:
                 description: Specifies the DNS parameters of a pod. Parameters specified
                   here will be merged to the generated DNS configuration based on
                   DNSPolicy.
-                items:
-                  x-kubernetes-preserve-unknown-fields: true
                 properties:
                   nameservers:
                     description: A list of DNS name server IP addresses. This will
@@ -6651,6 +6649,8 @@ spec:
                       type: string
                     type: array
                 type: object
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
@@ -7592,8 +7592,6 @@ spec:
                 description: Datasource Victoria Metrics or VMSelect url. Required
                   parameter. e.g. http://127.0.0.1:8428
                 properties:
-                  OAuth2:
-                    x-kubernetes-preserve-unknown-fields: true
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
                       basic authentication
@@ -7771,6 +7769,8 @@ spec:
                     description: Victoria Metrics or VMSelect url. Required parameter.
                       E.g. http://127.0.0.1:8428
                     type: string
+                  OAuth2:
+                    x-kubernetes-preserve-unknown-fields: true
                 required:
                 - url
                 type: object
@@ -7778,8 +7778,6 @@ spec:
                 description: Specifies the DNS parameters of a pod. Parameters specified
                   here will be merged to the generated DNS configuration based on
                   DNSPolicy.
-                items:
-                  x-kubernetes-preserve-unknown-fields: true
                 properties:
                   nameservers:
                     description: A list of DNS name server IP addresses. This will
@@ -7812,6 +7810,8 @@ spec:
                       type: string
                     type: array
                 type: object
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
@@ -7985,8 +7985,6 @@ spec:
                   notifier options could be chosen: notifierConfigRef or notifiers
                   +  notifier'
                 properties:
-                  OAuth2:
-                    x-kubernetes-preserve-unknown-fields: true
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
                       basic authentication
@@ -8232,6 +8230,8 @@ spec:
                   url:
                     description: AlertManager url.  E.g. http://127.0.0.1:9093
                     type: string
+                  OAuth2:
+                    x-kubernetes-preserve-unknown-fields: true
                 type: object
               notifierConfigRef:
                 description: 'NotifierConfigRef reference for secret with notifier
@@ -8264,8 +8264,6 @@ spec:
                   description: VMAlertNotifierSpec defines the notifier url for sending
                     information about alerts
                   properties:
-                    OAuth2:
-                      x-kubernetes-preserve-unknown-fields: true
                     basicAuth:
                       description: BasicAuth allow an endpoint to authenticate over
                         basic authentication
@@ -8511,6 +8509,8 @@ spec:
                     url:
                       description: AlertManager url.  E.g. http://127.0.0.1:9093
                       type: string
+                    OAuth2:
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 type: array
               podDisruptionBudget:
@@ -8604,8 +8604,6 @@ spec:
                   has been successfully persisted (via RemoteWrite) before. see -remoteRead.url
                   docs in vmalerts for details. E.g. http://127.0.0.1:8428
                 properties:
-                  OAuth2:
-                    x-kubernetes-preserve-unknown-fields: true
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
                       basic authentication
@@ -8788,6 +8786,8 @@ spec:
                   url:
                     description: URL of the endpoint to send samples to.
                     type: string
+                  OAuth2:
+                    x-kubernetes-preserve-unknown-fields: true
                 required:
                 - url
                 type: object
@@ -8798,8 +8798,6 @@ spec:
                   in the form of time series named ALERTS and ALERTS_FOR_STATE see
                   -remoteWrite.url docs in vmalerts for details. E.g. http://127.0.0.1:8428
                 properties:
-                  OAuth2:
-                    x-kubernetes-preserve-unknown-fields: true
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
                       basic authentication
@@ -8996,6 +8994,8 @@ spec:
                   url:
                     description: URL of the endpoint to send samples to.
                     type: string
+                  OAuth2:
+                    x-kubernetes-preserve-unknown-fields: true
                 required:
                 - url
                 type: object
@@ -9487,8 +9487,6 @@ spec:
                 description: Specifies the DNS parameters of a pod. Parameters specified
                   here will be merged to the generated DNS configuration based on
                   DNSPolicy.
-                items:
-                  x-kubernetes-preserve-unknown-fields: true
                 properties:
                   nameservers:
                     description: A list of DNS name server IP addresses. This will
@@ -9521,6 +9519,8 @@ spec:
                       type: string
                     type: array
                 type: object
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
@@ -10184,6 +10184,20 @@ spec:
                   description: VMAuthUnauthorizedPath defines url_map for unauthorized
                     access
                   properties:
+                    drop_src_path_prefix_parts:
+                      description: DropSrcPathPrefixParts is the number of `/`-delimited
+                        request path prefix parts to drop before proxying the request
+                        to backend. See https://docs.victoriametrics.com/vmauth.html#dropping-request-path-prefix
+                        for more details.
+                      type: integer
+                    headers:
+                      description: 'Headers represent additional http headers, that
+                        vmauth uses in form of ["header_key: header_value"] multiple
+                        values for header key: ["header_key: value1,value2"] it''s
+                        available since 1.68.0 version of vmauth'
+                      items:
+                        type: string
+                      type: array
                     ip_filters:
                       description: IPFilters defines filter for src ip address enterprise
                         only
@@ -10197,6 +10211,35 @@ spec:
                             type: string
                           type: array
                       type: object
+                    load_balancing_policy:
+                      description: 'LoadBalancingPolicy defines load balancing policy
+                        to use for backend urls. Supported policies: least_loaded,
+                        first_available. See https://docs.victoriametrics.com/vmauth.html#load-balancing
+                        for more details (default "least_loaded")'
+                      enum:
+                      - least_loaded
+                      - first_available
+                      type: string
+                    response_headers:
+                      description: 'ResponseHeaders represent additional http headers,
+                        that vmauth adds for request response in form of ["header_key:
+                        header_value"] multiple values for header key: ["header_key:
+                        value1,value2"] it''s available since 1.93.0 version of vmauth'
+                      items:
+                        type: string
+                      type: array
+                    retry_status_codes:
+                      description: RetryStatusCodes defines http status codes in numeric
+                        format for request retries e.g. [429,503]
+                      items:
+                        type: integer
+                      type: array
+                    src_hosts:
+                      description: SrcHosts is the list of regular expressions, which
+                        match the request hostname.
+                      items:
+                        type: string
+                      type: array
                     src_paths:
                       description: Paths src request paths
                       items:
@@ -10544,8 +10587,6 @@ spec:
                     description: Specifies the DNS parameters of a pod. Parameters
                       specified here will be merged to the generated DNS configuration
                       based on DNSPolicy.
-                    items:
-                      x-kubernetes-preserve-unknown-fields: true
                     properties:
                       nameservers:
                         description: A list of DNS name server IP addresses. This
@@ -10578,6 +10619,8 @@ spec:
                           type: string
                         type: array
                     type: object
+                    items:
+                      x-kubernetes-preserve-unknown-fields: true
                   dnsPolicy:
                     description: DNSPolicy sets DNS policy for the pod
                     type: string
@@ -11397,8 +11440,6 @@ spec:
                     description: Specifies the DNS parameters of a pod. Parameters
                       specified here will be merged to the generated DNS configuration
                       based on DNSPolicy.
-                    items:
-                      x-kubernetes-preserve-unknown-fields: true
                     properties:
                       nameservers:
                         description: A list of DNS name server IP addresses. This
@@ -11431,6 +11472,8 @@ spec:
                           type: string
                         type: array
                     type: object
+                    items:
+                      x-kubernetes-preserve-unknown-fields: true
                   dnsPolicy:
                     description: DNSPolicy sets DNS policy for the pod
                     type: string
@@ -12595,8 +12638,6 @@ spec:
                     description: Specifies the DNS parameters of a pod. Parameters
                       specified here will be merged to the generated DNS configuration
                       based on DNSPolicy.
-                    items:
-                      x-kubernetes-preserve-unknown-fields: true
                     properties:
                       nameservers:
                         description: A list of DNS name server IP addresses. This
@@ -12629,6 +12670,8 @@ spec:
                           type: string
                         type: array
                     type: object
+                    items:
+                      x-kubernetes-preserve-unknown-fields: true
                   dnsPolicy:
                     description: DNSPolicy sets DNS policy for the pod
                     type: string
@@ -17332,8 +17375,6 @@ spec:
                 description: Specifies the DNS parameters of a pod. Parameters specified
                   here will be merged to the generated DNS configuration based on
                   DNSPolicy.
-                items:
-                  x-kubernetes-preserve-unknown-fields: true
                 properties:
                   nameservers:
                     description: A list of DNS name server IP addresses. This will
@@ -17366,6 +17407,8 @@ spec:
                       type: string
                     type: array
                 type: object
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
@@ -19645,6 +19688,10 @@ spec:
                         vmauth uses in form of ["header_key: header_value"] multiple
                         values for header key: ["header_key: value1,value2"] it''s
                         available since 1.68.0 version of vmauth'
+                      items:
+                        type: string
+                      type: array
+                    hosts:
                       items:
                         type: string
                       type: array

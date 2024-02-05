@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Update victoriametrics CRD resources yaml.
 
 ## 0.27.11
 
