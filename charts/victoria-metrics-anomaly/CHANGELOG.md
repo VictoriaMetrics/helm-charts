@@ -2,7 +2,7 @@
 
 ## Next release
 
-- Add ability to render full vmanomaly config via `config` parameter.
+- Breaking change: passing full vmanomaly config via `config` parameter.
 - vmanomaly image moving to DockerHub
 
 ## 0.5.0
