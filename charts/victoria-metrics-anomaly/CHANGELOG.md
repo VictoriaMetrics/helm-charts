@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Breaking change: passing full vmanomaly config via `config` parameter.
+- vmanomaly image moving to DockerHub
 
 ## 0.5.0
 

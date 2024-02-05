@@ -2,17 +2,18 @@
 {{ fail "Pass -eula command-line flag or valid license at .Values.license if you have an enterprise license for running this software. See https://victoriametrics.com/legal/esa/ for details"}}
 {{- end -}}
 
-{{- if not .Values.remote.read.url -}}
-{{ fail "Please provide url for reading data from VictoriaMetrics. You need to specify url in `remote.read.url` parameter in values.yaml"}}
+{{- if not .Values.config.reader.datasource_url -}}
+{{ fail "Please provide url for reading data from VictoriaMetrics. You need to specify url in `config.reader.datasource_url` parameter in values.yaml"}}
 {{- end -}}
 
-{{- if not .Values.remote.write.url -}}
-{{ fail "Please provide url for writing data to VictoriaMetrics. You need to specify url in `remote.write.url` parameter  in values.yaml"}}
+{{- if not .Values.config.writer.datasource_url -}}
+{{ fail "Please provide url for writing data to VictoriaMetrics. You need to specify url in `config.writer.datasource_url` parameter  in values.yaml"}}
 {{- end -}}
 
-{{- if not .Values.queries -}}
-{{ fail "At least one query must be specified. You nee to add queries in `queries` parameter in values.yaml"}}
+{{- if not .Values.config.reader.queries -}}
+{{ fail "At least one query must be specified. You nee to add queries in `config.reader.queries` parameter in values.yaml"}}
 {{- end -}}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -33,9 +34,9 @@ spec:
         - name: model
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           workingDir: {{ .Values.containerWorkingDir }}
-          {{- if and .Values.monitoring.pull.enabled .Values.monitoring.pull.port }}
+          {{- if and .Values.config.monitoring .Values.config.monitoring.pull.port}}
           ports:
-            - containerPort: {{ .Values.monitoring.pull.port }}
+            - containerPort: {{ .Values.config.monitoring.pull.port }}
               name: metrics
           {{- end }}
           args:
