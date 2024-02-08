@@ -87,5 +87,7 @@ jobs:
       - name: Run chart-testing (install)
         run: |
           helm dep update charts/${{ matrix.chart }}
+
+          ct install --config .github/ci/ct.yaml --charts "charts/${{ matrix.chart }}" --helm-extra-set-args "--values ./hack/helm/${{ matrix.chart }}.yaml" --skip-clean-up
+
           helm template charts/${{ matrix.chart }} --values ./hack/helm/${{ matrix.chart }}.yaml | kubectl apply -f - --dry-run=server
-          ct install --config .github/ci/ct.yaml --charts "charts/${{ matrix.chart }}" --helm-extra-set-args "--values ./hack/helm/${{ matrix.chart }}.yaml"
