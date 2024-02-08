@@ -587,6 +587,9 @@ vmagent:
       cluster: cluster-name
     extraArgs:
       promscrape.streamParse: "true"
+      # Do not store original labels in vmagent's memory by default. This reduces the amount of memory used by vmagent
+      # but makes vmagent debugging UI less informative. See: https://docs.victoriametrics.com/vmagent/#relabel-debug
+      promscrape.dropOriginalLabels: "true"
   ingress:
     enabled: false
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
