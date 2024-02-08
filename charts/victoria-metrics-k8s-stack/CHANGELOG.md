@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Do not store original labels in `vmagent`'s memory by default. This reduces memory usage of `vmagent` but makes `vmagent`'s debugging UI less informative. See [this docs](https://docs.victoriametrics.com/vmagent/#relabel-debug) for details on relabeling debug. 
 
 ## 0.18.12
 
