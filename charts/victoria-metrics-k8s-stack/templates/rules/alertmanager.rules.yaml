@@ -8,7 +8,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "alertmanager.rules" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "alertmanager.rules" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
@@ -75,7 +75,7 @@ spec:
         (
           rate(alertmanager_notifications_failed_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}[5m])
         /
-          rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}[5m])
+          ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}"}[5m])
         )
         > 0.01
       for: 5m
@@ -95,7 +95,7 @@ spec:
         min by (namespace,service, integration) (
           rate(alertmanager_notifications_failed_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}", integration=~`.*`}[5m])
         /
-          rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}", integration=~`.*`}[5m])
+          ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}", integration=~`.*`}[5m])
         )
         > 0.01
       for: 5m
@@ -115,7 +115,7 @@ spec:
         min by (namespace,service, integration) (
           rate(alertmanager_notifications_failed_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}", integration!~`.*`}[5m])
         /
-          rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}", integration!~`.*`}[5m])
+          ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}",namespace="{{ .Release.Namespace }}", integration!~`.*`}[5m])
         )
         > 0.01
       for: 5m
