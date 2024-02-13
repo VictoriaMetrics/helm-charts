@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- replaces httpGet ready probe with tcpSocket check. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/528) for details
 
 ## 0.4.6
 
