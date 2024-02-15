@@ -1,0 +1,29 @@
+{{- if .Values.horizontalPodAutoscaler.enabled }}
+{{- if .Capabilities.APIVersions.Has "autoscaling/v2" -}}
+apiVersion: autoscaling/v2
+{{- else}}
+apiVersion: autoscaling/v2beta2
+{{- end}}
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
+{{- with .Values.vmselect.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+  name: {{ template "victoria-metrics.vmselect.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  maxReplicas: {{ .Values.horizontalPodAutoscaler.maxReplicas }}
+  minReplicas: {{ .Values.horizontalPodAutoscaler.minReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "victoria-metrics.vmselect.fullname" . }}
+  metrics:
+{{ toYaml .Values.horizontalPodAutoscaler.metrics | indent 4 }}
+{{- if .Values.horizontalPodAutoscaler.behavior }}
+  behavior:
+{{ toYaml .Values.horizontalPodAutoscaler.behavior | indent 4 }}
+{{- end -}}
+{{- end -}}
