@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- apply [v1.10](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1100) changes
+- docs fixes
 
 ## 1.0.0
 
@@ -11,7 +12,7 @@
 ![AppVersion: v1.9.2](https://img.shields.io/static/v1?label=AppVersion&message=v1.9.2&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-- Breaking change: passing full vmanomaly config via `config` parameter.
+- Breaking change: passing [full vmanomaly config](https://docs.victoriametrics.com/anomaly-detection/components/) via `config` parameter.
 - vmanomaly image moving to DockerHub
 
 ## 0.5.0
