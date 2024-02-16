@@ -75,7 +75,7 @@ skip_list = [
 condition_map = {
     'etcd': '.Values.kubeEtcd.enabled .Values.defaultRules.rules.etcd',
     'general.rules': '.Values.defaultRules.rules.general',
-    'k8s.rules': '.Values.defaultRules.rules.k8s',
+    'k8s.rules': '.Values.defaultRules.rules.k8s .Values.k8s.enabled',
     'kube-apiserver-availability.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverAvailability',
     'kube-apiserver-burnrate.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverBurnrate',
     'kube-apiserver-histogram.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverHistogram',
