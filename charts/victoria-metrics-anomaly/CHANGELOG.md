@@ -2,7 +2,7 @@
 
 ## Next release
 
-- apply [v1.10](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1100) change in [models section](https://docs.victoriametrics.com/anomaly-detection/components/models/)(does not break previous deploymet). 
+- apply [v1.10](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1100) change in [models section](https://docs.victoriametrics.com/anomaly-detection/components/models/)(does not break previous deployments). 
 - docs fixes
 
 ## 1.0.0
