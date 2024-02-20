@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 1.1.1
+
+**Release date:** 2024-02-20
+
+![AppVersion: v1.10.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.10.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Fix passing path to license file location when using `license.secret` mount.
 
 ## 1.1.0
