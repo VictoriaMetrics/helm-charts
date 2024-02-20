@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix passing path to license file location when using `license.secret` mount.
 
 ## 1.1.0
 
