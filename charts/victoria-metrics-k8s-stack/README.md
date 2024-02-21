@@ -173,12 +173,24 @@ helm upgrade -i some-very-long-name vm/victoria-metrics-k8s-stack --set fullname
 
 ## Upgrade guide
 
-Usually, helm upgrade doesn't requires manual actions. But release with CRD update must be patched manually with kubectl.
- Just execute command:
+Usually, helm upgrade doesn't requires manual actions. Just execute command:
+
 ```console
 $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
- All CRD manual actions upgrades listed below:
+
+But release with CRD update can only be patched manually with kubectl.
+Since helm does not perform a CRD update, we recommend that you always perform this when updating the helm-charts version:
+
+```console
+# 1. check the changes in CRD
+$ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl diff -f -
+
+# 2. apply the changes (update CRD)
+$ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl apply -f - --server-side
+```
+
+All other manual actions upgrades listed below:
 
 ### Upgrade to 0.13.0
 
