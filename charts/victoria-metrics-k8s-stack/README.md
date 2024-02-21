@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.19.0](https://img.shields.io/badge/Version-0.19.0-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.19.1](https://img.shields.io/badge/Version-0.19.1-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -173,12 +173,24 @@ helm upgrade -i some-very-long-name vm/victoria-metrics-k8s-stack --set fullname
 
 ## Upgrade guide
 
-Usually, helm upgrade doesn't requires manual actions. But release with CRD update must be patched manually with kubectl.
- Just execute command:
+Usually, helm upgrade doesn't requires manual actions. Just execute command:
+
 ```console
 $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
- All CRD manual actions upgrades listed below:
+
+But release with CRD update can only be patched manually with kubectl.
+Since helm does not perform a CRD update, we recommend that you always perform this when updating the helm-charts version:
+
+```console
+# 1. check the changes in CRD
+$ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl diff -f -
+
+# 2. apply the changes (update CRD)
+$ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl apply -f - --server-side
+```
+
+All other manual actions upgrades listed below:
 
 ### Upgrade to 0.13.0
 
@@ -524,7 +536,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.dropOriginalLabels" | string | `"true"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
-| vmagent.spec.image.tag | string | `"v1.97.1"` |  |
+| vmagent.spec.image.tag | string | `"v1.98.0"` |  |
 | vmagent.spec.scrapeInterval | string | `"20s"` |  |
 | vmagent.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.annotations | object | `{}` |  |
@@ -540,7 +552,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.remoteWriteVMAgent | bool | `false` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
 | vmalert.spec.externalLabels | object | `{}` |  |
-| vmalert.spec.image.tag | string | `"v1.97.1"` |  |
+| vmalert.spec.image.tag | string | `"v1.98.0"` |  |
 | vmalert.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.templateFiles | object | `{}` |  |
 | vmcluster.annotations | object | `{}` |  |
@@ -572,18 +584,18 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.spec.replicationFactor | int | `2` |  |
 | vmcluster.spec.retentionPeriod | string | `"14"` |  |
 | vmcluster.spec.vminsert.extraArgs | object | `{}` |  |
-| vmcluster.spec.vminsert.image.tag | string | `"v1.97.1-cluster"` |  |
+| vmcluster.spec.vminsert.image.tag | string | `"v1.98.0-cluster"` |  |
 | vmcluster.spec.vminsert.replicaCount | int | `2` |  |
 | vmcluster.spec.vminsert.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.cacheMountPath | string | `"/select-cache"` |  |
 | vmcluster.spec.vmselect.extraArgs | object | `{}` |  |
-| vmcluster.spec.vmselect.image.tag | string | `"v1.97.1-cluster"` |  |
+| vmcluster.spec.vmselect.image.tag | string | `"v1.98.0-cluster"` |  |
 | vmcluster.spec.vmselect.replicaCount | int | `2` |  |
 | vmcluster.spec.vmselect.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"2Gi"` |  |
-| vmcluster.spec.vmstorage.image.tag | string | `"v1.97.1-cluster"` |  |
+| vmcluster.spec.vmstorage.image.tag | string | `"v1.98.0-cluster"` |  |
 | vmcluster.spec.vmstorage.replicaCount | int | `2` |  |
 | vmcluster.spec.vmstorage.resources | object | `{}` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.97.1"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.98.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
