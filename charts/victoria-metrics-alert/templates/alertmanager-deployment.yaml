@@ -98,8 +98,20 @@ spec:
             - name: config
               mountPath: /config
               readOnly: true
+            {{- range .Values.server.extraHostPathMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly }}
+            {{- end }}
+            {{- with .Values.server.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           resources:
             {{- toYaml .Values.alertmanager.resources | nindent 12 }}
+        {{- with .Values.alertmanager.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.alertmanager.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -126,4 +138,12 @@ spec:
         - name: config
           configMap:
             name: {{ include "vmalert.alertmanager.configname" . }}
+        {{- range .Values.alertmanager.extraHostPathMounts }}
+        - name: {{ .name }}
+          hostPath:
+            path: {{ .hostPath }}
+        {{- end }}
+        {{- with .Values.alertmanager.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 {{- end -}}
