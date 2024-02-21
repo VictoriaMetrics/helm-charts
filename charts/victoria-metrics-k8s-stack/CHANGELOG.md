@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.19.1
+
+**Release date:** 2024-02-21
+
+![AppVersion: v1.98.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.98.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Update dependencies: victoria-metrics-operator -> 0.28.1, grafana -> 7.3.1.
 - Update victoriametrics CRD resources yaml.
 
