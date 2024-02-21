@@ -16,6 +16,7 @@ Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operato
 * [Values](#Parameters)
 
 ## Overview
+
 This chart is an All-in-one solution to start monitoring kubernetes cluster.
 It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/tree/master/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
 Also it installs Custom Resources like [VMSingle](https://docs.victoriametrics.com/operator/quick-start.html#vmsingle), [VMCluster](https://docs.victoriametrics.com/operator/quick-start.html#vmcluster), [VMAgent](https://docs.victoriametrics.com/operator/quick-start.html#vmagent), [VMAlert](https://docs.victoriametrics.com/operator/quick-start.html#vmalert).
@@ -37,6 +38,7 @@ Configuration of this chart is done through helm values.
 Dependencies can be enabled or disabled by setting `enabled` to `true` or `false` in `values.yaml` file.
 
 **!Important:** for dependency charts anything that you can find in values.yaml of dependency chart can be configured in this chart under key for that dependency. For example if you want to configure `grafana` you can find all possible configuration options in [values.yaml](https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml) and you should set them in values for this chart under grafana: key. For example if you want to configure `grafana.persistence.enabled` you should set it in values.yaml like this:
+
 ```yaml
 #################################################
 ###              dependencies               #####
@@ -53,6 +55,7 @@ grafana:
 
 This chart installs multiple VictoriaMetrics components using Custom Resources that are managed by [victoria-metrics-operator](https://docs.victoriametrics.com/operator/design.html)
 Each resource can be configured using `spec` of that resource from API docs of [victoria-metrics-operator](https://docs.victoriametrics.com/operator/api.html). For example if you want to configure `VMAgent` you can find all possible configuration options in [API docs](https://docs.victoriametrics.com/operator/api.html#vmagent) and you should set them in values for this chart under `vmagent.spec` key. For example if you want to configure `remoteWrite.url` you should set it in values.yaml like this:
+
 ```yaml
 vmagent:
   spec:
@@ -67,7 +70,9 @@ you can disable dashboards with `defaultDashboardsEnabled: false` and `experimen
 and rules can be configured under `defaultRules`
 
 ### Prometheus scrape configs
+
 This chart installs multiple scrape configurations for kubernetes monitoring. They are configured under `#ServiceMonitors` section in `values.yaml` file. For example if you want to configure scrape config for `kubelet` you should set it in values.yaml like this:
+
 ```yaml
 kubelet:
   enabled: true
@@ -147,6 +152,7 @@ Remove application with command.
 ```console
 helm uninstall [RELEASE_NAME] -n NAMESPACE
 ```
+
 This removes all the Kubernetes components associated with the chart and deletes the release.
 
 _See [helm uninstall](https://helm.sh/docs/helm/helm_uninstall/) for command documentation._
@@ -173,12 +179,24 @@ helm upgrade -i some-very-long-name vm/victoria-metrics-k8s-stack --set fullname
 
 ## Upgrade guide
 
-Usually, helm upgrade doesn't requires manual actions. But release with CRD update must be patched manually with kubectl.
- Just execute command:
+Usually, helm upgrade doesn't requires manual actions. Just execute command:
+
 ```console
 $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
- All CRD manual actions upgrades listed below:
+
+But release with CRD update can only be patched manually with kubectl.
+Since helm does not perform a CRD update, we recommend that you always perform this when updating the helm-charts version:
+
+```console
+# 1. check the changes in CRD
+$ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl diff -f -
+
+# 2. apply the changes (update CRD)
+$ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl apply -f - --server-side
+```
+
+All other manual actions upgrades listed below:
 
 ### Upgrade to 0.13.0
 
