@@ -173,10 +173,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
-| server.extraContainers | list | `[]` |  |
-| server.extraHostPathMounts | list | `[]` |  |
-| server.extraVolumeMounts | list | `[]` |  |
-| server.extraVolumes | list | `[]` |  |
+| server.extraContainers | list | `[]` | Additional containers to run in the same pod |
+| server.extraHostPathMounts | list | `[]` | Additional hostPath mounts |
+| server.extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
+| server.extraVolumes | list | `[]` | Extra Volumes for the pod |
 | server.fullnameOverride | string | `""` |  |
 | server.image.pullPolicy | string | `"IfNotPresent"` |  |
 | server.image.repository | string | `"victoriametrics/vmalert"` |  |
