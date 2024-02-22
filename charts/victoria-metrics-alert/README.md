@@ -115,6 +115,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.configMap | string | `""` |  |
 | alertmanager.enabled | bool | `false` |  |
 | alertmanager.extraArgs | object | `{}` |  |
+| alertmanager.extraContainers | list | `[]` |  |
+| alertmanager.extraHostPathMounts | list | `[]` |  |
+| alertmanager.extraVolumeMounts | list | `[]` |  |
+| alertmanager.extraVolumes | list | `[]` |  |
 | alertmanager.image | string | `"prom/alertmanager"` |  |
 | alertmanager.imagePullSecrets | list | `[]` |  |
 | alertmanager.ingress.annotations | object | `{}` |  |
