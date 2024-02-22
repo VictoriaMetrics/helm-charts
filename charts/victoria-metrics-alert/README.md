@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.8.7](https://img.shields.io/badge/Version-0.8.7-informational?style=flat-square)
+ ![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -173,10 +173,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
-| server.extraContainers | list | `[]` |  |
-| server.extraHostPathMounts | list | `[]` |  |
-| server.extraVolumeMounts | list | `[]` |  |
-| server.extraVolumes | list | `[]` |  |
+| server.extraContainers | list | `[]` | Additional containers to run in the same pod |
+| server.extraHostPathMounts | list | `[]` | Additional hostPath mounts |
+| server.extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
+| server.extraVolumes | list | `[]` | Extra Volumes for the pod |
 | server.fullnameOverride | string | `""` |  |
 | server.image.pullPolicy | string | `"IfNotPresent"` |  |
 | server.image.repository | string | `"victoriametrics/vmalert"` |  |
