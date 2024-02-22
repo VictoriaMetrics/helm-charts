@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.9.0
+
+**Release date:** 2024-02-22
+
+![AppVersion: v1.97.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.97.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Support adding extra arguments, containers, volumes and volume mounts to the alertmanager deployment.
 
 ## 0.8.7
