@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix templating of VMAgent `remoteWrite` in case both `VMSingle` and `VMCluster` are disabled. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/865) for details.
 
 ## 0.19.1
 
