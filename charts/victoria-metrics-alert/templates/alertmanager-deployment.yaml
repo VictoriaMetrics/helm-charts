@@ -52,7 +52,7 @@ spec:
             - --storage.path=/data
             {{- end}}
             - --data.retention={{ .Values.alertmanager.retention }}
-            - --web.listen-address=0.0.0.0:9093
+            - --web.listen-address={{ .Values.alertmanager.listenAddress }}
             - --cluster.advertise-address=$(POD_IP):6783
             {{ if .Values.alertmanager.baseURL }}
             - --web.external-url={{ .Values.alertmanager.baseURL }}
