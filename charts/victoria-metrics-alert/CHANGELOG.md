@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Allow overriding Alertmanager listen address and port via `alertmanager.listenAddress`.
 
 ## 0.9.0
 
