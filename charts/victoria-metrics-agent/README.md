@@ -293,6 +293,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumeMounts | list | `[]` |  |
 | extraVolumes | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
+| horizontalPodAutoscaling.enabled | bool | `false` | Use HPA for vmagent |
+| horizontalPodAutoscaling.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale vmagent |
+| horizontalPodAutoscaling.minReplicas | int | `1` | Minimum replicas for HPA to use to scale vmagent |
+| horizontalPodAutoscaling.metrics | list | `[]` | Metric for HPA to use to scale vmagent |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"victoriametrics/vmagent"` |  |
 | image.tag | string | `""` |  |
