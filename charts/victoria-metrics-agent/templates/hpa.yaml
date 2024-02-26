@@ -1,0 +1,29 @@
+{{- if .Values.horizontalPodAutoscaling.enabled }}
+{{- if .Capabilities.APIVersions.Has "autoscaling/v2" -}}
+apiVersion: autoscaling/v2
+{{- else}}
+apiVersion: autoscaling/v2beta2
+{{- end}}
+kind: horizontalPodAutoscaling
+metadata:
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+{{- with .Values.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+  name: {{ include "chart.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  maxReplicas: {{ .Values.horizontalPodAutoscaling.maxReplicas }}
+  minReplicas: {{ .Values.horizontalPodAutoscaling.minReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "chart.fullname" . }}
+  metrics:
+{{ toYaml .Values.horizontalPodAutoscaling.metrics | indent 4 }}
+{{- if .Values.horizontalPodAutoscaling.behavior }}
+  behavior:
+{{ toYaml .Values.horizontalPodAutoscaling.behavior | indent 4 }}
+{{- end -}}
+{{- end -}}
