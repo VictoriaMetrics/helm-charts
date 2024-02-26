@@ -293,6 +293,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumeMounts | list | `[]` |  |
 | extraVolumes | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
+| horizontalPodAutoscaling.enabled | bool | `false` |  |
+| horizontalPodAutoscaling.maxReplicas | int | `10` |  |
+| horizontalPodAutoscaling.metrics | list | `[]` |  |
+| horizontalPodAutoscaling.minReplicas | int | `1` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"victoriametrics/vmagent"` |  |
 | image.tag | string | `""` |  |
