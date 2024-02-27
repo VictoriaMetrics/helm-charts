@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Add ability to use HPA for vmagent. See [this](https://github.com/VictoriaMetrics/helm-charts/pull/863) pull request.
 
 ## 0.9.17
 
