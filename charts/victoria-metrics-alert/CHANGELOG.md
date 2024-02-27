@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fix possible null value on flag `notifier.url`, `remoteRead.url` and `remoteWrite.url` in vmalert deployment.
 
 ## 0.9.1
 
