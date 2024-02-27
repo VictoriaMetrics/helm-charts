@@ -98,13 +98,13 @@ spec:
             - name: config
               mountPath: /config
               readOnly: true
-            {{- range .Values.server.extraHostPathMounts }}
+            {{- range .Values.alertmanager.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
             {{- end }}
-            {{- with .Values.server.extraVolumeMounts }}
+            {{- with .Values.alertmanager.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           resources:
@@ -119,7 +119,7 @@ spec:
       {{- if .Values.alertmanager.priorityClassName }}
       priorityClassName: {{ .Values.alertmanager.priorityClassName | quote }}
       {{- end }}
-      {{- with .Values.server.affinity }}
+      {{- with .Values.alertmanager.affinity }}
       affinity:
         {{ toYaml . | nindent 8 }}
       {{- end }}
