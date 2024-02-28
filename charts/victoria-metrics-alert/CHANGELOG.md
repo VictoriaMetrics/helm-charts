@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.9.2
+
+**Release date:** 2024-02-28
+
+![AppVersion: v1.97.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.97.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Fix possible null value on flag `notifier.url`, `remoteRead.url` and `remoteWrite.url` in vmalert deployment.
 - Fix alertmanager using some of server's values in its deployment template.
 
