@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Commented default configuration for alertmanager. It simplifies configuration and makes it more explicit. See this [issue](https://github.com/VictoriaMetrics/helm-charts/issues/473) for details
 
 ## 0.19.2
 
