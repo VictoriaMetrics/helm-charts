@@ -85,10 +85,6 @@ jobs:
           kubectl taint --all=true nodes node.cloudprovider.kubernetes.io/uninitialized- || true
 
       - name: Run chart-testing (install)
-        env:
-          VMANOMALY_LICENSE_CICD: ${{ secrets.VMANOMALY_LICENSE_CICD }}
         run: |
-          kubectl create namespace ${{ matrix.chart }}-testing
-          kubectl create secret -n=${{ matrix.chart }}-testing generic vmanomaly-license --from-literal=license=$VMANOMALY_LICENSE_CICD
           helm dep update charts/${{ matrix.chart }}
-          ct install --namespace=${{ matrix.chart }}-testing --config .github/ci/ct.yaml --charts "charts/${{ matrix.chart }}" --helm-extra-set-args "--values ./hack/helm/${{ matrix.chart }}.yaml"
+          ct install --config .github/ci/ct.yaml --charts "charts/${{ matrix.chart }}" --helm-extra-set-args "--values ./hack/helm/${{ matrix.chart }}.yaml"
