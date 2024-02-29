@@ -2,10 +2,7 @@
 
 ## Next release
 
-![AppVersion: v1.98.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.98.0&color=success&logo=)
-![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
-
-- Fix made k8s rules optional if default rules where selected
+- TODO
 
 ## 0.19.2
 
