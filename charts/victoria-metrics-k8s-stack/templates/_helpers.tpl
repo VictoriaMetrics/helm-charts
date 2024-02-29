@@ -162,11 +162,11 @@ VM Agent remoteWrites
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAgentRemoteWrite" -}}
 remoteWrite:
-{{- if or .Values.vmsingle.enabled .Values.vmcluster.enabled .Values.externalVM.write.url }}
+{{- if or .Values.vmsingle.enabled .Values.vmcluster.enabled .Values.externalVM.write }}
 - {{ include "victoria-metrics-k8s-stack.vmWriteEndpoint" . | nindent 2 }}
-{{- end }}
 {{ range .Values.vmagent.additionalRemoteWrites }}
 -{{ toYaml . | nindent 2 }}
+{{- end }}
 {{- end }}
 {{- end }}
 
