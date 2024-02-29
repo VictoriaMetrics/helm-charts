@@ -2,7 +2,7 @@
 
 ## Next release
 
-- Support adding extra arguments, containers, volumes and volume mounts to the alertmanager deployment.
+- TODO
 
 ## 0.8.7
 
