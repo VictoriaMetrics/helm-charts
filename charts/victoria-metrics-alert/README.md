@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.9.1](https://img.shields.io/badge/Version-0.9.1-informational?style=flat-square)
+ ![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -127,7 +127,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.hosts | list | `[]` |  |
 | alertmanager.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | alertmanager.ingress.tls | list | `[]` |  |
-| alertmanager.listenAddress | string | `"0.0.0.0:9093"` |  |
 | alertmanager.nodeSelector | object | `{}` |  |
 | alertmanager.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
 | alertmanager.persistentVolume.annotations | object | `{}` | Persistant volume annotations |
