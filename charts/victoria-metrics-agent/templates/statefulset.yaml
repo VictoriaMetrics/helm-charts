@@ -14,9 +14,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-{{- if not .Values.horizontalPodAutoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-{{- end }}
   serviceName: {{ include "chart.fullname" . }}
   {{- if .Values.statefulset.updateStrategy }}
   updateStrategy:
