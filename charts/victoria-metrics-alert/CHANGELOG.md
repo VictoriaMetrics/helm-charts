@@ -3,7 +3,6 @@
 ## Next release
 
 - Fix possible null value on flag `notifier.url`, `remoteRead.url` and `remoteWrite.url` in vmalert deployment.
-- Fix alertmanager using some of server's values in its deployment template.
 
 ## 0.9.1
 
