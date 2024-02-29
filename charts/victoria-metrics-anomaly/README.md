@@ -111,7 +111,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity configurations |
 | annotations | object | `{}` | Annotations to be added to the deployment |
-| config | object | `{"models":{"prophet_model":{"args":{},"class":"model.prophet.ProphetModel"}},"reader":{"class":"reader.vm.VmReader","datasource_url":"","queries":{},"sampling_period":"1m","tenant_id":""},"schedulers":{"scheduler_periodic_1m":{"class":"scheduler.periodic.PeriodicScheduler","fit_every":"2h","fit_window":"14d","infer_every":"1m"}},"writer":{"class":"writer.vm.VmWriter","datasource_url":"","tenant_id":""}}` | Full [vmanomaly config section](https://docs.victoriametrics.com/anomaly-detection/components/) |
+| config | object | `{"models":{"prophet_model":{"args":{},"class":"model.prophet.ProphetModel"}},"reader":{"class":"reader.vm.VmReader","datasource_url":"","queries":{},"sampling_period":"1m","tenant_id":""},"scheduler":{"class":"scheduler.periodic.PeriodicScheduler","fit_every":"2h","fit_window":"14d","infer_every":"1m"},"writer":{"class":"writer.vm.VmWriter","datasource_url":"","tenant_id":""}}` | Full [vmanomaly config section](https://docs.victoriametrics.com/anomaly-detection/components/) |
 | config.models | object | `{"prophet_model":{"args":{},"class":"model.prophet.ProphetModel"}}` | [Models section](https://docs.victoriametrics.com/anomaly-detection/components/models/) |
 | config.models.prophet_model | object | `{"args":{},"class":"model.prophet.ProphetModel"}` | Model alias |
 | config.models.prophet_model.args | object | `{}` | Arguments specific to [model](https://docs.victoriametrics.com/anomaly-detection/components/models/) |
@@ -122,11 +122,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.reader.queries | object | `{}` | Required. PromQL/MetricsQL query to select data in format: QUERY_ALIAS: "QUERY". As accepted by "/query_range?query=%s". |
 | config.reader.sampling_period | string | `"1m"` | Frequency of the points returned. Will be converted to "/query_range?step=%s" param (in seconds). **Required** since 1.9.0. |
 | config.reader.tenant_id | string | `""` | For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs |
-| config.schedulers | object | `{"scheduler_periodic_1m":{"class":"scheduler.periodic.PeriodicScheduler","fit_every":"2h","fit_window":"14d","infer_every":"1m"}}` | [Scheduler section](https://docs.victoriametrics.com/anomaly-detection/components/scheduler/) |
-| config.schedulers.scheduler_periodic_1m.class | string | `"scheduler.periodic.PeriodicScheduler"` | Scheduler class |
-| config.schedulers.scheduler_periodic_1m.fit_every | string | `"2h"` | How often to completely retrain the models. If missing value of infer_every is used and retrain on every inference run. |
-| config.schedulers.scheduler_periodic_1m.fit_window | string | `"14d"` | What time range to use for training the models. Must be at least 1 second. |
-| config.schedulers.scheduler_periodic_1m.infer_every | string | `"1m"` | How often a model will write its conclusions on newly added data. Must be at least 1 second. |
+| config.scheduler | object | `{"class":"scheduler.periodic.PeriodicScheduler","fit_every":"2h","fit_window":"14d","infer_every":"1m"}` | [Scheduler section](https://docs.victoriametrics.com/anomaly-detection/components/scheduler/) |
+| config.scheduler.class | string | `"scheduler.periodic.PeriodicScheduler"` | Scheduler class |
+| config.scheduler.fit_every | string | `"2h"` | How often to completely retrain the models. If missing value of infer_every is used and retrain on every inference run. |
+| config.scheduler.fit_window | string | `"14d"` | What time range to use for training the models. Must be at least 1 second. |
+| config.scheduler.infer_every | string | `"1m"` | How often a model will write its conclusions on newly added data. Must be at least 1 second. |
 | config.writer | object | `{"class":"writer.vm.VmWriter","datasource_url":"","tenant_id":""}` | [Writer section](https://docs.victoriametrics.com/anomaly-detection/components/writer/) |
 | config.writer.class | string | `"writer.vm.VmWriter"` | Name of the class needed to enable writing to VictoriaMetrics or Prometheus. VmWriter is the default option, if not specified. |
 | config.writer.datasource_url | string | `""` | Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/" |
