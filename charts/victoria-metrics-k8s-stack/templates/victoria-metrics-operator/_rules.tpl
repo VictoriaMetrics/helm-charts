@@ -10,7 +10,7 @@ rules:
   - "k8s.rules.container_memory_cache"
   - "k8s.rules.container_memory_rss"
   - "k8s.rules.container_memory_swap"
-  - "k8s.rules.container_memory_workingSetBytes"
+  - "k8s.rules.container_memory_working_set_bytes"
   - "k8s.rules.container_resource"
   - "k8s.rules.pod_owner"
   - "kube-apiserver-availability.rules"
