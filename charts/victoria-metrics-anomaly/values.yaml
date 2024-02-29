@@ -114,11 +114,10 @@ serviceMonitor:
 # https://victoriametrics.com/legal/esa/
 eula: false
 
-# -- Full [vmanomaly config section](https://docs.victoriametrics.com/anomaly-detection/components/)
 config:
-  # -- [Scheduler section](https://docs.victoriametrics.com/anomaly-detection/components/scheduler/)
+
   scheduler:
-    # -- Scheduler class
+    # -- https://docs.victoriametrics.com/anomaly-detection/components/scheduler/
     class: "scheduler.periodic.PeriodicScheduler"
     # -- How often to completely retrain the models. If missing value of infer_every is used and retrain on every inference run.
     fit_every: "2h"
@@ -127,19 +126,18 @@ config:
     # -- How often a model will write its conclusions on newly added data. Must be at least 1 second.
     infer_every: "1m"
 
-  # -- [Models section](https://docs.victoriametrics.com/anomaly-detection/components/models/)
-  models:
-    # -- Model alias
-    prophet_model:
-      # -- Supported model classs by vmanomaly
-      class: "model.prophet.ProphetModel"
-      # -- Inner model args (key-value pairs) accepted by
-      # -- Arguments specific to [model](https://docs.victoriametrics.com/anomaly-detection/components/models/)
-      args: {}
-        #interval_width: 0.98
+  model:
+    # -- For all parameters see https://docs.victoriametrics.com/anomaly-detection/components/models/
+    # -- Supported models by vmanomaly helm chart. vmanomaly supports more models
+    class: "model.prophet.ProphetModel"
+    # -- Inner model args (key-value pairs) accepted by
+    # -- Arguments specific to model https://docs.victoriametrics.com/anomaly-detection/components/models/
+    args: {}
+      #interval_width: 0.98
 
-  # -- [Reader section](https://docs.victoriametrics.com/anomaly-detection/components/reader/)
+
   reader:
+    # -- For all parameters see https://docs.victoriametrics.com/anomaly-detection/components/reader/
     # -- Name of the class needed to enable reading from VictoriaMetrics or Prometheus. VmReader is the default option, if not specified.
     class: "reader.vm.VmReader"
     # -- Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/"
@@ -156,16 +154,16 @@ config:
     # -- Frequency of the points returned. Will be converted to "/query_range?step=%s" param (in seconds). **Required** since 1.9.0.
     sampling_period: '1m'
 
-  # -- [Writer section](https://docs.victoriametrics.com/anomaly-detection/components/writer/)
   writer:
+    # -- For all parameters see https://docs.victoriametrics.com/anomaly-detection/components/writer/
     # -- Name of the class needed to enable writing to VictoriaMetrics or Prometheus. VmWriter is the default option, if not specified.
     class: "writer.vm.VmWriter"
-    # -- Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/"
+    ## -- Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/"
     datasource_url: ""
     # -- For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs
     tenant_id: ""
 
-# -- License key configuration for vmanomaly. See [docs](https://docs.victoriametrics.com/vmanomaly.html#licensing)
+# -- License key configuration for vmanomaly. See https://docs.victoriametrics.com/vmanomaly.html#licensing
 # Required starting from v1.5.0.
 license:
   # -- License key for vmanomaly
