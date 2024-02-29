@@ -2,15 +2,6 @@
 
 ## Next release
 
-- TODO
-
-## 0.19.2
-
-**Release date:** 2024-02-26
-
-![AppVersion: v1.98.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.98.0&color=success&logo=)
-![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
-
 - Fix templating of VMAgent `remoteWrite` in case both `VMSingle` and `VMCluster` are disabled. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/865) for details.
 
 ## 0.19.1
