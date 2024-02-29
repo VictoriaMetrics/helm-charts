@@ -2,8 +2,7 @@
 
 ## Next release
 
-- Update dependencies: victoria-metrics-operator -> 0.28.1, grafana -> 7.3.1.
-- Update victoriametrics CRD resources yaml.
+- TODO
 
 ## 0.19.0
 
