@@ -267,81 +267,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | additionalVictoriaMetricsMap | string | `nil` |  |
 | alertmanager.annotations | object | `{}` |  |
-| alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
-| alertmanager.config.global.slack_api_url | string | `"http://slack:30500/"` |  |
-| alertmanager.config.inhibit_rules[0].equal[0] | string | `"cluster"` |  |
-| alertmanager.config.inhibit_rules[0].equal[1] | string | `"namespace"` |  |
-| alertmanager.config.inhibit_rules[0].equal[2] | string | `"alertname"` |  |
-| alertmanager.config.inhibit_rules[0].source_matchers[0] | string | `"severity=critical"` |  |
-| alertmanager.config.inhibit_rules[0].target_matchers[0] | string | `"severity=~\"warning|info\""` |  |
-| alertmanager.config.inhibit_rules[1].equal[0] | string | `"cluster"` |  |
-| alertmanager.config.inhibit_rules[1].equal[1] | string | `"namespace"` |  |
-| alertmanager.config.inhibit_rules[1].equal[2] | string | `"alertname"` |  |
-| alertmanager.config.inhibit_rules[1].source_matchers[0] | string | `"severity=warning"` |  |
-| alertmanager.config.inhibit_rules[1].target_matchers[0] | string | `"severity=info"` |  |
-| alertmanager.config.inhibit_rules[2].equal[0] | string | `"cluster"` |  |
-| alertmanager.config.inhibit_rules[2].equal[1] | string | `"namespace"` |  |
-| alertmanager.config.inhibit_rules[2].source_matchers[0] | string | `"alertname=InfoInhibitor"` |  |
-| alertmanager.config.inhibit_rules[2].target_matchers[0] | string | `"severity=info"` |  |
-| alertmanager.config.receivers[0].name | string | `"slack-monitoring"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[0].text | string | `"Runbook :green_book:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[0].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[0].url | string | `"{{ (index .Alerts 0).Annotations.runbook_url }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[1].text | string | `"Query :mag:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[1].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[1].url | string | `"{{ (index .Alerts 0).GeneratorURL }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[2].text | string | `"Dashboard :grafana:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[2].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[2].url | string | `"{{ (index .Alerts 0).Annotations.dashboard }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[3].text | string | `"Silence :no_bell:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[3].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[3].url | string | `"{{ template \"__alert_silence_link\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[4].text | string | `"{{ template \"slack.monzo.link_button_text\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[4].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[4].url | string | `"{{ .CommonAnnotations.link_url }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].channel | string | `"#channel"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].color | string | `"{{ template \"slack.monzo.color\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].icon_emoji | string | `"{{ template \"slack.monzo.icon_emoji\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].send_resolved | bool | `true` |  |
-| alertmanager.config.receivers[0].slack_configs[0].text | string | `"{{ template \"slack.monzo.text\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].title | string | `"{{ template \"slack.monzo.title\" . }}"` |  |
-| alertmanager.config.receivers[1].name | string | `"slack-code-owners"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[0].text | string | `"Runbook :green_book:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[0].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[0].url | string | `"{{ (index .Alerts 0).Annotations.runbook }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[1].text | string | `"Query :mag:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[1].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[1].url | string | `"{{ (index .Alerts 0).GeneratorURL }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[2].text | string | `"Dashboard :grafana:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[2].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[2].url | string | `"{{ (index .Alerts 0).Annotations.dashboard }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[3].text | string | `"Silence :no_bell:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[3].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[3].url | string | `"{{ template \"__alert_silence_link\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[4].text | string | `"{{ template \"slack.monzo.link_button_text\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[4].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[4].url | string | `"{{ .CommonAnnotations.link_url }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].channel | string | `"#{{ .CommonLabels.code_owner_channel }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].color | string | `"{{ template \"slack.monzo.color\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].icon_emoji | string | `"{{ template \"slack.monzo.icon_emoji\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].send_resolved | bool | `true` |  |
-| alertmanager.config.receivers[1].slack_configs[0].text | string | `"{{ template \"slack.monzo.text\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].title | string | `"{{ template \"slack.monzo.title\" . }}"` |  |
-| alertmanager.config.route.group_by[0] | string | `"alertgroup"` |  |
-| alertmanager.config.route.group_by[1] | string | `"job"` |  |
-| alertmanager.config.route.group_interval | string | `"5m"` |  |
-| alertmanager.config.route.group_wait | string | `"30s"` |  |
-| alertmanager.config.route.receiver | string | `"slack-monitoring"` |  |
-| alertmanager.config.route.repeat_interval | string | `"12h"` |  |
-| alertmanager.config.route.routes[0].group_by[0] | string | `"code_owner_channel"` |  |
-| alertmanager.config.route.routes[0].group_by[1] | string | `"alertgroup"` |  |
-| alertmanager.config.route.routes[0].group_by[2] | string | `"job"` |  |
-| alertmanager.config.route.routes[0].matchers[0] | string | `"code_owner_channel!=\"\""` |  |
-| alertmanager.config.route.routes[0].matchers[1] | string | `"severity=~\"info|warning|critical\""` |  |
-| alertmanager.config.route.routes[0].receiver | string | `"slack-code-owners"` |  |
-| alertmanager.config.route.routes[1].continue | bool | `true` |  |
-| alertmanager.config.route.routes[1].matchers[0] | string | `"severity=~\"info|warning|critical\""` |  |
-| alertmanager.config.route.routes[1].receiver | string | `"slack-monitoring"` |  |
+| alertmanager.config.receivers[0].name | string | `"blackhole"` |  |
+| alertmanager.config.route.receiver | string | `"blackhole"` |  |
 | alertmanager.config.templates[0] | string | `"/etc/vm/configs/**/*.tmpl"` |  |
 | alertmanager.enabled | bool | `true` |  |
 | alertmanager.ingress.annotations | object | `{}` |  |
