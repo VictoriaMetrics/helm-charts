@@ -154,7 +154,7 @@ server:
     envflag.prefix: VM_
     loggerFormat: json
 
-  # Additional hostPath mounts
+  # -- Additional hostPath mounts
   extraHostPathMounts:
     []
     # - name: certs-dir
@@ -163,19 +163,20 @@ server:
     #   hostPath: /etc/kubernetes/certs
   #   readOnly: true
 
-  # Extra Volumes for the pod
+  # -- Extra Volumes for the pod
   extraVolumes:
     []
     #- name: example
     #  configMap:
     #    name: example
 
-  # Extra Volume Mounts for the container
+  # -- Extra Volume Mounts for the container
   extraVolumeMounts:
     []
     # - name: example
     #   mountPath: /example
 
+  # -- Additional containers to run in the same pod
   extraContainers:
     []
     #- name: config-reloader
@@ -298,6 +299,7 @@ alertmanager:
   tolerations: []
   imagePullSecrets: []
   podSecurityContext: {}
+  listenAddress: "0.0.0.0:9093"
   extraArgs: {}
   # key: value
 
@@ -371,6 +373,33 @@ alertmanager:
     subPath: ""
     # -- Size of the volume. Better to set the same as resource limit memory property.
     size: 50Mi
+
+  # Additional hostPath mounts
+  extraHostPathMounts:
+    []
+    # - name: certs-dir
+    #   mountPath: /etc/kubernetes/certs
+    #   subPath: ""
+    #   hostPath: /etc/kubernetes/certs
+  #   readOnly: true
+
+  # Extra Volumes for the pod
+  extraVolumes:
+    []
+    #- name: example
+    #  configMap:
+    #    name: example
+
+  # Extra Volume Mounts for the container
+  extraVolumeMounts:
+    []
+    # - name: example
+    #   mountPath: /example
+
+  extraContainers:
+    []
+    #- name: config-reloader
+    #  image: reloader-image
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []

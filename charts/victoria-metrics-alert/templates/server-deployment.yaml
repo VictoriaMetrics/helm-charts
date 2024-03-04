@@ -67,7 +67,9 @@ spec:
             {{- with .Values.server.datasource.bearer.tokenFile }}
             - -datasource.bearerTokenFile={{ . }}
             {{- end }}
-            - -notifier.url={{ include "vmalert.alertmanager.urls" . }}
+            {{- with (include "vmalert.alertmanager.urls" .) }}
+            - -notifier.url={{ . }}
+            {{- end }}
             {{- with (include "vmalert.alertmanager.passwords" .) }}
             - -notifier.basicAuth.password={{ . }}
             {{- end }}
@@ -80,7 +82,9 @@ spec:
             {{- with (include "vmalert.alertmanager.bearerTokenFiles" .) }}
             - -notifier.bearerTokenFile={{ . }}
             {{- end }}
+            {{- if .Values.server.remote.read.url }}
             - -remoteRead.url={{ .Values.server.remote.read.url }}
+            {{- end }}
             {{- if or .Values.server.remote.read.basicAuth.password .Values.server.remote.read.basicAuth.username }}
             - -remoteRead.basicAuth.password={{ .Values.server.remote.read.basicAuth.password }}
             - -remoteRead.basicAuth.username={{ .Values.server.remote.read.basicAuth.username }}
@@ -91,7 +95,9 @@ spec:
             {{- with .Values.server.remote.read.bearer.tokenFile }}
             - -remoteRead.bearerTokenFile={{ . }}
             {{- end }}
+            {{- if .Values.server.remote.write.url }}
             - -remoteWrite.url={{ .Values.server.remote.write.url }}
+            {{- end }}
              {{- if or .Values.server.remote.write.basicAuth.password .Values.server.remote.write.basicAuth.username  }}
             - -remoteWrite.basicAuth.password={{ .Values.server.remote.write.basicAuth.password }}
             - -remoteWrite.basicAuth.username={{ .Values.server.remote.write.basicAuth.username }}
