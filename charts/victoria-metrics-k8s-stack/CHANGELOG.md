@@ -3,6 +3,7 @@
 ## Next release
 
 - Commented default configuration for alertmanager. It simplifies configuration and makes it more explicit. See this [issue](https://github.com/VictoriaMetrics/helm-charts/issues/473) for details
+- Fix Add boolean for k8s rules. With this is's possible to enable/disable k8s rules again
 
 ## 0.19.2
 
