@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.10.1
+
+**Release date:** 2024-03-05
+
+![AppVersion: v1.97.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.97.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Fix templating of HPA for vmagent. Previously, it was rendered with incorrect `kind` and thus was unusable. See [this pull request](https://github.com/VictoriaMetrics/helm-charts/pull/905).
 
 ## 0.10.0
