@@ -261,6 +261,44 @@ entries:
   victoria-metrics-agent:
   - annotations:
       artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: '- Fix templating of HPA for vmagent. Previously, it
+        was rendered with incorrect `kind` and thus was unusable. See [this pull request](https://github.com/VictoriaMetrics/helm-charts/pull/905).'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/vmagent.html
+    apiVersion: v1
+    appVersion: v1.97.1
+    created: "2024-03-05T10:04:10.433220857Z"
+    description: Victoria Metrics Agent - collects metrics from various sources and
+      stores them to VictoriaMetrics
+    digest: e5bd487e2bd8e62d1597627f82214fb7fb9a9f8de6d9c7376f987d0a33eeea19
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmagent
+    - agent
+    - collector
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    - servicediscovery
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-agent
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-agent-0.10.1/victoria-metrics-agent-0.10.1.tgz
+    version: 0.10.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: '- Add ability to use HPA for vmagent. See [this](https://github.com/VictoriaMetrics/helm-charts/pull/863)
         pull request.'
       artifacthub.io/license: Apache-2.0
@@ -9135,6 +9173,67 @@ entries:
   victoria-metrics-k8s-stack:
   - annotations:
       artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |-
+        - Commented default configuration for alertmanager. It simplifies configuration and makes it more explicit. See this [issue](https://github.com/VictoriaMetrics/helm-charts/issues/473) for details.
+        - Allow enabling/disabling default k8s rules when installing. See [#904](https://github.com/VictoriaMetrics/helm-charts/pull/904) by @passie.
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://docs.victoriametrics.com/vmgateway.html
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: v1.98.0
+    created: "2024-03-05T10:04:10.576273206Z"
+    dependencies:
+    - condition: victoria-metrics-operator.enabled
+      name: victoria-metrics-operator
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.28.*
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.16.*
+    - condition: prometheus-node-exporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.27.*
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 7.3.*
+    - condition: crds.enabled
+      name: crds
+      repository: ""
+      version: 0.0.0
+    description: Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics
+      Operator, Grafana dashboards, ServiceScrapes and VMRules
+    digest: da75a97556f0834ac7ce872ecf814805aef678bd8fe002289a4117a9ea670bd4
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-k8s-stack
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-k8s-stack-0.19.3/victoria-metrics-k8s-stack-0.19.3.tgz
+    version: 0.19.3
+  - annotations:
+      artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: '- Fix templating of VMAgent `remoteWrite` in case both
         `VMSingle` and `VMCluster` are disabled. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/865)
         for details.'
@@ -17341,4 +17440,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-03-04T18:02:23.34588994Z"
+generated: "2024-03-05T10:04:10.663839007Z"
