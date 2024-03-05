@@ -3,6 +3,7 @@
 ## Next release
 
 - replaces httpGet ready probe with tcpSocket check. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/528) for details
+- bump version of VM components to [v1.99.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.99.0)
 
 ## 0.4.6
 
