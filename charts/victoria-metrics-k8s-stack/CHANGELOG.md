@@ -2,7 +2,26 @@
 
 ## Next release
 
-- Commented default configuration for alertmanager. It simplifies configuration and makes it more explicit. See this [issue](https://github.com/VictoriaMetrics/helm-charts/issues/473) for details
+- TODO
+
+## 0.19.4
+
+**Release date:** 2024-03-05
+
+![AppVersion: v1.99.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.99.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM components to [v1.99.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.99.0)
+
+## 0.19.3
+
+**Release date:** 2024-03-05
+
+![AppVersion: v1.98.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.98.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Commented default configuration for alertmanager. It simplifies configuration and makes it more explicit. See this [issue](https://github.com/VictoriaMetrics/helm-charts/issues/473) for details.
+- Allow enabling/disabling default k8s rules when installing. See [#904](https://github.com/VictoriaMetrics/helm-charts/pull/904) by @passie.
 
 ## 0.19.2
 

@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.19.2](https://img.shields.io/badge/Version-0.19.2-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.19.4](https://img.shields.io/badge/Version-0.19.4-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -17,7 +17,7 @@ Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operato
 
 ## Overview
 This chart is an All-in-one solution to start monitoring kubernetes cluster.
-It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/tree/master/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
+It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
 Also it installs Custom Resources like [VMSingle](https://docs.victoriametrics.com/operator/quick-start.html#vmsingle), [VMCluster](https://docs.victoriametrics.com/operator/quick-start.html#vmcluster), [VMAgent](https://docs.victoriametrics.com/operator/quick-start.html#vmagent), [VMAlert](https://docs.victoriametrics.com/operator/quick-start.html#vmalert).
 
 By default, the operator [converts all existing prometheus-operator API objects](https://docs.victoriametrics.com/operator/quick-start.html#migration-from-prometheus-operator-objects) into corresponding VictoriaMetrics Operator objects.
@@ -267,81 +267,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | additionalVictoriaMetricsMap | string | `nil` |  |
 | alertmanager.annotations | object | `{}` |  |
-| alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
-| alertmanager.config.global.slack_api_url | string | `"http://slack:30500/"` |  |
-| alertmanager.config.inhibit_rules[0].equal[0] | string | `"cluster"` |  |
-| alertmanager.config.inhibit_rules[0].equal[1] | string | `"namespace"` |  |
-| alertmanager.config.inhibit_rules[0].equal[2] | string | `"alertname"` |  |
-| alertmanager.config.inhibit_rules[0].source_matchers[0] | string | `"severity=critical"` |  |
-| alertmanager.config.inhibit_rules[0].target_matchers[0] | string | `"severity=~\"warning|info\""` |  |
-| alertmanager.config.inhibit_rules[1].equal[0] | string | `"cluster"` |  |
-| alertmanager.config.inhibit_rules[1].equal[1] | string | `"namespace"` |  |
-| alertmanager.config.inhibit_rules[1].equal[2] | string | `"alertname"` |  |
-| alertmanager.config.inhibit_rules[1].source_matchers[0] | string | `"severity=warning"` |  |
-| alertmanager.config.inhibit_rules[1].target_matchers[0] | string | `"severity=info"` |  |
-| alertmanager.config.inhibit_rules[2].equal[0] | string | `"cluster"` |  |
-| alertmanager.config.inhibit_rules[2].equal[1] | string | `"namespace"` |  |
-| alertmanager.config.inhibit_rules[2].source_matchers[0] | string | `"alertname=InfoInhibitor"` |  |
-| alertmanager.config.inhibit_rules[2].target_matchers[0] | string | `"severity=info"` |  |
-| alertmanager.config.receivers[0].name | string | `"slack-monitoring"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[0].text | string | `"Runbook :green_book:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[0].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[0].url | string | `"{{ (index .Alerts 0).Annotations.runbook_url }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[1].text | string | `"Query :mag:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[1].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[1].url | string | `"{{ (index .Alerts 0).GeneratorURL }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[2].text | string | `"Dashboard :grafana:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[2].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[2].url | string | `"{{ (index .Alerts 0).Annotations.dashboard }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[3].text | string | `"Silence :no_bell:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[3].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[3].url | string | `"{{ template \"__alert_silence_link\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[4].text | string | `"{{ template \"slack.monzo.link_button_text\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[4].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[4].url | string | `"{{ .CommonAnnotations.link_url }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].channel | string | `"#channel"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].color | string | `"{{ template \"slack.monzo.color\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].icon_emoji | string | `"{{ template \"slack.monzo.icon_emoji\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].send_resolved | bool | `true` |  |
-| alertmanager.config.receivers[0].slack_configs[0].text | string | `"{{ template \"slack.monzo.text\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].title | string | `"{{ template \"slack.monzo.title\" . }}"` |  |
-| alertmanager.config.receivers[1].name | string | `"slack-code-owners"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[0].text | string | `"Runbook :green_book:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[0].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[0].url | string | `"{{ (index .Alerts 0).Annotations.runbook }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[1].text | string | `"Query :mag:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[1].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[1].url | string | `"{{ (index .Alerts 0).GeneratorURL }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[2].text | string | `"Dashboard :grafana:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[2].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[2].url | string | `"{{ (index .Alerts 0).Annotations.dashboard }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[3].text | string | `"Silence :no_bell:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[3].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[3].url | string | `"{{ template \"__alert_silence_link\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[4].text | string | `"{{ template \"slack.monzo.link_button_text\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[4].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[4].url | string | `"{{ .CommonAnnotations.link_url }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].channel | string | `"#{{ .CommonLabels.code_owner_channel }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].color | string | `"{{ template \"slack.monzo.color\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].icon_emoji | string | `"{{ template \"slack.monzo.icon_emoji\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].send_resolved | bool | `true` |  |
-| alertmanager.config.receivers[1].slack_configs[0].text | string | `"{{ template \"slack.monzo.text\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].title | string | `"{{ template \"slack.monzo.title\" . }}"` |  |
-| alertmanager.config.route.group_by[0] | string | `"alertgroup"` |  |
-| alertmanager.config.route.group_by[1] | string | `"job"` |  |
-| alertmanager.config.route.group_interval | string | `"5m"` |  |
-| alertmanager.config.route.group_wait | string | `"30s"` |  |
-| alertmanager.config.route.receiver | string | `"slack-monitoring"` |  |
-| alertmanager.config.route.repeat_interval | string | `"12h"` |  |
-| alertmanager.config.route.routes[0].group_by[0] | string | `"code_owner_channel"` |  |
-| alertmanager.config.route.routes[0].group_by[1] | string | `"alertgroup"` |  |
-| alertmanager.config.route.routes[0].group_by[2] | string | `"job"` |  |
-| alertmanager.config.route.routes[0].matchers[0] | string | `"code_owner_channel!=\"\""` |  |
-| alertmanager.config.route.routes[0].matchers[1] | string | `"severity=~\"info|warning|critical\""` |  |
-| alertmanager.config.route.routes[0].receiver | string | `"slack-code-owners"` |  |
-| alertmanager.config.route.routes[1].continue | bool | `true` |  |
-| alertmanager.config.route.routes[1].matchers[0] | string | `"severity=~\"info|warning|critical\""` |  |
-| alertmanager.config.route.routes[1].receiver | string | `"slack-monitoring"` |  |
+| alertmanager.config.receivers[0].name | string | `"blackhole"` |  |
+| alertmanager.config.route.receiver | string | `"blackhole"` |  |
 | alertmanager.config.templates[0] | string | `"/etc/vm/configs/**/*.tmpl"` |  |
 | alertmanager.enabled | bool | `true` |  |
 | alertmanager.ingress.annotations | object | `{}` |  |
@@ -536,7 +463,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
 | vmagent.spec.extraArgs."promscrape.dropOriginalLabels" | string | `"true"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
-| vmagent.spec.image.tag | string | `"v1.98.0"` |  |
+| vmagent.spec.image.tag | string | `"v1.99.0"` |  |
 | vmagent.spec.scrapeInterval | string | `"20s"` |  |
 | vmagent.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.annotations | object | `{}` |  |
@@ -552,7 +479,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.remoteWriteVMAgent | bool | `false` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
 | vmalert.spec.externalLabels | object | `{}` |  |
-| vmalert.spec.image.tag | string | `"v1.98.0"` |  |
+| vmalert.spec.image.tag | string | `"v1.99.0"` |  |
 | vmalert.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.templateFiles | object | `{}` |  |
 | vmcluster.annotations | object | `{}` |  |
@@ -584,18 +511,18 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.spec.replicationFactor | int | `2` |  |
 | vmcluster.spec.retentionPeriod | string | `"14"` |  |
 | vmcluster.spec.vminsert.extraArgs | object | `{}` |  |
-| vmcluster.spec.vminsert.image.tag | string | `"v1.98.0-cluster"` |  |
+| vmcluster.spec.vminsert.image.tag | string | `"v1.99.0-cluster"` |  |
 | vmcluster.spec.vminsert.replicaCount | int | `2` |  |
 | vmcluster.spec.vminsert.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.cacheMountPath | string | `"/select-cache"` |  |
 | vmcluster.spec.vmselect.extraArgs | object | `{}` |  |
-| vmcluster.spec.vmselect.image.tag | string | `"v1.98.0-cluster"` |  |
+| vmcluster.spec.vmselect.image.tag | string | `"v1.99.0-cluster"` |  |
 | vmcluster.spec.vmselect.replicaCount | int | `2` |  |
 | vmcluster.spec.vmselect.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"2Gi"` |  |
-| vmcluster.spec.vmstorage.image.tag | string | `"v1.98.0-cluster"` |  |
+| vmcluster.spec.vmstorage.image.tag | string | `"v1.99.0-cluster"` |  |
 | vmcluster.spec.vmstorage.replicaCount | int | `2` |  |
 | vmcluster.spec.vmstorage.resources | object | `{}` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.98.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.99.0"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
