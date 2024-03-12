@@ -4,6 +4,15 @@
 
 - TODO
 
+## 0.29.3
+
+**Release date:** 2024-03-12
+
+![AppVersion: 0.42.3](https://img.shields.io/static/v1?label=AppVersion&message=0.42.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- TODO
+
 ## 0.29.2
 
 **Release date:** 2024-03-06
