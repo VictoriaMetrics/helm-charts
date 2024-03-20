@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square)
+![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-anomaly)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
@@ -111,11 +111,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity configurations |
 | annotations | object | `{}` | Annotations to be added to the deployment |
-| config | object | `{"models":{"prophet_model":{"args":{},"class":"model.prophet.ProphetModel"}},"reader":{"class":"reader.vm.VmReader","datasource_url":"","queries":{},"sampling_period":"1m","tenant_id":""},"schedulers":{"scheduler_periodic_1m":{"class":"scheduler.periodic.PeriodicScheduler","fit_every":"2h","fit_window":"14d","infer_every":"1m"}},"writer":{"class":"writer.vm.VmWriter","datasource_url":"","tenant_id":""}}` | Full [vmanomaly config section](https://docs.victoriametrics.com/anomaly-detection/components/) |
+| config | object | `{"models":{"prophet_model":{"args":{},"class":"model.prophet.ProphetModel"}},"preset":"","reader":{"class":"reader.vm.VmReader","datasource_url":"","queries":{},"sampling_period":"1m","tenant_id":""},"schedulers":{"scheduler_periodic_1m":{"class":"scheduler.periodic.PeriodicScheduler","fit_every":"2h","fit_window":"14d","infer_every":"1m"}},"writer":{"class":"writer.vm.VmWriter","datasource_url":"","tenant_id":""}}` | Full [vmanomaly config section](https://docs.victoriametrics.com/anomaly-detection/components/) |
 | config.models | object | `{"prophet_model":{"args":{},"class":"model.prophet.ProphetModel"}}` | [Models section](https://docs.victoriametrics.com/anomaly-detection/components/models/) |
 | config.models.prophet_model | object | `{"args":{},"class":"model.prophet.ProphetModel"}` | Model alias |
 | config.models.prophet_model.args | object | `{}` | Arguments specific to [model](https://docs.victoriametrics.com/anomaly-detection/components/models/) |
 | config.models.prophet_model.class | string | `"model.prophet.ProphetModel"` | Supported model classs by vmanomaly |
+| config.preset | string | `""` | Whether to use preset configuration. If not empty, preset name should be specified. |
 | config.reader | object | `{"class":"reader.vm.VmReader","datasource_url":"","queries":{},"sampling_period":"1m","tenant_id":""}` | [Reader section](https://docs.victoriametrics.com/anomaly-detection/components/reader/) |
 | config.reader.class | string | `"reader.vm.VmReader"` | Name of the class needed to enable reading from VictoriaMetrics or Prometheus. VmReader is the default option, if not specified. |
 | config.reader.datasource_url | string | `""` | Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/" |
