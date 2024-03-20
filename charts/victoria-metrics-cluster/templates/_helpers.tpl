@@ -45,61 +45,61 @@ Create the name of the service account
 {{/*
 Create unified labels for victoria-metrics components
 */}}
-{{- define "victoria-metrics.common.matchLabels" -}}
+{{- define "victoria-metrics.common.matchLabels" | trunc 60 -}}
 app.kubernetes.io/name: {{ include "victoria-metrics.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
-{{- define "victoria-metrics.common.metaLabels" -}}
+{{- define "victoria-metrics.common.metaLabels" | trunc 60 -}}
 helm.sh/chart: {{ include "victoria-metrics.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-{{- define "victoria-metrics.common.podLabels" -}}
+{{- define "victoria-metrics.common.podLabels" | trunc 60 -}}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-{{- define "victoria-metrics.vmstorage.labels" -}}
+{{- define "victoria-metrics.vmstorage.labels" | trunc 60 -}}
 {{ include "victoria-metrics.vmstorage.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
 {{- end -}}
 
-{{- define "victoria-metrics.vmstorage.podLabels" -}}
+{{- define "victoria-metrics.vmstorage.podLabels" | trunc 60 -}}
 {{ include "victoria-metrics.vmstorage.matchLabels" . }}
 {{ include "victoria-metrics.common.podLabels" . }}
 {{- end -}}
 
-{{- define "victoria-metrics.vmstorage.matchLabels" -}}
+{{- define "victoria-metrics.vmstorage.matchLabels" | trunc 60 -}}
 app: {{ .Values.vmstorage.name }}
 {{ include "victoria-metrics.common.matchLabels" . }}
 {{- end -}}
 
-{{- define "victoria-metrics.vmselect.labels" -}}
+{{- define "victoria-metrics.vmselect.labels" | trunc 60 -}}
 {{ include "victoria-metrics.vmselect.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
 {{- end -}}
 
-{{- define "victoria-metrics.vmselect.podLabels" -}}
+{{- define "victoria-metrics.vmselect.podLabels" | trunc 60 -}}
 {{ include "victoria-metrics.vmselect.matchLabels" . }}
 {{ include "victoria-metrics.common.podLabels" . }}
 {{- end -}}
 
-{{- define "victoria-metrics.vmselect.matchLabels" -}}
+{{- define "victoria-metrics.vmselect.matchLabels" | trunc 60 -}}
 app: {{ .Values.vmselect.name }}
 {{ include "victoria-metrics.common.matchLabels" . }}
 {{- end -}}
 
-{{- define "victoria-metrics.vminsert.labels" -}}
+{{- define "victoria-metrics.vminsert.labels" | trunc 60 -}}
 {{ include "victoria-metrics.vminsert.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
 {{- end -}}
 
-{{- define "victoria-metrics.vminsert.podLabels" -}}
+{{- define "victoria-metrics.vminsert.podLabels" | trunc 60 -}}
 {{ include "victoria-metrics.vminsert.matchLabels" . }}
 {{ include "victoria-metrics.common.podLabels" . }}
 {{- end -}}
 
-{{- define "victoria-metrics.vminsert.matchLabels" -}}
+{{- define "victoria-metrics.vminsert.matchLabels" | trunc 60 -}}
 app: {{ .Values.vminsert.name }}
 {{ include "victoria-metrics.common.matchLabels" . }}
 {{- end -}}
