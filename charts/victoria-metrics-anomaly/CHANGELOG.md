@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Add support of passing preset configuration.
 
 ## 1.2.0
 

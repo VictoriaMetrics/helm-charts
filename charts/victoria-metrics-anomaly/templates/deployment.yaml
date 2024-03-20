@@ -10,7 +10,7 @@
 {{ fail "Please provide url for writing data to VictoriaMetrics. You need to specify url in `config.writer.datasource_url` parameter  in values.yaml"}}
 {{- end -}}
 
-{{- if not .Values.config.reader.queries -}}
+{{- if and (not .Values.config.reader.queries) (not .Values.config.preset) -}}
 {{ fail "At least one query must be specified. You nee to add queries in `config.reader.queries` parameter in values.yaml"}}
 {{- end -}}
 
