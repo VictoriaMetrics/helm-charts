@@ -140,9 +140,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | admissionWebhooks | object | `{"caBundle":"","certManager":{"enabled":false,"issuer":{}},"enabled":false,"enabledCRDValidation":{"vmagent":true,"vmalert":true,"vmalertmanager":true,"vmalertmanagerConfig":true,"vmauth":true,"vmcluster":true,"vmrule":true,"vmsingle":true,"vmuser":true},"policy":"Fail"}` | Configures resource validation |
-| admissionWebhooks.caBundle | string | `""` | with keys: tls.key, tls.crt, ca.crt |
+| admissionWebhooks.caBundle | string | `""` | Enables custom ca bundle, if you are not using cert-manager. -- in case of custom ca, you have to create secret - {{chart-name}}-validation -- with keys: tls.key, tls.crt, ca.crt |
 | admissionWebhooks.certManager.enabled | bool | `false` | Enables cert creation and injection by cert-manager. |
-| admissionWebhooks.certManager.issuer | object | `{}` | If needed, provide own issuer. Operator will create self-signed if empty. |
 | admissionWebhooks.enabled | bool | `false` | Enables validation webhook. |
 | admissionWebhooks.policy | string | `"Fail"` | What to do in case, when operator not available to validate request. |
 | affinity | object | `{}` | Pod affinity |
@@ -151,7 +150,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | cleanupImage.pullPolicy | string | `"IfNotPresent"` |  |
 | cleanupImage.repository | string | `"gcr.io/google_containers/hyperkube"` |  |
 | cleanupImage.tag | string | `"v1.18.0"` |  |
-| createCRD | bool | `true` | with this option, if you remove this chart, all crd resources will be deleted with it. |
+| createCRD | bool | `true` | enables CRD creation and management. -- with this option, if you remove this chart, all crd resources will be deleted with it. |
 | env | list | `[]` | extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD) |
 | envFrom | list | `[]` |  |
 | extraArgs | object | `{}` | operator container additional commandline arguments |
@@ -166,7 +165,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
 | image.tag | string | `"v0.42.3"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
-| logLevel | string | `"info"` | possible values: info and error. |
+| logLevel | string | `"info"` | VM operator log level -- possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name override |
 | nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/ |
 | operator.disable_prometheus_converter | bool | `false` | By default, operator converts prometheus-operator objects. |

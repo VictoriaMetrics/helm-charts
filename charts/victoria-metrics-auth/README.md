@@ -108,7 +108,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
 | extraLabels | object | `{}` | Labels to be added to the deployment and pods |
-| extraObjects | list | `[]` | Add extra specs dynamically to this chart |
+| extraObjects | list | `[]` |  |
 | extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` |  |
@@ -120,13 +120,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.enabled | bool | `false` |  |
 | ingress.extraLabels | object | `{}` |  |
 | ingress.hosts | list | `[]` |  |
-| ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
+| ingress.pathType | string | `"Prefix"` |  |
 | ingress.tls | list | `[]` |  |
 | ingressInternal.annotations | object | `{}` |  |
 | ingressInternal.enabled | bool | `false` |  |
 | ingressInternal.extraLabels | object | `{}` |  |
 | ingressInternal.hosts | list | `[]` |  |
-| ingressInternal.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
+| ingressInternal.pathType | string | `"Prefix"` |  |
 | ingressInternal.tls | list | `[]` |  |
 | license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |

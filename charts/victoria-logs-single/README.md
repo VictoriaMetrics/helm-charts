@@ -133,7 +133,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.affinity | object | `{}` | Pod affinity |
 | server.containerWorkingDir | string | `""` | Container workdir |
 | server.enabled | bool | `true` | Enable deployment of server component. Deployed as StatefulSet |
-| server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| server.env | list | `[]` | Env variables -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | server.envFrom | list | `[]` |  |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
@@ -151,7 +151,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
 | server.ingress.hosts | list | `[]` |  |
-| server.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
+| server.ingress.pathType | string | `"Prefix"` |  |
 | server.ingress.tls | list | `[]` | Array of TLS objects |
 | server.initContainers | list | `[]` |  |
 | server.livenessProbe.failureThreshold | int | `10` |  |
@@ -193,11 +193,11 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.service.loadBalancerIP | string | `""` | Service load balacner IP |
 | server.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
 | server.service.servicePort | int | `9428` | Service port |
-| server.service.type | string | `"ClusterIP"` | Service type |
+| server.service.type | string | `"ClusterIP"` | Node port nodePort: 30000 -- Service type |
 | server.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | server.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for server component. This is Prometheus operator object |
 | server.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
-| server.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
+| server.serviceMonitor.relabelings | list | `[]` |  |
 | server.startupProbe | object | `{}` |  |
 | server.statefulSet.enabled | bool | `true` | Creates statefulset instead of deployment, useful when you want to keep the cache |
 | server.statefulSet.podManagementPolicy | string | `"OrderedReady"` | Deploy order policy for StatefulSet pods |

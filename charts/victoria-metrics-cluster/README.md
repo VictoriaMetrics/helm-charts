@@ -145,8 +145,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.ingress.enabled | bool | `false` | Enable deployment of ingress for vminsert component |
 | vminsert.ingress.extraLabels | object | `{}` |  |
 | vminsert.ingress.hosts | list | `[]` | Array of host objects |
-| vminsert.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
-| vminsert.ingress.tls | list | `[]` | Array of TLS objects |
+| vminsert.ingress.pathType | string | `"Prefix"` |  |
+| vminsert.ingress.tls | list | `[]` |  |
 | vminsert.initContainers | list | `[]` |  |
 | vminsert.name | string | `"vminsert"` | vminsert container name |
 | vminsert.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
@@ -165,7 +165,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.probe.readiness.timeoutSeconds | int | `5` |  |
 | vminsert.replicaCount | int | `2` | Count of vminsert pods |
 | vminsert.resources | object | `{}` | Resource object |
-| vminsert.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| vminsert.securityContext | object | `{}` |  |
 | vminsert.service.annotations | object | `{}` | Service annotations |
 | vminsert.service.clusterIP | string | `""` | Service ClusterIP |
 | vminsert.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
@@ -176,12 +176,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.service.servicePort | int | `8480` | Service port |
 | vminsert.service.targetPort | string | `"http"` | Target port |
 | vminsert.service.type | string | `"ClusterIP"` | Service type |
-| vminsert.service.udp | bool | `false` | Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/ |
+| vminsert.service.udp | bool | `false` | Enable UDP port. used if you have "spec.opentsdbListenAddr" specified -- Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/ |
 | vminsert.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | vminsert.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object |
 | vminsert.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vminsert.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
-| vminsert.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
+| vminsert.serviceMonitor.relabelings | list | `[]` |  |
 | vminsert.strategy | object | `{}` |  |
 | vminsert.suppressStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs |
 | vminsert.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
@@ -215,8 +215,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.ingress.enabled | bool | `false` | Enable deployment of ingress for vmselect component |
 | vmselect.ingress.extraLabels | object | `{}` |  |
 | vmselect.ingress.hosts | list | `[]` | Array of host objects |
-| vmselect.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
-| vmselect.ingress.tls | list | `[]` | Array of TLS objects |
+| vmselect.ingress.pathType | string | `"Prefix"` |  |
+| vmselect.ingress.tls | list | `[]` |  |
 | vmselect.initContainers | list | `[]` |  |
 | vmselect.name | string | `"vmselect"` | Vmselect container name |
 | vmselect.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
@@ -225,7 +225,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.persistentVolume.enabled | bool | `false` | Create/use Persistent Volume Claim for vmselect component. Empty dir if false. If true, vmselect will create/use a Persistent Volume Claim |
 | vmselect.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmselect.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
 | vmselect.persistentVolume.labels | object | `{}` | Persistent volume labels |
-| vmselect.persistentVolume.size | string | `"2Gi"` | Size of the volume. Better to set the same as resource limit memory property |
+| vmselect.persistentVolume.size | string | `"2Gi"` |  |
 | vmselect.persistentVolume.subPath | string | `""` | Mount subpath |
 | vmselect.podAnnotations | object | `{}` | Pod's annotations |
 | vmselect.podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
@@ -257,7 +257,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operator object |
 | vmselect.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vmselect.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
-| vmselect.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
+| vmselect.serviceMonitor.relabelings | list | `[]` |  |
 | vmselect.statefulSet.enabled | bool | `false` | Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data. |
 | vmselect.statefulSet.podManagementPolicy | string | `"OrderedReady"` | Deploy order policy for StatefulSet pods |
 | vmselect.statefulSet.service.annotations | object | `{}` | Headless service annotations |
@@ -329,9 +329,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmstorage component. This is Prometheus operator object |
 | vmstorage.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vmstorage.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
-| vmstorage.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
+| vmstorage.serviceMonitor.relabelings | list | `[]` |  |
 | vmstorage.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
-| vmstorage.tolerations | list | `[]` | Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) # |
+| vmstorage.tolerations | list | `[]` | Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | vmstorage.topologySpreadConstraints | list | `[]` | Pod topologySpreadConstraints |
 | vmstorage.vmbackupmanager.destination | string | `""` | backup destination at S3, GCS or local filesystem. Pod name will be included to path! |
 | vmstorage.vmbackupmanager.disableDaily | bool | `false` | disable daily backups |

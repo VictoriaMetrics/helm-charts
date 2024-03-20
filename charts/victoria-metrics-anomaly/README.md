@@ -114,14 +114,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config | object | `{"models":{"prophet_model":{"args":{},"class":"model.prophet.ProphetModel"}},"preset":"","reader":{"class":"reader.vm.VmReader","datasource_url":"","queries":{},"sampling_period":"1m","tenant_id":""},"schedulers":{"scheduler_periodic_1m":{"class":"scheduler.periodic.PeriodicScheduler","fit_every":"2h","fit_window":"14d","infer_every":"1m"}},"writer":{"class":"writer.vm.VmWriter","datasource_url":"","tenant_id":""}}` | Full [vmanomaly config section](https://docs.victoriametrics.com/anomaly-detection/components/) |
 | config.models | object | `{"prophet_model":{"args":{},"class":"model.prophet.ProphetModel"}}` | [Models section](https://docs.victoriametrics.com/anomaly-detection/components/models/) |
 | config.models.prophet_model | object | `{"args":{},"class":"model.prophet.ProphetModel"}` | Model alias |
-| config.models.prophet_model.args | object | `{}` | Arguments specific to [model](https://docs.victoriametrics.com/anomaly-detection/components/models/) |
+| config.models.prophet_model.args | object | `{}` | Inner model args (key-value pairs) accepted by -- Arguments specific to [model](https://docs.victoriametrics.com/anomaly-detection/components/models/) |
 | config.models.prophet_model.class | string | `"model.prophet.ProphetModel"` | Supported model classs by vmanomaly |
 | config.preset | string | `""` | Whether to use preset configuration. If not empty, preset name should be specified. |
 | config.reader | object | `{"class":"reader.vm.VmReader","datasource_url":"","queries":{},"sampling_period":"1m","tenant_id":""}` | [Reader section](https://docs.victoriametrics.com/anomaly-detection/components/reader/) |
 | config.reader.class | string | `"reader.vm.VmReader"` | Name of the class needed to enable reading from VictoriaMetrics or Prometheus. VmReader is the default option, if not specified. |
 | config.reader.datasource_url | string | `""` | Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/" |
 | config.reader.queries | object | `{}` | Required. PromQL/MetricsQL query to select data in format: QUERY_ALIAS: "QUERY". As accepted by "/query_range?query=%s". |
-| config.reader.sampling_period | string | `"1m"` | Frequency of the points returned. Will be converted to "/query_range?step=%s" param (in seconds). **Required** since 1.9.0. |
 | config.reader.tenant_id | string | `""` | For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs |
 | config.schedulers | object | `{"scheduler_periodic_1m":{"class":"scheduler.periodic.PeriodicScheduler","fit_every":"2h","fit_window":"14d","infer_every":"1m"}}` | [Scheduler section](https://docs.victoriametrics.com/anomaly-detection/components/scheduler/) |
 | config.schedulers.scheduler_periodic_1m.class | string | `"scheduler.periodic.PeriodicScheduler"` | Scheduler class |
