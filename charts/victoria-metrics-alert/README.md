@@ -125,7 +125,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.enabled | bool | `false` |  |
 | alertmanager.ingress.extraLabels | object | `{}` |  |
 | alertmanager.ingress.hosts | list | `[]` |  |
-| alertmanager.ingress.pathType | string | `"Prefix"` |  |
+| alertmanager.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | alertmanager.ingress.tls | list | `[]` |  |
 | alertmanager.listenAddress | string | `"0.0.0.0:9093"` |  |
 | alertmanager.nodeSelector | object | `{}` |  |
@@ -187,7 +187,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.ingress.enabled | bool | `false` |  |
 | server.ingress.extraLabels | object | `{}` |  |
 | server.ingress.hosts | list | `[]` |  |
-| server.ingress.pathType | string | `"Prefix"` |  |
+| server.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | server.ingress.tls | list | `[]` |  |
 | server.labels | object | `{}` |  |
 | server.minReadySeconds | int | `0` |  |
