@@ -222,7 +222,7 @@ spec:
   {{- if and .Values.vmstorage.persistentVolume.enabled (not .Values.vmstorage.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
     - metadata:
-        name: vmstorage-volume
+        name: {{ .Values.vmstorage.persistentVolume.name }}
         {{- if .Values.vmstorage.persistentVolume.annotations }}
         annotations:
 {{ toYaml .Values.vmstorage.persistentVolume.annotations | indent 10 }}
