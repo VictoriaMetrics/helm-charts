@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.8.3](https://img.shields.io/badge/Version-0.8.3-informational?style=flat-square)
+ ![Version: 0.9.3](https://img.shields.io/badge/Version-0.9.3-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -115,6 +115,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.configMap | string | `""` |  |
 | alertmanager.enabled | bool | `false` |  |
 | alertmanager.extraArgs | object | `{}` |  |
+| alertmanager.extraContainers | list | `[]` |  |
+| alertmanager.extraHostPathMounts | list | `[]` |  |
+| alertmanager.extraVolumeMounts | list | `[]` |  |
+| alertmanager.extraVolumes | list | `[]` |  |
 | alertmanager.image | string | `"prom/alertmanager"` |  |
 | alertmanager.imagePullSecrets | list | `[]` |  |
 | alertmanager.ingress.annotations | object | `{}` |  |
@@ -123,6 +127,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.hosts | list | `[]` |  |
 | alertmanager.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | alertmanager.ingress.tls | list | `[]` |  |
+| alertmanager.listenAddress | string | `"0.0.0.0:9093"` |  |
 | alertmanager.nodeSelector | object | `{}` |  |
 | alertmanager.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
 | alertmanager.persistentVolume.annotations | object | `{}` | Persistant volume annotations |
@@ -165,13 +170,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.datasource.url | string | `""` |  |
 | server.enabled | bool | `true` |  |
 | server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| server.envFrom | list | `[]` |  |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
-| server.extraContainers | list | `[]` |  |
-| server.extraHostPathMounts | list | `[]` |  |
-| server.extraVolumeMounts | list | `[]` |  |
-| server.extraVolumes | list | `[]` |  |
+| server.extraContainers | list | `[]` | Additional containers to run in the same pod |
+| server.extraHostPathMounts | list | `[]` | Additional hostPath mounts |
+| server.extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
+| server.extraVolumes | list | `[]` | Extra Volumes for the pod |
 | server.fullnameOverride | string | `""` |  |
 | server.image.pullPolicy | string | `"IfNotPresent"` |  |
 | server.image.repository | string | `"victoriametrics/vmalert"` |  |

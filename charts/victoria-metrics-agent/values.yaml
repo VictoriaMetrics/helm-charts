@@ -97,6 +97,11 @@ env:
   #       name: auth_secret
   #       key: password
 
+envFrom:
+  []
+  #- configMapRef:
+  #    name: special-config
+
 # extra Labels for Pods, Deployment and Statefulset
 extraLabels: {}
 
@@ -128,6 +133,11 @@ extraVolumeMounts:
 extraContainers: []
 #   - name: config-reloader
 #     image: reloader-image
+
+initContainers:
+  []
+  # - name: example
+  #   image: example-image
 
 podSecurityContext:
   {}
@@ -242,6 +252,19 @@ persistence:
   existingClaim: ""
   # -- Bind Persistent Volume by labels. Must match all labels of targeted PV.
   matchLabels: {}
+
+# -- Horizontal Pod Autoscaling.
+# Note that it is not intended to be used for vmagents which perform scraping.
+# In order to scale scraping vmagents see: https://docs.victoriametrics.com/vmagent/#scraping-big-number-of-targets
+horizontalPodAutoscaling:
+  # -- Use HPA for vmagent
+  enabled: false
+  # -- Maximum replicas for HPA to use to to scale vmagent
+  maxReplicas: 10
+  # -- Minimum replicas for HPA to use to scale vmagent
+  minReplicas: 1
+  # -- Metric for HPA to use to scale vmagent
+  metrics: []
 
 config:
   global:

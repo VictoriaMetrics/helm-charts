@@ -69,6 +69,12 @@ spec:
           {{- with (include "chart.license.flag" .) }}
             - {{ . }}
           {{- end }}
+          {{- if .Values.vminsert.envFrom }}
+          envFrom:
+            {{- with .Values.vminsert.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.vminsert.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
@@ -123,6 +129,11 @@ spec:
               path: /health
             {{- end }}
               port: http
+            {{- if .Values.vminsert.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: {{ .Values.vminsert.probe.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vminsert.probe.readiness.periodSeconds }}
             timeoutSeconds: {{ .Values.vminsert.probe.readiness.timeoutSeconds }}
@@ -168,9 +179,11 @@ spec:
       topologySpreadConstraints:
 {{ toYaml .Values.vminsert.topologySpreadConstraints | indent 8 }}
       {{- end }}
-      {{- with .Values.vminsert.extraVolumes }}
+      {{- if or (and .Values.license.secret.name .Values.license.secret.key) .Values.vminsert.extraVolumes }}
       volumes:
+        {{- with .Values.vminsert.extraVolumes }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
         {{- include "chart.license.volume" . | nindent 8 }}
       {{- end }}
 {{- end }}

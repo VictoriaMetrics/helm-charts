@@ -9,7 +9,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmagent" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmagent" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
     {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
@@ -17,6 +17,9 @@ spec:
   {{- with .Values.grafanaOperatorDashboardsFormat.instanceSelector }}
   instanceSelector:
     {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
+  allowCrossNamespaceImport: true
   {{- end }}
 {{- else }}
 apiVersion: v1
@@ -52,7 +55,7 @@ data:
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "9.2.7"
+                "version": "10.3.1"
             },
             {
                 "type": "datasource",
@@ -196,7 +199,8 @@ data:
                                     "value": null
                                 }
                             ]
-                        }
+                        },
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -225,10 +229,12 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.7",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
@@ -236,7 +242,7 @@ data:
                             "uid": "$ds"
                         },
                         "editorMode": "code",
-                        "expr": "sum(rate(vm_promscrape_scraped_samples_sum{job=~\"$job\", instance=~\"$instance\", path!~\"/favicon.ico\"}[$__rate_interval]))",
+                        "expr": "sum(rate(vm_promscrape_scraped_samples_sum{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
                         "interval": "",
                         "legendFormat": "__auto",
                         "range": true,
@@ -263,7 +269,8 @@ data:
                                     "value": null
                                 }
                             ]
-                        }
+                        },
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -292,10 +299,12 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.7",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
@@ -318,9 +327,10 @@ data:
                     "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
-                "description": "Shows total number of all configured scrape targets in state \"up\".\n\nSee `http://vmagent-host:8429/targets` to get list of all targets. \n",
+                "description": "Shows the number of targets scraped per second.",
                 "fieldConfig": {
                     "defaults": {
+                        "decimals": 1,
                         "mappings": [],
                         "thresholds": {
                             "mode": "absolute",
@@ -330,7 +340,8 @@ data:
                                     "value": null
                                 }
                             ]
-                        }
+                        },
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -340,10 +351,11 @@ data:
                     "x": 8,
                     "y": 1
                 },
-                "id": 9,
+                "id": 134,
+                "links": [],
                 "options": {
                     "colorMode": "value",
-                    "graphMode": "area",
+                    "graphMode": "none",
                     "justifyMode": "auto",
                     "orientation": "auto",
                     "reduceOptions": {
@@ -353,23 +365,27 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.7",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
                             "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
-                        "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"up\"})",
+                        "editorMode": "code",
+                        "expr": "sum(rate(vm_promscrape_scrapes_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) ",
                         "interval": "",
-                        "legendFormat": "up",
+                        "legendFormat": "__auto",
+                        "range": true,
                         "refId": "A"
                     }
                 ],
-                "title": "Scrape targets up",
+                "title": "Targets scraped/s",
                 "type": "stat"
             },
             {
@@ -377,7 +393,7 @@ data:
                     "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
-                "description": "Shows total number of all configured scrape targets in state \"down\".\n\nSee `http://vmagent-host:8429/targets` to get list of all targets. \n",
+                "description": "Shows total number of all configured scrape targets in state `up` or `down`.\n\nSee `http://vmagent-host:8429/targets` to get list of all targets. \n",
                 "fieldConfig": {
                     "defaults": {
                         "mappings": [],
@@ -387,15 +403,37 @@ data:
                                 {
                                     "color": "green",
                                     "value": null
-                                },
+                                }
+                            ]
+                        },
+                        "unitScale": true
+                    },
+                    "overrides": [
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "down"
+                            },
+                            "properties": [
                                 {
-                                    "color": "red",
-                                    "value": 1
+                                    "id": "thresholds",
+                                    "value": {
+                                        "mode": "absolute",
+                                        "steps": [
+                                            {
+                                                "color": "green",
+                                                "value": null
+                                            },
+                                            {
+                                                "color": "red",
+                                                "value": 1
+                                            }
+                                        ]
+                                    }
                                 }
                             ]
                         }
-                    },
-                    "overrides": []
+                    ]
                 },
                 "gridPos": {
                     "h": 3,
@@ -422,23 +460,40 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.7",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
                             "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
-                        "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"down\"})",
+                        "editorMode": "code",
+                        "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"up\"})",
                         "interval": "",
                         "legendFormat": "up",
+                        "range": true,
                         "refId": "A"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "$ds"
+                        },
+                        "editorMode": "code",
+                        "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"down\"})",
+                        "hide": false,
+                        "interval": "",
+                        "legendFormat": "down",
+                        "range": true,
+                        "refId": "B"
                     }
                 ],
-                "title": "Scrape targets down",
+                "title": "Scrape targets",
                 "type": "stat"
             },
             {
@@ -464,7 +519,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short"
+                        "unit": "short",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -494,10 +550,12 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.7",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
@@ -535,7 +593,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "bytes"
+                        "unit": "bytes",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -558,10 +617,12 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.7",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
@@ -589,7 +650,9 @@ data:
                         },
                         "custom": {
                             "align": "auto",
-                            "displayMode": "auto",
+                            "cellOptions": {
+                                "type": "auto"
+                            },
                             "inspect": false,
                             "minWidth": 50
                         },
@@ -606,7 +669,8 @@ data:
                                     "value": 80
                                 }
                             ]
-                        }
+                        },
+                        "unitScale": true
                     },
                     "overrides": [
                         {
@@ -643,7 +707,9 @@ data:
                 },
                 "id": 101,
                 "options": {
+                    "cellHeight": "sm",
                     "footer": {
+                        "countRows": false,
                         "fields": "",
                         "reducer": [
                             "sum"
@@ -652,7 +718,7 @@ data:
                     },
                     "showHeader": true
                 },
-                "pluginVersion": "9.2.7",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
@@ -681,6 +747,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -694,6 +761,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "stepAfter",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -727,7 +795,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short"
+                        "unit": "short",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -811,6 +880,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -824,6 +894,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "linear",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -860,7 +931,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short"
+                        "unit": "short",
+                        "unitScale": true
                     },
                     "overrides": [
                         {
@@ -945,6 +1017,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -958,6 +1031,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "linear",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -996,7 +1070,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "bytes"
+                        "unit": "bytes",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -1062,6 +1137,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -1075,6 +1151,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "linear",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -1107,7 +1184,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short"
+                        "unit": "short",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -1171,6 +1249,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -1184,6 +1263,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "linear",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -1216,7 +1296,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "decbytes"
+                        "unit": "decbytes",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -1280,6 +1361,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -1293,6 +1375,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "linear",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -1325,7 +1408,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short"
+                        "unit": "short",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -1383,6 +1467,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -1396,6 +1481,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "linear",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -1428,7 +1514,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short"
+                        "unit": "short",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -1554,6 +1641,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -1567,6 +1655,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -1596,7 +1685,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -1604,7 +1694,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "percentunit"
+                                "unit": "percentunit",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -1612,7 +1703,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 11
+                            "y": 3
                         },
                         "id": 109,
                         "links": [],
@@ -1660,13 +1751,14 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Percentage of used memory (resident).\nThe application's performance will significantly degrade when memory usage is close to 100%.\n\nClick on the line and choose Drilldown to show Mem usage per instance",
+                        "description": "Percentage of used RSS memory (resident).\nThe RSS memory shows the amount of memory recently accessed by the application. It includes anonymous memory and data from recently accessed files (aka page cache).\nThe application's performance will significantly degrade when memory usage is close to 100%.\n\nClick on the line and choose Drilldown to show memory usage per instance",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -1680,6 +1772,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -1709,7 +1802,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -1717,7 +1811,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "percentunit"
+                                "unit": "percentunit",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -1725,7 +1820,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 11
+                            "y": 3
                         },
                         "id": 111,
                         "links": [],
@@ -1778,6 +1873,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -1791,6 +1887,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -1819,7 +1916,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -1827,7 +1925,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "bytes"
+                                "unit": "bytes",
+                                "unitScale": true
                             },
                             "overrides": [
                                 {
@@ -1848,7 +1947,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 19
+                            "y": 11
                         },
                         "id": 81,
                         "links": [],
@@ -1918,6 +2017,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -1931,6 +2031,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -1953,7 +2054,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -1961,7 +2063,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "bps"
+                                "unit": "bps",
+                                "unitScale": true
                             },
                             "overrides": [
                                 {
@@ -1982,7 +2085,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 19
+                            "y": 11
                         },
                         "id": 7,
                         "options": {
@@ -2045,6 +2148,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -2058,6 +2162,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -2082,7 +2187,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -2090,7 +2196,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "percentunit"
+                                "unit": "percentunit",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -2098,7 +2205,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 27
+                            "y": 19
                         },
                         "id": 83,
                         "links": [],
@@ -2149,6 +2256,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -2162,6 +2270,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -2186,7 +2295,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -2194,7 +2304,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "short"
+                                "unit": "short",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -2202,7 +2313,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 27
+                            "y": 19
                         },
                         "id": 39,
                         "links": [],
@@ -2247,12 +2358,14 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
+                        "description": "Shows the percent of CPU spent on garbage collection.\n\nIf % is high, then CPU usage can be decreased by changing GOGC to higher values. Increasing GOGC value will increase memory usage, and decrease CPU usage.\n\nTry searching for keyword `GOGC` at https://docs.victoriametrics.com/troubleshooting/ ",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -2266,6 +2379,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -2290,7 +2404,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -2298,7 +2413,116 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "short"
+                                "unit": "percentunit",
+                                "unitScale": true
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 27
+                        },
+                        "id": 135,
+                        "links": [],
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.2.6",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "max(\n  rate(go_gc_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]) \n / rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])\n ) by(job)",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 2,
+                                "legendFormat": "__auto",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "CPU spent on GC ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "decimals": 0,
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -2306,7 +2530,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 35
+                            "y": 27
                         },
                         "id": 41,
                         "links": [],
@@ -3218,7 +3442,9 @@ data:
                                 },
                                 "custom": {
                                     "align": "auto",
-                                    "displayMode": "auto",
+                                    "cellOptions": {
+                                        "type": "auto"
+                                    },
                                     "inspect": false
                                 },
                                 "mappings": [],
@@ -3367,6 +3593,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -3380,6 +3607,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -3403,7 +3631,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -3411,7 +3640,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "short"
+                                "unit": "short",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -3419,7 +3649,7 @@ data:
                             "h": 7,
                             "w": 12,
                             "x": 0,
-                            "y": 45
+                            "y": 37
                         },
                         "id": 48,
                         "options": {
@@ -3457,7 +3687,7 @@ data:
                                 "refId": "A"
                             }
                         ],
-                        "title": "Scrape targets UP",
+                        "title": "Scrape targets UP(By Type)",
                         "type": "timeseries"
                     },
                     {
@@ -3471,6 +3701,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -3484,6 +3715,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -3507,7 +3739,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -3515,7 +3748,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "short"
+                                "unit": "short",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -3523,7 +3757,7 @@ data:
                             "h": 7,
                             "w": 12,
                             "x": 12,
-                            "y": 45
+                            "y": 37
                         },
                         "id": 76,
                         "options": {
@@ -3559,7 +3793,7 @@ data:
                                 "refId": "A"
                             }
                         ],
-                        "title": "Scrape targets DOWN",
+                        "title": "Scrape targets DOWN(By Type)",
                         "type": "timeseries"
                     },
                     {
@@ -3567,13 +3801,13 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows the number of scrapes per second.",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -3587,6 +3821,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -3610,7 +3845,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -3618,7 +3854,223 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "short"
+                                "unit": "short",
+                                "unitScale": true
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 7,
+                            "w": 12,
+                            "x": 0,
+                            "y": 44
+                        },
+                        "id": 132,
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true,
+                                "sortBy": "Last *",
+                                "sortDesc": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.2.6",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(vm_promscrape_scrape_pool_targets{job=~\"$job\", instance=~\"$instance\", status=\"up\"}) by(job, scrape_job) > 0",
+                                "format": "time_series",
+                                "interval": "",
+                                "legendFormat": "{{`{{`}}job{{`}}`}}: {{`{{`}}scrape_job{{`}}`}}",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Scrape targets UP(By Job)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 10,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short",
+                                "unitScale": true
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 7,
+                            "w": 12,
+                            "x": 12,
+                            "y": 44
+                        },
+                        "id": 133,
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.2.6",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(vm_promscrape_scrape_pool_targets{job=~\"$job\", instance=~\"$instance\", status=\"down\"}) by(job, scrape_job) > 0",
+                                "format": "time_series",
+                                "interval": "",
+                                "legendFormat": "{{`{{`}}job{{`}}`}}: {{`{{`}}scrape_job{{`}}`}}",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Scrape targets DOWN(By Job)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows the number of scrapes per second.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -3626,7 +4078,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 52
+                            "y": 51
                         },
                         "id": 20,
                         "options": {
@@ -3676,6 +4128,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -3689,6 +4142,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -3712,7 +4166,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -3720,7 +4175,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "short"
+                                "unit": "short",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -3728,7 +4184,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 52
+                            "y": 51
                         },
                         "id": 126,
                         "options": {
@@ -3777,6 +4233,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -3790,6 +4247,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -3813,7 +4271,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -3821,7 +4280,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "bytes"
+                                "unit": "bytes",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -3829,7 +4289,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 60
+                            "y": 59
                         },
                         "id": 46,
                         "options": {
@@ -3878,6 +4338,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -3891,6 +4352,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -3914,7 +4376,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -3922,7 +4385,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "short"
+                                "unit": "short",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -3930,7 +4394,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 60
+                            "y": 59
                         },
                         "id": 31,
                         "options": {
@@ -4091,8 +4555,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -4208,8 +4671,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -4312,8 +4774,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -4429,8 +4890,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -4474,7 +4934,7 @@ data:
                                     "uid": "$ds"
                                 },
                                 "exemplar": true,
-                                "expr": "sum(rate(vm_ingestserver_request_errors_total{job=~\"$job\", instance=~\"$instance\", path!~\"/favicon.ico\"}[$__rate_interval])) by(type, net) > 0",
+                                "expr": "sum(rate(vm_ingestserver_request_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(type, net) > 0",
                                 "interval": "",
                                 "legendFormat": "{{`{{`}} type {{`}}`}} ({{`{{`}}net{{`}}`}})",
                                 "refId": "A"
@@ -5854,8 +6314,7 @@ data:
             }
         ],
         "refresh": "",
-        "schemaVersion": 37,
-        "style": "dark",
+        "schemaVersion": 39,
         "tags": [
             "vmagent",
             "victoriametrics",
@@ -5865,9 +6324,9 @@ data:
             "list": [
                 {
                     "current": {
-                        "selected": true,
+                        "selected": false,
                         "text": "VictoriaMetrics",
-                        "value": "VictoriaMetrics"
+                        "value": "P4169E866C3094E38"
                     },
                     "hide": 0,
                     "includeAll": false,

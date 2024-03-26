@@ -4,6 +4,70 @@
 
 - TODO
 
+## 0.11.13
+
+**Release date:** 2024-03-05
+
+![AppVersion: v1.99.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.99.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM components to [v1.99.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.99.0)
+
+## 0.11.12
+
+**Release date:** 2024-02-09
+
+![AppVersion: v1.97.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.97.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Remove unsupported `scheme` field under `livenessProbe.tcpSocket`. See [#844](https://github.com/VictoriaMetrics/helm-charts/pull/844) by @MisguidedEmails.
+
+## 0.11.11
+
+**Release date:** 2024-02-01
+
+![AppVersion: v1.97.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.97.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM components to [v1.97.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.97.1)
+- Switch probes scheme to `HTTPS` if vminsert and vmselect enabled tls in extraArgs.
+
+## 0.11.10
+
+**Release date:** 2023-12-19
+
+![AppVersion: v1.96.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.96.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Fix templating `podManagementPolicy` value in StatefulSet configuration of vmselect. See [#807](https://github.com/VictoriaMetrics/helm-charts/pull/807) by @MemberIT.
+
+## 0.11.9
+
+**Release date:** 2023-12-13
+
+![AppVersion: v1.96.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.96.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Fix configuration of volume mount for license key referenced by using secret.
+
+## 0.11.8
+
+**Release date:** 2023-12-12
+
+![AppVersion: v1.96.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.96.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM components to [v1.96.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.96.0)
+
+## 0.11.7
+
+**Release date:** 2023-12-08
+
+![AppVersion: v1.95.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.95.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Fix `vminsert` configuration for volumes when using `extraVolumes`.
+
 ## 0.11.6
 
 **Release date:** 2023-11-16

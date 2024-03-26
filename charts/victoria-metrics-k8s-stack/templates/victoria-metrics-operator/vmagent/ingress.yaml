@@ -1,25 +1,9 @@
-{{- if .Values.vmsingle.enabled }}
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMSingle
-metadata:
-  {{- with .Values.vmsingle.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end  }}
-  name: {{ .Values.vmsingle.name | default (include "victoria-metrics-k8s-stack.fullname" .) }}
-  namespace: {{ .Release.Namespace }}
-  labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
-spec:
-{{ include "victoria-metrics-k8s-stack.VMSingleSpec" . | nindent 2 }}
-{{- end }}
-
-{{ if and .Values.vmsingle.enabled .Values.vmsingle.ingress.enabled -}}
----
+{{ if and .Values.vmagent.enabled .Values.vmagent.ingress.enabled -}}
 {{- $servicePort := 8429 -}}
-{{- $ingressPath := .Values.vmsingle.ingress.path -}}
-{{- $serviceName := printf "%s-%s" "vmsingle" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
-{{- $ingressPathType := .Values.vmsingle.ingress.pathType | default "" -}}
-{{- $extraPaths := .Values.vmsingle.ingress.extraPaths -}}
+{{- $ingressPath := .Values.vmagent.ingress.path -}}
+{{- $serviceName := printf "%s-%s" "vmagent" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- $ingressPathType := .Values.vmagent.ingress.pathType | default "" -}}
+{{- $extraPaths := .Values.vmagent.ingress.extraPaths -}}
 {{- $newAPI := .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
 {{- if $newAPI -}}
 apiVersion: networking.k8s.io/v1
@@ -30,31 +14,31 @@ apiVersion: extensions/v1beta1
 {{- end }}
 kind: Ingress
 metadata:
-  name: {{ .Values.vmsingle.name | default $serviceName }}
+  name: {{ .Values.vmagent.name | default $serviceName }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-vmsingle
+    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-vmagent
 {{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
-{{- if .Values.vmsingle.ingress.labels }}
-{{ toYaml .Values.vmsingle.ingress.labels | indent 4 }}
+{{- if .Values.vmagent.ingress.labels }}
+{{ toYaml .Values.vmagent.ingress.labels | indent 4 }}
 {{- end }}
-  {{- if .Values.vmsingle.ingress.annotations }}
+  {{- if .Values.vmagent.ingress.annotations }}
   annotations:
-    {{- range $key, $value := .Values.vmsingle.ingress.annotations }}
+    {{- range $key, $value := .Values.vmagent.ingress.annotations }}
     {{ $key }}: {{ tpl $value $ | quote }}
     {{- end }}
   {{- end }}
 spec:
-  {{- if .Values.vmsingle.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.vmsingle.ingress.ingressClassName }}
+  {{- if .Values.vmagent.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.vmagent.ingress.ingressClassName }}
   {{- end -}}
-{{- if .Values.vmsingle.ingress.tls }}
+{{- if .Values.vmagent.ingress.tls }}
   tls:
-{{ tpl (toYaml .Values.vmsingle.ingress.tls) $ | indent 4 }}
+{{ tpl (toYaml .Values.vmagent.ingress.tls) $ | indent 4 }}
 {{- end }}
   rules:
-  {{- if .Values.vmsingle.ingress.hosts  }}
-  {{- range .Values.vmsingle.ingress.hosts }}
+  {{- if .Values.vmagent.ingress.hosts  }}
+  {{- range .Values.vmagent.ingress.hosts }}
     - host: {{ tpl . $}}
       http:
         paths:

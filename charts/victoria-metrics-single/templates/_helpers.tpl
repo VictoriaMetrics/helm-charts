@@ -186,7 +186,7 @@ Return license flag if necessary.
 -license={{ .Values.license.key }}
 {{- end }}
 {{- if and .Values.license.secret.name .Values.license.secret.key -}}
--license-file=/etc/vm-license-key
+-licenseFile=/etc/vm-license-key/{{ .Values.license.secret.key }}
 {{- end -}}
 {{- end -}}
 
@@ -199,7 +199,6 @@ Return license volume mount
 - name: license-key
   secret:
     secretName: {{ .Values.license.secret.name }}
-    key: {{ .Values.license.secret.key }}
 {{- end -}}
 {{- end -}}
 

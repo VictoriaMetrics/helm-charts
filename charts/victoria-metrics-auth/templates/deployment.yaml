@@ -61,16 +61,17 @@ spec:
           ports:
             - name: http
               containerPort: 8427
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
           readinessProbe:
-            httpGet:
-            {{- if index  .Values.extraArgs "http.pathPrefix" }}
-              path: {{ trimSuffix "/" (index .Values.extraArgs "http.pathPrefix") }}/health
-            {{- else }}
-              path: /health
-            {{- end }}
+            tcpSocket:
               port: http
             initialDelaySeconds: 5
             periodSeconds: 15

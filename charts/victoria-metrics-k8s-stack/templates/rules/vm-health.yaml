@@ -8,7 +8,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "vm-health" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "vm-health" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
@@ -98,7 +98,7 @@ spec:
       annotations:
         description: "Logging rate for job \"{{`{{`}} $labels.job {{`}}`}}\" ({{`{{`}} $labels.instance {{`}}`}}) is {{`{{`}} $value {{`}}`}} for last 15m.\n Worth to check logs for specific error messages."
         summary: Too many logs printed for job "{{`{{`}} $labels.job {{`}}`}}" ({{`{{`}} $labels.instance {{`}}`}})
-      expr: sum(increase(vm_log_messages_total{level="error"}[5m])) by (job, instance) > 0
+      expr: sum(increase(vm_log_messages_total{level="error"}[5m])) without (app_version, location) > 0
       for: 15m
       labels:
         severity: warning
@@ -111,7 +111,7 @@ spec:
       annotations:
         description: "The rate of TSID misses during query lookups is too high for \"{{`{{`}} $labels.job {{`}}`}}\" ({{`{{`}} $labels.instance {{`}}`}}).\n Make sure you're running VictoriaMetrics of v1.85.3 or higher.\n Related issue https://github.com/VictoriaMetrics/VictoriaMetrics/issues/3502"
         summary: Too many TSID misses for job "{{`{{`}} $labels.job {{`}}`}}" ({{`{{`}} $labels.instance {{`}}`}})
-      expr: sum(rate(vm_missing_tsids_for_metric_id_total[5m])) by (job, instance) > 0
+      expr: rate(vm_missing_tsids_for_metric_id_total[5m]) > 0
       for: 10m
       labels:
         severity: critical

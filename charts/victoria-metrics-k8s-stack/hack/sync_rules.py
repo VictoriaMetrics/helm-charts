@@ -75,7 +75,13 @@ skip_list = [
 condition_map = {
     'etcd': '.Values.kubeEtcd.enabled .Values.defaultRules.rules.etcd',
     'general.rules': '.Values.defaultRules.rules.general',
-    'k8s.rules': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_cpu_usage_seconds_total': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_memory_cache': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_memory_rss': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_memory_swap': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_memory_working_set_bytes': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_resource': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.pod_owner': '.Values.defaultRules.rules.k8s',
     'kube-apiserver-availability.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverAvailability',
     'kube-apiserver-burnrate.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverBurnrate',
     'kube-apiserver-histogram.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverHistogram',
@@ -155,7 +161,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%%s-%%s" (include "victoria-metrics-k8s-stack.fullname" .) "%(name)s" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%%s-%%s" (include "victoria-metrics-k8s-stack.fullname" .) "%(name)s" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}

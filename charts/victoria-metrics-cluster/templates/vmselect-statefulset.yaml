@@ -19,7 +19,7 @@ spec:
     matchLabels:
       {{- include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
   replicas: {{ .Values.vmselect.replicaCount }}
-  podManagementPolicy: {{ .Values.vmselect.podManagementPolicy }}
+  podManagementPolicy: {{ .Values.vmselect.statefulSet.podManagementPolicy }}
   template:
     metadata:
     {{- if .Values.vmselect.podAnnotations }}
@@ -67,6 +67,12 @@ spec:
           {{- with (include "chart.license.flag" .) }}
             - {{ . }}
           {{- end }}
+          {{- if .Values.vmselect.envFrom }}
+          envFrom:
+            {{- with .Values.vmselect.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.vmselect.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
@@ -86,6 +92,11 @@ spec:
               path: /health
             {{- end }}
               port: http
+            {{- if .Values.vmselect.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: 5
             periodSeconds: 15
           livenessProbe:

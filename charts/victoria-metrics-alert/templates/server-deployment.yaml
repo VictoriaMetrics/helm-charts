@@ -4,9 +4,6 @@
 {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
 {{- end -}}
 {{- end -}}
-{{- if (eq (include "vmalert.alertmanager.urls" . ) "") -}}
-{{- fail "alert manager URL must be specified. Please fill server.notifier.alertmanager.url or server.notifiers or enable Alertmanager in values file" -}}
-{{- end -}}
 {{- if eq .Values.server.datasource.url "" -}}
 {{- fail "server.datasource.url datasource URL must be specified" -}}
 {{- end -}}
@@ -70,7 +67,9 @@ spec:
             {{- with .Values.server.datasource.bearer.tokenFile }}
             - -datasource.bearerTokenFile={{ . }}
             {{- end }}
-            - -notifier.url={{ include "vmalert.alertmanager.urls" . }}
+            {{- with (include "vmalert.alertmanager.urls" .) }}
+            - -notifier.url={{ . }}
+            {{- end }}
             {{- with (include "vmalert.alertmanager.passwords" .) }}
             - -notifier.basicAuth.password={{ . }}
             {{- end }}
@@ -83,7 +82,9 @@ spec:
             {{- with (include "vmalert.alertmanager.bearerTokenFiles" .) }}
             - -notifier.bearerTokenFile={{ . }}
             {{- end }}
+            {{- if .Values.server.remote.read.url }}
             - -remoteRead.url={{ .Values.server.remote.read.url }}
+            {{- end }}
             {{- if or .Values.server.remote.read.basicAuth.password .Values.server.remote.read.basicAuth.username }}
             - -remoteRead.basicAuth.password={{ .Values.server.remote.read.basicAuth.password }}
             - -remoteRead.basicAuth.username={{ .Values.server.remote.read.basicAuth.username }}
@@ -94,7 +95,9 @@ spec:
             {{- with .Values.server.remote.read.bearer.tokenFile }}
             - -remoteRead.bearerTokenFile={{ . }}
             {{- end }}
+            {{- if .Values.server.remote.write.url }}
             - -remoteWrite.url={{ .Values.server.remote.write.url }}
+            {{- end }}
             {{- if or .Values.server.remote.write.basicAuth.password .Values.server.remote.write.basicAuth.username  }}
             - -remoteWrite.basicAuth.password={{ .Values.server.remote.write.basicAuth.password }}
             - -remoteWrite.basicAuth.username={{ .Values.server.remote.write.basicAuth.username }}
@@ -120,6 +123,12 @@ spec:
             - {{ . }}
             {{- end }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          {{- if .Values.server.envFrom }}
+          envFrom:
+            {{- with .Values.server.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.server.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}

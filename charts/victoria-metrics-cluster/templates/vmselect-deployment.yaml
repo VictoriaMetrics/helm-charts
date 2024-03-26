@@ -70,6 +70,12 @@ spec:
           {{- with (include "chart.license.flag" .) }}
             - {{ . }}
           {{- end }}
+          {{- if .Values.vmselect.envFrom }}
+          envFrom:
+            {{- with .Values.vmselect.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.vmselect.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
@@ -89,6 +95,11 @@ spec:
               path: /health
             {{- end }}
               port: http
+            {{- if .Values.vmselect.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: {{ .Values.vmselect.probe.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vmselect.probe.readiness.periodSeconds }}
             timeoutSeconds: {{ .Values.vmselect.probe.readiness.timeoutSeconds }}

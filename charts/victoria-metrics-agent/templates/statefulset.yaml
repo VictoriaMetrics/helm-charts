@@ -14,7 +14,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+{{- if not .Values.horizontalPodAutoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+{{- end }}
   serviceName: {{ include "chart.fullname" . }}
   {{- if .Values.statefulset.updateStrategy }}
   updateStrategy:
@@ -46,6 +48,10 @@ spec:
       serviceAccountName: {{ include "chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -110,6 +116,12 @@ spec:
             - name: opentsdb-udp
               protocol: UDP
               containerPort: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
+          {{- end }}
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- if or .Values.env .Values.statefulset.clusterMode}}
           env:

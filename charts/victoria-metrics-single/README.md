@@ -1,7 +1,7 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.9.12](https://img.shields.io/badge/Version-0.9.12-informational?style=flat-square)
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-single)
+ ![Version: 0.9.16](https://img.shields.io/badge/Version-0.9.16-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -120,6 +120,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.containerWorkingDir | string | `""` | Container workdir |
 | server.enabled | bool | `true` | Enable deployment of server component. Deployed as StatefulSet |
 | server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| server.envFrom | list | `[]` |  |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
@@ -131,7 +132,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | server.image.repository | string | `"victoriametrics/victoria-metrics"` | Image repository |
-| server.image.tag | string | `"v1.95.1"` | Image tag |
+| server.image.tag | string | `"v1.99.0"` | Image tag |
 | server.ingress.annotations | object | `{}` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
@@ -215,7 +216,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | server.vmbackupmanager.extraVolumeMounts | list | `[]` |  |
 | server.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| server.vmbackupmanager.image.tag | string | `"v1.95.1-enterprise"` | vmbackupmanager image tag |
+| server.vmbackupmanager.image.tag | string | `"v1.99.0-enterprise"` | vmbackupmanager image tag |
 | server.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
 | server.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
 | server.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |

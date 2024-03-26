@@ -4,6 +4,107 @@
 
 - TODO
 
+## 0.29.3
+
+**Release date:** 2024-03-12
+
+![AppVersion: 0.42.3](https://img.shields.io/static/v1?label=AppVersion&message=0.42.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- TODO
+
+## 0.29.2
+
+**Release date:** 2024-03-06
+
+![AppVersion: 0.42.2](https://img.shields.io/static/v1?label=AppVersion&message=0.42.2&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.42.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.42.2)
+
+## 0.29.0
+
+**Release date:** 2024-03-06
+
+![AppVersion: 0.42.1](https://img.shields.io/static/v1?label=AppVersion&message=0.42.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+
+- bump version of VM operator to [0.42.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.42.1)
+
+## 0.29.0
+
+**Release date:** 2024-03-04
+
+![AppVersion: 0.42.0](https://img.shields.io/static/v1?label=AppVersion&message=0.42.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.42.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.42.0)
+
+
+## 0.28.1
+
+**Release date:** 2024-02-21
+
+![AppVersion: 0.41.2](https://img.shields.io/static/v1?label=AppVersion&message=0.41.2&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.41.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.41.2)
+
+## 0.28.0
+
+**Release date:** 2024-02-09
+
+![AppVersion: 0.41.1](https://img.shields.io/static/v1?label=AppVersion&message=0.41.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Update victoriametrics CRD resources yaml.
+
+## 0.27.11
+
+**Release date:** 2024-02-01
+
+![AppVersion: 0.41.1](https://img.shields.io/static/v1?label=AppVersion&message=0.41.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.41.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.41.1)
+
+## 0.27.10
+
+**Release date:** 2024-01-24
+
+![AppVersion: 0.40.0](https://img.shields.io/static/v1?label=AppVersion&message=0.40.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Bump operator version to [0.40.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.40.0)
+
+## 0.27.9
+
+**Release date:** 2023-12-12
+
+![AppVersion: 0.39.4](https://img.shields.io/static/v1?label=AppVersion&message=0.39.4&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.39.4](https://github.com/VictoriaMetrics/operator/releases/tag/v0.39.4)
+
+## 0.27.8
+
+**Release date:** 2023-12-08
+
+![AppVersion: 0.39.3](https://img.shields.io/static/v1?label=AppVersion&message=0.39.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Sync CRD resources with operator [v0.39.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.39.3).
+
+## 0.27.7
+
+**Release date:** 2023-12-08
+
+![AppVersion: 0.39.3](https://img.shields.io/static/v1?label=AppVersion&message=0.39.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Skip deleting victoriametrics CRD resources when uninstall release.
+
 ## 0.27.6
 
 **Release date:** 2023-11-16
