@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- added ability to use slice variables in extraArgs
 
 ## 0.4.7
 
