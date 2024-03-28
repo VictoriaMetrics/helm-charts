@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- support adding `metricRelabelings` for server serviceMonitor (#946)
 
 ## 0.3.5
 
