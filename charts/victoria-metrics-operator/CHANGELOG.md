@@ -2,7 +2,7 @@
 
 ## Next release
 
-- added ability to use slice variables in extraArgs
+- added ability to use slice variables in extraArgs (#944)
 
 ## 0.29.3
 

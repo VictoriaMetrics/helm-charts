@@ -2,7 +2,8 @@
 
 ## Next release
 
-- added ability to use slice variables in extraArgs
+- added ability to use slice variables in extraArgs (#944)
+- support adding `metricRelabelings` for server serviceMonitor (#946)
 
 ## 0.4.7
 
