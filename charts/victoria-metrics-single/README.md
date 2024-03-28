@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.9.16](https://img.shields.io/badge/Version-0.9.16-informational?style=flat-square)
+ ![Version: 0.9.17](https://img.shields.io/badge/Version-0.9.17-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus

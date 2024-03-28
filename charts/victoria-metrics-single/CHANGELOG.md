@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.9.17
+
+**Release date:** 2024-03-28
+
+![AppVersion: v1.99.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.99.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - added ability to use slice variables in extraArgs (#944)
 - support adding `metricRelabelings` for server serviceMonitor (#946)
 
