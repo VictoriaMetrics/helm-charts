@@ -62,6 +62,10 @@ charts = [
         'destination': '../templates/rules',
     },
     {
+        'source': 'https://raw.githubusercontent.com/VictoriaMetrics/operator/master/config/alerting/vmoperator-rules.yaml',
+        'destination': '../templates/rules',
+    },
+    {
         'source': 'https://etcd.io/docs/v3.4/op-guide/etcd3_alert.rules.yml',
         'destination': '../templates/rules',
     }
@@ -108,7 +112,8 @@ condition_map = {
     'alertmanager.rules': '.Values.defaultRules.rules.alertmanager',
     'vmcluster': '.Values.defaultRules.rules.vmcluster',
     'vmsingle': '.Values.defaultRules.rules.vmsingle',
-    'vm-health': '.Values.defaultRules.rules.vmhealth'
+    'vm-health': '.Values.defaultRules.rules.vmhealth',
+    'vmoperator': '.Values.defaultRules.rules.vmoperator',
 }
 
 alert_condition_map = {

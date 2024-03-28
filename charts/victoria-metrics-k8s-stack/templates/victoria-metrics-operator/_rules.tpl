@@ -40,4 +40,5 @@ rules:
   - "vmcluster"
   - "vmsingle"
   - "vm-health"
+  - "vmoperator"
 {{- end }}

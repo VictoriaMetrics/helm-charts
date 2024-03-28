@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Add alerting rules for VictoriaMetrics operator.
+- Updated alerting rules for VictoriaMetrics components.
 
 ## 0.19.4
 
