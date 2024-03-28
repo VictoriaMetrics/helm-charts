@@ -180,6 +180,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | vminsert.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object |
 | vminsert.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
+| vminsert.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
 | vminsert.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vminsert.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vminsert.strategy | object | `{}` |  |
@@ -256,6 +257,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | vmselect.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operator object |
 | vmselect.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
+| vmselect.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
 | vmselect.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vmselect.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vmselect.statefulSet.enabled | bool | `false` | Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data. |
@@ -296,6 +298,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
 | vmstorage.persistentVolume.labels | object | `{}` | Persistent volume labels |
 | vmstorage.persistentVolume.mountPath | string | `"/storage"` | Data root path. Vmstorage data Persistent Volume mount root path |
+| vmstorage.persistentVolume.name | string | `"vmstorage-volume"` |  |
 | vmstorage.persistentVolume.size | string | `"8Gi"` | Size of the volume. |
 | vmstorage.persistentVolume.storageClass | string | `""` | Storage class name. Will be empty if not setted |
 | vmstorage.persistentVolume.subPath | string | `""` | Mount subpath |
@@ -328,6 +331,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | vmstorage.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmstorage component. This is Prometheus operator object |
 | vmstorage.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
+| vmstorage.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
 | vmstorage.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vmstorage.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vmstorage.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
