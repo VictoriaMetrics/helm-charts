@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.6
+
+**Release date:** 2024-03-28
+
+![AppVersion: v0.5.0-victorialogs](https://img.shields.io/static/v1?label=AppVersion&message=v0.5.0-victorialogs&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - support adding `metricRelabelings` for server serviceMonitor (#946)
 
 ## 0.3.5
