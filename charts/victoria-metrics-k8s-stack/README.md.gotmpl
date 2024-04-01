@@ -143,6 +143,22 @@ Get the pods lists by running this commands:
 kubectl get pods -A | grep 'victoria-metrics'
 ```
 
+### Install locally (Minikube)
+
+To run VictoriaMetrics stack locally it's possible to use [Minikube](https://github.com/kubernetes/minikube). To avoid dashboards and alert rules issues please follow the steps below:
+
+Run Minikube cluster
+
+```
+minikube start --container-runtime=containerd --extra-config=scheduler.bind-address=0.0.0.0 --extra-config=controller-manager.bind-address=0.0.0.0 
+```
+
+Install helm chart
+
+```
+helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -f values.minikube.yaml -n NAMESPACE --debug --dry-run
+```
+
 ## How to uninstall
 
 Remove application with command.

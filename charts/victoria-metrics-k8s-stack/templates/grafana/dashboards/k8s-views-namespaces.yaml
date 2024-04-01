@@ -58,30 +58,36 @@ data:
                 "pluginName": "Prometheus"
             }
         ],
-        "__elements": [],
+        "__elements": {},
         "__requires": [
+            {
+                "type": "panel",
+                "id": "gauge",
+                "name": "Gauge",
+                "version": ""
+            },
             {
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "8.3.4"
+                "version": "10.3.1"
             },
             {
                 "type": "datasource",
                 "id": "prometheus",
                 "name": "Prometheus",
-                "version": "5.0.0"
-            },
-            {
-                "type": "panel",
-                "id": "timeseries",
-                "name": "Time series",
-                "version": ""
+                "version": "1.0.0"
             },
             {
                 "type": "panel",
                 "id": "stat",
                 "name": "Stat",
+                "version": ""
+            },
+            {
+                "type": "panel",
+                "id": "timeseries",
+                "name": "Time series",
                 "version": ""
             }
         ],
@@ -159,7 +165,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "percentunit"
+                        "unit": "percentunit",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -183,9 +190,10 @@ data:
                     },
                     "showThresholdLabels": false,
                     "showThresholdMarkers": true,
+                    "sizing": "auto",
                     "text": {}
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
@@ -233,7 +241,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "percentunit"
+                        "unit": "percentunit",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -257,9 +266,10 @@ data:
                     },
                     "showThresholdLabels": false,
                     "showThresholdMarkers": true,
+                    "sizing": "auto",
                     "text": {}
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
@@ -332,7 +342,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short"
+                        "unit": "short",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -495,7 +506,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "none"
+                        "unit": "none",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -518,11 +530,12 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
@@ -595,7 +608,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "bytes"
+                        "unit": "bytes",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -618,11 +632,12 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.3.1",
                 "targets": [
                     {
                         "datasource": {
@@ -750,7 +765,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "none"
+                        "unit": "none",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -848,7 +864,8 @@ data:
                                 }
                             ]
                         },
-                        "unit": "bytes"
+                        "unit": "bytes",
+                        "unitScale": true
                     },
                     "overrides": []
                 },
@@ -942,8 +959,7 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green",
-                                    "value": null
+                                    "color": "green"
                                 },
                                 {
                                     "color": "red",
@@ -2186,7 +2202,7 @@ data:
             }
         ],
         "refresh": "30s",
-        "schemaVersion": 38,
+        "schemaVersion": 39,
         "tags": [
             "Kubernetes",
             "Prometheus",
@@ -2196,9 +2212,7 @@ data:
             "list": [
                 {
                     "current": {
-                        "selected": false,
-                        "text": "",
-                        "value": ""
+
                     },
                     "hide": 0,
                     "includeAll": false,
@@ -2216,10 +2230,7 @@ data:
                 },
                 {
                     "current": {
-                        "isNone": true,
-                        "selected": false,
-                        "text": "None",
-                        "value": ""
+
                     },
                     "datasource": {
                         "type": "prometheus",
@@ -2246,13 +2257,7 @@ data:
                 },
                 {
                     "current": {
-                        "selected": true,
-                        "text": [
-                            "monitoring"
-                        ],
-                        "value": [
-                            "monitoring"
-                        ]
+
                     },
                     "datasource": {
                         "type": "prometheus",
@@ -2328,9 +2333,7 @@ data:
                 },
                 {
                     "current": {
-                        "selected": false,
-                        "text": "All",
-                        "value": "$__all"
+
                     },
                     "datasource": {
                         "type": "prometheus",
@@ -2349,7 +2352,7 @@ data:
                         "query": "label_values(kube_pod_info{namespace=~\"$namespace\", container!=\"\", cluster=\"$cluster\"},created_by_name)",
                         "refId": "PrometheusVariableQueryEditor-VariableQuery"
                     },
-                    "refresh": 1,
+                    "refresh": 2,
                     "regex": "",
                     "skipUrlSync": false,
                     "sort": 1,
@@ -2367,7 +2370,7 @@ data:
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "Kubernetes / Views / Namespaces",
         "uid": "k8s_views_ns",
-        "version": 32,
+        "version": 34,
         "weekStart": ""
     }
 {{- end }}
