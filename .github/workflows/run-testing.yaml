@@ -92,4 +92,4 @@ jobs:
           kubectl create secret -n=${{ matrix.chart }}-testing generic vmanomaly-license --from-literal=license=$VMANOMALY_LICENSE_CICD
           helm dep update charts/${{ matrix.chart }}
           ct install --namespace=${{ matrix.chart }}-testing --config .github/ci/ct.yaml --charts "charts/${{ matrix.chart }}" --helm-extra-set-args "--values ./hack/helm/${{ matrix.chart }}.yaml" --skip-clean-up
-          helm template charts/${{ matrix.chart }} --values ./hack/helm/${{ matrix.chart }}.yaml | kubectl apply -f - --dry-run=server
+          helm template --namespace=${{ matrix.chart }}-testing charts/${{ matrix.chart }} --values ./hack/helm/${{ matrix.chart }}.yaml | kubectl apply -f - --dry-run=server
