@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 1.2.2
+
+**Release date:** 2024-04-02
+
+![AppVersion: v1.12.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.12.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - apply [v1.12](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1120) as a default (no config changes).
 
 ## 1.2.1
