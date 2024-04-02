@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- apply [v1.12](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1120) as a default (no config changes).
 
 ## 1.2.1
 
