@@ -58,25 +58,25 @@ data:
                 "pluginName": "Prometheus"
             }
         ],
-        "__elements": [],
+        "__elements": {},
         "__requires": [
+            {
+                "type": "panel",
+                "id": "bargauge",
+                "name": "Bar gauge",
+                "version": ""
+            },
             {
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "8.3.4"
+                "version": "10.3.1"
             },
             {
                 "type": "datasource",
                 "id": "prometheus",
                 "name": "Prometheus",
-                "version": "5.0.0"
-            },
-            {
-                "type": "panel",
-                "id": "timeseries",
-                "name": "Time series",
-                "version": ""
+                "version": "1.0.0"
             },
             {
                 "type": "panel",
@@ -86,8 +86,8 @@ data:
             },
             {
                 "type": "panel",
-                "id": "gauge",
-                "name": "Gauge",
+                "id": "timeseries",
+                "name": "Time series",
                 "version": ""
             }
         ],
@@ -176,6 +176,7 @@ data:
                 "id": 77,
                 "options": {
                     "displayMode": "lcd",
+                    "maxVizHeight": 300,
                     "minVizHeight": 10,
                     "minVizWidth": 0,
                     "namePlacement": "auto",
@@ -188,9 +189,10 @@ data:
                         "values": false
                     },
                     "showUnfilled": true,
+                    "sizing": "auto",
                     "valueMode": "color"
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
@@ -201,9 +203,23 @@ data:
                         "exemplar": true,
                         "expr": "avg(sum by (instance, cpu) (rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\", cluster=\"$cluster\"}[$__rate_interval])))",
                         "interval": "",
-                        "legendFormat": "Real",
+                        "legendFormat": "Real Linux",
                         "range": true,
-                        "refId": "A"
+                        "refId": "Real Linux"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "avg(sum by (core) (rate(windows_cpu_time_total{mode!=\"idle\", cluster=\"$cluster\"}[$__rate_interval])))",
+                        "hide": false,
+                        "interval": "",
+                        "legendFormat": "Real Windows",
+                        "range": true,
+                        "refId": "Real Windows"
                     },
                     {
                         "datasource": {
@@ -215,7 +231,7 @@ data:
                         "hide": false,
                         "legendFormat": "Requests",
                         "range": true,
-                        "refId": "B"
+                        "refId": "Requests"
                     },
                     {
                         "datasource": {
@@ -227,10 +243,45 @@ data:
                         "hide": false,
                         "legendFormat": "Limits",
                         "range": true,
-                        "refId": "C"
+                        "refId": "Limits"
                     }
                 ],
                 "title": "Global CPU  Usage",
+                "transformations": [
+                    {
+                        "id": "calculateField",
+                        "options": {
+                            "alias": "Real",
+                            "mode": "reduceRow",
+                            "reduce": {
+                                "include": [
+                                    "Real Linux",
+                                    "Real Windows"
+                                ],
+                                "reducer": "mean"
+                            }
+                        }
+                    },
+                    {
+                        "id": "organize",
+                        "options": {
+                            "excludeByName": {
+                                "Real Linux": true,
+                                "Real Windows": true,
+                                "Time": true
+                            },
+                            "indexByName": {
+                                "Limits": 5,
+                                "Real": 1,
+                                "Real Linux": 2,
+                                "Real Windows": 3,
+                                "Requests": 4,
+                                "Time": 0
+                            },
+                            "renameByName": {}
+                        }
+                    }
+                ],
                 "type": "bargauge"
             },
             {
@@ -273,6 +324,7 @@ data:
                 "id": 78,
                 "options": {
                     "displayMode": "lcd",
+                    "maxVizHeight": 300,
                     "minVizHeight": 10,
                     "minVizWidth": 0,
                     "namePlacement": "auto",
@@ -285,10 +337,11 @@ data:
                         "values": false
                     },
                     "showUnfilled": true,
+                    "sizing": "auto",
                     "text": {},
                     "valueMode": "color"
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
@@ -298,10 +351,24 @@ data:
                         "editorMode": "code",
                         "exemplar": true,
                         "expr": "sum(node_memory_MemTotal_bytes{cluster=\"$cluster\"} - node_memory_MemAvailable_bytes{cluster=\"$cluster\"}) / sum(node_memory_MemTotal_bytes{cluster=\"$cluster\"})",
+                        "hide": false,
                         "interval": "",
-                        "legendFormat": "Real",
+                        "legendFormat": "Real Linux",
                         "range": true,
-                        "refId": "A"
+                        "refId": "Real Linux"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(windows_memory_available_bytes{cluster=\"$cluster\"} + windows_memory_cache_bytes{cluster=\"$cluster\"}) / sum(windows_os_visible_memory_bytes{cluster=\"$cluster\"})",
+                        "interval": "",
+                        "legendFormat": "Real Windows",
+                        "range": true,
+                        "refId": "Real Windows"
                     },
                     {
                         "datasource": {
@@ -313,7 +380,7 @@ data:
                         "hide": false,
                         "legendFormat": "Requests",
                         "range": true,
-                        "refId": "B"
+                        "refId": "Requests"
                     },
                     {
                         "datasource": {
@@ -325,10 +392,46 @@ data:
                         "hide": false,
                         "legendFormat": "Limits",
                         "range": true,
-                        "refId": "C"
+                        "refId": "Limits"
                     }
                 ],
                 "title": "Global RAM Usage",
+                "transformations": [
+                    {
+                        "id": "calculateField",
+                        "options": {
+                            "alias": "Real",
+                            "mode": "reduceRow",
+                            "reduce": {
+                                "include": [
+                                    "Real Linux",
+                                    "Real Windows"
+                                ],
+                                "reducer": "mean"
+                            }
+                        }
+                    },
+                    {
+                        "id": "organize",
+                        "options": {
+                            "excludeByName": {
+                                "Real Linux": true,
+                                "Real Windows": true,
+                                "Time": true
+                            },
+                            "includeByName": {},
+                            "indexByName": {
+                                "Limits": 5,
+                                "Real": 3,
+                                "Real Linux": 1,
+                                "Real Windows": 2,
+                                "Requests": 4,
+                                "Time": 0
+                            },
+                            "renameByName": {}
+                        }
+                    }
+                ],
                 "type": "bargauge"
             },
             {
@@ -371,21 +474,24 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
                     "textMode": "value",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
                             "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": true,
                         "expr": "count(count by (node) (kube_node_info{cluster=\"$cluster\"}))",
                         "interval": "",
                         "legendFormat": "",
+                        "range": true,
                         "refId": "A"
                     }
                 ],
@@ -676,11 +782,12 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
                     "textMode": "value",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
@@ -737,11 +844,12 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
@@ -752,9 +860,23 @@ data:
                         "exemplar": true,
                         "expr": "sum(rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\", cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "",
-                        "legendFormat": "Real",
+                        "legendFormat": "Real Linux",
                         "range": true,
-                        "refId": "A"
+                        "refId": "Real Linux"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(rate(windows_cpu_time_total{mode!=\"idle\", cluster=\"$cluster\"}[$__rate_interval]))",
+                        "hide": false,
+                        "interval": "",
+                        "legendFormat": "Real Windows",
+                        "range": true,
+                        "refId": "Real Windows"
                     },
                     {
                         "datasource": {
@@ -766,7 +888,7 @@ data:
                         "hide": false,
                         "legendFormat": "Requests",
                         "range": true,
-                        "refId": "B"
+                        "refId": "Requests"
                     },
                     {
                         "datasource": {
@@ -778,7 +900,7 @@ data:
                         "hide": false,
                         "legendFormat": "Limits",
                         "range": true,
-                        "refId": "C"
+                        "refId": "Limits"
                     },
                     {
                         "datasource": {
@@ -790,10 +912,50 @@ data:
                         "hide": false,
                         "legendFormat": "Total",
                         "range": true,
-                        "refId": "D"
+                        "refId": "Total"
                     }
                 ],
                 "title": "CPU Usage",
+                "transformations": [
+                    {
+                        "id": "calculateField",
+                        "options": {
+                            "alias": "Real",
+                            "mode": "reduceRow",
+                            "reduce": {
+                                "include": [
+                                    "Real Linux",
+                                    "Real Windows"
+                                ],
+                                "reducer": "sum"
+                            }
+                        }
+                    },
+                    {
+                        "id": "organize",
+                        "options": {
+                            "excludeByName": {
+                                "Real Linux": true,
+                                "Real Windows": true,
+                                "Time": true,
+                                "Total Linux": true,
+                                "Total Windows": true
+                            },
+                            "indexByName": {
+                                "Limits": 5,
+                                "Real": 3,
+                                "Real Linux": 1,
+                                "Real Windows": 2,
+                                "Requests": 4,
+                                "Time": 0,
+                                "Total": 8,
+                                "Total Linux": 6,
+                                "Total Windows": 7
+                            },
+                            "renameByName": {}
+                        }
+                    }
+                ],
                 "type": "stat"
             },
             {
@@ -837,11 +999,12 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
@@ -852,9 +1015,23 @@ data:
                         "exemplar": true,
                         "expr": "sum(node_memory_MemTotal_bytes{cluster=\"$cluster\"} - node_memory_MemAvailable_bytes{cluster=\"$cluster\"})",
                         "interval": "",
-                        "legendFormat": "Real",
+                        "legendFormat": "Real Linux",
                         "range": true,
-                        "refId": "A"
+                        "refId": "Real Linux"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(windows_os_visible_memory_bytes{cluster=\"$cluster\"} - windows_memory_available_bytes{cluster=\"$cluster\"} - windows_memory_cache_bytes{cluster=\"$cluster\"})",
+                        "hide": false,
+                        "interval": "",
+                        "legendFormat": "Real Windows",
+                        "range": true,
+                        "refId": "Real Windows"
                     },
                     {
                         "datasource": {
@@ -866,7 +1043,7 @@ data:
                         "hide": false,
                         "legendFormat": "Requests",
                         "range": true,
-                        "refId": "B"
+                        "refId": "Requests"
                     },
                     {
                         "datasource": {
@@ -878,7 +1055,7 @@ data:
                         "hide": false,
                         "legendFormat": "Limits",
                         "range": true,
-                        "refId": "C"
+                        "refId": "Limits"
                     },
                     {
                         "datasource": {
@@ -890,10 +1067,47 @@ data:
                         "hide": false,
                         "legendFormat": "Total",
                         "range": true,
-                        "refId": "D"
+                        "refId": "Total"
                     }
                 ],
                 "title": "RAM Usage",
+                "transformations": [
+                    {
+                        "id": "calculateField",
+                        "options": {
+                            "alias": "Real",
+                            "mode": "reduceRow",
+                            "reduce": {
+                                "include": [
+                                    "Real Linux",
+                                    "Real Windows"
+                                ],
+                                "reducer": "mean"
+                            }
+                        }
+                    },
+                    {
+                        "id": "organize",
+                        "options": {
+                            "excludeByName": {
+                                "Real Linux": true,
+                                "Real Windows": true,
+                                "Time": true
+                            },
+                            "includeByName": {},
+                            "indexByName": {
+                                "Limits": 5,
+                                "Real": 3,
+                                "Real Linux": 1,
+                                "Real Windows": 2,
+                                "Requests": 4,
+                                "Time": 0,
+                                "Total": 6
+                            },
+                            "renameByName": {}
+                        }
+                    }
+                ],
                 "type": "stat"
             },
             {
@@ -936,11 +1150,12 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
                     "textMode": "value",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
@@ -1068,14 +1283,43 @@ data:
                             "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": true,
                         "expr": "avg(sum by (instance, cpu) (rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\", cluster=\"$cluster\"}[$__rate_interval])))",
                         "interval": "$resolution",
-                        "legendFormat": "CPU usage in %",
-                        "refId": "A"
+                        "legendFormat": "Linux",
+                        "range": true,
+                        "refId": "Linux"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "1 - avg(rate(windows_cpu_time_total{cluster=\"$cluster\",mode=\"idle\"}[$__rate_interval]))",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "Windows",
+                        "range": true,
+                        "refId": "Windows"
                     }
                 ],
                 "title": "Cluster CPU Utilization",
+                "transformations": [
+                    {
+                        "id": "calculateField",
+                        "options": {
+                            "alias": "CPU usage in %",
+                            "mode": "reduceRow",
+                            "reduce": {
+                                "reducer": "mean"
+                            },
+                            "replaceFields": true
+                        }
+                    }
+                ],
                 "type": "timeseries"
             },
             {
@@ -1177,12 +1421,39 @@ data:
                         "exemplar": true,
                         "expr": "sum(node_memory_MemTotal_bytes{cluster=\"$cluster\"} - node_memory_MemAvailable_bytes{cluster=\"$cluster\"}) / sum(node_memory_MemTotal_bytes{cluster=\"$cluster\"})",
                         "interval": "$resolution",
-                        "legendFormat": "Memory usage in %",
+                        "legendFormat": "Linux",
                         "range": true,
-                        "refId": "A"
+                        "refId": "Linux"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(windows_os_visible_memory_bytes{cluster=\"$cluster\"} - windows_memory_available_bytes{cluster=\"$cluster\"}) / sum(windows_os_visible_memory_bytes{cluster=\"$cluster\"})",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "Windows",
+                        "range": true,
+                        "refId": "Windows"
                     }
                 ],
                 "title": "Cluster Memory Utilization",
+                "transformations": [
+                    {
+                        "id": "calculateField",
+                        "options": {
+                            "alias": "Memory usage in %",
+                            "mode": "reduceRow",
+                            "reduce": {
+                                "reducer": "mean"
+                            },
+                            "replaceFields": true
+                        }
+                    }
+                ],
                 "type": "timeseries"
             },
             {
@@ -1274,17 +1545,21 @@ data:
                         "sort": "none"
                     }
                 },
-                "pluginVersion": "8.3.3",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
                             "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (namespace)",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (namespace)\n+ on (namespace)\n(sum(rate(windows_container_cpu_usage_seconds_total{container_id!=\"\", cluster=\"$cluster\"}[$__rate_interval]) * on (container_id) group_left (container, pod, namespace) max by ( container, container_id, pod, namespace) (kube_pod_container_info{container_id!=\"\", cluster=\"$cluster\"}) OR kube_namespace_created{cluster=\"$cluster\"} * 0) by (namespace))",
+                        "format": "time_series",
+                        "hide": false,
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} namespace {{`}}`}}",
+                        "range": true,
                         "refId": "A"
                     }
                 ],
@@ -1383,10 +1658,12 @@ data:
                             "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(container_memory_working_set_bytes{image!=\"\", cluster=\"$cluster\"}) by (namespace)",
+                        "expr": "sum(container_memory_working_set_bytes{image!=\"\", cluster=\"$cluster\"}) by (namespace)\n+ on (namespace)\n(sum(windows_container_memory_usage_commit_bytes{container_id!=\"\", cluster=\"$cluster\"} * on (container_id) group_left (container, pod, namespace) max by ( container, container_id, pod, namespace) (kube_pod_container_info{container_id!=\"\", cluster=\"$cluster\"}) OR kube_namespace_created{cluster=\"$cluster\"} * 0) by (namespace))",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} namespace {{`}}`}}",
+                        "range": true,
                         "refId": "A"
                     }
                 ],
@@ -1404,6 +1681,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "CPU %",
@@ -1417,6 +1695,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -1439,7 +1718,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -1483,11 +1763,27 @@ data:
                             "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
+                        "editorMode": "code",
                         "exemplar": true,
                         "expr": "avg(sum by (instance, cpu) (rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\", cluster=\"$cluster\"}[$__rate_interval]))) by (instance)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} node {{`}}`}}",
-                        "refId": "A"
+                        "range": true,
+                        "refId": "Linux"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "avg(sum by (instance,core) (rate(windows_cpu_time_total{mode!=\"idle\", cluster=\"$cluster\"}[$__rate_interval]))) by (instance)",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "{{`{{`}} node {{`}}`}}",
+                        "range": true,
+                        "refId": "Windows"
                     }
                 ],
                 "title": "CPU Utilization by instance",
@@ -1504,6 +1800,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "MEMORY",
@@ -1517,6 +1814,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -1538,7 +1836,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -1585,10 +1884,25 @@ data:
                         "editorMode": "code",
                         "exemplar": true,
                         "expr": "sum(node_memory_MemTotal_bytes{cluster=\"$cluster\"} - node_memory_MemAvailable_bytes{cluster=\"$cluster\"}) by (instance)",
+                        "hide": false,
                         "interval": "$resolution",
-                        "legendFormat": "{{`{{`}} node{{`}}`}}",
+                        "legendFormat": "{{`{{`}} instance {{`}}`}}",
                         "range": true,
-                        "refId": "A"
+                        "refId": "Linux"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(windows_os_visible_memory_bytes{cluster=\"$cluster\"} - windows_memory_available_bytes{cluster=\"$cluster\"}) by (instance)",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "{{`{{`}} instance {{`}}`}}",
+                        "range": true,
+                        "refId": "Windows"
                     }
                 ],
                 "title": "Memory Utilization by instance",
@@ -1606,6 +1920,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "SECONDS",
@@ -1619,6 +1934,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineStyle": {
                                 "fill": "solid"
@@ -1644,7 +1960,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -1712,6 +2029,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "NB",
@@ -1725,6 +2043,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineStyle": {
                                 "fill": "solid"
@@ -1750,7 +2069,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -1830,6 +2150,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -1843,6 +2164,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -1864,7 +2186,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -1943,6 +2266,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -1956,6 +2280,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -1977,7 +2302,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2045,6 +2371,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -2058,6 +2385,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -2079,7 +2407,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2147,6 +2476,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -2160,6 +2490,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -2181,7 +2512,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2266,6 +2598,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "BANDWIDTH",
@@ -2279,6 +2612,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -2300,7 +2634,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2340,11 +2675,11 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(node_network_receive_bytes_total{device!~\"lxc.*|veth.*\", cluster=\"$cluster\"}[$__rate_interval])) by (device)",
+                        "expr": "sum(rate(node_network_receive_bytes_total{device!~\"(veth|azv|lxc).*\", cluster=\"$cluster\"}[$__rate_interval])) by (device)",
                         "interval": "$resolution",
                         "legendFormat": "Received : {{`{{`}} device {{`}}`}}",
                         "range": true,
-                        "refId": "A"
+                        "refId": "Linux Received"
                     },
                     {
                         "datasource": {
@@ -2353,11 +2688,39 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "- sum(rate(node_network_transmit_bytes_total{device!~\"lxc.*|veth.*\", cluster=\"$cluster\"}[$__rate_interval]))  by (device)",
+                        "expr": "- sum(rate(node_network_transmit_bytes_total{device!~\"(veth|azv|lxc).*\", cluster=\"$cluster\"}[$__rate_interval])) by (device)",
                         "interval": "$resolution",
                         "legendFormat": "Transmitted : {{`{{`}} device {{`}}`}}",
                         "range": true,
-                        "refId": "B"
+                        "refId": "Linux Transmitted"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(rate(windows_net_bytes_received_total{cluster=\"$cluster\"}[$__rate_interval])) by (nic)",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "Received : {{`{{`}} nic {{`}}`}}",
+                        "range": true,
+                        "refId": "Windows Received"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "- sum(rate(windows_net_bytes_sent_total{cluster=\"$cluster\"}[$__rate_interval])) by (nic)",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "Transmitted : {{`{{`}} device {{`}}`}}",
+                        "range": true,
+                        "refId": "Windows Transmitted"
                     }
                 ],
                 "title": "Global Network Utilization by device",
@@ -2374,6 +2737,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "DROPPED PACKETS",
@@ -2387,6 +2751,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -2408,7 +2773,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2450,9 +2816,9 @@ data:
                         "exemplar": true,
                         "expr": "sum(rate(node_network_receive_drop_total{cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
-                        "legendFormat": "Packets dropped (receive)",
+                        "legendFormat": "Linux Packets dropped (receive)",
                         "range": true,
-                        "refId": "A"
+                        "refId": "Linux Packets dropped (receive)"
                     },
                     {
                         "datasource": {
@@ -2463,12 +2829,85 @@ data:
                         "exemplar": true,
                         "expr": "- sum(rate(node_network_transmit_drop_total{cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
-                        "legendFormat": "Packets dropped (transmit)",
+                        "legendFormat": "Linux Packets dropped (transmit)",
                         "range": true,
-                        "refId": "B"
+                        "refId": "Linux Packets dropped (transmit)"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(rate(windows_net_packets_received_discarded_total{cluster=\"$cluster\"}[$__rate_interval]))",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "Windows Packets dropped (receive)",
+                        "range": true,
+                        "refId": "Windows Packets dropped (receive)"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "- sum(rate(windows_net_packets_outbound_discarded_total{cluster=\"$cluster\"}[$__rate_interval]))",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "Windows Packets dropped (transmit)",
+                        "range": true,
+                        "refId": "Windows Packets dropped (transmit)"
                     }
                 ],
                 "title": "Network Saturation - Packets dropped",
+                "transformations": [
+                    {
+                        "id": "calculateField",
+                        "options": {
+                            "alias": "Packets dropped (receive)",
+                            "mode": "reduceRow",
+                            "reduce": {
+                                "include": [
+                                    "Linux Packets dropped (receive)",
+                                    "Windows Packets dropped (receive)"
+                                ],
+                                "reducer": "mean"
+                            }
+                        }
+                    },
+                    {
+                        "id": "calculateField",
+                        "options": {
+                            "alias": "Packets dropped (transmit)",
+                            "mode": "reduceRow",
+                            "reduce": {
+                                "include": [
+                                    "Linux Packets dropped (transmit)",
+                                    "Windows Packets dropped (transmit)"
+                                ],
+                                "reducer": "mean"
+                            }
+                        }
+                    },
+                    {
+                        "id": "organize",
+                        "options": {
+                            "excludeByName": {
+                                "Linux Packets dropped (receive)": true,
+                                "Linux Packets dropped (transmit)": true,
+                                "Time": false,
+                                "Windows Packets dropped (receive)": true,
+                                "Windows Packets dropped (transmit)": true
+                            },
+                            "includeByName": {},
+                            "indexByName": {},
+                            "renameByName": {}
+                        }
+                    }
+                ],
                 "type": "timeseries"
             },
             {
@@ -2482,6 +2921,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "BANDWIDTH",
@@ -2495,6 +2935,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -2516,7 +2957,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2556,7 +2998,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(container_network_receive_bytes_total{cluster=\"$cluster\"}[$__rate_interval])) by (namespace)",
+                        "expr": "sum(rate(container_network_receive_bytes_total{cluster=\"$cluster\"}[$__rate_interval])) by (namespace)\n+ on (namespace)\n(sum(rate(windows_container_network_receive_bytes_total{container_id!=\"\", cluster=\"$cluster\"}[$__rate_interval]) * on (container_id) group_left (container, pod, namespace) max by ( container, container_id, pod, namespace) (kube_pod_container_info{container_id!=\"\", cluster=\"$cluster\"}) OR kube_namespace_created{cluster=\"$cluster\"} * 0) by (namespace))",
                         "interval": "$resolution",
                         "legendFormat": "Received : {{`{{`}} namespace {{`}}`}}",
                         "range": true,
@@ -2568,7 +3010,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
-                        "expr": "- sum(rate(container_network_transmit_bytes_total{cluster=\"$cluster\"}[$__rate_interval])) by (namespace)",
+                        "expr": "- (sum(rate(container_network_transmit_bytes_total{cluster=\"$cluster\"}[$__rate_interval])) by (namespace)\n+ on (namespace)\n(sum(rate(windows_container_network_transmit_bytes_total{container_id!=\"\", cluster=\"$cluster\"}[$__rate_interval]) * on (container_id) group_left (container, pod, namespace) max by ( container, container_id, pod, namespace) (kube_pod_container_info{container_id!=\"\", cluster=\"$cluster\"}) OR kube_namespace_created{cluster=\"$cluster\"} * 0) by (namespace)))",
                         "hide": false,
                         "interval": "$resolution",
                         "legendFormat": "Transmitted : {{`{{`}} namespace {{`}}`}}",
@@ -2590,6 +3032,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "BANDWIDTH",
@@ -2603,6 +3046,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -2624,7 +3068,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2668,7 +3113,7 @@ data:
                         "interval": "$resolution",
                         "legendFormat": "Received bytes in {{`{{`}} instance {{`}}`}}",
                         "range": true,
-                        "refId": "A"
+                        "refId": "Linux Received bytes"
                     },
                     {
                         "datasource": {
@@ -2681,7 +3126,34 @@ data:
                         "interval": "$resolution",
                         "legendFormat": "Transmitted bytes in {{`{{`}} instance {{`}}`}}",
                         "range": true,
-                        "refId": "B"
+                        "refId": "Linux Transmitted bytes"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(rate(windows_net_bytes_received_total{cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "Received bytes in {{`{{`}} instance {{`}}`}}",
+                        "range": true,
+                        "refId": "Windows Received bytes"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "expr": "- sum(rate(windows_net_bytes_sent_total{cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "Transmitted bytes in {{`{{`}} instance {{`}}`}}",
+                        "range": true,
+                        "refId": "Windows Transmitted bytes"
                     }
                 ],
                 "title": "Total Network Received (with all virtual devices) by instance",
@@ -2699,6 +3171,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "BANDWIDTH",
@@ -2712,6 +3185,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -2733,7 +3207,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2773,7 +3248,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(node_network_receive_bytes_total{device!~\"lxc.*|veth.*|lo\", cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
+                        "expr": "sum(rate(node_network_receive_bytes_total{device!~\"(veth|azv|lxc|lo).*\", cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
                         "interval": "$resolution",
                         "legendFormat": "Received bytes in {{`{{`}} instance {{`}}`}}",
                         "range": true,
@@ -2785,12 +3260,40 @@ data:
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
-                        "expr": "- sum(rate(node_network_transmit_bytes_total{device!~\"lxc.*|veth.*|lo\", cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
+                        "expr": "- sum(rate(node_network_transmit_bytes_total{device!~\"(veth|azv|lxc|lo).*\", cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
                         "hide": false,
                         "interval": "$resolution",
                         "legendFormat": "Transmitted bytes in {{`{{`}} instance {{`}}`}}",
                         "range": true,
                         "refId": "B"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(rate(windows_net_bytes_received_total{nic!~\".*Virtual.*\",cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "Received bytes in {{`{{`}} instance {{`}}`}}",
+                        "range": true,
+                        "refId": "C"
+                    },
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "${datasource}"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "- sum(rate(windows_net_bytes_sent_total{nic!~\".*Virtual.*\",cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
+                        "hide": false,
+                        "interval": "$resolution",
+                        "legendFormat": "Transmitted bytes in {{`{{`}} instance {{`}}`}}",
+                        "range": true,
+                        "refId": "D"
                     }
                 ],
                 "title": "Network Received (without loopback)  by instance",
@@ -2808,6 +3311,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "BANDWIDTH",
@@ -2821,6 +3325,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -2842,7 +3347,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2907,7 +3413,7 @@ data:
             }
         ],
         "refresh": "30s",
-        "schemaVersion": 38,
+        "schemaVersion": 39,
         "tags": [
             "Kubernetes",
             "Prometheus",
@@ -2937,10 +3443,7 @@ data:
                 },
                 {
                     "current": {
-                        "isNone": true,
-                        "selected": false,
-                        "text": "None",
-                        "value": ""
+
                     },
                     "datasource": {
                         "type": "prometheus",
@@ -3024,7 +3527,7 @@ data:
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "Kubernetes / Views / Global",
         "uid": "k8s_views_global",
-        "version": 36,
+        "version": 38,
         "weekStart": ""
     }
 {{- end }}

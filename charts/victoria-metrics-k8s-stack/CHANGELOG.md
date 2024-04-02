@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- upgraded dashboards and alerting rules, added values file for local (Minikube) setup
 
 ## 0.20.0
 
