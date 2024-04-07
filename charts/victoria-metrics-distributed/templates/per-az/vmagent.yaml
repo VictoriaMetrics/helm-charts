@@ -1,0 +1,42 @@
+{{- $top := . -}}
+{{- range $zone := .Values.availabilityZones }}
+{{- if $zone.vmagent.enabled }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAgent
+metadata:
+  labels: {{ include "victoria-metrics-distributed.labels" $top | nindent 4 }}
+  {{- with $zone.vmagent.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end  }}
+  name: {{ $zone.vmagent.name }}-{{ $zone.name }}
+  namespace: {{ $top.Release.Namespace }}
+spec:
+{{- if and $zone.vmagent.spec $zone.vmagent.spec.remoteWrite }}
+{{- fail "Error: distributed vmagent doesn't support customized remoteWrite address" }}
+{{- end }}
+{{- $nodeSelector := deepCopy $zone.nodeSelector }}
+{{- if and $zone.vmagent.spec $zone.vmagent.spec.nodeSelector }}
+{{- $nodeSelector = mergeOverwrite (deepCopy $zone.nodeSelector) $zone.vmagent.spec.nodeSelector }}
+{{- end }}
+  nodeSelector:
+{{- toYaml $nodeSelector | nindent 4 }}
+{{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
+{{- if and $zone.vmagent.spec $zone.vmagent.spec.topologySpreadConstraints }}
+{{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmagent.spec.topologySpreadConstraints }}
+{{- end }}
+  topologySpreadConstraints:
+{{- toYaml $topologySpreadConstraints | nindent 2 }}
+  remoteWrite:
+{{- default "{}" (include "per-zone-vmagent.remoteWriteAddr" $top) }}
+  remoteWriteSettings:
+    useMultiTenantMode: true
+{{- $spec := deepCopy $zone.vmagent.spec }}
+{{- $spec := unset $spec "nodeSelector" }}
+{{- $spec := unset $spec "topologySpreadConstraints" }}
+{{- if $spec }}
+{{- toYaml $spec | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
