@@ -25,7 +25,7 @@ Per availability zone components:
 2. vmauth-ingest: performs l`east_loaded` policy for spreading requests to vminsert instances located in the same availability zone.
 3. vmcluster: supports different setup per availability zone.
 4. vmauth-query: performs `least_loaded` policy for spreading requests to vmselect instances located in the same availability zone.
-5. vmauth-query-cross-az: performs `first_available` policy on vmselect instances of all the availability zones, prefers "local" vmselect to reduce cross zone traffic.
+5. vmauth-query-cross-az: performs `first_available` policy on vmselect instances of all the availability zones, prefers "local" vmselect to reduce cross zone network traffic.
 
 Global components:
 1. vmagent: an extra vmagent to scrape targets and remote write to `vmauth-global-ingest`.
@@ -49,13 +49,13 @@ For example, set up vmcluster with two vminsert&vmstorage&vmselect instances and
         whenUnsatisfiable: DoNotSchedule
 ```
 Then each zone has a complete set of vminsert&vmstorage&vmselect, vmcluster can still serve write and query requests when one zone failure.
-But VictoriaMetrics components themselves don't support zone-awareness, means in the above example, if you have more than two vmstorage nodes and `replicationFactor=2`, vmstorage can't ensure that duplicated data written to vmstorage instances on different availability zone, thus data could be incomplete when one availability zone is down.
-2. use `victoria-metrics-distributed` chart, set up vmcluster for each availability zone, use the global write entrance to ingest data and the global query entrance to query.
+But VictoriaMetrics components themselves don't support zone-awareness, means in the above example, if you create more than two vmstorage nodes and `replicationFactor=2`, vmstorage can't ensure that duplicated data be written to vmstorage instances on different availability zone, thus data could be incomplete when one availability zone is down.
+2. use `victoria-metrics-distributed` chart here, set up separate vmcluster on each availability zone, write same data to all of them, and query from any of them.
 
 ### How to use multitenancy?
 
 By default, all the data that write to `vmauth-global-ingest` will be stored with tenant 0. If you want to write to different tenants, creating extra VMUser for `vmauth-global-ingest`.
-For example, ingesting data with tenant `1088` with follow steps:
+For example, ingest data under tenant `1088` with follow steps:
 1. create tenant VMUser for vmauth `vmauth-global-ingest` to use:
 ```
 apiVersion: operator.victoriametrics.com/v1beta1
@@ -97,7 +97,7 @@ Example command for writing the data using vmagent for above tenant 1088:
 
 ### How to roll out components?
 
-All the components under each availability zone can be configured separately, it's recommend to upgrade one zone at a time, stop ingesting and querying until upgrade is completed.
+All the components under each availability zone can be configured separately, it's recommend to upgrade one zone at a time, stop ingesting and querying until the upgrade is completed.
 ```
 availabilityZones:
   # stop ingest and query from zone-a until upgrade is completed
