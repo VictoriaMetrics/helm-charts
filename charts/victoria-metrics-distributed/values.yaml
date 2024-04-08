@@ -1,7 +1,7 @@
 # -- Overrides the chart's name. Used to change mimir/enterprise-metrics infix in the resource names. E.g. myRelease-mimir-ingester-1 to myRelease-nameOverride-ingester-1.
 # This option is used to align resource names with Cortex, when doing a migration from Cortex to Grafana Mimir.
 # Note: Grafana provided dashboards rely on the default naming and will need changes.
-nameOverride: ""
+nameOverride: "vm-distributed"
 
 # -- Overrides the chart's computed fullname. Used to change the full prefix of resource names. E.g. myRelease-mimir-ingester-1 to fullnameOverride-ingester-1.
 # Note: Grafana provided dashboards rely on the default naming and will need changes.
@@ -10,13 +10,13 @@ fullnameOverride: ""
 # set up a vmauth as the write entrypoint
 vmauthIngestGlobal:
   enabled: true
-  name: vmauth-global-ingest
+  name: ""
   spec: {}
 
 # set up a vmauth as the query entrypoint
 vmauthQueryGlobal:
   enabled: true
-  name: vmauth-global-query
+  name: ""
   spec: {}
 
 # config per availability zone components, including vmagent, vmcluster, vmauth etc
@@ -37,7 +37,8 @@ availabilityZones:
         whenUnsatisfiable: ScheduleAnyway
     vmauthIngest:
       enabled: true
-      name: vmauth-ingest
+      # override the name of the vmauth object
+      name: ""
       spec:
         image:
           tag: v1.100.0
@@ -47,23 +48,24 @@ availabilityZones:
           discoverBackendIPs: "true"
     vmauthQueryPerZone:
       enabled: true
-      name: vmauth-query
+      name: ""
       spec: {}
     # set up a vmauth with all the zone with `allowQuery: true` as query backends
     vmauthCrossAZQuery:
       enabled: true
-      name: vmauth-query-cross-az
+      name: ""
       spec: {}
     # vmagent here only meant to proxy write requests to each az,
     # doesn't support customized remote write address
     vmagent:
       enabled: true
-      name: vmagent
+      name: ""
       annotations: {}
       spec: {}
         # nodeSelector: {}
     vmcluster:
       enabled: true
+      name: ""
       # spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api.html#vmclusterspec
       spec:
         retentionPeriod: "14"
@@ -71,11 +73,7 @@ availabilityZones:
         vmstorage:
           replicaCount: 2
           storageDataPath: "/vm-data"
-          resources:
-            {}
-            # limits:
-            #   cpu: "1"
-            #   memory: 1500Mi
+          resources: {}
         vmselect:
           replicaCount: 2
           extraArgs: {}
@@ -103,7 +101,7 @@ availabilityZones:
         whenUnsatisfiable: ScheduleAnyway
     vmauthIngest:
       enabled: true
-      name: vmauth-ingest
+      name: ""
       spec:
         image:
           tag: v1.100.0
@@ -113,7 +111,7 @@ availabilityZones:
           discoverBackendIPs: "true"
     vmauthQueryPerZone:
       enabled: true
-      name: vmauth-query
+      name: ""
       spec: {}
     vmauthCrossAZQuery:
       enabled: true
@@ -123,11 +121,12 @@ availabilityZones:
     # doesn't support customized remote write address
     vmagent:
       enabled: true
-      name: vmagent
+      name: vmagent-zone-b
       annotations: {}
       spec: {}
     vmcluster:
       enabled: true
+      name: ""
       annotations: {}
       spec:
         retentionPeriod: "14"
@@ -136,9 +135,6 @@ availabilityZones:
           replicaCount: 1
           resources:
             {}
-            # limits:
-            #   cpu: "1"
-            #   memory: 1500Mi
         vmselect:
           replicaCount: 1
         vminsert:
@@ -161,7 +157,6 @@ availabilityZones:
   #       whenUnsatisfiable: ScheduleAnyway
   #   vmauthIngest:
   #     enabled: true
-  #     name: vmauth-ingest
   #     spec:
   #       extraArgs:
   #         # start from v1.100.0, vmauth can discover backend IPs via periodic DNS,
@@ -169,18 +164,15 @@ availabilityZones:
   #         discoverBackendIPs: "true"
   #   vmauthQueryPerZone:
   #     enabled: true
-  #     name: vmauth-query
   #     spec: {}
   #   # set up a vmauth with all the zone with `allowQuery: true` as query backends
   #   vmauthCrossAZQuery:
   #     enabled: true
-  #     name: vmauth-query-cross-az
   #     spec: {}
   #   # vmagent here only meant to proxy write requests to each az,
   #   # doesn't support customized remote write address
   #   vmagent:
   #     enabled: true
-  #     name: vmagent
   #     annotations: {}
   #     spec: {}
   #       # nodeSelector: {}

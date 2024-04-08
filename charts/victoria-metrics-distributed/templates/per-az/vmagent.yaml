@@ -10,7 +10,7 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end  }}
-  name: {{ $zone.vmagent.name }}-{{ $zone.name }}
+  name: {{ $zone.vmagent.name | default (printf "vmagent-%s" $zone.name ) }}
   namespace: {{ $top.Release.Namespace }}
 spec:
 {{- if and $zone.vmagent.spec $zone.vmagent.spec.remoteWrite }}

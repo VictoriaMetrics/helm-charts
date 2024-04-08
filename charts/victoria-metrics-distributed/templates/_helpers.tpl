@@ -24,6 +24,20 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
+Create the name for global ingest vmauth
+*/}}
+{{- define "victoria-metrics-distributed.vmauthIngestGlobalName" -}}
+{{- .Values.vmauthIngestGlobal.name | default (printf "vmauth-global-ingest-%s" (include "victoria-metrics-distributed.fullname" .)) | trunc 63 }}
+{{- end }}
+
+{{/*
+Create the name for global query vmauth
+*/}}
+{{- define "victoria-metrics-distributed.vmauthQueryGlobalName" -}}
+{{- .Values.vmauthQueryGlobal.name | default (printf "vmauth-global-query-%s" (include "victoria-metrics-distributed.fullname" .)) | trunc 63 }}
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "victoria-metrics-distributed.chart" -}}
@@ -68,7 +82,7 @@ Lists all the ingest vmauth addresss as remote write addresses for per zone vmag
 {{- define "per-zone-vmagent.remoteWriteAddr" -}}
 {{- range $zone := .Values.availabilityZones }}
 {{- if $zone.allowIngest }}
-{{ printf "- url: http://vmauth-%s-%s:8427" $zone.vmauthIngest.name $zone.name | indent 2 }}
+{{ printf "- url: http://vmauth-%s:8427" ( $zone.vmauthIngest.name | default (printf "vmauth-ingest-%s" $zone.name ) ) | indent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -128,7 +142,7 @@ Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstrai
 Gets global query entrance as grafana default datasource
 */}}
 {{- define "victoria-metrics-distributed.globalQueryAddr" -}}
-url: {{ printf "http://vmauth-%s.%s.svc:%s/select/0/prometheus/" .Values.vmauthQueryGlobal.name .Release.Namespace (.Values.vmauthQueryGlobal.spec.port | default "8427") }}
+url: {{ printf "http://vmauth-%s.%s.svc:%s/select/0/prometheus/" (include "victoria-metrics-distributed.vmauthQueryGlobalName" .) .Release.Namespace (.Values.vmauthQueryGlobal.spec.port | default "8427") }}
 {{- end }}
 
 
@@ -136,7 +150,6 @@ url: {{ printf "http://vmauth-%s.%s.svc:%s/select/0/prometheus/" .Values.vmauthQ
 Remote write spec for test-vmagent
 */}}
 {{- define "victoria-metrics-distributed.extravmagentSpec" -}}
-{{- $remoteWriteSpec := dict "remoteWrite" (list ( dict "url" (printf "http://vmauth-%s.%s.svc:%s/prometheus/api/v1/write" .Values.vmauthIngestGlobal.name .Release.Namespace (.Values.vmauthIngestGlobal.spec.port | default "8427") ) )) }}
+{{- $remoteWriteSpec := dict "remoteWrite" (list ( dict "url" (printf "http://vmauth-%s.%s.svc:%s/prometheus/api/v1/write" (include "victoria-metrics-distributed.vmauthIngestGlobalName" .) .Release.Namespace (.Values.vmauthIngestGlobal.spec.port | default "8427") ) )) }}
 {{- tpl (deepCopy .Values.extraVMAgent.spec | mergeOverwrite $remoteWriteSpec | toYaml) . }}
 {{- end }}
-

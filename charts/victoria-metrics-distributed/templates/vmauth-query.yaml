@@ -3,7 +3,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
-  name: {{ .Values.vmauthQueryGlobal.name }}
+  name: {{ include "victoria-metrics-distributed.vmauthQueryGlobalName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
 spec:
@@ -12,7 +12,7 @@ spec:
         - "/select/.+"
       url_prefix:
 {{- range $zone := $.Values.availabilityZones }}
-{{ printf "- http://vmauth-%s-%s:8427/"  $zone.vmauthCrossAZQuery.name $zone.name | indent 8 }}
+{{ printf "- http://vmauth-%s:8427/" ( $zone.vmauthCrossAZQuery.name | default ( printf "vmauth-query-cross-az-%s" $zone.name )) | indent 8 }}
 {{- end }}
 {{- end }}
 

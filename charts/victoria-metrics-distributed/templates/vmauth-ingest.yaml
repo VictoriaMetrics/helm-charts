@@ -3,7 +3,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
-  name: {{ .Values.vmauthIngestGlobal.name }}
+  name: {{ include "victoria-metrics-distributed.vmauthIngestGlobalName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
   {{- with .Values.vmauthIngestGlobal.annotations }}
@@ -20,7 +20,7 @@ spec:
         - "/api/v1/import/.+"
       url_prefix:
 {{- range $zone := $.Values.availabilityZones }}
-{{ printf "- http://vmagent-%s-%s:8429/" $zone.vmagent.name $zone.name | indent 8 }}
+{{ printf "- http://vmagent-%s:8429/" ($zone.vmagent.name | default (printf "vmagent-%s" $zone.name )) | indent 8 }}
 {{- end }}
 {{- $spec := deepCopy .Values.vmauthIngestGlobal.spec }}
 {{- $spec := unset $spec "unauthorizedAccessConfig" }}
