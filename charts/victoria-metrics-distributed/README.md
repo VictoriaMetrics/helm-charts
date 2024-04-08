@@ -203,19 +203,20 @@ Change the values according to the need of the environment in ``victoria-metrics
 | availabilityZones[0].topologySpreadConstraints[0].whenUnsatisfiable | string | `"ScheduleAnyway"` |  |
 | availabilityZones[0].vmagent.annotations | object | `{}` |  |
 | availabilityZones[0].vmagent.enabled | bool | `true` |  |
-| availabilityZones[0].vmagent.name | string | `"vmagent"` |  |
+| availabilityZones[0].vmagent.name | string | `""` |  |
 | availabilityZones[0].vmagent.spec | object | `{}` |  |
 | availabilityZones[0].vmauthCrossAZQuery.enabled | bool | `true` |  |
-| availabilityZones[0].vmauthCrossAZQuery.name | string | `"vmauth-query-cross-az"` |  |
+| availabilityZones[0].vmauthCrossAZQuery.name | string | `""` |  |
 | availabilityZones[0].vmauthCrossAZQuery.spec | object | `{}` |  |
 | availabilityZones[0].vmauthIngest.enabled | bool | `true` |  |
-| availabilityZones[0].vmauthIngest.name | string | `"vmauth-ingest"` |  |
+| availabilityZones[0].vmauthIngest.name | string | `""` |  |
 | availabilityZones[0].vmauthIngest.spec.extraArgs.discoverBackendIPs | string | `"true"` |  |
 | availabilityZones[0].vmauthIngest.spec.image.tag | string | `"v1.100.0"` |  |
 | availabilityZones[0].vmauthQueryPerZone.enabled | bool | `true` |  |
-| availabilityZones[0].vmauthQueryPerZone.name | string | `"vmauth-query"` |  |
+| availabilityZones[0].vmauthQueryPerZone.name | string | `""` |  |
 | availabilityZones[0].vmauthQueryPerZone.spec | object | `{}` |  |
 | availabilityZones[0].vmcluster.enabled | bool | `true` |  |
+| availabilityZones[0].vmcluster.name | string | `""` |  |
 | availabilityZones[0].vmcluster.spec.replicationFactor | int | `2` |  |
 | availabilityZones[0].vmcluster.spec.retentionPeriod | string | `"14"` |  |
 | availabilityZones[0].vmcluster.spec.vminsert.extraArgs | object | `{}` |  |
@@ -236,20 +237,21 @@ Change the values according to the need of the environment in ``victoria-metrics
 | availabilityZones[1].topologySpreadConstraints[0].whenUnsatisfiable | string | `"ScheduleAnyway"` |  |
 | availabilityZones[1].vmagent.annotations | object | `{}` |  |
 | availabilityZones[1].vmagent.enabled | bool | `true` |  |
-| availabilityZones[1].vmagent.name | string | `"vmagent"` |  |
+| availabilityZones[1].vmagent.name | string | `"vmagent-zone-b"` |  |
 | availabilityZones[1].vmagent.spec | object | `{}` |  |
 | availabilityZones[1].vmauthCrossAZQuery.enabled | bool | `true` |  |
 | availabilityZones[1].vmauthCrossAZQuery.name | string | `"vmauth-query-cross-az"` |  |
 | availabilityZones[1].vmauthCrossAZQuery.spec | object | `{}` |  |
 | availabilityZones[1].vmauthIngest.enabled | bool | `true` |  |
-| availabilityZones[1].vmauthIngest.name | string | `"vmauth-ingest"` |  |
+| availabilityZones[1].vmauthIngest.name | string | `""` |  |
 | availabilityZones[1].vmauthIngest.spec.extraArgs.discoverBackendIPs | string | `"true"` |  |
 | availabilityZones[1].vmauthIngest.spec.image.tag | string | `"v1.100.0"` |  |
 | availabilityZones[1].vmauthQueryPerZone.enabled | bool | `true` |  |
-| availabilityZones[1].vmauthQueryPerZone.name | string | `"vmauth-query"` |  |
+| availabilityZones[1].vmauthQueryPerZone.name | string | `""` |  |
 | availabilityZones[1].vmauthQueryPerZone.spec | object | `{}` |  |
 | availabilityZones[1].vmcluster.annotations | object | `{}` |  |
 | availabilityZones[1].vmcluster.enabled | bool | `true` |  |
+| availabilityZones[1].vmcluster.name | string | `""` |  |
 | availabilityZones[1].vmcluster.spec.replicationFactor | int | `1` |  |
 | availabilityZones[1].vmcluster.spec.retentionPeriod | string | `"14"` |  |
 | availabilityZones[1].vmcluster.spec.vminsert.replicaCount | int | `1` |  |
@@ -259,7 +261,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVMAgent.enabled | bool | `true` |  |
 | extraVMAgent.spec.selectAllByDefault | bool | `true` |  |
 | fullnameOverride | string | `""` | Overrides the chart's computed fullname. Used to change the full prefix of resource names. E.g. myRelease-mimir-ingester-1 to fullnameOverride-ingester-1. Note: Grafana provided dashboards rely on the default naming and will need changes. |
-| nameOverride | string | `""` | Overrides the chart's name. Used to change mimir/enterprise-metrics infix in the resource names. E.g. myRelease-mimir-ingester-1 to myRelease-nameOverride-ingester-1. This option is used to align resource names with Cortex, when doing a migration from Cortex to Grafana Mimir. Note: Grafana provided dashboards rely on the default naming and will need changes. |
+| nameOverride | string | `"vm-distributed"` | Overrides the chart's name. Used to change mimir/enterprise-metrics infix in the resource names. E.g. myRelease-mimir-ingester-1 to myRelease-nameOverride-ingester-1. This option is used to align resource names with Cortex, when doing a migration from Cortex to Grafana Mimir. Note: Grafana provided dashboards rely on the default naming and will need changes. |
 | victoria-metrics-k8s-stack.alertmanager.enabled | bool | `false` |  |
 | victoria-metrics-k8s-stack.crds.enabled | bool | `true` |  |
 | victoria-metrics-k8s-stack.enabled | bool | `true` |  |
@@ -271,8 +273,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | victoria-metrics-k8s-stack.vmcluster.enabled | bool | `false` |  |
 | victoria-metrics-k8s-stack.vmsingle.enabled | bool | `false` |  |
 | vmauthIngestGlobal.enabled | bool | `true` |  |
-| vmauthIngestGlobal.name | string | `"vmauth-global-ingest"` |  |
+| vmauthIngestGlobal.name | string | `""` |  |
 | vmauthIngestGlobal.spec | object | `{}` |  |
 | vmauthQueryGlobal.enabled | bool | `true` |  |
-| vmauthQueryGlobal.name | string | `"vmauth-global-query"` |  |
+| vmauthQueryGlobal.name | string | `""` |  |
 | vmauthQueryGlobal.spec | object | `{}` |  |
