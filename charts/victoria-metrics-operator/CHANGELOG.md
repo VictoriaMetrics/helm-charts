@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- clean up vmauth as well when uninstall chart with `cleanupCRD: true`, since it also has `finalizers`.
 
 ## 0.29.5
 

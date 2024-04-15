@@ -37,11 +37,12 @@ spec:
             - /bin/sh
             - -c
             - >
-              kubectl delete vmalerts --all --ignore-not-found=true;
               kubectl delete vmagents --all --ignore-not-found=true;
-              kubectl delete vmsingles --all --ignore-not-found=true;
               kubectl delete vmalertmanagers --all --ignore-not-found=true;
+              kubectl delete vmalerts --all --ignore-not-found=true;
+              kubectl delete vmauths --all --ignore-not-found=true;
               kubectl delete vmclusters --all --ignore-not-found=true;
+              kubectl delete vmsingles --all --ignore-not-found=true;
       restartPolicy: OnFailure
     {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -91,10 +92,11 @@ rules:
   - apiGroups: ["operator.victoriametrics.com"]
     resources:
       - vmagents
-      - vmalerts
-      - vmsingles
       - vmalertmanagers
+      - vmalerts
+      - vmauths
       - vmclusters
+      - vmsingles
     verbs: ["get", "list", "watch","delete"]
 ---
 {{- end }}
