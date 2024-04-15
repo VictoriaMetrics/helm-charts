@@ -38,22 +38,29 @@ For read path:
 Note:
 As the diagram showed above, this chart doesn't include components like vmalert, alertmanager, etc by default. If needed, those resources can be created using the dependency `victoria-metrics-k8s-stack` chart.
 
-### When&Why use `victoria-metrics-distributed` chart?
+### Why use `victoria-metrics-distributed` chart?
 
 One of the best practice of running production kubernetes cluster is running with [multiple availability zones](https://kubernetes.io/docs/setup/best-practices/multiple-zones/). And apart from kubernetes control plane components, we also want to spread our application pods on multiple zones, to continue serving even if zone outage happens. 
 VictoriaMetrics supports [data replication](https://docs.victoriametrics.com/cluster-victoriametrics/#replication-and-data-safety) natively which can guarantees data availability when part of the vmstorage instances failed. But it doesn't works well if vmstorage instances are spread on multiple availability zones, since data replication could be stored on single availability zone, which will be lost when zone outage happens. 
 To avoid this, vmcluster must be installed on multiple availability zones and each of them should contain complete data. Int this way, as long as one zone is available, global write&read entrypoint can server without interruption.
 
-### How to read data?
+### How to query data?
 
-The chart provides `vmauth-global-read` as a global read entrypoint, it picks the first zone as it's preferred datasource and switches automatically to next zone when first one is unavailable, check [vmauth `first_available`](https://docs.victoriametrics.com/vmauth/#high-availability) for more details. 
-But if you have workloads like vmalert or grafana on specific availability zone, you can use `vmauth-read-proxy` on nearest zone if not the same as your datasource, since it always prefer "local" vmcluster to reduce cross-zone traffic. 
+The chart provides `vmauth-global-read` as a global read entrypoint, it picks the first zone as it's preferred datasource and switches automatically to next zone if first one is unavailable, check [vmauth `first_available`](https://docs.victoriametrics.com/vmauth/#high-availability) for more details. 
+If you have workloads like vmalert or grafana which deployed on one zone specifically, you can use `vmauth-read-proxy` on the same zone as your datasource, since it always prefer "local" vmcluster which reduces cross-zone traffic. 
 
-You can also use other proxies like kubernetes service as global read entrypoint, which supports [Topology Aware Routing](https://kubernetes.io/docs/concepts/services-networking/topology-aware-routing/).
+You can also pick other proxies like kubernetes service which supports [Topology Aware Routing](https://kubernetes.io/docs/concepts/services-networking/topology-aware-routing/) as global read entrypoint.
 
-### How to use multitenancy?
+### What will happen if one zone outraged?
 
-By default, all the data that written to `vmauth-global-write` will be stored using tenant 0. To write to different tenants, creating extra tenant VMUser for `vmauth-global-write`. 
+If availability zone `zone-eu-1` outraged, `vmauth-global-write` and `vmauth-global-read` still work, and following things happen:
+1. `vmauth-global-write` stops proxying write requests to `zone-eu-1` automatically;
+2. `vmauth-global-read` and `vmauth-read-proxy` stops proxying read requests to `zone-eu-1` automatically;
+3. `vmagent` on `zone-us-1` fails to send data to `zone-eu-1` `vmauth-write-balancer`, starts to [buffer data on disk](https://docs.victoriametrics.com/vmagent/#calculating-disk-space-for-persistence-queue) if `-remoteWrite.disableOnDiskQueue` is not specified.
+
+### How to use [multitenancy](https://docs.victoriametrics.com/cluster-victoriametrics/#multitenancy)?
+
+By default, all the data that written to `vmauth-global-write` belong to tenant `0`. To write to different tenants, creating extra tenant user info in `vmauth-global-write`.
 For example, writing data for tenant `1088` with following steps:
 1. create tenant VMUser for vmauth `vmauth-global-write` to use:
 ```
