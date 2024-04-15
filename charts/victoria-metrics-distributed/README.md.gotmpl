@@ -17,52 +17,59 @@
 ## Chart Details
 
 This chart sets up multiple VictoriaMetrics cluster instances on multiple [availability zones](https://kubernetes.io/docs/setup/best-practices/multiple-zones/), provides both global write and read entrypoints.
-The default topology is like:
+
+The default setup is as shown below:
 
 ![victoriametrics-distributed-topology](./victoriametrics-distributed-topology.png)
 
-For write path:
-1. extra-vmagent(optional): scrapes external targets and all the components installed by this chart, sends data to global write entrypoint `vmauth-global-write`.
+For write:
+1. extra-vmagent(optional): scrapes external targets and all the components installed by this chart, sends data to global write entrypoint.
 2. vmauth-global-write: global write entrypoint, proxies requests to one of the zone `vmagent` with `least_loaded` policy.
 3. vmagent(per-zone): remote writes data to availability zones that enabled `.Values.availabilityZones.allowIngest`.
 4. vmauth-write-balancer(per-zone): proxies requests to vminsert instances inside it's zone with `least_loaded` policy.
-5. vmcluster(per-zone): receives write requests and stores data.
+5. vmcluster(per-zone): processes write requests and stores data.
 
-
-For read path:
-1. vmcluster(per-zone): process read requests and returns results.
+For read:
+1. vmcluster(per-zone): processes query requests and returns results.
 2. vmauth-read-balancer(per-zone): proxies requests to vmselect instances inside it's zone with `least_loaded` policy.
 3. vmauth-read-proxy(per-zone): uses all the `vmauth-read-balancer` as servers if zone has `.Values.availabilityZones.allowQuery` enabled, always prefer "local" `vmauth-read-balancer` to reduce cross-zone traffic with `first_available` policy.
 4. vmauth-global-read: global query entrypoint, proxies requests to one of the zone `vnauth-read-proxy` with `first_available` policy.
 5. grafana(optional): uses `vmauth-global-read` as default datasource.
 
-Note:
-As the diagram showed above, this chart doesn't include components like vmalert, alertmanager, etc by default. If needed, those resources can be created using the dependency `victoria-metrics-k8s-stack` chart.
+>Note:
+As the topology shown above, this chart doesn't include components like vmalert, alertmanager, etc by default. 
+You can install them using dependency [victoria-metrics-k8s-stack](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack) or having separate release.
 
 ### Why use `victoria-metrics-distributed` chart?
 
 One of the best practice of running production kubernetes cluster is running with [multiple availability zones](https://kubernetes.io/docs/setup/best-practices/multiple-zones/). And apart from kubernetes control plane components, we also want to spread our application pods on multiple zones, to continue serving even if zone outage happens.  
-VictoriaMetrics supports [data replication](https://docs.victoriametrics.com/cluster-victoriametrics/#replication-and-data-safety) natively which can guarantees data availability when part of the vmstorage instances failed. But it doesn't works well if vmstorage instances are spread on multiple availability zones, since data replication could be stored on single availability zone, which will be lost when zone outage happens.  
-To avoid this, vmcluster must be installed on multiple availability zones and each of them should contain complete data. Int this way, as long as one zone is available, global write&read entrypoint can server without interruption.
+
+VictoriaMetrics supports [data replication](https://docs.victoriametrics.com/cluster-victoriametrics/#replication-and-data-safety) natively which can guarantees data availability when part of the vmstorage instances failed. But it doesn't works well if vmstorage instances are spread on multiple availability zones, since data replication could be stored on single availability zone, which will be lost when zone outage happens.{{template "twospaces"}}  
+To avoid this, vmcluster must be installed on multiple availability zones and each of them should contain complete data. In this way, as long as one zone is available, both global write and read entrypoint work without interruption.
+
+### How to write data?
+
+The chart provides `vmauth-global-write` as global write entrypoint, it supports [push-based data ingestion protocols](https://docs.victoriametrics.com/vmagent/#how-to-push-data-to-vmagent) as VictoriaMetrics does.
+You can use this entrypoint as vmagent's remoteWrite url or use other clients push data to it directly.
 
 ### How to query data?
 
-The chart provides `vmauth-global-read` as a global read entrypoint, it picks the first zone as it's preferred datasource and switches automatically to next zone if first one is unavailable, check [vmauth `first_available`](https://docs.victoriametrics.com/vmauth/#high-availability) for more details.  
+The chart provides `vmauth-global-read` as global read entrypoint, it picks the first zone as it's preferred datasource and switches automatically to next zone if first one is unavailable, check [vmauth `first_available`](https://docs.victoriametrics.com/vmauth/#high-availability) for more details. {{template "twospaces"}}
 If you have workloads like vmalert or grafana which deployed on one zone specifically, you can use `vmauth-read-proxy` on the same zone as your datasource, since it always prefer "local" vmcluster which reduces cross-zone traffic.  
 
 You can also pick other proxies like kubernetes service which supports [Topology Aware Routing](https://kubernetes.io/docs/concepts/services-networking/topology-aware-routing/) as global read entrypoint.
 
 ### What will happen if one zone outraged?
 
-If availability zone `zone-eu-1` outraged, `vmauth-global-write` and `vmauth-global-read` still work, and following things happen:
+If availability zone `zone-eu-1` outraged, `vmauth-global-write` and `vmauth-global-read` still work without interruption, and following things happen:
 1. `vmauth-global-write` stops proxying write requests to `zone-eu-1` automatically;
 2. `vmauth-global-read` and `vmauth-read-proxy` stops proxying read requests to `zone-eu-1` automatically;
 3. `vmagent` on `zone-us-1` fails to send data to `zone-eu-1` `vmauth-write-balancer`, starts to [buffer data on disk](https://docs.victoriametrics.com/vmagent/#calculating-disk-space-for-persistence-queue) if `-remoteWrite.disableOnDiskQueue` is not specified.
 
 ### How to use [multitenancy](https://docs.victoriametrics.com/cluster-victoriametrics/#multitenancy)?
 
-By default, all the data that written to `vmauth-global-write` belong to tenant `0`. To write to different tenants, creating extra tenant user info in `vmauth-global-write`. 
-For example, writing data for tenant `1088` with following steps:
+By default, all the data that written to `vmauth-global-write` belong to tenant `0`. To write data to different tenants, creating new tenant user in `vmauth-global-write`. {{template "twospaces"}}  
+For example, writing data to tenant `1088` with following steps:
 1. create tenant VMUser for vmauth `vmauth-global-write` to use:
 ```
 apiVersion: operator.victoriametrics.com/v1beta1
@@ -131,31 +138,19 @@ Change the values according to the need of the environment in ``values.yaml`` fi
 Test the installation with command:
 
 ```console
-helm install vmcluster vm/victoria-metrics-distributed` -f values.yaml -n NAMESPACE --debug --dry-run
+helm install vm-dis vm/victoria-metrics-distributed` -f values.yaml -n NAMESPACE --debug --dry-run
 ```
 
 Install chart with command:
 
 ```console
-helm install vmcluster vm/victoria-metrics-distributed` -f values.yaml -n NAMESPACE
+helm install vm-dis vm/victoria-metrics-distributed` -f values.yaml -n NAMESPACE
 ```
 
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'vminsert\|vmselect\|vmstorage'
-```
-
-Get the application by running this command:
-
-```console
-helm list -f vmcluster -n NAMESPACE
-```
-
-See the history of versions of ``vmcluster`` application with command.
-
-```console
-helm history vmcluster -n NAMESPACE
+kubectl get pods -n NAMESPACE'
 ```
 
 ## How to uninstall
@@ -163,7 +158,7 @@ helm history vmcluster -n NAMESPACE
 Remove application with command.
 
 ```console
-helm uninstall vmcluster -n NAMESPACE
+helm uninstall vm-dis -n NAMESPACE
 ```
 
 ## Documentation of Helm Chart
@@ -187,3 +182,5 @@ The following tables lists the configurable parameters of the chart and their de
 Change the values according to the need of the environment in ``victoria-metrics-distributed`/values.yaml`` file.
 
 {{ template "chart.valuesTable" . }}
+
+{{define "twospaces"}}  {{end}}
