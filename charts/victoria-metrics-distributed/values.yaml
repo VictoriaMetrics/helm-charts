@@ -1,72 +1,68 @@
-# -- Overrides the chart's name. Used to change mimir/enterprise-metrics infix in the resource names. E.g. myRelease-mimir-ingester-1 to myRelease-nameOverride-ingester-1.
-# This option is used to align resource names with Cortex, when doing a migration from Cortex to Grafana Mimir.
-# Note: Grafana provided dashboards rely on the default naming and will need changes.
+# -- overrides the chart's name
 nameOverride: "vm-distributed"
 
-# -- Overrides the chart's computed fullname. Used to change the full prefix of resource names. E.g. myRelease-mimir-ingester-1 to fullnameOverride-ingester-1.
-# Note: Grafana provided dashboards rely on the default naming and will need changes.
+# -- overrides the chart's computed fullname.
 fullnameOverride: ""
 
-# set up a vmauth as the write entrypoint
+# -- set up a vmauth as the global write entrypoint
 vmauthIngestGlobal:
   enabled: true
   name: ""
   spec: {}
 
-# set up a vmauth as the query entrypoint
+# -- set up a vmauth as the global read entrypoint
 vmauthQueryGlobal:
   enabled: true
   name: ""
   spec: {}
 
-# config per availability zone components, including vmagent, vmcluster, vmauth etc
+# -- config per availability zone components, including vmagent, vmcluster, vmauth etc
 availabilityZones:
-  - name: zone-a
-    # allow data ingestion to this zone
+  - name: zone-eu-1
+    # -- allow data ingestion to this zone
     allowIngest: true
-    # allow data query from this zone through global query endpoint
+    # -- allow data query from this zone through global query endpoint
     allowQuery: true
-    # nodeselector to restrict where pods of this zone can be placed.
+    # -- nodeselector to restrict where pods of this zone can be placed.
     # usually provided by cloud providers.
     nodeSelector:
-      topology.kubernetes.io/zone: zone-a
-    # topologySpreadConstraints allows to customize the default topologySpreadConstraints.
+      topology.kubernetes.io/zone: zone-eu-1
+    # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
     topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: ScheduleAnyway
     vmauthIngest:
       enabled: true
-      # override the name of the vmauth object
+      # -- override the name of the vmauth object
       name: ""
       spec:
         image:
           tag: v1.100.0
         extraArgs:
-          # start from v1.100.0, vmauth can discover backend IPs via periodic DNS,
+          # -- start from v1.100.0, vmauth can discover backend IPs via periodic DNS,
           # which can help performing load balancing between vminsert instances
           discoverBackendIPs: "true"
     vmauthQueryPerZone:
       enabled: true
       name: ""
       spec: {}
-    # set up a vmauth with all the zone with `allowQuery: true` as query backends
+    # -- set up a vmauth with all the zone with `allowQuery: true` as query backends
     vmauthCrossAZQuery:
       enabled: true
       name: ""
       spec: {}
-    # vmagent here only meant to proxy write requests to each az,
-    # doesn't support customized remote write address
+    # -- vmagent here only meant to proxy write requests to each az,
+    # doesn't support customized other remote write address.
     vmagent:
       enabled: true
       name: ""
       annotations: {}
       spec: {}
-        # nodeSelector: {}
     vmcluster:
       enabled: true
       name: ""
-      # spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api.html#vmclusterspec
+      # -- spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api.html#vmclusterspec
       spec:
         retentionPeriod: "14"
         replicationFactor: 2
@@ -85,16 +81,16 @@ availabilityZones:
           resources:
             {}
     
-  - name: zone-b
-    # allow data ingestion to this zone
+  - name: zone-us-1
+    # -- allow data ingestion to this zone
     allowIngest: true
-    # allow data query from this zone through global query endpoint
+    # -- allow data query from this zone through global query endpoint
     allowQuery: true
-    # nodeselector to restrict where pods of this zone can be placed.
+    # -- nodeselector to restrict where pods of this zone can be placed.
     # usually provided by cloud providers.
     nodeSelector:
-      topology.kubernetes.io/zone: zone-b
-    # topologySpreadConstraints allows to customize the default topologySpreadConstraints.
+      topology.kubernetes.io/zone: zone-us-1
+    # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
     topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -106,7 +102,7 @@ availabilityZones:
         image:
           tag: v1.100.0
         extraArgs:
-          # start from v1.100.0, vmauth can discover backend IPs via periodic DNS,
+          # -- start from v1.100.0, vmauth can discover backend IPs via periodic DNS,
           # which can help performing load balancing between vminsert instances
           discoverBackendIPs: "true"
     vmauthQueryPerZone:
@@ -115,101 +111,94 @@ availabilityZones:
       spec: {}
     vmauthCrossAZQuery:
       enabled: true
-      name: vmauth-query-cross-az
+      name: ""
       spec: {}
-    # vmagent only meant to proxy write requests to each az,
+    # -- vmagent only meant to proxy write requests to each az,
     # doesn't support customized remote write address
     vmagent:
       enabled: true
-      name: vmagent-zone-b
+      name: ""
       annotations: {}
       spec: {}
     vmcluster:
       enabled: true
       name: ""
-      annotations: {}
+      # -- spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api.html#vmclusterspec
       spec:
         retentionPeriod: "14"
-        replicationFactor: 1
+        replicationFactor: 2
         vmstorage:
-          replicaCount: 1
+          replicaCount: 2
+          storageDataPath: "/vm-data"
+          resources: {}
+        vmselect:
+          replicaCount: 2
+          extraArgs: {}
           resources:
             {}
-        vmselect:
-          replicaCount: 1
         vminsert:
-          replicaCount: 1
+          replicaCount: 2
+          extraArgs: {}
+          resources:
+            {}
 
   ## add more zones if needed
-  # - name: zone-c
-  #   # allow data ingestion to this zone
+  # - name: zone-na-1
+  #   # -- allow data ingestion to this zone
   #   allowIngest: true
-  #   # allow data query from this zone through global query endpoint
+  #   # -- allow data query from this zone through global query endpoint
   #   allowQuery: true
-  #   # nodeselector to restrict where pods of this zone can be placed.
+  #   # -- nodeselector to restrict where pods of this zone can be placed.
   #   # usually provided by cloud providers.
   #   nodeSelector:
-  #     topology.kubernetes.io/zone: zone-c
-  #   # topologySpreadConstraints allows to customize the default topologySpreadConstraints.
+  #     topology.kubernetes.io/zone: zone-na-1
+  #   # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
   #   topologySpreadConstraints:
   #     - maxSkew: 1
   #       topologyKey: kubernetes.io/hostname
   #       whenUnsatisfiable: ScheduleAnyway
   #   vmauthIngest:
   #     enabled: true
+  #     # -- override the name of the vmauth object
+  #     name: ""
   #     spec:
+  #       image:
+  #         tag: v1.100.0
   #       extraArgs:
-  #         # start from v1.100.0, vmauth can discover backend IPs via periodic DNS,
+  #         # -- start from v1.100.0, vmauth can discover backend IPs via periodic DNS,
   #         # which can help performing load balancing between vminsert instances
   #         discoverBackendIPs: "true"
   #   vmauthQueryPerZone:
   #     enabled: true
+  #     name: ""
   #     spec: {}
-  #   # set up a vmauth with all the zone with `allowQuery: true` as query backends
+  #   # -- set up a vmauth with all the zone with `allowQuery: true` as query backends
   #   vmauthCrossAZQuery:
   #     enabled: true
+  #     name: ""
   #     spec: {}
-  #   # vmagent here only meant to proxy write requests to each az,
+  #   # -- vmagent here only meant to proxy write requests to each az,
   #   # doesn't support customized remote write address
   #   vmagent:
   #     enabled: true
+  #     name: ""
   #     annotations: {}
   #     spec: {}
-  #       # nodeSelector: {}
   #   vmcluster:
   #     enabled: true
-  #     # spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api.html#vmclusterspec
-  #     spec:
-  #       retentionPeriod: "14"
-  #       replicationFactor: 2
-  #       vmstorage:
-  #         replicaCount: 2
-  #         storageDataPath: "/vm-data"
-  #         resources:
-  #           {}
-  #           # limits:
-  #           #   cpu: "1"
-  #           #   memory: 1500Mi
-  #       vmselect:
-  #         replicaCount: 2
-  #         extraArgs: {}
-  #         resources:
-  #           {}
-  #       vminsert:
-  #         replicaCount: 2
-  #         extraArgs: {}
-  #         resources:
-  #           {}
+  #     name: ""
+  #     # -- spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api.html#vmclusterspec
+  #     spec: {}
 
 
-# set up an extra vmagent to scrape all the scrape objects by default,
+# -- set up an extra vmagent to scrape all the scrape objects by default,
 # and write data to above vmauth-global-ingest endpoint.
 extraVMAgent:
   enabled: true
   spec:
     selectAllByDefault: true
 
-# set up vm operator and other resources like vmalert, grafana if needed
+# -- set up vm operator and other resources like vmalert, grafana if needed
 victoria-metrics-k8s-stack:
   enabled: true
   victoria-metrics-operator:

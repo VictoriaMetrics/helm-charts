@@ -27,14 +27,14 @@ If release name contains chart name it will be used as a full name.
 Create the name for global ingest vmauth
 */}}
 {{- define "victoria-metrics-distributed.vmauthIngestGlobalName" -}}
-{{- .Values.vmauthIngestGlobal.name | default (printf "vmauth-global-ingest-%s" (include "victoria-metrics-distributed.fullname" .)) | trunc 63 }}
+{{- .Values.vmauthIngestGlobal.name | default (printf "vmauth-global-write-%s" (include "victoria-metrics-distributed.fullname" .)) | trunc 63 }}
 {{- end }}
 
 {{/*
 Create the name for global query vmauth
 */}}
 {{- define "victoria-metrics-distributed.vmauthQueryGlobalName" -}}
-{{- .Values.vmauthQueryGlobal.name | default (printf "vmauth-global-query-%s" (include "victoria-metrics-distributed.fullname" .)) | trunc 63 }}
+{{- .Values.vmauthQueryGlobal.name | default (printf "vmauth-global-read-%s" (include "victoria-metrics-distributed.fullname" .)) | trunc 63 }}
 {{- end }}
 
 {{/*
@@ -82,7 +82,7 @@ Lists all the ingest vmauth addresss as remote write addresses for per zone vmag
 {{- define "per-zone-vmagent.remoteWriteAddr" -}}
 {{- range $zone := .Values.availabilityZones }}
 {{- if $zone.allowIngest }}
-{{ printf "- url: http://vmauth-%s:8427" ( $zone.vmauthIngest.name | default (printf "vmauth-ingest-%s" $zone.name ) ) | indent 2 }}
+{{ printf "- url: http://vmauth-%s:8427" ( $zone.vmauthIngest.name | default (printf "vmauth-write-balancer-%s" $zone.name ) ) | indent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -12,7 +12,8 @@ spec:
         - "/select/.+"
       url_prefix:
 {{- range $zone := $.Values.availabilityZones }}
-{{ printf "- http://vmauth-%s:8427/" ( $zone.vmauthCrossAZQuery.name | default ( printf "vmauth-query-cross-az-%s" $zone.name )) | indent 8 }}
+{{ printf "- http://vmauth-%s:8427/" ( $zone.vmauthCrossAZQuery.name | default ( printf "vmauth-read-proxy-%s" $zone.name )) | indent 8 }}
 {{- end }}
+      load_balancing_policy: first_available
 {{- end }}
 
