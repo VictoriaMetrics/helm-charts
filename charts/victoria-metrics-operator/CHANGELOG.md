@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- sync new crd VMScrapeConfig from operator, see detail in https://docs.victoriametrics.com/operator/api/#vmscrapeconfig.
 
 ## 0.29.5
 
