@@ -2,6 +2,7 @@
 
 ## Next release
 
+- clean up vmauth as well when uninstall chart with `cleanupCRD: true`, since it also has `finalizers`.
 - sync new crd VMScrapeConfig from operator, see detail in https://docs.victoriametrics.com/operator/api/#vmscrapeconfig.
 
 ## 0.29.5
