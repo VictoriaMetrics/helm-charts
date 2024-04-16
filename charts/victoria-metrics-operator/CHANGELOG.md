@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.29.6
+
+**Release date:** 2024-04-16
+
+![AppVersion: 0.42.4](https://img.shields.io/static/v1?label=AppVersion&message=0.42.4&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - clean up vmauth as well when uninstall chart with `cleanupCRD: true`, since it also has `finalizers`.
 - sync new crd VMScrapeConfig from operator, see detail in https://docs.victoriametrics.com/operator/api/#vmscrapeconfig.
 
