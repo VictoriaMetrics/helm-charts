@@ -4,7 +4,7 @@
 
 - TODO
 
-## 0.9.17
+- bump version of VM components to [v1.100.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.100.1)
 
 **Release date:** 2024-03-28
 

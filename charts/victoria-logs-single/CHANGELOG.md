@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- bump version of victorialogs to [0.5.2](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.5.2-victorialogs)
 
 ## 0.3.6
 

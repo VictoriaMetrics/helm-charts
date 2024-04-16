@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- bump version of VM components to [v1.100.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.100.1)
 
 ## 0.9.4
 
@@ -20,8 +20,6 @@
 
 ![AppVersion: v1.99.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.99.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
-
-- TODO
 
 ## 0.9.2
 
