@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- updates operator to v0.44.0-rc2 version
+- adds `events` create permission
 
 ## 0.29.6
 
