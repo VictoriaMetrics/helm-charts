@@ -46,17 +46,17 @@ Create the name of the service account
 Create unified labels for victoria-metrics components
 */}}
 {{- define "victoria-metrics.common.matchLabels" -}}
-app.kubernetes.io/name: {{ include "victoria-metrics.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/name: {{ include "victoria-metrics.name" . | trunc 60 }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 60 }}
 {{- end -}}
 
 {{- define "victoria-metrics.common.metaLabels" -}}
-helm.sh/chart: {{ include "victoria-metrics.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+helm.sh/chart: {{ include "victoria-metrics.chart" . | trunc 60 }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 60 }}
 {{- end -}}
 
 {{- define "victoria-metrics.common.podLabels" -}}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 60}} 
 {{- end -}}
 
 {{- define "victoria-metrics.vmstorage.labels" -}}
@@ -139,7 +139,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
-Create a fully qualified vmselect name.
+Create a fully qualified vminsert name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "victoria-metrics.vminsert.fullname" -}}
