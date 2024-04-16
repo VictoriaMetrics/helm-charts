@@ -3,6 +3,7 @@
 ## Next release
 
 - upgraded dashboards and alerting rules, added values file for local (Minikube) setup
+- bump version of VM components to [v1.100.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.100.1)
 
 ## 0.20.0
 
