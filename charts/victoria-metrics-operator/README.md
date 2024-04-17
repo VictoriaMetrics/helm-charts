@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.29.5](https://img.shields.io/badge/Version-0.29.5-informational?style=flat-square)
+ ![Version: 0.30.0-rc2](https://img.shields.io/badge/Version-0.30.0--rc2-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-operator)
 
 Victoria Metrics Operator
@@ -147,7 +147,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | admissionWebhooks.policy | string | `"Fail"` | What to do in case, when operator not available to validate request. |
 | affinity | object | `{}` | Pod affinity |
 | annotations | object | `{}` | Annotations to be added to the all resources |
-| cleanupCRD | bool | `false` | Tells helm to clean up vm cr resources when uninstalling |
+| cleanupCRD | bool | `false` | Tells helm to clean up all the vm resources under this release's namespace when uninstalling |
 | cleanupImage.pullPolicy | string | `"IfNotPresent"` |  |
 | cleanupImage.repository | string | `"gcr.io/google_containers/hyperkube"` |  |
 | cleanupImage.tag | string | `"v1.18.0"` |  |
@@ -164,7 +164,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.42.4"` | Image tag |
+| image.tag | string | `"v0.44.0-rc2"` | Image tag |
 | imagePullSecrets | list | `[]` | Secret to pull images |
 | logLevel | string | `"info"` | possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name override |
