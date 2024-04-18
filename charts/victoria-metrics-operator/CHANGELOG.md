@@ -4,6 +4,15 @@
 
 - TODO
 
+## 0.30.1
+
+**Release date:** 2024-04-18
+
+![AppVersion: 0.43.1](https://img.shields.io/static/v1?label=AppVersion&message=0.43.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- TODO
+
 - updates operator to v0.43.1 version
 
 ## 0.30.0
