@@ -4,6 +4,9 @@
 
 - TODO
 
+- bump version of VM operator to [0.43.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.43.0)
+- updates CRDs definitions. 
+
 ## 0.20.1
 
 **Release date:** 2024-04-16
