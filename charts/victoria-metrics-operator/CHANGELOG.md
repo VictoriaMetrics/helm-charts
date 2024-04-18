@@ -4,6 +4,8 @@
 
 - TODO
 
+- updates operator to v0.43.1 version
+
 ## 0.30.0
 
 **Release date:** 2024-04-18
