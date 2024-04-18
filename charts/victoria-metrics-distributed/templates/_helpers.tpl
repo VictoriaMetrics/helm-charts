@@ -106,6 +106,7 @@ Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstrai
 {{- end -}}
 {{- $newvminsert := merge (dict "nodeSelector" $newNodeSelector) $vmclusterSpec.vminsert }}
 {{- $newvminsert = merge (dict "topologySpreadConstraints" $newTopologySpreadConstraints) $newvminsert }}
+{{- $newvminsert = merge (dict "serviceSpec" (dict "spec" (dict "clusterIP" "None" "type" "ClusterIP"))) $newvminsert }}
 
 {{- $newNodeSelector := deepCopy $rolloutZone.nodeSelector }}
 {{- if $rolloutZone.vmcluster.spec.vmstorage.nodeSelector }}
