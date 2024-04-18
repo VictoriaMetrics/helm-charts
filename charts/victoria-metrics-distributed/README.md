@@ -59,12 +59,15 @@ If you have services like [vmalert](https://docs.victoriametrics.com/vmalert.htm
 
 You can also pick other proxies like kubernetes service which supports [Topology Aware Routing](https://kubernetes.io/docs/concepts/services-networking/topology-aware-routing/) as global read entrypoint.
 
-### What happens if zone outage happened?
+### What happens if zone outage happen?
 
-If availability zone `zone-eu-1` had an outage, `vmauth-global-write` and `vmauth-global-read` will work without interruption:
+If availability zone `zone-eu-1` is experiencing an outage, `vmauth-global-write` and `vmauth-global-read` will work without interruption:
 1. `vmauth-global-write` stops proxying write requests to `zone-eu-1` automatically;
 2. `vmauth-global-read` and `vmauth-read-proxy` stops proxying read requests to `zone-eu-1` automatically;
-3. `vmagent` on `zone-us-1` fails to send data to `zone-eu-1.vmauth-write-balancer`, starts to [buffer data on disk](https://docs.victoriametrics.com/vmagent/#calculating-disk-space-for-persistence-queue) (unless `-remoteWrite.disableOnDiskQueue` is specified, which is not recommended for this topology).
+3. `vmagent` on `zone-us-1` fails to send data to `zone-eu-1.vmauth-write-balancer`, starts to buffer data on disk(unless `-remoteWrite.disableOnDiskQueue` is specified, which is not recommended for this topology);  
+To keep data completeness for all the availability zones, make sure you have enough disk space on vmagent for buffer, see [this doc](https://docs.victoriametrics.com/vmagent/#calculating-disk-space-for-persistence-queue) for size recommendation.
+
+And to avoid getting incomplete responses from `zone-eu-1` which gets recovered from outage, check vmagent on `zone-us-1` to see if persistent queue has been drained. If not, remove `zone-eu-1` from serving query by setting `.Values.availabilityZones.{zone-eu-1}.allowQuery=false` and change it back after confirm all data are restored.
 
 ### How to use [multitenancy](https://docs.victoriametrics.com/cluster-victoriametrics/#multitenancy)?
 
