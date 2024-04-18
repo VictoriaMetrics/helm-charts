@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.30.0
+
+**Release date:** 2024-04-18
+
+![AppVersion: 0.43.0](https://img.shields.io/static/v1?label=AppVersion&message=0.43.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - updates operator to v0.43.0-0 version
 - adds `events` create permission
 
