@@ -25,7 +25,7 @@ The default setup is as shown below:
 For write:
 1. extra-vmagent(optional): scrapes external targets and all the components installed by this chart, sends data to global write entrypoint.
 2. vmauth-global-write: global write entrypoint, proxies requests to one of the zone `vmagent` with `least_loaded` policy.
-3. vmagent(per-zone): remote writes data to availability zones that enabled `.Values.availabilityZones.allowIngest`.
+3. vmagent(per-zone): remote writes data to availability zones that enabled `.Values.availabilityZones.allowIngest`, and [buffer data on disk](https://docs.victoriametrics.com/vmagent/#calculating-disk-space-for-persistence-queue) when zone is unavailable to ingest.
 4. vmauth-write-balancer(per-zone): proxies requests to vminsert instances inside it's zone with `least_loaded` policy.
 5. vmcluster(per-zone): processes write requests and stores data.
 
@@ -45,26 +45,26 @@ You can install them using dependency [victoria-metrics-k8s-stack](https://githu
 One of the best practice of running production kubernetes cluster is running with [multiple availability zones](https://kubernetes.io/docs/setup/best-practices/multiple-zones/). And apart from kubernetes control plane components, we also want to spread our application pods on multiple zones, to continue serving even if zone outage happens. 
 
 VictoriaMetrics supports [data replication](https://docs.victoriametrics.com/cluster-victoriametrics/#replication-and-data-safety) natively which can guarantees data availability when part of the vmstorage instances failed. But it doesn't works well if vmstorage instances are spread on multiple availability zones, since data replication could be stored on single availability zone, which will be lost when zone outage happens. {{template "twospaces"}}  
-To avoid this, vmcluster must be installed on multiple availability zones and each of them should contain complete data. In this way, as long as one zone is available, both global write and read entrypoint work without interruption.
+To avoid this, vmcluster must be installed on multiple availability zones, each containing a 100% copy of data. As long as one zone is available, both global write and read entrypoints should work without interruption.
 
 ### How to write data?
 
 The chart provides `vmauth-global-write` as global write entrypoint, it supports [push-based data ingestion protocols](https://docs.victoriametrics.com/vmagent/#how-to-push-data-to-vmagent) as VictoriaMetrics does.
-You can use this entrypoint as vmagent's remoteWrite url or use other clients push data to it directly.
+Optionally, you can push data to any of the per-zone vmagents, and they will replicate the received data across zones.
 
 ### How to query data?
 
-The chart provides `vmauth-global-read` as global read entrypoint, it picks the first zone as it's preferred datasource and switches automatically to next zone if first one is unavailable, check [vmauth `first_available`](https://docs.victoriametrics.com/vmauth/#high-availability) for more details. {{template "twospaces"}}
-If you have workloads like vmalert or grafana which deployed on one zone specifically, you can use `vmauth-read-proxy` on the same zone as your datasource, since it always prefer "local" vmcluster which reduces cross-zone traffic.  
+The chart provides `vmauth-global-read` as global read entrypoint, it picks the first available zone (see [first_available](https://docs.victoriametrics.com/vmauth/#high-availability) policy) as it's preferred datasource and switches automatically to next zone if first one is unavailable, check [vmauth `first_available`](https://docs.victoriametrics.com/vmauth/#high-availability) for more details. {{template "twospaces"}}
+If you have services like [vmalert](https://docs.victoriametrics.com/vmalert.html) or Grafana deployed in each zone, then configure them to use local `vmauth-read-proxy`. Per-zone `vmauth-read-proxy` always prefers "local" vmcluster for querying and reduces cross-zone traffic.  
 
 You can also pick other proxies like kubernetes service which supports [Topology Aware Routing](https://kubernetes.io/docs/concepts/services-networking/topology-aware-routing/) as global read entrypoint.
 
 ### What happens if zone outage happened?
 
-If availability zone `zone-eu-1` had an outage, `vmauth-global-write` and `vmauth-global-read` still work without interruption, and following things happen:
+If availability zone `zone-eu-1` had an outage, `vmauth-global-write` and `vmauth-global-read` will work without interruption:
 1. `vmauth-global-write` stops proxying write requests to `zone-eu-1` automatically;
 2. `vmauth-global-read` and `vmauth-read-proxy` stops proxying read requests to `zone-eu-1` automatically;
-3. `vmagent` on `zone-us-1` fails to send data to `zone-eu-1` `vmauth-write-balancer`, starts to [buffer data on disk](https://docs.victoriametrics.com/vmagent/#calculating-disk-space-for-persistence-queue) if `-remoteWrite.disableOnDiskQueue` is not specified.
+3. `vmagent` on `zone-us-1` fails to send data to `zone-eu-1.vmauth-write-balancer`, starts to [buffer data on disk](https://docs.victoriametrics.com/vmagent/#calculating-disk-space-for-persistence-queue) (unless `-remoteWrite.disableOnDiskQueue` is specified, which is not recommended for this topology).
 
 ### How to use [multitenancy](https://docs.victoriametrics.com/cluster-victoriametrics/#multitenancy)?
 
