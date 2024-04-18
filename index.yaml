@@ -9981,6 +9981,66 @@ entries:
   victoria-metrics-k8s-stack:
   - annotations:
       artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: "- TODO\n\n- bump version of VM operator to [0.43.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.43.0)\n-
+        updates CRDs definitions. "
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://docs.victoriametrics.com/vmgateway.html
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: v1.100.1
+    created: "2024-04-18T16:46:22.876416215Z"
+    dependencies:
+    - condition: victoria-metrics-operator.enabled
+      name: victoria-metrics-operator
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.30.*
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.16.*
+    - condition: prometheus-node-exporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.27.*
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 7.3.*
+    - condition: crds.enabled
+      name: crds
+      repository: ""
+      version: 0.0.0
+    description: Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics
+      Operator, Grafana dashboards, ServiceScrapes and VMRules
+    digest: efea29cab54073eb0daf16e3bd931828b516ce885a3c8e07afc727e4aa8bad05
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-k8s-stack
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-k8s-stack-0.21.0/victoria-metrics-k8s-stack-0.21.0.tgz
+    version: 0.21.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |-
         - upgraded dashboards and alerting rules, added values file for local (Minikube) setup
         - bump version of VM components to [v1.100.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.100.1)
@@ -18887,4 +18947,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-04-18T11:57:27.839238944Z"
+generated: "2024-04-18T16:46:22.967376031Z"
