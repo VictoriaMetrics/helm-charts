@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- properly truncate value of `app.kubernetes.io/managed-by` and `app.kubernetes.io/instance` labels in case release name exceeds 63 characters.
 
 ## 0.9.18
 

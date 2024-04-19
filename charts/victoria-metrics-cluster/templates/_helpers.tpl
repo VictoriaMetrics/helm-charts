@@ -46,17 +46,17 @@ Create the name of the service account
 Create unified labels for victoria-metrics components
 */}}
 {{- define "victoria-metrics.common.matchLabels" -}}
-app.kubernetes.io/name: {{ include "victoria-metrics.name" . | trunc 60 }}
-app.kubernetes.io/instance: {{ .Release.Name | trunc 60 }}
+app.kubernetes.io/name: {{ include "victoria-metrics.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.common.metaLabels" -}}
-helm.sh/chart: {{ include "victoria-metrics.chart" . | trunc 60 }}
-app.kubernetes.io/managed-by: {{ .Release.Service | trunc 60 }}
+helm.sh/chart: {{ include "victoria-metrics.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.common.podLabels" -}}
-app.kubernetes.io/managed-by: {{ .Release.Service | trunc 60}} 
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmstorage.labels" -}}
@@ -110,13 +110,13 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "victoria-metrics.vmstorage.fullname" -}}
 {{- if .Values.vmstorage.fullnameOverride -}}
-{{- .Values.vmstorage.fullnameOverride | trunc 60 | trimSuffix "-" -}}
+{{- .Values.vmstorage.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" .Release.Name .Values.vmstorage.name | trunc 60 | trimSuffix "-" -}}
+{{- printf "%s-%s" .Release.Name .Values.vmstorage.name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s-%s" .Release.Name $name .Values.vmstorage.name | trunc 60 | trimSuffix "-" -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.vmstorage.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

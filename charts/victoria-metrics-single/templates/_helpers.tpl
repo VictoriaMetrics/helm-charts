@@ -47,12 +47,12 @@ Create unified labels for victoria-metrics components
 */}}
 {{- define "victoria-metrics.common.matchLabels" -}}
 app.kubernetes.io/name: {{ include "victoria-metrics.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.common.metaLabels" -}}
 helm.sh/chart: {{ include "victoria-metrics.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.server.labels" -}}
