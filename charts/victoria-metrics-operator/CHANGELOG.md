@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.30.2
+
+**Release date:** 2024-04-23
+
+![AppVersion: 0.43.3](https://img.shields.io/static/v1?label=AppVersion&message=0.43.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - updates operator to v0.43.1 version
 - fixes typo at single-namespace role for `vmscrapeconfig`. See this [issue](https://github.com/VictoriaMetrics/helm-charts/issues/987) for details.
 
