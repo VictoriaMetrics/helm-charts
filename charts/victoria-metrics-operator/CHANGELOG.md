@@ -24,6 +24,7 @@
 
 - updates operator to v0.43.0-0 version
 - adds `events` create permission
+- properly truncate value of `app.kubernetes.io/managed-by` and `app.kubernetes.io/instance` labels in case release name exceeds 63 characters.
 
 ## 0.29.6
 

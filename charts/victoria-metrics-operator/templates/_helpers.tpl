@@ -47,7 +47,7 @@ Selector labels
 */}}
 {{- define "vm-operator.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "vm-operator.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{/*
@@ -56,7 +56,7 @@ Create unified labels for vm-operator components
 {{- define "vm-operator.labels" -}}
 {{- include "vm-operator.selectorLabels" . }}
 helm.sh/chart: {{ include "vm-operator.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{/*

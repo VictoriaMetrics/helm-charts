@@ -40,12 +40,12 @@ Create unified labels for victoria-logs components
 */}}
 {{- define "victoria-logs.common.matchLabels" -}}
 app.kubernetes.io/name: {{ include "victoria-logs.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-logs.common.metaLabels" -}}
 helm.sh/chart: {{ include "victoria-logs.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-logs.server.labels" -}}

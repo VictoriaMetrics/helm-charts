@@ -36,12 +36,12 @@ Create unified labels for vmalert components
 */}}
 {{- define "vmalert.common.matchLabels" -}}
 app.kubernetes.io/name: {{ include "vmalert.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "vmalert.common.metaLabels" -}}
 helm.sh/chart: {{ include "vmalert.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "vmalert.server.labels" -}}
