@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- updates operator to v0.43.1 version
+- fixes typo at single-namespace role for `vmscrapeconfig`. See this [issue](https://github.com/VictoriaMetrics/helm-charts/issues/987) for details.
 
 ## 0.30.1
 
