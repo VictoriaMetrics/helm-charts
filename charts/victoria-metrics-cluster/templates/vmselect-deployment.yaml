@@ -31,7 +31,7 @@ spec:
 {{ toYaml .Values.vmselect.podAnnotations | indent 8 }}
     {{- end }}
       labels:
-        {{- include "victoria-metrics.vmselect.labels" . | nindent 8 }}
+        {{- include "victoria-metrics.vmselect.podLabels" . | nindent 8 }}
 {{- with .Values.vmselect.extraLabels }}
 {{ toYaml . | indent 8 }}
 {{- end }}
@@ -52,14 +52,29 @@ spec:
           workingDir: {{ .Values.vmselect.containerWorkingDir }}
           {{- end }}
           securityContext:
-            {{- toYaml .Values.vmselect.podSecurityContext | nindent 12 }}
+            {{- toYaml .Values.vmselect.securityContext | nindent 12 }}
           args:
             - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
-          {{- if not .Values.vmselect.suppresStorageFQDNsRender }}
+          {{- if not (or .Values.vmselect.suppressStorageFQDNsRender .Values.vmselect.suppresStorageFQDNsRender )}}
           {{- include "victoria-metrics.vmselect.vmstorage-pod-fqdn" . | nindent 12 }}
           {{- end }}
           {{- range $key, $value := .Values.vmselect.extraArgs }}
+          {{- if kindIs "slice" $value }}
+          {{- range $v := $value }}
+            - --{{ $key }}={{ $v }}
+          {{- end }}
+          {{- else }}
             - --{{ $key }}={{ $value }}
+          {{- end }}
+          {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
+          {{- if .Values.vmselect.envFrom }}
+          envFrom:
+            {{- with .Values.vmselect.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with .Values.vmselect.env }}
           env: {{ toYaml . | nindent 10 }}
@@ -74,8 +89,17 @@ spec:
           {{- end }}
           readinessProbe:
             httpGet:
+            {{- if index  .Values.vmselect.extraArgs "http.pathPrefix" }}
+              path: {{ trimSuffix "/" (index .Values.vmselect.extraArgs "http.pathPrefix") }}/health
+            {{- else }}
               path: /health
+            {{- end }}
               port: http
+            {{- if .Values.vmselect.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: {{ .Values.vmselect.probe.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vmselect.probe.readiness.periodSeconds }}
             timeoutSeconds: {{ .Values.vmselect.probe.readiness.timeoutSeconds }}
@@ -99,6 +123,7 @@ spec:
           {{- with .Values.vmselect.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
           resources:
             {{- with .Values.vmselect.resources }}
             {{- toYaml . | nindent 12 }}
@@ -114,9 +139,9 @@ spec:
       nodeSelector:
 {{ toYaml .Values.vmselect.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.vmselect.securityContext }}
+    {{- if .Values.vmselect.podSecurityContext }}
       securityContext:
-{{ toYaml .Values.vmselect.securityContext | indent 8 }}
+{{ toYaml .Values.vmselect.podSecurityContext | indent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.vmselect.tolerations }}
@@ -142,4 +167,5 @@ spec:
             {{- else }}
           emptyDir: {}
             {{- end -}}
+        {{- include "chart.license.volume" . | nindent 8 }}
 {{- end }}

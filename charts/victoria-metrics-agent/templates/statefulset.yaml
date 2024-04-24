@@ -14,7 +14,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+{{- if not .Values.horizontalPodAutoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+{{- end }}
   serviceName: {{ include "chart.fullname" . }}
   {{- if .Values.statefulset.updateStrategy }}
   updateStrategy:
@@ -46,6 +48,10 @@ spec:
       serviceAccountName: {{ include "chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -68,6 +74,9 @@ spec:
           {{- end }}
           {{- range $key, $value := .Values.extraArgs }}
             - -{{ $key }}={{ $value }}
+          {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -108,6 +117,12 @@ spec:
               protocol: UDP
               containerPort: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
           {{- end }}
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- if or .Values.env .Values.statefulset.clusterMode}}
           env:
             {{- if .Values.statefulset.clusterMode}}
@@ -122,7 +137,11 @@ spec:
           {{- end }}
           readinessProbe:
             httpGet:
+            {{- if index  .Values.extraArgs "http.pathPrefix" }}
+              path: {{ trimSuffix "/" (index .Values.extraArgs "http.pathPrefix") }}/health
+            {{- else }}
               path: /health
+            {{- end }}
               port: http
             initialDelaySeconds: 5
             periodSeconds: 15
@@ -163,6 +182,17 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range $constraint := . }}
+      - {{ toYaml $constraint | nindent 8 | trim }}
+          {{- if not $constraint.labelSelector }}
+        labelSelector:
+          matchLabels:
+            {{- include "chart.selectorLabels" $ | nindent 12 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
       volumes:
       {{- if not .Values.persistence.enabled }}
         - name: tmpdata

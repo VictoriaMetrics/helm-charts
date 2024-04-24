@@ -1,0 +1,15 @@
+{{- if .Values.vmcluster.enabled }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMCluster
+metadata:
+  {{- with .Values.vmcluster.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end  }}
+  name: {{ include "victoria-metrics-k8s-stack.vmclusterName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+spec:
+{{ include "victoria-metrics-k8s-stack.VMClusterSpec" . | nindent 2}}
+{{- end }}

@@ -13,8 +13,6 @@ serviceAccount:
   # mount API token to pod directly
   automountToken: true
 
-imagePullSecrets: []
-
 rbac:
   create: true
   # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
@@ -32,6 +30,7 @@ server:
     pullPolicy: IfNotPresent
   nameOverride: ""
   fullnameOverride: ""
+  imagePullSecrets: []
 
   ## See `kubectl explain poddisruptionbudget.spec` for more
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
@@ -49,6 +48,24 @@ server:
     #     secretKeyRef:
     #       name: auth_secret
     #       key: password
+
+  envFrom:
+    []
+    #- configMapRef:
+    #    name: special-config
+    
+  # Readiness & Liveness probes
+  probe:
+    readiness:
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
+    liveness:
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
 
   replicaCount: 1
 
@@ -104,16 +121,40 @@ server:
         # -- Token Auth file with Bearer token. You can use one of token or tokenFile
         tokenFile: ""
 
+  # -- Notifier to use for alerts.
+  # Multiple notifiers can be enabled by using `notifiers` section
   notifier:
     alertmanager:
       url: ""
+      # -- Basic auth for alertmanager
+      basicAuth:
+        username: ""
+        password: ""
+        # -- Auth based on Bearer token for alertmanager
+      bearer:
+        # -- Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string
+        token: ""
+        # -- Token Auth file with Bearer token. You can use one of token or tokenFile
+        tokenFile: ""
+
+  # -- Additional notifiers to use for alerts
+  notifiers:
+    []
+    # - alertmanager:
+    #    url: ""
+    #    basicAuth:
+    #      username: ""
+    #      password: ""
+    #    bearer:
+    #      token: ""
+    #      tokenFile: ""
 
   extraArgs:
     envflag.enable: "true"
     envflag.prefix: VM_
     loggerFormat: json
 
-  # Additional hostPath mounts
+  # -- Additional hostPath mounts
   extraHostPathMounts:
     []
     # - name: certs-dir
@@ -122,19 +163,20 @@ server:
     #   hostPath: /etc/kubernetes/certs
   #   readOnly: true
 
-  # Extra Volumes for the pod
+  # -- Extra Volumes for the pod
   extraVolumes:
     []
     #- name: example
     #  configMap:
     #    name: example
 
-  # Extra Volume Mounts for the container
+  # -- Extra Volume Mounts for the container
   extraVolumeMounts:
     []
     # - name: example
     #   mountPath: /example
 
+  # -- Additional containers to run in the same pod
   extraContainers:
     []
     #- name: config-reloader
@@ -235,6 +277,7 @@ serviceMonitor:
   extraLabels: {}
   annotations: {}
   relabelings: []
+  metricRelabelings: []
 #    interval: 15s
 #    scrapeTimeout: 5s
 # -- Commented. HTTP scheme to use for scraping.
@@ -245,12 +288,11 @@ serviceMonitor:
 
 alertmanager:
   enabled: false
-  replicaCount: 1
   podMetadata:
     labels: {}
     annotations: {}
   image: prom/alertmanager
-  tag: v0.20.0
+  tag: v0.25.0
   retention: 120h
   nodeSelector: {}
   priorityClassName: ""
@@ -258,6 +300,7 @@ alertmanager:
   tolerations: []
   imagePullSecrets: []
   podSecurityContext: {}
+  listenAddress: "0.0.0.0:9093"
   extraArgs: {}
   # key: value
 
@@ -331,3 +374,50 @@ alertmanager:
     subPath: ""
     # -- Size of the volume. Better to set the same as resource limit memory property.
     size: 50Mi
+
+  # Additional hostPath mounts
+  extraHostPathMounts:
+    []
+    # - name: certs-dir
+    #   mountPath: /etc/kubernetes/certs
+    #   subPath: ""
+    #   hostPath: /etc/kubernetes/certs
+  #   readOnly: true
+
+  # Extra Volumes for the pod
+  extraVolumes:
+    []
+    #- name: example
+    #  configMap:
+    #    name: example
+
+  # Extra Volume Mounts for the container
+  extraVolumeMounts:
+    []
+    # - name: example
+    #   mountPath: /example
+
+  extraContainers:
+    []
+    #- name: config-reloader
+    #  image: reloader-image
+
+# -- Add extra specs dynamically to this chart
+extraObjects: []
+
+# -- Enterprise license key configuration for VictoriaMetrics enterprise.
+# Required only for VictoriaMetrics enterprise.
+# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# for more information, visit https://victoriametrics.com/products/enterprise/ .
+# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Supported starting from VictoriaMetrics v1.94.0
+license:
+  # -- License key
+  key: ""
+
+  # -- Use existing secret with license key
+  secret:
+    # -- Existing secret name
+    name: ""
+    # -- Key in secret with license key
+    key: ""

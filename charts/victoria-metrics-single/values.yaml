@@ -40,7 +40,7 @@ server:
     # -- Image repository
     repository: victoriametrics/victoria-metrics
     # -- Image tag
-    tag: v1.87.1
+    tag: v1.100.1
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
@@ -114,6 +114,11 @@ server:
   # -- Env variables
   # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
   env: []
+
+  envFrom: []
+    #- configMapRef:
+    #    name: special-config
+
   # -- Container workdir
   containerWorkingDir: ""
 
@@ -233,13 +238,13 @@ server:
     enable: false
     # -- should be true and means that you have the legal right to run a backup manager
     # that can either be a signed contract or an email with confirmation to run the service in a trial period
-    # # https://victoriametrics.com/legal/eula/
+    # # https://victoriametrics.com/legal/esa/
     eula: false
     image:
       # -- vmbackupmanager image repository
       repository: victoriametrics/vmbackupmanager
       # -- vmbackupmanager image tag
-      tag: v1.87.1-enterprise
+      tag: v1.100.1-enterprise
     # -- disable hourly backups
     disableHourly: false
     # -- disable daily backups
@@ -351,6 +356,8 @@ server:
 #      insecureSkipVerify: true
     # -- Service Monitor relabelings
     relabelings: []
+    # -- Service Monitor metricRelabelings
+    metricRelabelings: []
 
   # -- Scrape configuration for victoriametrics
   scrape:
@@ -395,10 +402,10 @@ server:
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             # If your node certificates are self-signed or use a different CA to the
-            # master CA, then disable certificate verification below. Note that
+            # master CA, then you need to disable certificate verification. Note that
             # certificate verification is an integral part of a secure infrastructure
             # so this should only be disabled in a controlled environment. You can
-            # disable certificate verification by uncommenting the line below.
+            # enable certificate verification by commenting the line below.
             #
             insecure_skip_verify: true
           bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -428,10 +435,10 @@ server:
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             # If your node certificates are self-signed or use a different CA to the
-            # master CA, then disable certificate verification below. Note that
+            # master CA, then you need to disable certificate verification. Note that
             # certificate verification is an integral part of a secure infrastructure
             # so this should only be disabled in a controlled environment. You can
-            # disable certificate verification by uncommenting the line below.
+            # enable certificate verification by commenting the line below.
             #
             insecure_skip_verify: true
           bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -460,10 +467,10 @@ server:
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             # If your node certificates are self-signed or use a different CA to the
-            # master CA, then disable certificate verification below. Note that
+            # master CA, then you need to disable certificate verification. Note that
             # certificate verification is an integral part of a secure infrastructure
             # so this should only be disabled in a controlled environment. You can
-            # disable certificate verification by uncommenting the line below.
+            # enable certificate verification by commenting the line below.
             #
             insecure_skip_verify: true
           bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -483,7 +490,9 @@ server:
               regex: (.+)
               target_label: __metrics_path__
               replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
-
+          # ignore timestamps of cadvisor's metrics by default
+          # more info here https://github.com/VictoriaMetrics/VictoriaMetrics/issues/4697#issuecomment-1656540535
+          honor_timestamps: false 
         # -- Scrape config for service endpoints.
         #
         # The relabeling allows the actual service scrape endpoint to be configured
@@ -667,3 +676,23 @@ server:
 
     # -- Extra scrape configs that will be appended to `server.scrape.config`
     extraScrapeConfigs: []
+
+# -- Add extra specs dynamically to this chart
+extraObjects: []
+
+# -- Enterprise license key configuration for VictoriaMetrics enterprise.
+# Required only for VictoriaMetrics enterprise.
+# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# for more information, visit https://victoriametrics.com/products/enterprise/ .
+# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Supported starting from VictoriaMetrics v1.94.0
+license:
+  # -- License key
+  key: ""
+
+  # -- Use existing secret with license key
+  secret:
+    # -- Existing secret name
+    name: ""
+    # -- Key in secret with license key
+    key: ""

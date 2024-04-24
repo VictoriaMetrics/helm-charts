@@ -8,7 +8,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "kube-prometheus-general.rules" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "kube-prometheus-general.rules" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
@@ -21,7 +21,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: kube-prometheus-general.rules
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: kube-prometheus-general.rules
     rules:
     - expr: count without(instance, pod, node) (up == 1)
       record: count:up1

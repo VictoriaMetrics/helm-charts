@@ -9,7 +9,7 @@ image:
   # -- Victoria Metrics Auth Docker repository and image name
   repository: victoriametrics/vmauth
   # -- Tag of Docker image
-  tag: v1.87.1
+  tag: v1.100.1
   # -- Pull policy of Docker image
   pullPolicy: IfNotPresent
 
@@ -47,6 +47,10 @@ extraArgs:
 
 # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
 env: []
+
+envFrom: []
+  #- configMapRef:
+  #    name: special-config
 
 # -- Additional hostPath mounts
 extraHostPathMounts: []
@@ -158,6 +162,9 @@ annotations: {}
 # -- Annotations to be added to pod
 podAnnotations: {}
 
+# -- Labels to be added to the deployment and pods
+extraLabels: {}
+
 # -- NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/
 nodeSelector: {}
 
@@ -172,10 +179,11 @@ tolerations: []
 affinity: {}
 
 serviceMonitor:
-  enabled: false 
+  enabled: false
   extraLabels: {}
   annotations: {}
   relabelings: []
+  metricRelabelings: []
 #    interval: 15s
 #    scrapeTimeout: 5s
   # -- Commented. HTTP scheme to use for scraping.
@@ -184,8 +192,9 @@ serviceMonitor:
 #    tlsConfig:
 #      insecureSkipVerify: true
 
-# -- Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html
-configMap: ""
+# -- Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html.
+# Configuration in the given secret must be stored under `auth.yml` key.
+secretName: ""
 
 # -- Config file content.
 config:
@@ -217,3 +226,23 @@ config:
     # - username: "cluster-insert-account-42"
     #    password: "***"
     #    url_prefix: "http://vminsert:8480/insert/42/prometheus"
+
+# -- Add extra specs dynamically to this chart
+extraObjects: []
+
+# -- Enterprise license key configuration for VictoriaMetrics enterprise.
+# Required only for VictoriaMetrics enterprise.
+# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# for more information, visit https://victoriametrics.com/products/enterprise/ .
+# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Supported starting from VictoriaMetrics v1.94.0
+license:
+  # -- License key
+  key: ""
+
+  # -- Use existing secret with license key
+  secret:
+    # -- Existing secret name
+    name: ""
+    # -- Key in secret with license key
+    key: ""

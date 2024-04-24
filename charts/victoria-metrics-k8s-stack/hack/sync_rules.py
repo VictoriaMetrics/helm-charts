@@ -75,9 +75,16 @@ skip_list = [
 condition_map = {
     'etcd': '.Values.kubeEtcd.enabled .Values.defaultRules.rules.etcd',
     'general.rules': '.Values.defaultRules.rules.general',
-    'k8s.rules': '.Values.defaultRules.rules.k8s',
-    'kube-apiserver-burnrate.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverBurnrate',
+    'k8s.rules.container_cpu_usage_seconds_total': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_memory_cache': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_memory_rss': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_memory_swap': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_memory_working_set_bytes': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_resource': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.pod_owner': '.Values.defaultRules.rules.k8s',
     'kube-apiserver-availability.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverAvailability',
+    'kube-apiserver-burnrate.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverBurnrate',
+    'kube-apiserver-histogram.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverHistogram',
     'kube-apiserver-slos': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverSlos',
     'kube-apiserver.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserver',
     'kube-prometheus-general.rules': '.Values.defaultRules.rules.kubePrometheusGeneral',
@@ -98,7 +105,7 @@ condition_map = {
     'node-network': '.Values.defaultRules.rules.network',
     'node.rules': '.Values.defaultRules.rules.node',
     'vmagent': '.Values.vmagent.enabled .Values.defaultRules.rules.vmagent',
-    'alertmaanger': '.Values.defaultRules.rules.alertmanager',
+    'alertmanager.rules': '.Values.defaultRules.rules.alertmanager',
     'vmcluster': '.Values.defaultRules.rules.vmcluster',
     'vmsingle': '.Values.defaultRules.rules.vmsingle',
     'vm-health': '.Values.defaultRules.rules.vmhealth'
@@ -132,8 +139,13 @@ replacement_map = {
     'http://localhost:3000': {
         'replacement': '{{ index .Values.grafana.ingress.hosts 0 }}',
         'init': ''},
-    'job="alertmanager-main"' : {
+    'job="alertmanager-main"': {
         'replacement': 'job="{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}"',
+        'init': '',
+    },
+    'namespace="monitoring"': {
+        'replacement': 'namespace="{{ .Release.Namespace }}"',
+        'limitGroup': ['alertmanager.rules'],
         'init': '',
     },
 }
@@ -149,7 +161,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%%s-%%s" (include "victoria-metrics-k8s-stack.fullname" .) "%(name)s" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%%s-%%s" (include "victoria-metrics-k8s-stack.fullname" .) "%(name)s" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
@@ -162,7 +174,13 @@ metadata:
 {{- end }}
 spec:
   groups:
-  -'''
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }}'''
 
 
 def init_yaml_styles():
@@ -195,40 +213,59 @@ def yaml_str_repr(struct, indent=4):
     text = textwrap.indent(text, ' ' * indent)[indent - 1:]  # indent everything, and remove very first line extra indentation
     return text
 
-
-def add_rules_conditions(rules, indent=4):
-    """Add if wrapper for rules, listed in alert_condition_map"""
+def add_rules_conditions(rules, rules_map, indent=4):
+    """Add if wrapper for rules, listed in rules_map"""
     rule_condition = '{{- if %s }}\n'
-    for alert_name in alert_condition_map:
+    for alert_name in rules_map:
         line_start = ' ' * indent + '- alert: '
         if line_start + alert_name in rules:
-            rule_text = rule_condition % alert_condition_map[alert_name]
-            # add if condition
-            index = rules.index(line_start + alert_name)
-            rules = rules[:index] + rule_text + rules[index:]
-            # add end of if
-            try:
-                next_index = rules.index(line_start, index + len(rule_text) + 1)
-            except ValueError:
-                # we found the last alert in file if there are no alerts after it
-                next_index = len(rules)
+            rule_text = rule_condition % rules_map[alert_name]
+            start = 0
+            # to modify all alerts with same name
+            while True:
+                try:
+                    # add if condition
+                    index = rules.index(line_start + alert_name, start)
+                    start = index + len(rule_text) + 1
+                    rules = rules[:index] + rule_text + rules[index:]
+                    # add end of if
+                    try:
+                        next_index = rules.index(line_start, index + len(rule_text) + 1)
+                    except ValueError:
+                        # we found the last alert in file if there are no alerts after it
+                        next_index = len(rules)
 
-            # depending on the rule ordering in alert_condition_map it's possible that an if statement from another rule is present at the end of this block.
-            found_block_end = False
-            last_line_index = next_index
-            while not found_block_end:
-                last_line_index = rules.rindex('\n', index, last_line_index - 1)  # find the starting position of the last line
-                last_line = rules[last_line_index + 1:next_index]
+                    # depending on the rule ordering in rules_map it's possible that an if statement from another rule is present at the end of this block.
+                    found_block_end = False
+                    last_line_index = next_index
+                    while not found_block_end:
+                        last_line_index = rules.rindex('\n', index, last_line_index - 1)  # find the starting position of the last line
+                        last_line = rules[last_line_index + 1:next_index]
 
-                if last_line.startswith('{{- if'):
-                    next_index = last_line_index + 1  # move next_index back if the current block ends in an if statement
-                    continue
+                        if last_line.startswith('{{- if'):
+                            next_index = last_line_index + 1  # move next_index back if the current block ends in an if statement
+                            continue
 
-                found_block_end = True
-
-            rules = rules[:next_index] + '{{- end }}\n' + rules[next_index:]
+                        found_block_end = True
+                    rules = rules[:next_index] + '{{- end }}\n' + rules[next_index:]
+                except ValueError:
+                    break
     return rules
 
+def add_rules_conditions_from_condition_map(rules, indent=4):
+    """Add if wrapper for rules, listed in alert_condition_map"""
+    rules = add_rules_conditions(rules, alert_condition_map, indent)
+    return rules
+
+def add_rules_per_rule_conditions(rules, group, indent=4):
+    """Add if wrapper for rules, listed in alert_condition_map"""
+    rules_condition_map = {}
+    for rule in group['rules']:
+        if 'alert' in rule:
+            rules_condition_map[rule['alert']] = f"not (.Values.defaultRules.disabled.{rule['alert']} | default false)"
+
+    rules = add_rules_conditions(rules, rules_condition_map, indent)
+    return rules
 
 def add_custom_labels(rules, indent=4):
     """Add if wrapper for additional rules labels"""
@@ -251,7 +288,6 @@ def add_custom_labels(rules, indent=4):
         rules = rules[:index] + "\n" + rule_condition + rules[index:]
     return rules
 
-
 def write_group_to_file(group, url, destination):
     fix_expr(group['rules'])
     group_name = group['name']
@@ -268,7 +304,8 @@ def write_group_to_file(group, url, destination):
                 init_line += '\n' + replacement_map[line]['init']
     # append per-alert rules
     rules = add_custom_labels(rules)
-    rules = add_rules_conditions(rules)
+    rules = add_rules_conditions_from_condition_map(rules)
+    rules = add_rules_per_rule_conditions(rules, group)
     # initialize header
     lines = header % {
         'name': group['name'],
@@ -293,7 +330,6 @@ def write_group_to_file(group, url, destination):
         f.write(lines)
 
     print(f"Generated {new_filename}")
-
 
 def write_rules_names_template():
     with open('../templates/victoria-metrics-operator/_rules.tpl', 'w') as f:

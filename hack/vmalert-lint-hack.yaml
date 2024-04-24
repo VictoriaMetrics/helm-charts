@@ -2,10 +2,31 @@ server:
   notifier:
     alertmanager:
       url: foo
+  notifiers:
+    - alertmanager:
+        url: foo2
+        bearer:
+          token: foo
+    - alertmanager:
+        url: foo3
+        bearer:
+          tokenFile: foo
+    - alertmanager:
+        url: foo4
+        basicAuth:
+          username: foo
+          password: foo
+
   datasource:
       url: foo
-  config: 
+  config:
     alerts:
       groups: ["bar"]
   podDisruptionBudget:
     enabled: true
+
+license:
+#  key: "asdf"
+  secret:
+    name: "victoria-metrics-license"
+    key: "license"

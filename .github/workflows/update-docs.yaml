@@ -1,0 +1,66 @@
+name: "Update docs"
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'README.md'
+      - 'charts/**/README.md'
+      - 'charts/**/README.md.gotmpl'
+      - '**/README.md'
+      - '**/README.md.gotmpl'
+      - '.github/workflows/update-docs.yaml'
+
+jobs:
+  publish-readme:
+    permissions:
+      contents: write
+      id-token: write
+
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.VM_BOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.VM_BOT_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Generate docs
+        run:
+          make gen-docs
+
+      - name: Copy docs
+        run: |
+          cp -f README.md ${{ runner.temp }}/README.md
+          for readme in $(find charts/*/README.md)
+          do
+            mkdir -p $(dirname ${{ runner.temp }}/$readme)
+            cp -f $readme ${{ runner.temp }}/$readme
+          done
+
+      - name: Checkout to pages
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+
+      - name: Synchronize docs
+        run: |
+          export VM_GIT_BRANCH_NAME="docs-update-$(date +%s)"
+          git checkout -b "${VM_GIT_BRANCH_NAME}"
+          cp -f ${{ runner.temp }}/README.md .
+          cp -fr ${{ runner.temp }}/charts ./
+          git add README.md
+          git add charts/*/README.md
+          git commit -S -m "Synchronize docs"
+          git push origin ${VM_GIT_BRANCH_NAME}
+          gh pr create -f --base gh-pages
+        env:
+          GH_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"

@@ -19,7 +19,7 @@ spec:
     matchLabels:
       {{- include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
   replicas: {{ .Values.vmselect.replicaCount }}
-  podManagementPolicy: {{ .Values.vmselect.podManagementPolicy }}
+  podManagementPolicy: {{ .Values.vmselect.statefulSet.podManagementPolicy }}
   template:
     metadata:
     {{- if .Values.vmselect.podAnnotations }}
@@ -27,7 +27,7 @@ spec:
 {{ toYaml .Values.vmselect.podAnnotations | indent 8 }}
     {{- end }}
       labels:
-        {{- include "victoria-metrics.vmselect.labels" . | nindent 8 }}
+        {{- include "victoria-metrics.vmselect.podLabels" . | nindent 8 }}
 {{- with .Values.vmselect.extraLabels }}
 {{ toYaml . | indent 8 }}
 {{- end }}
@@ -48,15 +48,30 @@ spec:
           workingDir: {{ .Values.vmselect.containerWorkingDir }}
           {{- end }}
           securityContext:
-            {{- toYaml .Values.vmselect.podSecurityContext | nindent 12 }}
+            {{- toYaml .Values.vmselect.securityContext | nindent 12 }}
           args:
             - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
-          {{- if not .Values.vmselect.suppresStorageFQDNsRender }}
+          {{- if not (or .Values.vmselect.suppressStorageFQDNsRender .Values.vmselect.suppresStorageFQDNsRender) }}
           {{- include "victoria-metrics.vmselect.vmstorage-pod-fqdn" . | nindent 12 }}
           {{- end }}
           {{- include "victoria-metrics.vmselect.vmselect-pod-fqdn" . | nindent 12 -}}
           {{- range $key, $value := .Values.vmselect.extraArgs }}
+          {{- if kindIs "slice" $value }}
+          {{- range $v := $value }}
+            - --{{ $key }}={{ $v }}
+          {{- end }}
+          {{- else }}
             - --{{ $key }}={{ $value }}
+          {{- end }}
+          {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
+          {{- if .Values.vmselect.envFrom }}
+          envFrom:
+            {{- with .Values.vmselect.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with .Values.vmselect.env }}
           env: {{ toYaml . | nindent 10 }}
@@ -71,8 +86,17 @@ spec:
           {{- end }}
           readinessProbe:
             httpGet:
+            {{- if index  .Values.vmselect.extraArgs "http.pathPrefix" }}
+              path: {{ trimSuffix "/" (index .Values.vmselect.extraArgs "http.pathPrefix") }}/health
+            {{- else }}
               path: /health
+            {{- end }}
               port: http
+            {{- if .Values.vmselect.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: 5
             periodSeconds: 15
           livenessProbe:
@@ -93,6 +117,7 @@ spec:
             {{- with .Values.vmselect.extraVolumeMounts }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
           {{- with .Values.vmselect.resources }}
           resources:
           {{- toYaml . | nindent 12 }}
@@ -108,9 +133,9 @@ spec:
       nodeSelector:
 {{ toYaml .Values.vmselect.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.vmselect.securityContext }}
+    {{- if .Values.vmselect.podSecurityContext }}
       securityContext:
-{{ toYaml .Values.vmselect.securityContext | indent 8 }}
+{{ toYaml .Values.vmselect.podSecurityContext | indent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.vmselect.tolerations }}
@@ -121,6 +146,10 @@ spec:
       affinity:
 {{ toYaml .Values.vmselect.affinity | indent 8 }}
     {{- end }}
+    {{- if .Values.vmselect.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .Values.vmselect.topologySpreadConstraints | indent 8 }}
+    {{- end }}
       volumes:
       {{- with .Values.vmselect.extraVolumes }}
       {{- toYaml . | nindent 6 }}
@@ -129,17 +158,22 @@ spec:
       - name: cache-volume
         emptyDir: {}
       {{- end }}
+      {{- include "chart.license.volume" . | nindent 8 }}
   {{- if .Values.vmselect.persistentVolume.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: cache-volume
         {{- if .Values.vmselect.persistentVolume.annotations }}
         annotations:
-    {{ toYaml .Values.vmselect.persistentVolume.annotations | indent 10 }}
-    {{- end }}
+        {{ toYaml .Values.vmselect.persistentVolume.annotations | indent 10 }}
+        {{- end }}
+        {{- if .Values.vmstorage.persistentVolume.labels }}
+        labels:
+        {{ toYaml .Values.vmstorage.persistentVolume.labels | indent 10 }}
+        {{- end }}
       spec:
         accessModes:
-        {{ toYaml .Values.vmselect.persistentVolume.accessModes | indent 10 }}
+        {{- toYaml .Values.vmselect.persistentVolume.accessModes | nindent 10 }}
         resources:
           requests:
             storage: "{{ .Values.vmselect.persistentVolume.size }}"

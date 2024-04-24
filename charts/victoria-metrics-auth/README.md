@@ -1,14 +1,16 @@
 # Helm Chart For Victoria Metrics Auth.
 
- ![Version: 0.2.72](https://img.shields.io/badge/Version-0.2.72-informational?style=flat-square)
+ ![Version: 0.4.9](https://img.shields.io/badge/Version-0.4.9-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-auth)
+[![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
 Victoria Metrics Auth - is a simple auth proxy and router for VictoriaMetrics.
 
-# Prerequisites
+## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
 
-# How to install
+## How to install
 
 Access a Kubernetes cluster.
 
@@ -21,8 +23,6 @@ helm repo update
 ```
 
 List versions of ``vm/victoria-metrics-auth`` chart available to installation:
-
-##### for helm v3
 
 ```console
 helm search repo vm/victoria-metrics-auth -l
@@ -43,8 +43,6 @@ helm install vmauth vm/victoria-metrics-auth -f values.yaml -n NAMESPACE --debug
 ```
 
 Install chart with command:
-
-##### for helm v3
 
 ```console
 helm install vmauth vm/victoria-metrics-auth -f values.yaml -n NAMESPACE
@@ -68,7 +66,7 @@ See the history of versions of ``vmauth`` application with command.
 helm history vmauth -n NAMESPACE
 ```
 
-# How to uninstall
+## How to uninstall
 
 Remove application with command.
 
@@ -76,7 +74,7 @@ Remove application with command.
 helm uninstall vmauth -n NAMESPACE
 ```
 
-# Documentation of Helm Chart
+## Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
 
@@ -90,7 +88,7 @@ helm-docs
 
 The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-# Parameters
+## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
 
@@ -101,20 +99,22 @@ Change the values according to the need of the environment in ``victoria-metrics
 | affinity | object | `{}` | Affinity configurations |
 | annotations | object | `{}` | Annotations to be added to the deployment |
 | config | string | `nil` | Config file content. |
-| configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html |
 | containerWorkingDir | string | `"/"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| envFrom | list | `[]` |  |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | extraArgs.loggerFormat | string | `"json"` |  |
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
+| extraLabels | object | `{}` | Labels to be added to the deployment and pods |
+| extraObjects | list | `[]` | Add extra specs dynamically to this chart |
 | extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmauth"` | Victoria Metrics Auth Docker repository and image name |
-| image.tag | string | `"v1.87.1"` | Tag of Docker image |
+| image.tag | string | `"v1.100.1"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
@@ -128,6 +128,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingressInternal.hosts | list | `[]` |  |
 | ingressInternal.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | ingressInternal.tls | list | `[]` |  |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
+| license.key | string | `""` | License key |
+| license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
+| license.secret.key | string | `""` | Key in secret with license key |
+| license.secret.name | string | `""` | Existing secret name |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
@@ -138,6 +143,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` | Number of replicas of vmauth |
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
+| secretName | string | `""` | Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html. Configuration in the given secret must be stored under `auth.yml` key. |
 | securityContext | object | `{}` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
@@ -154,5 +160,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
+| serviceMonitor.metricRelabelings | list | `[]` |  |
 | serviceMonitor.relabelings | list | `[]` |  |
 | tolerations | list | `[]` | Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |

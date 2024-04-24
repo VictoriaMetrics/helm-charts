@@ -1,6 +1,7 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
 {{ template "chart.typeBadge" . }} {{ template "chart.versionBadge" . }}
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 {{ template "chart.description" . }}
 
@@ -15,10 +16,12 @@
 * [Values](#Parameters)
 
 
-# Overview
+## Overview
 This chart is an All-in-one solution to start monitoring kubernetes cluster.
-It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/tree/master/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
+It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
 Also it installs Custom Resources like [VMSingle](https://docs.victoriametrics.com/operator/quick-start.html#vmsingle), [VMCluster](https://docs.victoriametrics.com/operator/quick-start.html#vmcluster), [VMAgent](https://docs.victoriametrics.com/operator/quick-start.html#vmagent), [VMAlert](https://docs.victoriametrics.com/operator/quick-start.html#vmalert).
+
+By default, the operator [converts all existing prometheus-operator API objects](https://docs.victoriametrics.com/operator/quick-start.html#migration-from-prometheus-operator-objects) into corresponding VictoriaMetrics Operator objects.
 
 To enable metrics collection for kubernetes this chart installs multiple scrape configurations for kuberenetes components like kubelet and kube-proxy, etc. Metrics collection is done by [VMAgent](https://docs.victoriametrics.com/operator/quick-start.html#vmagent). So if want to ship metrics to external VictoriaMetrics database you can disable VMSingle installation by setting `vmsingle.enabled` to `false` and setting `vmagent.vmagentSpec.remoteWrite.url` to your external VictoriaMetrics database.
 
@@ -27,11 +30,12 @@ This chart also installs bunch of dashboards and recording rules from [kube-prom
 ![Overview](img/k8s-stack-overview.png)
 
 
-# Configuration
+## Configuration
 
-Configuration of this chart is done through helm values. 
+Configuration of this chart is done through helm values.
 
-## Dependencies
+### Dependencies
+
 Dependencies can be enabled or disabled by setting `enabled` to `true` or `false` in `values.yaml` file.
 
 **!Important:** for dependency charts anything that you can find in values.yaml of dependency chart can be configured in this chart under key for that dependency. For example if you want to configure `grafana` you can find all possible configuration options in [values.yaml](https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml) and you should set them in values for this chart under grafana: key. For example if you want to configure `grafana.persistence.enabled` you should set it in values.yaml like this:
@@ -47,7 +51,8 @@ grafana:
     enabled: false
 ```
 
-## VictoriaMetrics components
+### VictoriaMetrics components
+
 This chart installs multiple VictoriaMetrics components using Custom Resources that are managed by [victoria-metrics-operator](https://docs.victoriametrics.com/operator/design.html)
 Each resource can be configured using `spec` of that resource from API docs of [victoria-metrics-operator](https://docs.victoriametrics.com/operator/api.html). For example if you want to configure `VMAgent` you can find all possible configuration options in [API docs](https://docs.victoriametrics.com/operator/api.html#vmagent) and you should set them in values for this chart under `vmagent.spec` key. For example if you want to configure `remoteWrite.url` you should set it in values.yaml like this:
 ```yaml
@@ -57,12 +62,13 @@ vmagent:
       - url: "https://insert.vmcluster.domain.com/insert/0/prometheus/api/v1/write"
 ```
 
-## Rules and dashboards
+### Rules and dashboards
+
 This chart by default install multiple dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
 you can disable dashboards with `defaultDashboardsEnabled: false` and `experimentalDashboardsEnabled: false`
 and rules can be configured under `defaultRules`
 
-## Prometheus scrape configs
+### Prometheus scrape configs
 This chart installs multiple scrape configurations for kubernetes monitoring. They are configured under `#ServiceMonitors` section in `values.yaml` file. For example if you want to configure scrape config for `kubelet` you should set it in values.yaml like this:
 ```yaml
 kubelet:
@@ -75,10 +81,10 @@ kubelet:
   # spec for VMNodeScrape crd
   # https://docs.victoriametrics.com/operator/api.html#vmnodescrapespec
   spec:
-    interval: "30s" 
+    interval: "30s"
 ```
 
-# Prerequisites
+## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
 
@@ -86,14 +92,14 @@ kubelet:
 
 ```console
 helm repo add grafana https://grafana.github.io/helm-charts
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 ```
 
 * PV support on underlying infrastructure.
 
 
-# How to install
+## How to install
 
 Access a Kubernetes cluster.
 
@@ -106,8 +112,6 @@ helm repo update
 ```
 
 List versions of ``vm/victoria-metrics-k8s-stack`` chart available to installation:
-
-##### for helm v3
 
 ```console
 helm search repo vm/victoria-metrics-k8s-stack -l
@@ -129,8 +133,6 @@ helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAME
 
 Install chart with command:
 
-##### for helm v3
-
 ```console
 helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE
 ```
@@ -141,7 +143,23 @@ Get the pods lists by running this commands:
 kubectl get pods -A | grep 'victoria-metrics'
 ```
 
-# How to uninstall
+### Install locally (Minikube)
+
+To run VictoriaMetrics stack locally it's possible to use [Minikube](https://github.com/kubernetes/minikube). To avoid dashboards and alert rules issues please follow the steps below:
+
+Run Minikube cluster
+
+```
+minikube start --container-runtime=containerd --extra-config=scheduler.bind-address=0.0.0.0 --extra-config=controller-manager.bind-address=0.0.0.0 
+```
+
+Install helm chart
+
+```
+helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -f values.minikube.yaml -n NAMESPACE --debug --dry-run
+```
+
+## How to uninstall
 
 Remove application with command.
 
@@ -158,7 +176,7 @@ CRDs created by this chart are not removed by default and should be manually cle
 kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl delete crd {}
 ```
 
-# Troubleshooting
+## Troubleshooting
 
 - If you cannot install helm chart with error `configmap already exist`. It could happen because of name collisions, if you set too long release name.
   Kubernetes by default, allows only 63 symbols at resource names and all resource names are trimmed by helm to 63 symbols.
@@ -173,14 +191,26 @@ helm upgrade -i some-very-long-name vm/victoria-metrics-k8s-stack --set fullname
 ```
 
 
-# Upgrade guide
+## Upgrade guide
 
-Usually, helm upgrade doesn't requires manual actions. But release with CRD update must be patched manually with kubectl.
- Just execute command:
+Usually, helm upgrade doesn't requires manual actions. Just execute command:
+
 ```console
 $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
- All CRD manual actions upgrades listed below:
+
+But release with CRD update can only be patched manually with kubectl.
+Since helm does not perform a CRD update, we recommend that you always perform this when updating the helm-charts version:
+
+```console
+# 1. check the changes in CRD
+$ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl diff -f -
+
+# 2. apply the changes (update CRD)
+$ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl apply -f - --server-side
+```
+
+All other manual actions upgrades listed below:
 
 
 ### Upgrade to 0.13.0
@@ -238,7 +268,7 @@ kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.1
 ```
 
 
-# Documentation of Helm Chart
+## Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
 
@@ -252,7 +282,7 @@ helm-docs
 
 The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-# Parameters
+## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
 

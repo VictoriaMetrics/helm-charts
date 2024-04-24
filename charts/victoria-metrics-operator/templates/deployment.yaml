@@ -19,8 +19,7 @@ spec:
   replicas: {{.Values.replicaCount}}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "vm-operator.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "vm-operator.selectorLabels" . | nindent 6 }}
   template:
     metadata:
 {{- with .Values.annotations }}
@@ -28,32 +27,37 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
       labels:
-        app.kubernetes.io/name: {{ include "vm-operator.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-{{- with .Values.podLabels }}
-{{ toYaml . | indent 8 }}
-{{- end }}
+        {{- include "vm-operator.selectorLabels" . | nindent 8}}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-{{- with .Values.securityContext }}
+{{- with .Values.podSecurityContext }}
       securityContext:
-{{ toYaml . | nindent 8 }}
+{{- toYaml . | nindent 8 }}
 {{- end }}
       serviceAccountName: {{ template "vm-operator.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           env:
           {{- range .Values.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}
           {{- end }}
             - name: WATCH_NAMESPACE
-              value: ""
+              value: {{ .Values.watchNamespace | quote }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -90,7 +94,13 @@ spec:
             - --webhook.enable=true
             {{- end }}
             {{- range $key, $value := .Values.extraArgs }}
-            - -{{ $key }}={{ $value }}
+            {{- if kindIs "slice" $value }}
+            {{- range $v := $value }}
+            - --{{ $key }}={{ $v }}
+            {{- end }}
+            {{- else }}
+            - --{{ $key }}={{ $value }}
+            {{- end }}
             {{- end }}
           command:
             - manager
@@ -112,6 +122,10 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.securityContext }}
+          securityContext:
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
         {{- with.Values.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -122,6 +136,17 @@ spec:
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range $constraint := .Values.topologySpreadConstraints }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+          {{- if not $constraint.labelSelector }}
+          labelSelector:
+            matchLabels:
+              {{- include "vm-operator.selectorLabels" $ | nindent 14 }}
+          {{- end }}
+        {{- end }}
     {{- end }}
     {{- with .Values.tolerations }}
       tolerations:

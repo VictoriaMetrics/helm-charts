@@ -1,3 +1,5 @@
+name: "Test charts"
+
 on:
   push:
     paths-ignore:
@@ -10,9 +12,8 @@ on:
       - 'index.yaml'
       - '**.md'
 
-
 env:
-  HELM_VERSION: 3.9.2
+  HELM_VERSION: 3.11.3
 
 jobs:
   get-changed-charts:
@@ -28,7 +29,7 @@ jobs:
 
       - name: Run changed-files with dir_names
         id: changed-charts
-        uses: tj-actions/changed-files@v34
+        uses: tj-actions/changed-files@v41
         with:
           files: |
             charts/**
@@ -50,7 +51,7 @@ jobs:
     strategy:
       matrix:
         chart: ${{ fromJSON(needs.get-changed-charts.outputs.charts) }}
-        k8s_version: ["v1.22.16", "v1.23.14", "v1.24.8"]
+        k8s_version: ["v1.25.10", "v1.26.14", "v1.27.11","v1.28.7","v1.29.2"]
       fail-fast: false
     steps:
       - name: Checkout
@@ -84,6 +85,10 @@ jobs:
           kubectl taint --all=true nodes node.cloudprovider.kubernetes.io/uninitialized- || true
 
       - name: Run chart-testing (install)
+        env:
+          VMANOMALY_LICENSE_CICD: ${{ secrets.VMANOMALY_LICENSE_CICD }}
         run: |
+          kubectl create namespace ${{ matrix.chart }}-testing
+          kubectl create secret -n=${{ matrix.chart }}-testing generic vmanomaly-license --from-literal=license=$VMANOMALY_LICENSE_CICD
           helm dep update charts/${{ matrix.chart }}
-          ct install --config .github/ci/ct.yaml --charts "charts/${{ matrix.chart }}" --helm-extra-set-args "--values ./hack/helm/${{ matrix.chart }}.yaml"
+          ct install --namespace=${{ matrix.chart }}-testing --config .github/ci/ct.yaml --charts "charts/${{ matrix.chart }}" --helm-extra-set-args "--values ./hack/helm/${{ matrix.chart }}.yaml"

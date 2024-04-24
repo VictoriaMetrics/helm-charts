@@ -3,6 +3,7 @@
 from ast import operator
 from faulthandler import enable
 import json
+import re
 import textwrap
 from os import makedirs, path
 
@@ -26,9 +27,6 @@ def change_style(style, representer):
 
 sources_json = [
     {
-        'source': 'https://etcd.io/docs/v3.4/op-guide/grafana.json',
-    },
-    {
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json',
     },
     {
@@ -44,9 +42,6 @@ sources_json = [
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/operator.json',
     },
     {
-        'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json',
-    },
-    {
         'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json',
     },
     {
@@ -56,14 +51,11 @@ sources_json = [
         'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json',
     },
     {
-        'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json',
-    },
-    {
         'source': 'https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json',
     },
     {
         'source': 'https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json',
-    },
+    }
 ]
 # Source files list
 sources_yaml = [
@@ -72,9 +64,9 @@ sources_yaml = [
     },
 ]
 
-skip_list = [
-    "prometheus.json",
-    "prometheus-remote-write.json"
+allow_dashboards_list = [
+    "alertmanager-overview.json",
+    "grafana-overview.json",
 ]
 
 dashboards_destination = "../templates/grafana/dashboards"
@@ -109,6 +101,24 @@ Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
 {{- %(condition)s }}
+{{- if .Values.grafanaOperatorDashboardsFormat.enabled }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%%s-%%s" (include "victoria-metrics-k8s-stack.fullname" $) "%(name)s" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+spec:
+  {{- with .Values.grafanaOperatorDashboardsFormat.instanceSelector }}
+  instanceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
+  allowCrossNamespaceImport: true
+  {{- end }}
+{{- else }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -124,7 +134,7 @@ metadata:
     {{- end }}
     {{- end }}
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
-{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
     {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
   annotations:
     {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
@@ -132,6 +142,7 @@ metadata:
     {{- end }}
     {{- end }}
 data:
+{{- end }}
 '''
 
 
@@ -161,30 +172,47 @@ def yaml_str_repr(struct, indent=2):
     return text
 
 
+def replace_ds_type_in_panel(panel):
+    if 'datasource' in panel:
+        if 'type' in panel['datasource']:
+            panel['datasource']['type'] = '__VM_DEFAULT_DATASOURCE__'
+    for target in panel.get('targets', []):
+        if 'datasource' in target:
+            if 'type' in target['datasource']:
+                target['datasource']['type'] = '__VM_DEFAULT_DATASOURCE__'
+
 def patch_dashboards_json(content):
     try:
         content_struct = json.loads(content)
 
         ## multicluster
         overwrite_list = []
-        for variable in content_struct['templating']['list']:
-            if variable['name'] == 'cluster':
-                variable['hide'] = ':multicluster:'
-            overwrite_list.append(variable)
+        if 'templating' in content_struct:
+            for variable in content_struct['templating'].get('list', []):
+                if variable.get('name', '') == 'cluster':
+                    variable['hide'] = ':multicluster:'
+                if variable.get('type', '') == 'datasource' and variable.get('query', '') == 'prometheus':
+                    variable['query'] = '__VM_DEFAULT_DATASOURCE__'
+                overwrite_list.append(variable)
         content_struct['templating']['list'] = overwrite_list
 
         ## make dashboards readonly
         content_struct['editable'] = False
 
         ## add common tag
-        content_struct['tags'].append('vm-k8s-stack')
+        if 'tags' in content_struct:
+            content_struct['tags'].append('vm-k8s-stack')
 
         ## fix drilldown links. see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/659
-        for row in content_struct['rows']:
-            for panel in row['panels']:
+        for row in content_struct.get('rows', []):
+            for panel in row.get('panels', []):
+                replace_ds_type_in_panel(panel)
                 for style in panel.get('styles', []):
                     if 'linkUrl' in style and style['linkUrl'].startswith('./d'):
                         style['linkUrl'] = style['linkUrl'].replace('./d', '/d')
+
+        for panel in content_struct.get('panels', []):
+            replace_ds_type_in_panel(panel)
 
         content_array = []
         original_content_lines = content.split('\n')
@@ -212,10 +240,15 @@ def patch_dashboards_json(content):
                 '\{\{ if .Values.grafana.sidecar.dashboards.multicluster \}\}0\{\{ else \}\}2\{\{ end \}\}',
                 content[multicluster + 15:]
             ))
-    except (ValueError, KeyError):
-        pass
+    except (ValueError, KeyError) as err:
+        print("Cannot update dashboard content: ", err)
 
     return content
+
+
+def patch_json_set_timezone_as_variable(content):
+    # content is no more in json format, so we have to replace using regex
+    return re.sub(r'"timezone"\s*:\s*"(?:\\.|[^\"])*"', '"timezone": "\{\{ .Values.grafana.defaultDashboardsTimezone \}\}"', content, flags=re.IGNORECASE)
 
 
 def write_group_to_file(resource_name, content, url, destination):
@@ -232,13 +265,17 @@ def write_group_to_file(resource_name, content, url, destination):
     }
 
     content = patch_dashboards_json(content)
+    content = patch_json_set_timezone_as_variable(content)
 
-    filename_struct = {resource_name + '.json': (LiteralStr(content))}
     # rules themselves
-    lines += yaml_str_repr(filename_struct)
+    lines += '  {{ if not .Values.grafanaOperatorDashboardsFormat.enabled }}' + resource_name + '.{{ end }}json:'
+    lines += yaml_str_repr((LiteralStr(content)))
 
     # footer
     lines += '{{- end }}'
+
+    # replace placeholders with datasource type variable
+    lines = lines.replace("__VM_DEFAULT_DATASOURCE__", '{{ default \"prometheus\" .Values.grafana.defaultDatasourceType }}')
 
     filename = resource_name + '.yaml'
     new_filename = "%s/%s" % (destination, filename)
@@ -284,7 +321,7 @@ def main():
         groups = yaml_text['items']
         for group in groups:
             for resource, content in group['data'].items():
-                if resource in skip_list:
+                if resource not in allow_dashboards_list:
                     continue
                 write_group_to_file(resource.replace('.json', ''), content, src['source'], dashboards_destination)
        

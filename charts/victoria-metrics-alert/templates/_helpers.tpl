@@ -36,12 +36,12 @@ Create unified labels for vmalert components
 */}}
 {{- define "vmalert.common.matchLabels" -}}
 app.kubernetes.io/name: {{ include "vmalert.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "vmalert.common.metaLabels" -}}
 helm.sh/chart: {{ include "vmalert.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "vmalert.server.labels" -}}
@@ -119,13 +119,114 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 {{- end -}}
 
+
+{{/*
+Create base alertmanager url for notifers
+*/}}
 {{- define "vmalert.alertmanager.url" -}}
 {{- if .Values.alertmanager.enabled -}}
-http://{{- include "vmalert.alertmanager.fullname" . -}}:9093
+http://{{- include "vmalert.alertmanager.fullname" . -}}:9093{{ .Values.alertmanager.baseURLPrefix }}
 {{- else -}}
 {{- .Values.server.notifier.alertmanager.url -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "vmalert.alertmanager.urls" -}}
+{{- $urls := list -}}
+{{- with (include "vmalert.alertmanager.url" .) -}}
+{{- $urls = append $urls . -}}
+{{- end -}}
+{{- range .Values.server.notifiers }}
+    {{- if not (eq .alertmanager.url "") -}}
+        {{- $urls = append $urls .alertmanager.url -}}
+    {{- end -}}
+{{- end -}}
+{{- join "," $urls }}
+{{- end -}}
+
+{{- define "vmalert.alertmanager.passwords" -}}
+{{- $password := list -}}
+{{- if .Values.alertmanager.enabled -}}
+{{- $password = append $password "" -}}
+{{- end -}}
+{{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+{{- range $notifiers }}
+    {{- if not (eq .alertmanager.url "") -}}
+        {{- if and .alertmanager.basicAuth .alertmanager.basicAuth.password -}}
+            {{- $password = append $password .alertmanager.basicAuth.password -}}
+        {{- else -}}
+            {{- $password = append $password "" -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{ include "_vmalert.optionalPrintList" $password }}
+{{- end -}}
+
+{{- define "vmalert.alertmanager.usernames" -}}
+{{- $usernames := list -}}
+{{- if .Values.alertmanager.enabled -}}
+{{- $usernames = append $usernames "" -}}
+{{- end -}}
+{{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+{{- range $notifiers }}
+    {{- if not (eq .alertmanager.url "") -}}
+        {{- if and .alertmanager.basicAuth .alertmanager.basicAuth.username -}}
+            {{- $usernames = append $usernames .alertmanager.basicAuth.username -}}
+        {{- else -}}
+            {{- $usernames = append $usernames "" -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{ include "_vmalert.optionalPrintList" $usernames }}
+{{- end -}}
+
+{{- define "vmalert.alertmanager.bearerTokens" -}}
+{{- $tokens := list -}}
+{{- if .Values.alertmanager.enabled -}}
+{{- $tokens = append $tokens "" -}}
+{{- end -}}
+{{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+{{- range $notifiers }}
+    {{- if not (eq .alertmanager.url "") -}}
+        {{- if and .alertmanager.bearer .alertmanager.bearer.token -}}
+            {{- $tokens = append $tokens .alertmanager.bearer.token -}}
+        {{- else -}}
+            {{- $tokens = append $tokens "" -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{ include "_vmalert.optionalPrintList" $tokens }}
+{{- end -}}
+
+
+{{- define "vmalert.alertmanager.bearerTokenFiles" -}}
+{{- $files := list -}}
+{{- if .Values.alertmanager.enabled -}}
+{{- $files = append $files "" -}}
+{{- end -}}
+{{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+{{- range $notifiers }}
+    {{- if not (eq .alertmanager.url "") -}}
+        {{- if and .alertmanager.bearer .alertmanager.bearer.tokenFile -}}
+            {{- $files = append $files .alertmanager.bearer.tokenFile -}}
+        {{- else -}}
+            {{- $files = append $files "" -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{ include "_vmalert.optionalPrintList" $files }}
+{{- end -}}
+
+{{- define "_vmalert.optionalPrintList" }}
+{{- $str := join "," . -}}
+{{- $cleared := $str | replace "," "" | trim -}}
+{{- if eq $cleared "" -}}
+{{ $cleared }}
+{{- else -}}
+{{ $str }}
+{{- end -}}
+{{- end -}}
+
 
 {{/*
 Return the appropriate apiVersion for ingress.
@@ -159,4 +260,39 @@ Return if ingress supports pathType.
 */}}
 {{- define "vmalert.ingress.supportsPathType" -}}
   {{- or (eq (include "vmalert.ingress.isStable" .) "true") (and (eq (include "vmalert.ingress.apiVersion" .) "networking.k8s.io/v1beta1")) -}}
+{{- end -}}
+
+{{/*
+Return license flag if necessary.
+*/}}
+{{- define "vmalert.license.flag" -}}
+{{- if .Values.license.key -}}
+-license={{ .Values.license.key }}
+{{- end }}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+-licenseFile=/etc/vm-license-key/{{ .Values.license.secret.key }}
+{{- end -}}
+{{- end -}}
+
+
+{{/*
+Return license volume mount
+*/}}
+{{- define "vmalert.license.volume" -}}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+- name: license-key
+  secret:
+    secretName: {{ .Values.license.secret.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return license volume mount for container
+*/}}
+{{- define "vmalert.license.mount" -}}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+- name: license-key
+  mountPath: /etc/vm-license-key
+  readOnly: true
+{{- end -}}
 {{- end -}}

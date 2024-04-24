@@ -1,0 +1,137 @@
+name: "Release charts"
+
+on:
+  workflow_dispatch:
+    ref: master
+    branches:
+      - master
+    permissions:
+      teams:
+        - development
+
+env:
+  HELM_VERSION: 3.9.2
+  YQ_VERSION: 4.35.1
+
+jobs:
+  release:
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.VM_BOT_GH_TOKEN }}
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.VM_BOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.VM_BOT_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Install tools
+        uses: yokawasa/action-setup-kube-tools@v0.9.2
+        with:
+          setup-tools: |
+            helmv3
+            yq
+          helm: "${{ env.HELM_VERSION }}"
+          yq: "${{ env.YQ_VERSION }}"
+
+      - name: Add dependencies
+        run: |
+          yq -M eval '.repositories[] | (.name + " " + .url)' .github/ci/helm-repos.yaml | xargs -L 1 helm repo add
+          make helm-repo-update
+
+      - name: Generate docs
+        run: make gen-docs
+
+      - name: Generate release notes
+        run: |
+          for changelog in $(find charts/*/CHANGELOG.md)
+          do
+              if grep -q "^## Next release$" $changelog
+              then
+                echo "Processing $changelog"
+              else
+                echo "ERROR: Not found 'Next release' section in $changelog"
+                exit 1
+              fi
+              
+              # Useful variables
+              export CHART_FILE="$(dirname $changelog)/Chart.yaml"
+              export APP_VERSION="$(yq -M '.appVersion' $CHART_FILE)"
+              export CHART_VERSION="$(yq -M '.version' $CHART_FILE)"
+              
+              # If version already released
+              if grep -q "^## $CHART_VERSION$" $changelog
+              then
+                echo "There is nothing to release for $changelog"
+              else
+                # Release notes file
+                export RN_FILE="$(dirname $changelog)/RELEASE_NOTES.md"
+                export RN_CONTENT="$(awk '/^## Next release/{flag=1;next}/^## /{flag=0}flag' $changelog | awk 'NF {p=1} p')"
+          
+                # ArtifactHub annotation in Chart.yaml file
+                yq -M -i eval '.annotations["artifacthub.io/changes"] = strenv(RN_CONTENT)' $CHART_FILE
+          
+                # Create release notes
+                echo "# Release notes for version $CHART_VERSION" > $RN_FILE
+                echo "" >> $RN_FILE
+                echo "**Release date:** $(date -I)" >> $RN_FILE
+                echo "" >> $RN_FILE
+                echo "![AppVersion: $APP_VERSION](https://img.shields.io/static/v1?label=AppVersion&message=$APP_VERSION&color=success&logo=)" >> $RN_FILE
+                echo "![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)" >> $RN_FILE
+                echo "" >> $RN_FILE
+                echo "$RN_CONTENT" >> $RN_FILE
+                echo "" >> $RN_FILE 
+          
+                # Update chart version in CHANGELOG
+                cp $changelog $changelog.copy
+                : > $changelog
+                while read -r line; do 
+                  echo "$line" >> $changelog
+                  if [[ $line == "## Next release" ]]
+                  then
+                    echo "" >> $changelog
+                    echo "- TODO" >> $changelog
+                    echo "" >> $changelog
+                    echo "## $CHART_VERSION" >> $changelog
+                    echo "" >> $changelog
+                    echo "**Release date:** $(date -I)" >> $changelog
+                    echo "" >> $changelog
+                    echo "![AppVersion: $APP_VERSION](https://img.shields.io/static/v1?label=AppVersion&message=$APP_VERSION&color=success&logo=)" >> $changelog
+                    echo "![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)" >> $changelog
+                  fi 
+                done < $changelog.copy
+                rm $changelog.copy
+              fi
+          done
+
+      - name: Release
+        uses: helm/chart-releaser-action@v1.5.0
+        env:
+          CR_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
+        with:
+          config: .github/ci/cr.yaml
+
+      - name: Automatic update changelogs and readme
+        run: |
+          rm charts/*/RELEASE_NOTES.md
+          export VM_GIT_BRANCH_NAME="changelog-update-$(date +%s)"
+          git checkout -b "${VM_GIT_BRANCH_NAME}"
+          git add charts/*/CHANGELOG.md
+          git add charts/*/README.md
+          git commit -S -m "Automatic update CHANGELOGs and READMEs"
+          git push origin ${VM_GIT_BRANCH_NAME}
+          gh pr create -f
+        env:
+          GH_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"

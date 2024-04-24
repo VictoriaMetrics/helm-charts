@@ -22,6 +22,5 @@ spec:
       port: 443
       targetPort: 9443
   selector:
-    app.kubernetes.io/name: {{ include "vm-operator.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "vm-operator.selectorLabels" . | nindent 4 }}
   type: "ClusterIP"

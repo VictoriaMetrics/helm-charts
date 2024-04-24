@@ -4,6 +4,24 @@ Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
 {{- if and .Values.defaultDashboardsEnabled (index .Values "victoria-metrics-operator" "enabled") }}
+{{- if .Values.grafanaOperatorDashboardsFormat.enabled }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "operator" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+spec:
+  {{- with .Values.grafanaOperatorDashboardsFormat.instanceSelector }}
+  instanceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
+  allowCrossNamespaceImport: true
+  {{- end }}
+{{- else }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -19,7 +37,7 @@ metadata:
     {{- end }}
     {{- end }}
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
-{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
     {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
   annotations:
     {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
@@ -27,8 +45,43 @@ metadata:
     {{- end }}
     {{- end }}
 data:
-  operator.json: |-
+{{- end }}
+  {{ if not .Values.grafanaOperatorDashboardsFormat.enabled }}operator.{{ end }}json:  |-
     {
+        "__inputs": [],
+        "__elements": {},
+        "__requires": [
+            {
+                "type": "grafana",
+                "id": "grafana",
+                "name": "Grafana",
+                "version": "9.2.2"
+            },
+            {
+                "type": "panel",
+                "id": "graph",
+                "name": "Graph (old)",
+                "version": ""
+            },
+            {
+                "type": "datasource",
+                "id": "prometheus",
+                "name": "Prometheus",
+                "version": "1.0.0"
+            },
+            {
+                "type": "panel",
+                "id": "stat",
+                "name": "Stat",
+                "version": ""
+            },
+            {
+                "type": "panel",
+                "id": "text",
+                "name": "Text",
+                "version": ""
+            }
+        ],
         "annotations": {
             "list": [
                 {
@@ -52,16 +105,19 @@ data:
             ]
         },
         "description": "Overview for operator VictoriaMetrics v0.25.0 or higher",
-        "editable": true,
+        "editable": false,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 0,
-        "id": 38,
-        "iteration": 1653261405647,
+        "id": null,
         "links": [],
         "liveNow": false,
         "panels": [
             {
                 "collapsed": false,
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "$ds"
+                },
                 "gridPos": {
                     "h": 1,
                     "w": 24,
@@ -70,12 +126,21 @@ data:
                 },
                 "id": 8,
                 "panels": [],
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "$ds"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Overview",
                 "type": "row"
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "gridPos": {
@@ -86,16 +151,30 @@ data:
                 },
                 "id": 24,
                 "options": {
+                    "code": {
+                        "language": "plaintext",
+                        "showLineNumbers": false,
+                        "showMiniMap": false
+                    },
                     "content": "<div style=\"text-align: center;\">$version</div>",
                     "mode": "markdown"
                 },
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "9.2.2",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "$ds"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Version",
                 "type": "text"
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Number of objects at kubernetes cluster per each controller",
@@ -143,11 +222,11 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "9.2.2",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -162,7 +241,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -209,11 +288,11 @@ data:
                     },
                     "textMode": "auto"
                 },
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "9.2.2",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -236,7 +315,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fill": 1,
@@ -266,7 +345,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "9.2.2",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -277,7 +356,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -323,7 +402,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "",
@@ -354,7 +433,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.3.2",
+                "pluginVersion": "9.2.2",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -365,7 +444,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -407,6 +486,10 @@ data:
             },
             {
                 "collapsed": false,
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "$ds"
+                },
                 "gridPos": {
                     "h": 1,
                     "w": 24,
@@ -415,6 +498,15 @@ data:
                 },
                 "id": 6,
                 "panels": [],
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "$ds"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Troubleshooting",
                 "type": "row"
             },
@@ -424,7 +516,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Non zero metrics indicates about error with CR object definition (typos or incorrect values) or errors with kubernetes API connection.",
@@ -466,7 +558,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -479,7 +571,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -526,7 +618,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Operator limits number of reconcilation events to 5 events per 2 seconds.\n For now, this limit is applied only for vmalert and vmagent controllers.\n It should reduce load at kubernetes cluster and increase operator performance.",
@@ -567,7 +659,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -613,7 +705,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Number of objects waiting in the queue for reconciliation. Non-zero values indicate that operator cannot process CR objects changes with the given resources.",
@@ -655,7 +747,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -701,7 +793,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": " For controllers with StatefulSet it's ok to see latency greater then 3 seconds. It could be vmalertmanager,vmcluster or vmagent in statefulMode.\n\n For other controllers, latency greater then 1 second may indicate issues with kubernetes cluster or operator's performance.\n ",
@@ -750,7 +842,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -792,6 +884,10 @@ data:
             },
             {
                 "collapsed": false,
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "$ds"
+                },
                 "gridPos": {
                     "h": 1,
                     "w": 24,
@@ -800,6 +896,15 @@ data:
                 },
                 "id": 4,
                 "panels": [],
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "$ds"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "resources",
                 "type": "row"
             },
@@ -809,7 +914,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -856,7 +961,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -867,7 +972,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -879,7 +984,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -891,7 +996,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -938,7 +1043,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fill": 1,
@@ -978,7 +1083,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1024,7 +1129,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fill": 1,
@@ -1064,7 +1169,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1110,7 +1215,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -1157,7 +1262,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1199,26 +1304,29 @@ data:
             }
         ],
         "refresh": "",
-        "schemaVersion": 33,
+        "schemaVersion": 37,
         "style": "dark",
         "tags": [
             "operator",
-            "VictoriaMetrics"
+            "VictoriaMetrics",
+            "vm-k8s-stack"
         ],
         "templating": {
             "list": [
                 {
                     "current": {
                         "selected": false,
-                        "text": "cloud-test-13",
-                        "value": "cloud-test-13"
+                        "text": "cloud-c15",
+                        "value": "cloud-c15"
                     },
                     "hide": 0,
                     "includeAll": false,
                     "multi": false,
-                    "name": "datasource",
-                    "options": [],
-                    "query": "prometheus",
+                    "name": "ds",
+                    "options": [
+
+                    ],
+                    "query": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "queryValue": "",
                     "refresh": 1,
                     "regex": "",
@@ -1227,9 +1335,7 @@ data:
                 },
                 {
                     "current": {
-                        "selected": false,
-                        "text": "vm-operator-victoria-metrics-operator",
-                        "value": "vm-operator-victoria-metrics-operator"
+
                     },
                     "datasource": {
                         "type": "prometheus",
@@ -1240,7 +1346,9 @@ data:
                     "includeAll": false,
                     "multi": false,
                     "name": "job",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(operator_log_messages_total,job)",
                         "refId": "StandardVariableQuery"
@@ -1253,9 +1361,7 @@ data:
                 },
                 {
                     "current": {
-                        "selected": false,
-                        "text": "All",
-                        "value": "$__all"
+
                     },
                     "datasource": {
                         "type": "prometheus",
@@ -1266,7 +1372,9 @@ data:
                     "includeAll": true,
                     "multi": false,
                     "name": "instance",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(operator_log_messages_total{job=~\"$job\"},instance)",
                         "refId": "StandardVariableQuery"
@@ -1279,10 +1387,7 @@ data:
                 },
                 {
                     "current": {
-                        "isNone": true,
-                        "selected": false,
-                        "text": "None",
-                        "value": ""
+
                     },
                     "datasource": {
                         "type": "prometheus",
@@ -1293,7 +1398,9 @@ data:
                     "includeAll": false,
                     "multi": false,
                     "name": "version",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{job=\"$job\", instance=\"$instance\"},  version)",
                         "refId": "StandardVariableQuery"
@@ -1310,8 +1417,10 @@ data:
             "from": "now-15m",
             "to": "now"
         },
-        "timepicker": {},
-        "timezone": "",
+        "timepicker": {
+
+        },
+        "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "VictoriaMetrics - operator",
         "uid": "1H179hunk",
         "version": 1,

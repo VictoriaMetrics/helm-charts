@@ -1,6 +1,7 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.14.8](https://img.shields.io/badge/Version-0.14.8-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.21.2](https://img.shields.io/badge/Version-0.21.2-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 
@@ -14,10 +15,12 @@ Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operato
 * [Troubleshooting](#Troubleshooting)
 * [Values](#Parameters)
 
-# Overview
+## Overview
 This chart is an All-in-one solution to start monitoring kubernetes cluster.
-It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/tree/master/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
+It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
 Also it installs Custom Resources like [VMSingle](https://docs.victoriametrics.com/operator/quick-start.html#vmsingle), [VMCluster](https://docs.victoriametrics.com/operator/quick-start.html#vmcluster), [VMAgent](https://docs.victoriametrics.com/operator/quick-start.html#vmagent), [VMAlert](https://docs.victoriametrics.com/operator/quick-start.html#vmalert).
+
+By default, the operator [converts all existing prometheus-operator API objects](https://docs.victoriametrics.com/operator/quick-start.html#migration-from-prometheus-operator-objects) into corresponding VictoriaMetrics Operator objects.
 
 To enable metrics collection for kubernetes this chart installs multiple scrape configurations for kuberenetes components like kubelet and kube-proxy, etc. Metrics collection is done by [VMAgent](https://docs.victoriametrics.com/operator/quick-start.html#vmagent). So if want to ship metrics to external VictoriaMetrics database you can disable VMSingle installation by setting `vmsingle.enabled` to `false` and setting `vmagent.vmagentSpec.remoteWrite.url` to your external VictoriaMetrics database.
 
@@ -25,11 +28,12 @@ This chart also installs bunch of dashboards and recording rules from [kube-prom
 
 ![Overview](img/k8s-stack-overview.png)
 
-# Configuration
+## Configuration
 
 Configuration of this chart is done through helm values.
 
-## Dependencies
+### Dependencies
+
 Dependencies can be enabled or disabled by setting `enabled` to `true` or `false` in `values.yaml` file.
 
 **!Important:** for dependency charts anything that you can find in values.yaml of dependency chart can be configured in this chart under key for that dependency. For example if you want to configure `grafana` you can find all possible configuration options in [values.yaml](https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml) and you should set them in values for this chart under grafana: key. For example if you want to configure `grafana.persistence.enabled` you should set it in values.yaml like this:
@@ -45,7 +49,8 @@ grafana:
     enabled: false
 ```
 
-## VictoriaMetrics components
+### VictoriaMetrics components
+
 This chart installs multiple VictoriaMetrics components using Custom Resources that are managed by [victoria-metrics-operator](https://docs.victoriametrics.com/operator/design.html)
 Each resource can be configured using `spec` of that resource from API docs of [victoria-metrics-operator](https://docs.victoriametrics.com/operator/api.html). For example if you want to configure `VMAgent` you can find all possible configuration options in [API docs](https://docs.victoriametrics.com/operator/api.html#vmagent) and you should set them in values for this chart under `vmagent.spec` key. For example if you want to configure `remoteWrite.url` you should set it in values.yaml like this:
 ```yaml
@@ -55,12 +60,13 @@ vmagent:
       - url: "https://insert.vmcluster.domain.com/insert/0/prometheus/api/v1/write"
 ```
 
-## Rules and dashboards
+### Rules and dashboards
+
 This chart by default install multiple dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
 you can disable dashboards with `defaultDashboardsEnabled: false` and `experimentalDashboardsEnabled: false`
 and rules can be configured under `defaultRules`
 
-## Prometheus scrape configs
+### Prometheus scrape configs
 This chart installs multiple scrape configurations for kubernetes monitoring. They are configured under `#ServiceMonitors` section in `values.yaml` file. For example if you want to configure scrape config for `kubelet` you should set it in values.yaml like this:
 ```yaml
 kubelet:
@@ -76,7 +82,7 @@ kubelet:
     interval: "30s"
 ```
 
-# Prerequisites
+## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
 
@@ -90,7 +96,7 @@ helm repo update
 
 * PV support on underlying infrastructure.
 
-# How to install
+## How to install
 
 Access a Kubernetes cluster.
 
@@ -103,8 +109,6 @@ helm repo update
 ```
 
 List versions of ``vm/victoria-metrics-k8s-stack`` chart available to installation:
-
-##### for helm v3
 
 ```console
 helm search repo vm/victoria-metrics-k8s-stack -l
@@ -126,8 +130,6 @@ helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAME
 
 Install chart with command:
 
-##### for helm v3
-
 ```console
 helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE
 ```
@@ -138,7 +140,23 @@ Get the pods lists by running this commands:
 kubectl get pods -A | grep 'victoria-metrics'
 ```
 
-# How to uninstall
+### Install locally (Minikube)
+
+To run VictoriaMetrics stack locally it's possible to use [Minikube](https://github.com/kubernetes/minikube). To avoid dashboards and alert rules issues please follow the steps below:
+
+Run Minikube cluster
+
+```
+minikube start --container-runtime=containerd --extra-config=scheduler.bind-address=0.0.0.0 --extra-config=controller-manager.bind-address=0.0.0.0
+```
+
+Install helm chart
+
+```
+helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -f values.minikube.yaml -n NAMESPACE --debug --dry-run
+```
+
+## How to uninstall
 
 Remove application with command.
 
@@ -155,7 +173,7 @@ CRDs created by this chart are not removed by default and should be manually cle
 kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl delete crd {}
 ```
 
-# Troubleshooting
+## Troubleshooting
 
 - If you cannot install helm chart with error `configmap already exist`. It could happen because of name collisions, if you set too long release name.
   Kubernetes by default, allows only 63 symbols at resource names and all resource names are trimmed by helm to 63 symbols.
@@ -169,14 +187,26 @@ helm upgrade -i stack vm/victoria-metrics-k8s-stack
 helm upgrade -i some-very-long-name vm/victoria-metrics-k8s-stack --set fullnameOverride=stack
 ```
 
-# Upgrade guide
+## Upgrade guide
 
-Usually, helm upgrade doesn't requires manual actions. But release with CRD update must be patched manually with kubectl.
- Just execute command:
+Usually, helm upgrade doesn't requires manual actions. Just execute command:
+
 ```console
 $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
- All CRD manual actions upgrades listed below:
+
+But release with CRD update can only be patched manually with kubectl.
+Since helm does not perform a CRD update, we recommend that you always perform this when updating the helm-charts version:
+
+```console
+# 1. check the changes in CRD
+$ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl diff -f -
+
+# 2. apply the changes (update CRD)
+$ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl apply -f - --server-side
+```
+
+All other manual actions upgrades listed below:
 
 ### Upgrade to 0.13.0
 
@@ -229,7 +259,7 @@ kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.1
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.15.0/config/crd/bases/operator.victoriametrics.com_vmclusters.yaml
 ```
 
-# Documentation of Helm Chart
+## Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
 
@@ -243,7 +273,7 @@ helm-docs
 
 The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-# Parameters
+## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
 
@@ -253,81 +283,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | additionalVictoriaMetricsMap | string | `nil` |  |
 | alertmanager.annotations | object | `{}` |  |
-| alertmanager.config.global.resolve_timeout | string | `"5m"` |  |
-| alertmanager.config.global.slack_api_url | string | `"http://slack:30500/"` |  |
-| alertmanager.config.inhibit_rules[0].equal[0] | string | `"cluster"` |  |
-| alertmanager.config.inhibit_rules[0].equal[1] | string | `"namespace"` |  |
-| alertmanager.config.inhibit_rules[0].equal[2] | string | `"alertname"` |  |
-| alertmanager.config.inhibit_rules[0].source_matchers[0] | string | `"severity=critical"` |  |
-| alertmanager.config.inhibit_rules[0].target_matchers[0] | string | `"severity=~\"warning|info\""` |  |
-| alertmanager.config.inhibit_rules[1].equal[0] | string | `"cluster"` |  |
-| alertmanager.config.inhibit_rules[1].equal[1] | string | `"namespace"` |  |
-| alertmanager.config.inhibit_rules[1].equal[2] | string | `"alertname"` |  |
-| alertmanager.config.inhibit_rules[1].source_matchers[0] | string | `"severity=warning"` |  |
-| alertmanager.config.inhibit_rules[1].target_matchers[0] | string | `"severity=info"` |  |
-| alertmanager.config.inhibit_rules[2].equal[0] | string | `"cluster"` |  |
-| alertmanager.config.inhibit_rules[2].equal[1] | string | `"namespace"` |  |
-| alertmanager.config.inhibit_rules[2].source_matchers[0] | string | `"alertname=InfoInhibitor"` |  |
-| alertmanager.config.inhibit_rules[2].target_matchers[0] | string | `"severity=info"` |  |
-| alertmanager.config.receivers[0].name | string | `"slack-monitoring"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[0].text | string | `"Runbook :green_book:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[0].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[0].url | string | `"{{ (index .Alerts 0).Annotations.runbook_url }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[1].text | string | `"Query :mag:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[1].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[1].url | string | `"{{ (index .Alerts 0).GeneratorURL }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[2].text | string | `"Dashboard :grafana:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[2].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[2].url | string | `"{{ (index .Alerts 0).Annotations.dashboard }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[3].text | string | `"Silence :no_bell:"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[3].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[3].url | string | `"{{ template \"__alert_silence_link\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[4].text | string | `"{{ template \"slack.monzo.link_button_text\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[4].type | string | `"button"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].actions[4].url | string | `"{{ .CommonAnnotations.link_url }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].channel | string | `"#channel"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].color | string | `"{{ template \"slack.monzo.color\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].icon_emoji | string | `"{{ template \"slack.monzo.icon_emoji\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].send_resolved | bool | `true` |  |
-| alertmanager.config.receivers[0].slack_configs[0].text | string | `"{{ template \"slack.monzo.text\" . }}"` |  |
-| alertmanager.config.receivers[0].slack_configs[0].title | string | `"{{ template \"slack.monzo.title\" . }}"` |  |
-| alertmanager.config.receivers[1].name | string | `"slack-code-owners"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[0].text | string | `"Runbook :green_book:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[0].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[0].url | string | `"{{ (index .Alerts 0).Annotations.runbook }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[1].text | string | `"Query :mag:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[1].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[1].url | string | `"{{ (index .Alerts 0).GeneratorURL }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[2].text | string | `"Dashboard :grafana:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[2].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[2].url | string | `"{{ (index .Alerts 0).Annotations.dashboard }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[3].text | string | `"Silence :no_bell:"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[3].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[3].url | string | `"{{ template \"__alert_silence_link\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[4].text | string | `"{{ template \"slack.monzo.link_button_text\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[4].type | string | `"button"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].actions[4].url | string | `"{{ .CommonAnnotations.link_url }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].channel | string | `"#{{ .CommonLabels.code_owner_channel }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].color | string | `"{{ template \"slack.monzo.color\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].icon_emoji | string | `"{{ template \"slack.monzo.icon_emoji\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].send_resolved | bool | `true` |  |
-| alertmanager.config.receivers[1].slack_configs[0].text | string | `"{{ template \"slack.monzo.text\" . }}"` |  |
-| alertmanager.config.receivers[1].slack_configs[0].title | string | `"{{ template \"slack.monzo.title\" . }}"` |  |
-| alertmanager.config.route.group_by[0] | string | `"alertgroup"` |  |
-| alertmanager.config.route.group_by[1] | string | `"job"` |  |
-| alertmanager.config.route.group_interval | string | `"5m"` |  |
-| alertmanager.config.route.group_wait | string | `"30s"` |  |
-| alertmanager.config.route.receiver | string | `"slack-monitoring"` |  |
-| alertmanager.config.route.repeat_interval | string | `"12h"` |  |
-| alertmanager.config.route.routes[0].group_by[0] | string | `"code_owner_channel"` |  |
-| alertmanager.config.route.routes[0].group_by[1] | string | `"alertgroup"` |  |
-| alertmanager.config.route.routes[0].group_by[2] | string | `"job"` |  |
-| alertmanager.config.route.routes[0].matchers[0] | string | `"code_owner_channel!=\"\""` |  |
-| alertmanager.config.route.routes[0].matchers[1] | string | `"severity=~\"info|warning|critical\""` |  |
-| alertmanager.config.route.routes[0].receiver | string | `"slack-code-owners"` |  |
-| alertmanager.config.route.routes[1].continue | bool | `true` |  |
-| alertmanager.config.route.routes[1].matchers[0] | string | `"severity=~\"info|warning|critical\""` |  |
-| alertmanager.config.route.routes[1].receiver | string | `"slack-monitoring"` |  |
+| alertmanager.config.receivers[0].name | string | `"blackhole"` |  |
+| alertmanager.config.route.receiver | string | `"blackhole"` |  |
 | alertmanager.config.templates[0] | string | `"/etc/vm/configs/**/*.tmpl"` |  |
 | alertmanager.enabled | bool | `true` |  |
 | alertmanager.ingress.annotations | object | `{}` |  |
@@ -340,18 +297,21 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.tls | list | `[]` |  |
 | alertmanager.monzoTemplate.enabled | bool | `true` |  |
 | alertmanager.spec.externalURL | string | `""` |  |
-| alertmanager.spec.image.tag | string | `"v0.24.0"` |  |
+| alertmanager.spec.image.tag | string | `"v0.25.0"` |  |
 | alertmanager.spec.routePrefix | string | `"/"` |  |
 | alertmanager.spec.selectAllByDefault | bool | `true` |  |
 | alertmanager.templateFiles | object | `{}` |  |
 | argocdReleaseOverride | string | `""` | For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
-| coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}]}}` | Component scraping coreDns. Use either this or kubeDns |
+| coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}],"jobLabel":"jobLabel"}}` | Component scraping coreDns. Use either this or kubeDns |
+| crds.enabled | bool | `true` |  |
 | defaultDashboardsEnabled | bool | `true` |  |
 | defaultRules.additionalRuleLabels | object | `{}` | Additional labels for PrometheusRule alerts |
 | defaultRules.annotations | object | `{}` | Annotations for default rules |
 | defaultRules.appNamespacesTarget | string | `".*"` |  |
 | defaultRules.create | bool | `true` |  |
+| defaultRules.disabled | object | `{}` |  |
 | defaultRules.labels | object | `{}` | Labels for default rules |
+| defaultRules.params | object | `{}` | Optional HTTP URL parameters added to each rule request |
 | defaultRules.rules.alertmanager | bool | `true` |  |
 | defaultRules.rules.etcd | bool | `true` |  |
 | defaultRules.rules.general | bool | `true` |  |
@@ -359,6 +319,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rules.kubeApiserver | bool | `true` |  |
 | defaultRules.rules.kubeApiserverAvailability | bool | `true` |  |
 | defaultRules.rules.kubeApiserverBurnrate | bool | `true` |  |
+| defaultRules.rules.kubeApiserverHistogram | bool | `true` |  |
 | defaultRules.rules.kubeApiserverSlos | bool | `true` |  |
 | defaultRules.rules.kubePrometheusGeneral | bool | `true` |  |
 | defaultRules.rules.kubePrometheusNodeRecording | bool | `true` |  |
@@ -372,6 +333,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rules.network | bool | `true` |  |
 | defaultRules.rules.node | bool | `true` |  |
 | defaultRules.rules.vmagent | bool | `true` |  |
+| defaultRules.rules.vmcluster | bool | `true` |  |
 | defaultRules.rules.vmhealth | bool | `true` |  |
 | defaultRules.rules.vmsingle | bool | `true` |  |
 | defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
@@ -391,7 +353,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.dashboards.default.nodeexporter.datasource | string | `"VictoriaMetrics"` |  |
 | grafana.dashboards.default.nodeexporter.gnetId | int | `1860` |  |
 | grafana.dashboards.default.nodeexporter.revision | int | `22` |  |
-| grafana.defaultDashboardsEnabled | bool | `true` |  |
+| grafana.defaultDashboardsTimezone | string | `"utc"` |  |
+| grafana.defaultDatasourceType | string | `"prometheus"` |  |
 | grafana.enabled | bool | `true` |  |
 | grafana.forceDeployDatasource | bool | `false` |  |
 | grafana.ingress.annotations | object | `{}` |  |
@@ -408,9 +371,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.dashboards.multicluster | bool | `false` |  |
 | grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |
 | grafana.sidecar.datasources.enabled | bool | `true` |  |
+| grafana.sidecar.datasources.initDatasources | bool | `true` |  |
 | grafana.sidecar.datasources.jsonData | object | `{}` |  |
 | grafana.vmServiceScrape.enabled | bool | `true` |  |
 | grafana.vmServiceScrape.spec | object | `{}` |  |
+| grafanaOperatorDashboardsFormat.allowCrossNamespaceImport | bool | `false` |  |
+| grafanaOperatorDashboardsFormat.enabled | bool | `false` |  |
+| grafanaOperatorDashboardsFormat.instanceSelector.matchLabels.dashboards | string | `"grafana"` |  |
 | kube-state-metrics.enabled | bool | `true` |  |
 | kube-state-metrics.vmServiceScrape.spec | object | `{}` |  |
 | kubeApiServer | object | `{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"https","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"component","namespaceSelector":{"matchNames":["default"]},"selector":{"matchLabels":{"component":"apiserver","provider":"kubernetes"}}}}` | Component scraping the kube api server |
@@ -449,8 +416,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeScheduler.enabled | bool | `true` |  |
 | kubeScheduler.endpoints | list | `[]` |  |
 | kubeScheduler.service.enabled | bool | `true` |  |
-| kubeScheduler.service.port | int | `10251` |  |
-| kubeScheduler.service.targetPort | int | `10251` |  |
+| kubeScheduler.service.port | int | `10259` |  |
+| kubeScheduler.service.targetPort | int | `10259` |  |
 | kubeScheduler.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubeScheduler.spec.endpoints[0].port | string | `"http-metrics"` |  |
 | kubeScheduler.spec.endpoints[0].scheme | string | `"https"` |  |
@@ -461,6 +428,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubelet.probes | bool | `true` | Enable scraping /metrics/probes from kubelet's service |
 | kubelet.spec.bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubelet.spec.honorLabels | bool | `true` |  |
+| kubelet.spec.honorTimestamps | bool | `false` |  |
 | kubelet.spec.interval | string | `"30s"` |  |
 | kubelet.spec.metricRelabelConfigs[0].action | string | `"labeldrop"` |  |
 | kubelet.spec.metricRelabelConfigs[0].regex | string | `"(uid)"` |  |
@@ -495,7 +463,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
 | tenant | string | `"0"` |  |
 | victoria-metrics-operator | object | `{"cleanupCRD":true,"cleanupImage":{"pullPolicy":"IfNotPresent","repository":"gcr.io/google_containers/hyperkube","tag":"v1.18.0"},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":true}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars.html |
-| victoria-metrics-operator.cleanupCRD | bool | `true` | Tells helm to remove CRD after chart remove |
+| victoria-metrics-operator.cleanupCRD | bool | `true` | Tells helm to clean up vm cr resources when uninstalling |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `true` | By default, operator converts prometheus-operator objects. |
 | vmagent.additionalRemoteWrites | list | `[]` |  |
 | vmagent.annotations | object | `{}` |  |
@@ -509,9 +477,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.ingress.pathType | string | `"Prefix"` |  |
 | vmagent.ingress.tls | list | `[]` |  |
 | vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
+| vmagent.spec.extraArgs."promscrape.dropOriginalLabels" | string | `"true"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
-| vmagent.spec.image.tag | string | `"v1.87.1"` |  |
-| vmagent.spec.scrapeInterval | string | `"25s"` |  |
+| vmagent.spec.image.tag | string | `"v1.100.1"` |  |
+| vmagent.spec.scrapeInterval | string | `"20s"` |  |
 | vmagent.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.annotations | object | `{}` |  |
 | vmalert.enabled | bool | `true` |  |
@@ -525,7 +494,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmalert.ingress.tls | list | `[]` |  |
 | vmalert.remoteWriteVMAgent | bool | `false` |  |
 | vmalert.spec.evaluationInterval | string | `"15s"` |  |
-| vmalert.spec.image.tag | string | `"v1.87.1"` |  |
+| vmalert.spec.externalLabels | object | `{}` |  |
+| vmalert.spec.image.tag | string | `"v1.100.1"` |  |
 | vmalert.spec.selectAllByDefault | bool | `true` |  |
 | vmalert.templateFiles | object | `{}` |  |
 | vmcluster.annotations | object | `{}` |  |
@@ -555,20 +525,21 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmcluster.ingress.storage.pathType | string | `"Prefix"` |  |
 | vmcluster.ingress.storage.tls | list | `[]` |  |
 | vmcluster.spec.replicationFactor | int | `2` |  |
-| vmcluster.spec.retentionPeriod | string | `"14"` |  |
+| vmcluster.spec.retentionPeriod | string | `"1"` | Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention) |
 | vmcluster.spec.vminsert.extraArgs | object | `{}` |  |
-| vmcluster.spec.vminsert.image.tag | string | `"v1.87.1-cluster"` |  |
+| vmcluster.spec.vminsert.image.tag | string | `"v1.100.1-cluster"` |  |
 | vmcluster.spec.vminsert.replicaCount | int | `2` |  |
 | vmcluster.spec.vminsert.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.cacheMountPath | string | `"/select-cache"` |  |
 | vmcluster.spec.vmselect.extraArgs | object | `{}` |  |
-| vmcluster.spec.vmselect.image.tag | string | `"v1.87.1-cluster"` |  |
+| vmcluster.spec.vmselect.image.tag | string | `"v1.100.1-cluster"` |  |
 | vmcluster.spec.vmselect.replicaCount | int | `2` |  |
 | vmcluster.spec.vmselect.resources | object | `{}` |  |
 | vmcluster.spec.vmselect.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"2Gi"` |  |
-| vmcluster.spec.vmstorage.image.tag | string | `"v1.87.1-cluster"` |  |
+| vmcluster.spec.vmstorage.image.tag | string | `"v1.100.1-cluster"` |  |
 | vmcluster.spec.vmstorage.replicaCount | int | `2` |  |
 | vmcluster.spec.vmstorage.resources | object | `{}` |  |
 | vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
 | vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.87.1"},"replicaCount":1,"retentionPeriod":"14","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.100.1"},"replicaCount":1,"retentionPeriod":"1","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
+| vmsingle.spec.retentionPeriod | string | `"1"` | Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention) |

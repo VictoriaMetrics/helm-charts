@@ -6,63 +6,8 @@ metadata:
   labels: {{- include "chart.labels" . | nindent 4 }}
 data:
   config.yml: |
-    model:
-    {{- if eq .Values.model.enabled "zscore" }}
-      class: "model.zscore.ZscoreModel"
-      {{- toYaml .Values.model.zscore | nindent 6 }}
-    {{- end }}
-    {{- if eq .Values.model.enabled "prophet" }}
-      class: "model.prophet.ProphetModel"
-      {{- toYaml .Values.model.prophet | nindent 6 }}
-    {{- end }}
-    {{- if eq .Values.model.enabled "holt_winters" }}
-      class: "model.holtwinters.HoltWinters"
-      {{- toYaml .Values.model.holt_winters | nindent 6 }}
-    {{- end }}
-    scheduler:
-      {{- toYaml .Values.scheduler | nindent 6 }}
-    reader:
-      class: "reader.vm.VmReader"
-      datasource_url: {{ .Values.remote.read.url | quote }}
-      {{ with .Values.remote.read.tenant }}
-      tenant_id: "{{ . }}"
-      {{ end -}}
-      {{ if or .Values.remote.read.basicAuth.username .Values.remote.read.basicAuth.password -}}
-      user: "{{ .Values.remote.read.basicAuth.username }}"
-      password: "{{ .Values.remote.read.basicAuth.password }}"
-      {{ end -}}
-      {{ with .Values.remote.read.health -}}
-      health_path: {{.}}
-      {{ end -}}
-      queries:
-        {{- toYaml .Values.queries | nindent 8 }}
-      sampling_period: {{ .Values.scheduler.infer_every }}
-    writer:
-      class: "writer.vm.VmWriter"
-      datasource_url: "{{ .Values.remote.write.url }}"
-      {{ with .Values.remote.write.tenant }}
-      tenant_id: "{{ . }}"
-      {{ end -}}
-      {{ if or .Values.remote.write.basicAuth.username .Values.remote.write.basicAuth.password -}}
-      user: "{{ .Values.remote.write.basicAuth.username }}"
-      password: "{{ .Values.remote.write.basicAuth.password }}"
-      {{ end -}}
-      {{ with .Values.remote.write.health -}}
-      health_path: {{ . }}
-      {{ end -}}
-      metric_format:
-        __name__: "$VAR"
-        query: "$QUERY_KEY"
-        model: {{ .Values.model.enabled }}
-      {{ if or .Values.monitoring.pull.enabled .Values.monitoring.push.endpoint_url }}
-    monitoring:
-      {{- if .Values.monitoring.pull.enabled }}
-      pull:
-        {{- $v := deepCopy .Values.monitoring.pull }}
-        {{- unset $v "enabled" | toYaml | nindent 8 }}
-      {{- end }}
-      {{- if .Values.monitoring.push.endpoint_url }}
-      push:
-        {{- toYaml .Values.monitoring.push | nindent 8 }}
-      {{- end }}
-    {{- end }}
+    {{ with .Values.config }}
+    {{-  . | toYaml | nindent 4}}
+    {{ end -}}
+
+

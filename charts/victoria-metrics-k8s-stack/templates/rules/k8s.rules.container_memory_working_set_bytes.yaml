@@ -1,0 +1,38 @@
+{{- /*
+Generated from 'k8s.rules.container_memory_working_set_bytes' group from https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetesControlPlane-prometheusRule.yaml
+Do not change in-place! In order to change this file first read following link:
+https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
+*/ -}}
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.k8s }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "k8s.rules.container_memory_working_set_bytes" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}
+{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+{{- if .Values.defaultRules.labels }}
+{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: k8s.rules.container_memory_working_set_bytes
+    rules:
+    - expr: |-
+        container_memory_working_set_bytes{job="kubelet", metrics_path="/metrics/cadvisor", image!=""}
+        * on (cluster, namespace, pod) group_left(node) topk by(cluster, namespace, pod) (1,
+          max by(cluster, namespace, pod, node) (kube_pod_info{node!=""})
+        )
+      record: node_namespace_pod_container:container_memory_working_set_bytes
+{{- end }}

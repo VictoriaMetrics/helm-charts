@@ -1,22 +1,32 @@
 # Victoria Metrics Helm Chart for vmgateway
 
- ![Version: 0.1.30](https://img.shields.io/badge/Version-0.1.30-informational?style=flat-square)
+ ![Version: 0.1.58](https://img.shields.io/badge/Version-0.1.58-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-gateway)
+[![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
 Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
 
-# Prerequisites
+# Table of Content
+
+* [Prerequisites](#prerequisites)
+* [Chart Details](#chart-details)
+* [How to Install](#how-to-install)
+* [How to Uninstall](#how-to-uninstall)
+* [How to use JWT signature verification](#how-to-use-jwt-signature-verification)
+* [Documentation of Helm Chart](#documentation-of-helm-chart)
+
+## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
-
 * PV support on underlying infrastructure
 
-# Chart Details
+## Chart Details
 
 This chart will do the following:
 
 * Rollout victoria metrics gateway
 
-# How to install
+## How to install
 
 Access a Kubernetes cluster.
 
@@ -29,8 +39,6 @@ helm repo update
 ```
 
 List versions of ``vm/victoria-metrics-gateway`` chart available to installation:
-
-##### for helm v3
 
 ```console
 helm search repo vm/victoria-metrics-gateway -l
@@ -51,8 +59,6 @@ helm install vmgateway vm/victoria-metrics-gateway -f values.yaml -n NAMESPACE -
 ```
 
 Install chart with command:
-
-##### for helm v3
 
 ```console
 helm install vmgateway vm/victoria-metrics-gateway -f values.yaml -n NAMESPACE
@@ -76,7 +82,7 @@ See the history of versions of ``vmgateway`` application with command.
 helm history vmgateway -n NAMESPACE
 ```
 
-# How to uninstall
+## How to uninstall
 
 Remove application with command.
 
@@ -84,7 +90,58 @@ Remove application with command.
 helm uninstall vmgateway -n NAMESPACE
 ```
 
-# Documentation of Helm Chart
+# How to use [JWT signature verification](https://docs.victoriametrics.com/vmgateway.html#jwt-signature-verification)
+
+Kubernetes best-practice is to store sensitive configuration parts in secrets. For example, 2 keys will be stored as:
+```yaml
+apiVersion: v1
+data:
+  key: "<<KEY_DATA>>"
+kind: Secret
+metadata:
+  name: key1
+---
+apiVersion: v1
+data:
+  key: "<<KEY_DATA>>"
+kind: Secret
+metadata:
+  name: key2
+```
+
+In order to use those secrets it is needed to:
+- mount secrets into pod
+- provide flag pointing to secret on disk
+
+Here is an example `values.yml` file configuration to achieve this:
+```yaml
+auth:
+  enable: true
+
+extraVolumes:
+  - name: key1
+    secret:
+      secretName: key1
+  - name: key2
+    secret:
+      secretName: key2
+
+extraVolumeMounts:
+  - name: key1
+    mountPath: /key1
+  - name: key2
+    mountPath: /key2
+
+extraArgs:
+  envflag.enable: "true"
+  envflag.prefix: VM_
+  loggerFormat: json
+  auth.publicKeyFiles: "/key1/key,/key2/key"
+```
+Note that in this configuration all secret keys will be mounted and accessible to pod.
+Please, refer to [this](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#secretvolumesource-v1-core) doc to see all available secret source options.
+
+## Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
 
@@ -98,7 +155,7 @@ helm-docs
 
 The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-# Parameters
+## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
 
@@ -114,7 +171,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmgateway.html |
 | containerWorkingDir | string | `"/"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
-| eula | bool | `false` | should be true and means that you have the legal right to run a vmgateway that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/eula/ |
+| envFrom | list | `[]` |  |
+| eula | bool | `false` | should be true and means that you have the legal right to run a vmgateway that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/esa/ |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | extraArgs.loggerFormat | string | `"json"` |  |
@@ -125,7 +183,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmgateway"` | Victoria Metrics gateway Docker repository and image name |
-| image.tag | string | `"v1.87.1-enterprise"` | Tag of Docker image |
+| image.tag | string | `"v1.100.1-enterprise"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
@@ -133,6 +191,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.hosts | list | `[]` |  |
 | ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | ingress.tls | list | `[]` |  |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
+| license.key | string | `""` | License key |
+| license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
+| license.secret.key | string | `""` | Key in secret with license key |
+| license.secret.name | string | `""` | Existing secret name |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
@@ -162,6 +225,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
+| serviceMonitor.metricRelabelings | list | `[]` |  |
 | serviceMonitor.relabelings | list | `[]` |  |
 | tolerations | list | `[]` | Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | write.url | string | `""` | Write endpoint without suffixes, victoriametrics or vminsert. Example http://victoroametrics:8428 or http://vminsert:8480 |

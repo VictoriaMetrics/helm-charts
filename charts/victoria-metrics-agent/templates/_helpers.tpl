@@ -40,7 +40,7 @@ helm.sh/chart: {{ include "chart.chart" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{/*
@@ -48,7 +48,7 @@ Selector labels
 */}}
 {{- define "chart.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "chart.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{/*
@@ -110,4 +110,39 @@ Return if ingress supports pathType.
 */}}
 {{- define "vmagent.ingress.supportsPathType" -}}
   {{- or (eq (include "vmagent.ingress.isStable" .) "true") (and (eq (include "vmagent.ingress.apiVersion" .) "networking.k8s.io/v1beta1")) -}}
+{{- end -}}
+
+{{/*
+Return license flag if necessary.
+*/}}
+{{- define "chart.license.flag" -}}
+{{- if .Values.license.key -}}
+-license={{ .Values.license.key }}
+{{- end }}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+-licenseFile=/etc/vm-license-key/{{ .Values.license.secret.key }}
+{{- end -}}
+{{- end -}}
+
+
+{{/*
+Return license volume mount
+*/}}
+{{- define "chart.license.volume" -}}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+- name: license-key
+  secret:
+    secretName: {{ .Values.license.secret.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return license volume mount for container
+*/}}
+{{- define "chart.license.mount" -}}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+- name: license-key
+  mountPath: /etc/vm-license-key
+  readOnly: true
+{{- end -}}
 {{- end -}}

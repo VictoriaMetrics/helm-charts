@@ -47,17 +47,26 @@ Create unified labels for victoria-metrics components
 */}}
 {{- define "victoria-metrics.common.matchLabels" -}}
 app.kubernetes.io/name: {{ include "victoria-metrics.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.common.metaLabels" -}}
 helm.sh/chart: {{ include "victoria-metrics.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
+{{- define "victoria-metrics.common.podLabels" -}}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmstorage.labels" -}}
 {{ include "victoria-metrics.vmstorage.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
+{{- end -}}
+
+{{- define "victoria-metrics.vmstorage.podLabels" -}}
+{{ include "victoria-metrics.vmstorage.matchLabels" . }}
+{{ include "victoria-metrics.common.podLabels" . }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmstorage.matchLabels" -}}
@@ -70,6 +79,11 @@ app: {{ .Values.vmstorage.name }}
 {{ include "victoria-metrics.common.metaLabels" . }}
 {{- end -}}
 
+{{- define "victoria-metrics.vmselect.podLabels" -}}
+{{ include "victoria-metrics.vmselect.matchLabels" . }}
+{{ include "victoria-metrics.common.podLabels" . }}
+{{- end -}}
+
 {{- define "victoria-metrics.vmselect.matchLabels" -}}
 app: {{ .Values.vmselect.name }}
 {{ include "victoria-metrics.common.matchLabels" . }}
@@ -78,6 +92,11 @@ app: {{ .Values.vmselect.name }}
 {{- define "victoria-metrics.vminsert.labels" -}}
 {{ include "victoria-metrics.vminsert.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
+{{- end -}}
+
+{{- define "victoria-metrics.vminsert.podLabels" -}}
+{{ include "victoria-metrics.vminsert.matchLabels" . }}
+{{ include "victoria-metrics.common.podLabels" . }}
 {{- end -}}
 
 {{- define "victoria-metrics.vminsert.matchLabels" -}}
@@ -120,7 +139,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
-Create a fully qualified vmselect name.
+Create a fully qualified vminsert name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "victoria-metrics.vminsert.fullname" -}}
@@ -216,9 +235,12 @@ Return if ingress supports pathType.
 {{ toYaml . }}
 {{- end -}}
 {{- if .Values.vmstorage.vmbackupmanager.restore.onStart.enabled }}
-- name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
+- name: {{ template "victoria-metrics.name" . }}-vmbackupmanager-restore
   image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
   imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
+  {{- with .Values.vmstorage.podSecurityContext }}
+  securityContext:  {{ toYaml . | nindent 4 }}
+  {{- end }}
   args:
     - restore
     - {{ printf "%s=%t" "--eula" .Values.vmstorage.vmbackupmanager.eula | quote}}
@@ -227,7 +249,7 @@ Return if ingress supports pathType.
     - --{{ $key }}={{ $value }}
     {{- end }}
   {{- with .Values.vmstorage.vmbackupmanager.resources }}
-  resources: {{ toYaml . | nindent 12 }}
+  resources: {{ toYaml . | nindent 4 }}
   {{- end }}
   env:
     - name: POD_NAME
@@ -235,7 +257,7 @@ Return if ingress supports pathType.
         fieldRef:
           fieldPath: metadata.name
   {{- with .Values.vmstorage.vmbackupmanager.env }}
-  {{- toYaml . | nindent 12 }}
+  {{- toYaml . | nindent 4 }}
   {{- end }}
   ports:
     - name: manager-http
@@ -252,5 +274,53 @@ Return if ingress supports pathType.
 {{- end }}
 {{- else -}}
 []
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return license flag if necessary.
+*/}}
+{{- define "chart.license.flag" -}}
+{{- if .Values.license.key -}}
+--license={{ .Values.license.key }}
+{{- end }}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+--licenseFile=/etc/vm-license-key/{{ .Values.license.secret.key }}
+{{- end -}}
+{{- end -}}
+
+
+{{/*
+Return license volume mount
+*/}}
+{{- define "chart.license.volume" -}}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+- name: license-key
+  secret:
+    secretName: {{ .Values.license.secret.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return license volume mount for container
+*/}}
+{{- define "chart.license.mount" -}}
+{{- if and .Values.license.secret.name .Values.license.secret.key -}}
+- name: license-key
+  mountPath: /etc/vm-license-key
+  readOnly: true
+{{- end -}}
+{{- end -}}
+
+{{/*
+Enforce license for vmbackupmanager
+*/}}
+{{- define "chart.vmbackupmanager.enforce_license" -}}
+{{ if and .Values.vmstorage.vmbackupmanager.enable (not (or .Values.vmstorage.vmbackupmanager.eula .Values.license.key .Values.license.secret.name)) }}
+{{ fail `Pass -eula command-line flag or valid license at .Values.license if you have an enterprise license for running this software.
+  See https://victoriametrics.com/legal/esa/ for details.
+  Documentation - https://docs.victoriametrics.com/enterprise.html
+  for more information, visit https://victoriametrics.com/products/enterprise/
+  To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/`}}
 {{- end -}}
 {{- end -}}
