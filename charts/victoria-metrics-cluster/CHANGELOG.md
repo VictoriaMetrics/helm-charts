@@ -3,6 +3,7 @@
 ## Next release
 
 - properly truncate value of `app.kubernetes.io/managed-by` and `app.kubernetes.io/instance` labels in case release name exceeds 63 characters. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/931) and [this PR](https://github.com/VictoriaMetrics/helm-charts/pull/936).
+- enable templating for `port name` so users can replace the default with custom values in use cases such as outlined in [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/972) and has been addressed in [this PR](https://github.com/VictoriaMetrics/helm-charts/pull/975).
 
 ## 0.11.15
 
