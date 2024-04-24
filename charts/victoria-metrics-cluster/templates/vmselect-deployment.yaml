@@ -74,7 +74,7 @@ spec:
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
           ports:
-            - "{{ .Values.vmselect.ports.name | default "http" }}" 
+            - name: "{{ .Values.vmselect.ports.name | default "http" }}" 
               containerPort: 8481
           {{- if .Values.vmselect.extraArgs.clusternativeListenAddr }}
             - name: cluster-tcp
