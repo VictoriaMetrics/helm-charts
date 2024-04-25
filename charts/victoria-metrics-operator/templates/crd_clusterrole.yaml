@@ -1,0 +1,64 @@
+{{- /* do not update crds here, please update in /victoria-metrics-operator/crd.yaml */ -}}
+{{- /* this is used to add "helm.sh/resource-policy: keep" annotation for each crd */ -}}
+{{- /* see this pull request https://github.com/VictoriaMetrics/helm-charts/pull/771 for details */ -}}
+{{- if .Values.createCRD }}
+{{- if .Values.rbac.createAggregate }}
+{{- $files := .Files }}
+{{- $fileContentsList := $files.Get "crd.yaml" | splitList "---" }}
+{{- $groups := dict }}
+{{- range $fileContentsList }}
+    {{- $fileContents := . | fromYaml }}
+    {{- $group := $fileContents.spec.group }}
+    {{- $plural:= $fileContents.spec.names.plural }}
+    {{- $resources := get $groups $group | default (list) }}
+    {{- $resources := append $resources $plural }}
+    {{- $groups := set $groups $group $resources }}
+{{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: victoriametrics:admin
+  labels:
+    {{- include "vm-operator.labels" . | nindent 4 }}
+    {{- .Values.rbac.labels.admin | toYaml | nindent 4 }}
+rules:
+- apiGroups: 
+  {{- range $group, $resources := $groups }}
+  - {{ $group }}
+  resources:
+  {{- range $resource := $resources }}
+  - {{ $resource }}
+  {{- end }}
+  {{- end }}
+  verbs:
+  - create
+  - update
+  - patch
+  - delete
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: victoriametrics:readonly
+  labels:
+    {{- include "vm-operator.labels" . | nindent 4 }}
+    {{- .Values.rbac.labels.view | toYaml | nindent 4 }}
+rules:
+- apiGroups:
+  {{- range $group, $resources := $groups }}
+  - {{ $group }}
+  resources:
+  {{- range $resource := $resources }}
+  - {{ $resource }}
+  {{- end }}
+  {{- end }}
+  verbs:
+  - get
+  - list
+  - watch
+{{- end }}
+{{- end }}
