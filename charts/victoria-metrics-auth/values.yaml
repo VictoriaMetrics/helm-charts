@@ -1,7 +1,11 @@
 # Default values for victoria-metrics-auth.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+      
 # -- Number of replicas of vmauth
 replicaCount: 1
 
@@ -76,11 +80,13 @@ extraContainers:
   # - name: config-reloader
   #   image: reloader-image
 
-podSecurityContext: {}
+podSecurityContext:
+  enabled: false
   # fsGroup: 2000
 
 ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-securityContext: {}
+securityContext:
+  enabled: false
   # capabilities:
   #   drop:
   #   - ALL

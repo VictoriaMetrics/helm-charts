@@ -1,7 +1,11 @@
 # Default values for victoria-metrics-agent.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+      
 replicaCount: 1
 
 # ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
@@ -140,11 +144,11 @@ initContainers:
   #   image: example-image
 
 podSecurityContext:
-  {}
+  enabled: false
   # fsGroup: 2000
 
 securityContext:
-  {}
+  enabled: false
   # capabilities:
   #   drop:
   #   - ALL

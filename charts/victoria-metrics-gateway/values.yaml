@@ -1,6 +1,10 @@
 # Default values for victoria-metrics-gateway.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
 
 # -- Number of replicas of vmgateway
 replicaCount: 1
@@ -71,11 +75,13 @@ extraContainers: []
   # - name: config-reloader
   #   image: reloader-image
 
-podSecurityContext: {}
+podSecurityContext:
+  enabled: false
 # fsGroup: 2000
 
 ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 securityContext:
+  enabled: true
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000

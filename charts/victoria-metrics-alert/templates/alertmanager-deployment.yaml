@@ -35,14 +35,14 @@ spec:
     {{- end }}
       serviceAccountName: {{ template "vmalert.serviceAccountName" . }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
-      {{- with .Values.alertmanager.podSecurityContext }}
-      securityContext:
-        {{- toYaml .| nindent 8 }}
+      {{- if .Values.alertmanager.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.alertmanager.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ template "vmalert.name" . }}-alertmanager
-          securityContext:
-            {{- toYaml .Values.alertmanager.securityContext | nindent 12 }}
+          {{- if .Values.alertmanager.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.alertmanager.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.alertmanager.image }}:{{ .Values.alertmanager.tag }}"
           args:
             - --config.file=/config/alertmanager.yaml

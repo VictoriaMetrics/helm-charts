@@ -53,8 +53,9 @@ spec:
           {{- with .Values.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if .Values.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

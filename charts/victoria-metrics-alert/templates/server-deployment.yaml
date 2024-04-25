@@ -46,13 +46,15 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "vmalert.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.server.podSecurityContext | nindent 8 }}
+      {{- if .Values.server.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       containers:
         - name: {{ template "vmalert.name" . }}-{{ .Values.server.name }}
-          securityContext:
-            {{- toYaml .Values.server.securityContext | nindent 12 }}
+          {{- if .Values.server.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.server.image.repository }}:{{ default .Chart.AppVersion .Values.server.image.tag }}"
           args:
             - -rule=/config/alert-rules.yaml

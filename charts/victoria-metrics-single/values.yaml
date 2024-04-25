@@ -1,6 +1,10 @@
 # Default values for victoria-metrics.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
 
 rbac:
   create: true
@@ -203,9 +207,11 @@ server:
     #timeoutSeconds: 5
 
   # -- Security context to be added to server pods
-  securityContext: {}
+  securityContext:
+    enabled: false
   # -- Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
+  podSecurityContext:
+    enabled: false
   ingress:
     # -- Enable deployment of ingress for server component
     enabled: false
