@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.11.16
+
+**Release date:** 2024-04-26
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - properly truncate value of `app.kubernetes.io/managed-by` and `app.kubernetes.io/instance` labels in case release name exceeds 63 characters. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/931) and [this PR](https://github.com/VictoriaMetrics/helm-charts/pull/936).
 - enable templating for `port name` so users can replace the default with custom values in use cases such as outlined in [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/972) and has been addressed in [this PR](https://github.com/VictoriaMetrics/helm-charts/pull/975).
 - bump version of VM components to [v1.101.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.101.0)
