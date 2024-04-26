@@ -51,7 +51,7 @@ spec:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.server.name }}
           securityContext:
             {{- toYaml .Values.server.securityContext | nindent 12 }}
-          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
+          image: "{{ .Values.server.image.repository }}:{{ default .Chart.AppVersion .Values.server.image.tag }}"
           imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
           {{- if .Values.server.containerWorkingDir }}
           workingDir: {{ .Values.server.containerWorkingDir }}
