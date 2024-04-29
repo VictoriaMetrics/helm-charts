@@ -156,6 +156,17 @@ Get the pods lists by running this commands:
 kubectl get pods -n NAMESPACE'
 ```
 
+## How to upgrade
+
+In order to serving query and ingestion while upgrading components version or changing configurations, it's recommended to perform maintenance on availability zone one by one.    
+First, performing update on availability zone `zone-eu-1`:
+1. remove `zone-eu-1` from serving query by setting `.Values.availabilityZones.{zone-eu-1}.allowQuery=false`;
+2. run `helm upgrade vm-dis -n NAMESPACE` with updated configurations for `zone-eu-1` in `values.yaml`;
+3. wait for all the components on zone `zone-eu-1` running;
+4. wait `zone-us-1` vmagent persistent queue for `zone-eu-1` been drained, add `zone-eu-1` back to serving query by setting `.Values.availabilityZones.{zone-eu-1}.allowQuery=true`.
+
+Then, perform update on availability zone `zone-us-1` with the same steps1~4.
+
 ## How to uninstall
 
 Remove application with command.
