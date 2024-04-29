@@ -19,6 +19,11 @@ spec:
 {{- end }}
   nodeSelector:
 {{- toYaml $nodeSelector | nindent 4 }}
+{{- if or $zone.extraAffinity ( and $zone.vmauthQueryPerZone.spec $zone.vmauthQueryPerZone.spec.affinity ) }}
+{{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmauthQueryPerZone.spec.affinity | default (dict)) }}
+  affinity:
+{{- toYaml $affinity | nindent 4 }}
+{{- end }}
 {{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
 {{- if $zone.vmauthQueryPerZone.spec.topologySpreadConstraints }}
 {{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmauthQueryPerZone.spec.topologySpreadConstraints }}
@@ -31,6 +36,14 @@ spec:
       url_prefix:
 {{- range $i := until (int $zone.vmcluster.spec.vmselect.replicaCount) }}
 {{ printf "- http://vmselect-vmcluster-%s-%d.vmselect-vmcluster-%s:8481/" $zone.name $i $zone.name | indent 8 }}
+{{- end }}
+{{- $spec := deepCopy $zone.vmauthQueryPerZone.spec }}
+{{- $spec := unset $spec "nodeSelector" }}
+{{- $spec := unset $spec "affinity" }}
+{{- $spec := unset $spec "topologySpreadConstraints" }}
+{{- $spec := unset $spec "unauthorizedAccessConfig" }}
+{{- if $spec }}
+{{- toYaml $spec | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}

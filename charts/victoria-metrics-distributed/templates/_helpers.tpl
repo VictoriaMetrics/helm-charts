@@ -104,9 +104,13 @@ Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstrai
 {{- if $rolloutZone.vmcluster.spec.vminsert.topologySpreadConstraints }}
 {{- $newTopologySpreadConstraints = mergeOverwrite (deepCopy $rolloutZone.topologySpreadConstraints) $rolloutZone.vmcluster.spec.vminsert.topologySpreadConstraints }}
 {{- end -}}
-{{- $newvminsert := merge (dict "nodeSelector" $newNodeSelector) $vmclusterSpec.vminsert }}
-{{- $newvminsert = merge (dict "topologySpreadConstraints" $newTopologySpreadConstraints) $newvminsert }}
-{{- $newvminsert = merge (dict "serviceSpec" (dict "spec" (dict "clusterIP" "None" "type" "ClusterIP"))) $newvminsert }}
+{{- $newvminsert := mergeOverwrite (dict "nodeSelector" $newNodeSelector) $vmclusterSpec.vminsert }}
+{{- $newvminsert = mergeOverwrite (dict "topologySpreadConstraints" $newTopologySpreadConstraints) $newvminsert }}
+{{- $newvminsert = mergeOverwrite (dict "serviceSpec" (dict "spec" (dict "clusterIP" "None" "type" "ClusterIP"))) $newvminsert }}
+{{- if or $rolloutZone.extraAffinity ( and $rolloutZone.vmcluster.spec.vminsert $rolloutZone.vmcluster.spec.vminsert.affinity ) }}
+{{- $newAffinity := mergeOverwrite (deepCopy $rolloutZone.extraAffinity) ($rolloutZone.vmcluster.spec.vminsert.affinity | default (dict)) }}
+{{- $newvminsert = mergeOverwrite (dict "affinity" $newAffinity) $newvminsert }}
+{{- end -}}
 
 {{- $newNodeSelector := deepCopy $rolloutZone.nodeSelector }}
 {{- if $rolloutZone.vmcluster.spec.vmstorage.nodeSelector }}
@@ -116,8 +120,12 @@ Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstrai
 {{- if $rolloutZone.vmcluster.spec.vmstorage.topologySpreadConstraints }}
 {{- $newTopologySpreadConstraints = mergeOverwrite (deepCopy $rolloutZone.topologySpreadConstraints) $rolloutZone.vmcluster.spec.vmstorage.topologySpreadConstraints }}
 {{- end -}}
-{{- $newvmstorage := merge (dict "nodeSelector" $newNodeSelector) $vmclusterSpec.vmstorage }}
-{{- $newvmstorage = merge (dict "topologySpreadConstraints" $newTopologySpreadConstraints) $newvmstorage }}
+{{- $newvmstorage := mergeOverwrite (dict "nodeSelector" $newNodeSelector) $vmclusterSpec.vmstorage }}
+{{- $newvmstorage = mergeOverwrite (dict "topologySpreadConstraints" $newTopologySpreadConstraints) $newvmstorage }}
+{{- if or $rolloutZone.extraAffinity ( and $rolloutZone.vmcluster.spec.vmstorage $rolloutZone.vmcluster.spec.vmstorage.affinity ) }}
+{{- $newAffinity := mergeOverwrite (deepCopy $rolloutZone.extraAffinity) ($rolloutZone.vmcluster.spec.vmstorage.affinity | default (dict)) }}
+{{- $newvmstorage = mergeOverwrite (dict "affinity" $newAffinity) $newvmstorage }}
+{{- end -}}
 
 {{- $newNodeSelector := deepCopy $rolloutZone.nodeSelector }}
 {{- if $rolloutZone.vmcluster.spec.vmselect.nodeSelector }}
@@ -127,8 +135,12 @@ Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstrai
 {{- if $rolloutZone.vmcluster.spec.vmselect.topologySpreadConstraints }}
 {{- $newTopologySpreadConstraints = mergeOverwrite (deepCopy $rolloutZone.topologySpreadConstraints) $rolloutZone.vmcluster.spec.vmselect.topologySpreadConstraints }}
 {{- end -}}
-{{- $newvmselect := merge (dict "nodeSelector" $newNodeSelector) $vmclusterSpec.vmselect }}
-{{- $newvmselect = merge (dict "topologySpreadConstraints" $newTopologySpreadConstraints) $newvmselect }}
+{{- $newvmselect := mergeOverwrite (dict "nodeSelector" $newNodeSelector) $vmclusterSpec.vmselect }}
+{{- $newvmselect = mergeOverwrite (dict "topologySpreadConstraints" $newTopologySpreadConstraints) $newvmselect }}
+{{- if or $rolloutZone.extraAffinity ( and $rolloutZone.vmcluster.spec.vmselect $rolloutZone.vmcluster.spec.vmselect.affinity ) }}
+{{- $newAffinity := mergeOverwrite (deepCopy $rolloutZone.extraAffinity) ($rolloutZone.vmcluster.spec.vmselect.affinity | default (dict)) }}
+{{- $newvmselect = mergeOverwrite (dict "affinity" $newAffinity) $newvmselect }}
+{{- end -}}
 
 {{- $newvmclusterSpec := dict "vminsert" $newvminsert "vmstorage" $newvmstorage "vmselect" $newvmselect }}
 {{- $vmclusterSpec = mergeOverwrite (deepCopy $vmclusterSpec) $newvmclusterSpec }}

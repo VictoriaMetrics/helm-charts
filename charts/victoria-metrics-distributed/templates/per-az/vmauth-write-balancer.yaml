@@ -19,6 +19,11 @@ spec:
 {{- end }}
   nodeSelector:
 {{- toYaml $nodeSelector | nindent 4 }}
+{{- if or $zone.extraAffinity ( and $zone.vmauthIngest.spec $zone.vmauthIngest.spec.affinity ) }}
+{{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmauthIngest.spec.affinity | default (dict)) }}
+  affinity:
+{{- toYaml $affinity | nindent 4 }}
+{{- end }}
 {{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
 {{- if $zone.vmauthIngest.spec.topologySpreadConstraints }}
 {{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmauthIngest.spec.topologySpreadConstraints }}
@@ -32,6 +37,7 @@ spec:
         - "http://vminsert-vmcluster-{{ $zone.name }}-additional-service:8480/"
 {{- $spec := deepCopy $zone.vmauthIngest.spec }}
 {{- $spec := unset $spec "nodeSelector" }}
+{{- $spec := unset $spec "affinity" }}
 {{- $spec := unset $spec "topologySpreadConstraints" }}
 {{- $spec := unset $spec "unauthorizedAccessConfig" }}
 {{- if $spec }}

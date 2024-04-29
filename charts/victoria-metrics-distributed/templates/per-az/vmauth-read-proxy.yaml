@@ -19,6 +19,11 @@ spec:
 {{- end }}
   nodeSelector:
 {{- toYaml $nodeSelector | nindent 4 }}
+{{- if or $zone.extraAffinity ( and $zone.vmauthCrossAZQuery.spec $zone.vmauthCrossAZQuery.spec.affinity ) }}
+{{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmauthCrossAZQuery.spec.affinity | default (dict)) }}
+  affinity:
+{{- toYaml $affinity | nindent 4 }}
+{{- end }}
 {{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
 {{- if $zone.vmauthCrossAZQuery.spec.topologySpreadConstraints }}
 {{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmauthCrossAZQuery.spec.topologySpreadConstraints }}
@@ -36,5 +41,13 @@ spec:
 {{- end }}
 {{- end }}
       load_balancing_policy: first_available
+{{- $spec := deepCopy $zone.vmauthCrossAZQuery.spec }}
+{{- $spec := unset $spec "nodeSelector" }}
+{{- $spec := unset $spec "affinity" }}
+{{- $spec := unset $spec "topologySpreadConstraints" }}
+{{- $spec := unset $spec "unauthorizedAccessConfig" }}
+{{- if $spec }}
+{{- toYaml $spec | nindent 2 }}
+{{- end }}
 {{- end }}
 {{- end }}

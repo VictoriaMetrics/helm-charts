@@ -22,6 +22,11 @@ spec:
 {{- end }}
   nodeSelector:
 {{- toYaml $nodeSelector | nindent 4 }}
+{{- if or $zone.extraAffinity ( and $zone.vmagent.spec $zone.vmagent.spec.affinity ) }}
+{{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmagent.spec.affinity | default (dict)) }}
+  affinity:
+{{- toYaml $affinity | nindent 4 }}
+{{- end }}
 {{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
 {{- if and $zone.vmagent.spec $zone.vmagent.spec.topologySpreadConstraints }}
 {{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmagent.spec.topologySpreadConstraints }}
@@ -34,6 +39,7 @@ spec:
     useMultiTenantMode: true
 {{- $spec := deepCopy $zone.vmagent.spec }}
 {{- $spec := unset $spec "nodeSelector" }}
+{{- $spec := unset $spec "affinity" }}
 {{- $spec := unset $spec "topologySpreadConstraints" }}
 {{- if $spec }}
 {{- toYaml $spec | nindent 2 }}
