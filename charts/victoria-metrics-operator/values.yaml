@@ -40,6 +40,14 @@ rbac:
   create: true
   # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
   pspEnabled: true
+  # -- create agregate clusterroles for CRD readonly and admin permissions
+  createAggregateClusterRoles: true
+
+  labels:
+    view:
+      rbac.authorization.k8s.io/aggregate-to-view: "true"
+    admin:
+      rbac.authorization.k8s.io/aggregate-to-admin: "true"
 
 # -- Labels to be added to the all resources
 extraLabels: {}
