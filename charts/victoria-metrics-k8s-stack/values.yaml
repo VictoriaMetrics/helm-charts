@@ -32,15 +32,28 @@ serviceAccount:
   # -- If not set and create is true, a name is generated using the fullname template
   name: ""
 
+## -- custom Rules to override "for" and "severity" in defaultRules
+customRules: {}
+  # AlertmanagerFailedReload:
+  #   for: 3m
+  # AlertmanagerMembersInconsistent:
+  #   for: 5m
+  #   severity: "warning"
+  #
+
 ## -- Create default rules for monitoring the cluster
 defaultRules:
   create: true
   rules:
     etcd: true
     general: true
-    k8s: true
-    kubeApiserver: true
-    kubeApiserverAvailability: true
+    k8sContainerCpuUsageSecondsTotal: true
+    k8sContainerMemoryCache: true
+    k8sContainerMemoryRss: true
+    k8sContainerMemorySwap: true
+    k8sContainerMemoryWorkingSetBytes: true
+    k8sContainerResource: true
+    k8sPodOwner: true
     kubeApiserverBurnrate: true
     kubeApiserverHistogram: true
     kubeApiserverSlos: true
@@ -51,10 +64,14 @@ defaultRules:
     kubernetesResources: true
     kubernetesStorage: true
     kubernetesSystem: true
-    kubeScheduler: true
+    kubeSchedulerAlerting: true
+    kubeSchedulerRecording: true
     kubeStateMetrics: true
+    kubeControllerManager: true
     network: true
     node: true
+    nodeExporterAlerting: true
+    nodeExporterRecording: true
     vmagent: true
     vmsingle: true
     vmcluster: true
@@ -72,11 +89,70 @@ defaultRules:
 
   # -- Labels for default rules
   labels: {}
+
   # -- Annotations for default rules
   annotations: {}
 
   # -- Additional labels for PrometheusRule alerts
   additionalRuleLabels: {}
+
+  # -- Additional annotations for PrometheusRule alerts
+  additionalRuleAnnotations: {}
+
+  # -- Additional labels for specific PrometheusRule alert groups
+  additionalRuleGroupLabels:
+    alertmanager: {}
+    etcd: {}
+    general: {}
+    k8sPodOwner: {}
+    k8sContainerMemoryWorkingSetBytes: {}
+    k8sContainerCpuUsageSecondsTotal: {}
+    k8sContainerMemoryCache: {}
+    k8sContainerMemoryRss: {}
+    k8sContainerMemorySwap: {}
+    k8sContainerResource: {}
+    kubeApiserverBurnrate: {}
+    kubeApiserverHistogram: {}
+    kubeApiserverSlos: {}
+    kubeControllerManager: {}
+    kubelet: {}
+    kubePrometheusGeneral: {}
+    kubePrometheusNodeRecording: {}
+    kubernetesApps: {}
+    kubernetesResources: {}
+    kubernetesStorage: {}
+    kubernetesSystem: {}
+    kubeSchedulerAlerting: {}
+    kubeSchedulerRecording: {}
+    kubeStateMetrics: {}
+    network: {}
+    node: {}
+    nodeExporterAlerting: {}
+    nodeExporterRecording: {}
+    vmsingle: {}
+    vmcluster: {}
+    vmagent: {}
+
+  # -- Additional annotations for specific PrometheusRule alerts groups
+  additionalRuleGroupAnnotations:
+    alertmanager: {}
+    etcd: {}
+    general: {}
+    kubeApiserverSlos: {}
+    kubeControllerManager: {}
+    kubernetesApps: {}
+    kubernetesResources: {}
+    kubernetesStorage: {}
+    kubernetesSystem: {}
+    kubeSchedulerAlerting: {}
+    kubeStateMetrics: {}
+    network: {}
+    nodeExporterAlerting: {}
+    vmsingle: {}
+    vmcluster: {}
+    vmagent: {}
+
+  additionalAggregationLabels: []
 
   # -- Optional HTTP URL parameters added to each rule request
   params: {}

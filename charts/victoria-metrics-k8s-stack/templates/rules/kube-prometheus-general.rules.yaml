@@ -3,7 +3,7 @@ Generated from 'kube-prometheus-general.rules' group from https://raw.githubuser
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.defaultRules.create .Values.defaultRules.rules.kubePrometheusGeneral }}
+{{- if and .Values.defaultRules.create  .Values.defaultRules.rules.kubePrometheusGeneral }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
@@ -31,6 +31,24 @@ spec:
     rules:
     - expr: count without(instance, pod, node) (up == 1)
       record: count:up1
+      {{- if or .Values.defaultRules.additionalRuleLabels .Values.defaultRules.additionalRuleGroupLabels.kubePrometheusGeneral }}
+      labels:
+        {{- with .Values.defaultRules.additionalRuleLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.defaultRules.additionalRuleGroupLabels.kubePrometheusGeneral }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
     - expr: count without(instance, pod, node) (up == 0)
       record: count:up0
+      {{- if or .Values.defaultRules.additionalRuleLabels .Values.defaultRules.additionalRuleGroupLabels.kubePrometheusGeneral }}
+      labels:
+        {{- with .Values.defaultRules.additionalRuleLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.defaultRules.additionalRuleGroupLabels.kubePrometheusGeneral }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
 {{- end }}

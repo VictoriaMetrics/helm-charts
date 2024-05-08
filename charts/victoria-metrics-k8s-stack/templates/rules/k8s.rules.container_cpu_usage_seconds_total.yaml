@@ -3,7 +3,7 @@ Generated from 'k8s.rules.container_cpu_usage_seconds_total' group from https://
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.defaultRules.create .Values.defaultRules.rules.k8s }}
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.k8sContainerCpuUsageSecondsTotal }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
@@ -30,10 +30,19 @@ spec:
 {{- end }} name: k8s.rules.container_cpu_usage_seconds_total
     rules:
     - expr: |-
-        sum by (cluster, namespace, pod, container) (
+        sum by ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}cluster, namespace, pod, container) (
           irate(container_cpu_usage_seconds_total{job="kubelet", metrics_path="/metrics/cadvisor", image!=""}[5m])
-        ) * on (cluster, namespace, pod) group_left(node) topk by (cluster, namespace, pod) (
-          1, max by(cluster, namespace, pod, node) (kube_pod_info{node!=""})
+        ) * on ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}cluster, namespace, pod) group_left(node) topk by ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}cluster, namespace, pod) (
+          1, max by ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}cluster, namespace, pod, node) (kube_pod_info{node!=""})
         )
       record: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate
+      {{- if or .Values.defaultRules.additionalRuleLabels .Values.defaultRules.additionalRuleGroupLabels.k8sContainerCpuUsageSecondsTotal }}
+      labels:
+        {{- with .Values.defaultRules.additionalRuleLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.defaultRules.additionalRuleGroupLabels.k8sContainerCpuUsageSecondsTotal }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
 {{- end }}

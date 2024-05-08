@@ -3,7 +3,7 @@ Generated from 'k8s.rules.pod_owner' group from https://raw.githubusercontent.co
 Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
-{{- if and .Values.defaultRules.create .Values.defaultRules.rules.k8s }}
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.k8sPodOwner }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
@@ -30,13 +30,13 @@ spec:
 {{- end }} name: k8s.rules.pod_owner
     rules:
     - expr: |-
-        max by (cluster, namespace, workload, pod) (
+        max by ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}cluster, namespace, workload, pod) (
           label_replace(
             label_replace(
               kube_pod_owner{job="kube-state-metrics", owner_kind="ReplicaSet"},
               "replicaset", "$1", "owner_name", "(.*)"
-            ) * on(replicaset, namespace) group_left(owner_name) topk by(replicaset, namespace) (
-              1, max by (replicaset, namespace, owner_name) (
+            ) * on ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}replicaset, namespace) group_left(owner_name) topk by ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}replicaset, namespace) (
+              1, max by ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}replicaset, namespace, owner_name) (
                 kube_replicaset_owner{job="kube-state-metrics"}
               )
             ),
@@ -45,9 +45,17 @@ spec:
         )
       labels:
         workload_type: deployment
+      {{- if or .Values.defaultRules.additionalRuleLabels .Values.defaultRules.additionalRuleGroupLabels.k8sPodOwner }}
+        {{- with .Values.defaultRules.additionalRuleLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.defaultRules.additionalRuleGroupLabels.k8sPodOwner }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
       record: namespace_workload_pod:kube_pod_owner:relabel
     - expr: |-
-        max by (cluster, namespace, workload, pod) (
+        max by ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}cluster, namespace, workload, pod) (
           label_replace(
             kube_pod_owner{job="kube-state-metrics", owner_kind="DaemonSet"},
             "workload", "$1", "owner_name", "(.*)"
@@ -55,9 +63,17 @@ spec:
         )
       labels:
         workload_type: daemonset
+      {{- if or .Values.defaultRules.additionalRuleLabels .Values.defaultRules.additionalRuleGroupLabels.k8sPodOwner }}
+        {{- with .Values.defaultRules.additionalRuleLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.defaultRules.additionalRuleGroupLabels.k8sPodOwner }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
       record: namespace_workload_pod:kube_pod_owner:relabel
     - expr: |-
-        max by (cluster, namespace, workload, pod) (
+        max by ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}cluster, namespace, workload, pod) (
           label_replace(
             kube_pod_owner{job="kube-state-metrics", owner_kind="StatefulSet"},
             "workload", "$1", "owner_name", "(.*)"
@@ -65,9 +81,17 @@ spec:
         )
       labels:
         workload_type: statefulset
+      {{- if or .Values.defaultRules.additionalRuleLabels .Values.defaultRules.additionalRuleGroupLabels.k8sPodOwner }}
+        {{- with .Values.defaultRules.additionalRuleLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.defaultRules.additionalRuleGroupLabels.k8sPodOwner }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
       record: namespace_workload_pod:kube_pod_owner:relabel
     - expr: |-
-        max by (cluster, namespace, workload, pod) (
+        max by ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}cluster, namespace, workload, pod) (
           label_replace(
             kube_pod_owner{job="kube-state-metrics", owner_kind="Job"},
             "workload", "$1", "owner_name", "(.*)"
@@ -75,5 +99,13 @@ spec:
         )
       labels:
         workload_type: job
+      {{- if or .Values.defaultRules.additionalRuleLabels .Values.defaultRules.additionalRuleGroupLabels.k8sPodOwner }}
+        {{- with .Values.defaultRules.additionalRuleLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.defaultRules.additionalRuleGroupLabels.k8sPodOwner }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
       record: namespace_workload_pod:kube_pod_owner:relabel
 {{- end }}
