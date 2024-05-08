@@ -46,8 +46,8 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.server.name }}
-          {{- with  .Values.server.securityContext }}
-          securityContext: {{- toYaml . | nindent 12 }}
+          {{- if .Values.server.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.securityContext "context" $) | nindent 12 }}
           {{- end }}
           image: "{{ .Values.server.image.repository }}:{{ default .Chart.AppVersion .Values.server.image.tag }}"
           imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
@@ -190,8 +190,8 @@ spec:
           {{- with .Values.server.vmbackupmanager.resources }}
           resources: {{ toYaml . | nindent 12  }}
           {{- end }}
-          {{- with  .Values.server.securityContext }}
-          securityContext: {{- toYaml . | nindent 12 }}
+          {{- if .Values.server.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.securityContext "context" $) | nindent 12 }}
           {{- end }}
           {{- with $.Values.server.vmbackupmanager.livenessProbe }}
           livenessProbe: {{- toYaml . | nindent 12 }}
@@ -225,9 +225,8 @@ spec:
       nodeSelector:
 {{ toYaml .Values.server.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.server.podSecurityContext }}
-      securityContext:
-{{ toYaml .Values.server.podSecurityContext | indent 8 }}
+    {{- if .Values.server.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.podSecurityContext "context" $) | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.server.tolerations }}

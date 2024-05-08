@@ -51,8 +51,9 @@ spec:
           {{- if .Values.vmstorage.containerWorkingDir }}
           workingDir: {{ .Values.vmstorage.containerWorkingDir }}
           {{- end }}
-          securityContext:
-            {{- toYaml .Values.vmstorage.securityContext | nindent 12 }}
+          {{- if .Values.vmstorage.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmstorage.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           args:
             - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.vmstorage.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
@@ -123,9 +124,8 @@ spec:
         - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
           image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
           imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
-          {{- with .Values.vmstorage.securityContext }}
-          securityContext:
-            {{- toYaml .  | nindent 12 }}
+          {{- if .Values.vmstorage.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmstorage.securityContext "context" $) | nindent 12 }}
           {{- end }}
           args:
             - {{ printf "%s=%t" "--eula" .Values.vmstorage.vmbackupmanager.eula | quote}}
@@ -192,9 +192,8 @@ spec:
       nodeSelector:
 {{ toYaml .Values.vmstorage.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.vmstorage.podSecurityContext }}
-      securityContext:
-{{ toYaml .Values.vmstorage.podSecurityContext | indent 8 }}
+    {{- if .Values.vmstorage.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmstorage.podSecurityContext "context" $) | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.vmstorage.tolerations }}

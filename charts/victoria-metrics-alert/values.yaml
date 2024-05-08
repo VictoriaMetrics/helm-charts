@@ -1,7 +1,11 @@
 # Default values for victoria-metrics-alert.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+      
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -221,11 +225,12 @@ server:
     # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
 
-  podSecurityContext: {}
+  podSecurityContext:
+    enabled: false
   # fsGroup: 2000
 
   securityContext:
-    {}
+    enabled: false
     # capabilities:
     #   drop:
     #   - ALL
@@ -299,7 +304,10 @@ alertmanager:
   resources: {}
   tolerations: []
   imagePullSecrets: []
-  podSecurityContext: {}
+  podSecurityContext:
+    enabled: false
+  securityContext:
+    enabled: false
   listenAddress: "0.0.0.0:9093"
   extraArgs: {}
   # key: value

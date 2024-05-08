@@ -47,8 +47,9 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-logs.name" . }}-{{ .Values.server.name }}
-          securityContext:
-            {{- toYaml .Values.server.securityContext | nindent 12 }}
+          {{- if .Values.server.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
           imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
           {{- if .Values.server.containerWorkingDir }}
@@ -122,9 +123,8 @@ spec:
       nodeSelector:
 {{ toYaml .Values.server.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.server.podSecurityContext }}
-      securityContext:
-{{ toYaml .Values.server.podSecurityContext | indent 8 }}
+    {{- if .Values.server.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.podSecurityContext "context" $) | nindent 8 }}
     {{- end }}
     {{- if .Values.server.tolerations }}
       tolerations:

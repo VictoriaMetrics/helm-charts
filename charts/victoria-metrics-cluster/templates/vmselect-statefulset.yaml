@@ -47,8 +47,9 @@ spec:
           {{- if .Values.vmselect.containerWorkingDir }}
           workingDir: {{ .Values.vmselect.containerWorkingDir }}
           {{- end }}
-          securityContext:
-            {{- toYaml .Values.vmselect.securityContext | nindent 12 }}
+          {{- if .Values.vmselect.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmselect.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           args:
             - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
           {{- if not (or .Values.vmselect.suppressStorageFQDNsRender .Values.vmselect.suppresStorageFQDNsRender) }}
@@ -133,9 +134,8 @@ spec:
       nodeSelector:
 {{ toYaml .Values.vmselect.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.vmselect.podSecurityContext }}
-      securityContext:
-{{ toYaml .Values.vmselect.podSecurityContext | indent 8 }}
+    {{- if .Values.vmselect.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmselect.podSecurityContext "context" $) | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.vmselect.tolerations }}

@@ -1,7 +1,10 @@
 # Default values for victoria-logs.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
 # -- Print chart notes
 printNotes: true
 
@@ -174,6 +177,7 @@ server:
 
   # -- Security context to be added to server pods
   securityContext:
+    enabled: true
     allowPrivilegeEscalation: false
     capabilities:
       drop:
@@ -182,6 +186,7 @@ server:
 
   # -- Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext:
+    enabled: true
     fsGroup: 2000
     runAsNonRoot: true
     runAsUser: 1000
