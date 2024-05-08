@@ -178,6 +178,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podDisruptionBudget.labels | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
+| rbac.aggregatedClusterRoles | object | `{"enabled":true,"labels":{"admin":{"rbac.authorization.k8s.io/aggregate-to-admin":"true"},"view":{"rbac.authorization.k8s.io/aggregate-to-view":"true"}}}` | create aggregated clusterRoles for CRD readonly and admin permissions |
+| rbac.aggregatedClusterRoles.labels | object | `{"admin":{"rbac.authorization.k8s.io/aggregate-to-admin":"true"},"view":{"rbac.authorization.k8s.io/aggregate-to-view":"true"}}` | labels attached to according clusterRole |
 | rbac.create | bool | `true` | Specifies whether the RBAC resources should be created |
 | rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` |  |

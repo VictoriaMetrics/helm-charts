@@ -13,6 +13,7 @@
 
 - updates operator to [v0.44.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.44.0)
 - fix serviceAccount template when `.Values.serviceAccount.create=false`, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1002) by @tylerturk for details. 
+- support creating aggregated clusterRoles for VM CRDs with admin and read permissions, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/996) by @reegnz for details.
 
 ## 0.30.3
 
