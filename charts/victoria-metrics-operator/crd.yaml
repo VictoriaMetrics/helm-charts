@@ -698,6 +698,8 @@ spec:
                   Specifies the DNS parameters of a pod.
                   Parameters specified here will be merged to the generated DNS
                   configuration based on DNSPolicy.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
                 properties:
                   nameservers:
                     description: |-
@@ -733,8 +735,6 @@ spec:
                       type: string
                     type: array
                 type: object
-                items:
-                  x-kubernetes-preserve-unknown-fields: true
               dnsPolicy:
                 description: DNSPolicy set DNS policy for the pod
                 type: string
@@ -1243,6 +1243,11 @@ spec:
               overrideHonorTimestamps:
                 description: OverrideHonorTimestamps allows to globally enforce honoring
                   timestamps in all scrape configs.
+                type: boolean
+              paused:
+                description: |-
+                  Paused If set to true all actions on the underlaying managed objects are not
+                  going to be performed, except for delete actions.
                 type: boolean
               podDisruptionBudget:
                 description: PodDisruptionBudget created by operator
@@ -2014,12 +2019,30 @@ spec:
                                 items:
                                   type: string
                                 type: array
+                              dedup_interval:
+                                description: DedupInterval is an optional interval
+                                  for deduplication.
+                                type: string
+                              drop_input_labels:
+                                description: |-
+                                  DropInputLabels is an optional list with labels, which must be dropped before further processing of input samples.
+
+
+                                  Labels are dropped before de-duplication and aggregation.
+                                items:
+                                  type: string
+                                type: array
                               flush_on_shutdown:
                                 description: |-
                                   FlushOnShutdown defines whether to flush the aggregation state on process termination
                                   or config reload. Is `false` by default.
                                   It is not recommended changing this setting, unless unfinished aggregations states
                                   are preferred to missing data points.
+                                type: boolean
+                              ignore_old_samples:
+                                description: IgnoreOldSamples instructs to ignore
+                                  samples with old timestamps outside the current
+                                  aggregation interval.
                                 type: boolean
                               input_relabel_configs:
                                 description: |-
@@ -2103,6 +2126,11 @@ spec:
                               interval:
                                 description: Interval is the interval between aggregations.
                                 type: string
+                              keep_metric_names:
+                                description: KeepMetricNames instructs to leave metric
+                                  names as is for the output time series without adding
+                                  any suffix.
+                                type: boolean
                               match:
                                 description: |-
                                   Match is a label selector (or list of label selectors) for filtering time series for the given selector.
@@ -2110,6 +2138,11 @@ spec:
 
                                   If the match isn't set, then all the input time series are processed.
                                 x-kubernetes-preserve-unknown-fields: true
+                              no_align_flush_to_interval:
+                                description: |-
+                                  NoAlighFlushToInterval disables aligning of flushes to multiples of Interval.
+                                  By default flushes are aligned to Interval.
+                                type: boolean
                               output_relabel_configs:
                                 description: |-
                                   OutputRelabelConfigs is an optional relabeling rules, which are applied
@@ -2220,9 +2253,9 @@ spec:
                                   type: string
                                 type: array
                               staleness_interval:
-                                description: StalenessInterval defines an interval
-                                  after which the series state will be reset if no
-                                  samples have been sent during it.
+                                description: |-
+                                  Staleness interval is interval after which the series state will be reset if no samples have been sent during it.
+                                  The parameter is only relevant for outputs: total, total_prometheus, increase, increase_prometheus and histogram_bucket.
                                 type: string
                               without:
                                 description: |-
@@ -7225,6 +7258,8 @@ spec:
                   Specifies the DNS parameters of a pod.
                   Parameters specified here will be merged to the generated DNS
                   configuration based on DNSPolicy.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
                 properties:
                   nameservers:
                     description: |-
@@ -7260,8 +7295,6 @@ spec:
                       type: string
                     type: array
                 type: object
-                items:
-                  x-kubernetes-preserve-unknown-fields: true
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
@@ -8302,6 +8335,8 @@ spec:
                 description: Datasource Victoria Metrics or VMSelect url. Required
                   parameter. e.g. http://127.0.0.1:8428
                 properties:
+                  OAuth2:
+                    x-kubernetes-preserve-unknown-fields: true
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
                       basic authentication
@@ -8494,8 +8529,6 @@ spec:
                     description: Victoria Metrics or VMSelect url. Required parameter.
                       E.g. http://127.0.0.1:8428
                     type: string
-                  OAuth2:
-                    x-kubernetes-preserve-unknown-fields: true
                 required:
                 - url
                 type: object
@@ -8504,6 +8537,8 @@ spec:
                   Specifies the DNS parameters of a pod.
                   Parameters specified here will be merged to the generated DNS
                   configuration based on DNSPolicy.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
                 properties:
                   nameservers:
                     description: |-
@@ -8539,8 +8574,6 @@ spec:
                       type: string
                     type: array
                 type: object
-                items:
-                  x-kubernetes-preserve-unknown-fields: true
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
@@ -8724,6 +8757,8 @@ spec:
                   If specified both notifier and notifiers, notifier will be added as last element to notifiers.
                   only one of notifier options could be chosen: notifierConfigRef or notifiers +  notifier
                 properties:
+                  OAuth2:
+                    x-kubernetes-preserve-unknown-fields: true
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
                       basic authentication
@@ -8985,8 +9020,6 @@ spec:
                   url:
                     description: AlertManager url.  E.g. http://127.0.0.1:9093
                     type: string
-                  OAuth2:
-                    x-kubernetes-preserve-unknown-fields: true
                 type: object
               notifierConfigRef:
                 description: |-
@@ -9019,6 +9052,8 @@ spec:
                   description: VMAlertNotifierSpec defines the notifier url for sending
                     information about alerts
                   properties:
+                    OAuth2:
+                      x-kubernetes-preserve-unknown-fields: true
                     basicAuth:
                       description: BasicAuth allow an endpoint to authenticate over
                         basic authentication
@@ -9280,10 +9315,13 @@ spec:
                     url:
                       description: AlertManager url.  E.g. http://127.0.0.1:9093
                       type: string
-                    OAuth2:
-                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 type: array
+              paused:
+                description: |-
+                  Paused If set to true all actions on the underlaying managed objects are not
+                  going to be performed, except for delete actions.
+                type: boolean
               podDisruptionBudget:
                 description: PodDisruptionBudget created by operator
                 properties:
@@ -9378,6 +9416,8 @@ spec:
                   see -remoteRead.url docs in vmalerts for details.
                   E.g. http://127.0.0.1:8428
                 properties:
+                  OAuth2:
+                    x-kubernetes-preserve-unknown-fields: true
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
                       basic authentication
@@ -9574,8 +9614,6 @@ spec:
                   url:
                     description: URL of the endpoint to send samples to.
                     type: string
-                  OAuth2:
-                    x-kubernetes-preserve-unknown-fields: true
                 required:
                 - url
                 type: object
@@ -9588,6 +9626,8 @@ spec:
                   see -remoteWrite.url docs in vmalerts for details.
                   E.g. http://127.0.0.1:8428
                 properties:
+                  OAuth2:
+                    x-kubernetes-preserve-unknown-fields: true
                   basicAuth:
                     description: BasicAuth allow an endpoint to authenticate over
                       basic authentication
@@ -9799,8 +9839,6 @@ spec:
                   url:
                     description: URL of the endpoint to send samples to.
                     type: string
-                  OAuth2:
-                    x-kubernetes-preserve-unknown-fields: true
                 required:
                 - url
                 type: object
@@ -10372,11 +10410,24 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              default_url:
+                description: |-
+                  DefaultURLs backend url for non-matching paths filter
+                  usually used for default backend with error message
+                items:
+                  type: string
+                type: array
+              discover_backend_ips:
+                description: DiscoverBackendIPs instructs discovering URLPrefix backend
+                  IPs via DNS.
+                type: boolean
               dnsConfig:
                 description: |-
                   Specifies the DNS parameters of a pod.
                   Parameters specified here will be merged to the generated DNS
                   configuration based on DNSPolicy.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
                 properties:
                   nameservers:
                     description: |-
@@ -10412,11 +10463,14 @@ spec:
                       type: string
                     type: array
                 type: object
-                items:
-                  x-kubernetes-preserve-unknown-fields: true
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
+              drop_src_path_prefix_parts:
+                description: |-
+                  DropSrcPathPrefixParts is the number of `/`-delimited request path prefix parts to drop before proxying the request to backend.
+                  See https://docs.victoriametrics.com/vmauth.html#dropping-request-path-prefix for more details.
+                type: integer
               extraArgs:
                 additionalProperties:
                   type: string
@@ -10449,6 +10503,16 @@ spec:
                   - name
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
+                type: array
+              headers:
+                description: |-
+                  Headers represent additional http headers, that vmauth uses
+                  in form of ["header_key: header_value"]
+                  multiple values for header key:
+                  ["header_key: value1,value2"]
+                  it's available since 1.68.0 version of vmauth
+                items:
+                  type: string
                 type: array
               hostAliases:
                 description: |-
@@ -10753,6 +10817,21 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              ip_filters:
+                description: |-
+                  IPFilters defines per target src ip filters
+                  supported only with enterprise version of vmauth
+                  https://docs.victoriametrics.com/vmauth.html#ip-filters
+                properties:
+                  allow_list:
+                    items:
+                      type: string
+                    type: array
+                  deny_list:
+                    items:
+                      type: string
+                    type: array
+                type: object
               license:
                 description: |-
                   License allows to configure license key to be used for enterprise features.
@@ -10793,6 +10872,15 @@ spec:
                 description: LivenessProbe that will be added CRD pod
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
+              load_balancing_policy:
+                description: |-
+                  LoadBalancingPolicy defines load balancing policy to use for backend urls.
+                  Supported policies: least_loaded, first_available.
+                  See https://docs.victoriametrics.com/vmauth.html#load-balancing for more details (default "least_loaded")
+                enum:
+                - least_loaded
+                - first_available
+                type: string
               logFormat:
                 description: LogFormat for VMAuth to be configured with.
                 enum:
@@ -10809,6 +10897,11 @@ spec:
                 - FATAL
                 - PANIC
                 type: string
+              max_concurrent_requests:
+                description: |-
+                  MaxConcurrentRequests defines max concurrent requests per user
+                  300 is default value for vmauth
+                type: integer
               minReadySeconds:
                 description: |-
                   MinReadySeconds defines a minim number os seconds to wait before starting update next pod
@@ -10821,6 +10914,11 @@ spec:
                 description: NodeSelector Define which Nodes the Pods are scheduled
                   on.
                 type: object
+              paused:
+                description: |-
+                  Paused If set to true all actions on the underlaying managed objects are not
+                  going to be performed, except for delete actions.
+                type: boolean
               podDisruptionBudget:
                 description: PodDisruptionBudget created by operator
                 properties:
@@ -10968,6 +11066,23 @@ spec:
                       More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                 type: object
+              response_headers:
+                description: |-
+                  ResponseHeaders represent additional http headers, that vmauth adds for request response
+                  in form of ["header_key: header_value"]
+                  multiple values for header key:
+                  ["header_key: value1,value2"]
+                  it's available since 1.93.0 version of vmauth
+                items:
+                  type: string
+                type: array
+              retry_status_codes:
+                description: |-
+                  RetryStatusCodes defines http status codes in numeric format for request retries
+                  e.g. [429,503]
+                items:
+                  type: integer
+                type: array
               revisionHistoryLimitCount:
                 description: |-
                   The number of old ReplicaSets to retain to allow rollback in deployment or
@@ -11073,6 +11188,139 @@ spec:
                   termination
                 format: int64
                 type: integer
+              tlsConfig:
+                description: TLSConfig specifies TLSConfig configuration parameters.
+                properties:
+                  ca:
+                    description: Stuct containing the CA cert to use for the targets.
+                    properties:
+                      configMap:
+                        description: ConfigMap containing data to use for the targets.
+                        properties:
+                          key:
+                            description: The key to select.
+                            type: string
+                          name:
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?
+                            type: string
+                          optional:
+                            description: Specify whether the ConfigMap or its key
+                              must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      secret:
+                        description: Secret containing data to use for the targets.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    type: object
+                  caFile:
+                    description: Path to the CA cert in the container to use for the
+                      targets.
+                    type: string
+                  cert:
+                    description: Struct containing the client cert file for the targets.
+                    properties:
+                      configMap:
+                        description: ConfigMap containing data to use for the targets.
+                        properties:
+                          key:
+                            description: The key to select.
+                            type: string
+                          name:
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?
+                            type: string
+                          optional:
+                            description: Specify whether the ConfigMap or its key
+                              must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      secret:
+                        description: Secret containing data to use for the targets.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    type: object
+                  certFile:
+                    description: Path to the client cert file in the container for
+                      the targets.
+                    type: string
+                  insecureSkipVerify:
+                    description: Disable target certificate validation.
+                    type: boolean
+                  keyFile:
+                    description: Path to the client key file in the container for
+                      the targets.
+                    type: string
+                  keySecret:
+                    description: Secret containing the client key file for the targets.
+                    properties:
+                      key:
+                        description: The key of the secret to select from.  Must be
+                          a valid secret key.
+                        type: string
+                      name:
+                        description: |-
+                          Name of the referent.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?
+                        type: string
+                      optional:
+                        description: Specify whether the Secret or its key must be
+                          defined
+                        type: boolean
+                    required:
+                    - key
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  serverName:
+                    description: Used to verify the hostname for the targets.
+                    type: string
+                type: object
               tolerations:
                 description: Tolerations If specified, the pod's tolerations.
                 items:
@@ -11132,9 +11380,11 @@ spec:
                 description: UnauthorizedAccessConfig configures access for un authorized
                   users
                 items:
-                  description: VMAuthUnauthorizedPath defines url_map for unauthorized
-                    access
                   properties:
+                    discover_backend_ips:
+                      description: DiscoverBackendIPs instructs discovering URLPrefix
+                        backend IPs via DNS.
+                      type: boolean
                     drop_src_path_prefix_parts:
                       description: |-
                         DropSrcPathPrefixParts is the number of `/`-delimited request path prefix parts to drop before proxying the request to backend.
@@ -11142,7 +11392,7 @@ spec:
                       type: integer
                     headers:
                       description: |-
-                        Headers represent additional http headers, that vmauth uses
+                        RequestHeaders represent additional http headers, that vmauth uses
                         in form of ["header_key: header_value"]
                         multiple values for header key:
                         ["header_key: value1,value2"]
@@ -11150,20 +11400,6 @@ spec:
                       items:
                         type: string
                       type: array
-                    ip_filters:
-                      description: |-
-                        IPFilters defines filter for src ip address
-                        enterprise only
-                      properties:
-                        allow_list:
-                          items:
-                            type: string
-                          type: array
-                        deny_list:
-                          items:
-                            type: string
-                          type: array
-                      type: object
                     load_balancing_policy:
                       description: |-
                         LoadBalancingPolicy defines load balancing policy to use for backend urls.
@@ -11186,23 +11422,38 @@ spec:
                     retry_status_codes:
                       description: |-
                         RetryStatusCodes defines http status codes in numeric format for request retries
+                        Can be defined per target or at VMUser.spec level
                         e.g. [429,503]
                       items:
                         type: integer
                       type: array
+                    src_headers:
+                      description: SrcHeaders is an optional list of headers, which
+                        must match request headers.
+                      items:
+                        type: string
+                      type: array
                     src_hosts:
-                      description: SrcHosts is the list of regular expressions, which
-                        match the request hostname.
+                      description: SrcHosts is an optional list of regular expressions,
+                        which must match the request hostname.
                       items:
                         type: string
                       type: array
                     src_paths:
-                      description: Paths src request paths
+                      description: SrcPaths is an optional list of regular expressions,
+                        which must match the request path.
+                      items:
+                        type: string
+                      type: array
+                    src_query_args:
+                      description: SrcQueryArgs is an optional list of query args,
+                        which must match request URL query args.
                       items:
                         type: string
                       type: array
                     url_prefix:
-                      description: URLs defines url_prefix for dst routing
+                      description: UrlPrefix contains backend url prefixes for the
+                        proxied request url.
                       items:
                         type: string
                       type: array
@@ -11512,6 +11763,11 @@ spec:
                     type: object
                     x-kubernetes-map-type: atomic
                 type: object
+              paused:
+                description: |-
+                  Paused If set to true all actions on the underlaying managed objects are not
+                  going to be performed, except for delete actions.
+                type: boolean
               replicationFactor:
                 description: |-
                   ReplicationFactor defines how many copies of data make among
@@ -11574,6 +11830,8 @@ spec:
                       Specifies the DNS parameters of a pod.
                       Parameters specified here will be merged to the generated DNS
                       configuration based on DNSPolicy.
+                    items:
+                      x-kubernetes-preserve-unknown-fields: true
                     properties:
                       nameservers:
                         description: |-
@@ -11609,8 +11867,6 @@ spec:
                           type: string
                         type: array
                     type: object
-                    items:
-                      x-kubernetes-preserve-unknown-fields: true
                   dnsPolicy:
                     description: DNSPolicy sets DNS policy for the pod
                     type: string
@@ -12512,6 +12768,8 @@ spec:
                       Specifies the DNS parameters of a pod.
                       Parameters specified here will be merged to the generated DNS
                       configuration based on DNSPolicy.
+                    items:
+                      x-kubernetes-preserve-unknown-fields: true
                     properties:
                       nameservers:
                         description: |-
@@ -12547,8 +12805,6 @@ spec:
                           type: string
                         type: array
                     type: object
-                    items:
-                      x-kubernetes-preserve-unknown-fields: true
                   dnsPolicy:
                     description: DNSPolicy sets DNS policy for the pod
                     type: string
@@ -13824,6 +14080,8 @@ spec:
                       Specifies the DNS parameters of a pod.
                       Parameters specified here will be merged to the generated DNS
                       configuration based on DNSPolicy.
+                    items:
+                      x-kubernetes-preserve-unknown-fields: true
                     properties:
                       nameservers:
                         description: |-
@@ -13859,8 +14117,6 @@ spec:
                           type: string
                         type: array
                     type: object
-                    items:
-                      x-kubernetes-preserve-unknown-fields: true
                   dnsPolicy:
                     description: DNSPolicy sets DNS policy for the pod
                     type: string
@@ -22571,6 +22827,8 @@ spec:
                   Specifies the DNS parameters of a pod.
                   Parameters specified here will be merged to the generated DNS
                   configuration based on DNSPolicy.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
                 properties:
                   nameservers:
                     description: |-
@@ -22606,8 +22864,6 @@ spec:
                       type: string
                     type: array
                 type: object
-                items:
-                  x-kubernetes-preserve-unknown-fields: true
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
@@ -22797,6 +23053,11 @@ spec:
                 description: NodeSelector Define which Nodes the Pods are scheduled
                   on.
                 type: object
+              paused:
+                description: |-
+                  Paused If set to true all actions on the underlaying managed objects are not
+                  going to be performed, except for delete actions.
+                type: boolean
               podMetadata:
                 description: PodMetadata configures Labels and Annotations which are
                   propagated to the VMSingle pods.
@@ -23301,12 +23562,28 @@ spec:
                           items:
                             type: string
                           type: array
+                        dedup_interval:
+                          description: DedupInterval is an optional interval for deduplication.
+                          type: string
+                        drop_input_labels:
+                          description: |-
+                            DropInputLabels is an optional list with labels, which must be dropped before further processing of input samples.
+
+
+                            Labels are dropped before de-duplication and aggregation.
+                          items:
+                            type: string
+                          type: array
                         flush_on_shutdown:
                           description: |-
                             FlushOnShutdown defines whether to flush the aggregation state on process termination
                             or config reload. Is `false` by default.
                             It is not recommended changing this setting, unless unfinished aggregations states
                             are preferred to missing data points.
+                          type: boolean
+                        ignore_old_samples:
+                          description: IgnoreOldSamples instructs to ignore samples
+                            with old timestamps outside the current aggregation interval.
                           type: boolean
                         input_relabel_configs:
                           description: |-
@@ -23390,6 +23667,10 @@ spec:
                         interval:
                           description: Interval is the interval between aggregations.
                           type: string
+                        keep_metric_names:
+                          description: KeepMetricNames instructs to leave metric names
+                            as is for the output time series without adding any suffix.
+                          type: boolean
                         match:
                           description: |-
                             Match is a label selector (or list of label selectors) for filtering time series for the given selector.
@@ -23397,6 +23678,11 @@ spec:
 
                             If the match isn't set, then all the input time series are processed.
                           x-kubernetes-preserve-unknown-fields: true
+                        no_align_flush_to_interval:
+                          description: |-
+                            NoAlighFlushToInterval disables aligning of flushes to multiples of Interval.
+                            By default flushes are aligned to Interval.
+                          type: boolean
                         output_relabel_configs:
                           description: |-
                             OutputRelabelConfigs is an optional relabeling rules, which are applied
@@ -23507,9 +23793,9 @@ spec:
                             type: string
                           type: array
                         staleness_interval:
-                          description: StalenessInterval defines an interval after
-                            which the series state will be reset if no samples have
-                            been sent during it.
+                          description: |-
+                            Staleness interval is interval after which the series state will be reset if no samples have been sent during it.
+                            The parameter is only relevant for outputs: total, total_prometheus, increase, increase_prometheus and histogram_bucket.
                           type: string
                         without:
                           description: |-
@@ -25011,6 +25297,10 @@ spec:
                 description: DisableSecretCreation skips related secret creation for
                   vmuser
                 type: boolean
+              discover_backend_ips:
+                description: DiscoverBackendIPs instructs discovering URLPrefix backend
+                  IPs via DNS.
+                type: boolean
               drop_src_path_prefix_parts:
                 description: |-
                   DropSrcPathPrefixParts is the number of `/`-delimited request path prefix parts to drop before proxying the request to backend.
@@ -25141,6 +25431,10 @@ spec:
                       - name
                       - namespace
                       type: object
+                    discover_backend_ips:
+                      description: DiscoverBackendIPs instructs discovering URLPrefix
+                        backend IPs via DNS.
+                      type: boolean
                     drop_src_path_prefix_parts:
                       description: |-
                         DropSrcPathPrefixParts is the number of `/`-delimited request path prefix parts to drop before proxying the request to backend.
@@ -25148,7 +25442,7 @@ spec:
                       type: integer
                     headers:
                       description: |-
-                        Headers represent additional http headers, that vmauth uses
+                        RequestHeaders represent additional http headers, that vmauth uses
                         in form of ["header_key: header_value"]
                         multiple values for header key:
                         ["header_key: value1,value2"]
@@ -25192,6 +25486,18 @@ spec:
                       items:
                         type: integer
                       type: array
+                    src_headers:
+                      description: SrcHeaders is an optional list of headers, which
+                        must match request headers.
+                      items:
+                        type: string
+                      type: array
+                    src_query_args:
+                      description: SrcQueryArgs is an optional list of query args,
+                        which must match request URL query args.
+                      items:
+                        type: string
+                      type: array
                     static:
                       description: |-
                         Static - user defined url for traffic forward,
@@ -25209,7 +25515,6 @@ spec:
                       type: object
                     target_path_suffix:
                       description: |-
-                        QueryParams []string `json:"queryParams,omitempty"`
                         TargetPathSuffix allows to add some suffix to the target path
                         It allows to hide tenant configuration from user with crd as ref.
                         it also may contain any url encoded params.
@@ -25272,11 +25577,139 @@ spec:
                       type: object
                   type: object
                 type: array
-              tls_insecure_skip_verify:
-                description: |-
-                  TLSInsecureSkipVerify - whether to skip TLS verification when connecting to backend over HTTPS.
-                  See https://docs.victoriametrics.com/vmauth.html#backend-tls-setup
-                type: boolean
+              tlsConfig:
+                description: TLSConfig specifies TLSConfig configuration parameters.
+                properties:
+                  ca:
+                    description: Stuct containing the CA cert to use for the targets.
+                    properties:
+                      configMap:
+                        description: ConfigMap containing data to use for the targets.
+                        properties:
+                          key:
+                            description: The key to select.
+                            type: string
+                          name:
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?
+                            type: string
+                          optional:
+                            description: Specify whether the ConfigMap or its key
+                              must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      secret:
+                        description: Secret containing data to use for the targets.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    type: object
+                  caFile:
+                    description: Path to the CA cert in the container to use for the
+                      targets.
+                    type: string
+                  cert:
+                    description: Struct containing the client cert file for the targets.
+                    properties:
+                      configMap:
+                        description: ConfigMap containing data to use for the targets.
+                        properties:
+                          key:
+                            description: The key to select.
+                            type: string
+                          name:
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?
+                            type: string
+                          optional:
+                            description: Specify whether the ConfigMap or its key
+                              must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      secret:
+                        description: Secret containing data to use for the targets.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    type: object
+                  certFile:
+                    description: Path to the client cert file in the container for
+                      the targets.
+                    type: string
+                  insecureSkipVerify:
+                    description: Disable target certificate validation.
+                    type: boolean
+                  keyFile:
+                    description: Path to the client key file in the container for
+                      the targets.
+                    type: string
+                  keySecret:
+                    description: Secret containing the client key file for the targets.
+                    properties:
+                      key:
+                        description: The key of the secret to select from.  Must be
+                          a valid secret key.
+                        type: string
+                      name:
+                        description: |-
+                          Name of the referent.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?
+                        type: string
+                      optional:
+                        description: Specify whether the Secret or its key must be
+                          defined
+                        type: boolean
+                    required:
+                    - key
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  serverName:
+                    description: Used to verify the hostname for the targets.
+                    type: string
+                type: object
               tokenRef:
                 description: TokenRef allows fetching token from user-created secrets
                   by its name and key.
@@ -25314,3 +25747,4 @@ spec:
     storage: true
     subresources:
       status: {}
+
