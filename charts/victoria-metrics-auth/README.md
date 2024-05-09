@@ -112,6 +112,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` |  |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmauth"` | Victoria Metrics Auth Docker repository and image name |
 | image.tag | string | `""` | Tag of Docker image |
@@ -137,14 +138,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
-| podSecurityContext | object | `{}` |  |
+| podSecurityContext.enabled | bool | `false` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.extraLabels | object | `{}` |  |
 | rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` | Number of replicas of vmauth |
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
 | secretName | string | `""` | Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html. Configuration in the given secret must be stored under `auth.yml` key. |
-| securityContext | object | `{}` |  |
+| securityContext.enabled | bool | `false` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
 | service.enabled | bool | `true` |  |

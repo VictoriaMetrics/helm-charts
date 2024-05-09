@@ -105,6 +105,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | clusterDomainSuffix | string | `"cluster.local"` | k8s cluster domain suffix, uses for building storage pods' FQDN. Ref: [https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/) |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
 | extraSecrets | list | `[]` |  |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
@@ -153,7 +154,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.podAnnotations | object | `{}` | Pod's annotations |
 | vminsert.podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | vminsert.podDisruptionBudget.labels | object | `{}` |  |
-| vminsert.podSecurityContext | object | `{}` |  |
+| vminsert.podSecurityContext.enabled | bool | `false` |  |
 | vminsert.ports.name | string | `"http"` |  |
 | vminsert.priorityClassName | string | `""` | Name of Priority Class |
 | vminsert.probe.liveness.failureThreshold | int | `3` |  |
@@ -166,7 +167,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.probe.readiness.timeoutSeconds | int | `5` |  |
 | vminsert.replicaCount | int | `2` | Count of vminsert pods |
 | vminsert.resources | object | `{}` | Resource object |
-| vminsert.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| vminsert.securityContext | object | `{"enabled":false}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vminsert.service.annotations | object | `{}` | Service annotations |
 | vminsert.service.clusterIP | string | `""` | Service ClusterIP |
 | vminsert.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
@@ -232,7 +233,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.podAnnotations | object | `{}` | Pod's annotations |
 | vmselect.podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | vmselect.podDisruptionBudget.labels | object | `{}` |  |
-| vmselect.podSecurityContext | object | `{}` |  |
+| vmselect.podSecurityContext.enabled | bool | `false` |  |
 | vmselect.ports.name | string | `"http"` |  |
 | vmselect.priorityClassName | string | `""` | Name of Priority Class |
 | vmselect.probe.liveness.failureThreshold | int | `3` |  |
@@ -245,7 +246,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.probe.readiness.timeoutSeconds | int | `5` |  |
 | vmselect.replicaCount | int | `2` | Count of vmselect pods |
 | vmselect.resources | object | `{}` | Resource object |
-| vmselect.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
+| vmselect.securityContext | object | `{"enabled":false}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
 | vmselect.service.annotations | object | `{}` | Service annotations |
 | vmselect.service.clusterIP | string | `""` | Service ClusterIP |
 | vmselect.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips](https://kubernetes.io/docs/user-guide/services/#external-ips) |
@@ -307,7 +308,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.podAnnotations | object | `{}` | Pod's annotations |
 | vmstorage.podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | vmstorage.podManagementPolicy | string | `"OrderedReady"` | Deploy order policy for StatefulSet pods |
-| vmstorage.podSecurityContext | object | `{}` |  |
+| vmstorage.podSecurityContext.enabled | bool | `false` |  |
 | vmstorage.ports.name | string | `"http"` |  |
 | vmstorage.priorityClassName | string | `""` | Name of Priority Class |
 | vmstorage.probe.liveness.failureThreshold | int | `10` |  |
@@ -324,7 +325,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.replicaCount | int | `2` | Count of vmstorage pods |
 | vmstorage.resources | object | `{}` | Resource object. Ref: [https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | vmstorage.retentionPeriod | int | `1` | Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month |
-| vmstorage.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| vmstorage.securityContext | object | `{"enabled":false}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vmstorage.service.annotations | object | `{}` | Service annotations |
 | vmstorage.service.extraPorts | list | `[]` | Extra service ports |
 | vmstorage.service.labels | object | `{}` | Service labels |
