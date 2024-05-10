@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- support disabling default securityContext to keep compatible with platform like openshift, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/995) by @Baboulinet-33 for details.
 
 ## 0.4.10
 

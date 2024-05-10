@@ -127,6 +127,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | fluent-bit.daemonSetVolumes[1].name | string | `"varlibdockercontainers"` |  |
 | fluent-bit.enabled | bool | `false` | Enable deployment of fluent-bit |
 | fluent-bit.resources | object | `{}` |  |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | podDisruptionBudget.extraLabels | object | `{}` |  |
 | printNotes | bool | `true` | Print chart notes |
@@ -175,7 +176,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.podAnnotations | object | `{}` | Pod's annotations |
 | server.podLabels | object | `{}` | Pod's additional labels |
 | server.podManagementPolicy | string | `"OrderedReady"` | Pod's management policy |
-| server.podSecurityContext | object | `{"fsGroup":2000,"runAsNonRoot":true,"runAsUser":1000}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| server.podSecurityContext | object | `{"enabled":true,"fsGroup":2000,"runAsNonRoot":true,"runAsUser":1000}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | server.priorityClassName | string | `""` | Name of Priority Class |
 | server.readinessProbe.failureThreshold | int | `3` |  |
 | server.readinessProbe.httpGet.path | string | `"/health"` |  |
@@ -185,7 +186,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.readinessProbe.timeoutSeconds | int | `5` |  |
 | server.resources | object | `{}` | Resource object. Ref: [http://kubernetes.io/docs/user-guide/compute-resources/](http://kubernetes.io/docs/user-guide/compute-resources/ |
 | server.retentionPeriod | int | `1` | Data retention period in month |
-| server.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Security context to be added to server pods |
+| server.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"enabled":true,"readOnlyRootFilesystem":true}` | Security context to be added to server pods |
 | server.service.annotations | object | `{}` | Service annotations |
 | server.service.clusterIP | string | `""` | Service ClusterIP |
 | server.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
