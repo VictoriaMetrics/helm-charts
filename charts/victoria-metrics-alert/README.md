@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.9.6](https://img.shields.io/badge/Version-0.9.6-informational?style=flat-square)
+ ![Version: 0.9.7](https://img.shields.io/badge/Version-0.9.7-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -139,10 +139,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.persistentVolume.subPath | string | `""` | Mount subpath |
 | alertmanager.podMetadata.annotations | object | `{}` |  |
 | alertmanager.podMetadata.labels | object | `{}` |  |
-| alertmanager.podSecurityContext | object | `{}` |  |
+| alertmanager.podSecurityContext.enabled | bool | `false` |  |
 | alertmanager.priorityClassName | string | `""` |  |
 | alertmanager.resources | object | `{}` |  |
 | alertmanager.retention | string | `"120h"` |  |
+| alertmanager.securityContext.enabled | bool | `false` |  |
 | alertmanager.service.annotations | object | `{}` |  |
 | alertmanager.service.port | int | `9093` |  |
 | alertmanager.service.type | string | `"ClusterIP"` |  |
@@ -150,6 +151,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
@@ -203,7 +205,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.podDisruptionBudget.enabled | bool | `false` |  |
 | server.podDisruptionBudget.labels | object | `{}` |  |
 | server.podLabels | object | `{}` |  |
-| server.podSecurityContext | object | `{}` |  |
+| server.podSecurityContext.enabled | bool | `false` |  |
 | server.priorityClassName | string | `""` |  |
 | server.probe.liveness.failureThreshold | int | `3` |  |
 | server.probe.liveness.initialDelaySeconds | int | `5` |  |
@@ -224,7 +226,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.remote.write.url | string | `""` |  |
 | server.replicaCount | int | `1` |  |
 | server.resources | object | `{}` |  |
-| server.securityContext | object | `{}` |  |
+| server.securityContext.enabled | bool | `false` |  |
 | server.service.annotations | object | `{}` |  |
 | server.service.clusterIP | string | `""` |  |
 | server.service.externalIPs | list | `[]` |  |

@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 1.2.2](https://img.shields.io/badge/Version-1.2.2-informational?style=flat-square)
+![Version: 1.2.3](https://img.shields.io/badge/Version-1.2.3-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-anomaly)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
@@ -142,6 +142,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` |  |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"docker.io/victoriametrics/vmanomaly"` | Victoria Metrics anomaly Docker repository and image name |
 | image.tag | string | `""` | Tag of Docker image |
@@ -155,8 +156,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
-| podSecurityContext | object | `{}` |  |
+| podSecurityContext.enabled | bool | `false` |  |
 | resources | object | `{}` |  |
+| securityContext.enabled | bool | `true` |  |
 | securityContext.runAsGroup | int | `1000` |  |
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
