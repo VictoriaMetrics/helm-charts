@@ -2,7 +2,16 @@
 
 ## Next release
 
-- fix serviceAccount template when `.Values.serviceAccount.create=false`, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1002) by @tylerturk for details. 
+- TODO
+
+## 0.31.1
+
+**Release date:** 2024-05-10
+
+![AppVersion: 0.44.0](https://img.shields.io/static/v1?label=AppVersion&message=0.44.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- fix serviceAccount template when `.Values.serviceAccount.create=false`, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1002) by @tylerturk for details.
 - support creating aggregated clusterRoles for VM CRDs with admin and read permissions, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/996) by @reegnz for details.
 
 ## 0.31.0
