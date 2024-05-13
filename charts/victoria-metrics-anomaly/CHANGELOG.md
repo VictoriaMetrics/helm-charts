@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Add ability to configure persistent volume for vmanomaly models storage.
+- Fix `.Values.podSecurityContext` not being applied to the pod.
 
 ## 1.2.4
 

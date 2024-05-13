@@ -15,7 +15,11 @@
 {{- end -}}
 
 apiVersion: apps/v1
+{{- if .Values.persistentVolume.enabled }}
+kind: StatefulSet
+{{- else }}
 kind: Deployment
+{{- end }}
 metadata:
   namespace: {{ .Release.Namespace }}
   name: {{ include "chart.fullname" . }}
@@ -30,6 +34,9 @@ spec:
       labels:
         {{- include "chart.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if .Values.podSecurityContext}}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
       containers:
         - name: model
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
@@ -50,8 +57,15 @@ spec:
             {{ toYaml . | nindent 12 }}
             {{- end }}
           {{- end }}
-          {{- with .Values.env }}
-          env: {{ toYaml . | nindent 10 }}
+          {{- if and .Values.env .Values.persistentVolume.enabled }}
+          env:
+           {{ toYaml .Values.env | nindent 10 }}
+          - name: VMANOMALY_MODEL_DUMPS_DIR
+            value: "/tmp/vmanomaly-model-dumps"
+          {{- else if .Values.persistentVolume.enabled }}
+          env:
+            - name: VMANOMALY_MODEL_DUMPS_DIR
+              value: "/tmp/vmanomaly-model-dumps"
           {{- end }}
           {{- if .Values.securityContext.enabled }}
           securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" $) | nindent 12 }}
@@ -63,6 +77,10 @@ spec:
             - name: config
               mountPath: /etc/config
           {{- include "chart.license.mount" . | nindent 12 }}
+          {{- if .Values.persistentVolume.enabled }}
+            - name: models-dump
+              mountPath: /tmp/vmanomaly-model-dumps
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -80,3 +98,35 @@ spec:
           configMap:
             name: {{ include "chart.fullname" . }}
       {{- include "chart.license.volume" . | nindent 8}}
+      {{- if .Values.persistentVolume.existingClaim }}
+        - name: models-dump
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistentVolume.existingClaim }}
+      {{- end }}
+{{- if and .Values.persistentVolume.enabled (not .Values.persistentVolume.existingClaim) }}
+  volumeClaimTemplates:
+    - metadata:
+        name: models-dump
+        {{- if .Values.persistentVolume.annotations }}
+        annotations:
+{{ toYaml .Values.persistentVolume.annotations | indent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+{{ toYaml .Values.persistentVolume.accessModes | indent 10 }}
+        resources:
+          requests:
+            storage: "{{ .Values.persistentVolume.size }}"
+      {{- if .Values.persistentVolume.storageClass }}
+      {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+        storageClassName: ""
+      {{- else }}
+        storageClassName: "{{ .Values.persistentVolume.storageClass }}"
+      {{- end }}
+      {{- end }}
+      {{- with .Values.persistentVolume.matchLabels }}
+        selector:
+          matchLabels:
+            {{- toYaml . | nindent 12 }}
+      {{- end }}
+{{- end }}
