@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix missing serviceaccounts patch permission in ClusterRole, see [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1012) for details.
 
 ## 0.31.1
 

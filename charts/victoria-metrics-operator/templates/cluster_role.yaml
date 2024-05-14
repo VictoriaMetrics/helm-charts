@@ -57,30 +57,44 @@ rules:
   - ""
   resources:
   - services
+  - services/finalizers
   verbs:
   - '*'
 - apiGroups:
   - ""
   resources:
-  - services/finalizers
+    - serviceaccounts
+    - serviceaccounts/finalizers
   verbs:
   - '*'
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - 'create'
+- apiGroups:
+    - ""
+  resources:
+    - nodes
+    - nodes/proxy
+    - services
+    - endpoints
+    - pods
+    - endpointslices
+    - configmaps
+    - nodes/metrics
+    - namespaces
+  verbs:
+    - get
+    - list
+    - watch
 - apiGroups:
   - apps
   resources:
   - deployments
   - deployments/finalizers
-  verbs:
-  - '*'
-- apiGroups:
-  - apps
-  resources:
   - replicasets
-  verbs:
-  - '*'
-- apiGroups:
-  - apps
-  resources:
   - statefulsets
   - statefulsets/finalizers
   - statefulsets/status
@@ -157,22 +171,6 @@ rules:
   - patch
   - update
 - apiGroups:
-    - ""
-  resources:
-    - nodes
-    - nodes/proxy
-    - services
-    - endpoints
-    - pods
-    - endpointslices
-    - configmaps
-    - nodes/metrics
-    - namespaces
-  verbs:
-    - get
-    - list
-    - watch
-- apiGroups:
     - "extensions"
     - "networking.k8s.io"
   resources:
@@ -218,18 +216,6 @@ rules:
     - update
     - use
     - watch
-    - delete
-- apiGroups:
-    - ""
-  resources:
-    - serviceaccounts
-    - serviceaccounts/finalizers
-  verbs:
-    - get
-    - list
-    - create
-    - watch
-    - update
     - delete
 - apiGroups:
     - storage.k8s.io
@@ -293,10 +279,4 @@ rules:
     - list
     - watch
     - get
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - 'create'
 {{- end -}}
