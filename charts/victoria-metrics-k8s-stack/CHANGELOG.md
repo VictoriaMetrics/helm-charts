@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix missing serviceaccounts patch permission in VM operator, see [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1012) for details.
 
 ## 0.22.0
 
