@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.9.19](https://img.shields.io/badge/Version-0.9.19-informational?style=flat-square)
+ ![Version: 0.9.20](https://img.shields.io/badge/Version-0.9.20-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
@@ -104,6 +104,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | automountServiceAccountToken | bool | `true` |  |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
@@ -161,7 +162,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.podAnnotations | object | `{}` | Pod's annotations |
 | server.podLabels | object | `{}` | Pod's additional labels |
 | server.podManagementPolicy | string | `"OrderedReady"` | Pod's management policy |
-| server.podSecurityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| server.podSecurityContext | object | `{"enabled":false}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | server.priorityClassName | string | `""` | Name of Priority Class |
 | server.readinessProbe.failureThreshold | int | `3` |  |
 | server.readinessProbe.httpGet.path | string | `"/health"` |  |
@@ -182,7 +183,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.scrape.configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used |
 | server.scrape.enabled | bool | `false` | If true scrapes targets, creates config map or use specified one with scrape targets |
 | server.scrape.extraScrapeConfigs | list | `[]` | Extra scrape configs that will be appended to `server.scrape.config` |
-| server.securityContext | object | `{}` | Security context to be added to server pods |
+| server.securityContext | object | `{"enabled":false}` | Security context to be added to server pods |
 | server.service.annotations | object | `{}` | Service annotations |
 | server.service.clusterIP | string | `""` | Service ClusterIP |
 | server.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
