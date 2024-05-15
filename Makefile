@@ -67,6 +67,10 @@ lint: helm-repo-update
 	CMD="lint charts/victoria-metrics-gateway -f hack/vmgateway-cluster-ratelimiting-minimum.yaml" $(MAKE) $(HELM)
 	CMD="lint charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml" $(MAKE) $(HELM)
 	CMD="lint charts/victoria-metrics-anomaly -f hack/vmanomaly-lint-hack.yaml" $(MAKE) $(HELM)
+	CMD="dependency build charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM)
+	CMD="lint charts/victoria-metrics-k8s-stack -f hack/vm-k8s-stack-template-hack.yaml" $(MAKE) $(HELM)
+	CMD="dependency build charts/victoria-metrics-distributed" $(MAKE) $(HELM)
+	CMD="lint charts/victoria-metrics-distributed"  $(MAKE) $(HELM)
 	CMD="dependency build charts/victoria-logs-single" $(MAKE) $(HELM)
 	CMD="lint charts/victoria-logs-single -f hack/vlsingle-lint-hack.yaml" $(MAKE) $(HELM)
 
@@ -79,6 +83,10 @@ template: helm-repo-update
 	CMD="template charts/victoria-metrics-gateway -f hack/vmgateway-cluster-ratelimiting-minimum.yaml" $(MAKE) $(HELM)
 	CMD="template charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml" $(MAKE) $(HELM)
 	CMD="template charts/victoria-metrics-anomaly -f hack/vmanomaly-lint-hack.yaml" $(MAKE) $(HELM)
+	CMD="dependency build charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM)
+	CMD="template charts/victoria-metrics-k8s-stack -f hack/vm-k8s-stack-template-hack.yaml" $(MAKE) $(HELM)
+	CMD="dependency build charts/victoria-metrics-distributed" $(MAKE) $(HELM)
+	CMD="lint charts/victoria-metrics-distributed"  $(MAKE) $(HELM)
 	CMD="dependency build charts/victoria-logs-single" $(MAKE) $(HELM)
 	CMD="template charts/victoria-logs-single -f hack/vlsingle-lint-hack.yaml" $(MAKE) $(HELM)
 
