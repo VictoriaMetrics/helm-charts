@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix lost customized securityContext when introduced new default behavior for securityContext in [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/995).
 
 ## 1.2.3
 
