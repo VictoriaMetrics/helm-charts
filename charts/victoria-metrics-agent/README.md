@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.10.7](https://img.shields.io/badge/Version-0.10.7-informational?style=flat-square)
+ ![Version: 0.10.8](https://img.shields.io/badge/Version-0.10.8-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-agent)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -329,7 +329,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podDisruptionBudget.enabled | bool | `false` |  |
 | podDisruptionBudget.labels | object | `{}` |  |
 | podLabels | object | `{}` |  |
-| podSecurityContext.enabled | bool | `false` |  |
+| podSecurityContext.enabled | bool | `true` |  |
 | priorityClassName | string | `""` | priority class to be assigned to the pod(s) |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
@@ -339,7 +339,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | remoteWriteUrls | list | `[]` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext.enabled | bool | `false` |  |
+| securityContext.enabled | bool | `true` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
 | service.enabled | bool | `false` |  |
