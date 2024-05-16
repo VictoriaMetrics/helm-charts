@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.9.7](https://img.shields.io/badge/Version-0.9.7-informational?style=flat-square)
+ ![Version: 0.9.8](https://img.shields.io/badge/Version-0.9.8-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -205,7 +205,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.podDisruptionBudget.enabled | bool | `false` |  |
 | server.podDisruptionBudget.labels | object | `{}` |  |
 | server.podLabels | object | `{}` |  |
-| server.podSecurityContext.enabled | bool | `false` |  |
+| server.podSecurityContext.enabled | bool | `true` |  |
 | server.priorityClassName | string | `""` |  |
 | server.probe.liveness.failureThreshold | int | `3` |  |
 | server.probe.liveness.initialDelaySeconds | int | `5` |  |
@@ -226,7 +226,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.remote.write.url | string | `""` |  |
 | server.replicaCount | int | `1` |  |
 | server.resources | object | `{}` |  |
-| server.securityContext.enabled | bool | `false` |  |
+| server.securityContext.enabled | bool | `true` |  |
 | server.service.annotations | object | `{}` |  |
 | server.service.clusterIP | string | `""` |  |
 | server.service.externalIPs | list | `[]` |  |

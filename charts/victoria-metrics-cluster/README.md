@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.11.17](https://img.shields.io/badge/Version-0.11.17-informational?style=flat-square)
+ ![Version: 0.11.18](https://img.shields.io/badge/Version-0.11.18-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-cluster)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -233,7 +233,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.podAnnotations | object | `{}` | Pod's annotations |
 | vmselect.podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | vmselect.podDisruptionBudget.labels | object | `{}` |  |
-| vmselect.podSecurityContext.enabled | bool | `false` |  |
+| vmselect.podSecurityContext.enabled | bool | `true` |  |
 | vmselect.ports.name | string | `"http"` |  |
 | vmselect.priorityClassName | string | `""` | Name of Priority Class |
 | vmselect.probe.liveness.failureThreshold | int | `3` |  |
@@ -246,7 +246,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.probe.readiness.timeoutSeconds | int | `5` |  |
 | vmselect.replicaCount | int | `2` | Count of vmselect pods |
 | vmselect.resources | object | `{}` | Resource object |
-| vmselect.securityContext | object | `{"enabled":false}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
+| vmselect.securityContext | object | `{"enabled":true}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
 | vmselect.service.annotations | object | `{}` | Service annotations |
 | vmselect.service.clusterIP | string | `""` | Service ClusterIP |
 | vmselect.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips](https://kubernetes.io/docs/user-guide/services/#external-ips) |

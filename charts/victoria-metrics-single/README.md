@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.9.20](https://img.shields.io/badge/Version-0.9.20-informational?style=flat-square)
+ ![Version: 0.9.21](https://img.shields.io/badge/Version-0.9.21-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
@@ -162,7 +162,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.podAnnotations | object | `{}` | Pod's annotations |
 | server.podLabels | object | `{}` | Pod's additional labels |
 | server.podManagementPolicy | string | `"OrderedReady"` | Pod's management policy |
-| server.podSecurityContext | object | `{"enabled":false}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| server.podSecurityContext | object | `{"enabled":true}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | server.priorityClassName | string | `""` | Name of Priority Class |
 | server.readinessProbe.failureThreshold | int | `3` |  |
 | server.readinessProbe.httpGet.path | string | `"/health"` |  |
@@ -183,7 +183,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.scrape.configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used |
 | server.scrape.enabled | bool | `false` | If true scrapes targets, creates config map or use specified one with scrape targets |
 | server.scrape.extraScrapeConfigs | list | `[]` | Extra scrape configs that will be appended to `server.scrape.config` |
-| server.securityContext | object | `{"enabled":false}` | Security context to be added to server pods |
+| server.securityContext | object | `{"enabled":true}` | Security context to be added to server pods |
 | server.service.annotations | object | `{}` | Service annotations |
 | server.service.clusterIP | string | `""` | Service ClusterIP |
 | server.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
