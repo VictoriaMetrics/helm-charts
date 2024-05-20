@@ -458,6 +458,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | prometheus-node-exporter.vmServiceScrape.spec.endpoints[0].metricRelabelConfigs[0].source_labels[0] | string | `"mountpoint"` |  |
 | prometheus-node-exporter.vmServiceScrape.spec.endpoints[0].port | string | `"metrics"` |  |
 | prometheus-node-exporter.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| prometheus-operator-crds.enabled | bool | `false` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
