@@ -2,7 +2,9 @@
 
 ## Next release
 
-- TODO
+- Upgrade VictoriaLogs to [v0.8.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.8.0-victorialogs)
+- Move `.Values.server.name`, `.Values.server.fullnameOverride` to `.Values.global.victoriaLogs.server`. This allows to avoid issues with Fluent Bit output definition. See the [pull request]() for the details.
+- Include `kubernetes_namespace_name` field in the [stream fields](https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields) configuration of Fluent Bit output.
 
 ## 0.3.8
 

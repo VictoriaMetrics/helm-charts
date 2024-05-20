@@ -2,6 +2,15 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
+  nameOverride: ""
+  victoriaLogs:
+    server:
+      # -- Overrides the full name of server component
+      fullnameOverride:
+
+      # -- Server container name
+      name: server
+
   compatibility:
     openshift:
       adaptSecurityContext: "auto"
@@ -18,19 +27,15 @@ podDisruptionBudget:
 server:
   # -- Enable deployment of server component. Deployed as StatefulSet
   enabled: true
-  # -- Server container name
-  name: server
   image:
     # -- Image repository
     repository: victoriametrics/victoria-logs
     # -- Image tag
-    tag: "v0.5.2-victorialogs"
+    tag: "v0.8.0-victorialogs"
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Name of Priority Class
   priorityClassName: ""
-  # -- Overrides the full name of server component
-  fullnameOverride:
   # -- Data retention period in month
   retentionPeriod: 1
   # Extra command line arguments for container of component
@@ -304,15 +309,15 @@ fluent-bit:
 
   config:
     # -- Note that Host must be replaced to match your VictoriaLogs service name
-    # Default format is: {{release_name}}-victoria-logs-single-server
+    # Default format points to VictoriaLogs service.
     outputs: |
       [OUTPUT]
           Name http
           Match kube.*
-          Host {{ .Release.Name }}-victoria-logs-single-server
+          Host {{ include "victoria-logs.server.fullname" . }}
           port 9428
           compress gzip
-          uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name,kubernetes_container_name&_msg_field=log&_time_field=date
+          uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name,kubernetes_container_name,kubernetes_namespace_name&_msg_field=log&_time_field=date
           format json_lines
           json_date_format iso8601
           header AccountID 0

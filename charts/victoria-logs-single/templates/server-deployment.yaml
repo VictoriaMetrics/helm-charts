@@ -46,7 +46,7 @@ spec:
         {{- include "victoria-logs.initContiners" . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ template "victoria-logs.name" . }}-{{ .Values.server.name }}
+        - name: {{ template "victoria-logs.name" . }}-{{ .Values.global.victoriaLogs.server.name }}
           {{- if .Values.server.securityContext.enabled }}
           securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.securityContext "context" $) | nindent 12 }}
           {{- end }}
@@ -98,7 +98,7 @@ spec:
               readOnly: {{ .readOnly }}
           {{- end }}
           {{- range .Values.server.extraConfigmapMounts }}
-            - name: {{ $.Values.server.name }}-{{ .name }}
+            - name: {{ $.Values.global.victoriaLogs.server }}-{{ .name }}
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}

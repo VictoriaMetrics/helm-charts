@@ -3,7 +3,7 @@
 Expand the name of the chart.
 */}}
 {{- define "victoria-logs.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default .Chart.Name .Values.global.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -12,10 +12,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "victoria-logs.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- if .Values.global.victoriaLogs.server.fullnameOverride -}}
+{{- .Values.global.victoriaLogs.server.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- $name := default .Chart.Name .Values.global.nameOverride -}}
 {{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -54,23 +54,27 @@ app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-logs.server.matchLabels" -}}
-app: {{ .Values.server.name }}
+app: {{ .Values.global.victoriaLogs.server.name }}
 {{ include "victoria-logs.common.matchLabels" . }}
 {{- end -}}
 
 {{/*
 Create a fully qualified server name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+
+Use hardcoded default value as this template will be used in Fluent Bit chart
+and .Chart.Name will be "fluent-bit" in sub-chart context.
 */}}
 {{- define "victoria-logs.server.fullname" -}}
-{{- if .Values.server.fullnameOverride -}}
-{{- .Values.server.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- if .Values.global.victoriaLogs.server.fullnameOverride -}}
+{{- .Values.global.victoriaLogs.server.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
+
+{{- $name := default "victoria-logs-single" .Values.global.nameOverride -}}
 {{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" .Release.Name .Values.server.name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" .Release.Name .Values.global.victoriaLogs.server.name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s-%s" .Release.Name $name .Values.server.name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.global.victoriaLogs.server.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -79,17 +83,6 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- define "split-host-port" -}}
 {{- $hp := split ":" . -}}
 {{- printf "%s" $hp._1 -}}
-{{- end -}}
-
-{{/*
-Defines the name of scrape configuration map
-*/}}
-{{- define "victoria-logs.server.scrape.configname" -}}
-{{- if .Values.server.scrape.configMap -}}
-{{- .Values.server.scrape.configMap -}}
-{{- else -}}
-{{- include "victoria-logs.server.fullname" . -}}-scrapeconfig
-{{- end -}}
 {{- end -}}
 
 {{/*
