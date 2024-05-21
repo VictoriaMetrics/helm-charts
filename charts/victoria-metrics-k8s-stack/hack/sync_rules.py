@@ -71,56 +71,62 @@ skip_list = [
     # "kube-prometheus-general.rules",
     # "kube-prometheus-node-recording.rules"
 ]
+
 # Additional conditions map
 condition_map = {
+    'alertmanager.rules': '.Values.defaultRules.rules.alertmanager',
+    'config-reloaders': '.Values.defaultRules.rules.configReloaders',
     'etcd': '.Values.kubeEtcd.enabled .Values.defaultRules.rules.etcd',
     'general.rules': '.Values.defaultRules.rules.general',
-    'k8s.rules.container_cpu_usage_seconds_total': '.Values.defaultRules.rules.k8s',
-    'k8s.rules.container_memory_cache': '.Values.defaultRules.rules.k8s',
-    'k8s.rules.container_memory_rss': '.Values.defaultRules.rules.k8s',
-    'k8s.rules.container_memory_swap': '.Values.defaultRules.rules.k8s',
-    'k8s.rules.container_memory_working_set_bytes': '.Values.defaultRules.rules.k8s',
-    'k8s.rules.container_resource': '.Values.defaultRules.rules.k8s',
-    'k8s.rules.pod_owner': '.Values.defaultRules.rules.k8s',
+    'k8s.rules.container_cpu_usage_seconds_total': '.Values.defaultRules.rules.k8sContainerCpuUsageSecondsTotal',
+    'k8s.rules.container_memory_cache': '.Values.defaultRules.rules.k8sContainerMemoryCache',
+    'k8s.rules.container_memory_rss': '.Values.defaultRules.rules.k8sContainerMemoryRss',
+    'k8s.rules.container_memory_swap': '.Values.defaultRules.rules.k8sContainerMemorySwap',
+    'k8s.rules.container_memory_working_set_bytes': '.Values.defaultRules.rules.k8sContainerMemoryWorkingSetBytes',
+    'k8s.rules.container_resource': '.Values.defaultRules.rules.k8sContainerResource',
+    'k8s.rules.pod_owner': '.Values.defaultRules.rules.k8sPodOwner',
     'kube-apiserver-availability.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverAvailability',
     'kube-apiserver-burnrate.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverBurnrate',
     'kube-apiserver-histogram.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverHistogram',
-    'kube-apiserver-slos': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverSlos',
-    'kube-apiserver.rules': '.Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserver',
-    'kube-prometheus-general.rules': '.Values.defaultRules.rules.kubePrometheusGeneral',
+    'kube-apiserver-slos': ' .Values.kubeApiServer.enabled .Values.defaultRules.rules.kubeApiserverSlos',
+    'kube-prometheus-general.rules': ' .Values.defaultRules.rules.kubePrometheusGeneral',
     'kube-prometheus-node-recording.rules': '.Values.defaultRules.rules.kubePrometheusNodeRecording',
-    'kube-scheduler.rules': '.Values.kubeScheduler.enabled .Values.defaultRules.rules.kubeScheduler',
+    'kube-scheduler.rules': '.Values.kubeScheduler.enabled .Values.defaultRules.rules.kubeSchedulerRecording',
     'kube-state-metrics': '.Values.defaultRules.rules.kubeStateMetrics',
     'kubelet.rules': '.Values.kubelet.enabled .Values.defaultRules.rules.kubelet',
     'kubernetes-apps': '.Values.defaultRules.rules.kubernetesApps',
     'kubernetes-resources': '.Values.defaultRules.rules.kubernetesResources',
     'kubernetes-storage': '.Values.defaultRules.rules.kubernetesStorage',
     'kubernetes-system': '.Values.defaultRules.rules.kubernetesSystem',
-    'kubernetes-system-apiserver': '.Values.defaultRules.rules.kubernetesSystem',
-    'kubernetes-system-controller-manager': '.Values.kubeControllerManager.enabled',
-    'kubernetes-system-kubelet': '.Values.defaultRules.rules.kubernetesSystem',
-    'kubernetes-system-scheduler': '.Values.kubeScheduler.enabled .Values.defaultRules.rules.kubeScheduler',
-    'node-exporter': '.Values.defaultRules.rules.node',
-    'node-exporter.rules': '.Values.defaultRules.rules.node',
-    'node-network': '.Values.defaultRules.rules.network',
+    'kubernetes-system-kube-proxy': '.Values.kubeProxy.enabled .Values.defaultRules.rules.kubeProxy',
+    'kubernetes-system-apiserver': '.Values.defaultRules.rules.kubernetesSystem', # kubernetes-system was split into more groups in 1.14, one of them is kubernetes-system-apiserver
+    'kubernetes-system-kubelet': '.Values.defaultRules.rules.kubernetesSystem', # kubernetes-system was split into more groups in 1.14, one of them is kubernetes-system-kubelet
+    'kubernetes-system-controller-manager': '.Values.kubeControllerManager.enabled .Values.defaultRules.rules.kubeControllerManager',
+    'kubernetes-system-scheduler': '.Values.kubeScheduler.enabled .Values.defaultRules.rules.kubeSchedulerAlerting',
+    'node-exporter.rules': '.Values.defaultRules.rules.nodeExporterRecording',
+    'node-exporter': '.Values.defaultRules.rules.nodeExporterAlerting',
     'node.rules': '.Values.defaultRules.rules.node',
+    'node-network': '.Values.defaultRules.rules.network',
+    'prometheus-operator': '.Values.defaultRules.rules.prometheusOperator',
+    'prometheus': '.Values.defaultRules.rules.prometheus', # kube-prometheus >= 1.14 uses prometheus as group instead of prometheus.rules
+    'windows.node.rules': '.Values.windowsMonitoring.enabled .Values.defaultRules.rules.windows',
+    'windows.pod.rules': '.Values.windowsMonitoring.enabled .Values.defaultRules.rules.windows',
     'vmagent': '.Values.vmagent.enabled .Values.defaultRules.rules.vmagent',
-    'alertmanager.rules': '.Values.defaultRules.rules.alertmanager',
     'vmcluster': '.Values.defaultRules.rules.vmcluster',
     'vmsingle': '.Values.defaultRules.rules.vmsingle',
     'vm-health': '.Values.defaultRules.rules.vmhealth'
 }
 
 alert_condition_map = {
+    'AlertmanagerDown': '.Values.alertmanager.enabled',
+    'CoreDNSDown': '.Values.kubeDns.enabled',
     'KubeAPIDown': '.Values.kubeApiServer.enabled',  # there are more alerts which are left enabled, because they'll never fire without metrics
     'KubeControllerManagerDown': '.Values.kubeControllerManager.enabled',
+    'KubeletDown': '.Values.kubelet.enabled',  # there are more alerts which are left enabled, because they'll never fire without metrics
     'KubeSchedulerDown': '.Values.kubeScheduler.enabled',
     'KubeStateMetricsDown': ' (index .Values "kube-state-metrics" "enabled")',  # there are more alerts which are left enabled, because they'll never fire without metrics
-    'KubeletDown': '.Values.kubelet.enabled',  # there are more alerts which are left enabled, because they'll never fire without metrics
     'PrometheusOperatorDown': '.Values.prometheusOperator.enabled',
     'NodeExporterDown': '.Values.nodeExporter.enabled',
-    'CoreDNSDown': '.Values.kubeDns.enabled',
-    'AlertmanagerDown': '.Values.alertmanager.enabled',
     'KubeProxyDown': '.Values.kubeProxy.enabled',
 }
 
@@ -213,6 +219,15 @@ def yaml_str_repr(struct, indent=4):
     text = textwrap.indent(text, ' ' * indent)[indent - 1:]  # indent everything, and remove very first line extra indentation
     return text
 
+def get_rule_group_condition(group_name, value_key):
+    if group_name == '':
+        return ''
+
+    if group_name.count(".Values") > 1:
+        group_name = group_name.split(' ')[-1]
+
+    return group_name.replace('Values.defaultRules.rules', f"Values.defaultRules.{value_key}").strip()
+
 def add_rules_conditions(rules, rules_map, indent=4):
     """Add if wrapper for rules, listed in rules_map"""
     rule_condition = '{{- if %s }}\n'
@@ -267,26 +282,163 @@ def add_rules_per_rule_conditions(rules, group, indent=4):
     rules = add_rules_conditions(rules, rules_condition_map, indent)
     return rules
 
-def add_custom_labels(rules, indent=4):
+def add_custom_labels(rules_str, group, indent=4, label_indent=2):
     """Add if wrapper for additional rules labels"""
-    rule_condition = '{{- if .Values.defaultRules.additionalRuleLabels }}\n{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}\n{{- end }}'
+    rule_group_labels = get_rule_group_condition(condition_map.get(group['name'], ''), 'additionalRuleGroupLabels')
+
+    additional_rule_labels = textwrap.indent("""
+{{- with .Values.defaultRules.additionalRuleLabels }}
+  {{- toYaml . | nindent 8 }}
+{{- end }}
+{{- with %s }}
+  {{- toYaml . | nindent 8 }}
+{{- end }}""" % (rule_group_labels,), " " * (indent + label_indent * 2))
+
+    additional_rule_labels_condition_start = "\n" + " " * (indent + label_indent) + '{{- if or .Values.defaultRules.additionalRuleLabels %s }}' % (rule_group_labels,)
+    additional_rule_labels_condition_end = "\n" + " " * (indent + label_indent) + '{{- end }}'
+    # labels: cannot be null, if a rule does not have any labels by default, the labels block
+    # should only be added if there are .Values defaultRules.additionalRuleLabels defined
+    rule_seperator = "\n" + " " * indent + "-.*"
+    label_seperator = "\n" + " " * indent + "  labels:"
+    section_seperator = "\n" + " " * indent + "  \\S"
+    section_seperator_len = len(section_seperator)-1
+    rules_positions = re.finditer(rule_seperator,rules_str)
+
+    # fetch breakpoint between each set of rules
+    ruleStartingLine = [(rule_position.start(),rule_position.end()) for rule_position in rules_positions]
+    head = rules_str[:ruleStartingLine[0][0]]
+
+    # construct array of rules so they can be handled individually
+    rules = []
+    # pylint: disable=E1136
+    # See https://github.com/pylint-dev/pylint/issues/1498 for None Values
+    previousRule = None
+    for r in ruleStartingLine:
+         if previousRule != None:
+             rules.append(rules_str[previousRule[0]:r[0]])
+         previousRule = r
+    rules.append(rules_str[previousRule[0]:len(rules_str)-1])
+
+    for i, rule in enumerate(rules):
+        current_label = re.search(label_seperator,rule)
+        if current_label:
+            # `labels:` block exists
+            # determine if there are any existing entries
+            entries = re.search(section_seperator,rule[current_label.end():])
+            if entries:
+                entries_start = current_label.end()
+                entries_end = entries.end()+current_label.end()-section_seperator_len
+                rules[i] = rule[:entries_end] + additional_rule_labels_condition_start + additional_rule_labels + additional_rule_labels_condition_end + rule[entries_end:]
+            else:
+                # `labels:` does not contain any entries
+                # append template to label section
+                rules[i] += additional_rule_labels_condition_start + additional_rule_labels + additional_rule_labels_condition_end
+        else:
+            # `labels:` block does not exist
+            # create it and append template
+            rules[i] += additional_rule_labels_condition_start + "\n" + " " * indent + "  labels:" + additional_rule_labels + additional_rule_labels_condition_end
+    return head + "".join(rules) + "\n"
+
+def add_custom_annotations(rules, group, indent=4):
+    """Add if wrapper for additional rules annotations"""
+    rule_condition = '{{- if .Values.defaultRules.additionalRuleAnnotations }}\n{{ toYaml .Values.defaultRules.additionalRuleAnnotations | indent 8 }}\n{{- end }}'
+    rule_group_labels = get_rule_group_condition(condition_map.get(group['name'], ''), 'additionalRuleGroupAnnotations')
+    rule_group_condition = '\n{{- if %s }}\n{{ toYaml %s | indent 8 }}\n{{- end }}' % (rule_group_labels, rule_group_labels)
+    annotations = "      annotations:"
+    annotations_len = len(annotations) + 1
     rule_condition_len = len(rule_condition) + 1
+    rule_group_condition_len = len(rule_group_condition)
 
     separator = " " * indent + "- alert:.*"
-    alerts_positions = re.finditer(separator, rules)
-    alert = -1
+    alerts_positions = re.finditer(separator,rules)
+    alert = 0
+
     for alert_position in alerts_positions:
-        # add rule_condition at the end of the alert block
-        if alert >= 0:
-            index = alert_position.start() + rule_condition_len * alert - 1
-            rules = rules[:index] + "\n" + rule_condition + rules[index:]
+        # Add rule_condition after 'annotations:' statement
+        index = alert_position.end() + annotations_len + (rule_condition_len + rule_group_condition_len) * alert
+        rules = rules[:index] + "\n" + rule_condition + rule_group_condition +  rules[index:]
         alert += 1
 
-    # add rule_condition at the end of the last alert
-    if alert >= 0:
-        index = len(rules) - 1
-        rules = rules[:index] + "\n" + rule_condition + rules[index:]
     return rules
+
+
+def add_custom_keep_firing_for(rules, indent=4):
+    """Add if wrapper for additional rules annotations"""
+    indent_spaces = " " * indent + "  "
+    keep_firing_for = (indent_spaces + '{{- with .Values.defaultRules.keepFiringFor }}\n' +
+                        indent_spaces + 'keep_firing_for: "{{ . }}"\n' +
+                        indent_spaces + '{{- end }}')
+    keep_firing_for_len = len(keep_firing_for) + 1
+
+    separator = " " * indent + "  for:.*"
+    alerts_positions = re.finditer(separator, rules)
+    alert = 0
+
+    for alert_position in alerts_positions:
+        # Add rule_condition after 'annotations:' statement
+        index = alert_position.end() + keep_firing_for_len * alert
+        rules = rules[:index] + "\n" + keep_firing_for + rules[index:]
+        alert += 1
+
+    return rules
+
+
+def add_custom_for(rules, indent=4):
+    """Add custom 'for:' condition in rules"""
+    replace_field = "for:"
+    rules = add_custom_alert_rules(rules, replace_field, indent)
+
+    return rules
+
+
+def add_custom_severity(rules, indent=4):
+    """Add custom 'severity:' condition in rules"""
+    replace_field = "severity:"
+    rules = add_custom_alert_rules(rules, replace_field, indent)
+
+    return rules
+
+
+def add_custom_alert_rules(rules, key_to_replace, indent):
+    """Extend alert field to allow custom values"""
+    key_to_replace_indented = ' ' * indent + key_to_replace
+    alertkey_field = '- alert:'
+    found_alert_key = False
+    alertname = None
+    updated_rules = ''
+
+    # pylint: disable=C0200
+    i = 0
+    while i < len(rules):
+        if rules[i:i + len(alertkey_field)] == alertkey_field:
+            found_alert_key = True
+            start_index_word_after = i + len(alertkey_field) + 1
+            end_index_alertkey_field = start_index_word_after
+            while end_index_alertkey_field < len(rules) and rules[end_index_alertkey_field].isalnum():
+                end_index_alertkey_field += 1
+
+            alertname = rules[start_index_word_after:end_index_alertkey_field]
+
+        if found_alert_key:
+            if rules[i:i + len(key_to_replace_indented)] == key_to_replace_indented:
+                found_alert_key = False
+                start_index_key_value = i + len(key_to_replace_indented) + 1
+                end_index_key_to_replace = start_index_key_value
+                while end_index_key_to_replace < len(rules) and rules[end_index_key_to_replace].isalnum():
+                    end_index_key_to_replace += 1
+
+                word_after_key_to_replace = rules[start_index_key_value:end_index_key_to_replace]
+                new_key = key_to_replace_indented + ' {{ dig "' + alertname + \
+                    '" "' + key_to_replace[:-1] + '" "' + \
+                    word_after_key_to_replace + '" .Values.customRules }}'
+                updated_rules += new_key
+                i = end_index_key_to_replace
+
+        updated_rules += rules[i]
+        i += 1
+
+    return updated_rules
+
 
 def write_group_to_file(group, url, destination):
     fix_expr(group['rules'])
@@ -303,33 +455,42 @@ def write_group_to_file(group, url, destination):
             if replacement_map[line]['init']:
                 init_line += '\n' + replacement_map[line]['init']
     # append per-alert rules
-    rules = add_custom_labels(rules)
+    rules = add_custom_labels(rules, group)
+    rules = add_custom_annotations(rules, group)
+    rules = add_custom_keep_firing_for(rules)
+    rules = add_custom_for(rules)
+    rules = add_custom_severity(rules)
     rules = add_rules_conditions_from_condition_map(rules)
     rules = add_rules_per_rule_conditions(rules, group)
     # initialize header
     lines = header % {
-        'name': group['name'],
+        'name': sanitize_name(group['name']),
         'url': url,
         'condition': condition_map.get(group['name'], ''),
         'init_line': init_line
     }
 
     # rules themselves
-    lines += rules
+    lines += re.sub(
+        r'\s(by|on) ?\(',
+        r' \1 ({{ range $.Values.defaultRules.additionalAggregationLabels }}{{ . }},{{ end }}',
+        rules
+    )
 
     # footer
     lines += '{{- end }}'
 
-    new_filename = f"{destination}/{group['name']}.yaml"
+    filename = group['name'] + '.yaml'
+    new_filename = "%s/%s" % (destination, filename)
 
     # make sure directories to store the file exist
-    makedirs(destination, exist_ok=True)
+    os.makedirs(destination, exist_ok=True)
 
     # recreate the file
     with open(new_filename, 'w') as f:
         f.write(lines)
 
-    print(f"Generated {new_filename}")
+    print("Generated %s" % new_filename)
 
 def write_rules_names_template():
     with open('../templates/victoria-metrics-operator/_rules.tpl', 'w') as f:
@@ -340,7 +501,7 @@ https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-promet
         f.write('{{- define "rules.names" }}\n')
         f.write('rules:\n')
         for rule in condition_map:
-            f.write('  - "%s"\n' % rule)
+            f.write('  - "%s"\n' % sanitize_name(rule))
         f.write('{{- end }}')
 
 
@@ -369,6 +530,9 @@ def main():
 
     print("Finished")
 
+
+def sanitize_name(name):
+    return re.sub('[_]', '-', name).lower()
 
 if __name__ == '__main__':
     main()
