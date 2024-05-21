@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- sync latest etcd v3.5.x rules from [upstream](https://github.com/etcd-io/etcd/blob/release-3.5/contrib/mixin/mixin.libsonnet).
 
 ## 0.22.1
 
