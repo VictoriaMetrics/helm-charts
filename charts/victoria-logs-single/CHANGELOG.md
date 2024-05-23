@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Update fluent-bit chart to 0.46.7 and fluentbit to 3.0.4
 
 ## 0.4.0
 
