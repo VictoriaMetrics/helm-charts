@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.5.0
+
+**Release date:** 2024-05-23
+
+![AppVersion: v0.8.0-victorialogs](https://img.shields.io/static/v1?label=AppVersion&message=v0.8.0-victorialogs&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Update fluent-bit chart to 0.46.7 and fluentbit to 3.0.4
 - Update VictoriaLogs version to 0.9.1
 
