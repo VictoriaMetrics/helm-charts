@@ -1,0 +1,57 @@
+{{- $top := . -}}
+{{- range $i, $zone := .Values.availabilityZones }}
+{{- if and $zone.vmauthCrossAZQuery.enabled $zone.vmauthQueryPerZone.enabled}}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: {{ $zone.vmauthCrossAZQuery.name | default (printf "vmauth-read-proxy-%s" $zone.name ) }}
+  namespace: {{ $top.Release.Namespace }}
+  labels: {{ include "victoria-metrics-distributed.labels" $top | nindent 4 }}
+  {{- with $zone.vmauthCrossAZQuery.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end  }}
+spec:
+{{- $nodeSelector := deepCopy $zone.nodeSelector }}
+{{- if $zone.vmauthCrossAZQuery.spec.nodeSelector }}
+{{- $nodeSelector = mergeOverwrite (deepCopy $zone.nodeSelector) $zone.vmauthCrossAZQuery.spec.nodeSelector }}
+{{- end }}
+  nodeSelector:
+{{- toYaml $nodeSelector | nindent 4 }}
+{{- if or $zone.extraAffinity ( and $zone.vmauthCrossAZQuery.spec $zone.vmauthCrossAZQuery.spec.affinity ) }}
+{{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmauthCrossAZQuery.spec.affinity | default (dict)) }}
+  affinity:
+{{- toYaml $affinity | nindent 4 }}
+{{- end }}
+{{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
+{{- if $zone.vmauthCrossAZQuery.spec.topologySpreadConstraints }}
+{{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmauthCrossAZQuery.spec.topologySpreadConstraints }}
+{{- end }}
+  topologySpreadConstraints:
+{{- toYaml $topologySpreadConstraints | nindent 4 }}
+  unauthorizedAccessConfig:
+    - src_paths:
+        - "/select/.+"
+      url_prefix:
+{{- if $zone.allowQuery }}
+{{ printf "- http://vmauth-%s:8427/" ($zone.vmauthQueryPerZone.name | default ( printf "vmauth-read-balancer-%s" $zone.name ))| indent 8 }}
+{{- end }}
+{{- range $j, $tmpzone := $.Values.availabilityZones }}
+{{- if and (ne $j $i) $tmpzone.allowQuery }}
+{{ printf "- http://vmauth-%s:8427/" ($tmpzone.vmauthQueryPerZone.name | default ( printf "vmauth-read-balancer-%s" $tmpzone.name )) | indent 8 }}
+{{- end }}
+{{- end }}
+      load_balancing_policy: first_available
+      retry_status_codes:
+        - 503
+{{- $spec := deepCopy $zone.vmauthCrossAZQuery.spec }}
+{{- $spec := unset $spec "nodeSelector" }}
+{{- $spec := unset $spec "affinity" }}
+{{- $spec := unset $spec "topologySpreadConstraints" }}
+{{- $spec := unset $spec "unauthorizedAccessConfig" }}
+{{- if $spec }}
+{{- toYaml $spec | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -62,7 +62,7 @@ charts = [
         'destination': '../templates/rules',
     },
     {
-        'source': 'https://etcd.io/docs/v3.4/op-guide/etcd3_alert.rules.yml',
+        'source': 'https://etcd.io/docs/v3.5/op-guide/etcd3_alert.rules.yml',
         'destination': '../templates/rules',
     }
 ]

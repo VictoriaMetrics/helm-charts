@@ -1,6 +1,6 @@
 # Victoria Logs Helm Chart for Single Version
 
- ![Version: 0.3.8](https://img.shields.io/badge/Version-0.3.8-informational?style=flat-square)
+ ![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-single)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -115,7 +115,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 |-----|------|---------|-------------|
 | extraObjects | list | `[]` |  |
 | fluent-bit.config.filters | string | `"[FILTER]\n    Name kubernetes\n    Match kube.*\n    Merge_Log On\n    Keep_Log On\n    K8S-Logging.Parser On\n    K8S-Logging.Exclude On\n[FILTER]\n    Name                nest\n    Match               *\n    Wildcard            pod_name\n    Operation lift\n    Nested_under kubernetes\n    Add_prefix   kubernetes_\n"` |  |
-| fluent-bit.config.outputs | string | `"[OUTPUT]\n    Name http\n    Match kube.*\n    Host {{ .Release.Name }}-victoria-logs-single-server\n    port 9428\n    compress gzip\n    uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name,kubernetes_container_name&_msg_field=log&_time_field=date\n    format json_lines\n    json_date_format iso8601\n    header AccountID 0\n    header ProjectID 0\n"` | Note that Host must be replaced to match your VictoriaLogs service name Default format is: {{release_name}}-victoria-logs-single-server |
+| fluent-bit.config.outputs | string | `"[OUTPUT]\n    Name http\n    Match kube.*\n    Host {{ include \"victoria-logs.server.fullname\" . }}\n    port 9428\n    compress gzip\n    uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name,kubernetes_container_name,kubernetes_namespace_name&_msg_field=log&_time_field=date\n    format json_lines\n    json_date_format iso8601\n    header AccountID 0\n    header ProjectID 0\n"` | Note that Host must be replaced to match your VictoriaLogs service name Default format points to VictoriaLogs service. |
 | fluent-bit.daemonSetVolumeMounts[0].mountPath | string | `"/var/log"` |  |
 | fluent-bit.daemonSetVolumeMounts[0].name | string | `"varlog"` |  |
 | fluent-bit.daemonSetVolumeMounts[1].mountPath | string | `"/var/lib/docker/containers"` |  |
@@ -128,6 +128,9 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | fluent-bit.enabled | bool | `false` | Enable deployment of fluent-bit |
 | fluent-bit.resources | object | `{}` |  |
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
+| global.nameOverride | string | `""` |  |
+| global.victoriaLogs.server.fullnameOverride | string | `nil` | Overrides the full name of server component |
+| global.victoriaLogs.server.name | string | `"server"` | Server container name |
 | podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | podDisruptionBudget.extraLabels | object | `{}` |  |
 | printNotes | bool | `true` | Print chart notes |
@@ -144,10 +147,9 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.extraLabels | object | `{}` | Sts/Deploy additional labels |
 | server.extraVolumeMounts | list | `[]` |  |
 | server.extraVolumes | list | `[]` |  |
-| server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | server.image.repository | string | `"victoriametrics/victoria-logs"` | Image repository |
-| server.image.tag | string | `"v0.5.2-victorialogs"` | Image tag |
+| server.image.tag | string | `"v0.9.1-victorialogs"` | Image tag |
 | server.ingress.annotations | string | `nil` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
@@ -162,7 +164,6 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.livenessProbe.initialDelaySeconds | int | `30` |  |
 | server.livenessProbe.periodSeconds | int | `30` |  |
 | server.livenessProbe.timeoutSeconds | int | `5` |  |
-| server.name | string | `"server"` | Server container name |
 | server.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
 | server.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
 | server.persistentVolume.annotations | object | `{}` | Persistant volume annotations |
