@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Update fluent-bit chart to 0.46.7 and fluentbit to 3.0.4
+- Update VictoriaLogs version to 0.9.1
 
 ## 0.4.0
 
