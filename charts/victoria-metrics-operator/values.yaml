@@ -11,7 +11,12 @@ image:
 
 # -- enables CRD creation and management.
 # -- with this option, if you remove this chart, all crd resources will be deleted with it.
-createCRD: true
+# -- To prevent this, you can install CRD using a separate victoria-metrics-operator-crd chart.
+victoria-metrics-operator-crd:
+  enabled: true
+  annotations: {}
+  ClusterRoles:
+    enabled: true
 
 # -- Tells helm to clean up all the vm resources under this release's namespace when uninstalling
 cleanupCRD: false

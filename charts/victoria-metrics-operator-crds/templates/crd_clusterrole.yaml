@@ -3,19 +3,7 @@
 {{- /* kubernetes clusterrole aggregation feature to include these */ -}}
 {{- /* cluster roles into the default view and admin roles */ -}}
 {{- /* See https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles */ -}}
-{{- if .Values.createCRD }}
-{{- if .Values.rbac.aggregatedClusterRoles.enabled }}
-{{- $files := .Files }}
-{{- $fileContentsList := $files.Get "crd.yaml" | splitList "---" }}
-{{- $groups := dict }}
-{{- range $fileContentsList }}
-    {{- $fileContents := . | fromYaml }}
-    {{- $group := $fileContents.spec.group }}
-    {{- $plural:= $fileContents.spec.names.plural }}
-    {{- $resources := get $groups $group | default (list) }}
-    {{- $resources := append $resources $plural }}
-    {{- $groups := set $groups $group $resources }}
-{{- end }}
+{{- if .Values.ClusterRoles.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -62,5 +50,4 @@ rules:
   - get
   - list
   - watch
-{{- end }}
 {{- end }}

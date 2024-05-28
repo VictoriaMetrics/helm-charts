@@ -18,7 +18,11 @@ victoria-metrics-operator:
     tag: v1.18.0
     pullPolicy: IfNotPresent
 
-  createCRD: false # we disable crd creation by operator chart as we create them in this chart
+  victoria-metrics-operator-crd:
+  enabled: false # we disable crd creation by operator chart as we create them in this chart
+  annotations: {}
+  ClusterRoles:
+    enabled: true 
   operator:
     # -- By default, operator converts prometheus-operator objects.
     disable_prometheus_converter: true
@@ -1032,3 +1036,10 @@ crds:
 ## install prometheus operator crds
 prometheus-operator-crds:
   enabled: false
+
+## install victoria-metrics operator crds outside victoria-metrics-operator chart
+victoria-metrics-operator-crd:
+  enabled: true
+  annotations: {}
+  ClusterRoles:
+    enabled: true
