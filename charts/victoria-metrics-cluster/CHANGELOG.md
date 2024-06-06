@@ -2,7 +2,10 @@
 
 ## Next release
 
-- Added fix for [issue](https://github.com/VictoriaMetrics/helm-charts/issues/1060) to support the custom port name for vmselect and vminsert in [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1061)
+**Update note**: The VictoriaMetrics components image tag template has been updated. This change introduces `.Values.<component>.image.variant` to specify tag suffixes like `-scratch`, `-cluster`, `-enterprise`. Additionally, you can now omit `.Values.<component>.image.tag` to automatically use the version specified in `.Chart.AppVersion`.
+
+- fix workload's readinessProbe and livenessProbe when using custom port name. Thanks to @hanumanhuda for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1061).
+- support specifying image tag suffix like "-enterprise" for VictoriaMetrics components using `.Values.<component>.image.variant`.
 
 ## 0.11.18
 
