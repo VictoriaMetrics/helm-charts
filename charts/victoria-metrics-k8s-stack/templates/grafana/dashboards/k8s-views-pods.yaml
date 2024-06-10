@@ -157,6 +157,7 @@ data:
                     "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
+                "description": "Panel only works when a single pod is selected.",
                 "fieldConfig": {
                     "defaults": {
                         "mappings": [],
@@ -192,10 +193,11 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "textMode": "name",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -219,6 +221,7 @@ data:
                     "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
+                "description": "Panel only works when a single pod is selected.",
                 "fieldConfig": {
                     "defaults": {
                         "links": [
@@ -260,10 +263,11 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "textMode": "name",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -287,6 +291,7 @@ data:
                     "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
+                "description": "Panel only works when a single pod is selected.",
                 "fieldConfig": {
                     "defaults": {
                         "mappings": [],
@@ -322,10 +327,11 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "textMode": "name",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -349,6 +355,7 @@ data:
                     "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
+                "description": "Panel only works when a single pod is selected.",
                 "fieldConfig": {
                     "defaults": {
                         "mappings": [],
@@ -384,10 +391,11 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "textMode": "name",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -413,6 +421,7 @@ data:
                     "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
+                "description": "Panel only works when a single pod is selected.",
                 "fieldConfig": {
                     "defaults": {
                         "color": {
@@ -480,10 +489,11 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "textMode": "name",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -507,6 +517,7 @@ data:
                     "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
+                "description": "Panel only works when a single pod is selected.",
                 "fieldConfig": {
                     "defaults": {
                         "mappings": [],
@@ -544,10 +555,11 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "textMode": "name",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -571,6 +583,7 @@ data:
                     "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
+                "description": "Panel only works when a single pod is selected.",
                 "fieldConfig": {
                     "defaults": {
                         "mappings": [],
@@ -612,10 +625,11 @@ data:
                         "fields": "",
                         "values": true
                     },
+                    "showPercentChange": false,
                     "textMode": "value",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -716,9 +730,10 @@ data:
                         "values": false
                     },
                     "showThresholdLabels": false,
-                    "showThresholdMarkers": true
+                    "showThresholdMarkers": true,
+                    "sizing": "auto"
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -727,7 +742,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"})",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=~\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"})",
                         "instant": true,
                         "interval": "$resolution",
                         "legendFormat": "Requests",
@@ -788,9 +803,10 @@ data:
                         "values": false
                     },
                     "showThresholdLabels": false,
-                    "showThresholdMarkers": true
+                    "showThresholdMarkers": true,
+                    "sizing": "auto"
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -799,7 +815,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"})",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=~\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"})",
                         "instant": true,
                         "interval": "$resolution",
                         "legendFormat": "Limits",
@@ -864,9 +880,10 @@ data:
                         "values": false
                     },
                     "showThresholdLabels": false,
-                    "showThresholdMarkers": true
+                    "showThresholdMarkers": true,
+                    "sizing": "auto"
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -875,7 +892,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", cluster=\"$cluster\"}) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"})",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", cluster=\"$cluster\"}) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=~\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"})",
                         "instant": true,
                         "interval": "$resolution",
                         "legendFormat": "Requests",
@@ -936,9 +953,10 @@ data:
                         "values": false
                     },
                     "showThresholdLabels": false,
-                    "showThresholdMarkers": true
+                    "showThresholdMarkers": true,
+                    "sizing": "auto"
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -947,7 +965,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", cluster=\"$cluster\"}) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"}) ",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", cluster=\"$cluster\"}) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=~\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"}) ",
                         "instant": true,
                         "interval": "$resolution",
                         "legendFormat": "Limits",
@@ -1057,7 +1075,7 @@ data:
                     "showHeader": true,
                     "sortBy": []
                 },
-                "pluginVersion": "10.2.2",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
@@ -1066,7 +1084,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
+                        "expr": "sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=~\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
                         "format": "table",
                         "instant": true,
                         "interval": "",
@@ -1081,7 +1099,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
+                        "expr": "sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=~\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
                         "format": "table",
                         "instant": true,
                         "interval": "",
@@ -1096,7 +1114,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
+                        "expr": "sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=~\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
                         "format": "table",
                         "instant": true,
                         "interval": "",
@@ -1110,7 +1128,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
+                        "expr": "sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=~\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
                         "format": "table",
                         "instant": true,
                         "interval": "",
@@ -1124,7 +1142,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (container)",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", container!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (container)",
                         "format": "table",
                         "hide": false,
                         "instant": true,
@@ -1139,7 +1157,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"\", cluster=\"$cluster\"}) by (container)",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", container!=\"\", cluster=\"$cluster\"}) by (container)",
                         "format": "table",
                         "hide": false,
                         "instant": true,
@@ -1341,7 +1359,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=~\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} container {{`}}`}}  REQUESTS",
                         "range": true,
@@ -1353,7 +1371,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=~\"$pod\", resource=\"cpu\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
                         "hide": false,
                         "legendFormat": "{{`{{`}} container {{`}}`}}  LIMITS",
                         "range": true,
@@ -1469,7 +1487,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", cluster=\"$cluster\"}) by (container) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", cluster=\"$cluster\"}) by (container) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\", pod=~\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
                         "interval": "",
                         "legendFormat": "{{`{{`}} container {{`}}`}} REQUESTS",
                         "range": true,
@@ -1481,7 +1499,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", cluster=\"$cluster\"}) by (container) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", cluster=\"$cluster\"}) by (container) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\", pod=~\"$pod\", resource=\"memory\", job=~\"$job\", cluster=\"$cluster\"}) by (container)",
                         "hide": false,
                         "legendFormat": "{{`{{`}} container {{`}}`}} LIMITS",
                         "range": true,
@@ -1604,7 +1622,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (container)",
+                        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", container!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (container)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} container {{`}}`}}",
                         "range": true,
@@ -1710,7 +1728,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"\", cluster=\"$cluster\"}) by (container)",
+                        "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\", pod=~\"$pod\", image!=\"\", container!=\"\", cluster=\"$cluster\"}) by (container)",
                         "interval": "",
                         "legendFormat": "{{`{{`}} container {{`}}`}}",
                         "range": true,
@@ -1772,7 +1790,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -1818,7 +1837,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=~\"$namespace\", pod=\"$pod\", image!=\"\", container!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (container)",
+                        "expr": "sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=~\"$namespace\", pod=~\"$pod\", image!=\"\", container!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (container)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} container {{`}}`}}",
                         "range": true,
@@ -1894,7 +1913,8 @@ data:
                             "mode": "percentage",
                             "steps": [
                                 {
-                                    "color": "red"
+                                    "color": "red",
+                                    "value": null
                                 },
                                 {
                                     "color": "yellow",
@@ -2009,7 +2029,8 @@ data:
                             "mode": "percentage",
                             "steps": [
                                 {
-                                    "color": "red"
+                                    "color": "red",
+                                    "value": null
                                 },
                                 {
                                     "color": "yellow",
@@ -2144,7 +2165,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2183,7 +2205,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"$namespace\", pod=\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
+                        "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"$namespace\", pod=~\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Received",
                         "refId": "A"
@@ -2194,7 +2216,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "- sum(rate(container_network_transmit_bytes_total{namespace=\"$namespace\", pod=\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
+                        "expr": "- sum(rate(container_network_transmit_bytes_total{namespace=\"$namespace\", pod=~\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Transmitted",
                         "refId": "B"
@@ -2250,7 +2272,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2289,7 +2312,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(container_network_receive_packets_total{namespace=\"$namespace\", pod=\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
+                        "expr": "sum(rate(container_network_receive_packets_total{namespace=\"$namespace\", pod=~\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Received",
                         "refId": "A"
@@ -2300,7 +2323,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "- sum(rate(container_network_transmit_packets_total{namespace=\"$namespace\", pod=\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
+                        "expr": "- sum(rate(container_network_transmit_packets_total{namespace=\"$namespace\", pod=~\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Transmitted",
                         "refId": "B"
@@ -2356,7 +2379,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2395,7 +2419,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(container_network_receive_packets_dropped_total{namespace=\"$namespace\", pod=\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
+                        "expr": "sum(rate(container_network_receive_packets_dropped_total{namespace=\"$namespace\", pod=~\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Received",
                         "refId": "A"
@@ -2406,7 +2430,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "- sum(rate(container_network_transmit_packets_dropped_total{namespace=\"$namespace\", pod=\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
+                        "expr": "- sum(rate(container_network_transmit_packets_dropped_total{namespace=\"$namespace\", pod=~\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Transmitted",
                         "refId": "B"
@@ -2462,7 +2486,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -2501,7 +2526,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(container_network_receive_errors_total{namespace=\"$namespace\", pod=\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
+                        "expr": "sum(rate(container_network_receive_errors_total{namespace=\"$namespace\", pod=~\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Received",
                         "refId": "A"
@@ -2512,7 +2537,7 @@ data:
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "- sum(rate(container_network_transmit_errors_total{namespace=\"$namespace\", pod=\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
+                        "expr": "- sum(rate(container_network_transmit_errors_total{namespace=\"$namespace\", pod=~\"$pod\", cluster=\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "Transmitted",
                         "refId": "B"
@@ -2523,7 +2548,7 @@ data:
             }
         ],
         "refresh": "30s",
-        "schemaVersion": 38,
+        "schemaVersion": 39,
         "tags": [
             "Kubernetes",
             "Prometheus",
@@ -2624,8 +2649,8 @@ data:
                     },
                     "definition": "label_values(kube_pod_info{namespace=\"$namespace\", cluster=\"$cluster\"}, pod)",
                     "hide": 0,
-                    "includeAll": false,
-                    "multi": false,
+                    "includeAll": true,
+                    "multi": true,
                     "name": "pod",
                     "options": [
 
@@ -2700,7 +2725,7 @@ data:
                         "type": "prometheus",
                         "uid": "${datasource}"
                     },
-                    "definition": "label_values(kube_pod_info,job)",
+                    "definition": "label_values(kube_pod_info{namespace=\"$namespace\", cluster=\"$cluster\"},job)",
                     "hide": 0,
                     "includeAll": false,
                     "multi": true,
@@ -2710,7 +2735,7 @@ data:
                     ],
                     "query": {
                         "qryType": 1,
-                        "query": "label_values(kube_pod_info,job)",
+                        "query": "label_values(kube_pod_info{namespace=\"$namespace\", cluster=\"$cluster\"},job)",
                         "refId": "PrometheusVariableQueryEditor-VariableQuery"
                     },
                     "refresh": 1,
@@ -2731,7 +2756,7 @@ data:
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "Kubernetes / Views / Pods",
         "uid": "k8s_views_pods",
-        "version": 26,
+        "version": 28,
         "weekStart": ""
     }
 {{- end }}

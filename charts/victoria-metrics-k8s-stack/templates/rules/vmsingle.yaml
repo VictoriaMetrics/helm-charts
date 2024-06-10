@@ -59,7 +59,7 @@ spec:
     - alert: DiskRunsOutOfSpace
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=53&var-instance={{`{{`}} $labels.instance {{`}}`}}
-        description: "Disk utilisation on instance {{`{{`}} $labels.instance {{`}}`}} is more than 80%.\n Having less than 20% of free disk space could cripple merges processes and overall performance. Consider to limit the ingestion rate, decrease retention or scale the disk space if possible."
+        description: "Disk utilisation on instance {{`{{`}} $labels.instance {{`}}`}} is more than 80%.\n Having less than 20% of free disk space could cripple merge processes and overall performance. Consider to limit the ingestion rate, decrease retention or scale the disk space if possible."
         summary: Instance {{`{{`}} $labels.instance {{`}}`}} (job={{`{{`}} $labels.job {{`}}`}}) will run out of disk space soon
       expr: |-
         sum(vm_data_size_bytes) by(job, instance) /
@@ -163,7 +163,7 @@ spec:
     - alert: LabelsLimitExceededOnIngestion
       annotations:
         dashboard: {{ index .Values.grafana.ingress.hosts 0 }}/d/wNf0q_kZk?viewPanel=74&var-instance={{`{{`}} $labels.instance {{`}}`}}
-        description: "VictoriaMetrics limits the number of labels per each metric with `-maxLabelsPerTimeseries` command-line flag.\n This prevents from ingesting metrics with too many labels. Please verify that `-maxLabelsPerTimeseries` is configured correctly or that clients which send these metrics aren't misbehaving."
+        description: "VictoriaMetrics limits the number of labels per each metric with `-maxLabelsPerTimeseries` command-line flag.\n This prevents ingestion of metrics with too many labels. Please verify that `-maxLabelsPerTimeseries` is configured correctly or that clients which send these metrics aren't misbehaving."
         summary: Metrics ingested in ({{`{{`}} $labels.instance {{`}}`}}) are exceeding labels limit
       expr: increase(vm_metrics_with_dropped_labels_total[5m]) > 0
       for: 15m
