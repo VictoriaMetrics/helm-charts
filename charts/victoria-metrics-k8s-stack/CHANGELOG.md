@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- sync latest vm alerts and dashboards.
 
 ## 0.23.0
 

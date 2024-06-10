@@ -55,7 +55,7 @@ data:
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "10.3.1"
+                "version": "10.4.2"
             },
             {
                 "type": "datasource",
@@ -108,7 +108,7 @@ data:
                         "uid": "$ds"
                     },
                     "enable": true,
-                    "expr": "sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"}) by(short_version) unless (sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"} offset 20m) by(short_version))",
+                    "expr": "sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"}) by(short_version) unless (sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"} offset $__interval) by(short_version))",
                     "hide": true,
                     "iconColor": "dark-blue",
                     "name": "version",
@@ -121,15 +121,14 @@ data:
                         "uid": "$ds"
                     },
                     "enable": true,
-                    "expr": "sum(changes(vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"})) by(job, instance)",
-                    "hide": true,
+                    "expr": "sum(changes(vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"}[$__interval])) by(job, instance)",
                     "iconColor": "dark-yellow",
                     "name": "restarts",
                     "textFormat": "{{`{{`}}job{{`}}`}}:{{`{{`}}instance{{`}}`}} restarted"
                 }
             ]
         },
-        "description": "Overview for VictoriaMetrics vmalert v1.96.0 or higher",
+        "description": "Overview for VictoriaMetrics vmalert v1.102.0 or higher",
         "editable": false,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 1,
@@ -145,7 +144,7 @@ data:
                 "title": "vmalert docs",
                 "tooltip": "",
                 "type": "link",
-                "url": "https://docs.victoriametrics.com/vmalert.html"
+                "url": "https://docs.victoriametrics.com/vmalert/"
             },
             {
                 "asDropdown": false,
@@ -227,8 +226,7 @@ data:
                                     "value": null
                                 }
                             ]
-                        },
-                        "unitScale": true
+                        }
                     },
                     "overrides": []
                 },
@@ -256,7 +254,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -290,8 +288,7 @@ data:
                                     "value": null
                                 }
                             ]
-                        },
-                        "unitScale": true
+                        }
                     },
                     "overrides": []
                 },
@@ -319,7 +316,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -353,8 +350,7 @@ data:
                                     "value": null
                                 }
                             ]
-                        },
-                        "unitScale": true
+                        }
                     },
                     "overrides": []
                 },
@@ -382,7 +378,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -420,8 +416,7 @@ data:
                                     "value": 1
                                 }
                             ]
-                        },
-                        "unitScale": true
+                        }
                     },
                     "overrides": []
                 },
@@ -449,7 +444,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -487,8 +482,7 @@ data:
                                     "value": 1
                                 }
                             ]
-                        },
-                        "unitScale": true
+                        }
                     },
                     "overrides": []
                 },
@@ -516,7 +510,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -566,8 +560,7 @@ data:
                                     "value": 80
                                 }
                             ]
-                        },
-                        "unitScale": true
+                        }
                     },
                     "overrides": [
                         {
@@ -615,7 +608,7 @@ data:
                     },
                     "showHeader": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -692,8 +685,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -823,8 +815,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -929,8 +920,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "s",
-                        "unitScale": true
+                        "unit": "s"
                     },
                     "overrides": []
                 },
@@ -1035,8 +1025,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -1139,8 +1128,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -1319,7 +1307,7 @@ data:
                     "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
-                "description": "Missed evaluation means that group evaluation time takes longer than the configured evaluation interval. \nThis may result in missed alerting notifications or recording rules samples. Try increasing evaluation interval or concurrency for such groups. See https://docs.victoriametrics.com/vmalert.html#groups\n\nIf rule expressions are taking longer than expected, please see https://docs.victoriametrics.com/Troubleshooting.html#slow-queries.\"",
+                "description": "Missed evaluation means that group evaluation time takes longer than the configured evaluation interval. \nThis may result in missed alerting notifications or recording rules samples. Try increasing evaluation interval or concurrency for such groups. See https://docs.victoriametrics.com/vmalert/#groups\n\nIf rule expressions are taking longer than expected, please see https://docs.victoriametrics.com/troubleshooting/#slow-queries.\"",
                 "fieldConfig": {
                     "defaults": {
                         "color": {
@@ -1478,8 +1466,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1503,7 +1490,7 @@ data:
                             {
                                 "targetBlank": true,
                                 "title": "Profiling",
-                                "url": "https://docs.victoriametrics.com/vmagent.html#profiling"
+                                "url": "https://docs.victoriametrics.com/vmagent/#profiling"
                             }
                         ],
                         "options": {
@@ -1593,8 +1580,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1618,7 +1604,7 @@ data:
                             {
                                 "targetBlank": true,
                                 "title": "Profiling",
-                                "url": "https://docs.victoriametrics.com/vmagent.html#profiling"
+                                "url": "https://docs.victoriametrics.com/vmagent/#profiling"
                             }
                         ],
                         "options": {
@@ -1708,8 +1694,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1733,7 +1718,7 @@ data:
                             {
                                 "targetBlank": true,
                                 "title": "Profiling",
-                                "url": "https://docs.victoriametrics.com/vmagent.html#profiling"
+                                "url": "https://docs.victoriametrics.com/vmagent/#profiling"
                             }
                         ],
                         "options": {
@@ -1825,8 +1810,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1850,7 +1834,7 @@ data:
                             {
                                 "targetBlank": true,
                                 "title": "Profiling",
-                                "url": "https://docs.victoriametrics.com/vmagent.html#profiling"
+                                "url": "https://docs.victoriametrics.com/vmagent/#profiling"
                             }
                         ],
                         "options": {
@@ -1959,8 +1943,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2068,8 +2051,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2177,8 +2159,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -3303,6 +3284,213 @@ data:
                         ],
                         "title": "Datapoints drop rate ($instance)",
                         "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows current number of established connections to remote write endpoints.\n\n",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green"
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 44
+                        },
+                        "id": 54,
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(max_over_time(vmalert_remotewrite_conns{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)",
+                                "interval": "",
+                                "legendFormat": "__auto",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Connections ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows the global rate for number of written bytes via remote write connections.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "decbytes"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 44
+                        },
+                        "id": 55,
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(rate(vmalert_remotewrite_conn_bytes_written_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) > 0",
+                                "interval": "",
+                                "legendFormat": "__auto",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Bytes write rate ($instance)",
+                        "type": "timeseries"
                     }
                 ],
                 "title": "Remote write",
@@ -3320,7 +3508,7 @@ data:
             "list": [
                 {
                     "current": {
-                        "selected": true,
+                        "selected": false,
                         "text": "VictoriaMetrics",
                         "value": "P4169E866C3094E38"
                     },

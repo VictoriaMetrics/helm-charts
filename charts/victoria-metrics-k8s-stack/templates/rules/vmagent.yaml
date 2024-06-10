@@ -184,4 +184,28 @@ spec:
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
 {{- end }}
+{{- if not (.Values.defaultRules.disabled.StreamAggrFlushTimeout | default false) }}
+    - alert: StreamAggrFlushTimeout
+      annotations:
+        description: 'Stream aggregation process can''t keep up with the load and might produce incorrect aggregation results. Check logs for more details. Possible solutions: increase aggregation interval; aggregate smaller number of series; reduce samples'' ingestion rate to stream aggregation.'
+        summary: Streaming aggregation at "{{`{{`}} $labels.job {{`}}`}}" (instance {{`{{`}} $labels.instance {{`}}`}}) can't be finished within the configured aggregation interval.
+      expr: increase(vm_streamaggr_flush_timeouts_total[5m]) > 0
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.StreamAggrDedupFlushTimeout | default false) }}
+    - alert: StreamAggrDedupFlushTimeout
+      annotations:
+        description: 'Deduplication process can''t keep up with the load and might produce incorrect results. Check docs https://docs.victoriametrics.com/stream-aggregation/#deduplication and logs for more details. Possible solutions: increase deduplication interval; deduplicate smaller number of series; reduce samples'' ingestion rate.'
+        summary: Deduplication "{{`{{`}} $labels.job {{`}}`}}" (instance {{`{{`}} $labels.instance {{`}}`}}) can't be finished within configured deduplication interval.
+      expr: increase(vm_streamaggr_dedup_flush_timeouts_total[5m]) > 0
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
 {{- end }}

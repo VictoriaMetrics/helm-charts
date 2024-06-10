@@ -55,7 +55,7 @@ data:
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "10.3.1"
+                "version": "10.4.2"
             },
             {
                 "type": "datasource",
@@ -125,7 +125,7 @@ data:
                         "uid": "$ds"
                     },
                     "enable": true,
-                    "expr": "sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"}) by(version) unless (sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"} offset 20m) by(version))",
+                    "expr": "sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"}) by(version) unless (sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"} offset $__interval) by(version))",
                     "hide": true,
                     "iconColor": "dark-blue",
                     "name": "version change",
@@ -138,8 +138,7 @@ data:
                         "uid": "$ds"
                     },
                     "enable": true,
-                    "expr": "sum(changes(vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"})) by(job)",
-                    "hide": true,
+                    "expr": "sum(changes(vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"}[$__interval])) by(job)",
                     "iconColor": "dark-yellow",
                     "name": "restarts",
                     "textFormat": "{{`{{`}}job{{`}}`}} restarted"
@@ -217,8 +216,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -229,7 +227,6 @@ data:
                     "y": 1
                 },
                 "id": 131,
-                "links": [],
                 "maxDataPoints": 100,
                 "options": {
                     "colorMode": "value",
@@ -248,7 +245,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -289,8 +286,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -301,7 +297,6 @@ data:
                     "y": 1
                 },
                 "id": 124,
-                "links": [],
                 "maxDataPoints": 100,
                 "options": {
                     "colorMode": "value",
@@ -320,7 +315,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -363,8 +358,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "req/s",
-                        "unitScale": true
+                        "unit": "req/s"
                     },
                     "overrides": []
                 },
@@ -375,7 +369,6 @@ data:
                     "y": 1
                 },
                 "id": 130,
-                "links": [],
                 "maxDataPoints": 100,
                 "options": {
                     "colorMode": "value",
@@ -394,7 +387,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -436,8 +429,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -448,7 +440,6 @@ data:
                     "y": 1
                 },
                 "id": 126,
-                "links": [],
                 "maxDataPoints": 100,
                 "options": {
                     "colorMode": "value",
@@ -467,7 +458,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -509,8 +500,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -521,7 +511,6 @@ data:
                     "y": 4
                 },
                 "id": 34,
-                "links": [],
                 "maxDataPoints": 100,
                 "options": {
                     "colorMode": "value",
@@ -540,7 +529,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -582,8 +571,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "bytes",
-                        "unitScale": true
+                        "unit": "bytes"
                     },
                     "overrides": []
                 },
@@ -594,7 +582,6 @@ data:
                     "y": 4
                 },
                 "id": 35,
-                "links": [],
                 "maxDataPoints": 100,
                 "options": {
                     "colorMode": "value",
@@ -613,7 +600,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -655,8 +642,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "bytes",
-                        "unitScale": true
+                        "unit": "bytes"
                     },
                     "overrides": []
                 },
@@ -667,7 +653,6 @@ data:
                     "y": 4
                 },
                 "id": 112,
-                "links": [],
                 "maxDataPoints": 100,
                 "options": {
                     "colorMode": "value",
@@ -686,7 +671,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -727,8 +712,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "bytes",
-                        "unitScale": true
+                        "unit": "bytes"
                     },
                     "overrides": []
                 },
@@ -739,7 +723,6 @@ data:
                     "y": 4
                 },
                 "id": 128,
-                "links": [],
                 "maxDataPoints": 100,
                 "options": {
                     "colorMode": "value",
@@ -758,7 +741,7 @@ data:
                     "textMode": "auto",
                     "wideLayout": true
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -810,8 +793,7 @@ data:
                                     "value": 80
                                 }
                             ]
-                        },
-                        "unitScale": true
+                        }
                     },
                     "overrides": [
                         {
@@ -865,7 +847,7 @@ data:
                         }
                     ]
                 },
-                "pluginVersion": "10.3.1",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
@@ -942,8 +924,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "none",
-                        "unitScale": true
+                        "unit": "none"
                     },
                     "overrides": []
                 },
@@ -1067,8 +1048,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -1175,8 +1155,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -1187,7 +1166,6 @@ data:
                     "y": 13
                 },
                 "id": 6,
-                "links": [],
                 "options": {
                     "legend": {
                         "calcs": [
@@ -1284,8 +1262,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -1390,8 +1367,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "s",
-                        "unitScale": true
+                        "unit": "s"
                     },
                     "overrides": []
                 },
@@ -1402,7 +1378,6 @@ data:
                     "y": 21
                 },
                 "id": 8,
-                "links": [],
                 "options": {
                     "legend": {
                         "calcs": [
@@ -1490,7 +1465,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -1498,8 +1474,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -1510,7 +1485,6 @@ data:
                     "y": 29
                 },
                 "id": 52,
-                "links": [],
                 "options": {
                     "legend": {
                         "calcs": [
@@ -1604,7 +1578,8 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green"
+                                    "color": "green",
+                                    "value": null
                                 },
                                 {
                                     "color": "red",
@@ -1612,8 +1587,7 @@ data:
                                 }
                             ]
                         },
-                        "unit": "short",
-                        "unitScale": true
+                        "unit": "short"
                     },
                     "overrides": []
                 },
@@ -1624,7 +1598,6 @@ data:
                     "y": 29
                 },
                 "id": 104,
-                "links": [],
                 "options": {
                     "legend": {
                         "calcs": [
@@ -1735,8 +1708,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1850,8 +1822,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1964,8 +1935,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2074,8 +2044,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2215,8 +2184,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2341,8 +2309,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2481,8 +2448,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2589,8 +2555,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2697,8 +2662,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2805,8 +2769,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2914,8 +2877,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -3022,7 +2984,7 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows the rate and total number of new series created over last 24h.\n\nHigh [churn rate](https://docs.victoriametrics.com/faq/#what-is-high-churn-rate) tightly connected with database performance and may result in unexpected OOM's or slow queries. It is recommended to always keep an eye on this metric to avoid unexpected [cardinality](https://docs.victoriametrics.com/keyconcepts/#cardinality) \"explosions\".\n\nThe higher churn rate is, the more resources required to handle it. Consider to keep the churn rate as low as possible.\n\nTo investigate stats about most expensive series use `api/v1/status/tsdb` handler. More details here https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#url-format\n\nGood references to read:\n* https://www.robustperception.io/cardinality-is-key\n* https://valyala.medium.com/high-cardinality-tsdb-benchmarks-victoriametrics-vs-timescaledb-vs-influxdb-13e6ee64dd6b",
+                        "description": "Shows the rate and total number of new series created over last 24h.\n\nHigh [churn rate](https://docs.victoriametrics.com/faq/#what-is-high-churn-rate) tightly connected with database performance and may result in unexpected OOM's or slow queries. It is recommended to always keep an eye on this metric to avoid unexpected [cardinality](https://docs.victoriametrics.com/keyconcepts/#cardinality) \"explosions\".\n\nThe higher churn rate is, the more resources required to handle it. Consider to keep the churn rate as low as possible.\n\nTo investigate stats about most expensive series use `api/v1/status/tsdb` handler. More details here https://docs.victoriametrics.com/cluster-victoriametrics/#url-format\n\nGood references to read:\n* https://www.robustperception.io/cardinality-is-key\n* https://valyala.medium.com/high-cardinality-tsdb-benchmarks-victoriametrics-vs-timescaledb-vs-influxdb-13e6ee64dd6b",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
@@ -3320,7 +3282,7 @@ data:
                             {
                                 "targetBlank": true,
                                 "title": "Readonly mode",
-                                "url": "https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#readonly-mode"
+                                "url": "https://docs.victoriametrics.com/cluster-victoriametrics/#readonly-mode"
                             }
                         ],
                         "options": {
@@ -4828,6 +4790,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -4841,6 +4804,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -4864,7 +4828,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -4880,10 +4845,9 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 14
+                            "y": 6
                         },
                         "id": 100,
-                        "links": [],
                         "options": {
                             "legend": {
                                 "calcs": [
@@ -4933,6 +4897,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -4946,6 +4911,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -4975,7 +4941,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -4991,10 +4958,9 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 14
+                            "y": 6
                         },
                         "id": 113,
-                        "links": [],
                         "options": {
                             "legend": {
                                 "calcs": [
@@ -5045,6 +5011,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -5058,6 +5025,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -5087,7 +5055,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5103,10 +5072,9 @@ data:
                             "h": 7,
                             "w": 12,
                             "x": 0,
-                            "y": 22
+                            "y": 14
                         },
                         "id": 151,
-                        "links": [],
                         "options": {
                             "legend": {
                                 "calcs": [
@@ -5190,6 +5158,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -5203,6 +5172,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -5232,7 +5202,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5248,10 +5219,9 @@ data:
                             "h": 7,
                             "w": 12,
                             "x": 12,
-                            "y": 22
+                            "y": 14
                         },
                         "id": 167,
-                        "links": [],
                         "options": {
                             "legend": {
                                 "calcs": [
@@ -5328,109 +5298,6 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Value > 0 means vmstorage is in readonly mode.",
-                        "fieldConfig": {
-                            "defaults": {
-                                "color": {
-                                    "mode": "palette-classic"
-                                },
-                                "custom": {
-                                    "axisCenteredZero": false,
-                                    "axisColorMode": "text",
-                                    "axisLabel": "",
-                                    "axisPlacement": "auto",
-                                    "barAlignment": 0,
-                                    "drawStyle": "line",
-                                    "fillOpacity": 0,
-                                    "gradientMode": "none",
-                                    "hideFrom": {
-                                        "legend": false,
-                                        "tooltip": false,
-                                        "viz": false
-                                    },
-                                    "lineInterpolation": "linear",
-                                    "lineWidth": 1,
-                                    "pointSize": 5,
-                                    "scaleDistribution": {
-                                        "type": "linear"
-                                    },
-                                    "showPoints": "never",
-                                    "spanNulls": false,
-                                    "stacking": {
-                                        "group": "A",
-                                        "mode": "none"
-                                    },
-                                    "thresholdsStyle": {
-                                        "mode": "off"
-                                    }
-                                },
-                                "mappings": [],
-                                "thresholds": {
-                                    "mode": "absolute",
-                                    "steps": [
-                                        {
-                                            "color": "green"
-                                        },
-                                        {
-                                            "color": "red",
-                                            "value": 80
-                                        }
-                                    ]
-                                },
-                                "unit": "short"
-                            },
-                            "overrides": []
-                        },
-                        "gridPos": {
-                            "h": 8,
-                            "w": 12,
-                            "x": 0,
-                            "y": 29
-                        },
-                        "id": 141,
-                        "links": [
-                            {
-                                "targetBlank": true,
-                                "title": "Readonly mode",
-                                "url": "https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#readonly-mode"
-                            }
-                        ],
-                        "options": {
-                            "legend": {
-                                "calcs": [],
-                                "displayMode": "list",
-                                "placement": "bottom",
-                                "showLegend": false
-                            },
-                            "tooltip": {
-                                "mode": "multi",
-                                "sort": "desc"
-                            }
-                        },
-                        "pluginVersion": "9.1.0",
-                        "targets": [
-                            {
-                                "datasource": {
-                                    "type": "prometheus",
-                                    "uid": "$ds"
-                                },
-                                "editorMode": "code",
-                                "exemplar": true,
-                                "expr": "vm_storage_is_read_only{job=~\"$job_storage\", instance=~\"$instance\"} > 0",
-                                "interval": "",
-                                "legendFormat": "{{`{{`}} instance {{`}}`}}",
-                                "range": true,
-                                "refId": "A"
-                            }
-                        ],
-                        "title": "Readonly mode",
-                        "type": "timeseries"
-                    },
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "$ds"
-                        },
                         "description": "Shows how many ongoing insertions (not API /write calls) on disk are taking place, where:\n* `max` - equal to number of CPUs;\n* `current` - current number of goroutines busy with inserting rows into underlying storage.\n\nEvery successful API /write call results into flush on disk. The `max` is an internal limit and can't be changed. It is always equal to the number of CPUs. \n\nWhen `current` hits `max` constantly, it means storage is overloaded and requires more CPU (see CPU usage) or disks with more IOPS (see disk writes and reads panels in Resource Usage row).",
                         "fieldConfig": {
                             "defaults": {
@@ -5438,6 +5305,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -5451,6 +5319,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -5472,7 +5341,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5503,10 +5373,10 @@ data:
                         "gridPos": {
                             "h": 8,
                             "w": 12,
-                            "x": 12,
-                            "y": 29
+                            "x": 0,
+                            "y": 21
                         },
-                        "id": 133,
+                        "id": 212,
                         "links": [
                             {
                                 "targetBlank": true,
@@ -5570,13 +5440,14 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "The number of on-going merges in storage nodes.  It is expected to have high numbers for `storage/small` metric.",
+                        "description": "Shows the number of concurrently executed read requests, where:\n* `max` - equal to `-search.maxConcurrentRequest` cmd-line flag;\n* `current` - current number of concurrent select requests executed by storage.\n\nEach concurrent select request requires RAM, CPU and disk IO resources during processing. Too many concurrent requests could result into OOM exceptions.\n\nWhen `current` hits `max` constantly, it means storage is overloaded and requires more CPU (see CPU usage) or disks with more IOPS (see disk writes and reads panels in Resource Usage row).\n\nSee more at https://docs.victoriametrics.com/cluster-victoriametrics/#resource-usage-limits",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -5590,6 +5461,142 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "mappings": [],
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short"
+                            },
+                            "overrides": [
+                                {
+                                    "matcher": {
+                                        "id": "byName",
+                                        "options": "max"
+                                    },
+                                    "properties": [
+                                        {
+                                            "id": "color",
+                                            "value": {
+                                                "fixedColor": "#C4162A",
+                                                "mode": "fixed"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 21
+                        },
+                        "id": 133,
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true,
+                                "sortBy": "Last *",
+                                "sortDesc": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "none"
+                            }
+                        },
+                        "pluginVersion": "9.1.0",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "max(\n    max_over_time(vm_vmselect_concurrent_requests_current{job=~\"$job_storage\", \n    instance=~\"$instance\"}[$__rate_interval])\n)",
+                                "interval": "",
+                                "legendFormat": "current",
+                                "range": true,
+                                "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "min(vm_vmselect_concurrent_requests_capacity{job=~\"$job_storage\", instance=~\"$instance\"})",
+                                "hide": false,
+                                "interval": "",
+                                "legendFormat": "max",
+                                "range": true,
+                                "refId": "B"
+                            }
+                        ],
+                        "title": "Concurrent selects ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "The max number of on-going merges across storage nodes.\n The drastic change in number of merges could be a sign of on-going deduplication/downsampling activity.\n It is expected to have high numbers for `storage/small` metric.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -5614,7 +5621,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5630,7 +5638,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 37
+                            "y": 29
                         },
                         "id": 54,
                         "options": {
@@ -5659,7 +5667,7 @@ data:
                                     "uid": "$ds"
                                 },
                                 "editorMode": "code",
-                                "expr": "sum(max_over_time(vm_active_merges{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])) by(type)",
+                                "expr": "max(max_over_time(vm_active_merges{job=~\"$job_storage\", instance=~\"$instance\"}[$__rate_interval])) by(type)",
                                 "legendFormat": "__auto",
                                 "range": true,
                                 "refId": "A"
@@ -5680,6 +5688,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -5693,6 +5702,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -5717,7 +5727,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5733,7 +5744,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 37
+                            "y": 29
                         },
                         "id": 55,
                         "options": {
@@ -5783,6 +5794,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -5796,6 +5808,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -5825,7 +5838,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5841,10 +5855,9 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 45
+                            "y": 37
                         },
                         "id": 20,
-                        "links": [],
                         "options": {
                             "legend": {
                                 "calcs": [
@@ -5922,6 +5935,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -5935,6 +5949,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -5958,7 +5973,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -5974,10 +5990,9 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 45
+                            "y": 37
                         },
                         "id": 22,
-                        "links": [],
                         "options": {
                             "legend": {
                                 "calcs": [
@@ -6028,6 +6043,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -6041,6 +6057,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -6070,7 +6087,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         }
                                     ]
                                 },
@@ -6082,10 +6100,9 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 53
+                            "y": 45
                         },
                         "id": 202,
-                        "links": [],
                         "options": {
                             "legend": {
                                 "calcs": [
@@ -6149,6 +6166,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -6162,6 +6180,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -6185,7 +6204,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -6218,10 +6238,9 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 53
+                            "y": 45
                         },
                         "id": 14,
-                        "links": [],
                         "options": {
                             "legend": {
                                 "calcs": [
@@ -6286,6 +6305,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -6299,6 +6319,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -6321,7 +6342,8 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green"
+                                            "color": "green",
+                                            "value": null
                                         },
                                         {
                                             "color": "red",
@@ -6348,12 +6370,11 @@ data:
                         },
                         "gridPos": {
                             "h": 8,
-                            "w": 24,
+                            "w": 12,
                             "x": 0,
-                            "y": 61
+                            "y": 53
                         },
                         "id": 206,
-                        "links": [],
                         "options": {
                             "legend": {
                                 "calcs": [
@@ -6402,6 +6423,112 @@ data:
                             }
                         ],
                         "title": "Network usage ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Value > 0 means vmstorage is in readonly mode.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "mappings": [],
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 53
+                        },
+                        "id": 141,
+                        "links": [
+                            {
+                                "targetBlank": true,
+                                "title": "Readonly mode",
+                                "url": "https://docs.victoriametrics.com/cluster-victoriametrics/#readonly-mode"
+                            }
+                        ],
+                        "options": {
+                            "legend": {
+                                "calcs": [],
+                                "displayMode": "list",
+                                "placement": "bottom",
+                                "showLegend": false
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.1.0",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "vm_storage_is_read_only{job=~\"$job_storage\", instance=~\"$instance\"} > 0",
+                                "interval": "",
+                                "legendFormat": "{{`{{`}} instance {{`}}`}}",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Readonly mode",
                         "type": "timeseries"
                     }
                 ],
@@ -7279,7 +7406,7 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "99th percentile of number of [data samples](https://docs.victoriametrics.com/keyconcepts/#raw-samples) scanner per query.\n\nThis number can exceed number of DatapointsReadPerQuery if `step` query arg passed to [/api/v1/query_range](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) is smaller than the lookbehind window set in square brackets of [rollup function](https://docs.victoriametrics.com/MetricsQL.html#rollup-functions). For example, if `increase(some_metric[1h])` is executed with the `step=5m`, then the same [data samples](https://docs.victoriametrics.com/keyconcepts/#raw-samples) on a hour time range are scanned `1h/5m=12` times. See [this article](https://valyala.medium.com/how-to-optimize-promql-and-metricsql-queries-85a1b75bf986) for details.",
+                        "description": "99th percentile of number of [data samples](https://docs.victoriametrics.com/keyconcepts/#raw-samples) scanner per query.\n\nThis number can exceed number of DatapointsReadPerQuery if `step` query arg passed to [/api/v1/query_range](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) is smaller than the lookbehind window set in square brackets of [rollup function](https://docs.victoriametrics.com/metricsql/#rollup-functions). For example, if `increase(some_metric[1h])` is executed with the `step=5m`, then the same [data samples](https://docs.victoriametrics.com/keyconcepts/#raw-samples) on a hour time range are scanned `1h/5m=12` times. See [this article](https://valyala.medium.com/how-to-optimize-promql-and-metricsql-queries-85a1b75bf986) for details.",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
