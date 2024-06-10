@@ -2,6 +2,7 @@
 
 ## Next release
 
+- updates operator to v0.45.0 release
 - sync latest vm alerts and dashboards.
 
 ## 0.23.0
