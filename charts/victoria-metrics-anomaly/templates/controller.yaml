@@ -59,9 +59,7 @@ spec:
           {{- end }}
           {{- if and .Values.env .Values.persistentVolume.enabled }}
           env:
-           {{ toYaml .Values.env | nindent 10 }}
-          - name: VMANOMALY_MODEL_DUMPS_DIR
-            value: "/tmp/vmanomaly-model-dumps"
+           {{ concat .Values.env (list (dict "name" "VMANOMALY_MODEL_DUMPS_DIR" "value" "/tmp/vmanomaly-model-dumps")) | toYaml | nindent 10 }}
           {{- else if .Values.persistentVolume.enabled }}
           env:
             - name: VMANOMALY_MODEL_DUMPS_DIR
