@@ -66,6 +66,9 @@ spec:
           env:
             - name: VMANOMALY_MODEL_DUMPS_DIR
               value: "/tmp/vmanomaly-model-dumps"
+          {{- else if .Values.env }}
+          env:
+          {{ toYaml .Values.env | nindent 10 }}
           {{- end }}
           {{- if .Values.securityContext.enabled }}
           securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" $) | nindent 12 }}
