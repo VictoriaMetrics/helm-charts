@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 1.3.0
+
+**Release date:** 2024-06-11
+
+![AppVersion: v1.13.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.13.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Add ability to configure persistent volume for vmanomaly models storage.
 - Fix `.Values.podSecurityContext` not being applied to the pod.
 - Update vmanomaly to [v1.13.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1130).
