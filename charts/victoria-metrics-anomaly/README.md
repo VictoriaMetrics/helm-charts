@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 1.2.4](https://img.shields.io/badge/Version-1.2.4-informational?style=flat-square)
+![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-anomaly)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
@@ -154,6 +154,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | license.secret.name | string | `""` | Existing secret name |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
+| persistentVolume | object | `{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"existingClaim":"","matchLabels":{},"size":"1Gi","storageClass":""}` | Persistence to store models on disk. Available starting from v1.13.0 |
+| persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
+| persistentVolume.annotations | object | `{}` | Persistant volume annotations |
+| persistentVolume.enabled | bool | `false` | Create/use Persistent Volume Claim for models dump. |
+| persistentVolume.existingClaim | string | `""` | Existing Claim name. If defined, PVC must be created manually before volume will be bound |
+| persistentVolume.matchLabels | object | `{}` | Bind Persistent Volume by labels. Must match all labels of targeted PV. |
+| persistentVolume.size | string | `"1Gi"` | Size of the volume. Should be calculated based on the metrics you send and retention policy you set. |
+| persistentVolume.storageClass | string | `""` | StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | podSecurityContext.enabled | bool | `true` |  |
