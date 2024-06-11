@@ -175,6 +175,30 @@ config:
     # -- For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs
     tenant_id: ""
 
+# -- Persistence to store models on disk.
+# Available starting from v1.13.0
+persistentVolume:
+  # -- Create/use Persistent Volume Claim for models dump.
+  enabled: false
+
+  # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/)
+  accessModes:
+    - ReadWriteOnce
+  # -- Persistant volume annotations
+  annotations: {}
+
+  # -- StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically
+  storageClass: ""
+
+  # -- Existing Claim name. If defined, PVC must be created manually before volume will be bound
+  existingClaim: ""
+
+  # -- Bind Persistent Volume by labels. Must match all labels of targeted PV.
+  matchLabels: {}
+
+  # -- Size of the volume. Should be calculated based on the metrics you send and retention policy you set.
+  size: 1Gi
+
 # -- License key configuration for vmanomaly. See [docs](https://docs.victoriametrics.com/vmanomaly.html#licensing)
 # Required starting from v1.5.0.
 license:
