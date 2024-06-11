@@ -4,6 +4,7 @@
 
 - Add ability to configure persistent volume for vmanomaly models storage.
 - Fix `.Values.podSecurityContext` not being applied to the pod.
+- Update vmanomaly to [v1.13.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1130).
 
 ## 1.2.4
 
