@@ -55,7 +55,7 @@ spec:
           {{- if .Values.server.securityContext.enabled }}
           securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.securityContext "context" $) | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.server.image.repository }}:{{ default .Chart.AppVersion .Values.server.image.tag }}"
+          image: "{{ .Values.server.image.repository }}:{{ default .Chart.AppVersion .Values.server.image.tag }}{{- with .Values.server.image.variant }}-{{ . }}{{- end }}"
           args:
             - -rule=/config/alert-rules.yaml
             - -datasource.url={{ .Values.server.datasource.url}}

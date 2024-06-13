@@ -61,7 +61,7 @@ spec:
           {{- if .Values.securityContext.enabled }}
           securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" $) | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}{{- with .Values.image.variant }}-{{ . }}{{- end }}"
           workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -clusterMode={{ .Values.clusterMode }}
