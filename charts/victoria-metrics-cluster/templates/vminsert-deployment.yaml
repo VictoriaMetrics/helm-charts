@@ -129,7 +129,7 @@ spec:
             {{- else }}
               path: /health
             {{- end }}
-              port: http
+              port: "{{ .Values.vminsert.ports.name  | default "http" }}"
             {{- if .Values.vminsert.extraArgs.tls }}
               scheme: HTTPS
             {{- else }}
@@ -141,7 +141,7 @@ spec:
             failureThreshold: {{ .Values.vminsert.probe.readiness.failureThreshold }}
           livenessProbe:
             tcpSocket:
-              port: http
+              port: "{{ .Values.vminsert.ports.name  | default "http" }}"
             initialDelaySeconds: {{ .Values.vminsert.probe.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vminsert.probe.liveness.periodSeconds }}
             timeoutSeconds: {{ .Values.vminsert.probe.liveness.timeoutSeconds }}
