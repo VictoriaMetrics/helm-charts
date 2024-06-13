@@ -583,8 +583,10 @@ vmagent:
     image:
       tag: v1.101.0
     scrapeInterval: 20s
-    externalLabels:
-      cluster: cluster-name
+    externalLabels: {}
+      # For multi-cluster setups it is useful to use "cluster" label to identify the metrics source.
+      # For example:
+      # cluster: cluster-name
     extraArgs:
       promscrape.streamParse: "true"
       # Do not store original labels in vmagent's memory by default. This reduces the amount of memory used by vmagent

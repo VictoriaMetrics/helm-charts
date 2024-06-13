@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Do not add `cluster` external label at VMAgent by default. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/774) for the details. 
 
 ## 0.23.1
 
