@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added fix for [issue](https://github.com/VictoriaMetrics/helm-charts/issues/1060) to support the custom port name for vmselect and vminsert in [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1061)
 
 ## 0.11.18
 
