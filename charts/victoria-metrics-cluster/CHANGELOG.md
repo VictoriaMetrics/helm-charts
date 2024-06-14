@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.11.19
+
+**Release date:** 2024-06-14
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 **Update note**: The VictoriaMetrics components image tag template has been updated. This change introduces `.Values.<component>.image.variant` to specify tag suffixes like `-scratch`, `-cluster`, `-enterprise`. Additionally, you can now omit `.Values.<component>.image.tag` to automatically use the version specified in `.Chart.AppVersion`.
 
 - fix workload's readinessProbe and livenessProbe when using custom port name. Thanks to @hanumanhuda for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1061).
