@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.23.1](https://img.shields.io/badge/Version-0.23.1-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.23.2](https://img.shields.io/badge/Version-0.23.2-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -477,7 +477,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmagent.ingress.path | string | `"/"` |  |
 | vmagent.ingress.pathType | string | `"Prefix"` |  |
 | vmagent.ingress.tls | list | `[]` |  |
-| vmagent.spec.externalLabels.cluster | string | `"cluster-name"` |  |
+| vmagent.spec.externalLabels | object | `{}` |  |
 | vmagent.spec.extraArgs."promscrape.dropOriginalLabels" | string | `"true"` |  |
 | vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
 | vmagent.spec.image.tag | string | `"v1.101.0"` |  |
