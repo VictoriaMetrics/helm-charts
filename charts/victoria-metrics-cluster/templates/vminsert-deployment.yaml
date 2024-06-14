@@ -46,7 +46,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vminsert.name }}
-          image: "{{ .Values.vminsert.image.repository }}:{{ .Values.vminsert.image.tag }}"
+          image: "{{ .Values.vminsert.image.repository }}:{{ default .Chart.AppVersion .Values.vminsert.image.tag }}{{- with .Values.vminsert.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: "{{ .Values.vminsert.image.pullPolicy }}"
           {{- if .Values.vminsert.containerWorkingDir }}
           workingDir: {{ .Values.vminsert.containerWorkingDir }}

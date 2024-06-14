@@ -46,7 +46,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vmstorage.name }}
-          image: "{{ .Values.vmstorage.image.repository }}:{{ .Values.vmstorage.image.tag }}"
+          image: "{{ .Values.vmstorage.image.repository }}:{{ default .Chart.AppVersion .Values.vmstorage.image.tag }}{{- with .Values.vmstorage.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
           {{- if .Values.vmstorage.containerWorkingDir }}
           workingDir: {{ .Values.vmstorage.containerWorkingDir }}
@@ -122,7 +122,7 @@ spec:
           {{- include "chart.license.mount" . | nindent 12 }}
         {{- if .Values.vmstorage.vmbackupmanager.enable }}
         - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
-          image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
+          image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ default .Chart.AppVersion .Values.vmstorage.vmbackupmanager.image.tag }}{{- with .Values.vmstorage.vmbackupmanager.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
           {{- if .Values.vmstorage.securityContext.enabled }}
           securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmstorage.securityContext "context" $) | nindent 12 }}
