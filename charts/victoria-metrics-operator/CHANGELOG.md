@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix default image tag when using `Chart.AppVersion`, previously the version is missing "v".
 
 ## 0.32.1
 
