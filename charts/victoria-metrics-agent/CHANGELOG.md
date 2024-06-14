@@ -2,7 +2,7 @@
 
 ## Next release
 
-**Update note: VictoriaMetrics components image tag template have been changed, tag suffix like `-scratch`, `-cluster`, `-enterprise` can be specified in `.Values.<component>.image.variant`, `.Values.<component>.image.tag` can be omitted if it's the same as `.Chart.AppVersion`.
+**Update note**: The VictoriaMetrics components image tag template has been updated. This change introduces `.Values.<component>.image.variant` to specify tag suffixes like `-scratch`, `-cluster`, `-enterprise`. Additionally, you can now omit `.Values.<component>.image.tag` to automatically use the version specified in `.Chart.AppVersion`.
 
 - support specifying image tag suffix like "-enterprise" for VictoriaMetrics components using `.Values.<component>.image.variant`.
 
