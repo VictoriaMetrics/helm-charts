@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix invalid label selector usage in notes printed after chart installation 
 
 ## 0.5.1
 
