@@ -2,7 +2,16 @@
 
 ## Next release
 
-- fix invalid label selector usage in notes printed after chart installation 
+- TODO
+
+## 0.5.2
+
+**Release date:** 2024-06-17
+
+![AppVersion: v0.15.0-victorialogs](https://img.shields.io/static/v1?label=AppVersion&message=v0.15.0-victorialogs&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- fix invalid label selector usage in notes printed after chart installation
 
 ## 0.5.1
 
