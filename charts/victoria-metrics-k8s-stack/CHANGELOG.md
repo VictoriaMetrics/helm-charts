@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Enable [conversion of Prometheus CRDs](https://docs.victoriametrics.com/operator/migration/#objects-conversion) by default. See [this](https://github.com/VictoriaMetrics/helm-charts/pull/1069) pull request for details.
 
 ## 0.23.2
 
