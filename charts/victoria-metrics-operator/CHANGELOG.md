@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- use bitnami/kubectl image for cleanup instead of deprecated gcr.io/google_containers/hyperkube
 
 ## 0.32.2
 

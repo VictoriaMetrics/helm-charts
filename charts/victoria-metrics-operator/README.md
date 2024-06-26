@@ -149,8 +149,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | annotations | object | `{}` | Annotations to be added to the all resources |
 | cleanupCRD | bool | `false` | Tells helm to clean up all the vm resources under this release's namespace when uninstalling |
 | cleanupImage.pullPolicy | string | `"IfNotPresent"` |  |
-| cleanupImage.repository | string | `"gcr.io/google_containers/hyperkube"` |  |
-| cleanupImage.tag | string | `"v1.18.0"` |  |
+| cleanupImage.repository | string | `"bitnami/kubectl"` |  |
 | createCRD | bool | `true` | with this option, if you remove this chart, all crd resources will be deleted with it. |
 | env | list | `[]` | extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD) |
 | envFrom | list | `[]` |  |
