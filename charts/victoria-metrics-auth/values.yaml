@@ -1,7 +1,11 @@
 # Default values for victoria-metrics-auth.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+      
 # -- Number of replicas of vmauth
 replicaCount: 1
 
@@ -9,7 +13,10 @@ image:
   # -- Victoria Metrics Auth Docker repository and image name
   repository: victoriametrics/vmauth
   # -- Tag of Docker image
-  tag: v1.96.0
+  tag: "" # rewrites Chart.AppVersion
+  # Variant of the image to use.
+  # e.g. enterprise, scratch
+  variant: ""
   # -- Pull policy of Docker image
   pullPolicy: IfNotPresent
 
@@ -48,6 +55,10 @@ extraArgs:
 # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
 env: []
 
+envFrom: []
+  #- configMapRef:
+  #    name: special-config
+
 # -- Additional hostPath mounts
 extraHostPathMounts: []
   # - name: certs-dir
@@ -72,11 +83,13 @@ extraContainers:
   # - name: config-reloader
   #   image: reloader-image
 
-podSecurityContext: {}
+podSecurityContext:
+  enabled: true
   # fsGroup: 2000
 
 ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-securityContext: {}
+securityContext:
+  enabled: true
   # capabilities:
   #   drop:
   #   - ALL
@@ -179,6 +192,7 @@ serviceMonitor:
   extraLabels: {}
   annotations: {}
   relabelings: []
+  metricRelabelings: []
 #    interval: 15s
 #    scrapeTimeout: 5s
   # -- Commented. HTTP scheme to use for scraping.

@@ -1,0 +1,30 @@
+{{- if .Values.vmauthIngestGlobal.enabled }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: {{ include "victoria-metrics-distributed.vmauthIngestGlobalName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
+  {{- with .Values.vmauthIngestGlobal.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end  }}
+spec:
+  unauthorizedAccessConfig:
+    - src_paths:
+        - "/api/v1/write"
+        - "/prometheus/api/v1/write"
+        - "/write"
+        - "/api/v1/import"
+        - "/api/v1/import/.+"
+      url_prefix:
+{{- range $zone := $.Values.availabilityZones }}
+{{ printf "- http://vmagent-%s:8429/" ($zone.vmagent.name | default (printf "vmagent-%s" $zone.name )) | indent 8 }}
+{{- end }}
+{{- $spec := deepCopy .Values.vmauthIngestGlobal.spec }}
+{{- $spec := unset $spec "unauthorizedAccessConfig" }}
+{{- if $spec }}
+{{- toYaml $spec | nindent 2 }}
+{{- end }}
+{{- end }}

@@ -1,7 +1,7 @@
 # Victoria Metrics Helm Chart for Cluster Version
 
- ![Version: 0.11.10](https://img.shields.io/badge/Version-0.11.10-informational?style=flat-square)
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-cluster)
+ ![Version: 0.11.19](https://img.shields.io/badge/Version-0.11.19-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-cluster)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
 Victoria Metrics Cluster version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
@@ -105,6 +105,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | clusterDomainSuffix | string | `"cluster.local"` | k8s cluster domain suffix, uses for building storage pods' FQDN. Ref: [https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/) |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
 | extraSecrets | list | `[]` |  |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
@@ -124,6 +125,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.containerWorkingDir | string | `""` | Container workdir |
 | vminsert.enabled | bool | `true` | Enable deployment of vminsert component. Deployment is used |
 | vminsert.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| vminsert.envFrom | list | `[]` |  |
 | vminsert.extraArgs."envflag.enable" | string | `"true"` |  |
 | vminsert.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vminsert.extraArgs.loggerFormat | string | `"json"` |  |
@@ -139,7 +141,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vminsert component |
 | vminsert.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vminsert.image.repository | string | `"victoriametrics/vminsert"` | Image repository |
-| vminsert.image.tag | string | `"v1.96.0-cluster"` | Image tag |
+| vminsert.image.tag | string | `"v1.101.0-cluster"` | Image tag override Chart.AppVersion     |
+| vminsert.image.variant | string | `""` |  |
 | vminsert.ingress.annotations | object | `{}` | Ingress annotations |
 | vminsert.ingress.enabled | bool | `false` | Enable deployment of ingress for vminsert component |
 | vminsert.ingress.extraLabels | object | `{}` |  |
@@ -152,7 +155,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.podAnnotations | object | `{}` | Pod's annotations |
 | vminsert.podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | vminsert.podDisruptionBudget.labels | object | `{}` |  |
-| vminsert.podSecurityContext | object | `{}` |  |
+| vminsert.podSecurityContext.enabled | bool | `false` |  |
+| vminsert.ports.name | string | `"http"` |  |
 | vminsert.priorityClassName | string | `""` | Name of Priority Class |
 | vminsert.probe.liveness.failureThreshold | int | `3` |  |
 | vminsert.probe.liveness.initialDelaySeconds | int | `5` |  |
@@ -164,7 +168,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.probe.readiness.timeoutSeconds | int | `5` |  |
 | vminsert.replicaCount | int | `2` | Count of vminsert pods |
 | vminsert.resources | object | `{}` | Resource object |
-| vminsert.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| vminsert.securityContext | object | `{"enabled":false}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vminsert.service.annotations | object | `{}` | Service annotations |
 | vminsert.service.clusterIP | string | `""` | Service ClusterIP |
 | vminsert.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
@@ -179,6 +183,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | vminsert.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object |
 | vminsert.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
+| vminsert.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
 | vminsert.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vminsert.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vminsert.strategy | object | `{}` |  |
@@ -192,6 +197,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.containerWorkingDir | string | `""` | Container workdir |
 | vmselect.enabled | bool | `true` | Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet |
 | vmselect.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| vmselect.envFrom | list | `[]` |  |
 | vmselect.extraArgs."envflag.enable" | string | `"true"` |  |
 | vmselect.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vmselect.extraArgs.loggerFormat | string | `"json"` |  |
@@ -208,7 +214,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vmselect component |
 | vmselect.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmselect.image.repository | string | `"victoriametrics/vmselect"` | Image repository |
-| vmselect.image.tag | string | `"v1.96.0-cluster"` | Image tag |
+| vmselect.image.tag | string | `"v1.101.0-cluster"` | Image tag override Chart.AppVersion |
+| vmselect.image.variant | string | `""` |  |
 | vmselect.ingress.annotations | object | `{}` | Ingress annotations |
 | vmselect.ingress.enabled | bool | `false` | Enable deployment of ingress for vmselect component |
 | vmselect.ingress.extraLabels | object | `{}` |  |
@@ -228,7 +235,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.podAnnotations | object | `{}` | Pod's annotations |
 | vmselect.podDisruptionBudget.enabled | bool | `false` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | vmselect.podDisruptionBudget.labels | object | `{}` |  |
-| vmselect.podSecurityContext | object | `{}` |  |
+| vmselect.podSecurityContext.enabled | bool | `true` |  |
+| vmselect.ports.name | string | `"http"` |  |
 | vmselect.priorityClassName | string | `""` | Name of Priority Class |
 | vmselect.probe.liveness.failureThreshold | int | `3` |  |
 | vmselect.probe.liveness.initialDelaySeconds | int | `5` |  |
@@ -240,7 +248,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.probe.readiness.timeoutSeconds | int | `5` |  |
 | vmselect.replicaCount | int | `2` | Count of vmselect pods |
 | vmselect.resources | object | `{}` | Resource object |
-| vmselect.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
+| vmselect.securityContext | object | `{"enabled":true}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
 | vmselect.service.annotations | object | `{}` | Service annotations |
 | vmselect.service.clusterIP | string | `""` | Service ClusterIP |
 | vmselect.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips](https://kubernetes.io/docs/user-guide/services/#external-ips) |
@@ -254,6 +262,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | vmselect.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operator object |
 | vmselect.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
+| vmselect.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
 | vmselect.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vmselect.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vmselect.statefulSet.enabled | bool | `false` | Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data. |
@@ -271,6 +280,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.containerWorkingDir | string | `""` | Container workdir |
 | vmstorage.enabled | bool | `true` | Enable deployment of vmstorage component. StatefulSet is used |
 | vmstorage.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| vmstorage.envFrom | list | `[]` |  |
 | vmstorage.extraArgs."envflag.enable" | string | `"true"` |  |
 | vmstorage.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vmstorage.extraArgs.loggerFormat | string | `"json"` |  |
@@ -283,7 +293,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.fullnameOverride | string | `nil` | Overrides the full name of vmstorage component |
 | vmstorage.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | vmstorage.image.repository | string | `"victoriametrics/vmstorage"` | Image repository |
-| vmstorage.image.tag | string | `"v1.96.0-cluster"` | Image tag |
+| vmstorage.image.tag | string | `"v1.101.0-cluster"` | Image tag override Chart.AppVersion |
+| vmstorage.image.variant | string | `""` |  |
 | vmstorage.initContainers | list | `[]` |  |
 | vmstorage.name | string | `"vmstorage"` | vmstorage container name |
 | vmstorage.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
@@ -293,13 +304,15 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.persistentVolume.existingClaim | string | `""` | Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound |
 | vmstorage.persistentVolume.labels | object | `{}` | Persistent volume labels |
 | vmstorage.persistentVolume.mountPath | string | `"/storage"` | Data root path. Vmstorage data Persistent Volume mount root path |
+| vmstorage.persistentVolume.name | string | `"vmstorage-volume"` |  |
 | vmstorage.persistentVolume.size | string | `"8Gi"` | Size of the volume. |
 | vmstorage.persistentVolume.storageClass | string | `""` | Storage class name. Will be empty if not setted |
 | vmstorage.persistentVolume.subPath | string | `""` | Mount subpath |
 | vmstorage.podAnnotations | object | `{}` | Pod's annotations |
 | vmstorage.podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | vmstorage.podManagementPolicy | string | `"OrderedReady"` | Deploy order policy for StatefulSet pods |
-| vmstorage.podSecurityContext | object | `{}` |  |
+| vmstorage.podSecurityContext.enabled | bool | `false` |  |
+| vmstorage.ports.name | string | `"http"` |  |
 | vmstorage.priorityClassName | string | `""` | Name of Priority Class |
 | vmstorage.probe.liveness.failureThreshold | int | `10` |  |
 | vmstorage.probe.liveness.initialDelaySeconds | int | `30` |  |
@@ -315,7 +328,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.replicaCount | int | `2` | Count of vmstorage pods |
 | vmstorage.resources | object | `{}` | Resource object. Ref: [https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | vmstorage.retentionPeriod | int | `1` | Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month |
-| vmstorage.securityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| vmstorage.securityContext | object | `{"enabled":false}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vmstorage.service.annotations | object | `{}` | Service annotations |
 | vmstorage.service.extraPorts | list | `[]` | Extra service ports |
 | vmstorage.service.labels | object | `{}` | Service labels |
@@ -325,6 +338,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | vmstorage.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmstorage component. This is Prometheus operator object |
 | vmstorage.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
+| vmstorage.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
 | vmstorage.serviceMonitor.namespace | string | `""` | Target namespace of ServiceMonitor manifest |
 | vmstorage.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vmstorage.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
@@ -343,7 +357,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | vmstorage.vmbackupmanager.extraSecretMounts | list | `[]` |  |
 | vmstorage.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| vmstorage.vmbackupmanager.image.tag | string | `"v1.96.0-enterprise"` | vmbackupmanager image tag |
+| vmstorage.vmbackupmanager.image.tag | string | `"v1.101.0-enterprise"` | vmbackupmanager image tag override Chart.AppVersion |
+| vmstorage.vmbackupmanager.image.variant | string | `""` |  |
 | vmstorage.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
 | vmstorage.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
 | vmstorage.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |

@@ -42,13 +42,14 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vmselect.name }}
-          image: "{{ .Values.vmselect.image.repository }}:{{ .Values.vmselect.image.tag }}"
+          image: "{{ .Values.vmselect.image.repository }}:{{ default .Chart.AppVersion .Values.vmselect.image.tag }}{{- with .Values.vmselect.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: "{{ .Values.vmselect.image.pullPolicy }}"
           {{- if .Values.vmselect.containerWorkingDir }}
           workingDir: {{ .Values.vmselect.containerWorkingDir }}
           {{- end }}
-          securityContext:
-            {{- toYaml .Values.vmselect.securityContext | nindent 12 }}
+          {{- if .Values.vmselect.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmselect.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           args:
             - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
           {{- if not (or .Values.vmselect.suppressStorageFQDNsRender .Values.vmselect.suppresStorageFQDNsRender) }}
@@ -56,10 +57,22 @@ spec:
           {{- end }}
           {{- include "victoria-metrics.vmselect.vmselect-pod-fqdn" . | nindent 12 -}}
           {{- range $key, $value := .Values.vmselect.extraArgs }}
+          {{- if kindIs "slice" $value }}
+          {{- range $v := $value }}
+            - --{{ $key }}={{ $v }}
+          {{- end }}
+          {{- else }}
             - --{{ $key }}={{ $value }}
+          {{- end }}
           {{- end }}
           {{- with (include "chart.license.flag" .) }}
             - {{ . }}
+          {{- end }}
+          {{- if .Values.vmselect.envFrom }}
+          envFrom:
+            {{- with .Values.vmselect.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with .Values.vmselect.env }}
           env: {{ toYaml . | nindent 10 }}
@@ -80,6 +93,11 @@ spec:
               path: /health
             {{- end }}
               port: http
+            {{- if .Values.vmselect.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: 5
             periodSeconds: 15
           livenessProbe:
@@ -116,9 +134,8 @@ spec:
       nodeSelector:
 {{ toYaml .Values.vmselect.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.vmselect.podSecurityContext }}
-      securityContext:
-{{ toYaml .Values.vmselect.podSecurityContext | indent 8 }}
+    {{- if .Values.vmselect.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmselect.podSecurityContext "context" $) | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.vmselect.tolerations }}

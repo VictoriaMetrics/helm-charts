@@ -8,7 +8,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "kubernetes-resources" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "kubernetes-resources" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}
 {{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
@@ -160,9 +160,9 @@ spec:
         runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/cputhrottlinghigh
         summary: Processes experience elevated CPU throttling.
       expr: |-
-        sum(increase(container_cpu_cfs_throttled_periods_total{container!="", }[5m])) by (container, pod, namespace)
+        sum(increase(container_cpu_cfs_throttled_periods_total{container!="", }[5m])) by (cluster, container, pod, namespace)
           /
-        sum(increase(container_cpu_cfs_periods_total{}[5m])) by (container, pod, namespace)
+        sum(increase(container_cpu_cfs_periods_total{}[5m])) by (cluster, container, pod, namespace)
           > ( 25 / 100 )
       for: 15m
       labels:

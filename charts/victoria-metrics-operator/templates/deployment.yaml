@@ -43,8 +43,14 @@ spec:
       serviceAccountName: {{ template "vm-operator.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}{{- with .Values.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           env:
           {{- range .Values.env }}
             - name: {{ .name }}
@@ -88,7 +94,13 @@ spec:
             - --webhook.enable=true
             {{- end }}
             {{- range $key, $value := .Values.extraArgs }}
+            {{- if kindIs "slice" $value }}
+            {{- range $v := $value }}
+            - --{{ $key }}={{ $v }}
+            {{- end }}
+            {{- else }}
             - --{{ $key }}={{ $value }}
+            {{- end }}
             {{- end }}
           command:
             - manager

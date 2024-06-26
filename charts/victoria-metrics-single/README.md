@@ -1,7 +1,7 @@
 # Victoria Metrics Helm Chart for Single Version
 
- ![Version: 0.9.14](https://img.shields.io/badge/Version-0.9.14-informational?style=flat-square)
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-single)
+ ![Version: 0.9.22](https://img.shields.io/badge/Version-0.9.22-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
 
@@ -104,6 +104,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | automountServiceAccountToken | bool | `true` |  |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
@@ -120,6 +121,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.containerWorkingDir | string | `""` | Container workdir |
 | server.enabled | bool | `true` | Enable deployment of server component. Deployed as StatefulSet |
 | server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| server.envFrom | list | `[]` |  |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
@@ -131,7 +133,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | server.image.repository | string | `"victoriametrics/victoria-metrics"` | Image repository |
-| server.image.tag | string | `"v1.96.0"` | Image tag |
+| server.image.tag | string | `""` | Image tag |
+| server.image.variant | string | `""` |  |
 | server.ingress.annotations | object | `{}` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
@@ -160,7 +163,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.podAnnotations | object | `{}` | Pod's annotations |
 | server.podLabels | object | `{}` | Pod's additional labels |
 | server.podManagementPolicy | string | `"OrderedReady"` | Pod's management policy |
-| server.podSecurityContext | object | `{}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| server.podSecurityContext | object | `{"enabled":true}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | server.priorityClassName | string | `""` | Name of Priority Class |
 | server.readinessProbe.failureThreshold | int | `3` |  |
 | server.readinessProbe.httpGet.path | string | `"/health"` |  |
@@ -181,7 +184,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.scrape.configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used |
 | server.scrape.enabled | bool | `false` | If true scrapes targets, creates config map or use specified one with scrape targets |
 | server.scrape.extraScrapeConfigs | list | `[]` | Extra scrape configs that will be appended to `server.scrape.config` |
-| server.securityContext | object | `{}` | Security context to be added to server pods |
+| server.securityContext | object | `{"enabled":true}` | Security context to be added to server pods |
 | server.service.annotations | object | `{}` | Service annotations |
 | server.service.clusterIP | string | `""` | Service ClusterIP |
 | server.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
@@ -193,6 +196,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
 | server.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for server component. This is Prometheus operator object |
 | server.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
+| server.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
 | server.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | server.startupProbe | object | `{}` |  |
 | server.statefulSet.enabled | bool | `true` | Creates statefulset instead of deployment, useful when you want to keep the cache |
@@ -215,7 +219,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | server.vmbackupmanager.extraVolumeMounts | list | `[]` |  |
 | server.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| server.vmbackupmanager.image.tag | string | `"v1.96.0-enterprise"` | vmbackupmanager image tag |
+| server.vmbackupmanager.image.tag | string | `"v1.101.0-enterprise"` | vmbackupmanager image tag |
+| server.vmbackupmanager.image.variant | string | `""` |  |
 | server.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
 | server.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
 | server.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |

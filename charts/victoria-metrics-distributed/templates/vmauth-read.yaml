@@ -1,0 +1,19 @@
+{{- if .Values.vmauthQueryGlobal.enabled }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: {{ include "victoria-metrics-distributed.vmauthQueryGlobalName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
+spec:
+  unauthorizedAccessConfig:
+    - src_paths:
+        - "/select/.+"
+      url_prefix:
+{{- range $zone := $.Values.availabilityZones }}
+{{ printf "- http://vmauth-%s:8427/" ( $zone.vmauthCrossAZQuery.name | default ( printf "vmauth-read-proxy-%s" $zone.name )) | indent 8 }}
+{{- end }}
+      load_balancing_policy: first_available
+{{- end }}
+

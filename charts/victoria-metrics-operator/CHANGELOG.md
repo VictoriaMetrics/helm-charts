@@ -2,7 +2,207 @@
 
 ## Next release
 
+- use bitnami/kubectl image for cleanup instead of deprecated gcr.io/google_containers/hyperkube
+
+## 0.32.2
+
+**Release date:** 2024-06-14
+
+![AppVersion: v0.45.0](https://img.shields.io/static/v1?label=AppVersion&message=v0.45.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- fix default image tag when using `Chart.AppVersion`, previously the version is missing "v".
+
+## 0.32.1
+
+**Release date:** 2024-06-14
+
+![AppVersion: 0.45.0](https://img.shields.io/static/v1?label=AppVersion&message=0.45.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+**Update note**: The VictoriaMetrics components image tag template has been updated. This change introduces `.Values.<component>.image.variant` to specify tag suffixes like `-scratch`, `-cluster`, `-enterprise`. Additionally, you can now omit `.Values.<component>.image.tag` to automatically use the version specified in `.Chart.AppVersion`.
+
+- support specifying image tag suffix like "-enterprise" for VictoriaMetrics components using `.Values.<component>.image.variant`.
+
+## 0.32.0
+
+**Release date:** 2024-06-10
+
+![AppVersion: 0.45.0](https://img.shields.io/static/v1?label=AppVersion&message=0.45.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- updates operator to [v0.45.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.45.0)
+
+## 0.31.2
+
+**Release date:** 2024-05-14
+
+![AppVersion: 0.44.0](https://img.shields.io/static/v1?label=AppVersion&message=0.44.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- fix missing serviceaccounts patch permission in ClusterRole, see [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1012) for details.
+
+## 0.31.1
+
+**Release date:** 2024-05-10
+
+![AppVersion: 0.44.0](https://img.shields.io/static/v1?label=AppVersion&message=0.44.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- fix serviceAccount template when `.Values.serviceAccount.create=false`, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1002) by @tylerturk for details.
+- support creating aggregated clusterRoles for VM CRDs with admin and read permissions, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/996) by @reegnz for details.
+
+## 0.31.0
+
+**Release date:** 2024-05-09
+
+![AppVersion: 0.44.0](https://img.shields.io/static/v1?label=AppVersion&message=0.44.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- updates operator to [v0.44.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.44.0)
+
+## 0.30.3
+
+**Release date:** 2024-04-26
+
+![AppVersion: 0.43.5](https://img.shields.io/static/v1?label=AppVersion&message=0.43.5&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- updates operator to [v0.43.5](https://github.com/VictoriaMetrics/operator/releases/tag/v0.43.5)
+
+## 0.30.2
+
+**Release date:** 2024-04-23
+
+![AppVersion: 0.43.3](https://img.shields.io/static/v1?label=AppVersion&message=0.43.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- updates operator to v0.43.1 version
+- fixes typo at single-namespace role for `vmscrapeconfig`. See this [issue](https://github.com/VictoriaMetrics/helm-charts/issues/987) for details.
+
+## 0.30.1
+
+**Release date:** 2024-04-18
+
+![AppVersion: 0.43.1](https://img.shields.io/static/v1?label=AppVersion&message=0.43.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - TODO
+
+- updates operator to v0.43.1 version
+
+## 0.30.0
+
+**Release date:** 2024-04-18
+
+![AppVersion: 0.43.0](https://img.shields.io/static/v1?label=AppVersion&message=0.43.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- updates operator to v0.43.0-0 version
+- adds `events` create permission
+- properly truncate value of `app.kubernetes.io/managed-by` and `app.kubernetes.io/instance` labels in case release name exceeds 63 characters.
+
+## 0.29.6
+
+**Release date:** 2024-04-16
+
+![AppVersion: 0.42.4](https://img.shields.io/static/v1?label=AppVersion&message=0.42.4&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- clean up vmauth as well when uninstall chart with `cleanupCRD: true`, since it also has `finalizers`.
+- sync new crd VMScrapeConfig from operator, see detail in https://docs.victoriametrics.com/operator/api/#vmscrapeconfig.
+
+## 0.29.5
+
+**Release date:** 2024-04-02
+
+![AppVersion: 0.42.4](https://img.shields.io/static/v1?label=AppVersion&message=0.42.4&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.42.4](https://github.com/VictoriaMetrics/operator/releases/tag/v0.42.4)
+
+## 0.29.4
+
+**Release date:** 2024-03-28
+
+![AppVersion: 0.42.3](https://img.shields.io/static/v1?label=AppVersion&message=0.42.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- added ability to use slice variables in extraArgs (#944)
+
+## 0.29.3
+
+**Release date:** 2024-03-12
+
+![AppVersion: 0.42.3](https://img.shields.io/static/v1?label=AppVersion&message=0.42.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- TODO
+
+## 0.29.2
+
+**Release date:** 2024-03-06
+
+![AppVersion: 0.42.2](https://img.shields.io/static/v1?label=AppVersion&message=0.42.2&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.42.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.42.2)
+
+## 0.29.0
+
+**Release date:** 2024-03-06
+
+![AppVersion: 0.42.1](https://img.shields.io/static/v1?label=AppVersion&message=0.42.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+
+- bump version of VM operator to [0.42.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.42.1)
+
+## 0.29.0
+
+**Release date:** 2024-03-04
+
+![AppVersion: 0.42.0](https://img.shields.io/static/v1?label=AppVersion&message=0.42.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.42.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.42.0)
+
+
+## 0.28.1
+
+**Release date:** 2024-02-21
+
+![AppVersion: 0.41.2](https://img.shields.io/static/v1?label=AppVersion&message=0.41.2&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.41.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.41.2)
+
+## 0.28.0
+
+**Release date:** 2024-02-09
+
+![AppVersion: 0.41.1](https://img.shields.io/static/v1?label=AppVersion&message=0.41.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Update victoriametrics CRD resources yaml.
+
+## 0.27.11
+
+**Release date:** 2024-02-01
+
+![AppVersion: 0.41.1](https://img.shields.io/static/v1?label=AppVersion&message=0.41.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.41.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.41.1)
+
+## 0.27.10
+
+**Release date:** 2024-01-24
+
+![AppVersion: 0.40.0](https://img.shields.io/static/v1?label=AppVersion&message=0.40.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Bump operator version to [0.40.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.40.0)
 
 ## 0.27.9
 

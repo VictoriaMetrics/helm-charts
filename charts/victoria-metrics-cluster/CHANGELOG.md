@@ -4,6 +4,94 @@
 
 - TODO
 
+## 0.11.19
+
+**Release date:** 2024-06-14
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+**Update note**: The VictoriaMetrics components image tag template has been updated. This change introduces `.Values.<component>.image.variant` to specify tag suffixes like `-scratch`, `-cluster`, `-enterprise`. Additionally, you can now omit `.Values.<component>.image.tag` to automatically use the version specified in `.Chart.AppVersion`.
+
+- fix workload's readinessProbe and livenessProbe when using custom port name. Thanks to @hanumanhuda for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1061).
+- support specifying image tag suffix like "-enterprise" for VictoriaMetrics components using `.Values.<component>.image.variant`.
+
+## 0.11.18
+
+**Release date:** 2024-05-16
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- fix lost customized securityContext when introduced new default behavior for securityContext in [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/995).
+
+## 0.11.17
+
+**Release date:** 2024-05-10
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- support disabling default securityContext to keep compatible with platform like openshift, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/995) by @Baboulinet-33 for details.
+
+## 0.11.16
+
+**Release date:** 2024-04-26
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- properly truncate value of `app.kubernetes.io/managed-by` and `app.kubernetes.io/instance` labels in case release name exceeds 63 characters. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/931) and [this PR](https://github.com/VictoriaMetrics/helm-charts/pull/936).
+- enable templating for `port name` so users can replace the default with custom values in use cases such as outlined in [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/972) and has been addressed in [this PR](https://github.com/VictoriaMetrics/helm-charts/pull/975).
+- bump version of VM components to [v1.101.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.101.0)
+
+## 0.11.15
+
+**Release date:** 2024-04-16
+
+![AppVersion: v1.100.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.100.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM components to [v1.100.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.100.1)
+
+## 0.11.14
+
+**Release date:** 2024-03-28
+
+![AppVersion: v1.99.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.99.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- added ability to use slice variables in extraArgs (#944)
+- support adding `metricRelabelings` for server serviceMonitor (#946)
+
+## 0.11.13
+
+**Release date:** 2024-03-05
+
+![AppVersion: v1.99.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.99.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM components to [v1.99.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.99.0)
+
+## 0.11.12
+
+**Release date:** 2024-02-09
+
+![AppVersion: v1.97.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.97.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Remove unsupported `scheme` field under `livenessProbe.tcpSocket`. See [#844](https://github.com/VictoriaMetrics/helm-charts/pull/844) by @MisguidedEmails.
+
+## 0.11.11
+
+**Release date:** 2024-02-01
+
+![AppVersion: v1.97.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.97.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM components to [v1.97.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.97.1)
+- Switch probes scheme to `HTTPS` if vminsert and vmselect enabled tls in extraArgs.
+
 ## 0.11.10
 
 **Release date:** 2023-12-19

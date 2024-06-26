@@ -1,0 +1,79 @@
+{{- /*
+Generated from 'k8s.rules.pod_owner' group from https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetesControlPlane-prometheusRule.yaml
+Do not change in-place! In order to change this file first read following link:
+https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
+*/ -}}
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.k8s }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "k8s.rules.pod_owner" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}
+{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+{{- if .Values.defaultRules.labels }}
+{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: k8s.rules.pod_owner
+    rules:
+    - expr: |-
+        max by (cluster, namespace, workload, pod) (
+          label_replace(
+            label_replace(
+              kube_pod_owner{job="kube-state-metrics", owner_kind="ReplicaSet"},
+              "replicaset", "$1", "owner_name", "(.*)"
+            ) * on(replicaset, namespace) group_left(owner_name) topk by(replicaset, namespace) (
+              1, max by (replicaset, namespace, owner_name) (
+                kube_replicaset_owner{job="kube-state-metrics"}
+              )
+            ),
+            "workload", "$1", "owner_name", "(.*)"
+          )
+        )
+      labels:
+        workload_type: deployment
+      record: namespace_workload_pod:kube_pod_owner:relabel
+    - expr: |-
+        max by (cluster, namespace, workload, pod) (
+          label_replace(
+            kube_pod_owner{job="kube-state-metrics", owner_kind="DaemonSet"},
+            "workload", "$1", "owner_name", "(.*)"
+          )
+        )
+      labels:
+        workload_type: daemonset
+      record: namespace_workload_pod:kube_pod_owner:relabel
+    - expr: |-
+        max by (cluster, namespace, workload, pod) (
+          label_replace(
+            kube_pod_owner{job="kube-state-metrics", owner_kind="StatefulSet"},
+            "workload", "$1", "owner_name", "(.*)"
+          )
+        )
+      labels:
+        workload_type: statefulset
+      record: namespace_workload_pod:kube_pod_owner:relabel
+    - expr: |-
+        max by (cluster, namespace, workload, pod) (
+          label_replace(
+            kube_pod_owner{job="kube-state-metrics", owner_kind="Job"},
+            "workload", "$1", "owner_name", "(.*)"
+          )
+        )
+      labels:
+        workload_type: job
+      record: namespace_workload_pod:kube_pod_owner:relabel
+{{- end }}

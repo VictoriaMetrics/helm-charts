@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.8.6](https://img.shields.io/badge/Version-0.8.6-informational?style=flat-square)
+ ![Version: 0.9.9](https://img.shields.io/badge/Version-0.9.9-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -115,6 +115,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.configMap | string | `""` |  |
 | alertmanager.enabled | bool | `false` |  |
 | alertmanager.extraArgs | object | `{}` |  |
+| alertmanager.extraContainers | list | `[]` |  |
+| alertmanager.extraHostPathMounts | list | `[]` |  |
+| alertmanager.extraVolumeMounts | list | `[]` |  |
+| alertmanager.extraVolumes | list | `[]` |  |
 | alertmanager.image | string | `"prom/alertmanager"` |  |
 | alertmanager.imagePullSecrets | list | `[]` |  |
 | alertmanager.ingress.annotations | object | `{}` |  |
@@ -123,6 +127,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.hosts | list | `[]` |  |
 | alertmanager.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | alertmanager.ingress.tls | list | `[]` |  |
+| alertmanager.listenAddress | string | `"0.0.0.0:9093"` |  |
 | alertmanager.nodeSelector | object | `{}` |  |
 | alertmanager.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
 | alertmanager.persistentVolume.annotations | object | `{}` | Persistant volume annotations |
@@ -134,10 +139,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.persistentVolume.subPath | string | `""` | Mount subpath |
 | alertmanager.podMetadata.annotations | object | `{}` |  |
 | alertmanager.podMetadata.labels | object | `{}` |  |
-| alertmanager.podSecurityContext | object | `{}` |  |
+| alertmanager.podSecurityContext.enabled | bool | `false` |  |
 | alertmanager.priorityClassName | string | `""` |  |
 | alertmanager.resources | object | `{}` |  |
 | alertmanager.retention | string | `"120h"` |  |
+| alertmanager.securityContext.enabled | bool | `false` |  |
 | alertmanager.service.annotations | object | `{}` |  |
 | alertmanager.service.port | int | `9093` |  |
 | alertmanager.service.type | string | `"ClusterIP"` |  |
@@ -145,6 +151,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
@@ -165,17 +172,19 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.datasource.url | string | `""` |  |
 | server.enabled | bool | `true` |  |
 | server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| server.envFrom | list | `[]` |  |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
-| server.extraContainers | list | `[]` |  |
-| server.extraHostPathMounts | list | `[]` |  |
-| server.extraVolumeMounts | list | `[]` |  |
-| server.extraVolumes | list | `[]` |  |
+| server.extraContainers | list | `[]` | Additional containers to run in the same pod |
+| server.extraHostPathMounts | list | `[]` | Additional hostPath mounts |
+| server.extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
+| server.extraVolumes | list | `[]` | Extra Volumes for the pod |
 | server.fullnameOverride | string | `""` |  |
 | server.image.pullPolicy | string | `"IfNotPresent"` |  |
 | server.image.repository | string | `"victoriametrics/vmalert"` |  |
 | server.image.tag | string | `""` |  |
+| server.image.variant | string | `""` |  |
 | server.imagePullSecrets | list | `[]` |  |
 | server.ingress.annotations | object | `{}` |  |
 | server.ingress.enabled | bool | `false` |  |
@@ -197,7 +206,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.podDisruptionBudget.enabled | bool | `false` |  |
 | server.podDisruptionBudget.labels | object | `{}` |  |
 | server.podLabels | object | `{}` |  |
-| server.podSecurityContext | object | `{}` |  |
+| server.podSecurityContext.enabled | bool | `true` |  |
 | server.priorityClassName | string | `""` |  |
 | server.probe.liveness.failureThreshold | int | `3` |  |
 | server.probe.liveness.initialDelaySeconds | int | `5` |  |
@@ -218,7 +227,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.remote.write.url | string | `""` |  |
 | server.replicaCount | int | `1` |  |
 | server.resources | object | `{}` |  |
-| server.securityContext | object | `{}` |  |
+| server.securityContext.enabled | bool | `true` |  |
 | server.service.annotations | object | `{}` |  |
 | server.service.clusterIP | string | `""` |  |
 | server.service.externalIPs | list | `[]` |  |
@@ -238,4 +247,5 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
+| serviceMonitor.metricRelabelings | list | `[]` |  |
 | serviceMonitor.relabelings | list | `[]` |  |

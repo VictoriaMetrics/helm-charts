@@ -47,16 +47,16 @@ Create unified labels for victoria-metrics components
 */}}
 {{- define "victoria-metrics.common.matchLabels" -}}
 app.kubernetes.io/name: {{ include "victoria-metrics.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.common.metaLabels" -}}
 helm.sh/chart: {{ include "victoria-metrics.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.common.podLabels" -}}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmstorage.labels" -}}
@@ -110,13 +110,13 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "victoria-metrics.vmstorage.fullname" -}}
 {{- if .Values.vmstorage.fullnameOverride -}}
-{{- .Values.vmstorage.fullnameOverride | trunc 60 | trimSuffix "-" -}}
+{{- .Values.vmstorage.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" .Release.Name .Values.vmstorage.name | trunc 60 | trimSuffix "-" -}}
+{{- printf "%s-%s" .Release.Name .Values.vmstorage.name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s-%s" .Release.Name $name .Values.vmstorage.name | trunc 60 | trimSuffix "-" -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.vmstorage.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -139,7 +139,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
-Create a fully qualified vmselect name.
+Create a fully qualified vminsert name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "victoria-metrics.vminsert.fullname" -}}
@@ -236,7 +236,7 @@ Return if ingress supports pathType.
 {{- end -}}
 {{- if .Values.vmstorage.vmbackupmanager.restore.onStart.enabled }}
 - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager-restore
-  image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
+  image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ default .Chart.AppVersion .Values.vmstorage.vmbackupmanager.image.tag }}{{- with .Values.vmstorage.vmbackupmanager.image.variant }}-{{ . }}{{- end }}"
   imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
   {{- with .Values.vmstorage.podSecurityContext }}
   securityContext:  {{ toYaml . | nindent 4 }}
@@ -323,4 +323,37 @@ Enforce license for vmbackupmanager
   for more information, visit https://victoriametrics.com/products/enterprise/
   To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/`}}
 {{- end -}}
+{{- end -}}
+
+{{/* 
+Return true if the detected platform is Openshift
+Usage:
+{{- include "common.compatibility.isOpenshift" . -}}
+*/}}
+{{- define "common.compatibility.isOpenshift" -}}
+{{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
+{{- true -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Render a compatible securityContext depending on the platform. By default it is maintained as it is. In other platforms like Openshift we remove default user/group values that do not work out of the box with the restricted-v1 SCC
+Usage:
+{{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "context" $) -}}
+*/}}
+{{- define "common.compatibility.renderSecurityContext" -}}
+{{- $adaptedContext := .secContext -}}
+{{- if .context.Values.global.compatibility -}}
+  {{- if .context.Values.global.compatibility.openshift -}}
+    {{- if or (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "force") (and (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "auto") (include "common.compatibility.isOpenshift" .context)) -}}
+      {{/* Remove incompatible user/group values that do not work in Openshift out of the box */}}
+      {{- $adaptedContext = omit $adaptedContext "fsGroup" "runAsUser" "runAsGroup" -}}
+      {{- if not .secContext.seLinuxOptions -}}
+      {{/* If it is an empty object, we remove it from the resulting context because it causes validation issues */}}
+      {{- $adaptedContext = omit $adaptedContext "seLinuxOptions" -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- omit $adaptedContext "enabled" | toYaml -}}
 {{- end -}}

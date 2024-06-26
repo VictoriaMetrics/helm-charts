@@ -5,6 +5,181 @@
 - Add alerting rules for VictoriaMetrics operator.
 - Updated alerting rules for VictoriaMetrics components.
 
+## 0.23.3
+
+**Release date:** 2024-06-26
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Enable [conversion of Prometheus CRDs](https://docs.victoriametrics.com/operator/migration/#objects-conversion) by default. See [this](https://github.com/VictoriaMetrics/helm-charts/pull/1069) pull request for details.
+- use bitnami/kubectl image for cleanup instead of deprecated gcr.io/google_containers/hyperkube
+
+## 0.23.2
+
+**Release date:** 2024-06-14
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Do not add `cluster` external label at VMAgent by default. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/774) for the details.
+
+## 0.23.1
+
+**Release date:** 2024-06-10
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- updates operator to v0.45.0 release
+- sync latest vm alerts and dashboards.
+
+## 0.23.0
+
+**Release date:** 2024-05-30
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- sync latest etcd v3.5.x rules from [upstream](https://github.com/etcd-io/etcd/blob/release-3.5/contrib/mixin/mixin.libsonnet).
+- add Prometheus operator CRDs as an optional dependency. See [this PR](https://github.com/VictoriaMetrics/helm-charts/pull/1022) and [related issue](https://github.com/VictoriaMetrics/helm-charts/issues/341) for the details.
+
+## 0.22.1
+
+**Release date:** 2024-05-14
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- fix missing serviceaccounts patch permission in VM operator, see [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1012) for details.
+
+## 0.22.0
+
+**Release date:** 2024-05-10
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.44.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.44.0)
+
+## 0.21.3
+
+**Release date:** 2024-04-26
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM components to [v1.101.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.101.0)
+
+## 0.21.2
+
+**Release date:** 2024-04-23
+
+![AppVersion: v1.100.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.100.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.43.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.43.3)
+
+## 0.21.1
+
+**Release date:** 2024-04-18
+
+![AppVersion: v1.100.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.100.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- TODO
+
+## 0.21.0
+
+**Release date:** 2024-04-18
+
+![AppVersion: v1.100.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.100.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- TODO
+
+- bump version of VM operator to [0.43.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.43.0)
+- updates CRDs definitions.
+
+## 0.20.1
+
+**Release date:** 2024-04-16
+
+![AppVersion: v1.100.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.100.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- upgraded dashboards and alerting rules, added values file for local (Minikube) setup
+- bump version of VM components to [v1.100.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.100.1)
+
+## 0.20.0
+
+**Release date:** 2024-04-02
+
+![AppVersion: v1.99.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.99.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM operator to [0.42.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.42.3)
+
+## 0.19.4
+
+**Release date:** 2024-03-05
+
+![AppVersion: v1.99.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.99.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM components to [v1.99.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.99.0)
+
+## 0.19.3
+
+**Release date:** 2024-03-05
+
+![AppVersion: v1.98.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.98.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Commented default configuration for alertmanager. It simplifies configuration and makes it more explicit. See this [issue](https://github.com/VictoriaMetrics/helm-charts/issues/473) for details.
+- Allow enabling/disabling default k8s rules when installing. See [#904](https://github.com/VictoriaMetrics/helm-charts/pull/904) by @passie.
+
+## 0.19.2
+
+**Release date:** 2024-02-26
+
+![AppVersion: v1.98.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.98.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Fix templating of VMAgent `remoteWrite` in case both `VMSingle` and `VMCluster` are disabled. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/865) for details.
+
+## 0.19.1
+
+**Release date:** 2024-02-21
+
+![AppVersion: v1.98.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.98.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Update dependencies: victoria-metrics-operator -> 0.28.1, grafana -> 7.3.1.
+- Update victoriametrics CRD resources yaml.
+
+## 0.19.0
+
+**Release date:** 2024-02-09
+
+![AppVersion: v1.97.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.97.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Do not store original labels in `vmagent`'s memory by default. This reduces memory usage of `vmagent` but makes `vmagent`'s debugging UI less informative. See [this docs](https://docs.victoriametrics.com/vmagent/#relabel-debug) for details on relabeling debug.
+- Update dependencies: kube-state-metrics -> 5.16.0, prometheus-node-exporter -> 4.27.0, grafana -> 7.3.0.
+- Update victoriametrics CRD resources yaml.
+- Update builtin dashboards and rules.
+
+## 0.18.12
+
+**Release date:** 2024-02-01
+
+![AppVersion: v1.97.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.97.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- bump version of VM components to [v1.97.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.97.1)
+- Fix helm lint when ingress resources enabled - split templates of resources per kind. See [#820](https://github.com/VictoriaMetrics/helm-charts/pull/820) by @MemberIT.
+
 ## 0.18.11
 
 **Release date:** 2023-12-15

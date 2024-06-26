@@ -1,0 +1,83 @@
+{{- $newAPI := .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
+{{ if and .Values.vmcluster.enabled .Values.vmcluster.ingress.insert.enabled -}}
+{{- with .Values.vmcluster.ingress.insert }}
+{{- $servicePort := $.Values.vmcluster.spec.vminsert.port | default 8480 -}}
+{{- $serviceName := (include "victoria-metrics-k8s-stack.vminsertName" $) }}
+{{- $ingressPath := .path -}}
+{{- $ingressPathType := .pathType | default "" -}}
+{{- $extraPaths := .extraPaths -}}
+{{- if $newAPI -}}
+apiVersion: networking.k8s.io/v1
+{{- else if $.Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
+apiVersion: networking.k8s.io/v1beta1
+{{- else }}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $serviceName }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-vmcluster
+{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+{{- if .labels }}
+{{ toYaml .labels | indent 4 }}
+{{- end }}
+  {{- if .annotations }}
+  annotations:
+    {{- range $key, $value := .annotations }}
+    {{ $key }}: {{ tpl $value $ | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  {{- if .ingressClassName }}
+  ingressClassName: {{ .ingressClassName }}
+  {{- end -}}
+{{- if .tls }}
+  tls:
+{{ tpl (toYaml .tls) $ | indent 4 }}
+{{- end }}
+  rules:
+  {{- if .hosts  }}
+  {{- range .hosts }}
+    - host: {{ tpl . $}}
+      http:
+        paths:
+{{- if $extraPaths }}
+{{ toYaml $extraPaths | indent 10 }}
+{{- end }}
+          - path: {{ $ingressPath }}
+            {{- if $newAPI }}
+            pathType: {{ $ingressPathType }}
+            {{- end }}
+            backend:
+              {{- if $newAPI }}
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+              {{- else }}
+              serviceName: {{ $serviceName }}
+              servicePort: {{ $servicePort }}
+              {{- end }}
+  {{- end }}
+  {{- else }}
+    - http:
+        paths:
+          - backend:
+              {{- if $newAPI }}
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+            pathType: {{ $ingressPathType }}
+              {{- else }}
+              serviceName: {{ $serviceName }}
+              servicePort: {{ $servicePort }}
+              {{- end }}
+          {{- if $ingressPath }}
+            path: {{ $ingressPath }}
+            {{- end }}
+  {{- end -}}
+{{- end }}
+{{- end }}

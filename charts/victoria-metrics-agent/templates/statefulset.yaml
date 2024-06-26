@@ -14,7 +14,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+{{- if not .Values.horizontalPodAutoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+{{- end }}
   serviceName: {{ include "chart.fullname" . }}
   {{- if .Values.statefulset.updateStrategy }}
   updateStrategy:
@@ -44,17 +46,19 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ include "chart.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
       {{- with .Values.initContainers }}
       initContainers:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          {{- if .Values.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" $) | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}{{- with .Values.image.variant }}-{{ . }}{{- end }}"
           workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -promscrape.config=/config/scrape.yml
@@ -114,6 +118,12 @@ spec:
             - name: opentsdb-udp
               protocol: UDP
               containerPort: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
+          {{- end }}
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- if or .Values.env .Values.statefulset.clusterMode}}
           env:

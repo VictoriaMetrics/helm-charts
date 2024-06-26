@@ -46,14 +46,16 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "vmalert.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.server.podSecurityContext | nindent 8 }}
+      {{- if .Values.server.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       containers:
         - name: {{ template "vmalert.name" . }}-{{ .Values.server.name }}
-          securityContext:
-            {{- toYaml .Values.server.securityContext | nindent 12 }}
-          image: "{{ .Values.server.image.repository }}:{{ default .Chart.AppVersion .Values.server.image.tag }}"
+          {{- if .Values.server.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.securityContext "context" $) | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.server.image.repository }}:{{ default .Chart.AppVersion .Values.server.image.tag }}{{- with .Values.server.image.variant }}-{{ . }}{{- end }}"
           args:
             - -rule=/config/alert-rules.yaml
             - -datasource.url={{ .Values.server.datasource.url}}
@@ -67,7 +69,9 @@ spec:
             {{- with .Values.server.datasource.bearer.tokenFile }}
             - -datasource.bearerTokenFile={{ . }}
             {{- end }}
-            - -notifier.url={{ include "vmalert.alertmanager.urls" . }}
+            {{- with (include "vmalert.alertmanager.urls" .) }}
+            - -notifier.url={{ . }}
+            {{- end }}
             {{- with (include "vmalert.alertmanager.passwords" .) }}
             - -notifier.basicAuth.password={{ . }}
             {{- end }}
@@ -80,7 +84,9 @@ spec:
             {{- with (include "vmalert.alertmanager.bearerTokenFiles" .) }}
             - -notifier.bearerTokenFile={{ . }}
             {{- end }}
+            {{- if .Values.server.remote.read.url }}
             - -remoteRead.url={{ .Values.server.remote.read.url }}
+            {{- end }}
             {{- if or .Values.server.remote.read.basicAuth.password .Values.server.remote.read.basicAuth.username }}
             - -remoteRead.basicAuth.password={{ .Values.server.remote.read.basicAuth.password }}
             - -remoteRead.basicAuth.username={{ .Values.server.remote.read.basicAuth.username }}
@@ -91,8 +97,10 @@ spec:
             {{- with .Values.server.remote.read.bearer.tokenFile }}
             - -remoteRead.bearerTokenFile={{ . }}
             {{- end }}
+            {{- if .Values.server.remote.write.url }}
             - -remoteWrite.url={{ .Values.server.remote.write.url }}
-             {{- if or .Values.server.remote.write.basicAuth.password .Values.server.remote.write.basicAuth.username  }}
+            {{- end }}
+            {{- if or .Values.server.remote.write.basicAuth.password .Values.server.remote.write.basicAuth.username  }}
             - -remoteWrite.basicAuth.password={{ .Values.server.remote.write.basicAuth.password }}
             - -remoteWrite.basicAuth.username={{ .Values.server.remote.write.basicAuth.username }}
             {{- end }}
@@ -102,17 +110,27 @@ spec:
             {{- with .Values.server.remote.write.bearer.tokenFile }}
             - -remoteWrite.bearerTokenFile={{ . }}
             {{- end }}
-          {{- range $key, $value := .Values.server.extraArgs }}
-              {{- if eq $key "rule" }}
-            - -{{ $key }}={{ $value | quote}}
-              {{- else }}
+            {{- range $key, $value := .Values.server.extraArgs }}
+            {{- if kindIs "slice" $value }}
+            {{- range $v := $value }}
+            - -{{ $key }}={{ $v }}
+            {{- end }}
+            {{- else if eq $key "rule" }}
+            - -{{ $key }}={{ $value | quote }}
+            {{- else }}
             - -{{ $key }}={{ $value }}
             {{- end }}
-          {{- end }}
-          {{- with (include "vmalert.license.flag" .) }}
+            {{- end }}
+            {{- with (include "vmalert.license.flag" .) }}
             - {{ . }}
-          {{- end }}
+            {{- end }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          {{- if .Values.server.envFrom }}
+          envFrom:
+            {{- with .Values.server.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.server.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}

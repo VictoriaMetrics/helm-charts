@@ -1,7 +1,7 @@
 # Helm Chart For Victoria Metrics Auth.
 
- ![Version: 0.4.5](https://img.shields.io/badge/Version-0.4.5-informational?style=flat-square)
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-auth)
+ ![Version: 0.4.13](https://img.shields.io/badge/Version-0.4.13-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-auth)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
 Victoria Metrics Auth - is a simple auth proxy and router for VictoriaMetrics.
@@ -101,6 +101,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config | string | `nil` | Config file content. |
 | containerWorkingDir | string | `"/"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| envFrom | list | `[]` |  |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | extraArgs.loggerFormat | string | `"json"` |  |
@@ -111,9 +112,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` |  |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmauth"` | Victoria Metrics Auth Docker repository and image name |
-| image.tag | string | `"v1.96.0"` | Tag of Docker image |
+| image.tag | string | `""` | Tag of Docker image |
+| image.variant | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
@@ -136,14 +139,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
-| podSecurityContext | object | `{}` |  |
+| podSecurityContext.enabled | bool | `true` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.extraLabels | object | `{}` |  |
 | rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` | Number of replicas of vmauth |
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
 | secretName | string | `""` | Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html. Configuration in the given secret must be stored under `auth.yml` key. |
-| securityContext | object | `{}` |  |
+| securityContext.enabled | bool | `true` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
 | service.enabled | bool | `true` |  |
@@ -159,5 +162,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
+| serviceMonitor.metricRelabelings | list | `[]` |  |
 | serviceMonitor.relabelings | list | `[]` |  |
 | tolerations | list | `[]` | Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |

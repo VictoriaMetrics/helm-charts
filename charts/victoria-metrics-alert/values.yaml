@@ -1,7 +1,11 @@
 # Default values for victoria-metrics-alert.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+      
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -27,6 +31,9 @@ server:
   image:
     repository: victoriametrics/vmalert
     tag: "" # rewrites Chart.AppVersion
+    # Variant of the image to use.
+    # e.g. enterprise, scratch
+    variant: ""
     pullPolicy: IfNotPresent
   nameOverride: ""
   fullnameOverride: ""
@@ -48,6 +55,11 @@ server:
     #     secretKeyRef:
     #       name: auth_secret
     #       key: password
+
+  envFrom:
+    []
+    #- configMapRef:
+    #    name: special-config
     
   # Readiness & Liveness probes
   probe:
@@ -149,7 +161,7 @@ server:
     envflag.prefix: VM_
     loggerFormat: json
 
-  # Additional hostPath mounts
+  # -- Additional hostPath mounts
   extraHostPathMounts:
     []
     # - name: certs-dir
@@ -158,19 +170,20 @@ server:
     #   hostPath: /etc/kubernetes/certs
   #   readOnly: true
 
-  # Extra Volumes for the pod
+  # -- Extra Volumes for the pod
   extraVolumes:
     []
     #- name: example
     #  configMap:
     #    name: example
 
-  # Extra Volume Mounts for the container
+  # -- Extra Volume Mounts for the container
   extraVolumeMounts:
     []
     # - name: example
     #   mountPath: /example
 
+  # -- Additional containers to run in the same pod
   extraContainers:
     []
     #- name: config-reloader
@@ -215,11 +228,12 @@ server:
     # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
 
-  podSecurityContext: {}
+  podSecurityContext:
+    enabled: true
   # fsGroup: 2000
 
   securityContext:
-    {}
+    enabled: true
     # capabilities:
     #   drop:
     #   - ALL
@@ -271,6 +285,7 @@ serviceMonitor:
   extraLabels: {}
   annotations: {}
   relabelings: []
+  metricRelabelings: []
 #    interval: 15s
 #    scrapeTimeout: 5s
 # -- Commented. HTTP scheme to use for scraping.
@@ -292,7 +307,11 @@ alertmanager:
   resources: {}
   tolerations: []
   imagePullSecrets: []
-  podSecurityContext: {}
+  podSecurityContext:
+    enabled: false
+  securityContext:
+    enabled: false
+  listenAddress: "0.0.0.0:9093"
   extraArgs: {}
   # key: value
 
@@ -366,6 +385,33 @@ alertmanager:
     subPath: ""
     # -- Size of the volume. Better to set the same as resource limit memory property.
     size: 50Mi
+
+  # Additional hostPath mounts
+  extraHostPathMounts:
+    []
+    # - name: certs-dir
+    #   mountPath: /etc/kubernetes/certs
+    #   subPath: ""
+    #   hostPath: /etc/kubernetes/certs
+  #   readOnly: true
+
+  # Extra Volumes for the pod
+  extraVolumes:
+    []
+    #- name: example
+    #  configMap:
+    #    name: example
+
+  # Extra Volume Mounts for the container
+  extraVolumeMounts:
+    []
+    # - name: example
+    #   mountPath: /example
+
+  extraContainers:
+    []
+    #- name: config-reloader
+    #  image: reloader-image
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []

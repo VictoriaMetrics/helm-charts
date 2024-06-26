@@ -1,7 +1,7 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.27.9](https://img.shields.io/badge/Version-0.27.9-informational?style=flat-square)
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-operator)
+ ![Version: 0.32.2](https://img.shields.io/badge/Version-0.32.2-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-operator)
 
 Victoria Metrics Operator
 
@@ -147,12 +147,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | admissionWebhooks.policy | string | `"Fail"` | What to do in case, when operator not available to validate request. |
 | affinity | object | `{}` | Pod affinity |
 | annotations | object | `{}` | Annotations to be added to the all resources |
-| cleanupCRD | bool | `false` | Tells helm to clean up vm cr resources when uninstalling |
+| cleanupCRD | bool | `false` | Tells helm to clean up all the vm resources under this release's namespace when uninstalling |
 | cleanupImage.pullPolicy | string | `"IfNotPresent"` |  |
-| cleanupImage.repository | string | `"gcr.io/google_containers/hyperkube"` |  |
-| cleanupImage.tag | string | `"v1.18.0"` |  |
+| cleanupImage.repository | string | `"bitnami/kubectl"` |  |
 | createCRD | bool | `true` | with this option, if you remove this chart, all crd resources will be deleted with it. |
 | env | list | `[]` | extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD) |
+| envFrom | list | `[]` |  |
 | extraArgs | object | `{}` | operator container additional commandline arguments |
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
@@ -163,7 +163,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
-| image.tag | string | `"v0.39.3"` | Image tag |
+| image.tag | string | `""` | Image tag override Chart.AppVersion |
+| image.variant | string | `""` |  |
 | imagePullSecrets | list | `[]` | Secret to pull images |
 | logLevel | string | `"info"` | possible values: info and error. |
 | nameOverride | string | `""` | VM operatror deployment name override |
@@ -177,6 +178,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podDisruptionBudget.labels | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
+| rbac.aggregatedClusterRoles | object | `{"enabled":true,"labels":{"admin":{"rbac.authorization.k8s.io/aggregate-to-admin":"true"},"view":{"rbac.authorization.k8s.io/aggregate-to-view":"true"}}}` | create aggregated clusterRoles for CRD readonly and admin permissions |
+| rbac.aggregatedClusterRoles.labels | object | `{"admin":{"rbac.authorization.k8s.io/aggregate-to-admin":"true"},"view":{"rbac.authorization.k8s.io/aggregate-to-view":"true"}}` | labels attached to according clusterRole |
 | rbac.create | bool | `true` | Specifies whether the RBAC resources should be created |
 | rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` |  |

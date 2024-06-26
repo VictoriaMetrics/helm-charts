@@ -1,7 +1,7 @@
 # Victoria Metrics Helm Chart for vmgateway
 
- ![Version: 0.1.54](https://img.shields.io/badge/Version-0.1.54-informational?style=flat-square)
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-gateway)
+ ![Version: 0.1.62](https://img.shields.io/badge/Version-0.1.62-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-gateway)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
 Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria Metrics
@@ -171,6 +171,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmgateway.html |
 | containerWorkingDir | string | `"/"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| envFrom | list | `[]` |  |
 | eula | bool | `false` | should be true and means that you have the legal right to run a vmgateway that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/esa/ |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
@@ -180,9 +181,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` |  |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.repository | string | `"victoriametrics/vmgateway"` | Victoria Metrics gateway Docker repository and image name |
-| image.tag | string | `"v1.96.0-enterprise"` | Tag of Docker image |
+| image.tag | string | `"v1.101.0-enterprise"` | Tag of Docker image override Chart.AppVersion |
+| image.variant | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
@@ -199,13 +202,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
-| podSecurityContext | object | `{}` |  |
+| podSecurityContext.enabled | bool | `true` |  |
 | rateLimiter | object | `{"config":{},"datasource":{"url":""},"enable":false}` | Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway.html#rate-limiter |
 | rateLimiter.datasource.url | string | `""` | Datasource VictoriaMetrics or vmselects. Required. Example http://victoroametrics:8428 or http://vmselect:8481/select/0/prometheus |
 | rateLimiter.enable | bool | `false` | Enable/Disable rate-limiting |
 | read.url | string | `""` | Read endpoint without suffixes, victoriametrics or vmselect. Example http://victoroametrics:8428 or http://vmselect:8481 |
 | replicaCount | int | `1` | Number of replicas of vmgateway |
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
+| securityContext.enabled | bool | `true` |  |
 | securityContext.runAsGroup | int | `1000` |  |
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
@@ -224,6 +228,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
+| serviceMonitor.metricRelabelings | list | `[]` |  |
 | serviceMonitor.relabelings | list | `[]` |  |
 | tolerations | list | `[]` | Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | write.url | string | `""` | Write endpoint without suffixes, victoriametrics or vminsert. Example http://victoroametrics:8428 or http://vminsert:8480 |

@@ -5,7 +5,11 @@ image:
   # -- Image repository
   repository: victoriametrics/operator
   # -- Image tag
-  tag: v0.39.3
+  # override Chart.AppVersion
+  tag: ""
+  # Variant of the image to use.
+  # e.g. scratch
+  variant: ""
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
@@ -13,11 +17,12 @@ image:
 # -- with this option, if you remove this chart, all crd resources will be deleted with it.
 createCRD: true
 
-# -- Tells helm to clean up vm cr resources when uninstalling
+# -- Tells helm to clean up all the vm resources under this release's namespace when uninstalling
 cleanupCRD: false
 cleanupImage:
-  repository: gcr.io/google_containers/hyperkube
-  tag: v1.18.0
+  repository: bitnami/kubectl
+  # use image tag that matches k8s API version by default
+  # tag: 1.29.6
   pullPolicy: IfNotPresent
 
 replicaCount: 1
@@ -40,6 +45,15 @@ rbac:
   create: true
   # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
   pspEnabled: true
+  # -- create aggregated clusterRoles for CRD readonly and admin permissions
+  aggregatedClusterRoles:
+    enabled: true
+    # -- labels attached to according clusterRole
+    labels:
+      view:
+        rbac.authorization.k8s.io/aggregate-to-view: "true"
+      admin:
+        rbac.authorization.k8s.io/aggregate-to-admin: "true"
 
 # -- Labels to be added to the all resources
 extraLabels: {}
@@ -114,6 +128,11 @@ env:
   []
   # - name: VM_VMSINGLEDEFAULT_VERSION
   #   value: v1.43.0
+
+envFrom:
+  []
+  #- configMapRef:
+  #    name: special-config
 
 # -- Additional hostPath mounts
 extraHostPathMounts:
