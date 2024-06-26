@@ -3,6 +3,7 @@
 ## Next release
 
 - Enable [conversion of Prometheus CRDs](https://docs.victoriametrics.com/operator/migration/#objects-conversion) by default. See [this](https://github.com/VictoriaMetrics/helm-charts/pull/1069) pull request for details.
+- use bitnami/kubectl image for cleanup instead of deprecated gcr.io/google_containers/hyperkube
 
 ## 0.23.2
 

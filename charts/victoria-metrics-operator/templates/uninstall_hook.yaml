@@ -24,7 +24,7 @@ spec:
     {{- end }}
       containers:
         - name: kubectl
-          image: "{{ (index .Values "cleanupImage" "repository") }}:{{ (index .Values "cleanupImage" "tag") }}"
+          image: "{{ (index .Values "cleanupImage" "repository") }}:{{ (index .Values "cleanupImage" "tag" | default (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor)) }}"
           imagePullPolicy: "{{ (index .Values "cleanupImage" "pullPolicy") }}"
           resources:
             limits:
@@ -33,16 +33,11 @@ spec:
             requests:
               cpu: "100m"
               memory: "56Mi"
-          command:
-            - /bin/sh
-            - -c
-            - >
-              kubectl delete vmagents --all --ignore-not-found=true;
-              kubectl delete vmalertmanagers --all --ignore-not-found=true;
-              kubectl delete vmalerts --all --ignore-not-found=true;
-              kubectl delete vmauths --all --ignore-not-found=true;
-              kubectl delete vmclusters --all --ignore-not-found=true;
-              kubectl delete vmsingles --all --ignore-not-found=true;
+          args:
+            - delete
+            - vmagents,vmalertmanagers,vmalerts,vmauths,vmclusters,vmsingles
+            - --all
+            - --ignore-not-found=true
       restartPolicy: OnFailure
     {{- with .Values.nodeSelector }}
       nodeSelector:
