@@ -34,9 +34,7 @@ spec:
     - src_paths:
         - "/select/.+"
       url_prefix:
-{{- range $i := until (int $zone.vmcluster.spec.vmselect.replicaCount) }}
-{{ printf "- http://vmselect-vmcluster-%s-%d.vmselect-vmcluster-%s:8481/" $zone.name $i $zone.name | indent 8 }}
-{{- end }}
+{{ printf "- http://vmselect-vmcluster-%s:8481/" $zone.name | indent 8 }}
 {{- $spec := deepCopy $zone.vmauthQueryPerZone.spec }}
 {{- $spec := unset $spec "nodeSelector" }}
 {{- $spec := unset $spec "affinity" }}
