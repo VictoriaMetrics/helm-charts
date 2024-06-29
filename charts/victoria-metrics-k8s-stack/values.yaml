@@ -36,31 +36,172 @@ serviceAccount:
 ## -- Create default rules for monitoring the cluster
 defaultRules:
   create: true
+
+  # -- Common properties for PrometheusRule alert's groups
+  group:
+    spec:
+
+      # -- Optional HTTP URL parameters added to each rule request
+      params: {}
+
+  # -- Common properties for PrometheusRule alert's rules
+  rule:
+    spec:
+
+      # -- Additional labels for PrometheusRule alerts
+      labels: {}
+
+      # -- Additional annotations for PrometheusRule alerts
+      annotations: {}
+
+  # -- Per rule properties
   rules:
-    etcd: true
-    general: true
-    k8s: true
-    kubeApiserver: true
-    kubeApiserverAvailability: true
-    kubeApiserverBurnrate: true
-    kubeApiserverHistogram: true
-    kubeApiserverSlos: true
-    kubelet: true
-    kubePrometheusGeneral: true
-    kubePrometheusNodeRecording: true
-    kubernetesApps: true
-    kubernetesResources: true
-    kubernetesStorage: true
-    kubernetesSystem: true
-    kubeScheduler: true
-    kubeStateMetrics: true
-    network: true
-    node: true
-    vmagent: true
-    vmsingle: true
-    vmcluster: true
-    vmhealth: true
-    alertmanager: true
+    # CPUThrottlingHigh:
+    #   spec:
+    #     for: 15m
+    #     labels:
+    #       severity: critical
+    KubeAPIDown:
+      extraCondition: .Values.kubeApiServer.enabled
+    KubeControllerManagerDown:
+      extraCondition: .Values.kubeControllerManager.enabled
+    KubeSchedulerDown:
+      extraCondition: .Values.kubeScheduler.enabled
+    KubeStateMetricsDown:
+      extraCondition: (index .Values "kube-state-metrics" "enabled")
+    KubeletDown:
+      extraCondition: .Values.kubelet.enabled
+    PrometheusOperatorDown:
+      extraCondition: .Values.prometheusOperator.enabled
+    NodeExporterDown:
+      extraCondition: .Values.nodeExporter.enabled
+    CoreDNSDown:
+      extraCondition: .Values.kubeDns.enabled
+    AlertmanagerDown:
+      extraCondition: .Values.alertmanager.enabled
+    KubeProxyDown:
+      extraCondition: .Values.kubeProxy.enabled
+  groups:
+    etcd:
+      create: true
+      extraCondition: .Values.kubeEtcd.enabled
+
+      # -- Common properties for all rules in a group
+      rules: {}
+      # spec:
+      #   annotations:
+      #     dashboard: https://example.com/dashboard/1
+    general:
+      create: true
+      rules: {}
+    k8sContainerMemoryRss:
+      create: true
+      rules: {}
+    k8sContainerMemoryCache:
+      create: true
+      rules: {}
+    k8sContainerCpuUsageSecondsTotal:
+      create: true
+      rules: {}
+    k8sPodOwner:
+      create: true
+      rules: {}
+    k8sContainerResource:
+      create: true
+      rules: {}
+    k8sContainerMemoryWorkingSetBytes:
+      create: true
+      rules: {}
+    k8sContainerMemorySwap:
+      create: true
+      rules: {}
+    kubeApiserver:
+      create: true
+      extraCondition: .Values.kubeApiServer.enabled
+      rules: {}
+    kubeApiserverAvailability:
+      create: true
+      extraCondition: .Values.kubeApiServer.enabled
+      rules: {}
+    kubeApiserverBurnrate:
+      create: true
+      extraCondition: .Values.kubeApiServer.enabled
+      rules: {}
+    kubeApiserverHistogram:
+      create: true
+      extraCondition: .Values.kubeApiServer.enabled
+      rules: {}
+    kubeApiserverSlos:
+      create: true
+      extraCondition: .Values.kubeApiServer.enabled
+      rules: {}
+    kubelet:
+      create: true
+      extraCondition: .Values.kubelet.enabled
+      rules: {}
+      targetNamespace: ".*"
+    kubePrometheusGeneral:
+      create: true
+      rules: {}
+    kubePrometheusNodeRecording:
+      create: true
+      rules: {}
+    kubernetesApps:
+      create: true
+      rules: {}
+      targetNamespace: ".*"
+    kubernetesResources:
+      create: true
+      rules: {}
+    kubernetesStorage:
+      create: true
+      rules: {}
+      targetNamespace: ".*"
+    kubernetesSystem:
+      create: true
+      rules: {}
+    kubernetesSystemKubelet:
+      create: true
+      rules: {}
+    kubernetesSystemApiserver:
+      create: true
+      rules: {}
+    kubernetesSystemControllerManager:
+      create: true
+      extraCondition: .Values.kubeControllerManager.enabled
+      rules: {}
+    kubeScheduler:
+      create: true
+      extraCondition: .Values.kubeScheduler.enabled
+      rules: {}
+    kubernetesSystemScheduler:
+      create: true
+      extraCondition: .Values.kubeScheduler.enabled
+      rules: {}
+    kubeStateMetrics:
+      create: true
+      rules: {}
+    nodeNetwork:
+      create: true
+      rules: {}
+    node:
+      create: true
+      rules: {}
+    vmagent:
+      create: true
+      rules: {}
+    vmsingle:
+      create: true
+      rules: {}
+    vmcluster:
+      create: true
+      rules: {}
+    vmHealth:
+      create: true
+      rules: {}
+    alertmanager:
+      create: true
+      rules: {}
 
   # -- Runbook url prefix for default rules
   runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
@@ -68,19 +209,10 @@ defaultRules:
   # Disabled VMRules
   disabled: {}
 
-  ## Reduce app namespace alert scope
-  appNamespacesTarget: ".*"
-
   # -- Labels for default rules
   labels: {}
   # -- Annotations for default rules
   annotations: {}
-
-  # -- Additional labels for PrometheusRule alerts
-  additionalRuleLabels: {}
-
-  # -- Optional HTTP URL parameters added to each rule request
-  params: {}
 
 ## -- Create default dashboards
 defaultDashboardsEnabled: true
