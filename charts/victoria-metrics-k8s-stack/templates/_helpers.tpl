@@ -268,3 +268,59 @@ VictoriaMetrics Datasource
       jsonData: {{ toYaml .Values.grafana.sidecar.datasources.jsonData | nindent 8 }}
 {{- end }}
 {{- end }}
+
+{{/*
+VMRule name
+*/}}
+{{- define "victoria-metrics-k8s-stack.rulegroup.name" -}}
+{{- $id := include "victoria-metrics-k8s-stack.rulegroup.id" . -}}
+{{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) $id }}
+{{- end -}}
+
+{{/*
+VMRule annotations
+*/}}
+{{- define "victoria-metrics-k8s-stack.rulegroup.annotations" -}}
+{{- with .Values.defaultRules.annotations }}
+{{ toYaml . }}
+{{- end }}
+{{- end }}
+
+{{/*
+VMRule labels
+*/}}
+{{- define "victoria-metrics-k8s-stack.rulegroup.labels" -}}
+app: {{ include "victoria-metrics-k8s-stack.name" . }}
+{{ include "victoria-metrics-k8s-stack.labels" . }}
+{{- with .Values.defaultRules.labels }}
+{{ toYaml . }}
+{{- end }}
+{{- end }}
+
+{{/*
+VMRule key
+*/}}
+{{- define "victoria-metrics-k8s-stack.rulegroup.key" -}}
+{{ without (regexSplit "[-_.]" .name -1) "exporter" "rules" | join "-" | camelcase | untitle }}
+{{- end -}}
+
+{{/* 
+VMRule ID
+*/}}
+{{- define "victoria-metrics-k8s-stack.rulegroup.id" -}}
+{{ .name | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+{{- end -}}
+
+{{/*
+VMAlertmanager name
+*/}}
+{{- define "victoria-metrics-k8s-stack.alertmanager.name" -}}
+{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}
+{{- end -}}
+
+{{/*
+VMRule conditions
+*/}}
+{{- define "victoria-metrics-k8s-stack.rulegroup.condition" -}}
+{{ printf "{{ %s }}" (dig "extraCondition" "true" .) }}
+{{- end -}}
