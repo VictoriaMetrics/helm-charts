@@ -1,0 +1,92 @@
+{{- /*
+Generated from 'vmoperator' group from https://raw.githubusercontent.com/VictoriaMetrics/operator/master/config/alerting/vmoperator-rules.yaml
+Do not change in-place! In order to change this file first read following link:
+https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
+*/ -}}
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.vmoperator }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "vmoperator" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}
+{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+{{- if .Values.defaultRules.labels }}
+{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+{{- if .Values.defaultRules.params }}
+  - params:
+{{ toYaml .Values.defaultRules.params | indent 6 }}
+{{ indent 3 "" }}
+{{- else }}
+  -
+{{- end }} name: vmoperator
+    rules:
+{{- if not (.Values.defaultRules.disabled.LogErrors | default false) }}
+    - alert: LogErrors
+      annotations:
+        dashboard: '{{`{{`}} $externalURL {{`}}`}}/d/1H179hunk/victoriametrics-operator?ds={{`{{`}} $labels.dc {{`}}`}}&orgId=1&viewPanel=16'
+        description: 'Operator has too many errors at logs: {{`{{`}} $value{{`}}`}}, check operator logs'
+        summary: 'Too many errors at logs of operator: {{`{{`}} $value{{`}}`}}'
+      expr: sum(rate(operator_log_messages_total{level="error", job=~".*((victoria.*)|vm)-?operator"}[5m])) > 0
+      for: 15m
+      labels:
+        severity: high
+        show_at: dashboard
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.ReconcileErrors | default false) }}
+    - alert: ReconcileErrors
+      annotations:
+        dashboard: '{{`{{`}} $externalURL {{`}}`}}/d/1H179hunk/victoriametrics-operator?ds={{`{{`}} $labels.dc {{`}}`}}&orgId=1&viewPanel=10'
+        description: 'Operator cannot parse response from k8s api server, possible bug: {{`{{`}} $value {{`}}`}}, check operator logs'
+        summary: 'Too many errors at reconcile loop of operator: {{`{{`}} $value{{`}}`}}'
+      expr: sum(rate(controller_runtime_reconcile_errors_total{job=~".*((victoria.*)|vm)-?operator"}[5m])) > 0
+      for: 10m
+      labels:
+        severity: high
+        show_at: dashboard
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.HighQueueDepth | default false) }}
+    - alert: HighQueueDepth
+      annotations:
+        dashboard: '{{`{{`}} $externalURL {{`}}`}}/d/1H179hunk/victoriametrics-operator?ds={{`{{`}} $labels.dc {{`}}`}}&orgId=1&viewPanel=20'
+        description: 'Operator cannot handle reconciliation load for controller: `{{`{{`}}- $labels.name {{`}}`}}`, current depth: {{`{{`}} $value {{`}}`}}'
+        summary: 'Too many `{{`{{`}}- $labels.name {{`}}`}}` in queue: {{`{{`}} $value {{`}}`}}'
+      expr: (sum(workqueue_depth{job=~".*((victoria.*)|vm)-?operator"}) by (name)) > 10
+      for: 15m
+      labels:
+        severity: high
+        show_at: dashboard
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
+{{- if not (.Values.defaultRules.disabled.BadObjects | default false) }}
+    - alert: BadObjects
+      annotations:
+        dashboard: '{{`{{`}} $externalURL {{`}}`}}/d/1H179hunk/victoriametrics-operator?ds={{`{{`}} $labels.dc {{`}}`}}&orgId=1'
+        description: Operator got incorrect resources in controller {{`{{`}} $labels.controller {{`}}`}}, check operator logs
+        summary: Incorrect `{{`{{`}} $labels.controller {{`}}`}}` resources in the cluster
+      expr: (sum(operator_controller_bad_objects_count{job=~".*((victoria.*)|vm)-?operator"}) by (controller)) > 0
+      for: 15m
+      labels:
+        severity: high
+        show_at: dashboard
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
+{{- end }}
