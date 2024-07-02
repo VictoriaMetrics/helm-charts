@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.23.4
+
+**Release date:** 2024-07-02
+
+![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Add `extraObjects` to allow deploying additional resources with the chart release.
 
 ## 0.23.3

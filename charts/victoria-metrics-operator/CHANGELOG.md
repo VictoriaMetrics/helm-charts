@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.32.3
+
+**Release date:** 2024-07-02
+
+![AppVersion: v0.45.0](https://img.shields.io/static/v1?label=AppVersion&message=v0.45.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - use bitnami/kubectl image for cleanup instead of deprecated gcr.io/google_containers/hyperkube
 
 ## 0.32.2
