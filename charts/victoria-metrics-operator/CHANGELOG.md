@@ -2,7 +2,10 @@
 
 ## Next release
 
-- TODO
+- breaking change: operator uses different entrypoint, remove `command` entrypoint
+- breaking change: operator uses new flag for leader election `leader-elect`
+- removes podsecurity policy. It's longer supported by kubernetes
+- updates operator to v0.46.0 release
 
 ## 0.32.3
 
@@ -119,7 +122,7 @@
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
 - clean up vmauth as well when uninstall chart with `cleanupCRD: true`, since it also has `finalizers`.
-- sync new crd VMScrapeConfig from operator, see detail in https://docs.victoriametrics.com/operator/api/#vmscrapeconfig.
+- sync new crd VMScrapeConfig from operator, see detail in <https://docs.victoriametrics.com/operator/api/#vmscrapeconfig>.
 
 ## 0.29.5
 
@@ -164,7 +167,6 @@
 ![AppVersion: 0.42.1](https://img.shields.io/static/v1?label=AppVersion&message=0.42.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-
 - bump version of VM operator to [0.42.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.42.1)
 
 ## 0.29.0
@@ -175,7 +177,6 @@
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
 - bump version of VM operator to [0.42.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.42.0)
-
 
 ## 0.28.1
 
@@ -339,11 +340,11 @@
 ![AppVersion: 0.36.0](https://img.shields.io/static/v1?label=AppVersion&message=0.36.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-* Added `topologySpreadConstraints` for the operator + a small refactoring (#611)
-* Fix vm operator appVersion (#589)
-* Fixes operator doc description
-* Add `cleanupCRD` option to clean up vm cr resources when uninstalling (#593)
-* Bump operator version to [v0.36.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.36.0)
+- Added `topologySpreadConstraints` for the operator + a small refactoring (#611)
+- Fix vm operator appVersion (#589)
+- Fixes operator doc description
+- Add `cleanupCRD` option to clean up vm cr resources when uninstalling (#593)
+- Bump operator version to [v0.36.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.36.0)
 
 ## 0.24.1
 
@@ -352,7 +353,7 @@
 ![AppVersion: 0.35.](https://img.shields.io/static/v1?label=AppVersion&message=0.35.&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-* operator release v0.35.1
+- operator release v0.35.1
 
 ## 0.24.0
 
@@ -361,8 +362,8 @@
 ![AppVersion: 0.35.0](https://img.shields.io/static/v1?label=AppVersion&message=0.35.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-* updates operator for v0.35.0
-* updates for v1.91.1 release
+- updates operator for v0.35.0
+- updates for v1.91.1 release
 
 ## 0.23.1
 
@@ -371,7 +372,7 @@
 ![AppVersion: 0.34.1](https://img.shields.io/static/v1?label=AppVersion&message=0.34.1&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-* updates operator for v0.34.1 version
+- updates operator for v0.34.1 version
 
 ## 0.23.0
 
@@ -380,5 +381,5 @@
 ![AppVersion: 0.34.0](https://img.shields.io/static/v1?label=AppVersion&message=0.34.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-* bump operator version
-* feat(operator): add PodDisruptionBudget (#546)
+- bump operator version
+- feat(operator): add PodDisruptionBudget (#546)
