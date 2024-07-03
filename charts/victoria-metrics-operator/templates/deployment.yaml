@@ -83,13 +83,11 @@ spec:
             - name: VM_PROMETHEUSCONVERTERADDARGOCDIGNOREANNOTATIONS
               value: "true"
             {{- end }}
-            - name: VM_PSPAUTOCREATEENABLED
-              value: {{ .Values.operator.psp_auto_creation_enabled | quote }}
             - name: VM_ENABLEDPROMETHEUSCONVERTEROWNERREFERENCES
               value: {{.Values.operator.enable_converter_ownership | quote}}
           args:
             - --zap-log-level={{ .Values.logLevel }}
-            - --enable-leader-election
+            - --leader-elect
             {{- if .Values.admissionWebhooks.enabled }}
             - --webhook.enable=true
             {{- end }}
@@ -102,8 +100,6 @@ spec:
             - --{{ $key }}={{ $value }}
             {{- end }}
             {{- end }}
-          command:
-            - manager
           ports:
             - containerPort: 8080
               name: http
