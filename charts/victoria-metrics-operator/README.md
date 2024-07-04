@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
- ![Version: 0.32.3](https://img.shields.io/badge/Version-0.32.3-informational?style=flat-square)
+ ![Version: 0.33.1](https://img.shields.io/badge/Version-0.33.1-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-operator)
 
 Victoria Metrics Operator
@@ -172,7 +172,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | operator.disable_prometheus_converter | bool | `false` | By default, operator converts prometheus-operator objects. |
 | operator.enable_converter_ownership | bool | `false` | Enables ownership reference for converted prometheus-operator objects, it will remove corresponding victoria-metrics objects in case of deletion prometheus one. |
 | operator.prometheus_converter_add_argocd_ignore_annotations | bool | `false` | Compare-options and sync-options for prometheus objects converted by operator for properly use with ArgoCD |
-| operator.psp_auto_creation_enabled | bool | `false` | By default, operator doesn't create psp for its objects. |
 | operator.useCustomConfigReloader | bool | `false` | Enables custom config-reloader, bundled with operator. It should reduce  vmagent and vmauth config sync-time and make it predictable. |
 | podDisruptionBudget.enabled | bool | `false` |  |
 | podDisruptionBudget.labels | object | `{}` |  |
@@ -181,7 +180,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.aggregatedClusterRoles | object | `{"enabled":true,"labels":{"admin":{"rbac.authorization.k8s.io/aggregate-to-admin":"true"},"view":{"rbac.authorization.k8s.io/aggregate-to-view":"true"}}}` | create aggregated clusterRoles for CRD readonly and admin permissions |
 | rbac.aggregatedClusterRoles.labels | object | `{"admin":{"rbac.authorization.k8s.io/aggregate-to-admin":"true"},"view":{"rbac.authorization.k8s.io/aggregate-to-view":"true"}}` | labels attached to according clusterRole |
 | rbac.create | bool | `true` | Specifies whether the RBAC resources should be created |
-| rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` | Resource object |
 | securityContext | object | `{}` |  |
