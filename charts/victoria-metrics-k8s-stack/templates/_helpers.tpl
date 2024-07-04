@@ -119,7 +119,11 @@ remoteWrite:
 {{- end }}
 remoteRead: {{ include "victoria-metrics-k8s-stack.vmReadEndpoint" . | nindent 2 }}
 datasource: {{ include "victoria-metrics-k8s-stack.vmReadEndpoint" . | nindent 2 }}
-{{- if .Values.alertmanager.enabled }}
+{{- if .Values.vmalert.additionalNotifierConfigs }}
+notifierConfigRef:
+    name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmalert-additional-notifier" | trimSuffix "-" }}
+    key: notifier-configs.yaml
+{{- else if .Values.alertmanager.enabled }}
 {{- $alertManagerReplicas := .Values.alertmanager.spec.replicaCount | default 1 }}
 notifiers:
     {{- range $n := until (int $alertManagerReplicas) }}

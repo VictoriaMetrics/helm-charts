@@ -533,6 +533,16 @@ vmalert:
     #   {{- end }}
     # template_2.tmpl: ""
 
+  ## additionalNotifierConfigs allows to configure static notifiers, discover notifiers via Consul and DNS,
+  ## see specification in https://docs.victoriametrics.com/vmalert/#notifier-configuration-file.
+  ## This configuration will be created as separate secret and mounted to vmalert pod.
+  additionalNotifierConfigs: {}
+    # dns_sd_configs:
+    #   - names:
+    #       - my.domain.com
+    #     type: 'A'
+    #     port: 9093
+
   ingress:
     enabled: false
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
