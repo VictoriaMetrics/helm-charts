@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.33.2
+
+**Release date:** 2024-07-04
+
+![AppVersion: v0.46.2](https://img.shields.io/static/v1?label=AppVersion&message=v0.46.2&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - breaking change: operator uses different entrypoint, remove `command` entrypoint
 - breaking change: operator uses new flag for leader election `leader-elect`
 - removes podsecurity policy. It's longer supported by kubernetes
