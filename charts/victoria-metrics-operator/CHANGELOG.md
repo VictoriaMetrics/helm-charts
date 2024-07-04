@@ -2,7 +2,10 @@
 
 ## Next release
 
-- TODO
+- breaking change: operator uses different entrypoint, remove `command` entrypoint
+- breaking change: operator uses new flag for leader election `leader-elect`
+- removes podsecurity policy. It's longer supported by kubernetes
+- updates operator to [v0.46.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.46.2) release
 
 ## 0.33.1
 
