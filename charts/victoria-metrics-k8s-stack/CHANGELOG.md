@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Support configuring vmalert `-notifier.config` with `.Values.vmalert.additionalNotifierConfigs`.
 
 ## 0.23.4
 
