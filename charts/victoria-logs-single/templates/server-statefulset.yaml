@@ -148,7 +148,9 @@ spec:
         {{- end }}
   {{- if and .Values.server.persistentVolume.enabled (not .Values.server.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: server-volume
         {{- if .Values.server.persistentVolume.annotations }}
         annotations:

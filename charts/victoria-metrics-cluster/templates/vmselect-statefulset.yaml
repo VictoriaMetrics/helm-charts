@@ -161,7 +161,9 @@ spec:
       {{- include "chart.license.volume" . | nindent 8 }}
   {{- if .Values.vmselect.persistentVolume.enabled }}
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: cache-volume
         {{- if .Values.vmselect.persistentVolume.annotations }}
         annotations:
