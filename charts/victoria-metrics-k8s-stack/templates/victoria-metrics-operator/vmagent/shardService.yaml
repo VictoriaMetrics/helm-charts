@@ -1,9 +1,10 @@
-{{- $shardCountStr := .Values.vmagent.spec.shardCount }}
-{{- $shardCount := int $shardCountStr | default 0 }}
-{{- $servicePort := 8429 -}}
-{{- $serviceName := printf "%s-%s" "vmagent" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
-{{- if and (gt $shardCount 0) (not (eq (typeOf $shardCountStr) "string")) }}
-  {{- range $i := until $shardCount }}
+{{- if .Values.vmagent.spec.shardCount }}
+  {{- $shardCountStr := .Values.vmagent.spec.shardCount }}
+  {{- $shardCount := int $shardCountStr | default 0 }}
+  {{- $servicePort := 8429 -}}
+  {{- $serviceName := printf "%s-%s" "vmagent" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
+  {{- if and (gt $shardCount 0) (not (eq (typeOf $shardCountStr) "string")) }}
+    {{- range $i := until $shardCount }}
 ---
 apiVersion: v1
 kind: Service
@@ -20,6 +21,6 @@ spec:
     - protocol: TCP
       port: {{ $servicePort }}
       targetPort: {{ $servicePort }}
+    {{- end }}
   {{- end }}
 {{- end }}
-
