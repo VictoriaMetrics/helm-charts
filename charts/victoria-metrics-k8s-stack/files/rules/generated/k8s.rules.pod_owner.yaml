@@ -1,6 +1,8 @@
+condition: '{{ true }}'
 name: k8s.rules.pod_owner
 rules:
-- expr: |-
+- condition: '{{ true }}'
+  expr: |-
     max by (cluster, namespace, workload, pod) (
       label_replace(
         label_replace(
@@ -17,7 +19,8 @@ rules:
   labels:
     workload_type: deployment
   record: namespace_workload_pod:kube_pod_owner:relabel
-- expr: |-
+- condition: '{{ true }}'
+  expr: |-
     max by (cluster, namespace, workload, pod) (
       label_replace(
         kube_pod_owner{job="kube-state-metrics", owner_kind="DaemonSet"},
@@ -27,7 +30,8 @@ rules:
   labels:
     workload_type: daemonset
   record: namespace_workload_pod:kube_pod_owner:relabel
-- expr: |-
+- condition: '{{ true }}'
+  expr: |-
     max by (cluster, namespace, workload, pod) (
       label_replace(
         kube_pod_owner{job="kube-state-metrics", owner_kind="StatefulSet"},
@@ -37,7 +41,8 @@ rules:
   labels:
     workload_type: statefulset
   record: namespace_workload_pod:kube_pod_owner:relabel
-- expr: |-
+- condition: '{{ true }}'
+  expr: |-
     max by (cluster, namespace, workload, pod) (
       label_replace(
         kube_pod_owner{job="kube-state-metrics", owner_kind="Job"},

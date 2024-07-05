@@ -1,3 +1,4 @@
+condition: '{{ .Values.kubeScheduler.enabled }}'
 name: kubernetes-system-scheduler
 rules:
 - alert: KubeSchedulerDown
@@ -5,6 +6,7 @@ rules:
     description: 'KubeScheduler has disappeared from Prometheus target discovery.'
     runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubeschedulerdown'
     summary: 'Target disappeared from Prometheus target discovery.'
+  condition: '{{ .Values.kubeScheduler.enabled }}'
   expr: absent(up{job="kube-scheduler"} == 1)
   for: 15m
   labels:

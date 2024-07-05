@@ -1,6 +1,8 @@
+condition: '{{ true }}'
 name: k8s.rules.container_cpu_usage_seconds_total
 rules:
-- expr: |-
+- condition: '{{ true }}'
+  expr: |-
     sum by (cluster, namespace, pod, container) (
       irate(container_cpu_usage_seconds_total{job="kubelet", metrics_path="/metrics/cadvisor", image!=""}[5m])
     ) * on (cluster, namespace, pod) group_left(node) topk by (cluster, namespace, pod) (

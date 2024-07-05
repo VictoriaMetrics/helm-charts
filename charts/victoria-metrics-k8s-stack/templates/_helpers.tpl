@@ -317,10 +317,3 @@ VMAlertmanager name
 {{- define "victoria-metrics-k8s-stack.alertmanager.name" -}}
 {{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}
 {{- end -}}
-
-{{/*
-VMRule conditions
-*/}}
-{{- define "victoria-metrics-k8s-stack.rulegroup.condition" -}}
-{{ printf "{{ %s }}" (dig "extraCondition" "true" .) }}
-{{- end -}}

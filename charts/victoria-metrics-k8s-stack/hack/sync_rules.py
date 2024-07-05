@@ -41,6 +41,33 @@ rules = [
     'https://etcd.io/docs/v3.5/op-guide/etcd3_alert.rules.yml',
 ]
 
+# Additional conditions map
+condition_map = {
+    'etcd': '.Values.kubeEtcd.enabled',
+    'kube-apiserver-availability.rules': '.Values.kubeApiServer.enabled',
+    'kube-apiserver-burnrate.rules': '.Values.kubeApiServer.enabled',
+    'kube-apiserver-histogram.rules': '.Values.kubeApiServer.enabled',
+    'kube-apiserver-slos': '.Values.kubeApiServer.enabled',
+    'kube-apiserver.rules': '.Values.kubeApiServer.enabled',
+    'kube-scheduler.rules': '.Values.kubeScheduler.enabled',
+    'kubelet.rules': '.Values.kubelet.enabled',
+    'kubernetes-system-controller-manager': '.Values.kubeControllerManager.enabled',
+    'kubernetes-system-scheduler': '.Values.kubeScheduler.enabled'
+}
+
+alert_condition_map = {
+    'KubeAPIDown': '.Values.kubeApiServer.enabled',  # there are more alerts which are left enabled, because they'll never fire without metrics
+    'KubeControllerManagerDown': '.Values.kubeControllerManager.enabled',
+    'KubeSchedulerDown': '.Values.kubeScheduler.enabled',
+    'KubeStateMetricsDown': ' (index .Values "kube-state-metrics" "enabled")',  # there are more alerts which are left enabled, because they'll never fire without metrics
+    'KubeletDown': '.Values.kubelet.enabled',  # there are more alerts which are left enabled, because they'll never fire without metrics
+    'PrometheusOperatorDown': '.Values.prometheusOperator.enabled',
+    'NodeExporterDown': '.Values.nodeExporter.enabled',
+    'CoreDNSDown': '.Values.kubeDns.enabled',
+    'AlertmanagerDown': '.Values.alertmanager.enabled',
+    'KubeProxyDown': '.Values.kubeProxy.enabled',
+}
+
 skip_list = [
     # "kube-prometheus-general.rules",
     # "kube-prometheus-node-recording.rules"
@@ -65,7 +92,7 @@ replacement_map = {
         'replacement': '{{ index .Values.grafana.ingress.hosts 0 }}',
         'init': ''},
     'job="alertmanager-main"': {
-        'replacement': 'job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}',
+        'replacement': 'job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}"',
     },
     'namespace="monitoring"': {
         'replacement': 'namespace="{{ .Release.Namespace }}"',
@@ -85,6 +112,10 @@ def fix_expr(rules):
      due to yaml import specifics;
      convert multiline expressions to literal style, |-"""
     for rule in rules:
+        rule['condition'] = "{{ true }}"
+        if 'alert' in rule:
+            if rule['alert'] in alert_condition_map:
+                rule['condition'] = "{{ %(condition)s }}" % {"condition": alert_condition_map[rule['alert']]}
         rule['expr'] = rule['expr'].rstrip()
         if '\n' in rule['expr']:
             rule['expr'] = literal(rule['expr'])
@@ -104,7 +135,9 @@ def yaml_dump(struct):
 def write_group_to_file(group, url, destination):
     fix_expr(group['rules'])
     group_name = group['name']
-
+    group["condition"] = "{{ true }}"
+    if group_name in condition_map:
+        group["condition"] = "{{ %(condition)s }}" % {"condition": condition_map[group_name]}
     # prepare rules string representation
     rules = yaml_dump(group)
     # add replacements of custom variables and include their initialisation in case it's needed

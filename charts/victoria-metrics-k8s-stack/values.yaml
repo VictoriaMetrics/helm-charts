@@ -37,54 +37,34 @@ serviceAccount:
 defaultRules:
   create: true
 
-  # -- Common properties for PrometheusRule alert's groups
+  # -- Common properties for VMRule groups
   group:
     spec:
 
       # -- Optional HTTP URL parameters added to each rule request
       params: {}
 
-  # -- Common properties for PrometheusRule alert's rules
+  # -- Common properties for VMRules
   rule:
     spec:
 
-      # -- Additional labels for PrometheusRule alerts
+      # -- Additional labels for VMRule alerts
       labels: {}
+        # severity: critical
 
-      # -- Additional annotations for PrometheusRule alerts
+      # -- Additional annotations for VMRule alerts
       annotations: {}
 
   # -- Per rule properties
-  rules:
+  rules: {}
     # CPUThrottlingHigh:
     #   spec:
     #     for: 15m
     #     labels:
     #       severity: critical
-    KubeAPIDown:
-      extraCondition: .Values.kubeApiServer.enabled
-    KubeControllerManagerDown:
-      extraCondition: .Values.kubeControllerManager.enabled
-    KubeSchedulerDown:
-      extraCondition: .Values.kubeScheduler.enabled
-    KubeStateMetricsDown:
-      extraCondition: (index .Values "kube-state-metrics" "enabled")
-    KubeletDown:
-      extraCondition: .Values.kubelet.enabled
-    PrometheusOperatorDown:
-      extraCondition: .Values.prometheusOperator.enabled
-    NodeExporterDown:
-      extraCondition: .Values.nodeExporter.enabled
-    CoreDNSDown:
-      extraCondition: .Values.kubeDns.enabled
-    AlertmanagerDown:
-      extraCondition: .Values.alertmanager.enabled
-    KubeProxyDown:
-      extraCondition: .Values.kubeProxy.enabled
   groups:
     etcd:
       create: true
-      extraCondition: .Values.kubeEtcd.enabled
 
       # -- Common properties for all rules in a group
       rules: {}
@@ -117,29 +97,22 @@ defaultRules:
       rules: {}
     kubeApiserver:
       create: true
-      extraCondition: .Values.kubeApiServer.enabled
       rules: {}
     kubeApiserverAvailability:
       create: true
-      extraCondition: .Values.kubeApiServer.enabled
       rules: {}
     kubeApiserverBurnrate:
       create: true
-      extraCondition: .Values.kubeApiServer.enabled
       rules: {}
     kubeApiserverHistogram:
       create: true
-      extraCondition: .Values.kubeApiServer.enabled
       rules: {}
     kubeApiserverSlos:
       create: true
-      extraCondition: .Values.kubeApiServer.enabled
       rules: {}
     kubelet:
       create: true
-      extraCondition: .Values.kubelet.enabled
       rules: {}
-      targetNamespace: ".*"
     kubePrometheusGeneral:
       create: true
       rules: {}
@@ -168,15 +141,12 @@ defaultRules:
       rules: {}
     kubernetesSystemControllerManager:
       create: true
-      extraCondition: .Values.kubeControllerManager.enabled
       rules: {}
     kubeScheduler:
       create: true
-      extraCondition: .Values.kubeScheduler.enabled
       rules: {}
     kubernetesSystemScheduler:
       create: true
-      extraCondition: .Values.kubeScheduler.enabled
       rules: {}
     kubeStateMetrics:
       create: true

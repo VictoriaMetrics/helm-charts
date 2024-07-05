@@ -1,6 +1,8 @@
+condition: '{{ true }}'
 name: k8s.rules.container_memory_working_set_bytes
 rules:
-- expr: |-
+- condition: '{{ true }}'
+  expr: |-
     container_memory_working_set_bytes{job="kubelet", metrics_path="/metrics/cadvisor", image!=""}
     * on (cluster, namespace, pod) group_left(node) topk by(cluster, namespace, pod) (1,
       max by(cluster, namespace, pod, node) (kube_pod_info{node!=""})

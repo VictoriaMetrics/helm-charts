@@ -308,12 +308,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.annotations | object | `{}` | Annotations for default rules |
 | defaultRules.create | bool | `true` |  |
 | defaultRules.disabled | object | `{}` |  |
-| defaultRules.group | object | `{"spec":{"params":{}}}` | Common properties for PrometheusRule alert's groups |
+| defaultRules.group | object | `{"spec":{"params":{}}}` | Common properties for VMRule groups |
 | defaultRules.group.spec.params | object | `{}` | Optional HTTP URL parameters added to each rule request |
 | defaultRules.groups.alertmanager.create | bool | `true` |  |
 | defaultRules.groups.alertmanager.rules | object | `{}` |  |
 | defaultRules.groups.etcd.create | bool | `true` |  |
-| defaultRules.groups.etcd.extraCondition | string | `".Values.kubeEtcd.enabled"` |  |
 | defaultRules.groups.etcd.rules | object | `{}` | Common properties for all rules in a group |
 | defaultRules.groups.general.create | bool | `true` |  |
 | defaultRules.groups.general.rules | object | `{}` |  |
@@ -332,33 +331,25 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.groups.k8sPodOwner.create | bool | `true` |  |
 | defaultRules.groups.k8sPodOwner.rules | object | `{}` |  |
 | defaultRules.groups.kubeApiserver.create | bool | `true` |  |
-| defaultRules.groups.kubeApiserver.extraCondition | string | `".Values.kubeApiServer.enabled"` |  |
 | defaultRules.groups.kubeApiserver.rules | object | `{}` |  |
 | defaultRules.groups.kubeApiserverAvailability.create | bool | `true` |  |
-| defaultRules.groups.kubeApiserverAvailability.extraCondition | string | `".Values.kubeApiServer.enabled"` |  |
 | defaultRules.groups.kubeApiserverAvailability.rules | object | `{}` |  |
 | defaultRules.groups.kubeApiserverBurnrate.create | bool | `true` |  |
-| defaultRules.groups.kubeApiserverBurnrate.extraCondition | string | `".Values.kubeApiServer.enabled"` |  |
 | defaultRules.groups.kubeApiserverBurnrate.rules | object | `{}` |  |
 | defaultRules.groups.kubeApiserverHistogram.create | bool | `true` |  |
-| defaultRules.groups.kubeApiserverHistogram.extraCondition | string | `".Values.kubeApiServer.enabled"` |  |
 | defaultRules.groups.kubeApiserverHistogram.rules | object | `{}` |  |
 | defaultRules.groups.kubeApiserverSlos.create | bool | `true` |  |
-| defaultRules.groups.kubeApiserverSlos.extraCondition | string | `".Values.kubeApiServer.enabled"` |  |
 | defaultRules.groups.kubeApiserverSlos.rules | object | `{}` |  |
 | defaultRules.groups.kubePrometheusGeneral.create | bool | `true` |  |
 | defaultRules.groups.kubePrometheusGeneral.rules | object | `{}` |  |
 | defaultRules.groups.kubePrometheusNodeRecording.create | bool | `true` |  |
 | defaultRules.groups.kubePrometheusNodeRecording.rules | object | `{}` |  |
 | defaultRules.groups.kubeScheduler.create | bool | `true` |  |
-| defaultRules.groups.kubeScheduler.extraCondition | string | `".Values.kubeScheduler.enabled"` |  |
 | defaultRules.groups.kubeScheduler.rules | object | `{}` |  |
 | defaultRules.groups.kubeStateMetrics.create | bool | `true` |  |
 | defaultRules.groups.kubeStateMetrics.rules | object | `{}` |  |
 | defaultRules.groups.kubelet.create | bool | `true` |  |
-| defaultRules.groups.kubelet.extraCondition | string | `".Values.kubelet.enabled"` |  |
 | defaultRules.groups.kubelet.rules | object | `{}` |  |
-| defaultRules.groups.kubelet.targetNamespace | string | `".*"` |  |
 | defaultRules.groups.kubernetesApps.create | bool | `true` |  |
 | defaultRules.groups.kubernetesApps.rules | object | `{}` |  |
 | defaultRules.groups.kubernetesApps.targetNamespace | string | `".*"` |  |
@@ -372,12 +363,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.groups.kubernetesSystemApiserver.create | bool | `true` |  |
 | defaultRules.groups.kubernetesSystemApiserver.rules | object | `{}` |  |
 | defaultRules.groups.kubernetesSystemControllerManager.create | bool | `true` |  |
-| defaultRules.groups.kubernetesSystemControllerManager.extraCondition | string | `".Values.kubeControllerManager.enabled"` |  |
 | defaultRules.groups.kubernetesSystemControllerManager.rules | object | `{}` |  |
 | defaultRules.groups.kubernetesSystemKubelet.create | bool | `true` |  |
 | defaultRules.groups.kubernetesSystemKubelet.rules | object | `{}` |  |
 | defaultRules.groups.kubernetesSystemScheduler.create | bool | `true` |  |
-| defaultRules.groups.kubernetesSystemScheduler.extraCondition | string | `".Values.kubeScheduler.enabled"` |  |
 | defaultRules.groups.kubernetesSystemScheduler.rules | object | `{}` |  |
 | defaultRules.groups.node.create | bool | `true` |  |
 | defaultRules.groups.node.rules | object | `{}` |  |
@@ -392,10 +381,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.groups.vmsingle.create | bool | `true` |  |
 | defaultRules.groups.vmsingle.rules | object | `{}` |  |
 | defaultRules.labels | object | `{}` | Labels for default rules |
-| defaultRules.rule | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for PrometheusRule alert's rules |
-| defaultRules.rule.spec.annotations | object | `{}` | Additional annotations for PrometheusRule alerts |
-| defaultRules.rule.spec.labels | object | `{}` | Additional labels for PrometheusRule alerts |
-| defaultRules.rules | object | `{"AlertmanagerDown":{"extraCondition":".Values.alertmanager.enabled"},"CoreDNSDown":{"extraCondition":".Values.kubeDns.enabled"},"KubeAPIDown":{"extraCondition":".Values.kubeApiServer.enabled"},"KubeControllerManagerDown":{"extraCondition":".Values.kubeControllerManager.enabled"},"KubeProxyDown":{"extraCondition":".Values.kubeProxy.enabled"},"KubeSchedulerDown":{"extraCondition":".Values.kubeScheduler.enabled"},"KubeStateMetricsDown":{"extraCondition":"(index .Values \"kube-state-metrics\" \"enabled\")"},"KubeletDown":{"extraCondition":".Values.kubelet.enabled"},"NodeExporterDown":{"extraCondition":".Values.nodeExporter.enabled"},"PrometheusOperatorDown":{"extraCondition":".Values.prometheusOperator.enabled"}}` | Per rule properties |
+| defaultRules.rule | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for VMRules |
+| defaultRules.rule.spec.annotations | object | `{}` | Additional annotations for VMRule alerts |
+| defaultRules.rule.spec.labels | object | `{}` | Additional labels for VMRule alerts |
+| defaultRules.rules | object | `{}` | Per rule properties |
 | defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
 | experimentalDashboardsEnabled | bool | `true` |  |
 | externalVM.read.url | string | `""` |  |
