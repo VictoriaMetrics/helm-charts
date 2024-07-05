@@ -1,13 +1,13 @@
-{{- if .Values.VerticalPodAutoscaler.enabled }}
+{{- if .Values.server.VerticalPodAutoscaler.enabled }}
 apiVersion: autoscaling.k8s.io/v1
 kind: VerticalPodAutoscaler
 metadata:
   name: {{ include "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
-  {{- if .Values.VerticalPodAutoscaler.recommenders }}
+  {{- if .Values.server.VerticalPodAutoscaler.recommenders }}
   recommenders:
-    {{- range .Values.VerticalPodAutoscaler.recommenders }}
+    {{- range .Values.server.VerticalPodAutoscaler.recommenders }}
     - name: {{ . }}
     {{- end -}}
   {{- end -}}
@@ -15,12 +15,12 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "chart.fullname" . }}
-  {{- if .Values.VerticalPodAutoscaler.updatePolicy }}
+  {{- if .Values.server.VerticalPodAutoscaler.updatePolicy }}
   updatePolicy:
-    {{ toYaml .Values.VerticalPodAutoscaler.updatePolicy | nindent 4 }}
+    {{ toYaml .Values.server.VerticalPodAutoscaler.updatePolicy | nindent 4 }}
   {{- end -}}
-  {{- if .Values.VerticalPodAutoscaler.resourcePolicy }}
+  {{- if .Values.server.VerticalPodAutoscaler.resourcePolicy }}
   resourcePolicy:
-    {{ toYaml .Values.VerticalPodAutoscaler.resourcePolicy | nindent 4 }}
+    {{ toYaml .Values.server.VerticalPodAutoscaler.resourcePolicy | nindent 4 }}
   {{- end }}
 {{- end }}
