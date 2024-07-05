@@ -2,23 +2,23 @@
 apiVersion: autoscaling.k8s.io/v1
 kind: VerticalPodAutoscaler
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ include "vmalert.server.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
   {{- if .Values.server.VerticalPodAutoscaler.recommenders }}
   recommenders:
     {{- range .Values.server.VerticalPodAutoscaler.recommenders }}
     - name: {{ . }}
-    {{- end -}}
-  {{- end -}}
+    {{- end }}
+  {{- end }}
   targetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "chart.fullname" . }}
+    name: {{ include "vmalert.server.fullname" . }}
   {{- if .Values.server.VerticalPodAutoscaler.updatePolicy }}
   updatePolicy:
     {{ toYaml .Values.server.VerticalPodAutoscaler.updatePolicy | nindent 4 }}
-  {{- end -}}
+  {{- end }}
   {{- if .Values.server.VerticalPodAutoscaler.resourcePolicy }}
   resourcePolicy:
     {{ toYaml .Values.server.VerticalPodAutoscaler.resourcePolicy | nindent 4 }}
