@@ -226,7 +226,9 @@ spec:
         {{- include "chart.license.volume" . | nindent 8 }}
   {{- if and .Values.vmstorage.persistentVolume.enabled (not .Values.vmstorage.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: {{ .Values.vmstorage.persistentVolume.name }}
         {{- if .Values.vmstorage.persistentVolume.annotations }}
         annotations:

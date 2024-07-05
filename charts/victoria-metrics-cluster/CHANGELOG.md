@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- add missing API version and kind for volumeClaimTemplates, see [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1092).
 
 ## 0.11.19
 

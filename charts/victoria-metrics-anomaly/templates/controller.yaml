@@ -106,7 +106,9 @@ spec:
       {{- end }}
 {{- if and .Values.persistentVolume.enabled (not .Values.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: models-dump
         {{- if .Values.persistentVolume.annotations }}
         annotations:

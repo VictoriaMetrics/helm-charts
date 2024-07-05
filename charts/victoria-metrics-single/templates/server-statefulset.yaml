@@ -259,7 +259,9 @@ spec:
         {{- include "victoria-metrics.license.volume" . | nindent 8 }}
   {{- if and .Values.server.persistentVolume.enabled (not .Values.server.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: server-volume
         {{- if .Values.server.persistentVolume.annotations }}
         annotations:
