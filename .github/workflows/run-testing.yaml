@@ -13,7 +13,7 @@ on:
       - '**.md'
 
 env:
-  HELM_VERSION: 3.11.3
+  HELM_VERSION: 3.15.1
 
 jobs:
   get-changed-charts:
@@ -23,13 +23,13 @@ jobs:
       charts: ${{ steps.charts-diff.outputs.charts }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Run changed-files with dir_names
         id: changed-charts
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v44
         with:
           files: |
             charts/**
@@ -55,12 +55,12 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Install Kubernetes tools
-        uses: yokawasa/action-setup-kube-tools@v0.9.2
+        uses: yokawasa/action-setup-kube-tools@v0.11.1
         with:
           setup-tools: |
             helmv3
@@ -68,7 +68,7 @@ jobs:
           helm: "${{ env.HELM_VERSION }}"
           kubectl: "${{ matrix.k8s_version }}"
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
