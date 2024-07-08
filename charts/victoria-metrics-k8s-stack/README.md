@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.23.5](https://img.shields.io/badge/Version-0.23.5-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.23.6](https://img.shields.io/badge/Version-0.23.6-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -305,37 +305,86 @@ Change the values according to the need of the environment in ``victoria-metrics
 | coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}],"jobLabel":"jobLabel"}}` | Component scraping coreDns. Use either this or kubeDns |
 | crds.enabled | bool | `true` |  |
 | defaultDashboardsEnabled | bool | `true` |  |
-| defaultRules.additionalRuleLabels | object | `{}` | Additional labels for PrometheusRule alerts |
 | defaultRules.annotations | object | `{}` | Annotations for default rules |
-| defaultRules.appNamespacesTarget | string | `".*"` |  |
 | defaultRules.create | bool | `true` |  |
 | defaultRules.disabled | object | `{}` |  |
+| defaultRules.group | object | `{"spec":{"params":{}}}` | Common properties for VMRule groups |
+| defaultRules.group.spec.params | object | `{}` | Optional HTTP URL parameters added to each rule request |
+| defaultRules.groups.alertmanager.create | bool | `true` |  |
+| defaultRules.groups.alertmanager.rules | object | `{}` |  |
+| defaultRules.groups.etcd.create | bool | `true` |  |
+| defaultRules.groups.etcd.rules | object | `{}` | Common properties for all rules in a group |
+| defaultRules.groups.general.create | bool | `true` |  |
+| defaultRules.groups.general.rules | object | `{}` |  |
+| defaultRules.groups.k8sContainerCpuUsageSecondsTotal.create | bool | `true` |  |
+| defaultRules.groups.k8sContainerCpuUsageSecondsTotal.rules | object | `{}` |  |
+| defaultRules.groups.k8sContainerMemoryCache.create | bool | `true` |  |
+| defaultRules.groups.k8sContainerMemoryCache.rules | object | `{}` |  |
+| defaultRules.groups.k8sContainerMemoryRss.create | bool | `true` |  |
+| defaultRules.groups.k8sContainerMemoryRss.rules | object | `{}` |  |
+| defaultRules.groups.k8sContainerMemorySwap.create | bool | `true` |  |
+| defaultRules.groups.k8sContainerMemorySwap.rules | object | `{}` |  |
+| defaultRules.groups.k8sContainerMemoryWorkingSetBytes.create | bool | `true` |  |
+| defaultRules.groups.k8sContainerMemoryWorkingSetBytes.rules | object | `{}` |  |
+| defaultRules.groups.k8sContainerResource.create | bool | `true` |  |
+| defaultRules.groups.k8sContainerResource.rules | object | `{}` |  |
+| defaultRules.groups.k8sPodOwner.create | bool | `true` |  |
+| defaultRules.groups.k8sPodOwner.rules | object | `{}` |  |
+| defaultRules.groups.kubeApiserver.create | bool | `true` |  |
+| defaultRules.groups.kubeApiserver.rules | object | `{}` |  |
+| defaultRules.groups.kubeApiserverAvailability.create | bool | `true` |  |
+| defaultRules.groups.kubeApiserverAvailability.rules | object | `{}` |  |
+| defaultRules.groups.kubeApiserverBurnrate.create | bool | `true` |  |
+| defaultRules.groups.kubeApiserverBurnrate.rules | object | `{}` |  |
+| defaultRules.groups.kubeApiserverHistogram.create | bool | `true` |  |
+| defaultRules.groups.kubeApiserverHistogram.rules | object | `{}` |  |
+| defaultRules.groups.kubeApiserverSlos.create | bool | `true` |  |
+| defaultRules.groups.kubeApiserverSlos.rules | object | `{}` |  |
+| defaultRules.groups.kubePrometheusGeneral.create | bool | `true` |  |
+| defaultRules.groups.kubePrometheusGeneral.rules | object | `{}` |  |
+| defaultRules.groups.kubePrometheusNodeRecording.create | bool | `true` |  |
+| defaultRules.groups.kubePrometheusNodeRecording.rules | object | `{}` |  |
+| defaultRules.groups.kubeScheduler.create | bool | `true` |  |
+| defaultRules.groups.kubeScheduler.rules | object | `{}` |  |
+| defaultRules.groups.kubeStateMetrics.create | bool | `true` |  |
+| defaultRules.groups.kubeStateMetrics.rules | object | `{}` |  |
+| defaultRules.groups.kubelet.create | bool | `true` |  |
+| defaultRules.groups.kubelet.rules | object | `{}` |  |
+| defaultRules.groups.kubernetesApps.create | bool | `true` |  |
+| defaultRules.groups.kubernetesApps.rules | object | `{}` |  |
+| defaultRules.groups.kubernetesApps.targetNamespace | string | `".*"` |  |
+| defaultRules.groups.kubernetesResources.create | bool | `true` |  |
+| defaultRules.groups.kubernetesResources.rules | object | `{}` |  |
+| defaultRules.groups.kubernetesStorage.create | bool | `true` |  |
+| defaultRules.groups.kubernetesStorage.rules | object | `{}` |  |
+| defaultRules.groups.kubernetesStorage.targetNamespace | string | `".*"` |  |
+| defaultRules.groups.kubernetesSystem.create | bool | `true` |  |
+| defaultRules.groups.kubernetesSystem.rules | object | `{}` |  |
+| defaultRules.groups.kubernetesSystemApiserver.create | bool | `true` |  |
+| defaultRules.groups.kubernetesSystemApiserver.rules | object | `{}` |  |
+| defaultRules.groups.kubernetesSystemControllerManager.create | bool | `true` |  |
+| defaultRules.groups.kubernetesSystemControllerManager.rules | object | `{}` |  |
+| defaultRules.groups.kubernetesSystemKubelet.create | bool | `true` |  |
+| defaultRules.groups.kubernetesSystemKubelet.rules | object | `{}` |  |
+| defaultRules.groups.kubernetesSystemScheduler.create | bool | `true` |  |
+| defaultRules.groups.kubernetesSystemScheduler.rules | object | `{}` |  |
+| defaultRules.groups.node.create | bool | `true` |  |
+| defaultRules.groups.node.rules | object | `{}` |  |
+| defaultRules.groups.nodeNetwork.create | bool | `true` |  |
+| defaultRules.groups.nodeNetwork.rules | object | `{}` |  |
+| defaultRules.groups.vmHealth.create | bool | `true` |  |
+| defaultRules.groups.vmHealth.rules | object | `{}` |  |
+| defaultRules.groups.vmagent.create | bool | `true` |  |
+| defaultRules.groups.vmagent.rules | object | `{}` |  |
+| defaultRules.groups.vmcluster.create | bool | `true` |  |
+| defaultRules.groups.vmcluster.rules | object | `{}` |  |
+| defaultRules.groups.vmsingle.create | bool | `true` |  |
+| defaultRules.groups.vmsingle.rules | object | `{}` |  |
 | defaultRules.labels | object | `{}` | Labels for default rules |
-| defaultRules.params | object | `{}` | Optional HTTP URL parameters added to each rule request |
-| defaultRules.rules.alertmanager | bool | `true` |  |
-| defaultRules.rules.etcd | bool | `true` |  |
-| defaultRules.rules.general | bool | `true` |  |
-| defaultRules.rules.k8s | bool | `true` |  |
-| defaultRules.rules.kubeApiserver | bool | `true` |  |
-| defaultRules.rules.kubeApiserverAvailability | bool | `true` |  |
-| defaultRules.rules.kubeApiserverBurnrate | bool | `true` |  |
-| defaultRules.rules.kubeApiserverHistogram | bool | `true` |  |
-| defaultRules.rules.kubeApiserverSlos | bool | `true` |  |
-| defaultRules.rules.kubePrometheusGeneral | bool | `true` |  |
-| defaultRules.rules.kubePrometheusNodeRecording | bool | `true` |  |
-| defaultRules.rules.kubeScheduler | bool | `true` |  |
-| defaultRules.rules.kubeStateMetrics | bool | `true` |  |
-| defaultRules.rules.kubelet | bool | `true` |  |
-| defaultRules.rules.kubernetesApps | bool | `true` |  |
-| defaultRules.rules.kubernetesResources | bool | `true` |  |
-| defaultRules.rules.kubernetesStorage | bool | `true` |  |
-| defaultRules.rules.kubernetesSystem | bool | `true` |  |
-| defaultRules.rules.network | bool | `true` |  |
-| defaultRules.rules.node | bool | `true` |  |
-| defaultRules.rules.vmagent | bool | `true` |  |
-| defaultRules.rules.vmcluster | bool | `true` |  |
-| defaultRules.rules.vmhealth | bool | `true` |  |
-| defaultRules.rules.vmsingle | bool | `true` |  |
+| defaultRules.rule | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for VMRules |
+| defaultRules.rule.spec.annotations | object | `{}` | Additional annotations for VMRule alerts |
+| defaultRules.rule.spec.labels | object | `{}` | Additional labels for VMRule alerts |
+| defaultRules.rules | object | `{}` | Per rule properties |
 | defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
 | experimentalDashboardsEnabled | bool | `true` |  |
 | externalVM.read.url | string | `""` |  |
