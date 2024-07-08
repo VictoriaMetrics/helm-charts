@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 1.3.1
+
+**Release date:** 2024-07-08
+
+![AppVersion: v1.13.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.13.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - add missing API version and kind for volumeClaimTemplates, see [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1092).
 
 ## 1.3.0
