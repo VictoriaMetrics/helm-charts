@@ -10,8 +10,8 @@ on:
         - development
 
 env:
-  HELM_VERSION: 3.9.2
-  YQ_VERSION: 4.35.1
+  HELM_VERSION: 3.15.1
+  YQ_VERSION: 4.44.2
 
 jobs:
   release:
@@ -23,13 +23,13 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.VM_BOT_GH_TOKEN }}
 
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v5
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.VM_BOT_GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.VM_BOT_PASSPHRASE }}
@@ -37,7 +37,7 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Install tools
-        uses: yokawasa/action-setup-kube-tools@v0.9.2
+        uses: yokawasa/action-setup-kube-tools@v0.11.1
         with:
           setup-tools: |
             helmv3
@@ -81,7 +81,7 @@ jobs:
                 export CHANGELOG=$changelog
           
                 # ArtifactHub annotation in Chart.yaml file
-                yq -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | "\(.changes)\n")' $CHART_FILE
+                yq -M -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | "\(.changes)\n")' $CHART_FILE
           
                 # Create release notes
                 echo "# Release notes for version $CHART_VERSION" > $RN_FILE
@@ -117,7 +117,7 @@ jobs:
           done
 
       - name: Release
-        uses: helm/chart-releaser-action@v1.5.0
+        uses: helm/chart-releaser-action@v1.6.0
         env:
           CR_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
         with:
