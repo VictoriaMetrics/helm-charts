@@ -36,31 +36,142 @@ serviceAccount:
 ## -- Create default rules for monitoring the cluster
 defaultRules:
   create: true
-  rules:
-    etcd: true
-    general: true
-    k8s: true
-    kubeApiserver: true
-    kubeApiserverAvailability: true
-    kubeApiserverBurnrate: true
-    kubeApiserverHistogram: true
-    kubeApiserverSlos: true
-    kubelet: true
-    kubePrometheusGeneral: true
-    kubePrometheusNodeRecording: true
-    kubernetesApps: true
-    kubernetesResources: true
-    kubernetesStorage: true
-    kubernetesSystem: true
-    kubeScheduler: true
-    kubeStateMetrics: true
-    network: true
-    node: true
-    vmagent: true
-    vmsingle: true
-    vmcluster: true
-    vmhealth: true
-    alertmanager: true
+
+  # -- Common properties for VMRule groups
+  group:
+    spec:
+
+      # -- Optional HTTP URL parameters added to each rule request
+      params: {}
+
+  # -- Common properties for VMRules
+  rule:
+    spec:
+
+      # -- Additional labels for VMRule alerts
+      labels: {}
+        # severity: critical
+
+      # -- Additional annotations for VMRule alerts
+      annotations: {}
+
+  # -- Per rule properties
+  rules: {}
+    # CPUThrottlingHigh:
+    #   spec:
+    #     for: 15m
+    #     labels:
+    #       severity: critical
+  groups:
+    etcd:
+      create: true
+
+      # -- Common properties for all rules in a group
+      rules: {}
+      # spec:
+      #   annotations:
+      #     dashboard: https://example.com/dashboard/1
+    general:
+      create: true
+      rules: {}
+    k8sContainerMemoryRss:
+      create: true
+      rules: {}
+    k8sContainerMemoryCache:
+      create: true
+      rules: {}
+    k8sContainerCpuUsageSecondsTotal:
+      create: true
+      rules: {}
+    k8sPodOwner:
+      create: true
+      rules: {}
+    k8sContainerResource:
+      create: true
+      rules: {}
+    k8sContainerMemoryWorkingSetBytes:
+      create: true
+      rules: {}
+    k8sContainerMemorySwap:
+      create: true
+      rules: {}
+    kubeApiserver:
+      create: true
+      rules: {}
+    kubeApiserverAvailability:
+      create: true
+      rules: {}
+    kubeApiserverBurnrate:
+      create: true
+      rules: {}
+    kubeApiserverHistogram:
+      create: true
+      rules: {}
+    kubeApiserverSlos:
+      create: true
+      rules: {}
+    kubelet:
+      create: true
+      rules: {}
+    kubePrometheusGeneral:
+      create: true
+      rules: {}
+    kubePrometheusNodeRecording:
+      create: true
+      rules: {}
+    kubernetesApps:
+      create: true
+      rules: {}
+      targetNamespace: ".*"
+    kubernetesResources:
+      create: true
+      rules: {}
+    kubernetesStorage:
+      create: true
+      rules: {}
+      targetNamespace: ".*"
+    kubernetesSystem:
+      create: true
+      rules: {}
+    kubernetesSystemKubelet:
+      create: true
+      rules: {}
+    kubernetesSystemApiserver:
+      create: true
+      rules: {}
+    kubernetesSystemControllerManager:
+      create: true
+      rules: {}
+    kubeScheduler:
+      create: true
+      rules: {}
+    kubernetesSystemScheduler:
+      create: true
+      rules: {}
+    kubeStateMetrics:
+      create: true
+      rules: {}
+    nodeNetwork:
+      create: true
+      rules: {}
+    node:
+      create: true
+      rules: {}
+    vmagent:
+      create: true
+      rules: {}
+    vmsingle:
+      create: true
+      rules: {}
+    vmcluster:
+      create: true
+      rules: {}
+    vmHealth:
+      create: true
+      rules: {}
+    alertmanager:
+      create: true
+      rules: {}
 
   # -- Runbook url prefix for default rules
   runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
@@ -68,19 +179,10 @@ defaultRules:
   # Disabled VMRules
   disabled: {}
 
-  ## Reduce app namespace alert scope
-  appNamespacesTarget: ".*"
-
   # -- Labels for default rules
   labels: {}
   # -- Annotations for default rules
   annotations: {}
-
-  # -- Additional labels for PrometheusRule alerts
-  additionalRuleLabels: {}
-
-  # -- Optional HTTP URL parameters added to each rule request
-  params: {}
 
 ## -- Create default dashboards
 defaultDashboardsEnabled: true
