@@ -2,8 +2,7 @@
 
 ## Next release
 
-- first feature
-- second feature
+- TODO
 
 ## 0.33.3
 
