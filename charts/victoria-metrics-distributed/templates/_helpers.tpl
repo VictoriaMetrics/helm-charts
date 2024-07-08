@@ -82,7 +82,7 @@ Lists all the ingest vmauth addresss as remote write addresses for per zone vmag
 {{- define "per-zone-vmagent.remoteWriteAddr" -}}
 {{- range $zone := .Values.availabilityZones }}
 {{- if $zone.allowIngest }}
-{{ printf "- url: http://vmauth-%s:8427" ( $zone.vmauthIngest.name | default (printf "vmauth-write-balancer-%s" $zone.name ) ) | indent 2 }}
+{{ printf "- url: http://vmauth-%s:8427%s" ( $zone.vmauthIngest.name | default (printf "vmauth-write-balancer-%s" $zone.name ) ) ($zone.vmagent.writePath | default "") | indent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}
