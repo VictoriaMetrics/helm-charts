@@ -2,7 +2,7 @@
 
 ## Next release
 
-- fix vmalertmanager configuration when using `.VMAlertmanagerSpec.ConfigRawYaml`.
+- fix vmalertmanager configuration when using `.VMAlertmanagerSpec.ConfigRawYaml`. See [this pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1136).
 
 ## 0.24.1
 
