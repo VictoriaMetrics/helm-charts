@@ -187,7 +187,9 @@ Alermanager spec
 */}}
 {{- define "victoria-metrics-k8s-stack.alertmanagerSpec" -}}
 {{ omit .Values.alertmanager.spec  "configMaps" "configSecret" | toYaml }}
+{{- if not .Values.alertmanager.spec.configRawYaml }}
 configSecret: {{ .Values.alertmanager.spec.configSecret | default (printf "%s-alertmanager" (include "victoria-metrics-k8s-stack.fullname" .)) }}
+{{- end }}
 {{- if .Values.alertmanager.spec.configMaps }}
 configMaps:
 {{- range compact .Values.alertmanager.spec.configMaps }}
