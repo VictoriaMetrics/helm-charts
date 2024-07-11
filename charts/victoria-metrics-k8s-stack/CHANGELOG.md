@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix vmalertmanager configuration when using `.VMAlertmanagerSpec.ConfigRawYaml`.
 
 ## 0.24.1
 

@@ -1,5 +1,8 @@
 {{- if .Values.alertmanager.enabled }}
-{{- if not .Values.alertmanager.spec.configSecret }}
+{{- if and .Values.alertmanager.spec.configRawYaml .Values.alertmanager.config }}
+{{- fail "ERROR: Both .Values.alertmanager.spec.configRawYaml and .Values.alertmanager.config are set, but only one is allowed." }}
+{{- end }}
+{{- if and (not .Values.alertmanager.spec.configSecret) (not .Values.alertmanager.spec.configRawYaml) }}
 ---
 apiVersion: v1
 kind: Secret
