@@ -2,7 +2,7 @@
 
 ## Next release
 
-- fix default multitenancy mode, see https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy.
+- Breaking change: disable multitenancy mode by default, see how to enable it in https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy. See [this pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1137) for details.
 
 ## 0.1.1
 

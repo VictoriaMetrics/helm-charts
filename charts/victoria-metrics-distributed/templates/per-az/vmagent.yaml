@@ -35,14 +35,18 @@ spec:
 {{- toYaml $topologySpreadConstraints | nindent 2 }}
   remoteWrite:
 {{- default "{}" (include "per-zone-vmagent.remoteWriteAddr" $top) }}
-  remoteWriteSettings:
-    useMultiTenantMode: true
 {{- $spec := deepCopy $zone.vmagent.spec }}
 {{- $spec := unset $spec "nodeSelector" }}
 {{- $spec := unset $spec "affinity" }}
 {{- $spec := unset $spec "topologySpreadConstraints" }}
+{{- $spec := unset $spec "remoteWriteSettings" }}
 {{- if $spec }}
 {{- toYaml $spec | nindent 2 }}
+{{- end }}
+{{- if $.Values.enableMultitenancy }}
+  {{- $mergedSettings := merge (default (default dict) $zone.vmagent.spec.remoteWriteSettings) (dict "useMultiTenantMode" true) }}
+  remoteWriteSettings:
+    {{- toYaml $mergedSettings | nindent 4 }}
 {{- end }}
 {{- end }}
 {{- end }}
