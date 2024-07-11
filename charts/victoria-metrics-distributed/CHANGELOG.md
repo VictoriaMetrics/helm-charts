@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix default multitenancy mode, see https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy.
 
 ## 0.1.1
 
