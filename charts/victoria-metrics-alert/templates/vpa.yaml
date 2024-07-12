@@ -1,13 +1,13 @@
-{{- if .Values.server.VerticalPodAutoscaler.enabled }}
+{{- if and (.Capabilities.APIVersions.Has "autoscaling.k8s.io/v1") (.Values.server.verticalPodAutoscaler.enabled) }}
 apiVersion: autoscaling.k8s.io/v1
 kind: VerticalPodAutoscaler
 metadata:
   name: {{ include "vmalert.server.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
-  {{- if .Values.server.VerticalPodAutoscaler.recommenders }}
+  {{- if .Values.server.verticalPodAutoscaler.recommenders }}
   recommenders:
-    {{- range .Values.server.VerticalPodAutoscaler.recommenders }}
+    {{- range .Values.server.verticalPodAutoscaler.recommenders }}
     - name: {{ . }}
     {{- end }}
   {{- end }}
@@ -15,12 +15,12 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "vmalert.server.fullname" . }}
-  {{- if .Values.server.VerticalPodAutoscaler.updatePolicy }}
+  {{- if .Values.server.verticalPodAutoscaler.updatePolicy }}
   updatePolicy:
-    {{ toYaml .Values.server.VerticalPodAutoscaler.updatePolicy | nindent 4 }}
+    {{ toYaml .Values.server.verticalPodAutoscaler.updatePolicy | nindent 4 }}
   {{- end }}
-  {{- if .Values.server.VerticalPodAutoscaler.resourcePolicy }}
+  {{- if .Values.server.verticalPodAutoscaler.resourcePolicy }}
   resourcePolicy:
-    {{ toYaml .Values.server.VerticalPodAutoscaler.resourcePolicy | nindent 4 }}
+    {{ toYaml .Values.server.verticalPodAutoscaler.resourcePolicy | nindent 4 }}
   {{- end }}
 {{- end }}

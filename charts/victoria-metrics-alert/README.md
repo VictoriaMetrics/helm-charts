@@ -237,10 +237,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.strategy.rollingUpdate.maxUnavailable | string | `"25%"` |  |
 | server.strategy.type | string | `"RollingUpdate"` |  |
 | server.tolerations | list | `[]` |  |
-| server.VerticalPodAutoscaler.enabled | bool | `false` |  |
-| server.VerticalPodAutoscaler.recommenders | object | `{}` |  |
-| server.VerticalPodAutoscaler.updatePolicy | object | `{}` |  |
-| server.VerticalPodAutoscaler.resourcePolicy | object | `{}` |  |
+| server.verticalPodAutoscaler.enabled | bool | `false` |  |
+| server.verticalPodAutoscaler.recommenders | object | `{}` |  |
+| server.verticalPodAutoscaler.updatePolicy | object | `{}` |  |
+| server.verticalPodAutoscaler.resourcePolicy | object | `{}` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automountToken | bool | `true` |  |
 | serviceAccount.create | bool | `true` |  |
