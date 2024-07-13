@@ -58,7 +58,7 @@ spec:
             - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.server.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.server.persistentVolume.mountPath | quote}}
           {{- if .Values.server.scrape.enabled }}
-            - -promscrape.config=/scrapeconfig/scrape.yml
+            - --promscrape.config=/scrapeconfig/scrape.yml
           {{- end }}
           {{- range $key, $value := .Values.server.extraArgs }}
           {{- if kindIs "slice" $value }}

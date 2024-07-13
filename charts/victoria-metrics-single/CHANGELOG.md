@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix license flags templates, Thanks to @akatch for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1140).
 
 ## 0.9.23
 
