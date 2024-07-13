@@ -183,10 +183,10 @@ Return license flag if necessary.
 */}}
 {{- define "victoria-metrics.license.flag" -}}
 {{- if .Values.license.key -}}
--license={{ .Values.license.key }}
+--license={{ .Values.license.key }}
 {{- end }}
 {{- if and .Values.license.secret.name .Values.license.secret.key -}}
--licenseFile=/etc/vm-license-key/{{ .Values.license.secret.key }}
+--licenseFile=/etc/vm-license-key/{{ .Values.license.secret.key }}
 {{- end -}}
 {{- end -}}
 
@@ -226,7 +226,7 @@ Enforce license for vmbackupmanager
 {{- end -}}
 {{- end -}}
 
-{{/* 
+{{/*
 Return true if the detected platform is Openshift
 Usage:
 {{- include "common.compatibility.isOpenshift" . -}}
