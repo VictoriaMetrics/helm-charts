@@ -307,7 +307,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultDashboardsEnabled | bool | `true` |  |
 | defaultRules.annotations | object | `{}` | Annotations for default rules |
 | defaultRules.create | bool | `true` |  |
-| defaultRules.disabled | object | `{}` |  |
 | defaultRules.group | object | `{"spec":{"params":{}}}` | Common properties for VMRule groups |
 | defaultRules.group.spec.params | object | `{}` | Optional HTTP URL parameters added to each rule request |
 | defaultRules.groups.alertmanager.create | bool | `true` |  |
