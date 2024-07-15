@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for Setting up VMCluster on Multiple Availability Zones
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-distributed)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -71,7 +71,7 @@ And to avoid getting incomplete responses from `zone-eu-1` which gets recovered 
 
 ### How to use [multitenancy](https://docs.victoriametrics.com/cluster-victoriametrics/#multitenancy)?
 
-By default, all the data that written to `vmauth-global-write` belong to tenant `0`. To write data to different tenants, creating new tenant user in `vmauth-global-write`.    
+By default, all the data that written to `vmauth-global-write` belong to tenant `0`. To write data to different tenants, set `.Values.enableMultitenancy=true` and create new tenant users for `vmauth-global-write`.  
 For example, writing data to tenant `1088` with following steps:
 1. create tenant VMUser for vmauth `vmauth-global-write` to use:
 ```
@@ -214,6 +214,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | availabilityZones[1].topologySpreadConstraints | list | `[{"maxSkew":1,"topologyKey":"kubernetes.io/hostname","whenUnsatisfiable":"ScheduleAnyway"}]` | topologySpreadConstraints allows to customize the default topologySpreadConstraints. |
 | availabilityZones[1].vmagent | object | `{"annotations":{},"enabled":true,"name":"","spec":{}}` | vmagent only meant to proxy write requests to each az, doesn't support customized remote write address |
 | availabilityZones[1].vmcluster.spec | object | `{"replicationFactor":2,"retentionPeriod":"14","vminsert":{"extraArgs":{},"replicaCount":2,"resources":{}},"vmselect":{"extraArgs":{},"replicaCount":2,"resources":{}},"vmstorage":{"replicaCount":2,"resources":{},"storageDataPath":"/vm-data"}}` | spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api.html#vmclusterspec |
+| enableMultitenancy | bool | `false` | enable multitenancy mode see https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy |
 | extraVMAgent | object | `{"enabled":true,"spec":{"selectAllByDefault":true}}` | set up an extra vmagent to scrape all the scrape objects by default, and write data to above vmauth-global-ingest endpoint. |
 | fullnameOverride | string | `""` | overrides the chart's computed fullname. |
 | nameOverride | string | `"vm-distributed"` | overrides the chart's name |
