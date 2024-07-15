@@ -80,9 +80,13 @@ Create the name of the service account to use
 Lists all the ingest vmauth addresss as remote write addresses for per zone vmagent
 */}}
 {{- define "per-zone-vmagent.remoteWriteAddr" -}}
+{{- $multitenacySuffix := "/insert/0/prometheus/api/v1/write" }}
+{{- if .Values.enableMultitenancy }}
+  {{- $multitenacySuffix = "/insert/multitenant/prometheus/api/v1/write" }}
+{{- end }}
 {{- range $zone := .Values.availabilityZones }}
 {{- if $zone.allowIngest }}
-{{ printf "- url: http://vmauth-%s:8427" ( $zone.vmauthIngest.name | default (printf "vmauth-write-balancer-%s" $zone.name ) ) | indent 2 }}
+{{ printf "- url: http://vmauth-%s:8427%s" ( $zone.vmauthIngest.name | default (printf "vmauth-write-balancer-%s" $zone.name ) ) $multitenacySuffix | indent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}
