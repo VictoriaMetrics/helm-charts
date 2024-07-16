@@ -72,6 +72,12 @@ spec:
           ports:
             - name: web
               containerPort: 9093
+          {{- if .Values.alertmanager.envFrom }}
+          envFrom:
+            {{- with .Values.alertmanager.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           env:
             - name: POD_IP
               valueFrom:
