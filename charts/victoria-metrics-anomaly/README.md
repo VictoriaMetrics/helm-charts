@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 1.3.2](https://img.shields.io/badge/Version-1.3.2-informational?style=flat-square)
+![Version: 1.3.3](https://img.shields.io/badge/Version-1.3.3-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-anomaly)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
@@ -111,7 +111,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity configurations |
 | annotations | object | `{}` | Annotations to be added to the deployment |
-| config | object | `{"models":{"zscore_model":{"args":{},"class":"zscore"}},"preset":"","reader":{"class":"vm","datasource_url":"","queries":{},"sampling_period":"1m","tenant_id":""},"schedulers":{"1w_1m":{"class":"","fit_every":"","fit_window":"","infer_every":""}},"writer":{"class":"vm","datasource_url":"","tenant_id":""}}` | Full [vmanomaly config section](https://docs.victoriametrics.com/anomaly-detection/components/) |
+| config | object | `{"models":{"zscore_model":{"args":{},"class":"zscore"}},"preset":"","reader":{"class":"vm","datasource_url":"","queries":{},"sampling_period":"1m","tenant_id":""},"schedulers":{"1w_1m":{"class":"periodic","fit_every":"","fit_window":"","infer_every":""}},"writer":{"class":"vm","datasource_url":"","tenant_id":""}}` | Full [vmanomaly config section](https://docs.victoriametrics.com/anomaly-detection/components/) |
 | config.models | object | `{"zscore_model":{"args":{},"class":"zscore"}}` | [Models section](https://docs.victoriametrics.com/anomaly-detection/components/models/) |
 | config.models.zscore_model | object | `{"args":{},"class":"zscore"}` | Model alias |
 | config.models.zscore_model.args | object | `{}` | Arguments specific to [model](https://docs.victoriametrics.com/anomaly-detection/components/models/) |
@@ -123,8 +123,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.reader.queries | object | `{}` | Required. PromQL/MetricsQL query to select data in format: QUERY_ALIAS: "QUERY". As accepted by "/query_range?query=%s". |
 | config.reader.sampling_period | string | `"1m"` | Frequency of the points returned. Will be converted to "/query_range?step=%s" param (in seconds). **Required** since 1.9.0. |
 | config.reader.tenant_id | string | `""` | For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs |
-| config.schedulers | object | `{"1w_1m":{"class":"","fit_every":"","fit_window":"","infer_every":""}}` | [Scheduler section](https://docs.victoriametrics.com/anomaly-detection/components/scheduler/) |
-| config.schedulers.1w_1m.class | string | `""` | Scheduler class |
+| config.schedulers | object | `{"1w_1m":{"class":"periodic","fit_every":"","fit_window":"","infer_every":""}}` | [Scheduler section](https://docs.victoriametrics.com/anomaly-detection/components/scheduler/) |
+| config.schedulers.1w_1m.class | string | `"periodic"` | Scheduler class |
 | config.schedulers.1w_1m.fit_every | string | `""` | How often to completely retrain the models. If missing value of infer_every is used and retrain on every inference run. |
 | config.schedulers.1w_1m.fit_window | string | `""` | What time range to use for training the models. Must be at least 1 second. |
 | config.schedulers.1w_1m.infer_every | string | `""` | How often a model will write its conclusions on newly added data. Must be at least 1 second. |
