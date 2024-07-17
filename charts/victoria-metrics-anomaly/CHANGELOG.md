@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix default value for `.Values.config.schedulers.class`. 
 
 ## 1.3.2
 
