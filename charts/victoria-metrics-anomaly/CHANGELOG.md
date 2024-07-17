@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- changes made for vmanomaly [v1.13.2](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1132)
 
 ## 1.3.1
 
