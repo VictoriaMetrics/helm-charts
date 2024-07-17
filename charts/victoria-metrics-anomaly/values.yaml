@@ -127,22 +127,22 @@ config:
   # -- [Scheduler section](https://docs.victoriametrics.com/anomaly-detection/components/scheduler/)
   schedulers:
     # Scheduler alias
-    scheduler_periodic_1m:
+    1w_1m:
       # -- Scheduler class
-      class: "scheduler.periodic.PeriodicScheduler"
+      class: ""
       # -- How often to completely retrain the models. If missing value of infer_every is used and retrain on every inference run.
-      fit_every: "2h"
+      fit_every: ""
       # -- What time range to use for training the models. Must be at least 1 second.
-      fit_window: "14d"
+      fit_window: ""
       # -- How often a model will write its conclusions on newly added data. Must be at least 1 second.
-      infer_every: "1m"
+      infer_every: ""
 
   # -- [Models section](https://docs.victoriametrics.com/anomaly-detection/components/models/)
   models:
     # -- Model alias
-    prophet_model:
+    zscore_model:
       # -- Supported model classs by vmanomaly
-      class: "model.prophet.ProphetModel"
+      class: "zscore"
       # -- Inner model args (key-value pairs) accepted by
       # -- Arguments specific to [model](https://docs.victoriametrics.com/anomaly-detection/components/models/)
       args: {}
@@ -151,7 +151,7 @@ config:
   # -- [Reader section](https://docs.victoriametrics.com/anomaly-detection/components/reader/)
   reader:
     # -- Name of the class needed to enable reading from VictoriaMetrics or Prometheus. VmReader is the default option, if not specified.
-    class: "reader.vm.VmReader"
+    class: "vm"
     # -- Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/"
     datasource_url: ""
     # -- For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs
@@ -169,7 +169,7 @@ config:
   # -- [Writer section](https://docs.victoriametrics.com/anomaly-detection/components/writer/)
   writer:
     # -- Name of the class needed to enable writing to VictoriaMetrics or Prometheus. VmWriter is the default option, if not specified.
-    class: "writer.vm.VmWriter"
+    class: "vm"
     # -- Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/"
     datasource_url: ""
     # -- For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs
