@@ -2,7 +2,16 @@
 
 ## Next release
 
-- fix default value for `.Values.config.schedulers.class`. 
+- TODO
+
+## 1.3.3
+
+**Release date:** 2024-07-17
+
+![AppVersion: v1.13.2](https://img.shields.io/static/v1?label=AppVersion&message=v1.13.2&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- fix default value for `.Values.config.schedulers.class`.
 
 ## 1.3.2
 
