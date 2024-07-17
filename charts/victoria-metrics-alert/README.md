@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.9.9](https://img.shields.io/badge/Version-0.9.9-informational?style=flat-square)
+ ![Version: 0.9.10](https://img.shields.io/badge/Version-0.9.10-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -114,6 +114,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.config.route.repeat_interval | string | `"24h"` |  |
 | alertmanager.configMap | string | `""` |  |
 | alertmanager.enabled | bool | `false` |  |
+| alertmanager.envFrom | list | `[]` |  |
 | alertmanager.extraArgs | object | `{}` |  |
 | alertmanager.extraContainers | list | `[]` |  |
 | alertmanager.extraHostPathMounts | list | `[]` |  |
