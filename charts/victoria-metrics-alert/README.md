@@ -114,6 +114,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.config.route.repeat_interval | string | `"24h"` |  |
 | alertmanager.configMap | string | `""` |  |
 | alertmanager.enabled | bool | `false` |  |
+| alertmanager.envFrom | list | `[]` |  |
 | alertmanager.extraArgs | object | `{}` |  |
 | alertmanager.extraContainers | list | `[]` |  |
 | alertmanager.extraHostPathMounts | list | `[]` |  |
