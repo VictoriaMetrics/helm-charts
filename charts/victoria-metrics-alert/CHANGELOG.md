@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- add an option to provide additional environment variables for Alertmanager via `.Values.alertmanager.envFrom`.
 
 ## 0.9.9
 
