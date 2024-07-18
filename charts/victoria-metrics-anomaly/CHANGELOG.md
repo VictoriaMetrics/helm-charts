@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- leave empty `schedulers` and `models` section to fix aliases error
 
 ## 1.3.3
 
