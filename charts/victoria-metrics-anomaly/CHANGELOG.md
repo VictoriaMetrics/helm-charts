@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 1.3.4
+
+**Release date:** 2024-07-19
+
+![AppVersion: v1.13.3](https://img.shields.io/static/v1?label=AppVersion&message=v1.13.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - leave empty `schedulers` and `models` section to fix aliases error
 
 ## 1.3.3
