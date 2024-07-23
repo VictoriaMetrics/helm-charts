@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- support enabling VerticalPodAutoscaler for vmalert server, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1112) by @rakesh-von for details.
 
 ## 0.9.11
 
