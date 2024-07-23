@@ -241,6 +241,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.strategy.rollingUpdate.maxUnavailable | string | `"25%"` |  |
 | server.strategy.type | string | `"RollingUpdate"` |  |
 | server.tolerations | list | `[]` |  |
+| server.verticalPodAutoscaler | object | `{"enabled":false}` | Vertical Pod Autoscaler |
+| server.verticalPodAutoscaler.enabled | bool | `false` | Use VPA for vmalert |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automountToken | bool | `true` |  |
 | serviceAccount.create | bool | `true` |  |
