@@ -60,7 +60,7 @@ server:
     []
     #- configMapRef:
     #    name: special-config
-    
+
   # Readiness & Liveness probes
   probe:
     readiness:
@@ -279,6 +279,26 @@ server:
   config:
     alerts:
       groups: []
+
+  # -- Vertical Pod Autoscaler
+  verticalPodAutoscaler:
+    # -- Use VPA for vmalert
+    enabled: false
+    # recommenders:
+    #   - name: 'alternative'
+    # updatePolicy:
+    #   updateMode: "Auto"
+    #   minReplicas: 1
+    # resourcePolicy:
+    #   containerPolicies:
+    #     - containerName: '*'
+    #       minAllowed:
+    #         cpu: 100m
+    #         memory: 128Mi
+    #       maxAllowed:
+    #         cpu: 1
+    #         memory: 500Mi
+    #       controlledResources: ["cpu", "memory"]
 
 serviceMonitor:
   enabled: false
