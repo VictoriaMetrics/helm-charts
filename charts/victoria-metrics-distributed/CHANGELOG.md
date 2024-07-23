@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- bump version of VM components to [v1.102.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.102.0)
 
 ## 0.2.0
 
@@ -11,7 +11,7 @@
 ![AppVersion: v1.101.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.101.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-- Breaking change: disable multitenancy mode by default, see how to enable it in https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy. See [this pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1137) for details.
+- Breaking change: disable multitenancy mode by default, see how to enable it in <https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy>. See [this pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1137) for details.
 
 ## 0.1.1
 
