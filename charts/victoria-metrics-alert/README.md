@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.9.10](https://img.shields.io/badge/Version-0.9.10-informational?style=flat-square)
+ ![Version: 0.9.11](https://img.shields.io/badge/Version-0.9.11-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -241,10 +241,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.strategy.rollingUpdate.maxUnavailable | string | `"25%"` |  |
 | server.strategy.type | string | `"RollingUpdate"` |  |
 | server.tolerations | list | `[]` |  |
-| server.verticalPodAutoscaler.enabled | bool | `false` |  |
-| server.verticalPodAutoscaler.recommenders | object | `{}` |  |
-| server.verticalPodAutoscaler.updatePolicy | object | `{}` |  |
-| server.verticalPodAutoscaler.resourcePolicy | object | `{}` |  |
+| server.verticalPodAutoscaler | object | `{"enabled":false}` | Vertical Pod Autoscaler |
+| server.verticalPodAutoscaler.enabled | bool | `false` | Use VPA for vmalert |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automountToken | bool | `true` |  |
 | serviceAccount.create | bool | `true` |  |
