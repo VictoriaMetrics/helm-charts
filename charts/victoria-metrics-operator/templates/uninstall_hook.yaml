@@ -24,7 +24,7 @@ spec:
     {{- end }}
       containers:
         - name: kubectl
-          image: "{{ (index .Values "cleanupImage" "repository") }}:{{ (index .Values "cleanupImage" "tag" | default (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor)) }}"
+          image: "{{ (index .Values "cleanupImage" "repository") }}:{{ (index .Values "cleanupImage" "tag" | default (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor | replace "+" "")) }}"
           imagePullPolicy: "{{ (index .Values "cleanupImage" "pullPolicy") }}"
           resources:
             limits:
