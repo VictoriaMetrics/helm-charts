@@ -84,8 +84,8 @@ rules:
     summary: 'Alertmanager instances within the same cluster have different configurations.'
   condition: '{{ true }}'
   expr: |-
-    count by (namespace,service) (
-      count_values by (namespace,service) ("config_hash", alertmanager_config_hash{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"})
+    count by (namespace,service,cluster) (
+      count_values by (namespace,service,cluster) ("config_hash", alertmanager_config_hash{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"})
     )
     != 1
   for: 20m
