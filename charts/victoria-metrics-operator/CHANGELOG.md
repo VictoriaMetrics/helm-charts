@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix cleanup job image tag when `.Capabilities.KubeVersion.Minor` returns version with plus sign. See [this pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1169) by @dimaslv.
 
 ## 0.33.4
 
