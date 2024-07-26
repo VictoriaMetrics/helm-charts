@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Update dependencies: grafana -> 8.3.6.
 
 ## 0.24.3
 
