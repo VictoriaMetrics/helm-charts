@@ -303,7 +303,8 @@ app: {{ include "victoria-metrics-k8s-stack.name" . }}
 VMRule key
 */}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.key" -}}
-{{ .name | replace "node-exporter.rules" "node-records" | replace "node-exporter" "node-records" | regexSplit "[-_.]" -1 | without "exporter" "rules" | join "-" | camelcase | untitle }}
+{{- $fixedName := .name | replace "node-exporter.rules" "node-records" | replace "node-exporter" "node-records" -}}
+{{- without (regexSplit "[-_.]" $fixedName -1) "exporter" "rules" | join "-" | camelcase | untitle -}}
 {{- end -}}
 
 {{/* 
