@@ -95,7 +95,7 @@ spec:
           {{- end }}
           resources: {{ toYaml .Values.vmstorage.resources | nindent 12 }}
           volumeMounts:
-            - name: vmstorage-volume
+            - name: {{ .Values.vmstorage.persistentVolume.name }}
               mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
               subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
           {{- range .Values.vmstorage.extraHostPathMounts }}
@@ -170,7 +170,7 @@ spec:
             - name: manager-http
               containerPort: 8300
           volumeMounts:
-            - name: vmstorage-volume
+            - name: {{ .Values.vmstorage.persistentVolume.name }}
               mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
               subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
             {{- range .Values.vmstorage.vmbackupmanager.extraSecretMounts }}
