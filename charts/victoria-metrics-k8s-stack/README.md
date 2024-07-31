@@ -305,6 +305,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}],"jobLabel":"jobLabel"}}` | Component scraping coreDns. Use either this or kubeDns |
 | crds.enabled | bool | `true` |  |
 | defaultDashboardsEnabled | bool | `true` |  |
+| defaultRules.alerting | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for VMRules alerts |
+| defaultRules.alerting.spec.annotations | object | `{}` | Additional annotations for VMRule alerts |
+| defaultRules.alerting.spec.labels | object | `{}` | Additional labels for VMRule alerts |
 | defaultRules.annotations | object | `{}` | Annotations for default rules |
 | defaultRules.create | bool | `true` |  |
 | defaultRules.group | object | `{"spec":{"params":{}}}` | Common properties for VMRule groups |
@@ -380,9 +383,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.groups.vmsingle.create | bool | `true` |  |
 | defaultRules.groups.vmsingle.rules | object | `{}` |  |
 | defaultRules.labels | object | `{}` | Labels for default rules |
-| defaultRules.rule | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for VMRules |
-| defaultRules.rule.spec.annotations | object | `{}` | Additional annotations for VMRule alerts |
-| defaultRules.rule.spec.labels | object | `{}` | Additional labels for VMRule alerts |
+| defaultRules.recording | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for VMRules recording rules |
+| defaultRules.recording.spec.annotations | object | `{}` | Additional annotations for VMRule recording rules |
+| defaultRules.recording.spec.labels | object | `{}` | Additional labels for VMRule recording rules |
+| defaultRules.rule | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for all VMRules |
+| defaultRules.rule.spec.annotations | object | `{}` | Additional annotations for all VMRules |
+| defaultRules.rule.spec.labels | object | `{}` | Additional labels for all VMRules |
 | defaultRules.rules | object | `{}` | Per rule properties |
 | defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
 | experimentalDashboardsEnabled | bool | `true` |  |
