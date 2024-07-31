@@ -4,7 +4,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ ternary "RoleBinding" "ClusterRoleBinding" $namespaced }}
 metadata:
   name: {{ template "chart.fullname" . }}{{- ternary "" "-clusterrolebinding" $namespaced }}
-  {{- if not $namespaced }}
+  {{- if $namespaced }}
   namespace: {{ .Release.Namespace }}
   {{- end }}
   labels:
