@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.11.22
+
+**Release date:** 2024-07-31
+
+![AppVersion: v1.102.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - fix mount name for `vmstorage` when using `.Values.vmstorage.persistentVolume.name` to override PVC name. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1181) for the details. Thanks to @srinusanduri for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1182).
 
 ## 0.11.21
