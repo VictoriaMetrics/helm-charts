@@ -24,9 +24,6 @@ rules:
   verbs: ["get", "list", "watch"]
 - apiGroups: [""]
   resources:
-  - nodes
-  - nodes/proxy
-  - nodes/metrics
   - services
   - endpoints
   - pods
@@ -38,6 +35,12 @@ rules:
   - ingresses
   verbs: ["get", "list", "watch"]
 {{- if not $namespaced }}
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/proxy
+  - nodes/metrics
+  verbs: ["get", "list", "watch"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 {{- end }}

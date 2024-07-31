@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix possible template error when `.Values.rbac.namespaced=true`. Thanks to @guptaachin for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1179).
 
 ## 0.10.11
 
