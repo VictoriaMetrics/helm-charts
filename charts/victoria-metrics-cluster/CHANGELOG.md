@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix mount name for `vmstorage` when using `.Values.vmstorage.persistentVolume.name` to override PVC name. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1181) for the details. Thanks to @srinusanduri for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1182).
 
 ## 0.11.21
 
