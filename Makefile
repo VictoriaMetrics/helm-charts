@@ -1,8 +1,8 @@
 URL=https://victoriametrics.github.io/helm-charts/
 HELM_IMAGE = alpine/helm:3.12.3
-HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.11.0
-PYTHON_IMAGE = python:3.11.5-alpine3.18
-CT_IMAGE = quay.io/helmpack/chart-testing:v3.7.1
+HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.14.2
+PYTHON_IMAGE = python:3.12.4-alpine
+CT_IMAGE = quay.io/helmpack/chart-testing:v3.11.0
 KNOWN_TARGETS=helm
 HELM?=helm-docker
 CT?=ct-docker
@@ -155,7 +155,8 @@ gen-docs:
 sync-rules:
 	$(CONTAINER) run --rm \
 		$(CONTAINER_USER_OPTION) \
-		--volume "$(shell pwd)/charts/victoria-metrics-k8s-stack:/k8s-stack$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(PWD)/charts/victoria-metrics-k8s-stack:/k8s-stack$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(PWD)/.local:/.local" \
 		-w /k8s-stack/hack/ \
 		$(PYTHON_IMAGE) sh -c "\
 			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_rules.py \

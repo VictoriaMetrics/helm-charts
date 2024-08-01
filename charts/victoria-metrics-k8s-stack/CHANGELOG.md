@@ -3,6 +3,7 @@
 ## Next release
 
 - Update dependencies: grafana -> 8.3.6.
+- Added `.Values.defaultRules.alerting` and `.Values.defaultRules.recording` to setup common properties for all alerting an recording rules
 
 ## 0.24.3
 
