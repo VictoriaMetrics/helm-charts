@@ -81,7 +81,7 @@ jobs:
                 export CHANGELOG=$changelog
           
                 # ArtifactHub annotation in Chart.yaml file
-                yq -M -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | "\(.changes)\n")' $CHART_FILE
+                yq -M -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | .changes | split("\n") | .[] |= sub("^[\s]*-[\s]+", "") | to_yaml)' $CHART_FILE
           
                 # Create release notes
                 echo "# Release notes for version $CHART_VERSION" > $RN_FILE
