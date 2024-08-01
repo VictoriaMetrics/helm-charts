@@ -120,7 +120,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.affinity | object | `{}` | Pod affinity |
 | server.containerWorkingDir | string | `""` | Container workdir |
 | server.enabled | bool | `true` | Enable deployment of server component. Deployed as StatefulSet |
-| server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables |
 | server.envFrom | list | `[]` |  |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
