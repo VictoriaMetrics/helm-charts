@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.24.4
+
+**Release date:** 2024-08-01
+
+![AppVersion: v1.102.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Update dependencies: grafana -> 8.3.6.
 - Added `.Values.defaultRules.alerting` and `.Values.defaultRules.recording` to setup common properties for all alerting an recording rules
 
