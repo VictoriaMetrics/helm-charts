@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.10.12
+
+**Release date:** 2024-08-01
+
+![AppVersion: v1.102.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - fix possible template error when `.Values.rbac.namespaced=true`. Thanks to @guptaachin for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1179).
 
 ## 0.10.11
