@@ -100,7 +100,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | annotations | object | `{}` | Annotations to be added to the deployment |
 | config | string | `nil` | Config file content. |
 | containerWorkingDir | string | `"/"` |  |
-| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables |
 | envFrom | list | `[]` |  |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |

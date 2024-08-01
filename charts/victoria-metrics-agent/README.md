@@ -280,7 +280,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | containerWorkingDir | string | `"/"` |  |
 | deployment.enabled | bool | `true` |  |
 | deployment.strategy | object | `{}` |  |
-| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables |
 | envFrom | list | `[]` |  |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
