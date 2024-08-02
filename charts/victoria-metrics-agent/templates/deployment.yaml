@@ -14,7 +14,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+{{- if not .Values.horizontalPodAutoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+{{- end }}
   {{- with .Values.deployment.strategy }}
   strategy:
     {{- toYaml . | nindent 4 }}
@@ -43,13 +45,20 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ include "chart.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          {{- if .Values.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" $) | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}{{- with .Values.image.variant }}-{{ . }}{{- end }}"
           workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -promscrape.config=/config/scrape.yml
@@ -61,7 +70,16 @@ spec:
             - -remoteWrite.multitenantURL={{ . }}
           {{- end }}
           {{- range $key, $value := .Values.extraArgs }}
+          {{- if kindIs "slice" $value }}
+          {{- range $v := $value }}
+            - -{{ $key }}={{ $v }}
+          {{- end }}
+          {{- else }}
             - -{{ $key }}={{ $value }}
+          {{- end }}
+          {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -102,12 +120,22 @@ spec:
               protocol: UDP
               containerPort: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
           {{- end }}
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
           readinessProbe:
             httpGet:
+            {{- if index  .Values.extraArgs "http.pathPrefix" }}
+              path: {{ trimSuffix "/" (index .Values.extraArgs "http.pathPrefix") }}/health
+            {{- else }}
               path: /health
+            {{- end }}
               port: http
             initialDelaySeconds: 5
             periodSeconds: 15
@@ -131,6 +159,7 @@ spec:
           {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
         {{- with .Values.extraContainers }}
@@ -148,6 +177,17 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range $constraint := . }}
+      - {{ toYaml $constraint | nindent 8 | trim }}
+          {{- if not $constraint.labelSelector }}
+        labelSelector:
+          matchLabels:
+            {{- include "chart.selectorLabels" $ | nindent 12 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
       volumes:
         - name: tmpdata
       {{- if .Values.persistence.enabled }}
@@ -167,6 +207,7 @@ spec:
       {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "chart.license.volume" . | nindent 8 }}
     {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName }}
     {{- end }}

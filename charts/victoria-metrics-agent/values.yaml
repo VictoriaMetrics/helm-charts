@@ -1,7 +1,11 @@
 # Default values for victoria-metrics-agent.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+      
 replicaCount: 1
 
 # ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
@@ -30,6 +34,9 @@ statefulset:
 image:
   repository: victoriametrics/vmagent
   tag: "" # rewrites Chart.AppVersion
+  # Variant of the image to use.
+  # e.g. enterprise, scratch
+  variant: ""
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -88,7 +95,7 @@ extraArgs:
   # opentsdbHTTPListenAddr: ":4242"
   # opentsdbListenAddr: ":4242"
 
-# -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
+# -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
 env:
   []
   # - name: VM_remoteWrite_basicAuth_password
@@ -96,6 +103,11 @@ env:
   #     secretKeyRef:
   #       name: auth_secret
   #       key: password
+
+envFrom:
+  []
+  #- configMapRef:
+  #    name: special-config
 
 # extra Labels for Pods, Deployment and Statefulset
 extraLabels: {}
@@ -129,12 +141,17 @@ extraContainers: []
 #   - name: config-reloader
 #     image: reloader-image
 
+initContainers:
+  []
+  # - name: example
+  #   image: example-image
+
 podSecurityContext:
-  {}
+  enabled: true
   # fsGroup: 2000
 
 securityContext:
-  {}
+  enabled: true
   # capabilities:
   #   drop:
   #   - ALL
@@ -201,6 +218,11 @@ nodeSelector: {}
 
 tolerations: []
 
+topologySpreadConstraints: []
+  # - maxSkew: 1
+  #   topologyKey: topology.kubernetes.io/zone
+  #   whenUnsatisfiable: DoNotSchedule
+
 affinity: {}
 
 # vmagent scraping configuration:
@@ -218,6 +240,7 @@ serviceMonitor:
   extraLabels: {}
   annotations: {}
   relabelings: []
+  metricRelabelings: []
 #    interval: 15s
 #    scrapeTimeout: 5s
   # -- Commented. HTTP scheme to use for scraping.
@@ -237,6 +260,19 @@ persistence:
   existingClaim: ""
   # -- Bind Persistent Volume by labels. Must match all labels of targeted PV.
   matchLabels: {}
+
+# -- Horizontal Pod Autoscaling.
+# Note that it is not intended to be used for vmagents which perform scraping.
+# In order to scale scraping vmagents see: https://docs.victoriametrics.com/vmagent/#scraping-big-number-of-targets
+horizontalPodAutoscaling:
+  # -- Use HPA for vmagent
+  enabled: false
+  # -- Maximum replicas for HPA to use to to scale vmagent
+  maxReplicas: 10
+  # -- Minimum replicas for HPA to use to scale vmagent
+  minReplicas: 1
+  # -- Metric for HPA to use to scale vmagent
+  metrics: []
 
 config:
   global:
@@ -259,7 +295,7 @@ config:
       # well as HA API server deployments.
     - job_name: "kubernetes-apiservers"
       kubernetes_sd_configs:
-        - role: endpointslices
+        - role: endpoints
       # Default to scraping over https. If required, just disable this or change to
       # `http`.
       scheme: https
@@ -272,10 +308,10 @@ config:
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         # If your node certificates are self-signed or use a different CA to the
-        # master CA, then disable certificate verification below. Note that
+        # master CA, then you need to disable certificate verification. Note that
         # certificate verification is an integral part of a secure infrastructure
         # so this should only be disabled in a controlled environment. You can
-        # disable certificate verification by uncommenting the line below.
+        # enable certificate verification by commenting the line below.
         #
         insecure_skip_verify: true
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -304,10 +340,10 @@ config:
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         # If your node certificates are self-signed or use a different CA to the
-        # master CA, then disable certificate verification below. Note that
+        # master CA, then you need to disable certificate verification. Note that
         # certificate verification is an integral part of a secure infrastructure
         # so this should only be disabled in a controlled environment. You can
-        # disable certificate verification by uncommenting the line below.
+        # enable certificate verification by commenting the line below.
         #
         insecure_skip_verify: true
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -335,10 +371,10 @@ config:
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         # If your node certificates are self-signed or use a different CA to the
-        # master CA, then disable certificate verification below. Note that
+        # master CA, then you need to disable certificate verification. Note that
         # certificate verification is an integral part of a secure infrastructure
         # so this should only be disabled in a controlled environment. You can
-        # disable certificate verification by uncommenting the line below.
+        # enable certificate verification by commenting the line below.
         #
         insecure_skip_verify: true
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -358,7 +394,9 @@ config:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
-
+      # ignore timestamps of cadvisor's metrics by default
+      # more info here https://github.com/VictoriaMetrics/VictoriaMetrics/issues/4697#issuecomment-1656540535
+      honor_timestamps: false
     # Scrape config for service endpoints.
     #
     # The relabeling allows the actual service scrape endpoint to be configured
@@ -547,11 +585,6 @@ config:
           target_label: container
         - source_labels: [__meta_kubernetes_namespace]
           target_label: namespace
-        - source_labels: [__meta_kubernetes_service_name]
-          target_label: service
-        - source_labels: [__meta_kubernetes_service_name]
-          target_label: job
-          replacement: ${1}
         - source_labels: [__meta_kubernetes_pod_node_name]
           action: replace
           target_label: node
@@ -559,3 +592,23 @@ config:
 
 # -- Extra scrape configs that will be appended to `config`
 extraScrapeConfigs: []
+
+# Add extra specs dynamically to this chart
+extraObjects: []
+
+# -- Enterprise license key configuration for VictoriaMetrics enterprise.
+# Required only for VictoriaMetrics enterprise.
+# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# for more information, visit https://victoriametrics.com/products/enterprise/ .
+# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Supported starting from VictoriaMetrics v1.94.0
+license:
+  # -- License key
+  key: ""
+
+  # -- Use existing secret with license key
+  secret:
+    # -- Existing secret name
+    name: ""
+    # -- Key in secret with license key
+    key: ""

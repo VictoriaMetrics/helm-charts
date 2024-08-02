@@ -1,4 +1,5 @@
 {{- if .Values.vmstorage.enabled -}}
+{{ include "chart.vmbackupmanager.enforce_license" .}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -27,7 +28,7 @@ spec:
 {{ toYaml .Values.vmstorage.podAnnotations | indent 8 }}
     {{- end }}
       labels:
-        {{- include "victoria-metrics.vmstorage.labels" . | nindent 8 }}
+        {{- include "victoria-metrics.vmstorage.podLabels" . | nindent 8 }}
 {{- with .Values.vmstorage.extraLabels }}
 {{ toYaml . | indent 8 }}
 {{- end }}
@@ -45,26 +46,42 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vmstorage.name }}
-          image: "{{ .Values.vmstorage.image.repository }}:{{ .Values.vmstorage.image.tag }}"
+          image: "{{ .Values.vmstorage.image.repository }}:{{ default .Chart.AppVersion .Values.vmstorage.image.tag }}{{- with .Values.vmstorage.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
           {{- if .Values.vmstorage.containerWorkingDir }}
           workingDir: {{ .Values.vmstorage.containerWorkingDir }}
           {{- end }}
-          securityContext:
-            {{- toYaml .Values.vmstorage.podSecurityContext | nindent 12 }}
+          {{- if .Values.vmstorage.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmstorage.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           args:
             - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.vmstorage.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
           {{- range $key, $value := .Values.vmstorage.extraArgs }}
+          {{- if kindIs "slice" $value }}
+          {{- range $v := $value }}
+            - --{{ $key }}={{ $v }}
+          {{- end }}
+          {{- else }}
             - --{{ $key }}={{ $value }}
           {{- end }}
+          {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
           ports:
-            - name: http
+            - name: "{{ .Values.vmstorage.ports.name | default "http" }}" 
               containerPort: 8482
             - name: vminsert
               containerPort: 8400
             - name: vmselect
               containerPort: 8401
+          {{- if .Values.vmstorage.envFrom }}
+          envFrom:
+            {{- with .Values.vmstorage.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.vmstorage.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
@@ -78,7 +95,7 @@ spec:
           {{- end }}
           resources: {{ toYaml .Values.vmstorage.resources | nindent 12 }}
           volumeMounts:
-            - name: vmstorage-volume
+            - name: {{ .Values.vmstorage.persistentVolume.name }}
               mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
               subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
           {{- range .Values.vmstorage.extraHostPathMounts }}
@@ -102,10 +119,14 @@ spec:
           {{- with .Values.vmstorage.extraVolumeMounts }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
         {{- if .Values.vmstorage.vmbackupmanager.enable }}
         - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
-          image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ .Values.vmstorage.vmbackupmanager.image.tag }}"
+          image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ default .Chart.AppVersion .Values.vmstorage.vmbackupmanager.image.tag }}{{- with .Values.vmstorage.vmbackupmanager.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
+          {{- if .Values.vmstorage.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmstorage.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           args:
             - {{ printf "%s=%t" "--eula" .Values.vmstorage.vmbackupmanager.eula | quote}}
             - {{ printf "%s=%t" "--disableHourly" .Values.vmstorage.vmbackupmanager.disableHourly | quote}}
@@ -122,6 +143,9 @@ spec:
             - "--snapshot.deleteURL=http://localhost:8482/snapshot/delete"
             {{- range $key, $value := .Values.vmstorage.vmbackupmanager.extraArgs }}
             - --{{ $key }}={{ $value }}
+            {{- end }}
+            {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
             {{- end }}
           {{- with .Values.vmstorage.vmbackupmanager.resources }}
           resources: {{ toYaml . | nindent 12 }}
@@ -146,7 +170,7 @@ spec:
             - name: manager-http
               containerPort: 8300
           volumeMounts:
-            - name: vmstorage-volume
+            - name: {{ .Values.vmstorage.persistentVolume.name }}
               mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
               subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
             {{- range .Values.vmstorage.vmbackupmanager.extraSecretMounts }}
@@ -155,6 +179,7 @@ spec:
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
             {{- end }}
+            {{- include "chart.license.mount" . | nindent 12 }}
         {{- end }}
         {{- with .Values.vmstorage.extraContainers }}
         {{- toYaml . | nindent 8 }}
@@ -167,9 +192,8 @@ spec:
       nodeSelector:
 {{ toYaml .Values.vmstorage.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.vmstorage.securityContext }}
-      securityContext:
-{{ toYaml .Values.vmstorage.securityContext | indent 8 }}
+    {{- if .Values.vmstorage.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmstorage.podSecurityContext "context" $) | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.vmstorage.tolerations }}
@@ -180,6 +204,10 @@ spec:
       affinity:
 {{ toYaml .Values.vmstorage.affinity | indent 8 }}
     {{- end }}
+     {{- if .Values.vmstorage.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .Values.vmstorage.topologySpreadConstraints | indent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.vmstorage.terminationGracePeriodSeconds }}
       volumes:
         {{- with .Values.vmstorage.extraVolumes }}
@@ -195,10 +223,13 @@ spec:
             claimName: {{ .Values.vmstorage.persistentVolume.existingClaim }}
         {{- end }}
         {{- end }}
+        {{- include "chart.license.volume" . | nindent 8 }}
   {{- if and .Values.vmstorage.persistentVolume.enabled (not .Values.vmstorage.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
-    - metadata:
-        name: vmstorage-volume
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: {{ .Values.vmstorage.persistentVolume.name }}
         {{- if .Values.vmstorage.persistentVolume.annotations }}
         annotations:
 {{ toYaml .Values.vmstorage.persistentVolume.annotations | indent 10 }}

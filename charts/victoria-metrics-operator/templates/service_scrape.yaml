@@ -1,4 +1,6 @@
 {{- if .Values.serviceMonitor.enabled -}}
+{{- $mergedVMServiceScrapeAnnotations := mustMerge .Values.serviceMonitor.annotations .Values.annotations -}}
+{{- $mergedVMServiceScrapeLabels := mustMerge .Values.serviceMonitor.extraLabels .Values.extraLabels -}}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
@@ -6,18 +8,17 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
 {{ include "vm-operator.labels" . | indent 4 }}
-{{- with .Values.extraLabels }}
+{{- with $mergedVMServiceScrapeLabels }}
 {{ toYaml . | indent 4 }}
 {{- end }}
-{{- with .Values.annotations }}
+{{- with $mergedVMServiceScrapeAnnotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
   selector:
     matchLabels:
-        app.kubernetes.io/name: {{ include "vm-operator.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "vm-operator.selectorLabels" . | nindent 6 }}
   endpoints:
     - port: http
       {{- if .Values.serviceMonitor.scheme }}
@@ -34,7 +35,7 @@ spec:
           {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.serviceMonitor.relabelings }}
-      relabelings:
+      relabelConfigs:
           {{- toYaml . | nindent 8 }}
       {{- end }}
   namespaceSelector:

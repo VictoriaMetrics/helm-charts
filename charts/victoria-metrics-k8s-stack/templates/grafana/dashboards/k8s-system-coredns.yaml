@@ -4,6 +4,24 @@ Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
 {{- if and .Values.defaultDashboardsEnabled .Values.experimentalDashboardsEnabled .Values.coreDns.enabled }}
+{{- if .Values.grafanaOperatorDashboardsFormat.enabled }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "k8s-system-coredns" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+spec:
+  {{- with .Values.grafanaOperatorDashboardsFormat.instanceSelector }}
+  instanceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
+  allowCrossNamespaceImport: true
+  {{- end }}
+{{- else }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -19,7 +37,7 @@ metadata:
     {{- end }}
     {{- end }}
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
-{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
     {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
   annotations:
     {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
@@ -27,7 +45,8 @@ metadata:
     {{- end }}
     {{- end }}
 data:
-  k8s-system-coredns.json: |-
+{{- end }}
+  {{ if not .Values.grafanaOperatorDashboardsFormat.enabled }}k8s-system-coredns.{{ end }}json:  |-
     {
         "__inputs": [
             {
@@ -89,7 +108,7 @@ data:
             ]
         },
         "description": "This is a modern CoreDNS dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes",
-        "editable": true,
+        "editable": false,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 1,
         "links": [],
@@ -97,7 +116,7 @@ data:
         "panels": [
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -150,17 +169,19 @@ data:
                         "fields": "",
                         "values": false
                     },
-                    "textMode": "value_and_name"
+                    "showPercentChange": false,
+                    "textMode": "value_and_name",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.4",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "up{job=\"coredns\", instance=~\"$instance\"}",
+                        "expr": "up{job=~\"$job\", instance=~\"$instance\", cluster=~\"$cluster\"}",
                         "interval": "",
                         "legendFormat": "{{`{{`}} instance {{`}}`}}",
                         "refId": "A"
@@ -171,7 +192,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -180,6 +201,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -193,6 +215,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -200,7 +223,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -251,11 +274,11 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "rate(process_cpu_seconds_total{job=\"coredns\", instance=~\"$instance\"}[$__rate_interval])",
+                        "expr": "rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\", cluster=~\"$cluster\"}[$__rate_interval])",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} instance {{`}}`}}",
                         "refId": "A"
@@ -266,7 +289,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -275,6 +298,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -288,6 +312,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -295,7 +320,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -345,11 +370,11 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "process_resident_memory_bytes{job=\"coredns\", instance=~\"$instance\"}",
+                        "expr": "process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\", cluster=~\"$cluster\"}",
                         "interval": "",
                         "legendFormat": "{{`{{`}} instance {{`}}`}}",
                         "refId": "A"
@@ -360,7 +385,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -369,6 +394,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -382,6 +408,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -389,7 +416,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -439,11 +466,11 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(coredns_dns_requests_total{instance=~\"$instance\",proto=\"$protocol\"}[$__rate_interval]))",
+                        "expr": "sum(rate(coredns_dns_requests_total{instance=~\"$instance\",proto=\"$protocol\", cluster=~\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "total $protocol requests",
                         "refId": "A"
@@ -454,7 +481,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -463,6 +490,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -476,6 +504,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -483,7 +512,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -533,11 +562,11 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "avg(rate(coredns_dns_request_size_bytes_sum{instance=~\"$instance\",proto=\"$protocol\"}[$__rate_interval])) by (proto)",
+                        "expr": "sum(rate(coredns_dns_request_size_bytes_sum{instance=~\"$instance\",proto=\"$protocol\", cluster=~\"$cluster\"}[$__rate_interval])) by (proto) / sum(rate(coredns_dns_request_size_bytes_count{instance=~\"$instance\",proto=\"$protocol\", cluster=~\"$cluster\"}[$__rate_interval])) by (proto)",
                         "interval": "$resolution",
                         "legendFormat": "average $protocol packet size",
                         "refId": "A"
@@ -548,7 +577,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -557,6 +586,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -570,6 +600,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -577,7 +608,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -627,11 +658,11 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(coredns_dns_requests_total{instance=~\"$instance\"}[$__rate_interval])) by (type)",
+                        "expr": "sum(rate(coredns_dns_requests_total{instance=~\"$instance\", cluster=~\"$cluster\"}[$__rate_interval])) by (type)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} type {{`}}`}}",
                         "refId": "A"
@@ -642,7 +673,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -651,6 +682,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -664,6 +696,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -671,7 +704,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -721,11 +754,11 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(coredns_dns_responses_total{instance=~\"$instance\"}[$__rate_interval])) by (rcode)",
+                        "expr": "sum(rate(coredns_dns_responses_total{instance=~\"$instance\", cluster=~\"$cluster\"}[$__rate_interval])) by (rcode)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} rcode {{`}}`}}",
                         "refId": "A"
@@ -736,7 +769,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -745,6 +778,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -758,6 +792,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -765,7 +800,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -815,11 +850,11 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(coredns_forward_requests_total[$__rate_interval]))",
+                        "expr": "sum(rate(coredns_forward_requests_total{cluster=~\"$cluster\"}[$__rate_interval]))",
                         "interval": "$resolution",
                         "legendFormat": "total forward requests",
                         "refId": "A"
@@ -830,7 +865,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -839,6 +874,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -852,6 +888,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -859,7 +896,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -909,11 +946,11 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(coredns_forward_responses_total{rcode=~\"SERVFAIL|REFUSED\"}[$__rate_interval])) by (rcode)",
+                        "expr": "sum(rate(coredns_forward_responses_total{rcode=~\"SERVFAIL|REFUSED\", cluster=~\"$cluster\"}[$__rate_interval])) by (rcode)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} rcode {{`}}`}}",
                         "refId": "A"
@@ -924,7 +961,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -933,6 +970,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -946,6 +984,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -953,7 +992,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1003,22 +1042,22 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(coredns_cache_hits_total{instance=~\"$instance\"}[$__rate_interval])) by (type)",
+                        "expr": "sum(rate(coredns_cache_hits_total{instance=~\"$instance\", cluster=~\"$cluster\"}[$__rate_interval])) by (type)",
                         "interval": "$resolution",
                         "legendFormat": "{{`{{`}} type {{`}}`}}",
                         "refId": "A"
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(rate(coredns_cache_misses_total{instance=~\"$instance\"}[$__rate_interval])) by (type)",
+                        "expr": "sum(rate(coredns_cache_misses_total{instance=~\"$instance\", cluster=~\"$cluster\"}[$__rate_interval])) by (type)",
                         "interval": "$resolution",
                         "legendFormat": "misses",
                         "refId": "B"
@@ -1029,7 +1068,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1038,6 +1077,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -1051,6 +1091,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "smooth",
                             "lineWidth": 2,
                             "pointSize": 5,
@@ -1058,7 +1099,7 @@ data:
                                 "type": "linear"
                             },
                             "showPoints": "never",
-                            "spanNulls": true,
+                            "spanNulls": false,
                             "stacking": {
                                 "group": "A",
                                 "mode": "none"
@@ -1108,11 +1149,11 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "exemplar": true,
-                        "expr": "sum(coredns_cache_entries) by (type)",
+                        "expr": "sum(coredns_cache_entries{cluster=~\"$cluster\"}) by (type)",
                         "interval": "",
                         "legendFormat": "{{`{{`}} type {{`}}`}}",
                         "refId": "A"
@@ -1123,7 +1164,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1173,7 +1214,8 @@ data:
                         "layout": "auto"
                     },
                     "tooltip": {
-                        "show": true,
+                        "mode": "single",
+                        "showColorScale": false,
                         "yHistogram": false
                     },
                     "yAxis": {
@@ -1182,15 +1224,15 @@ data:
                         "unit": "s"
                     }
                 },
-                "pluginVersion": "9.3.1",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
-                        "expr": "sum(increase(coredns_dns_request_duration_seconds_bucket{instance=~\"$instance\"}[$__rate_interval])) by (le)",
+                        "expr": "sum(increase(coredns_dns_request_duration_seconds_bucket{instance=~\"$instance\", cluster=~\"$cluster\"}[$__rate_interval])) by (le)",
                         "format": "heatmap",
                         "legendFormat": "{{`{{`}}le{{`}}`}}",
                         "range": true,
@@ -1202,7 +1244,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1225,85 +1267,6 @@ data:
                     "w": 12,
                     "x": 12,
                     "y": 43
-                },
-                "id": 30,
-                "options": {
-                    "calculate": false,
-                    "cellGap": 1,
-                    "color": {
-                        "exponent": 0.5,
-                        "fill": "dark-orange",
-                        "mode": "scheme",
-                        "reverse": false,
-                        "scale": "exponential",
-                        "scheme": "RdYlBu",
-                        "steps": 64
-                    },
-                    "exemplars": {
-                        "color": "rgba(255,0,255,0.7)"
-                    },
-                    "filterValues": {
-                        "le": 1e-09
-                    },
-                    "legend": {
-                        "show": true
-                    },
-                    "rowsFrame": {
-                        "layout": "auto"
-                    },
-                    "tooltip": {
-                        "show": true,
-                        "yHistogram": false
-                    },
-                    "yAxis": {
-                        "axisPlacement": "left",
-                        "reverse": false,
-                        "unit": "s"
-                    }
-                },
-                "pluginVersion": "9.3.1",
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "${datasource}"
-                        },
-                        "editorMode": "code",
-                        "expr": "sum(increase(coredns_forward_request_duration_seconds_bucket{instance=~\"$instance\"}[$__rate_interval])) by (le)",
-                        "format": "heatmap",
-                        "legendFormat": "{{`{{`}}le{{`}}`}}",
-                        "range": true,
-                        "refId": "A"
-                    }
-                ],
-                "title": "CoreDNS - Forward request duration",
-                "type": "heatmap"
-            },
-            {
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "${datasource}"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "custom": {
-                            "hideFrom": {
-                                "legend": false,
-                                "tooltip": false,
-                                "viz": false
-                            },
-                            "scaleDistribution": {
-                                "type": "linear"
-                            }
-                        }
-                    },
-                    "overrides": []
-                },
-                "gridPos": {
-                    "h": 10,
-                    "w": 12,
-                    "x": 0,
-                    "y": 53
                 },
                 "id": 28,
                 "options": {
@@ -1331,7 +1294,8 @@ data:
                         "layout": "auto"
                     },
                     "tooltip": {
-                        "show": true,
+                        "mode": "single",
+                        "showColorScale": false,
                         "yHistogram": false
                     },
                     "yAxis": {
@@ -1340,15 +1304,15 @@ data:
                         "unit": "decbytes"
                     }
                 },
-                "pluginVersion": "9.3.1",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
-                        "expr": "sum(increase(coredns_dns_request_size_bytes_bucket{instance=~\"$instance\", le!=\"0\"}[$__rate_interval])) by (le)",
+                        "expr": "sum(increase(coredns_dns_request_size_bytes_bucket{instance=~\"$instance\", le!=\"0\", cluster=~\"$cluster\"}[$__rate_interval])) by (le)",
                         "format": "heatmap",
                         "legendFormat": "{{`{{`}}le{{`}}`}}",
                         "range": true,
@@ -1360,7 +1324,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "${datasource}"
                 },
                 "fieldConfig": {
@@ -1381,7 +1345,7 @@ data:
                 "gridPos": {
                     "h": 10,
                     "w": 12,
-                    "x": 12,
+                    "x": 0,
                     "y": 53
                 },
                 "id": 29,
@@ -1410,7 +1374,8 @@ data:
                         "layout": "auto"
                     },
                     "tooltip": {
-                        "show": true,
+                        "mode": "single",
+                        "showColorScale": false,
                         "yHistogram": false
                     },
                     "yAxis": {
@@ -1419,15 +1384,15 @@ data:
                         "unit": "decbytes"
                     }
                 },
-                "pluginVersion": "9.3.1",
+                "pluginVersion": "10.4.1",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "${datasource}"
                         },
                         "editorMode": "code",
-                        "expr": "sum(increase(coredns_dns_response_size_bytes_bucket{instance=~\"$instance\", le!=\"0\"}[$__rate_interval])) by (le)",
+                        "expr": "sum(increase(coredns_dns_response_size_bytes_bucket{instance=~\"$instance\", le!=\"0\", cluster=~\"$cluster\"}[$__rate_interval])) by (le)",
                         "format": "heatmap",
                         "legendFormat": "{{`{{`}}le{{`}}`}}",
                         "range": true,
@@ -1439,11 +1404,11 @@ data:
             }
         ],
         "refresh": "30s",
-        "schemaVersion": 37,
-        "style": "dark",
+        "schemaVersion": 39,
         "tags": [
             "Kubernetes",
-            "Prometheus"
+            "Prometheus",
+            "vm-k8s-stack"
         ],
         "templating": {
             "list": [
@@ -1457,13 +1422,45 @@ data:
                     "includeAll": false,
                     "multi": false,
                     "name": "datasource",
-                    "options": [],
-                    "query": "prometheus",
+                    "options": [
+
+                    ],
+                    "query": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "queryValue": "",
                     "refresh": 1,
                     "regex": "",
                     "skipUrlSync": false,
                     "type": "datasource"
+                },
+                {
+                    "current": {
+                        "isNone": true,
+                        "selected": false,
+                        "text": "None",
+                        "value": ""
+                    },
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${datasource}"
+                    },
+                    "definition": "label_values(kube_node_info,cluster)",
+                    "hide": {{ if .Values.grafana.sidecar.dashboards.multicluster }}0{{ else }}2{{ end }},
+                    "includeAll": false,
+                    "multi": false,
+                    "name": "cluster",
+                    "options": [
+
+                    ],
+                    "query": {
+                        "qryType": 1,
+                        "query": "label_values(kube_node_info,cluster)",
+                        "refId": "PrometheusVariableQueryEditor-VariableQuery"
+                    },
+                    "refresh": 1,
+                    "regex": "",
+                    "skipUrlSync": false,
+                    "sort": 1,
+                    "type": "query"
                 },
                 {
                     "current": {
@@ -1475,16 +1472,19 @@ data:
                         "type": "prometheus",
                         "uid": "${datasource}"
                     },
-                    "definition": "label_values(up{job=\"coredns\"}, instance)",
+                    "definition": "label_values(up{job=\"$job\", cluster=\"$cluster\"},instance)",
                     "hide": 0,
                     "includeAll": true,
                     "label": "",
                     "multi": false,
                     "name": "instance",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
-                        "query": "label_values(up{job=\"coredns\"}, instance)",
-                        "refId": "StandardVariableQuery"
+                        "qryType": 1,
+                        "query": "label_values(up{job=\"$job\", cluster=\"$cluster\"},instance)",
+                        "refId": "PrometheusVariableQueryEditor-VariableQuery"
                     },
                     "refresh": 1,
                     "regex": "",
@@ -1506,15 +1506,17 @@ data:
                         "type": "prometheus",
                         "uid": "${datasource}"
                     },
-                    "definition": "label_values(coredns_dns_requests_total, proto)",
+                    "definition": "label_values(coredns_dns_requests_total{cluster=\"$cluster\"}, proto)",
                     "hide": 0,
                     "includeAll": false,
                     "label": "",
                     "multi": false,
                     "name": "protocol",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
-                        "query": "label_values(coredns_dns_requests_total, proto)",
+                        "query": "label_values(coredns_dns_requests_total{cluster=\"$cluster\"}, proto)",
                         "refId": "StandardVariableQuery"
                     },
                     "refresh": 1,
@@ -1528,7 +1530,7 @@ data:
                 },
                 {
                     "current": {
-                        "selected": true,
+                        "selected": false,
                         "text": "30s",
                         "value": "30s"
                     },
@@ -1572,6 +1574,39 @@ data:
                     "queryValue": "",
                     "skipUrlSync": false,
                     "type": "custom"
+                },
+                {
+                    "current": {
+                        "selected": true,
+                        "text": [
+                            "coredns"
+                        ],
+                        "value": [
+                            "coredns"
+                        ]
+                    },
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${datasource}"
+                    },
+                    "definition": "label_values(coredns_build_info{cluster=\"$cluster\"},job)",
+                    "hide": 0,
+                    "includeAll": false,
+                    "multi": true,
+                    "name": "job",
+                    "options": [
+
+                    ],
+                    "query": {
+                        "qryType": 1,
+                        "query": "label_values(coredns_build_info{cluster=\"$cluster\"},job)",
+                        "refId": "PrometheusVariableQueryEditor-VariableQuery"
+                    },
+                    "refresh": 1,
+                    "regex": "",
+                    "skipUrlSync": false,
+                    "sort": 1,
+                    "type": "query"
                 }
             ]
         },
@@ -1579,11 +1614,13 @@ data:
             "from": "now-1h",
             "to": "now"
         },
-        "timepicker": {},
+        "timepicker": {
+
+        },
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "Kubernetes / System / CoreDNS",
         "uid": "k8s_system_coredns",
-        "version": 11,
+        "version": 18,
         "weekStart": ""
     }
 {{- end }}

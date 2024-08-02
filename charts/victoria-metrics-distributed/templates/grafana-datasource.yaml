@@ -1,0 +1,22 @@
+{{ if and .Values.vmauthQueryGlobal.enabled (index .Values "victoria-metrics-k8s-stack" "grafana" "enabled") }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-%s" .Release.Name "grafana-ds" | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
+    {{ index .Values "victoria-metrics-k8s-stack" "grafana" "sidecar" "datasources" "label" }}: "1"
+data:
+  datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+    - name: VictoriaMetrics
+      type: prometheus
+      {{- $readEndpoint:= (include "victoria-metrics-distributed.globalQueryAddr" . | fromYaml) }}
+      url: {{ $readEndpoint.url }}
+      access: proxy
+      isDefault: true
+      jsonData: {}
+{{- end }}
+

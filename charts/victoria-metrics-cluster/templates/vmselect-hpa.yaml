@@ -1,5 +1,9 @@
 {{- if .Values.vmselect.horizontalPodAutoscaler.enabled }}
+{{- if .Capabilities.APIVersions.Has "autoscaling/v2" -}}
+apiVersion: autoscaling/v2
+{{- else}}
 apiVersion: autoscaling/v2beta2
+{{- end}}
 kind: HorizontalPodAutoscaler
 metadata:
   labels:
@@ -18,4 +22,8 @@ spec:
     name: {{ template "victoria-metrics.vmselect.fullname" . }}
   metrics:
 {{ toYaml .Values.vmselect.horizontalPodAutoscaler.metrics | indent 4 }}
+{{- if .Values.vmselect.horizontalPodAutoscaler.behavior }}
+  behavior:
+{{ toYaml .Values.vmselect.horizontalPodAutoscaler.behavior | indent 4 }}
+{{- end -}}
 {{- end -}}

@@ -4,6 +4,24 @@ Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
 {{- if .Values.defaultDashboardsEnabled }}
+{{- if .Values.grafanaOperatorDashboardsFormat.enabled }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "backupmanager" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+spec:
+  {{- with .Values.grafanaOperatorDashboardsFormat.instanceSelector }}
+  instanceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
+  allowCrossNamespaceImport: true
+  {{- end }}
+{{- else }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -19,7 +37,7 @@ metadata:
     {{- end }}
     {{- end }}
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
-{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
     {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
   annotations:
     {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
@@ -27,7 +45,8 @@ metadata:
     {{- end }}
     {{- end }}
 data:
-  backupmanager.json: |-
+{{- end }}
+  {{ if not .Values.grafanaOperatorDashboardsFormat.enabled }}backupmanager.{{ end }}json:  |-
     {
         "__inputs": [],
         "__elements": {},
@@ -42,7 +61,7 @@ data:
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "9.0.4"
+                "version": "10.4.0"
             },
             {
                 "type": "datasource",
@@ -92,7 +111,7 @@ data:
             ]
         },
         "description": "Overview for VictoriaMetrics backupmanager v1.85.3 or higher",
-        "editable": true,
+        "editable": false,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 0,
         "id": null,
@@ -114,7 +133,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -154,13 +173,15 @@ data:
                         "fields": "",
                         "values": false
                     },
-                    "textMode": "auto"
+                    "showPercentChange": false,
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.0.4",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -177,7 +198,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Status of last backup operation.",
@@ -228,13 +249,15 @@ data:
                         "fields": "",
                         "values": false
                     },
-                    "textMode": "auto"
+                    "showPercentChange": false,
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.0.4",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -249,7 +272,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Number of backups stored in remote storage.",
@@ -290,13 +313,15 @@ data:
                         "fields": "",
                         "values": false
                     },
-                    "textMode": "auto"
+                    "showPercentChange": false,
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.0.4",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -311,7 +336,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Space used in remote storage.",
@@ -353,13 +378,15 @@ data:
                         "fields": "",
                         "values": false
                     },
-                    "textMode": "auto"
+                    "showPercentChange": false,
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.0.4",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -374,7 +401,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "",
@@ -429,13 +456,15 @@ data:
                         "fields": "",
                         "values": false
                     },
-                    "textMode": "auto"
+                    "showPercentChange": false,
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.0.4",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -450,7 +479,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Status of last retention run.\n\nRetention is a process of removing old backups from remote storage.",
@@ -501,13 +530,15 @@ data:
                         "fields": "",
                         "values": false
                     },
-                    "textMode": "auto"
+                    "showPercentChange": false,
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.0.4",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -522,7 +553,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -576,13 +607,15 @@ data:
                         "fields": "",
                         "values": false
                     },
-                    "textMode": "auto"
+                    "showPercentChange": false,
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.0.4",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -597,7 +630,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -607,7 +640,9 @@ data:
                         },
                         "custom": {
                             "align": "auto",
-                            "displayMode": "auto",
+                            "cellOptions": {
+                                "type": "auto"
+                            },
                             "inspect": false
                         },
                         "mappings": [],
@@ -660,7 +695,9 @@ data:
                 },
                 "id": 22,
                 "options": {
+                    "cellHeight": "sm",
                     "footer": {
+                        "countRows": false,
                         "fields": "",
                         "reducer": [
                             "sum"
@@ -675,11 +712,11 @@ data:
                         }
                     ]
                 },
-                "pluginVersion": "9.0.4",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -720,7 +757,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -730,7 +767,9 @@ data:
                         },
                         "custom": {
                             "align": "auto",
-                            "displayMode": "auto",
+                            "cellOptions": {
+                                "type": "auto"
+                            },
                             "inspect": false
                         },
                         "mappings": [],
@@ -783,7 +822,9 @@ data:
                 },
                 "id": 21,
                 "options": {
+                    "cellHeight": "sm",
                     "footer": {
+                        "countRows": false,
                         "fields": "",
                         "reducer": [
                             "sum"
@@ -798,11 +839,11 @@ data:
                         }
                     ]
                 },
-                "pluginVersion": "9.0.4",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -915,7 +956,7 @@ data:
                                     "min",
                                     "mean"
                                 ],
-                                "displayMode": "table",
+                                "displayMode": "list",
                                 "placement": "bottom",
                                 "showLegend": false
                             },
@@ -1136,7 +1177,9 @@ data:
                                 },
                                 "custom": {
                                     "align": "auto",
-                                    "displayMode": "auto",
+                                    "cellOptions": {
+                                        "type": "auto"
+                                    },
                                     "inspect": false
                                 },
                                 "mappings": [],
@@ -1281,7 +1324,8 @@ data:
                             "legend": {
                                 "calcs": [],
                                 "displayMode": "list",
-                                "placement": "bottom"
+                                "placement": "bottom",
+                                "showLegend": true
                             },
                             "orientation": "auto",
                             "showValue": "auto",
@@ -1373,7 +1417,7 @@ data:
                                     "max",
                                     "mean"
                                 ],
-                                "displayMode": "table",
+                                "displayMode": "list",
                                 "placement": "right",
                                 "showLegend": false
                             },
@@ -1466,7 +1510,8 @@ data:
                             "legend": {
                                 "calcs": [],
                                 "displayMode": "list",
-                                "placement": "bottom"
+                                "placement": "bottom",
+                                "showLegend": true
                             },
                             "orientation": "auto",
                             "showValue": "auto",
@@ -1687,9 +1732,10 @@ data:
             }
         ],
         "refresh": "1m",
-        "schemaVersion": 36,
-        "style": "dark",
-        "tags": [],
+        "schemaVersion": 39,
+        "tags": [
+            "vm-k8s-stack"
+        ],
         "templating": {
             "list": [
                 {
@@ -1702,8 +1748,10 @@ data:
                     "includeAll": false,
                     "multi": false,
                     "name": "ds",
-                    "options": [],
-                    "query": "prometheus",
+                    "options": [
+
+                    ],
+                    "query": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "queryValue": "",
                     "refresh": 1,
                     "regex": "",
@@ -1712,7 +1760,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "uid": "$ds"
                     },
@@ -1721,7 +1771,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "job",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{version=~\"^vmbackupmanager.*\"}, job)",
                         "refId": "StandardVariableQuery"
@@ -1737,7 +1789,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "uid": "$ds"
                     },
@@ -1746,7 +1800,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "instance",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{job=~\"$job\"}, instance)",
                         "refId": "VictoriaMetrics-instance-Variable-Query"
@@ -1765,7 +1821,9 @@ data:
                         "type": "prometheus",
                         "uid": "$ds"
                     },
-                    "filters": [],
+                    "filters": [
+
+                    ],
                     "hide": 0,
                     "name": "adhoc",
                     "skipUrlSync": false,
@@ -1777,7 +1835,9 @@ data:
             "from": "now-7d",
             "to": "now"
         },
-        "timepicker": {},
+        "timepicker": {
+
+        },
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "VictoriaMetrics - backupmanager",
         "uid": "gF-lxRdVz",

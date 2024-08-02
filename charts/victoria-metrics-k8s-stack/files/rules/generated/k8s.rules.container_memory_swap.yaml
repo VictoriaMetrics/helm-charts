@@ -1,0 +1,10 @@
+condition: '{{ true }}'
+name: k8s.rules.container_memory_swap
+rules:
+- condition: '{{ true }}'
+  expr: |-
+    container_memory_swap{job="kubelet", metrics_path="/metrics/cadvisor", image!=""}
+    * on (cluster, namespace, pod) group_left(node) topk by(cluster, namespace, pod) (1,
+      max by(cluster, namespace, pod, node) (kube_pod_info{node!=""})
+    )
+  record: node_namespace_pod_container:container_memory_swap

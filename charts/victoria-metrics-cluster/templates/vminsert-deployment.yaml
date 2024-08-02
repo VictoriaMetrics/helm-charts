@@ -31,7 +31,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "victoria-metrics.vminsert.labels" . | nindent 8 }}
+        {{- include "victoria-metrics.vminsert.podLabels" . | nindent 8 }}
         {{- with .Values.vminsert.extraLabels }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -46,25 +46,41 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vminsert.name }}
-          image: "{{ .Values.vminsert.image.repository }}:{{ .Values.vminsert.image.tag }}"
+          image: "{{ .Values.vminsert.image.repository }}:{{ default .Chart.AppVersion .Values.vminsert.image.tag }}{{- with .Values.vminsert.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: "{{ .Values.vminsert.image.pullPolicy }}"
           {{- if .Values.vminsert.containerWorkingDir }}
           workingDir: {{ .Values.vminsert.containerWorkingDir }}
           {{- end }}
-          securityContext:
-            {{- toYaml .Values.vminsert.podSecurityContext | nindent 12 }}
+          {{- if .Values.vminsert.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vminsert.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           args:
-          {{- if not .Values.vminsert.suppresStorageFQDNsRender }}
+          {{- if not (or .Values.vminsert.suppresStorageFQDNsRender .Values.vminsert.suppressStorageFQDNsRender) }}
             {{- include "victoria-metrics.vminsert.vmstorage-pod-fqdn" . | nindent 12 }}
           {{- end }}
           {{- range $key, $value := .Values.vminsert.extraArgs }}
+          {{- if kindIs "slice" $value }}
+          {{- range $v := $value }}
+            - --{{ $key }}={{ $v }}
+          {{- end }}
+          {{- else }}
             - --{{ $key }}={{ $value }}
+          {{- end }}
+          {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
+          {{- if .Values.vminsert.envFrom }}
+          envFrom:
+            {{- with .Values.vminsert.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with .Values.vminsert.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
           ports:
-            - name: http
+            - name: "{{ .Values.vminsert.ports.name  | default "http" }}"
               containerPort: 8480
           {{- if .Values.vminsert.extraArgs.clusternativeListenAddr }}
             - name: cluster-tcp
@@ -108,23 +124,33 @@ spec:
           {{- end }}
           readinessProbe:
             httpGet:
+            {{- if index  .Values.vminsert.extraArgs "http.pathPrefix" }}
+              path: {{ trimSuffix "/" (index .Values.vminsert.extraArgs "http.pathPrefix") }}/health
+            {{- else }}
               path: /health
-              port: http
+            {{- end }}
+              port: "{{ .Values.vminsert.ports.name  | default "http" }}"
+            {{- if .Values.vminsert.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: {{ .Values.vminsert.probe.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vminsert.probe.readiness.periodSeconds }}
             timeoutSeconds: {{ .Values.vminsert.probe.readiness.timeoutSeconds }}
             failureThreshold: {{ .Values.vminsert.probe.readiness.failureThreshold }}
           livenessProbe:
             tcpSocket:
-              port: http
+              port: "{{ .Values.vminsert.ports.name  | default "http" }}"
             initialDelaySeconds: {{ .Values.vminsert.probe.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vminsert.probe.liveness.periodSeconds }}
             timeoutSeconds: {{ .Values.vminsert.probe.liveness.timeoutSeconds }}
             failureThreshold: {{ .Values.vminsert.probe.liveness.failureThreshold }}
-          {{- with .Values.vminsert.extraVolumeMounts }}
           volumeMounts:
+          {{- with .Values.vminsert.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
           resources: {{- toYaml .Values.vminsert.resources | nindent 12 }}
         {{- with .Values.vminsert.extraContainers }}
         {{- toYaml . | nindent 8 }}
@@ -137,9 +163,8 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.vminsert.securityContext }}
-      securityContext:
-        {{- toYaml . | nindent 8 }}
+      {{- if .Values.vminsert.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vminsert.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
       {{- with .Values.vminsert.tolerations }}
@@ -150,8 +175,15 @@ spec:
       affinity:
       {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.vminsert.extraVolumes }}
+      {{- if .Values.vminsert.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .Values.vminsert.topologySpreadConstraints | indent 8 }}
+      {{- end }}
+      {{- if or (and .Values.license.secret.name .Values.license.secret.key) .Values.vminsert.extraVolumes }}
       volumes:
+        {{- with .Values.vminsert.extraVolumes }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- include "chart.license.volume" . | nindent 8 }}
       {{- end }}
 {{- end }}

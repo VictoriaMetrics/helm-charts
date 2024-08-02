@@ -1,14 +1,16 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.5.21](https://img.shields.io/badge/Version-0.5.21-informational?style=flat-square)
+ ![Version: 0.9.12](https://img.shields.io/badge/Version-0.9.12-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
+[![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
 Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) and sends alerts to Alert Manager.
 
-# Prerequisites
+## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
 
-# How to install
+## How to install
 
 Access a Kubernetes cluster.
 
@@ -21,8 +23,6 @@ helm repo update
 ```
 
 List versions of ``vm/victoria-metrics-alert`` chart available to installation:
-
-##### for helm v3
 
 ```console
 helm search repo vm/victoria-metrics-alert -l
@@ -43,8 +43,6 @@ helm install vmalert vm/victoria-metrics-alert -f values.yaml -n NAMESPACE --deb
 ```
 
 Install chart with command:
-
-##### for helm v3
 
 ```console
 helm install vmalert vm/victoria-metrics-alert -f values.yaml -n NAMESPACE
@@ -68,7 +66,14 @@ See the history of versions of ``vmalert`` application with command.
 helm history vmalert -n NAMESPACE
 ```
 
-# How to uninstall
+## HA configuration for Alertmanager
+
+There is no option on this chart to set up Alertmanager with [HA mode](https://github.com/prometheus/alertmanager#high-availability).
+To enable the HA configuration, you can use:
+- [VictoriaMetrics Operator](https://docs.victoriametrics.com/operator/VictoriaMetrics-Operator.html)
+- official [Alertmanager Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager)
+
+## How to uninstall
 
 Remove application with command.
 
@@ -76,7 +81,7 @@ Remove application with command.
 helm uninstall vmalert -n NAMESPACE
 ```
 
-# Documentation of Helm Chart
+## Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
 
@@ -90,7 +95,7 @@ helm-docs
 
 The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-# Parameters
+## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
 
@@ -109,7 +114,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.config.route.repeat_interval | string | `"24h"` |  |
 | alertmanager.configMap | string | `""` |  |
 | alertmanager.enabled | bool | `false` |  |
+| alertmanager.envFrom | list | `[]` |  |
 | alertmanager.extraArgs | object | `{}` |  |
+| alertmanager.extraContainers | list | `[]` |  |
+| alertmanager.extraHostPathMounts | list | `[]` |  |
+| alertmanager.extraVolumeMounts | list | `[]` |  |
+| alertmanager.extraVolumes | list | `[]` |  |
 | alertmanager.image | string | `"prom/alertmanager"` |  |
 | alertmanager.imagePullSecrets | list | `[]` |  |
 | alertmanager.ingress.annotations | object | `{}` |  |
@@ -118,6 +128,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.ingress.hosts | list | `[]` |  |
 | alertmanager.ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | alertmanager.ingress.tls | list | `[]` |  |
+| alertmanager.listenAddress | string | `"0.0.0.0:9093"` |  |
 | alertmanager.nodeSelector | object | `{}` |  |
 | alertmanager.persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/) |
 | alertmanager.persistentVolume.annotations | object | `{}` | Persistant volume annotations |
@@ -129,18 +140,24 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.persistentVolume.subPath | string | `""` | Mount subpath |
 | alertmanager.podMetadata.annotations | object | `{}` |  |
 | alertmanager.podMetadata.labels | object | `{}` |  |
-| alertmanager.podSecurityContext | object | `{}` |  |
+| alertmanager.podSecurityContext.enabled | bool | `false` |  |
 | alertmanager.priorityClassName | string | `""` |  |
-| alertmanager.replicaCount | int | `1` |  |
 | alertmanager.resources | object | `{}` |  |
 | alertmanager.retention | string | `"120h"` |  |
+| alertmanager.securityContext.enabled | bool | `false` |  |
 | alertmanager.service.annotations | object | `{}` |  |
 | alertmanager.service.port | int | `9093` |  |
 | alertmanager.service.type | string | `"ClusterIP"` |  |
 | alertmanager.tag | string | `"v0.25.0"` |  |
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
-| imagePullSecrets | list | `[]` |  |
+| extraObjects | list | `[]` | Add extra specs dynamically to this chart |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
+| license.key | string | `""` | License key |
+| license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
+| license.secret.key | string | `""` | Key in secret with license key |
+| license.secret.name | string | `""` | Existing secret name |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |
@@ -155,18 +172,21 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.datasource.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |
 | server.datasource.url | string | `""` |  |
 | server.enabled | bool | `true` |  |
-| server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables |
+| server.envFrom | list | `[]` |  |
 | server.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.extraArgs.loggerFormat | string | `"json"` |  |
-| server.extraContainers | list | `[]` |  |
-| server.extraHostPathMounts | list | `[]` |  |
-| server.extraVolumeMounts | list | `[]` |  |
-| server.extraVolumes | list | `[]` |  |
+| server.extraContainers | list | `[]` | Additional containers to run in the same pod |
+| server.extraHostPathMounts | list | `[]` | Additional hostPath mounts |
+| server.extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
+| server.extraVolumes | list | `[]` | Extra Volumes for the pod |
 | server.fullnameOverride | string | `""` |  |
 | server.image.pullPolicy | string | `"IfNotPresent"` |  |
 | server.image.repository | string | `"victoriametrics/vmalert"` |  |
 | server.image.tag | string | `""` |  |
+| server.image.variant | string | `""` |  |
+| server.imagePullSecrets | list | `[]` |  |
 | server.ingress.annotations | object | `{}` |  |
 | server.ingress.enabled | bool | `false` |  |
 | server.ingress.extraLabels | object | `{}` |  |
@@ -178,16 +198,25 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.name | string | `"server"` |  |
 | server.nameOverride | string | `""` |  |
 | server.nodeSelector | object | `{}` |  |
+| server.notifier | object | `{"alertmanager":{"basicAuth":{"password":"","username":""},"bearer":{"token":"","tokenFile":""},"url":""}}` | Notifier to use for alerts. Multiple notifiers can be enabled by using `notifiers` section |
 | server.notifier.alertmanager.basicAuth | object | `{"password":"","username":""}` | Basic auth for alertmanager |
 | server.notifier.alertmanager.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
 | server.notifier.alertmanager.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |
-| server.notifier.alertmanager.url | string | `""` |  |
+| server.notifiers | list | `[]` | Additional notifiers to use for alerts |
 | server.podAnnotations | object | `{}` |  |
 | server.podDisruptionBudget.enabled | bool | `false` |  |
 | server.podDisruptionBudget.labels | object | `{}` |  |
 | server.podLabels | object | `{}` |  |
-| server.podSecurityContext | object | `{}` |  |
+| server.podSecurityContext.enabled | bool | `true` |  |
 | server.priorityClassName | string | `""` |  |
+| server.probe.liveness.failureThreshold | int | `3` |  |
+| server.probe.liveness.initialDelaySeconds | int | `5` |  |
+| server.probe.liveness.periodSeconds | int | `15` |  |
+| server.probe.liveness.timeoutSeconds | int | `5` |  |
+| server.probe.readiness.failureThreshold | int | `3` |  |
+| server.probe.readiness.initialDelaySeconds | int | `5` |  |
+| server.probe.readiness.periodSeconds | int | `15` |  |
+| server.probe.readiness.timeoutSeconds | int | `5` |  |
 | server.remote.read.basicAuth | object | `{"password":"","username":""}` | Basic auth for remote read |
 | server.remote.read.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
 | server.remote.read.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |
@@ -199,7 +228,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.remote.write.url | string | `""` |  |
 | server.replicaCount | int | `1` |  |
 | server.resources | object | `{}` |  |
-| server.securityContext | object | `{}` |  |
+| server.securityContext.enabled | bool | `true` |  |
 | server.service.annotations | object | `{}` |  |
 | server.service.clusterIP | string | `""` |  |
 | server.service.externalIPs | list | `[]` |  |
@@ -212,6 +241,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.strategy.rollingUpdate.maxUnavailable | string | `"25%"` |  |
 | server.strategy.type | string | `"RollingUpdate"` |  |
 | server.tolerations | list | `[]` |  |
+| server.verticalPodAutoscaler | object | `{"enabled":false}` | Vertical Pod Autoscaler |
+| server.verticalPodAutoscaler.enabled | bool | `false` | Use VPA for vmalert |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automountToken | bool | `true` |  |
 | serviceAccount.create | bool | `true` |  |
@@ -219,4 +250,5 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
+| serviceMonitor.metricRelabelings | list | `[]` |  |
 | serviceMonitor.relabelings | list | `[]` |  |

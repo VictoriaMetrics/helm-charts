@@ -1,6 +1,10 @@
 # Default values for victoria-metrics-gateway.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
 
 # -- Number of replicas of vmgateway
 replicaCount: 1
@@ -9,7 +13,11 @@ image:
   # -- Victoria Metrics gateway Docker repository and image name
   repository: victoriametrics/vmgateway
   # -- Tag of Docker image
-  tag: v1.89.1-enterprise
+  # override Chart.AppVersion
+  tag: v1.101.0-enterprise
+  # Variant of the image to use.
+  # e.g. enterprise, enterprise-scratch
+  variant: ""
   # -- Pull policy of Docker image
   pullPolicy: IfNotPresent
 
@@ -42,6 +50,12 @@ extraArgs:
 # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
 env: []
 
+envFrom: []
+  #- configMapRef:
+  #    name: special-config
+
+
+
 # -- Additional hostPath mounts
 extraHostPathMounts: []
   # - name: certs-dir
@@ -65,11 +79,13 @@ extraContainers: []
   # - name: config-reloader
   #   image: reloader-image
 
-podSecurityContext: {}
+podSecurityContext:
+  enabled: true
 # fsGroup: 2000
 
 ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 securityContext:
+  enabled: true
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000
@@ -145,6 +161,7 @@ serviceMonitor:
   extraLabels: {}
   annotations: {}
   relabelings: []
+  metricRelabelings: []
   #    interval: 15s
   #    scrapeTimeout: 5s
   # -- Commented. HTTP scheme to use for scraping.
@@ -155,7 +172,7 @@ serviceMonitor:
 
 # -- should be true and means that you have the legal right to run a vmgateway
 # that can either be a signed contract or an email with confirmation to run the service in a trial period
-# https://victoriametrics.com/legal/eula/
+# https://victoriametrics.com/legal/esa/
 eula: false
 
 # -- Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmgateway.html
@@ -198,3 +215,20 @@ read:
 write:
   # -- Write endpoint without suffixes, victoriametrics or vminsert. Example http://victoroametrics:8428 or http://vminsert:8480
   url: ""
+
+# -- Enterprise license key configuration for VictoriaMetrics enterprise.
+# Required only for VictoriaMetrics enterprise.
+# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# for more information, visit https://victoriametrics.com/products/enterprise/ .
+# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Supported starting from VictoriaMetrics v1.94.0
+license:
+  # -- License key
+  key: ""
+
+  # -- Use existing secret with license key
+  secret:
+    # -- Existing secret name
+    name: ""
+    # -- Key in secret with license key
+    key: ""

@@ -5,6 +5,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "chart.labels" . | nindent 4 }}
+    {{- with .Values.extraLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- with .Values.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -18,6 +21,9 @@ spec:
     metadata:
       labels:
         {{- include "chart.selectorLabels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         {{- range $key, $value := .Values.podAnnotations }}
@@ -29,29 +35,45 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ include "chart.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          {{- if .Values.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" $) | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}{{- with .Values.image.variant }}-{{ . }}{{- end }}"
           workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -auth.config=/config/auth.yml
           {{- range $key, $value := .Values.extraArgs }}
+          {{- if kindIs "slice" $value }}
+          {{- range $v := $value }}
+            - -{{ $key }}={{ $v }}
+          {{- end }}
+          {{- else }}
             - -{{ $key }}={{ $value }}
+          {{- end }}
+          {{- end }}
+          {{- with (include "vmauth.license.flag" .) }}
+            - {{ . }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8427
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- with .Values.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
           readinessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: http
             initialDelaySeconds: 5
             periodSeconds: 15
@@ -73,6 +95,7 @@ spec:
           {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "vmauth.license.mount" . | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
         {{- with .Values.extraContainers }}
@@ -93,7 +116,11 @@ spec:
       volumes:
         - name: config
           secret:
+          {{- if .Values.secretName }}
+            secretName: {{ .Values.secretName }}
+          {{- else }}
             secretName: {{ include "chart.fullname" .}}
+          {{- end }}
       {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
@@ -102,3 +129,4 @@ spec:
       {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "vmauth.license.volume" . | nindent 8 }}

@@ -7,7 +7,7 @@ metadata:
   labels:
     {{- include "vmalert.alertmanager.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.alertmanager.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       {{- include "vmalert.alertmanager.matchLabels" . | nindent 6 }}
@@ -35,14 +35,14 @@ spec:
     {{- end }}
       serviceAccountName: {{ template "vmalert.serviceAccountName" . }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
-      {{- with .Values.alertmanager.securityContext }}
-      securityContext:
-        {{- toYaml .| nindent 8 }}
+      {{- if .Values.alertmanager.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.alertmanager.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ template "vmalert.name" . }}-alertmanager
-          securityContext:
-            {{- toYaml .Values.alertmanager.podSecurityContext | nindent 12 }}
+          {{- if .Values.alertmanager.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.alertmanager.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.alertmanager.image }}:{{ .Values.alertmanager.tag }}"
           args:
             - --config.file=/config/alertmanager.yaml
@@ -52,7 +52,7 @@ spec:
             - --storage.path=/data
             {{- end}}
             - --data.retention={{ .Values.alertmanager.retention }}
-            - --web.listen-address=0.0.0.0:9093
+            - --web.listen-address={{ .Values.alertmanager.listenAddress }}
             - --cluster.advertise-address=$(POD_IP):6783
             {{ if .Values.alertmanager.baseURL }}
             - --web.external-url={{ .Values.alertmanager.baseURL }}
@@ -61,11 +61,21 @@ spec:
             - --web.route-prefix={{ .Values.alertmanager.baseURLPrefix }}
             {{- end }}
             {{- range $key, $value := .Values.alertmanager.extraArgs }}
+            {{- if kindIs "slice" $value }}
+            {{- range $v := $value }}
+            - --{{ $key }}={{ $v }}
+            {{- end }}
+            {{- else }}
             - --{{ $key }}={{ $value }}
+            {{- end }}
             {{- end }}
           ports:
             - name: web
               containerPort: 9093
+          {{- with .Values.alertmanager.envFrom }}
+          envFrom:
+            {{ toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: POD_IP
               valueFrom:
@@ -98,8 +108,20 @@ spec:
             - name: config
               mountPath: /config
               readOnly: true
+            {{- range .Values.alertmanager.extraHostPathMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly }}
+            {{- end }}
+            {{- with .Values.alertmanager.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           resources:
             {{- toYaml .Values.alertmanager.resources | nindent 12 }}
+        {{- with .Values.alertmanager.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.alertmanager.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -107,7 +129,7 @@ spec:
       {{- if .Values.alertmanager.priorityClassName }}
       priorityClassName: {{ .Values.alertmanager.priorityClassName | quote }}
       {{- end }}
-      {{- with .Values.server.affinity }}
+      {{- with .Values.alertmanager.affinity }}
       affinity:
         {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -126,4 +148,12 @@ spec:
         - name: config
           configMap:
             name: {{ include "vmalert.alertmanager.configname" . }}
+        {{- range .Values.alertmanager.extraHostPathMounts }}
+        - name: {{ .name }}
+          hostPath:
+            path: {{ .hostPath }}
+        {{- end }}
+        {{- with .Values.alertmanager.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 {{- end -}}

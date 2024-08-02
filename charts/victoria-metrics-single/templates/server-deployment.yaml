@@ -1,4 +1,5 @@
 {{- if and .Values.server.enabled (not .Values.server.statefulSet.enabled) -}}
+{{ include "victoria-metrics.vmbackupmanager.enforce_license" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -48,9 +49,10 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.server.name }}
-          securityContext:
-            {{- toYaml .Values.server.podSecurityContext | nindent 12 }}
-          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
+          {{- if .Values.server.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.securityContext "context" $) | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.server.image.repository }}:{{ default .Chart.AppVersion .Values.server.image.tag }}{{- with .Values.server.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
           {{- if .Values.server.containerWorkingDir }}
           workingDir: {{ .Values.server.containerWorkingDir }}
@@ -59,10 +61,25 @@ spec:
             - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.server.retentionPeriod) | quote}}
             - {{ printf "%s=%s" "--storageDataPath" .Values.server.persistentVolume.mountPath | quote}}
           {{- if .Values.server.scrape.enabled }}
-            - -promscrape.config=/scrapeconfig/scrape.yml
+            - --promscrape.config=/scrapeconfig/scrape.yml
           {{- end }}
           {{- range $key, $value := .Values.server.extraArgs }}
+          {{- if kindIs "slice" $value }}
+          {{- range $v := $value }}
+            - --{{ $key }}={{ $v }}
+          {{- end }}
+          {{- else }}
             - --{{ $key }}={{ $value }}
+          {{- end }}
+          {{- end }}
+          {{- with (include "victoria-metrics.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
+          {{- if .Values.server.envFrom }}
+          envFrom:
+            {{- with .Values.server.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with .Values.server.env }}
           env: {{ toYaml . | nindent 10 }}
@@ -145,12 +162,13 @@ spec:
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
           {{- end }}
+          {{- include "victoria-metrics.license.mount" . | nindent 12 }}
           {{- with .Values.server.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
         {{- if .Values.server.vmbackupmanager.enable }}
         - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
-          image: "{{ .Values.server.vmbackupmanager.image.repository }}:{{ .Values.server.vmbackupmanager.image.tag }}"
+          image: "{{ .Values.server.vmbackupmanager.image.repository }}:{{ default .Chart.AppVersion .Values.server.vmbackupmanager.image.tag }}{{- with .Values.server.vmbackupmanager.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
           args:
             - {{ printf "%s=%t" "--eula" .Values.server.vmbackupmanager.eula | quote}}
@@ -168,6 +186,9 @@ spec:
             - "--snapshot.deleteURL=http://localhost:8428/snapshot/delete"
             {{- range $key, $value := .Values.server.vmbackupmanager.extraArgs }}
             - --{{ $key }}={{ $value }}
+            {{- end }}
+            {{- with (include "victoria-metrics.license.flag" .) }}
+            - {{ . }}
             {{- end }}
           {{- with .Values.server.vmbackupmanager.resources }}
           resources: {{ toYaml . | nindent 12  }}
@@ -191,6 +212,7 @@ spec:
           {{- with .Values.server.vmbackupmanager.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "victoria-metrics.license.mount" . | nindent 12 }}
         {{- end }}
         {{- with .Values.server.extraContainers }}
         {{- toYaml . | nindent 8 }}
@@ -203,9 +225,8 @@ spec:
       nodeSelector:
 {{ toYaml .Values.server.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.server.securityContext }}
-      securityContext:
-{{ toYaml .Values.server.securityContext | indent 8 }}
+    {{- if .Values.server.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.podSecurityContext "context" $) | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.server.tolerations }}
@@ -232,4 +253,5 @@ spec:
 {{- else }}
         emptyDir: {}
 {{- end }}
+      {{- include "victoria-metrics.license.volume" . | nindent 8 }}
 {{- end }}

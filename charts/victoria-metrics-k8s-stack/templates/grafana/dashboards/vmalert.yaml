@@ -4,6 +4,24 @@ Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
 {{- if and .Values.defaultDashboardsEnabled .Values.vmalert.enabled }}
+{{- if .Values.grafanaOperatorDashboardsFormat.enabled }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmalert" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+spec:
+  {{- with .Values.grafanaOperatorDashboardsFormat.instanceSelector }}
+  instanceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
+  allowCrossNamespaceImport: true
+  {{- end }}
+{{- else }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -19,7 +37,7 @@ metadata:
     {{- end }}
     {{- end }}
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
-{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
     {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
   annotations:
     {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
@@ -27,7 +45,8 @@ metadata:
     {{- end }}
     {{- end }}
 data:
-  vmalert.json: |-
+{{- end }}
+  {{ if not .Values.grafanaOperatorDashboardsFormat.enabled }}vmalert.{{ end }}json:  |-
     {
         "__inputs": [],
         "__elements": {},
@@ -36,7 +55,7 @@ data:
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "9.2.6"
+                "version": "10.4.2"
             },
             {
                 "type": "datasource",
@@ -89,17 +108,28 @@ data:
                         "uid": "$ds"
                     },
                     "enable": true,
-                    "expr": "sum(vm_app_version{job=~\"$job\"}) by(short_version) unless (sum(vm_app_version{job=~\"$job\"} offset 20m) by(short_version))",
+                    "expr": "sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"}) by(short_version) unless (sum(vm_app_version{job=~\"$job\", instance=~\"$instance\"} offset $__interval) by(short_version))",
                     "hide": true,
                     "iconColor": "dark-blue",
                     "name": "version",
                     "textFormat": "{{`{{`}}short_version{{`}}`}}",
                     "titleFormat": "Version change"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$ds"
+                    },
+                    "enable": true,
+                    "expr": "sum(changes(vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"}[$__interval])) by(job, instance)",
+                    "iconColor": "dark-yellow",
+                    "name": "restarts",
+                    "textFormat": "{{`{{`}}job{{`}}`}}:{{`{{`}}instance{{`}}`}} restarted"
                 }
             ]
         },
-        "description": "Overview for VictoriaMetrics vmalert v1.83.0 or higher",
-        "editable": true,
+        "description": "Overview for VictoriaMetrics vmalert v1.102.0 or higher",
+        "editable": false,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 1,
         "id": null,
@@ -114,7 +144,7 @@ data:
                 "title": "vmalert docs",
                 "tooltip": "",
                 "type": "link",
-                "url": "https://docs.victoriametrics.com/vmalert.html"
+                "url": "https://docs.victoriametrics.com/vmalert/"
             },
             {
                 "asDropdown": false,
@@ -158,7 +188,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows if the last configuration update was successful. \"Not Ok\" means there was an unsuccessful attempt to update the configuration due to some error. Check the log for details.",
@@ -219,14 +249,16 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "exemplar": false,
@@ -241,7 +273,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the total number of loaded alerting rules across selected instances and groups.",
@@ -279,18 +311,20 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "exemplar": false,
-                        "expr": "count(vmalert_alerting_rules_error{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"})",
+                        "expr": "count(vmalert_alerting_rules_last_evaluation_samples{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"})",
                         "interval": "",
                         "legendFormat": "",
                         "refId": "A"
@@ -301,7 +335,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the total number of loaded recording rules across selected instances and groups.",
@@ -339,18 +373,20 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "exemplar": false,
-                        "expr": "count(vmalert_recording_rules_error{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"})",
+                        "expr": "count(vmalert_recording_rules_last_evaluation_samples{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"})",
                         "interval": "",
                         "legendFormat": "",
                         "refId": "A"
@@ -361,7 +397,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the total number of errors generated by recording/alerting rules for selected instances and groups.",
@@ -403,18 +439,20 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "exemplar": false,
-                        "expr": "(sum(vmalert_alerting_rules_error{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"}) or vector(0)) + \n(sum(vmalert_recording_rules_error{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"}) or vector(0))",
+                        "expr": "(sum(increase(vmalert_alerting_rules_errors_total{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"}[$__rate_interval])) or vector(0)) + \n(sum(increase(vmalert_recording_rules_errors_total{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"}[$__rate_interval])) or vector(0))",
                         "interval": "",
                         "legendFormat": "",
                         "refId": "A"
@@ -425,7 +463,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows number of Recording Rules which produce no data.\n\n Usually it means that such rules are misconfigured, since they give no output during the evaluation.\nPlease check if rule's expression is correct and it is working as expected.",
@@ -467,19 +505,21 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "count(vmalert_recording_rules_last_evaluation_samples < 1) or 0",
+                        "expr": "count(vmalert_recording_rules_last_evaluation_samples{job=~\"$job\", instance=~\"$instance\"} < 1) or 0",
                         "interval": "",
                         "legendFormat": "",
                         "range": true,
@@ -491,7 +531,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -501,7 +541,9 @@ data:
                         },
                         "custom": {
                             "align": "auto",
-                            "displayMode": "auto",
+                            "cellOptions": {
+                                "type": "auto"
+                            },
                             "inspect": false,
                             "minWidth": 50
                         },
@@ -555,7 +597,9 @@ data:
                 },
                 "id": 45,
                 "options": {
+                    "cellHeight": "sm",
                     "footer": {
+                        "countRows": false,
                         "fields": "",
                         "reducer": [
                             "sum"
@@ -564,11 +608,11 @@ data:
                     },
                     "showHeader": true
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "10.4.2",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -584,7 +628,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -593,6 +637,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -606,6 +651,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "stepAfter",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -670,7 +716,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -689,7 +735,7 @@ data:
             {
                 "collapsed": false,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
@@ -703,7 +749,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -714,7 +760,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the number of fired alerts by job.",
@@ -724,6 +770,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -737,6 +784,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "linear",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -800,7 +848,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -817,7 +865,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Top $topk groups by evaluation duration. Shows groups that take the most of time during the evaluation across all instances.\n\nThe panel uses MetricsQL functions and may not work with Prometheus.",
@@ -827,6 +875,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -840,6 +889,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "linear",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -903,7 +953,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -920,7 +970,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows how many requests (executions) per second vmalert sends to the configured datasource.",
@@ -930,6 +980,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -943,6 +994,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "linear",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -1004,7 +1056,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1021,7 +1073,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Shows the error rate while executing configured rules. Non-zero value means there are some issues with existing rules. Check the logs to get more details.",
@@ -1031,6 +1083,7 @@ data:
                             "mode": "palette-classic"
                         },
                         "custom": {
+                            "axisBorderShow": false,
                             "axisCenteredZero": false,
                             "axisColorMode": "text",
                             "axisLabel": "",
@@ -1044,6 +1097,7 @@ data:
                                 "tooltip": false,
                                 "viz": false
                             },
+                            "insertNulls": false,
                             "lineInterpolation": "linear",
                             "lineWidth": 1,
                             "pointSize": 5,
@@ -1105,7 +1159,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1122,7 +1176,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -1132,7 +1186,9 @@ data:
                         },
                         "custom": {
                             "align": "auto",
-                            "displayMode": "auto",
+                            "cellOptions": {
+                                "type": "auto"
+                            },
                             "inspect": false
                         },
                         "mappings": [],
@@ -1140,8 +1196,7 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green",
-                                    "value": null
+                                    "color": "green"
                                 },
                                 {
                                     "color": "red",
@@ -1179,7 +1234,7 @@ data:
                 },
                 "gridPos": {
                     "h": 7,
-                    "w": 24,
+                    "w": 12,
                     "x": 0,
                     "y": 25
                 },
@@ -1200,11 +1255,11 @@ data:
                         }
                     ]
                 },
-                "pluginVersion": "9.2.6",
+                "pluginVersion": "9.2.7",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1248,9 +1303,109 @@ data:
                 "type": "table"
             },
             {
+                "datasource": {
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "$ds"
+                },
+                "description": "Missed evaluation means that group evaluation time takes longer than the configured evaluation interval. \nThis may result in missed alerting notifications or recording rules samples. Try increasing evaluation interval or concurrency for such groups. See https://docs.victoriametrics.com/vmalert/#groups\n\nIf rule expressions are taking longer than expected, please see https://docs.victoriametrics.com/troubleshooting/#slow-queries.\"",
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        },
+                        "custom": {
+                            "axisCenteredZero": false,
+                            "axisColorMode": "text",
+                            "axisLabel": "",
+                            "axisPlacement": "auto",
+                            "barAlignment": 0,
+                            "drawStyle": "bars",
+                            "fillOpacity": 10,
+                            "gradientMode": "none",
+                            "hideFrom": {
+                                "legend": false,
+                                "tooltip": false,
+                                "viz": false
+                            },
+                            "lineInterpolation": "linear",
+                            "lineWidth": 1,
+                            "pointSize": 5,
+                            "scaleDistribution": {
+                                "type": "linear"
+                            },
+                            "showPoints": "never",
+                            "spanNulls": false,
+                            "stacking": {
+                                "group": "A",
+                                "mode": "none"
+                            },
+                            "thresholdsStyle": {
+                                "mode": "off"
+                            }
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green"
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        },
+                        "unit": "short"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 7,
+                    "w": 12,
+                    "x": 12,
+                    "y": 25
+                },
+                "id": 58,
+                "options": {
+                    "legend": {
+                        "calcs": [
+                            "mean",
+                            "lastNotNull",
+                            "max"
+                        ],
+                        "displayMode": "table",
+                        "placement": "bottom",
+                        "showLegend": true
+                    },
+                    "tooltip": {
+                        "mode": "multi",
+                        "sort": "none"
+                    }
+                },
+                "pluginVersion": "9.2.6",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "$ds"
+                        },
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "sum(increase(vmalert_iteration_missed_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, group) > 0",
+                        "interval": "1m",
+                        "legendFormat": "__auto",
+                        "range": true,
+                        "refId": "A"
+                    }
+                ],
+                "title": "Missed evaluations ($instance)",
+                "type": "timeseries"
+            },
+            {
                 "collapsed": true,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
@@ -1266,13 +1421,14 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows the CPU usage percentage per vmalert instance. \nIf you think that usage is abnormal or unexpected pls file an issue and attach CPU profile if possible.",
+                        "description": "The precentage of used RSS memory\n\nIf you think that usage is abnormal or unexpected, please file an issue and attach memory profile if possible.",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -1286,6 +1442,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -1309,8 +1466,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1318,7 +1474,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "percentunit"
+                                "unit": "percentunit",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -1326,14 +1483,242 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 35
+                            "y": 3
+                        },
+                        "id": 37,
+                        "links": [
+                            {
+                                "targetBlank": true,
+                                "title": "Profiling",
+                                "url": "https://docs.victoriametrics.com/vmagent/#profiling"
+                            }
+                        ],
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true,
+                                "sortBy": "Last *",
+                                "sortDesc": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.2.6",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": false,
+                                "expr": "max(\n    max_over_time(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    vm_available_memory_bytes{job=~\"$job\", instance=~\"$instance\"}\n) by(job)",
+                                "interval": "",
+                                "legendFormat": "__auto",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Memory usage % ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Amount of used RSS memory\n\nIf you think that usage is abnormal or unexpected, please file an issue and attach memory profile if possible.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green"
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "bytes",
+                                "unitScale": true
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 3
+                        },
+                        "id": 57,
+                        "links": [
+                            {
+                                "targetBlank": true,
+                                "title": "Profiling",
+                                "url": "https://docs.victoriametrics.com/vmagent/#profiling"
+                            }
+                        ],
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true,
+                                "sortBy": "Last *",
+                                "sortDesc": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.2.6",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": false,
+                                "expr": "max(\n    max_over_time(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])\n) by(job)",
+                                "interval": "",
+                                "legendFormat": "{{`{{`}}job{{`}}`}}",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Memory usage ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows the CPU usage percentage per vmalert instance. \nIf you think that usage is abnormal or unexpected pls file an issue and attach CPU profile if possible.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green"
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "percentunit",
+                                "unitScale": true
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 11
                         },
                         "id": 35,
                         "links": [
                             {
                                 "targetBlank": true,
                                 "title": "Profiling",
-                                "url": "https://docs.victoriametrics.com/vmagent.html#profiling"
+                                "url": "https://docs.victoriametrics.com/vmagent/#profiling"
                             }
                         ],
                         "options": {
@@ -1380,13 +1765,14 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Amount of used memory\n\nResident memory shows share which can be freed by OS when needed.\n\nAnonymous shows share for memory allocated by the process itself. This share cannot be freed by the OS, so it must be taken into account by OOM killer.\n\nIf you think that usage is abnormal or unexpected, please file an issue and attach memory profile if possible.",
+                        "description": "Shows the max number of CPU cores used  by a `job` and the corresponding limit.",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -1400,6 +1786,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -1423,8 +1810,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1432,7 +1818,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "percentunit"
+                                "unit": "short",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -1440,14 +1827,14 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 35
+                            "y": 11
                         },
-                        "id": 37,
+                        "id": 56,
                         "links": [
                             {
                                 "targetBlank": true,
                                 "title": "Profiling",
-                                "url": "https://docs.victoriametrics.com/vmagent.html#profiling"
+                                "url": "https://docs.victoriametrics.com/vmagent/#profiling"
                             }
                         ],
                         "options": {
@@ -1465,7 +1852,7 @@ data:
                             },
                             "tooltip": {
                                 "mode": "multi",
-                                "sort": "none"
+                                "sort": "desc"
                             }
                         },
                         "pluginVersion": "9.2.6",
@@ -1477,14 +1864,32 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": false,
-                                "expr": "max(\n    max_over_time(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])\n    /\n    vm_available_memory_bytes{job=~\"$job\", instance=~\"$instance\"}\n) by(job)",
+                                "expr": "max(rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)",
+                                "format": "time_series",
                                 "interval": "",
-                                "legendFormat": "__auto",
+                                "intervalFactor": 1,
+                                "legendFormat": "{{`{{`}}job{{`}}`}}",
                                 "range": true,
                                 "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": false,
+                                "expr": "min(process_cpu_cores_available{job=~\"$job\", instance=~\"$instance\"}) by(job)",
+                                "format": "time_series",
+                                "hide": false,
+                                "interval": "",
+                                "intervalFactor": 1,
+                                "legendFormat": "limit ({{`{{`}}job{{`}}`}})",
+                                "range": true,
+                                "refId": "B"
                             }
                         ],
-                        "title": "Memory usage % ($instance)",
+                        "title": "CPU usage ($instance)",
                         "type": "timeseries"
                     },
                     {
@@ -1499,6 +1904,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -1512,6 +1918,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -1536,8 +1943,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1545,7 +1951,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "percentunit"
+                                "unit": "percentunit",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -1553,7 +1960,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 43
+                            "y": 19
                         },
                         "id": 39,
                         "links": [],
@@ -1570,7 +1977,7 @@ data:
                             },
                             "tooltip": {
                                 "mode": "multi",
-                                "sort": "none"
+                                "sort": "desc"
                             }
                         },
                         "pluginVersion": "9.2.6",
@@ -1605,6 +2012,7 @@ data:
                                     "mode": "palette-classic"
                                 },
                                 "custom": {
+                                    "axisBorderShow": false,
                                     "axisCenteredZero": false,
                                     "axisColorMode": "text",
                                     "axisLabel": "",
@@ -1618,6 +2026,7 @@ data:
                                         "tooltip": false,
                                         "viz": false
                                     },
+                                    "insertNulls": false,
                                     "lineInterpolation": "linear",
                                     "lineWidth": 1,
                                     "pointSize": 5,
@@ -1642,8 +2051,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1651,7 +2059,8 @@ data:
                                         }
                                     ]
                                 },
-                                "unit": "short"
+                                "unit": "short",
+                                "unitScale": true
                             },
                             "overrides": []
                         },
@@ -1659,7 +2068,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 43
+                            "y": 19
                         },
                         "id": 41,
                         "links": [],
@@ -1698,12 +2107,120 @@ data:
                         ],
                         "title": "Goroutines ($instance)",
                         "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows the percent of CPU spent on garbage collection.\n\nIf % is high, then CPU usage can be decreased by changing GOGC to higher values. Increasing GOGC value will increase memory usage, and decrease CPU usage.\n\nTry searching for keyword `GOGC` at https://docs.victoriametrics.com/troubleshooting/ ",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "decimals": 0,
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green"
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "percentunit",
+                                "unitScale": true
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 27
+                        },
+                        "id": 59,
+                        "links": [],
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "9.2.6",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "max(\n  rate(go_gc_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]) \n / rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])\n ) by(job)",
+                                "format": "time_series",
+                                "interval": "",
+                                "intervalFactor": 2,
+                                "legendFormat": "__auto",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "CPU spent on GC ($instance)",
+                        "type": "timeseries"
                     }
                 ],
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -1715,7 +2232,7 @@ data:
             {
                 "collapsed": true,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
@@ -1772,8 +2289,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1789,7 +2305,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 28
+                            "y": 36
                         },
                         "id": 14,
                         "options": {
@@ -1875,8 +2391,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1892,7 +2407,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 28
+                            "y": 36
                         },
                         "id": 13,
                         "options": {
@@ -1922,7 +2437,7 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": false,
-                                "expr": "sum(vmalert_alerting_rules_error{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"}) by(job, group, alertname) > 0",
+                                "expr": "sum(increase(vmalert_alerting_rules_errors_total{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"}[$__rate_interval])) by(job, group, alertname) > 0",
                                 "interval": "",
                                 "legendFormat": "{{`{{`}}group{{`}}`}}.{{`{{`}}alertname{{`}}`}} ({{`{{`}}job{{`}}`}})",
                                 "range": true,
@@ -1978,8 +2493,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -1995,7 +2509,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 36
+                            "y": 44
                         },
                         "id": 20,
                         "options": {
@@ -2082,8 +2596,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2099,7 +2612,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 36
+                            "y": 44
                         },
                         "id": 32,
                         "options": {
@@ -2115,7 +2628,7 @@ data:
                             },
                             "tooltip": {
                                 "mode": "multi",
-                                "sort": "none"
+                                "sort": "desc"
                             }
                         },
                         "pluginVersion": "9.2.6",
@@ -2126,13 +2639,13 @@ data:
                                     "uid": "$ds"
                                 },
                                 "exemplar": false,
-                                "expr": "sum(rate(vmalert_alerts_send_errors_total{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"}[$__rate_interval])) by(instance, addr) > 0",
+                                "expr": "sum(rate(vmalert_alerts_send_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(instance, addr) > 0",
                                 "interval": "",
                                 "legendFormat": "{{`{{`}}instance{{`}}`}} => {{`{{`}}addr{{`}}`}}",
                                 "refId": "A"
                             }
                         ],
-                        "title": "Errors rate to Alertmanager ($group)",
+                        "title": "Errors rate to Alertmanager",
                         "type": "timeseries"
                     },
                     {
@@ -2182,8 +2695,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2199,7 +2711,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 44
+                            "y": 52
                         },
                         "id": 26,
                         "options": {
@@ -2241,7 +2753,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -2253,7 +2765,7 @@ data:
             {
                 "collapsed": true,
                 "datasource": {
-                    "type": "datasource",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "grafana"
                 },
                 "gridPos": {
@@ -2269,7 +2781,7 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows the top $topk recording rules which generate the most of samples. Each generated sample is basically a time series which then ingested into configured remote storage. Rules with high numbers may cause the most pressure on the remote database and become a source of too high cardinality.\n\nThe panel uses MetricsQL functions and may not work with Prometheus.",
+                        "description": "Shows the top $topk recording rules which generate the most of [samples](https://docs.victoriametrics.com/keyconcepts/#raw-samples). Each generated sample is basically a time series which then ingested into configured remote storage. Rules with high numbers may cause the most pressure on the remote database and become a source of too high cardinality.\n\nThe panel uses MetricsQL functions and may not work with Prometheus.",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
@@ -2310,8 +2822,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2327,7 +2838,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 43
+                            "y": 51
                         },
                         "id": 31,
                         "options": {
@@ -2345,7 +2856,7 @@ data:
                             },
                             "tooltip": {
                                 "mode": "multi",
-                                "sort": "none"
+                                "sort": "desc"
                             }
                         },
                         "pluginVersion": "9.2.6",
@@ -2372,7 +2883,7 @@ data:
                             "type": "prometheus",
                             "uid": "$ds"
                         },
-                        "description": "Shows the rules which do not produce any samples during the evaluation. Usually it means that such rules are misconfigured, since they give no output during the evaluation.\nPlease check if rule's expression is correct and it is working as expected.",
+                        "description": "Shows the rules which do not produce any [samples](https://docs.victoriametrics.com/keyconcepts/#raw-samples) during the evaluation. Usually it means that such rules are misconfigured, since they give no output during the evaluation.\nPlease check if rule's expression is correct and it is working as expected.",
                         "fieldConfig": {
                             "defaults": {
                                 "color": {
@@ -2413,8 +2924,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2430,7 +2940,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 43
+                            "y": 51
                         },
                         "id": 33,
                         "options": {
@@ -2515,8 +3025,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2532,7 +3041,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 51
+                            "y": 59
                         },
                         "id": 30,
                         "options": {
@@ -2560,7 +3069,7 @@ data:
                                 },
                                 "editorMode": "code",
                                 "exemplar": false,
-                                "expr": "sum(vmalert_recording_rules_error{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"}) by(job, group, recording) > 0",
+                                "expr": "sum(increase(vmalert_recording_rules_errors_total{job=~\"$job\", instance=~\"$instance\", group=~\"$group\"}[$__rate_interval])) by(job, group, recording) > 0",
                                 "interval": "",
                                 "legendFormat": "{{`{{`}}group{{`}}`}}.{{`{{`}}recording{{`}}`}} ({{`{{`}}job{{`}}`}})",
                                 "range": true,
@@ -2574,7 +3083,7 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "datasource",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "grafana"
                         },
                         "refId": "A"
@@ -2638,8 +3147,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2654,7 +3162,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 0,
-                            "y": 9
+                            "y": 17
                         },
                         "id": 52,
                         "options": {
@@ -2666,7 +3174,7 @@ data:
                             },
                             "tooltip": {
                                 "mode": "single",
-                                "sort": "none"
+                                "sort": "desc"
                             }
                         },
                         "targets": [
@@ -2731,8 +3239,7 @@ data:
                                     "mode": "absolute",
                                     "steps": [
                                         {
-                                            "color": "green",
-                                            "value": null
+                                            "color": "green"
                                         },
                                         {
                                             "color": "red",
@@ -2747,7 +3254,7 @@ data:
                             "h": 8,
                             "w": 12,
                             "x": 12,
-                            "y": 9
+                            "y": 17
                         },
                         "id": 53,
                         "options": {
@@ -2759,7 +3266,7 @@ data:
                             },
                             "tooltip": {
                                 "mode": "single",
-                                "sort": "none"
+                                "sort": "desc"
                             }
                         },
                         "targets": [
@@ -2777,33 +3284,242 @@ data:
                         ],
                         "title": "Datapoints drop rate ($instance)",
                         "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows current number of established connections to remote write endpoints.\n\n",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green"
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 44
+                        },
+                        "id": 54,
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(max_over_time(vmalert_remotewrite_conns{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)",
+                                "interval": "",
+                                "legendFormat": "__auto",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Connections ($instance)",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Shows the global rate for number of written bytes via remote write connections.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "links": [],
+                                "mappings": [],
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "decbytes"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 44
+                        },
+                        "id": 55,
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": true,
+                                "expr": "sum(rate(vmalert_remotewrite_conn_bytes_written_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) > 0",
+                                "interval": "",
+                                "legendFormat": "__auto",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Bytes write rate ($instance)",
+                        "type": "timeseries"
                     }
                 ],
                 "title": "Remote write",
                 "type": "row"
             }
         ],
-        "refresh": false,
-        "schemaVersion": 37,
-        "style": "dark",
+        "refresh": "",
+        "schemaVersion": 39,
         "tags": [
             "victoriametrics",
-            "vmalert"
+            "vmalert",
+            "vm-k8s-stack"
         ],
         "templating": {
             "list": [
                 {
                     "current": {
-                        "selected": true,
+                        "selected": false,
                         "text": "VictoriaMetrics",
-                        "value": "VictoriaMetrics"
+                        "value": "P4169E866C3094E38"
                     },
                     "hide": 0,
                     "includeAll": false,
                     "multi": false,
                     "name": "ds",
-                    "options": [],
-                    "query": "prometheus",
+                    "options": [
+
+                    ],
+                    "query": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "queryValue": "",
                     "refresh": 1,
                     "regex": "",
@@ -2811,7 +3527,9 @@ data:
                     "type": "datasource"
                 },
                 {
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -2821,7 +3539,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "job",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{version=~\"^vmalert.*\"}, job)",
                         "refId": "StandardVariableQuery"
@@ -2834,7 +3554,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -2844,7 +3566,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "instance",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vm_app_version{job=~\"$job\"}, instance)",
                         "refId": "StandardVariableQuery"
@@ -2857,7 +3581,9 @@ data:
                 },
                 {
                     "allValue": ".*",
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -2867,7 +3593,9 @@ data:
                     "includeAll": true,
                     "multi": true,
                     "name": "group",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(vmalert_iteration_duration_seconds{job=~\"$job\", instance=~\"$instance\"}, group)",
                         "refId": "StandardVariableQuery"
@@ -2880,7 +3608,7 @@ data:
                 },
                 {
                     "current": {
-                        "selected": true,
+                        "selected": false,
                         "text": "5",
                         "value": "5"
                     },
@@ -2930,7 +3658,9 @@ data:
                         "type": "prometheus",
                         "uid": "$ds"
                     },
-                    "filters": [],
+                    "filters": [
+
+                    ],
                     "hide": 0,
                     "name": "adhoc",
                     "skipUrlSync": false,
@@ -2942,7 +3672,9 @@ data:
             "from": "now-3h",
             "to": "now"
         },
-        "timepicker": {},
+        "timepicker": {
+
+        },
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "VictoriaMetrics - vmalert",
         "uid": "LzldHAVnz",

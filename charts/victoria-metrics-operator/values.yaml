@@ -5,13 +5,25 @@ image:
   # -- Image repository
   repository: victoriametrics/operator
   # -- Image tag
-  tag: v0.32.1
+  # override Chart.AppVersion
+  tag: ""
+  # Variant of the image to use.
+  # e.g. scratch
+  variant: ""
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
 # -- enables CRD creation and management.
 # -- with this option, if you remove this chart, all crd resources will be deleted with it.
 createCRD: true
+
+# -- Tells helm to clean up all the vm resources under this release's namespace when uninstalling
+cleanupCRD: false
+cleanupImage:
+  repository: bitnami/kubectl
+  # use image tag that matches k8s API version by default
+  # tag: 1.29.6
+  pullPolicy: IfNotPresent
 
 replicaCount: 1
 
@@ -31,8 +43,15 @@ logLevel: "info"
 rbac:
   # -- Specifies whether the RBAC resources should be created
   create: true
-  # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
-  pspEnabled: true
+  # -- create aggregated clusterRoles for CRD readonly and admin permissions
+  aggregatedClusterRoles:
+    enabled: true
+    # -- labels attached to according clusterRole
+    labels:
+      view:
+        rbac.authorization.k8s.io/aggregate-to-view: "true"
+      admin:
+        rbac.authorization.k8s.io/aggregate-to-admin: "true"
 
 # -- Labels to be added to the all resources
 extraLabels: {}
@@ -41,15 +60,14 @@ podLabels: {}
 # -- Annotations to be added to the all resources
 annotations: {}
 
-securityContext:
-  {}
+podSecurityContext: {}
+securityContext: {}
+
 operator:
   # -- By default, operator converts prometheus-operator objects.
   disable_prometheus_converter: false
   # -- Compare-options and sync-options for prometheus objects converted by operator for properly use with ArgoCD
   prometheus_converter_add_argocd_ignore_annotations: false
-  # -- By default, operator creates psp for its objects.
-  psp_auto_creation_enabled: true
   # -- Enables ownership reference for converted prometheus-operator objects,
   # it will remove corresponding victoria-metrics objects in case of deletion prometheus one.
   enable_converter_ownership: false
@@ -57,6 +75,10 @@ operator:
   # It should reduce  vmagent and vmauth config sync-time and make it predictable.
   useCustomConfigReloader: false
 
+# By default, the operator will watch all the namespaces
+# If you want to override this behavior, specify the namespace.
+# Operator supports only single namespace for watching.
+watchNamespace: ""
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -64,8 +86,17 @@ serviceAccount:
   # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name: ""
 
+## See `kubectl explain poddisruptionbudget.spec` for more
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+podDisruptionBudget:
+  enabled: false
+  # minAvailable: 1
+  # maxUnavailable: 1
+  labels: {}
+
 # -- Resource object
-resources: {}
+resources:
+  {}
   # limits:
   #   cpu: 120m
   #   memory: 320Mi
@@ -81,13 +112,23 @@ tolerations: []
 
 # -- Pod affinity
 affinity: {}
+
+# -- Pod Topology Spread Constraints. Ref: [https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+topologySpreadConstraints: []
+
 # -- operator container additional commandline arguments
 extraArgs: {}
 
 # -- extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD)
-env: []
+env:
+  []
   # - name: VM_VMSINGLEDEFAULT_VERSION
   #   value: v1.43.0
+
+envFrom:
+  []
+  #- configMapRef:
+  #    name: special-config
 
 # -- Additional hostPath mounts
 extraHostPathMounts:
@@ -145,6 +186,9 @@ admissionWebhooks:
 # -- configures monitoring with serviceScrape. VMServiceScrape must be pre-installed
 serviceMonitor:
   enabled: false
-  extraLabels: { }
-  annotations: { }
-  relabelings: [ ]
+  extraLabels: {}
+  annotations: {}
+  relabelings: []
+
+# -- Add extra specs dynamically to this chart
+extraObjects: []

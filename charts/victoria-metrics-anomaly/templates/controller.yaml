@@ -1,0 +1,135 @@
+{{- if not (or .Values.eula .Values.license.key .Values.license.secret.key) -}}
+{{ fail "Pass -eula command-line flag or valid license at .Values.license if you have an enterprise license for running this software. See https://victoriametrics.com/legal/esa/ for details"}}
+{{- end -}}
+
+{{- if not .Values.config.reader.datasource_url -}}
+{{ fail "Please provide url for reading data from VictoriaMetrics. You need to specify url in `config.reader.datasource_url` parameter in values.yaml"}}
+{{- end -}}
+
+{{- if not .Values.config.writer.datasource_url -}}
+{{ fail "Please provide url for writing data to VictoriaMetrics. You need to specify url in `config.writer.datasource_url` parameter  in values.yaml"}}
+{{- end -}}
+
+{{- if and (not .Values.config.reader.queries) (not .Values.config.preset) -}}
+{{ fail "At least one query must be specified. You nee to add queries in `config.reader.queries` parameter in values.yaml"}}
+{{- end -}}
+
+apiVersion: apps/v1
+{{- if .Values.persistentVolume.enabled }}
+kind: StatefulSet
+{{- else }}
+kind: Deployment
+{{- end }}
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ include "chart.fullname" . }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        {{- include "chart.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.podSecurityContext}}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: model
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          workingDir: {{ .Values.containerWorkingDir }}
+          {{- if and .Values.config.monitoring .Values.config.monitoring.pull.port}}
+          ports:
+            - containerPort: {{ .Values.config.monitoring.pull.port }}
+              name: metrics
+          {{- end }}
+          args:
+            - /etc/config/config.yml
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end}}
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- with .Values.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if and .Values.env .Values.persistentVolume.enabled }}
+          env:
+           {{ concat .Values.env (list (dict "name" "VMANOMALY_MODEL_DUMPS_DIR" "value" "/tmp/vmanomaly-model-dumps")) | toYaml | nindent 10 }}
+          {{- else if .Values.persistentVolume.enabled }}
+          env:
+            - name: VMANOMALY_MODEL_DUMPS_DIR
+              value: "/tmp/vmanomaly-model-dumps"
+          {{- else if .Values.env }}
+          env:
+          {{ toYaml .Values.env | nindent 10 }}
+          {{- end }}
+          {{- if .Values.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" $) | nindent 12 }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config
+          {{- include "chart.license.mount" . | nindent 12 }}
+          {{- if .Values.persistentVolume.enabled }}
+            - name: models-dump
+              mountPath: /tmp/vmanomaly-model-dumps
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "chart.fullname" . }}
+      {{- include "chart.license.volume" . | nindent 8}}
+      {{- if .Values.persistentVolume.existingClaim }}
+        - name: models-dump
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistentVolume.existingClaim }}
+      {{- end }}
+{{- if and .Values.persistentVolume.enabled (not .Values.persistentVolume.existingClaim) }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: models-dump
+        {{- if .Values.persistentVolume.annotations }}
+        annotations:
+{{ toYaml .Values.persistentVolume.annotations | indent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+{{ toYaml .Values.persistentVolume.accessModes | indent 10 }}
+        resources:
+          requests:
+            storage: "{{ .Values.persistentVolume.size }}"
+      {{- if .Values.persistentVolume.storageClass }}
+      {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+        storageClassName: ""
+      {{- else }}
+        storageClassName: "{{ .Values.persistentVolume.storageClass }}"
+      {{- end }}
+      {{- end }}
+      {{- with .Values.persistentVolume.matchLabels }}
+        selector:
+          matchLabels:
+            {{- toYaml . | nindent 12 }}
+      {{- end }}
+{{- end }}

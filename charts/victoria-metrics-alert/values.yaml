@@ -1,7 +1,11 @@
 # Default values for victoria-metrics-alert.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+      
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -12,8 +16,6 @@ serviceAccount:
   name:
   # mount API token to pod directly
   automountToken: true
-
-imagePullSecrets: []
 
 rbac:
   create: true
@@ -29,9 +31,13 @@ server:
   image:
     repository: victoriametrics/vmalert
     tag: "" # rewrites Chart.AppVersion
+    # Variant of the image to use.
+    # e.g. enterprise, scratch
+    variant: ""
     pullPolicy: IfNotPresent
   nameOverride: ""
   fullnameOverride: ""
+  imagePullSecrets: []
 
   ## See `kubectl explain poddisruptionbudget.spec` for more
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
@@ -41,7 +47,7 @@ server:
     # maxUnavailable: 1
     labels: {}
 
-  # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
+  # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
   env:
     []
     # - name: VM_remoteWrite_basicAuth_password
@@ -49,6 +55,24 @@ server:
     #     secretKeyRef:
     #       name: auth_secret
     #       key: password
+
+  envFrom:
+    []
+    #- configMapRef:
+    #    name: special-config
+
+  # Readiness & Liveness probes
+  probe:
+    readiness:
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
+    liveness:
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
 
   replicaCount: 1
 
@@ -104,6 +128,8 @@ server:
         # -- Token Auth file with Bearer token. You can use one of token or tokenFile
         tokenFile: ""
 
+  # -- Notifier to use for alerts.
+  # Multiple notifiers can be enabled by using `notifiers` section
   notifier:
     alertmanager:
       url: ""
@@ -118,12 +144,24 @@ server:
         # -- Token Auth file with Bearer token. You can use one of token or tokenFile
         tokenFile: ""
 
+  # -- Additional notifiers to use for alerts
+  notifiers:
+    []
+    # - alertmanager:
+    #    url: ""
+    #    basicAuth:
+    #      username: ""
+    #      password: ""
+    #    bearer:
+    #      token: ""
+    #      tokenFile: ""
+
   extraArgs:
     envflag.enable: "true"
     envflag.prefix: VM_
     loggerFormat: json
 
-  # Additional hostPath mounts
+  # -- Additional hostPath mounts
   extraHostPathMounts:
     []
     # - name: certs-dir
@@ -132,19 +170,20 @@ server:
     #   hostPath: /etc/kubernetes/certs
   #   readOnly: true
 
-  # Extra Volumes for the pod
+  # -- Extra Volumes for the pod
   extraVolumes:
     []
     #- name: example
     #  configMap:
     #    name: example
 
-  # Extra Volume Mounts for the container
+  # -- Extra Volume Mounts for the container
   extraVolumeMounts:
     []
     # - name: example
     #   mountPath: /example
 
+  # -- Additional containers to run in the same pod
   extraContainers:
     []
     #- name: config-reloader
@@ -189,11 +228,12 @@ server:
     # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
 
-  podSecurityContext: {}
+  podSecurityContext:
+    enabled: true
   # fsGroup: 2000
 
   securityContext:
-    {}
+    enabled: true
     # capabilities:
     #   drop:
     #   - ALL
@@ -240,11 +280,32 @@ server:
     alerts:
       groups: []
 
+  # -- Vertical Pod Autoscaler
+  verticalPodAutoscaler:
+    # -- Use VPA for vmalert
+    enabled: false
+    # recommenders:
+    #   - name: 'alternative'
+    # updatePolicy:
+    #   updateMode: "Auto"
+    #   minReplicas: 1
+    # resourcePolicy:
+    #   containerPolicies:
+    #     - containerName: '*'
+    #       minAllowed:
+    #         cpu: 100m
+    #         memory: 128Mi
+    #       maxAllowed:
+    #         cpu: 1
+    #         memory: 500Mi
+    #       controlledResources: ["cpu", "memory"]
+
 serviceMonitor:
   enabled: false
   extraLabels: {}
   annotations: {}
   relabelings: []
+  metricRelabelings: []
 #    interval: 15s
 #    scrapeTimeout: 5s
 # -- Commented. HTTP scheme to use for scraping.
@@ -255,7 +316,6 @@ serviceMonitor:
 
 alertmanager:
   enabled: false
-  replicaCount: 1
   podMetadata:
     labels: {}
     annotations: {}
@@ -267,10 +327,14 @@ alertmanager:
   resources: {}
   tolerations: []
   imagePullSecrets: []
-  podSecurityContext: {}
+  podSecurityContext:
+    enabled: false
+  securityContext:
+    enabled: false
+  listenAddress: "0.0.0.0:9093"
   extraArgs: {}
   # key: value
-
+  envFrom: []
   # external URL, that alertmanager will expose to receivers
   baseURL: ""
   # external URL Prefix, Prefix for the internal routes of web endpoints
@@ -341,3 +405,50 @@ alertmanager:
     subPath: ""
     # -- Size of the volume. Better to set the same as resource limit memory property.
     size: 50Mi
+
+  # Additional hostPath mounts
+  extraHostPathMounts:
+    []
+    # - name: certs-dir
+    #   mountPath: /etc/kubernetes/certs
+    #   subPath: ""
+    #   hostPath: /etc/kubernetes/certs
+  #   readOnly: true
+
+  # Extra Volumes for the pod
+  extraVolumes:
+    []
+    #- name: example
+    #  configMap:
+    #    name: example
+
+  # Extra Volume Mounts for the container
+  extraVolumeMounts:
+    []
+    # - name: example
+    #   mountPath: /example
+
+  extraContainers:
+    []
+    #- name: config-reloader
+    #  image: reloader-image
+
+# -- Add extra specs dynamically to this chart
+extraObjects: []
+
+# -- Enterprise license key configuration for VictoriaMetrics enterprise.
+# Required only for VictoriaMetrics enterprise.
+# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# for more information, visit https://victoriametrics.com/products/enterprise/ .
+# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Supported starting from VictoriaMetrics v1.94.0
+license:
+  # -- License key
+  key: ""
+
+  # -- Use existing secret with license key
+  secret:
+    # -- Existing secret name
+    name: ""
+    # -- Key in secret with license key
+    key: ""

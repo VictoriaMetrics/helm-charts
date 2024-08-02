@@ -4,6 +4,24 @@ Do not change in-place! In order to change this file first read following link:
 https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack/hack
 */ -}}
 {{- if and .Values.defaultDashboardsEnabled (index .Values "victoria-metrics-operator" "enabled") }}
+{{- if .Values.grafanaOperatorDashboardsFormat.enabled }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "operator" | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+spec:
+  {{- with .Values.grafanaOperatorDashboardsFormat.instanceSelector }}
+  instanceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
+  allowCrossNamespaceImport: true
+  {{- end }}
+{{- else }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -19,7 +37,7 @@ metadata:
     {{- end }}
     {{- end }}
     app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
-{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
     {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
   annotations:
     {{- range $key, $val := .Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
@@ -27,7 +45,8 @@ metadata:
     {{- end }}
     {{- end }}
 data:
-  operator.json: |-
+{{- end }}
+  {{ if not .Values.grafanaOperatorDashboardsFormat.enabled }}operator.{{ end }}json:  |-
     {
         "__inputs": [],
         "__elements": {},
@@ -36,13 +55,7 @@ data:
                 "type": "grafana",
                 "id": "grafana",
                 "name": "Grafana",
-                "version": "9.2.2"
-            },
-            {
-                "type": "panel",
-                "id": "graph",
-                "name": "Graph (old)",
-                "version": ""
+                "version": "10.4.0"
             },
             {
                 "type": "datasource",
@@ -60,6 +73,12 @@ data:
                 "type": "panel",
                 "id": "text",
                 "name": "Text",
+                "version": ""
+            },
+            {
+                "type": "panel",
+                "id": "timeseries",
+                "name": "Time series",
                 "version": ""
             }
         ],
@@ -86,7 +105,7 @@ data:
             ]
         },
         "description": "Overview for operator VictoriaMetrics v0.25.0 or higher",
-        "editable": true,
+        "editable": false,
         "fiscalYearStartMonth": 0,
         "graphTooltip": 0,
         "id": null,
@@ -96,8 +115,8 @@ data:
             {
                 "collapsed": false,
                 "datasource": {
-                    "type": "prometheus",
-                    "uid": "$ds"
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "PB894574A363DF0AF"
                 },
                 "gridPos": {
                     "h": 1,
@@ -110,8 +129,8 @@ data:
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
-                            "uid": "$ds"
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "PB894574A363DF0AF"
                         },
                         "refId": "A"
                     }
@@ -121,7 +140,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "gridPos": {
@@ -140,11 +159,11 @@ data:
                     "content": "<div style=\"text-align: center;\">$version</div>",
                     "mode": "markdown"
                 },
-                "pluginVersion": "9.2.2",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "refId": "A"
@@ -155,7 +174,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "Number of objects at kubernetes cluster per each controller",
@@ -200,14 +219,16 @@ data:
                         "fields": "",
                         "values": false
                     },
+                    "showPercentChange": false,
                     "text": {},
-                    "textMode": "auto"
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.2",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -222,7 +243,7 @@ data:
             },
             {
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
@@ -235,12 +256,12 @@ data:
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "green",
+                                    "color": "red",
                                     "value": null
                                 },
                                 {
-                                    "color": "red",
-                                    "value": 80
+                                    "color": "green",
+                                    "value": 1800
                                 }
                             ]
                         },
@@ -267,13 +288,15 @@ data:
                         "fields": "",
                         "values": false
                     },
-                    "textMode": "auto"
+                    "showPercentChange": false,
+                    "textMode": "auto",
+                    "wideLayout": true
                 },
-                "pluginVersion": "9.2.2",
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -291,141 +314,192 @@ data:
                 "type": "stat"
             },
             {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
-                "fill": 1,
-                "fillGradient": 0,
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        },
+                        "custom": {
+                            "axisBorderShow": false,
+                            "axisCenteredZero": false,
+                            "axisColorMode": "text",
+                            "axisLabel": "",
+                            "axisPlacement": "auto",
+                            "barAlignment": 0,
+                            "drawStyle": "line",
+                            "fillOpacity": 0,
+                            "gradientMode": "none",
+                            "hideFrom": {
+                                "legend": false,
+                                "tooltip": false,
+                                "viz": false
+                            },
+                            "insertNulls": false,
+                            "lineInterpolation": "linear",
+                            "lineWidth": 1,
+                            "pointSize": 5,
+                            "scaleDistribution": {
+                                "type": "linear"
+                            },
+                            "showPoints": "never",
+                            "spanNulls": false,
+                            "stacking": {
+                                "group": "A",
+                                "mode": "none"
+                            },
+                            "thresholdsStyle": {
+                                "mode": "off"
+                            }
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        },
+                        "unit": "short"
+                    },
+                    "overrides": []
+                },
                 "gridPos": {
                     "h": 13,
                     "w": 12,
                     "x": 0,
                     "y": 8
                 },
-                "hiddenSeries": false,
                 "id": 12,
-                "legend": {
-                    "alignAsTable": true,
-                    "avg": true,
-                    "current": false,
-                    "max": true,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": true
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
                 "options": {
-                    "alertThreshold": true
+                    "legend": {
+                        "calcs": [
+                            "mean",
+                            "max"
+                        ],
+                        "displayMode": "table",
+                        "placement": "bottom",
+                        "showLegend": true
+                    },
+                    "tooltip": {
+                        "mode": "multi",
+                        "sort": "desc"
+                    }
                 },
-                "percentage": false,
-                "pluginVersion": "9.2.2",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
-                        "expr": "sum(rate(controller_runtime_reconcile_total{job=~\"$job\",instance=~\"$instance\",result=~\"requeue_after|requeue|success\"}[$__rate_interval])) by(controller)",
+                        "expr": "sum(rate(controller_runtime_reconcile_total{job=~\"$job\",instance=~\"$instance\",result=~\"requeue_after|requeue|success\"}[$__rate_interval])) by(controller) > 0",
                         "legendFormat": "{{`{{`}}controller{{`}}`}}",
                         "range": true,
                         "refId": "A"
                     }
                 ],
-                "thresholds": [],
-                "timeRegions": [],
                 "title": "Reconciliation rate by controller",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
+                "type": "timeseries"
             },
             {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "description": "",
-                "fill": 1,
-                "fillGradient": 0,
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        },
+                        "custom": {
+                            "axisBorderShow": false,
+                            "axisCenteredZero": false,
+                            "axisColorMode": "text",
+                            "axisLabel": "",
+                            "axisPlacement": "auto",
+                            "barAlignment": 0,
+                            "drawStyle": "line",
+                            "fillOpacity": 10,
+                            "gradientMode": "none",
+                            "hideFrom": {
+                                "legend": false,
+                                "tooltip": false,
+                                "viz": false
+                            },
+                            "insertNulls": false,
+                            "lineInterpolation": "linear",
+                            "lineWidth": 1,
+                            "pointSize": 5,
+                            "scaleDistribution": {
+                                "type": "linear"
+                            },
+                            "showPoints": "never",
+                            "spanNulls": false,
+                            "stacking": {
+                                "group": "A",
+                                "mode": "none"
+                            },
+                            "thresholdsStyle": {
+                                "mode": "off"
+                            }
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        },
+                        "unit": "short"
+                    },
+                    "overrides": []
+                },
                 "gridPos": {
                     "h": 13,
                     "w": 12,
                     "x": 12,
                     "y": 8
                 },
-                "hiddenSeries": false,
                 "id": 16,
-                "legend": {
-                    "alignAsTable": true,
-                    "avg": true,
-                    "current": false,
-                    "max": true,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": true
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
                 "options": {
-                    "alertThreshold": true
+                    "legend": {
+                        "calcs": [
+                            "mean",
+                            "max"
+                        ],
+                        "displayMode": "table",
+                        "placement": "bottom",
+                        "showLegend": true
+                    },
+                    "tooltip": {
+                        "mode": "multi",
+                        "sort": "desc"
+                    }
                 },
-                "percentage": false,
-                "pluginVersion": "9.2.2",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -435,41 +509,14 @@ data:
                         "refId": "A"
                     }
                 ],
-                "thresholds": [],
-                "timeRegions": [],
                 "title": "Log message rate",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
+                "type": "timeseries"
             },
             {
-                "collapsed": false,
+                "collapsed": true,
                 "datasource": {
-                    "type": "prometheus",
-                    "uid": "$ds"
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "PB894574A363DF0AF"
                 },
                 "gridPos": {
                     "h": 1,
@@ -478,12 +525,424 @@ data:
                     "y": 21
                 },
                 "id": 6,
-                "panels": [],
-                "targets": [
+                "panels": [
                     {
                         "datasource": {
                             "type": "prometheus",
                             "uid": "$ds"
+                        },
+                        "description": "Non zero metrics indicates about error with CR object definition (typos or incorrect values) or errors with kubernetes API connection.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 10,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "mappings": [],
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 0,
+                            "y": 2
+                        },
+                        "id": 10,
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "none"
+                            }
+                        },
+                        "pluginVersion": "10.4.0",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "exemplar": false,
+                                "expr": "sum(rate(controller_runtime_reconcile_errors_total{job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])) by(controller) > 0 ",
+                                "instant": false,
+                                "legendFormat": "{{`{{`}}controller{{`}}`}}",
+                                "range": true,
+                                "refId": "A"
+                            },
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(rate(controller_runtime_reconcile_total{job=~\"$job\",instance=~\"$instance\",result=\"error\"}[$__rate_interval])) by(controller) > 0",
+                                "hide": false,
+                                "legendFormat": "{{`{{`}}label_name{{`}}`}}",
+                                "range": true,
+                                "refId": "B"
+                            }
+                        ],
+                        "title": "reconcile errors by controller",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Operator limits number of reconcilation events to 5 events per 2 seconds.\n For now, this limit is applied only for vmalert and vmagent controllers.\n It should reduce load at kubernetes cluster and increase operator performance.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 10,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "mappings": [],
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 8,
+                            "w": 12,
+                            "x": 12,
+                            "y": 2
+                        },
+                        "id": 18,
+                        "options": {
+                            "legend": {
+                                "calcs": [],
+                                "displayMode": "list",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "none"
+                            }
+                        },
+                        "pluginVersion": "10.4.0",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum(rate(operator_reconcile_throttled_events_total[$__rate_interval])) by(controller)",
+                                "legendFormat": "{{`{{`}}controller{{`}}`}}",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "throttled reconcilation events",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": "Number of objects waiting in the queue for reconciliation. Non-zero values indicate that operator cannot process CR objects changes with the given resources.",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 10,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "mappings": [],
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "short"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 11,
+                            "w": 12,
+                            "x": 0,
+                            "y": 10
+                        },
+                        "id": 20,
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "lastNotNull",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "10.4.0",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "max(workqueue_depth{job=~\"$job\",instance=~\"$instance\"}) by (name)",
+                                "legendFormat": "{{`{{`}}label_name{{`}}`}}",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Wokring queue depth",
+                        "type": "timeseries"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "$ds"
+                        },
+                        "description": " For controllers with StatefulSet it's ok to see latency greater then 3 seconds. It could be vmalertmanager,vmcluster or vmagent in statefulMode.\n\n For other controllers, latency greater then 1 second may indicate issues with kubernetes cluster or operator's performance.\n ",
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {
+                                    "mode": "palette-classic"
+                                },
+                                "custom": {
+                                    "axisBorderShow": false,
+                                    "axisCenteredZero": false,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 10,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": false,
+                                        "tooltip": false,
+                                        "viz": false
+                                    },
+                                    "insertNulls": false,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {
+                                        "type": "linear"
+                                    },
+                                    "showPoints": "never",
+                                    "spanNulls": false,
+                                    "stacking": {
+                                        "group": "A",
+                                        "mode": "none"
+                                    },
+                                    "thresholdsStyle": {
+                                        "mode": "off"
+                                    }
+                                },
+                                "mappings": [],
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": null
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                },
+                                "unit": "s"
+                            },
+                            "overrides": []
+                        },
+                        "gridPos": {
+                            "h": 11,
+                            "w": 12,
+                            "x": 12,
+                            "y": 10
+                        },
+                        "id": 26,
+                        "options": {
+                            "legend": {
+                                "calcs": [
+                                    "mean",
+                                    "max"
+                                ],
+                                "displayMode": "table",
+                                "placement": "bottom",
+                                "showLegend": true
+                            },
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc"
+                            }
+                        },
+                        "pluginVersion": "10.4.0",
+                        "targets": [
+                            {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "$ds"
+                                },
+                                "editorMode": "code",
+                                "expr": "histogram_quantile(0.99, sum(rate(controller_runtime_reconcile_time_seconds_bucket[$__rate_interval])) by(le,controller))",
+                                "legendFormat": "q.99 {{`{{`}}controller{{`}}`}}",
+                                "range": true,
+                                "refId": "A"
+                            }
+                        ],
+                        "title": "Reconcilation latency by controller",
+                        "type": "timeseries"
+                    }
+                ],
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "PB894574A363DF0AF"
                         },
                         "refId": "A"
                     }
@@ -492,396 +951,24 @@ data:
                 "type": "row"
             },
             {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$ds"
-                },
-                "description": "Non zero metrics indicates about error with CR object definition (typos or incorrect values) or errors with kubernetes API connection.",
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 0,
-                    "y": 22
-                },
-                "hiddenSeries": false,
-                "id": 10,
-                "legend": {
-                    "alignAsTable": true,
-                    "avg": false,
-                    "current": true,
-                    "max": true,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": true
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "8.3.2",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "$ds"
-                        },
-                        "editorMode": "code",
-                        "exemplar": false,
-                        "expr": "sum(rate(controller_runtime_reconcile_errors_total{job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])) by(controller) > 0 ",
-                        "instant": false,
-                        "legendFormat": "{{`{{`}}controller{{`}}`}}",
-                        "range": true,
-                        "refId": "A"
-                    },
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "$ds"
-                        },
-                        "editorMode": "code",
-                        "expr": "sum(rate(controller_runtime_reconcile_total{job=~\"$job\",instance=~\"$instance\",result=\"error\"}[$__rate_interval])) by(controller) > 0",
-                        "hide": false,
-                        "legendFormat": "{{`{{`}}label_name{{`}}`}}",
-                        "range": true,
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "reconcile errors by controller",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$ds"
-                },
-                "description": "Operator limits number of reconcilation events to 5 events per 2 seconds.\n For now, this limit is applied only for vmalert and vmagent controllers.\n It should reduce load at kubernetes cluster and increase operator performance.",
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 12,
-                    "y": 22
-                },
-                "hiddenSeries": false,
-                "id": 18,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "8.3.2",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "$ds"
-                        },
-                        "editorMode": "code",
-                        "expr": "sum(rate(operator_reconcile_throttled_events_total[$__rate_interval])) by(controller)",
-                        "legendFormat": "{{`{{`}}controller{{`}}`}}",
-                        "range": true,
-                        "refId": "A"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "throttled reconcilation events",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$ds"
-                },
-                "description": "Number of objects waiting in the queue for reconciliation. Non-zero values indicate that operator cannot process CR objects changes with the given resources.",
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 11,
-                    "w": 12,
-                    "x": 0,
-                    "y": 30
-                },
-                "hiddenSeries": false,
-                "id": 20,
-                "legend": {
-                    "alignAsTable": true,
-                    "avg": false,
-                    "current": true,
-                    "max": true,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": true
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "8.3.2",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "$ds"
-                        },
-                        "editorMode": "code",
-                        "expr": "max(workqueue_depth{job=~\"$job\",instance=~\"$instance\"}) by (name)",
-                        "legendFormat": "{{`{{`}}label_name{{`}}`}}",
-                        "range": true,
-                        "refId": "A"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Wokring queue depth",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$ds"
-                },
-                "description": " For controllers with StatefulSet it's ok to see latency greater then 3 seconds. It could be vmalertmanager,vmcluster or vmagent in statefulMode.\n\n For other controllers, latency greater then 1 second may indicate issues with kubernetes cluster or operator's performance.\n ",
-                "fieldConfig": {
-                    "defaults": {
-                        "unit": "s"
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 11,
-                    "w": 12,
-                    "x": 12,
-                    "y": 30
-                },
-                "hiddenSeries": false,
-                "id": 26,
-                "legend": {
-                    "alignAsTable": true,
-                    "avg": true,
-                    "current": false,
-                    "max": true,
-                    "min": false,
-                    "rightSide": false,
-                    "show": true,
-                    "total": false,
-                    "values": true
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "8.3.2",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "$ds"
-                        },
-                        "editorMode": "code",
-                        "expr": "histogram_quantile(0.99,sum(rate(controller_runtime_reconcile_time_seconds_bucket[$__rate_interval])) by(le,controller) )",
-                        "legendFormat": "q.99 {{`{{`}}controller{{`}}`}}",
-                        "range": true,
-                        "refId": "A"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Reconcilation latency by controller",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "s",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
                 "collapsed": false,
                 "datasource": {
-                    "type": "prometheus",
-                    "uid": "$ds"
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                    "uid": "PB894574A363DF0AF"
                 },
                 "gridPos": {
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 41
+                    "y": 22
                 },
                 "id": 4,
                 "panels": [],
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
-                            "uid": "$ds"
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
+                            "uid": "PB894574A363DF0AF"
                         },
                         "refId": "A"
                     }
@@ -890,59 +977,93 @@ data:
                 "type": "row"
             },
             {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
                     "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        },
+                        "custom": {
+                            "axisBorderShow": false,
+                            "axisCenteredZero": false,
+                            "axisColorMode": "text",
+                            "axisLabel": "",
+                            "axisPlacement": "auto",
+                            "barAlignment": 0,
+                            "drawStyle": "line",
+                            "fillOpacity": 10,
+                            "gradientMode": "none",
+                            "hideFrom": {
+                                "legend": false,
+                                "tooltip": false,
+                                "viz": false
+                            },
+                            "insertNulls": false,
+                            "lineInterpolation": "linear",
+                            "lineWidth": 1,
+                            "pointSize": 5,
+                            "scaleDistribution": {
+                                "type": "linear"
+                            },
+                            "showPoints": "never",
+                            "spanNulls": false,
+                            "stacking": {
+                                "group": "A",
+                                "mode": "none"
+                            },
+                            "thresholdsStyle": {
+                                "mode": "off"
+                            }
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        },
                         "unit": "bytes"
                     },
                     "overrides": []
                 },
-                "fill": 1,
-                "fillGradient": 0,
                 "gridPos": {
                     "h": 8,
                     "w": 12,
                     "x": 0,
-                    "y": 42
+                    "y": 23
                 },
-                "hiddenSeries": false,
                 "id": 28,
-                "legend": {
-                    "alignAsTable": true,
-                    "avg": true,
-                    "current": true,
-                    "max": true,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": true
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
                 "options": {
-                    "alertThreshold": true
+                    "legend": {
+                        "calcs": [
+                            "mean",
+                            "lastNotNull",
+                            "max"
+                        ],
+                        "displayMode": "table",
+                        "placement": "bottom",
+                        "showLegend": true
+                    },
+                    "tooltip": {
+                        "mode": "multi",
+                        "sort": "desc"
+                    }
                 },
-                "percentage": false,
-                "pluginVersion": "8.3.2",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -953,7 +1074,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -965,7 +1086,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -977,7 +1098,7 @@ data:
                     },
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -988,83 +1109,94 @@ data:
                         "refId": "D"
                     }
                 ],
-                "thresholds": [],
-                "timeRegions": [],
                 "title": "Memory usage ($instance)",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "bytes",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
+                "type": "timeseries"
             },
             {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
-                "fill": 1,
-                "fillGradient": 0,
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        },
+                        "custom": {
+                            "axisBorderShow": false,
+                            "axisCenteredZero": false,
+                            "axisColorMode": "text",
+                            "axisLabel": "",
+                            "axisPlacement": "auto",
+                            "axisSoftMin": 0,
+                            "barAlignment": 0,
+                            "drawStyle": "line",
+                            "fillOpacity": 10,
+                            "gradientMode": "none",
+                            "hideFrom": {
+                                "legend": false,
+                                "tooltip": false,
+                                "viz": false
+                            },
+                            "insertNulls": false,
+                            "lineInterpolation": "linear",
+                            "lineWidth": 1,
+                            "pointSize": 5,
+                            "scaleDistribution": {
+                                "type": "linear"
+                            },
+                            "showPoints": "never",
+                            "spanNulls": false,
+                            "stacking": {
+                                "group": "A",
+                                "mode": "none"
+                            },
+                            "thresholdsStyle": {
+                                "mode": "off"
+                            }
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        },
+                        "unit": "short"
+                    },
+                    "overrides": []
+                },
                 "gridPos": {
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 42
+                    "y": 23
                 },
-                "hiddenSeries": false,
                 "id": 30,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
                 "options": {
-                    "alertThreshold": true
+                    "legend": {
+                        "calcs": [],
+                        "displayMode": "list",
+                        "placement": "bottom",
+                        "showLegend": true
+                    },
+                    "tooltip": {
+                        "mode": "multi",
+                        "sort": "none"
+                    }
                 },
-                "percentage": false,
-                "pluginVersion": "8.3.2",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1074,83 +1206,93 @@ data:
                         "refId": "A"
                     }
                 ],
-                "thresholds": [],
-                "timeRegions": [],
                 "title": "CPU ($instance)",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
+                "type": "timeseries"
             },
             {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
-                "fill": 1,
-                "fillGradient": 0,
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        },
+                        "custom": {
+                            "axisBorderShow": false,
+                            "axisCenteredZero": false,
+                            "axisColorMode": "text",
+                            "axisLabel": "",
+                            "axisPlacement": "auto",
+                            "barAlignment": 0,
+                            "drawStyle": "line",
+                            "fillOpacity": 10,
+                            "gradientMode": "none",
+                            "hideFrom": {
+                                "legend": false,
+                                "tooltip": false,
+                                "viz": false
+                            },
+                            "insertNulls": false,
+                            "lineInterpolation": "linear",
+                            "lineWidth": 1,
+                            "pointSize": 5,
+                            "scaleDistribution": {
+                                "type": "linear"
+                            },
+                            "showPoints": "never",
+                            "spanNulls": false,
+                            "stacking": {
+                                "group": "A",
+                                "mode": "none"
+                            },
+                            "thresholdsStyle": {
+                                "mode": "off"
+                            }
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        },
+                        "unit": "short"
+                    },
+                    "overrides": []
+                },
                 "gridPos": {
                     "h": 8,
                     "w": 12,
                     "x": 0,
-                    "y": 50
+                    "y": 31
                 },
-                "hiddenSeries": false,
                 "id": 32,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
                 "options": {
-                    "alertThreshold": true
+                    "legend": {
+                        "calcs": [],
+                        "displayMode": "list",
+                        "placement": "bottom",
+                        "showLegend": true
+                    },
+                    "tooltip": {
+                        "mode": "multi",
+                        "sort": "none"
+                    }
                 },
-                "percentage": false,
-                "pluginVersion": "8.3.2",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1160,90 +1302,96 @@ data:
                         "refId": "A"
                     }
                 ],
-                "thresholds": [],
-                "timeRegions": [],
                 "title": "Goroutines ($instance)",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
+                "type": "timeseries"
             },
             {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
                 "datasource": {
-                    "type": "prometheus",
+                    "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "uid": "$ds"
                 },
                 "fieldConfig": {
                     "defaults": {
+                        "color": {
+                            "mode": "palette-classic"
+                        },
+                        "custom": {
+                            "axisBorderShow": false,
+                            "axisCenteredZero": false,
+                            "axisColorMode": "text",
+                            "axisLabel": "",
+                            "axisPlacement": "auto",
+                            "barAlignment": 0,
+                            "drawStyle": "line",
+                            "fillOpacity": 10,
+                            "gradientMode": "none",
+                            "hideFrom": {
+                                "legend": false,
+                                "tooltip": false,
+                                "viz": false
+                            },
+                            "insertNulls": false,
+                            "lineInterpolation": "linear",
+                            "lineWidth": 1,
+                            "pointSize": 5,
+                            "scaleDistribution": {
+                                "type": "linear"
+                            },
+                            "showPoints": "never",
+                            "spanNulls": false,
+                            "stacking": {
+                                "group": "A",
+                                "mode": "none"
+                            },
+                            "thresholdsStyle": {
+                                "mode": "off"
+                            }
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        },
                         "unit": "s"
                     },
                     "overrides": []
                 },
-                "fill": 1,
-                "fillGradient": 0,
                 "gridPos": {
                     "h": 8,
                     "w": 12,
                     "x": 12,
-                    "y": 50
+                    "y": 31
                 },
-                "hiddenSeries": false,
                 "id": 34,
-                "legend": {
-                    "alignAsTable": true,
-                    "avg": true,
-                    "current": false,
-                    "max": true,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": true
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
                 "options": {
-                    "alertThreshold": true
+                    "legend": {
+                        "calcs": [
+                            "mean",
+                            "max"
+                        ],
+                        "displayMode": "table",
+                        "placement": "bottom",
+                        "showLegend": true
+                    },
+                    "tooltip": {
+                        "mode": "multi",
+                        "sort": "none"
+                    }
                 },
-                "percentage": false,
-                "pluginVersion": "8.3.2",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
+                "pluginVersion": "10.4.0",
                 "targets": [
                     {
                         "datasource": {
-                            "type": "prometheus",
+                            "type": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                             "uid": "$ds"
                         },
                         "editorMode": "code",
@@ -1253,58 +1401,33 @@ data:
                         "refId": "A"
                     }
                 ],
-                "thresholds": [],
-                "timeRegions": [],
                 "title": "GC duration ($instance)",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "s",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
+                "type": "timeseries"
             }
         ],
         "refresh": "",
-        "schemaVersion": 37,
-        "style": "dark",
+        "schemaVersion": 39,
         "tags": [
             "operator",
-            "VictoriaMetrics"
+            "VictoriaMetrics",
+            "vm-k8s-stack"
         ],
         "templating": {
             "list": [
                 {
                     "current": {
-                        "selected": false,
-                        "text": "cloud-c15",
-                        "value": "cloud-c15"
+                        "selected": true,
+                        "text": "VictoriaMetrics",
+                        "value": "PF64AB64142051B50"
                     },
                     "hide": 0,
                     "includeAll": false,
                     "multi": false,
                     "name": "ds",
-                    "options": [],
-                    "query": "prometheus",
+                    "options": [
+
+                    ],
+                    "query": "{{ default "prometheus" .Values.grafana.defaultDatasourceType }}",
                     "queryValue": "",
                     "refresh": 1,
                     "regex": "",
@@ -1312,7 +1435,9 @@ data:
                     "type": "datasource"
                 },
                 {
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -1322,7 +1447,9 @@ data:
                     "includeAll": false,
                     "multi": false,
                     "name": "job",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(operator_log_messages_total,job)",
                         "refId": "StandardVariableQuery"
@@ -1334,7 +1461,9 @@ data:
                     "type": "query"
                 },
                 {
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
@@ -1344,7 +1473,9 @@ data:
                     "includeAll": true,
                     "multi": false,
                     "name": "instance",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
                         "query": "label_values(operator_log_messages_total{job=~\"$job\"},instance)",
                         "refId": "StandardVariableQuery"
@@ -1356,20 +1487,25 @@ data:
                     "type": "query"
                 },
                 {
-                    "current": {},
+                    "current": {
+
+                    },
                     "datasource": {
                         "type": "prometheus",
                         "uid": "$ds"
                     },
-                    "definition": "label_values(vm_app_version{job=\"$job\", instance=\"$instance\"},  version)",
+                    "definition": "label_values(vm_app_version{job=\"$job\", instance=~\"$instance\"},version)",
                     "hide": 2,
                     "includeAll": false,
                     "multi": false,
                     "name": "version",
-                    "options": [],
+                    "options": [
+
+                    ],
                     "query": {
-                        "query": "label_values(vm_app_version{job=\"$job\", instance=\"$instance\"},  version)",
-                        "refId": "StandardVariableQuery"
+                        "qryType": 1,
+                        "query": "label_values(vm_app_version{job=\"$job\", instance=~\"$instance\"},version)",
+                        "refId": "PrometheusVariableQueryEditor-VariableQuery"
                     },
                     "refresh": 1,
                     "regex": "",
@@ -1383,7 +1519,9 @@ data:
             "from": "now-15m",
             "to": "now"
         },
-        "timepicker": {},
+        "timepicker": {
+
+        },
         "timezone": "{{ .Values.grafana.defaultDashboardsTimezone }}",
         "title": "VictoriaMetrics - operator",
         "uid": "1H179hunk",

@@ -31,7 +31,7 @@ spec:
 {{ toYaml .Values.vmselect.podAnnotations | indent 8 }}
     {{- end }}
       labels:
-        {{- include "victoria-metrics.vmselect.labels" . | nindent 8 }}
+        {{- include "victoria-metrics.vmselect.podLabels" . | nindent 8 }}
 {{- with .Values.vmselect.extraLabels }}
 {{ toYaml . | indent 8 }}
 {{- end }}
@@ -46,26 +46,42 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vmselect.name }}
-          image: "{{ .Values.vmselect.image.repository }}:{{ .Values.vmselect.image.tag }}"
+          image: "{{ .Values.vmselect.image.repository }}:{{ default .Chart.AppVersion .Values.vmselect.image.tag }}{{- with .Values.vmselect.image.variant }}-{{ . }}{{- end }}"
           imagePullPolicy: "{{ .Values.vmselect.image.pullPolicy }}"
           {{- if .Values.vmselect.containerWorkingDir }}
           workingDir: {{ .Values.vmselect.containerWorkingDir }}
           {{- end }}
-          securityContext:
-            {{- toYaml .Values.vmselect.podSecurityContext | nindent 12 }}
+          {{- if .Values.vmselect.securityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmselect.securityContext "context" $) | nindent 12 }}
+          {{- end }}
           args:
             - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
-          {{- if not .Values.vmselect.suppresStorageFQDNsRender }}
+          {{- if not (or .Values.vmselect.suppressStorageFQDNsRender .Values.vmselect.suppresStorageFQDNsRender )}}
           {{- include "victoria-metrics.vmselect.vmstorage-pod-fqdn" . | nindent 12 }}
           {{- end }}
           {{- range $key, $value := .Values.vmselect.extraArgs }}
+          {{- if kindIs "slice" $value }}
+          {{- range $v := $value }}
+            - --{{ $key }}={{ $v }}
+          {{- end }}
+          {{- else }}
             - --{{ $key }}={{ $value }}
+          {{- end }}
+          {{- end }}
+          {{- with (include "chart.license.flag" .) }}
+            - {{ . }}
+          {{- end }}
+          {{- if .Values.vmselect.envFrom }}
+          envFrom:
+            {{- with .Values.vmselect.envFrom -}}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with .Values.vmselect.env }}
           env: {{ toYaml . | nindent 10 }}
           {{- end }}
           ports:
-            - name: http
+            - name: "{{ .Values.vmselect.ports.name | default "http" }}" 
               containerPort: 8481
           {{- if .Values.vmselect.extraArgs.clusternativeListenAddr }}
             - name: cluster-tcp
@@ -74,15 +90,24 @@ spec:
           {{- end }}
           readinessProbe:
             httpGet:
+            {{- if index  .Values.vmselect.extraArgs "http.pathPrefix" }}
+              path: {{ trimSuffix "/" (index .Values.vmselect.extraArgs "http.pathPrefix") }}/health
+            {{- else }}
               path: /health
-              port: http
+            {{- end }}
+              port: "{{ .Values.vmselect.ports.name | default "http" }}" 
+            {{- if .Values.vmselect.extraArgs.tls }}
+              scheme: HTTPS
+            {{- else }}
+              scheme: HTTP
+            {{- end }}
             initialDelaySeconds: {{ .Values.vmselect.probe.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vmselect.probe.readiness.periodSeconds }}
             timeoutSeconds: {{ .Values.vmselect.probe.readiness.timeoutSeconds }}
             failureThreshold: {{ .Values.vmselect.probe.readiness.failureThreshold }}
           livenessProbe:
             tcpSocket:
-              port: http
+              port: "{{ .Values.vmselect.ports.name | default "http" }}" 
             initialDelaySeconds: {{ .Values.vmselect.probe.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.vmselect.probe.liveness.periodSeconds }}
             timeoutSeconds: {{ .Values.vmselect.probe.liveness.timeoutSeconds }}
@@ -99,6 +124,7 @@ spec:
           {{- with .Values.vmselect.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "chart.license.mount" . | nindent 12 }}
           resources:
             {{- with .Values.vmselect.resources }}
             {{- toYaml . | nindent 12 }}
@@ -114,9 +140,8 @@ spec:
       nodeSelector:
 {{ toYaml .Values.vmselect.nodeSelector | indent 8 }}
     {{- end }}
-    {{- if .Values.vmselect.securityContext }}
-      securityContext:
-{{ toYaml .Values.vmselect.securityContext | indent 8 }}
+    {{- if .Values.vmselect.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmselect.podSecurityContext "context" $) | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
     {{- if .Values.vmselect.tolerations }}
@@ -142,4 +167,5 @@ spec:
             {{- else }}
           emptyDir: {}
             {{- end -}}
+        {{- include "chart.license.volume" . | nindent 8 }}
 {{- end }}

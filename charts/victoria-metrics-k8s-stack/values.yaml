@@ -11,17 +11,18 @@ argocdReleaseOverride: ""
 # -- also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars.html
 victoria-metrics-operator:
   enabled: true
-  # -- Tells helm to remove CRD after chart remove
+  # -- Tells helm to clean up vm cr resources when uninstalling
   cleanupCRD: true
   cleanupImage:
-    repository: gcr.io/google_containers/hyperkube
-    tag: v1.18.0
+    repository: bitnami/kubectl
+    # use image tag that matches k8s API version by default
+    # tag: 1.29.6
     pullPolicy: IfNotPresent
 
   createCRD: false # we disable crd creation by operator chart as we create them in this chart
   operator:
     # -- By default, operator converts prometheus-operator objects.
-    disable_prometheus_converter: true
+    disable_prometheus_converter: false
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -35,48 +36,176 @@ serviceAccount:
 ## -- Create default rules for monitoring the cluster
 defaultRules:
   create: true
-  rules:
-    etcd: true
-    general: true
-    k8s: true
-    kubeApiserver: true
-    kubeApiserverAvailability: true
-    kubeApiserverBurnrate: true
-    kubeApiserverSlos: true
-    kubelet: true
-    kubePrometheusGeneral: true
-    kubePrometheusNodeRecording: true
-    kubernetesApps: true
-    kubernetesResources: true
-    kubernetesStorage: true
-    kubernetesSystem: true
-    kubeScheduler: true
-    kubeStateMetrics: true
-    network: true
-    node: true
-    vmagent: true
-    vmsingle: true
-    vmhealth: true
-    alertmanager: true
+
+  # -- Common properties for VMRule groups
+  group:
+    spec:
+      # -- Optional HTTP URL parameters added to each rule request
+      params: {}
+
+  # -- Common properties for all VMRules
+  rule:
+    spec:
+      # -- Additional labels for all VMRules
+      labels: {}
+      # -- Additional annotations for all VMRules
+      annotations: {}
+
+  # -- Common properties for VMRules alerts
+  alerting:
+    spec:
+      # -- Additional labels for VMRule alerts
+      labels: {}
+      # -- Additional annotations for VMRule alerts
+      annotations: {}
+
+  # -- Common properties for VMRules recording rules
+  recording:
+    spec:
+      # -- Additional labels for VMRule recording rules
+      labels: {}
+      # -- Additional annotations for VMRule recording rules
+      annotations: {}
+
+  # -- Per rule properties
+  rules: {}
+    # CPUThrottlingHigh:
+    #   create: true
+    #   spec:
+    #     for: 15m
+    #     labels:
+    #       severity: critical
+  groups:
+    etcd:
+      create: true
+      # -- Common properties for all rules in a group
+      rules: {}
+      # spec:
+      #   annotations:
+      #     dashboard: https://example.com/dashboard/1
+    general:
+      create: true
+      rules: {}
+    k8sContainerMemoryRss:
+      create: true
+      rules: {}
+    k8sContainerMemoryCache:
+      create: true
+      rules: {}
+    k8sContainerCpuUsageSecondsTotal:
+      create: true
+      rules: {}
+    k8sPodOwner:
+      create: true
+      rules: {}
+    k8sContainerResource:
+      create: true
+      rules: {}
+    k8sContainerMemoryWorkingSetBytes:
+      create: true
+      rules: {}
+    k8sContainerMemorySwap:
+      create: true
+      rules: {}
+    kubeApiserver:
+      create: true
+      rules: {}
+    kubeApiserverAvailability:
+      create: true
+      rules: {}
+    kubeApiserverBurnrate:
+      create: true
+      rules: {}
+    kubeApiserverHistogram:
+      create: true
+      rules: {}
+    kubeApiserverSlos:
+      create: true
+      rules: {}
+    kubelet:
+      create: true
+      rules: {}
+    kubePrometheusGeneral:
+      create: true
+      rules: {}
+    kubePrometheusNodeRecording:
+      create: true
+      rules: {}
+    kubernetesApps:
+      create: true
+      rules: {}
+      targetNamespace: ".*"
+    kubernetesResources:
+      create: true
+      rules: {}
+    kubernetesStorage:
+      create: true
+      rules: {}
+      targetNamespace: ".*"
+    kubernetesSystem:
+      create: true
+      rules: {}
+    kubernetesSystemKubelet:
+      create: true
+      rules: {}
+    kubernetesSystemApiserver:
+      create: true
+      rules: {}
+    kubernetesSystemControllerManager:
+      create: true
+      rules: {}
+    kubeScheduler:
+      create: true
+      rules: {}
+    kubernetesSystemScheduler:
+      create: true
+      rules: {}
+    kubeStateMetrics:
+      create: true
+      rules: {}
+    nodeNetwork:
+      create: true
+      rules: {}
+    node:
+      create: true
+      rules: {}
+    vmagent:
+      create: true
+      rules: {}
+    vmsingle:
+      create: true
+      rules: {}
+    vmcluster:
+      create: true
+      rules: {}
+    vmHealth:
+      create: true
+      rules: {}
+    alertmanager:
+      create: true
+      rules: {}
 
   # -- Runbook url prefix for default rules
   runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
-  ## Reduce app namespace alert scope
-  appNamespacesTarget: ".*"
 
   # -- Labels for default rules
   labels: {}
   # -- Annotations for default rules
   annotations: {}
 
-  # -- Additional labels for PrometheusRule alerts
-  additionalRuleLabels: {}
-
 ## -- Create default dashboards
 defaultDashboardsEnabled: true
 
 ## -- Create experimental dashboards
 experimentalDashboardsEnabled: true
+
+## -- Create dashboards as CRDs (reuqires grafana-operator to be installed)
+grafanaOperatorDashboardsFormat:
+  enabled: false
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  allowCrossNamespaceImport: false
 
 # Provide custom recording or alerting rules to be deployed into the cluster.
 additionalVictoriaMetricsMap:
@@ -109,8 +238,9 @@ vmsingle:
   # https://docs.victoriametrics.com/operator/api.html#vmsinglespec
   spec:
     image:
-      tag: v1.89.1
-    retentionPeriod: "14"
+      tag: v1.102.1
+    # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
+    retentionPeriod: "1"
     replicaCount: 1
     extraArgs: {}
     storage:
@@ -158,14 +288,15 @@ vmsingle:
 vmcluster:
   enabled: false
   annotations: {}
-  # spec for VMSingle crd
+  # spec for VMCluster crd
   # https://docs.victoriametrics.com/operator/api.html#vmclusterspec
   spec:
-    retentionPeriod: "14"
+    # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
+    retentionPeriod: "1"
     replicationFactor: 2
     vmstorage:
       image:
-        tag: v1.89.1-cluster
+        tag: v1.102.1-cluster
       replicaCount: 2
       storageDataPath: "/vm-data"
       storage:
@@ -181,7 +312,7 @@ vmcluster:
         #   memory: 1500Mi
     vmselect:
       image:
-        tag: v1.89.1-cluster
+        tag: v1.102.1-cluster
       replicaCount: 2
       cacheMountPath: "/select-cache"
       extraArgs: {}
@@ -201,7 +332,7 @@ vmcluster:
         #   memory: "500Mi"
     vminsert:
       image:
-        tag: v1.89.1-cluster
+        tag: v1.102.1-cluster
       replicaCount: 2
       extraArgs: {}
       resources:
@@ -336,109 +467,107 @@ alertmanager:
     # configSecret: "alertmanager-config"
 
   config:
-    global:
-      resolve_timeout: 5m
-      slack_api_url: "http://slack:30500/"
     templates:
       - "/etc/vm/configs/**/*.tmpl"
     route:
-      group_by: ["alertgroup", "job"]
-      group_wait: 30s
-      group_interval: 5m
-      repeat_interval: 12h
-      receiver: "slack-monitoring"
-      routes:
+      # group_by: ["alertgroup", "job"]
+      # group_wait: 30s
+      # group_interval: 5m
+      # repeat_interval: 12h
+      receiver: "blackhole"
+      ## routes:
         ###################################################
         ## Duplicate code_owner routes to teams
         ## These will send alerts to team channels but continue
         ## processing through the rest of the tree to handled by on-call
-        - matchers:
-            - code_owner_channel!=""
-            - severity=~"info|warning|critical"
-          group_by: ["code_owner_channel", "alertgroup", "job"]
-          receiver: slack-code-owners
-        ###################################################
-        ## Standard on-call routes
-        - matchers:
-            - severity=~"info|warning|critical"
-          receiver: slack-monitoring
-          continue: true
+        # - matchers:
+        #     - code_owner_channel!=""
+        #     - severity=~"info|warning|critical"
+        #   group_by: ["code_owner_channel", "alertgroup", "job"]
+        #   receiver: slack-code-owners
+        # ###################################################
+        # ## Standard on-call routes
+        # - matchers:
+        #     - severity=~"info|warning|critical"
+        #   receiver: slack-monitoring
+        #   continue: true
 
-    inhibit_rules:
-      - target_matchers:
-          - severity=~"warning|info"
-        source_matchers:
-          - severity=critical
-        equal:
-          - cluster
-          - namespace
-          - alertname
-      - target_matchers:
-          - severity=info
-        source_matchers:
-          - severity=warning
-        equal:
-          - cluster
-          - namespace
-          - alertname
-      - target_matchers:
-          - severity=info
-        source_matchers:
-          - alertname=InfoInhibitor
-        equal:
-          - cluster
-          - namespace
+    # inhibit_rules:
+    #   - target_matchers:
+    #       - severity=~"warning|info"
+    #     source_matchers:
+    #       - severity=critical
+    #     equal:
+    #       - cluster
+    #       - namespace
+    #       - alertname
+    #   - target_matchers:
+    #       - severity=info
+    #     source_matchers:
+    #       - severity=warning
+    #     equal:
+    #       - cluster
+    #       - namespace
+    #       - alertname
+    #   - target_matchers:
+    #       - severity=info
+    #     source_matchers:
+    #       - alertname=InfoInhibitor
+    #     equal:
+    #       - cluster
+    #       - namespace
 
     receivers:
-      - name: "slack-monitoring"
-        slack_configs:
-          - channel: "#channel"
-            send_resolved: true
-            title: '{{ template "slack.monzo.title" . }}'
-            icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
-            color: '{{ template "slack.monzo.color" . }}'
-            text: '{{ template "slack.monzo.text" . }}'
-            actions:
-              - type: button
-                text: "Runbook :green_book:"
-                url: "{{ (index .Alerts 0).Annotations.runbook_url }}"
-              - type: button
-                text: "Query :mag:"
-                url: "{{ (index .Alerts 0).GeneratorURL }}"
-              - type: button
-                text: "Dashboard :grafana:"
-                url: "{{ (index .Alerts 0).Annotations.dashboard }}"
-              - type: button
-                text: "Silence :no_bell:"
-                url: '{{ template "__alert_silence_link" . }}'
-              - type: button
-                text: '{{ template "slack.monzo.link_button_text" . }}'
-                url: "{{ .CommonAnnotations.link_url }}"
-      - name: slack-code-owners
-        slack_configs:
-          - channel: "#{{ .CommonLabels.code_owner_channel }}"
-            send_resolved: true
-            title: '{{ template "slack.monzo.title" . }}'
-            icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
-            color: '{{ template "slack.monzo.color" . }}'
-            text: '{{ template "slack.monzo.text" . }}'
-            actions:
-              - type: button
-                text: "Runbook :green_book:"
-                url: "{{ (index .Alerts 0).Annotations.runbook }}"
-              - type: button
-                text: "Query :mag:"
-                url: "{{ (index .Alerts 0).GeneratorURL }}"
-              - type: button
-                text: "Dashboard :grafana:"
-                url: "{{ (index .Alerts 0).Annotations.dashboard }}"
-              - type: button
-                text: "Silence :no_bell:"
-                url: '{{ template "__alert_silence_link" . }}'
-              - type: button
-                text: '{{ template "slack.monzo.link_button_text" . }}'
-                url: "{{ .CommonAnnotations.link_url }}"
-
+      - name: blackhole
+      # - name: "slack-monitoring"
+      #   slack_configs:
+      #     - channel: "#channel"
+      #       send_resolved: true
+      #       title: '{{ template "slack.monzo.title" . }}'
+      #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
+      #       color: '{{ template "slack.monzo.color" . }}'
+      #       text: '{{ template "slack.monzo.text" . }}'
+      #       actions:
+      #         - type: button
+      #           text: "Runbook :green_book:"
+      #           url: "{{ (index .Alerts 0).Annotations.runbook_url }}"
+      #         - type: button
+      #           text: "Query :mag:"
+      #           url: "{{ (index .Alerts 0).GeneratorURL }}"
+      #         - type: button
+      #           text: "Dashboard :grafana:"
+      #           url: "{{ (index .Alerts 0).Annotations.dashboard }}"
+      #         - type: button
+      #           text: "Silence :no_bell:"
+      #           url: '{{ template "__alert_silence_link" . }}'
+      #         - type: button
+      #           text: '{{ template "slack.monzo.link_button_text" . }}'
+      #           url: "{{ .CommonAnnotations.link_url }}"
+      # - name: slack-code-owners
+      #   slack_configs:
+      #     - channel: "#{{ .CommonLabels.code_owner_channel }}"
+      #       send_resolved: true
+      #       title: '{{ template "slack.monzo.title" . }}'
+      #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
+      #       color: '{{ template "slack.monzo.color" . }}'
+      #       text: '{{ template "slack.monzo.text" . }}'
+      #       actions:
+      #         - type: button
+      #           text: "Runbook :green_book:"
+      #           url: "{{ (index .Alerts 0).Annotations.runbook }}"
+      #         - type: button
+      #           text: "Query :mag:"
+      #           url: "{{ (index .Alerts 0).GeneratorURL }}"
+      #         - type: button
+      #           text: "Dashboard :grafana:"
+      #           url: "{{ (index .Alerts 0).Annotations.dashboard }}"
+      #         - type: button
+      #           text: "Silence :no_bell:"
+      #           url: '{{ template "__alert_silence_link" . }}'
+      #         - type: button
+      #           text: '{{ template "slack.monzo.link_button_text" . }}'
+      #           url: "{{ .CommonAnnotations.link_url }}"
+      #
   # better alert templates for slack
   # source https://gist.github.com/milesbxf/e2744fc90e9c41b47aa47925f8ff6512
   monzoTemplate:
@@ -500,8 +629,11 @@ vmalert:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.89.1
+      tag: v1.102.1
     evaluationInterval: 15s
+
+    # External labels to add to all generated recording rules and alerts
+    externalLabels: {}
 
   # extra vmalert annotation templates
   templateFiles:
@@ -511,6 +643,16 @@ vmalert:
     #   hello, Victoria!
     #   {{- end }}
     # template_2.tmpl: ""
+
+  ## additionalNotifierConfigs allows to configure static notifiers, discover notifiers via Consul and DNS,
+  ## see specification in https://docs.victoriametrics.com/vmalert/#notifier-configuration-file.
+  ## This configuration will be created as separate secret and mounted to vmalert pod.
+  additionalNotifierConfigs: {}
+    # dns_sd_configs:
+    #   - names:
+    #       - my.domain.com
+    #     type: 'A'
+    #     port: 9093
 
   ingress:
     enabled: false
@@ -561,12 +703,17 @@ vmagent:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.89.1
-    scrapeInterval: 25s
-    externalLabels:
-      cluster: cluster-name
+      tag: v1.102.1
+    scrapeInterval: 20s
+    externalLabels: {}
+      # For multi-cluster setups it is useful to use "cluster" label to identify the metrics source.
+      # For example:
+      # cluster: cluster-name
     extraArgs:
       promscrape.streamParse: "true"
+      # Do not store original labels in vmagent's memory by default. This reduces the amount of memory used by vmagent
+      # but makes vmagent debugging UI less informative. See: https://docs.victoriametrics.com/vmagent/#relabel-debug
+      promscrape.dropOriginalLabels: "true"
   ingress:
     enabled: false
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
@@ -613,6 +760,7 @@ grafana:
   sidecar:
     datasources:
       enabled: true
+      initDatasources: true
       createVMReplicasDatasources: false
       # JSON options for VM datasources
       # See https://grafana.com/docs/grafana/latest/administration/provisioning/#json-data
@@ -663,9 +811,21 @@ grafana:
         revision: 22
         datasource: VictoriaMetrics
 
-  defaultDashboardsEnabled: true
-
   defaultDashboardsTimezone: utc
+
+  # Enabling VictoriaMetrics Datasource in Grafana. See more details here: https://github.com/VictoriaMetrics/grafana-datasource/blob/main/README.md#victoriametrics-datasource-for-grafana
+  # Note that Grafana will need internet access to install the datasource plugin.
+  # Uncomment the block below, if you want to enable VictoriaMetrics Datasource in Grafana:
+  #plugins:
+  #  - "https://github.com/VictoriaMetrics/grafana-datasource/releases/download/v0.5.0/victoriametrics-datasource-v0.5.0.zip;victoriametrics-datasource"
+  #grafana.ini:
+  #  plugins:
+  #    # Why VictoriaMetrics datasource is unsigned: https://github.com/VictoriaMetrics/grafana-datasource/blob/main/README.md#why-victoriametrics-datasource-is-unsigned
+  #    allow_loading_unsigned_plugins: victoriametrics-datasource
+
+  # Change datasource type in dashboards from Prometheus to VictoriaMetrics.
+  # you can use `victoriametrics-datasource` instead of `prometheus` if enabled VictoriaMetrics Datasource above
+  defaultDatasourceType: "prometheus"
 
   ingress:
     enabled: false
@@ -704,7 +864,7 @@ grafana:
     #      - grafana.domain.com
 
   vmServiceScrape:
-    # wheter we should create a service scrape resource for node-exporter
+    # whether we should create a service scrape resource for grafana
     enabled: true
 
     # spec for VMServiceScrape crd
@@ -725,7 +885,7 @@ prometheus-node-exporter:
     - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
 
   vmServiceScrape:
-    # wheter we should create a service scrape resource for node-exporter
+    # whether we should create a service scrape resource for node-exporter
     enabled: true
 
     # spec for VMServiceScrape crd
@@ -738,7 +898,7 @@ prometheus-node-exporter:
             - action: drop
               source_labels: [mountpoint]
               regex: "/var/lib/kubelet/pods.+"
-# kube-state-metrics dependency chart configuration. For possible values refer to https://github.com/kubernetes/kube-state-metrics/blob/master/charts/kube-state-metrics/values.yaml
+# kube-state-metrics dependency chart configuration. For possible values refer to https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-state-metrics/values.yaml
 kube-state-metrics:
   enabled: true
   ## all values for kube-state-metrics helm chart can be specified here
@@ -788,7 +948,9 @@ kubelet:
         targetLabel: metrics_path
       - targetLabel: "job"
         replacement: "kubelet"
-
+    # ignore timestamps of cadvisor's metrics by default
+    # more info here https://github.com/VictoriaMetrics/VictoriaMetrics/issues/4697#issuecomment-1656540535
+    honorTimestamps: false
 # -- Component scraping the kube api server
 kubeApiServer:
   enabled: true
@@ -882,6 +1044,7 @@ coreDns:
   # spec for VMServiceScrape crd
   # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
   spec:
+    jobLabel: jobLabel
     endpoints:
       - port: http-metrics
         bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -936,8 +1099,8 @@ kubeScheduler:
   ##
   service:
     enabled: true
-    port: 10251
-    targetPort: 10251
+    port: 10259
+    targetPort: 10259
     # selector:
     #   component: kube-scheduler
 
@@ -985,3 +1148,14 @@ kubeProxy:
         scheme: https
         tlsConfig:
           caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+## install vm operator crds
+crds:
+  enabled: true
+
+## install prometheus operator crds
+prometheus-operator-crds:
+  enabled: false
+
+# -- Add extra objects dynamically to this chart
+extraObjects: []

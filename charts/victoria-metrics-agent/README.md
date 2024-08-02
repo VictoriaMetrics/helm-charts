@@ -1,14 +1,16 @@
 # Helm Chart For Victoria Metrics Agent.
 
- ![Version: 0.8.35](https://img.shields.io/badge/Version-0.8.35-informational?style=flat-square)
+ ![Version: 0.10.13](https://img.shields.io/badge/Version-0.10.13-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-agent)
+[![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
 Victoria Metrics Agent - collects metrics from various sources and stores them to VictoriaMetrics
 
-# Prerequisites
+## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
 
-# How to install
+## How to install
 
 Access a Kubernetes cluster.
 
@@ -21,8 +23,6 @@ helm repo update
 ```
 
 List versions of ``vm/victoria-metrics-agent`` chart available to installation:
-
-##### for helm v3
 
 ```console
 helm search repo vm/victoria-metrics-agent -l
@@ -43,8 +43,6 @@ helm install vmagent vm/victoria-metrics-agent -f values.yaml -n NAMESPACE --deb
 ```
 
 Install chart with command:
-
-##### for helm v3
 
 ```console
 helm install vmagent vm/victoria-metrics-agent -f values.yaml -n NAMESPACE
@@ -68,7 +66,7 @@ See the history of versions of ``vmagent`` application with command.
 helm history vmagent -n NAMESPACE
 ```
 
-# How to uninstall
+## How to uninstall
 
 Remove application with command.
 
@@ -76,7 +74,7 @@ Remove application with command.
 helm uninstall vmagent -n NAMESPACE
 ```
 
-# Documentation of Helm Chart
+## Documentation of Helm Chart
 
 Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
 
@@ -90,7 +88,7 @@ helm-docs
 
 The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-# Parameters
+## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
 
@@ -105,7 +103,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[0].static_configs[0].targets[0] | string | `"localhost:8429"` |  |
 | config.scrape_configs[1].bearer_token_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | config.scrape_configs[1].job_name | string | `"kubernetes-apiservers"` |  |
-| config.scrape_configs[1].kubernetes_sd_configs[0].role | string | `"endpointslices"` |  |
+| config.scrape_configs[1].kubernetes_sd_configs[0].role | string | `"endpoints"` |  |
 | config.scrape_configs[1].relabel_configs[0].action | string | `"keep"` |  |
 | config.scrape_configs[1].relabel_configs[0].regex | string | `"default;kubernetes;https"` |  |
 | config.scrape_configs[1].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
@@ -129,6 +127,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[2].tls_config.ca_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
 | config.scrape_configs[2].tls_config.insecure_skip_verify | bool | `true` |  |
 | config.scrape_configs[3].bearer_token_file | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
+| config.scrape_configs[3].honor_timestamps | bool | `false` |  |
 | config.scrape_configs[3].job_name | string | `"kubernetes-nodes-cadvisor"` |  |
 | config.scrape_configs[3].kubernetes_sd_configs[0].role | string | `"node"` |  |
 | config.scrape_configs[3].relabel_configs[0].action | string | `"labelmap"` |  |
@@ -250,12 +249,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[7].relabel_configs[0].action | string | `"drop"` |  |
 | config.scrape_configs[7].relabel_configs[0].regex | bool | `true` |  |
 | config.scrape_configs[7].relabel_configs[0].source_labels[0] | string | `"__meta_kubernetes_pod_container_init"` |  |
-| config.scrape_configs[7].relabel_configs[10].replacement | string | `"${1}"` |  |
-| config.scrape_configs[7].relabel_configs[10].source_labels[0] | string | `"__meta_kubernetes_service_name"` |  |
-| config.scrape_configs[7].relabel_configs[10].target_label | string | `"job"` |  |
-| config.scrape_configs[7].relabel_configs[11].action | string | `"replace"` |  |
-| config.scrape_configs[7].relabel_configs[11].source_labels[0] | string | `"__meta_kubernetes_pod_node_name"` |  |
-| config.scrape_configs[7].relabel_configs[11].target_label | string | `"node"` |  |
 | config.scrape_configs[7].relabel_configs[1].action | string | `"keep_if_equal"` |  |
 | config.scrape_configs[7].relabel_configs[1].source_labels[0] | string | `"__meta_kubernetes_pod_annotation_prometheus_io_port"` |  |
 | config.scrape_configs[7].relabel_configs[1].source_labels[1] | string | `"__meta_kubernetes_pod_container_port_number"` |  |
@@ -280,26 +273,36 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.scrape_configs[7].relabel_configs[7].target_label | string | `"container"` |  |
 | config.scrape_configs[7].relabel_configs[8].source_labels[0] | string | `"__meta_kubernetes_namespace"` |  |
 | config.scrape_configs[7].relabel_configs[8].target_label | string | `"namespace"` |  |
-| config.scrape_configs[7].relabel_configs[9].source_labels[0] | string | `"__meta_kubernetes_service_name"` |  |
-| config.scrape_configs[7].relabel_configs[9].target_label | string | `"service"` |  |
+| config.scrape_configs[7].relabel_configs[9].action | string | `"replace"` |  |
+| config.scrape_configs[7].relabel_configs[9].source_labels[0] | string | `"__meta_kubernetes_pod_node_name"` |  |
+| config.scrape_configs[7].relabel_configs[9].target_label | string | `"node"` |  |
 | configMap | string | `""` |  |
 | containerWorkingDir | string | `"/"` |  |
 | deployment.enabled | bool | `true` |  |
 | deployment.strategy | object | `{}` |  |
-| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
+| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables |
+| envFrom | list | `[]` |  |
 | extraArgs."envflag.enable" | string | `"true"` |  |
 | extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | extraArgs.loggerFormat | string | `"json"` |  |
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` |  |
 | extraLabels | object | `{}` |  |
+| extraObjects | list | `[]` |  |
 | extraScrapeConfigs | list | `[]` | Extra scrape configs that will be appended to `config` |
 | extraVolumeMounts | list | `[]` |  |
 | extraVolumes | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
+| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
+| horizontalPodAutoscaling | object | `{"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1}` | Horizontal Pod Autoscaling. Note that it is not intended to be used for vmagents which perform scraping. In order to scale scraping vmagents see: https://docs.victoriametrics.com/vmagent/#scraping-big-number-of-targets |
+| horizontalPodAutoscaling.enabled | bool | `false` | Use HPA for vmagent |
+| horizontalPodAutoscaling.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale vmagent |
+| horizontalPodAutoscaling.metrics | list | `[]` | Metric for HPA to use to scale vmagent |
+| horizontalPodAutoscaling.minReplicas | int | `1` | Minimum replicas for HPA to use to scale vmagent |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"victoriametrics/vmagent"` |  |
 | image.tag | string | `""` |  |
+| image.variant | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
@@ -307,6 +310,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.hosts | list | `[]` |  |
 | ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | ingress.tls | list | `[]` |  |
+| initContainers | list | `[]` |  |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
+| license.key | string | `""` | License key |
+| license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
+| license.secret.key | string | `""` | Key in secret with license key |
+| license.secret.name | string | `""` | Existing secret name |
 | multiTenantUrls | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
@@ -321,7 +330,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podDisruptionBudget.enabled | bool | `false` |  |
 | podDisruptionBudget.labels | object | `{}` |  |
 | podLabels | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
+| podSecurityContext.enabled | bool | `true` |  |
 | priorityClassName | string | `""` | priority class to be assigned to the pod(s) |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
@@ -331,7 +340,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | remoteWriteUrls | list | `[]` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext | object | `{}` |  |
+| securityContext.enabled | bool | `true` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
 | service.enabled | bool | `false` |  |
@@ -347,9 +356,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor.annotations | object | `{}` |  |
 | serviceMonitor.enabled | bool | `false` |  |
 | serviceMonitor.extraLabels | object | `{}` |  |
+| serviceMonitor.metricRelabelings | list | `[]` |  |
 | serviceMonitor.relabelings | list | `[]` |  |
 | statefulset.clusterMode | bool | `false` | create cluster of vmagents. See https://docs.victoriametrics.com/vmagent.html#scraping-big-number-of-targets available since 1.77.2 version https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.2 |
 | statefulset.enabled | bool | `false` |  |
 | statefulset.replicationFactor | int | `1` | replication factor for vmagent in cluster mode |
 | statefulset.updateStrategy | object | `{}` |  |
 | tolerations | list | `[]` |  |
+| topologySpreadConstraints | list | `[]` |  |

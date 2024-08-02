@@ -1,3 +1,5 @@
+name: "Lint charts"
+
 on:
   push:
     paths-ignore:
@@ -11,7 +13,7 @@ on:
       - '**.md'
 
 env:
-  HELM_VERSION: 3.9.2
+  HELM_VERSION: 3.15.1
 
 jobs:
   lint-charts:
@@ -19,10 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Code checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
 
       - name: Install helm
-        uses: yokawasa/action-setup-kube-tools@v0.9.2
+        uses: yokawasa/action-setup-kube-tools@v0.11.1
         with:
           setup-tools: |
             helmv3
