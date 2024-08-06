@@ -17,7 +17,7 @@ data:
   datasource.yaml: |-
     apiVersion: 1
     datasources:
-{{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled }}
+{{- if and (.Values.grafana.provisionDefaultDatasource) (or .Values.vmsingle.enabled  .Values.vmcluster.enabled) }}
     - name: VictoriaMetrics
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       {{- $readEndpoint:= (include "victoria-metrics-k8s-stack.vmReadEndpoint" . | fromYaml) }}
