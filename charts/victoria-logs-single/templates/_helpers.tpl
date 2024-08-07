@@ -51,6 +51,9 @@ app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- define "victoria-logs.server.labels" -}}
 {{ include "victoria-logs.server.matchLabels" . }}
 {{ include "victoria-logs.common.metaLabels" . }}
+{{- with .extraLabels }}
+{{ toYaml .}}
+{{- end }}
 {{- end -}}
 
 {{- define "victoria-logs.server.matchLabels" -}}

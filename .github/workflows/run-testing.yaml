@@ -93,6 +93,13 @@ jobs:
           helm dep update charts/${{ matrix.chart }}
           # Skip run for k8s stack chart as it fails CRD check
           if [ "${{ matrix.chart }}" != "victoria-metrics-k8s-stack" ] && [ "${{ matrix.chart }}" != "victoria-metrics-distributed" ]; then
-            helm template --namespace=${{ matrix.chart }}-testing charts/${{ matrix.chart }} --values ./hack/helm/${{ matrix.chart }}.yaml --validate | kubectl apply -f - --dry-run=server
+            helm template charts/${{ matrix.chart }} \
+              --namespace ${{ matrix.chart }}-testing \
+              --values ./hack/helm/${{ matrix.chart }}/e2e/simple.yaml \
+              --validate | kubectl apply -f - --dry-run=server
           fi
-          ct install --namespace=${{ matrix.chart }}-testing --config .github/ci/ct.yaml --charts "charts/${{ matrix.chart }}" --helm-extra-set-args "--values ./hack/helm/${{ matrix.chart }}.yaml" --skip-clean-up
+          ct install \
+            --namespace ${{ matrix.chart }}-testing \
+            --config .github/ci/ct.yaml \
+            --charts "charts/${{ matrix.chart }}" \
+            --helm-extra-set-args "--values ./hack/helm/${{ matrix.chart }}/e2e/simple.yaml" --skip-clean-up

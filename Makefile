@@ -60,35 +60,19 @@ helm-repo-update:
 
 # Run linter for helm chart
 lint: helm-repo-update
-	CMD="lint charts/victoria-metrics-cluster -f hack/vmcluster-template-hack.yaml" $(MAKE) $(HELM)
-	CMD="lint charts/victoria-metrics-single -f hack/vmsingle-lint-hack.yaml" $(MAKE) $(HELM)
-	CMD="lint charts/victoria-metrics-agent -f hack/vmagent-lint-hack.yaml" $(MAKE) $(HELM)
-	CMD="lint charts/victoria-metrics-alert -f hack/vmalert-lint-hack.yaml" $(MAKE) $(HELM)
-	CMD="lint charts/victoria-metrics-gateway -f hack/vmgateway-cluster-ratelimiting-minimum.yaml" $(MAKE) $(HELM)
-	CMD="lint charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml" $(MAKE) $(HELM)
-	CMD="lint charts/victoria-metrics-anomaly -f hack/vmanomaly-lint-hack.yaml" $(MAKE) $(HELM)
-	CMD="dependency build charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM)
-	CMD="lint charts/victoria-metrics-k8s-stack -f hack/vm-k8s-stack-template-hack.yaml" $(MAKE) $(HELM)
-	CMD="dependency build charts/victoria-metrics-distributed" $(MAKE) $(HELM)
-	CMD="lint charts/victoria-metrics-distributed"  $(MAKE) $(HELM)
-	CMD="dependency build charts/victoria-logs-single" $(MAKE) $(HELM)
-	CMD="lint charts/victoria-logs-single -f hack/vlsingle-lint-hack.yaml" $(MAKE) $(HELM)
+	$(foreach values,$(wildcard hack/helm/*/lint/*.yaml), \
+		$(eval chart := $(word 3, $(subst /, ,$(values)))) \
+		CMD="dependency build charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
+		CMD="lint charts/$(chart) -f $(values)" $(MAKE) $(HELM) || exit 1; \
+	)
 
 # Run template for helm charts
 template: helm-repo-update
-	CMD="template charts/victoria-metrics-cluster -f hack/vmcluster-template-hack.yaml" $(MAKE) $(HELM)
-	CMD="template charts/victoria-metrics-single -f hack/vmsingle-lint-hack.yaml" $(MAKE) $(HELM)
-	CMD="template charts/victoria-metrics-agent -f hack/vmagent-lint-hack.yaml" $(MAKE) $(HELM)
-	CMD="template charts/victoria-metrics-alert -f hack/vmalert-lint-hack.yaml" $(MAKE) $(HELM)
-	CMD="template charts/victoria-metrics-gateway -f hack/vmgateway-cluster-ratelimiting-minimum.yaml" $(MAKE) $(HELM)
-	CMD="template charts/victoria-metrics-auth -f hack/vmauth-lint-hack.yaml" $(MAKE) $(HELM)
-	CMD="template charts/victoria-metrics-anomaly -f hack/vmanomaly-lint-hack.yaml" $(MAKE) $(HELM)
-	CMD="dependency build charts/victoria-metrics-k8s-stack" $(MAKE) $(HELM)
-	CMD="template charts/victoria-metrics-k8s-stack -f hack/vm-k8s-stack-template-hack.yaml" $(MAKE) $(HELM)
-	CMD="dependency build charts/victoria-metrics-distributed" $(MAKE) $(HELM)
-	CMD="lint charts/victoria-metrics-distributed"  $(MAKE) $(HELM)
-	CMD="dependency build charts/victoria-logs-single" $(MAKE) $(HELM)
-	CMD="template charts/victoria-logs-single -f hack/vlsingle-lint-hack.yaml" $(MAKE) $(HELM)
+	$(foreach values,$(wildcard hack/helm/*/lint/*.yaml), \
+		$(eval chart := $(word 3, $(subst /, ,$(values)))) \
+		CMD="dependency build charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
+		CMD="template charts/$(chart) -f $(values)" $(MAKE) $(HELM) || exit 1; \
+	)
 
 lint-ct:
 	CMD="lint --config .github/ci/ct.yaml --all" $(MAKE) $(CT)
