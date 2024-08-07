@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- add missing permission to allow patching `horizontalpodautoscalers` when operator watches single namespace.
 
 ## 0.33.5
 
