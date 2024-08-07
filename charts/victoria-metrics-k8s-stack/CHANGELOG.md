@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Moved dashboards templating logic out of sync script to Helm template
 
 ## 0.24.5
 

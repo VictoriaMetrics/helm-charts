@@ -1,0 +1,89 @@
+{{- if .Values.defaultDashboardsEnabled }}
+
+{{- /*
+Create custom template context
+*/}}
+{{- $ctx := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $ctx := mergeOverwrite $ctx (dict "yaxis" "y") -}}
+
+{{- /*
+Loop through all dashboard files, that were crafted with hack/sync_grafana_dashboards.py
+*/}}
+{{- range $dashboardFile, $_ := .Files.Glob  "files/dashboards/**.yaml" -}}
+
+{{- /*
+Get dashboard name
+*/}}
+{{- $dashboardBase := base $dashboardFile }}
+{{- $dashboardName := (trimSuffix (ext $dashboardBase) $dashboardBase) -}}
+
+{{- /*
+Get dashboard data from file
+*/}}
+{{- $dashboardData := fromYaml (tpl ($.Files.Get $dashboardFile) $ctx) -}}
+
+{{- /*
+Save condition for a dashboard from file
+*/}}
+{{- $dashboardCondition := (eq $dashboardData.condition "true") -}}
+
+{{- /*
+Delete condition from dashboard
+*/}}
+{{- $_ := unset $dashboardData "condition" -}}
+
+{{- /*
+Check if dashboard is enabled
+*/}}
+{{- if $dashboardCondition }}
+
+{{- $dashboardResult := toRawJson $dashboardData -}}
+{{- if $.Values.grafanaOperatorDashboardsFormat.enabled }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  namespace: {{ $.Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) $dashboardName | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+spec:
+  {{- with $.Values.grafanaOperatorDashboardsFormat.instanceSelector }}
+  instanceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if $.Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
+  allowCrossNamespaceImport: true
+  {{- end }}
+  json: | {{ $dashboardResult | nindent 4 }}
+{{- else }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ $.Release.Namespace }}
+  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) $dashboardName | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  labels:
+    {{- if $.Values.grafana.sidecar.dashboards.label }}
+    {{ $.Values.grafana.sidecar.dashboards.label }}: "1"
+    {{- end }}
+    {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+    {{- range $key, $val := $.Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- end }}
+    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+    {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
+  annotations:
+    {{- range $key, $val := $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- end }}
+data:
+  {{ $dashboardName }}.json: | {{ $dashboardResult | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
