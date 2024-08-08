@@ -3,6 +3,7 @@
 ## Next release
 
 - Moved dashboards templating logic out of sync script to Helm template
+- Allow to disable default grafana datasource
 
 ## 0.24.5
 

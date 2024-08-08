@@ -420,6 +420,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.ingress.path | string | `"/"` |  |
 | grafana.ingress.pathType | string | `"Prefix"` |  |
 | grafana.ingress.tls | list | `[]` |  |
+| grafana.provisionDefaultDatasource | bool | `true` |  |
 | grafana.sidecar.dashboards.additionalDashboardAnnotations | object | `{}` |  |
 | grafana.sidecar.dashboards.additionalDashboardLabels | object | `{}` |  |
 | grafana.sidecar.dashboards.enabled | bool | `true` |  |
