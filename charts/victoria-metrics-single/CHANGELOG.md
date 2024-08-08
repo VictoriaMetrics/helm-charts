@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed relabeling inconsistencies
 
 ## 0.9.26
 
