@@ -21,19 +21,32 @@ Loop through all rules files, that were crafted with hack/sync_rules.py
 {{- range $groupFile, $_ := .Files.Glob  "files/rules/**.yaml" -}}
 
 {{- /*
-Get group data from file
+Get group name from file
 */}}
-{{- $groupData := fromYaml ($.Files.Get $groupFile) -}}
+{{- $groupBase := base $groupFile -}}
+{{- $groupNameRaw := trimSuffix (ext $groupBase) $groupBase -}}
 
 {{- /*
 Create context for templating
 */}}
-{{- $_ := set $ctx "name" $groupData.name -}}
+{{- $_ := set $ctx "name" $groupNameRaw -}}
 
 {{- /*
 Create sanitized group name retrieved from file
 */}}
 {{- $groupName := include "victoria-metrics-k8s-stack.rulegroup.key" $ctx -}}
+
+{{- /*
+Merge common group with a group data of a current iteration
+*/}}
+
+{{- $group := mergeOverwrite (deepCopy (dig "group" (default dict) $defaultRules)) (dig "groups" $groupName (default dict) $defaultRules) -}}
+
+{{- /*
+Get group data from file
+*/}}
+{{- $groupCtx := mergeOverwrite (deepCopy $ctx) $group }}
+{{- $groupData := fromYaml (tpl ($.Files.Get $groupFile) $groupCtx) -}}
 
 {{- /*
 Save rules spec from file
@@ -48,17 +61,12 @@ Delete rules from group
 {{- /*
 Save condition for group from file
 */}}
-{{- $groupCondition := $groupData.condition -}}
+{{- $groupCondition := (eq $groupData.condition "true") -}}
 
 {{- /*
 Delete condition from group
 */}}
 {{- $_ := unset $groupData "condition" -}}
-
-{{- /*
-Merge common group with a group data of a current iteration
-*/}}
-{{- $group := mergeOverwrite (deepCopy (dig "group" (default dict) $defaultRules)) (dig "groups" $groupName (default dict) $defaultRules) -}}
 
 {{- /*
 Merge group spec
@@ -74,11 +82,11 @@ Filter out ignore rules
 {{- range $_, $ruleSpec := $rulesSpec }}
   {{- $ruleName := $ruleSpec.alert | default "" }}
   {{- $ruleKey := (hasKey $ruleSpec "record" | ternary "recording" "alerting") -}}
-  {{- $ruleCondition := $ruleSpec.condition }}
+  {{- $ruleCondition := (eq $ruleSpec.condition "true") }}
   {{- $_ := unset $ruleSpec "condition" }}
   {{- $exactRule := index $exactRules $ruleName | default dict }}
   {{- $resultRule := mergeOverwrite (deepCopy $commonRule) (index $defaultRules $ruleKey) $commonInGroupRule $exactRule }}
-  {{- if (and (dig "create" true $resultRule) (eq (tpl $ruleCondition $ctx) "true")) }}
+  {{- if (and (dig "create" true $resultRule) $ruleCondition) }}
     {{- $ruleSpec := mergeOverwrite (deepCopy $ruleSpec) (dig "spec" (default dict) $resultRule) }}
     {{- $filteredRulesSpec = append $filteredRulesSpec $ruleSpec }}
   {{- end }}
@@ -88,7 +96,7 @@ Filter out ignore rules
 {{- /*
 Check if group is enabled
 */}}
-{{- if (and $rulesSpec (dig "create" true $group) (eq (tpl $groupCondition $ctx) "true")) }}
+{{- if (and $rulesSpec (dig "create" true $group) $groupCondition) }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
@@ -106,8 +114,7 @@ spec:
   - {{ toYaml $groupSpec | indent 4 | trim }}
     rules:
     {{- range $ruleSpec := $rulesSpec }}
-      {{- $groupCtx := mergeOverwrite (deepCopy $ctx) $group }}
-    - {{ tpl (toYaml $ruleSpec) $groupCtx | indent 6 | trim }}
+    - {{ toYaml $ruleSpec | indent 6 | trim }}
     {{- end }}
 {{- end }}
 {{- end }}

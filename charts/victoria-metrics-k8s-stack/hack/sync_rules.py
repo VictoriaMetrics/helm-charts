@@ -8,7 +8,7 @@ import yaml
 from yaml.representer import SafeRepresenter
 import re
 
-rulesDir = join(dirname(realpath(__file__)), "..", "files", "rules", "generated")
+rulesDir = join(dirname(realpath(__file__)), '..', 'files', 'rules', 'generated')
 
 # https://stackoverflow.com/a/20863889/961092
 class literal(str):
@@ -69,33 +69,40 @@ alert_condition_map = {
 }
 
 skip_list = [
-    # "kube-prometheus-general.rules",
-    # "kube-prometheus-node-recording.rules"
+    # 'kube-prometheus-general.rules',
+    # 'kube-prometheus-node-recording.rules'
 ]
 
 def escape(s):
-    return s.replace("{{", "{{`{{").replace("}}", "}}`}}").replace("{{`{{", "{{`{{`}}").replace("}}`}}", "{{`}}`}}")
+    return (s
+        .replace('{{', '{{`{{')
+        .replace('}}', '}}`}}')
+        .replace('{{`{{', '{{`{{`}}')
+        .replace('}}`}}', '{{`}}`}}')
+        .replace(']]', '}}')
+        .replace('[[', '{{')
+    )
 
 replacement_map = {
     'https://runbooks.prometheus-operator.dev/runbooks': {
-        'replacement': '{{ .Values.defaultRules.runbookUrl }}',
+        'replacement': '[[ .Values.defaultRules.runbookUrl ]]',
     },
     'job="kube-state-metrics"': {
-        'replacement': 'job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"',
+        'replacement': 'job="kube-state-metrics", namespace=~"[[ .targetNamespace ]]"',
         'limitGroup': ['kubernetes-apps'],
     },
     'job="kubelet"': {
-        'replacement': 'job="kubelet", namespace=~"{{ .targetNamespace }}"',
+        'replacement': 'job="kubelet", namespace=~"[[ .targetNamespace ]]"',
         'limitGroup': ['kubernetes-storage'],
     },
     'http://localhost:3000': {
-        'replacement': '{{ index .Values.grafana.ingress.hosts 0 }}',
+        'replacement': '[[ index .Values.grafana.ingress.hosts 0 ]]',
         'init': ''},
     'job="alertmanager-main"': {
-        'replacement': 'job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}"',
+        'replacement': 'job="[[ include "victoria-metrics-k8s-stack.alertmanager.name" . ]]"',
     },
     'namespace="monitoring"': {
-        'replacement': 'namespace="{{ .Release.Namespace }}"',
+        'replacement': 'namespace="[[ .Release.Namespace ]]"',
         'limitGroup': ['alertmanager.rules'],
     },
 }
@@ -109,19 +116,16 @@ def init_yaml_styles():
 
 def fix_expr(rules):
     """Remove trailing whitespaces and line breaks, which happen to creep in
-     due to yaml import specifics;
-     convert multiline expressions to literal style, |-"""
+    due to yaml import specifics;
+    convert multiline expressions to literal style, |-"""
     for rule in rules:
-        rule['condition'] = "{{ true }}"
-        if 'alert' in rule:
-            if rule['alert'] in alert_condition_map:
-                rule['condition'] = "{{ %(condition)s }}" % {"condition": alert_condition_map[rule['alert']]}
+        rule['condition'] = '[[ %(condition)s ]]' % {'condition': alert_condition_map.get(rule.get('alert', 'empty'), 'true')}
         rule['expr'] = rule['expr'].rstrip()
         if '\n' in rule['expr']:
             rule['expr'] = literal(rule['expr'])
         if 'annotations' in rule:
             for k in rule['annotations']:
-               rule['annotations'][k] = quoted(escape(rule['annotations'][k]))
+               rule['annotations'][k] = quoted(rule['annotations'][k])
 
 
 def yaml_dump(struct):
@@ -135,13 +139,11 @@ def yaml_dump(struct):
 def write_group_to_file(group, url, destination):
     fix_expr(group['rules'])
     group_name = group['name']
-    group["condition"] = "{{ true }}"
-    if group_name in condition_map:
-        group["condition"] = "{{ %(condition)s }}" % {"condition": condition_map[group_name]}
+    group['condition'] = '[[ %(condition)s ]]' % {'condition': condition_map.get(group_name, 'true')}
     # prepare rules string representation
     rules = yaml_dump(group)
     # add replacements of custom variables and include their initialisation in case it's needed
-    lines = ""
+    lines = ''
     for line in replacement_map:
         if group_name in replacement_map[line].get('limitGroup', [group_name]) and line in rules:
             print(f"Applying replace rule for '{line}' in {group_name}")
@@ -157,7 +159,7 @@ def write_group_to_file(group, url, destination):
 
     # recreate the file
     with open(new_filename, 'w') as f:
-        f.write(lines)
+        f.write(escape(lines))
 
     print(f"Generated {new_filename}")
 
