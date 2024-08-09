@@ -2,7 +2,7 @@
 
 ## Next release
 
-- fixed relabeling inconsistencies
+- fix inconsistent relabeling `target_label` in default scrape config.
 
 ## 0.9.26
 
