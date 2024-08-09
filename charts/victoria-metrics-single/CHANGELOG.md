@@ -3,6 +3,7 @@
 ## Next release
 
 - Added basicAuth support for ServiceMonitor
+- fix inconsistent relabeling `target_label` in default scrape config.
 
 ## 0.9.26
 

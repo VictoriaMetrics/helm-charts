@@ -112,7 +112,7 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      max without (revision) (
+      max by(namespace, statefulset) (
         kube_statefulset_status_current_revision{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
           unless
         kube_statefulset_status_update_revision{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}

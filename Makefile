@@ -1,12 +1,13 @@
 URL=https://victoriametrics.github.io/helm-charts/
 HELM_IMAGE = alpine/helm:3.12.3
 HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.14.2
-PYTHON_IMAGE = python:3.12.4-alpine
 CT_IMAGE = quay.io/helmpack/chart-testing:v3.11.0
 KNOWN_TARGETS=helm
 HELM?=helm-docker
 CT?=ct-docker
 CONTAINER ?= docker
+
+include $(shell find charts -name Makefile)
 
 ifeq ($(CONTAINER),docker)
     CONTAINER_USER_OPTION = --user $(shell id -u):$(shell id -g)
@@ -134,24 +135,3 @@ gen-docs:
 		-w /helm-charts \
 		$(HELM_DOCS_IMAGE) \
 		helm-docs
-
-# Synchronize alerting rules in charts/victoria-metrics-k8s-stack/templates/rules
-sync-rules:
-	$(CONTAINER) run --rm \
-		$(CONTAINER_USER_OPTION) \
-		--volume "$(PWD)/charts/victoria-metrics-k8s-stack:/k8s-stack$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
-		--volume "$(PWD)/.local:/.local" \
-		-w /k8s-stack/hack/ \
-		$(PYTHON_IMAGE) sh -c "\
-			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_rules.py \
-		"
-
-# Synchronize grafana dashboards in charts/victoria-metrics-k8s-stack/templates/grafana/dashboards
-sync-dashboards:
-	$(CONTAINER) run --rm \
-		$(CONTAINER_USER_OPTION) \
-		--volume "$(shell pwd)/charts/victoria-metrics-k8s-stack:/k8s-stack$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
-		-w /k8s-stack/hack/ \
-		$(PYTHON_IMAGE) sh -c "\
-			pip3 install --no-cache-dir --no-build-isolation -r requirements.txt --user && python3 sync_grafana_dashboards.py \
-		"
