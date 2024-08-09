@@ -62,6 +62,9 @@ app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- define "victoria-metrics.vmstorage.labels" -}}
 {{ include "victoria-metrics.vmstorage.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
+{{- with .extraLabels }}
+{{ toYaml .}}
+{{- end }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmstorage.podLabels" -}}
@@ -77,6 +80,9 @@ app: {{ .Values.vmstorage.name }}
 {{- define "victoria-metrics.vmselect.labels" -}}
 {{ include "victoria-metrics.vmselect.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
+{{- with .extraLabels }}
+{{ toYaml .}}
+{{- end }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmselect.podLabels" -}}
@@ -92,6 +98,9 @@ app: {{ .Values.vmselect.name }}
 {{- define "victoria-metrics.vminsert.labels" -}}
 {{ include "victoria-metrics.vminsert.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
+{{- with .extraLabels }}
+{{ toYaml .}}
+{{- end }}
 {{- end -}}
 
 {{- define "victoria-metrics.vminsert.podLabels" -}}

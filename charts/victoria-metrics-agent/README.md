@@ -353,11 +353,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `nil` |  |
-| serviceMonitor.annotations | object | `{}` |  |
-| serviceMonitor.enabled | bool | `false` |  |
-| serviceMonitor.extraLabels | object | `{}` |  |
-| serviceMonitor.metricRelabelings | list | `[]` |  |
-| serviceMonitor.relabelings | list | `[]` |  |
+| serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
+| serviceMonitor.basicAuth | object | `{}` | Basic auth params for Service Monitor |
+| serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for server component. This is Prometheus operator object |
+| serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
+| serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
+| serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | statefulset.clusterMode | bool | `false` | create cluster of vmagents. See https://docs.victoriametrics.com/vmagent.html#scraping-big-number-of-targets available since 1.77.2 version https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.2 |
 | statefulset.enabled | bool | `false` |  |
 | statefulset.replicationFactor | int | `1` | replication factor for vmagent in cluster mode |

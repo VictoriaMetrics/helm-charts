@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added basicAuth support for ServiceMonitor
 
 ## 0.11.23
 

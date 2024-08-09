@@ -1,48 +1,44 @@
 {{- if and .Values.vmselect.enabled .Values.vmselect.serviceMonitor.enabled -}}
+{{- $serviceMonitor := .Values.vmselect.serviceMonitor -}}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  {{- if .Values.vmselect.serviceMonitor.annotations }}
-  annotations:
-{{ toYaml .Values.vmselect.serviceMonitor.annotations | indent 4 }}
+  {{- with $serviceMonitor.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  labels:
-  {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
-  {{- if .Values.vmselect.serviceMonitor.extraLabels }}
-{{ toYaml .Values.vmselect.serviceMonitor.extraLabels | indent 4 }}
-  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $serviceMonitor.extraLabels) }}
+  labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
   name: {{ template "victoria-metrics.vmselect.fullname" . }}
-  {{- if .Values.vmselect.serviceMonitor.namespace }}
-  namespace: {{ .Values.vmselect.serviceMonitor.namespace }}
+  {{- with $serviceMonitor.namespace }}
+  namespace: {{ . }}
   {{- end }}
 spec:
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}
   selector:
-    matchLabels:
-      {{- include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }} 
+    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }} 
   endpoints:
     - port: http
-      {{- if .Values.vmselect.serviceMonitor.scheme }}
-      scheme: {{ .Values.vmselect.serviceMonitor.scheme }}
+      {{- with $serviceMonitor.basicAuth }}
+      basicAuth: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.vmselect.serviceMonitor.interval }}
-      interval: {{ .Values.vmselect.serviceMonitor.interval }}
+      {{- with $serviceMonitor.scheme }}
+      scheme: {{ . }}
       {{- end }}
-      {{- if .Values.vmselect.serviceMonitor.scrapeTimeout }}
-      scrapeTimeout: {{ .Values.vmselect.serviceMonitor.scrapeTimeout }}
+      {{- with $serviceMonitor.interval }}
+      interval: {{ . }}
       {{- end }}
-      {{- with .Values.vmselect.serviceMonitor.tlsConfig }}
-      tlsConfig:
-          {{- toYaml . | nindent 8 }}
+      {{- with $serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ . }}
       {{- end }}
-      {{- with .Values.vmselect.serviceMonitor.relabelings }}
-      relabelings:
-          {{- toYaml . | nindent 8 }}
+      {{- with $serviceMonitor.tlsConfig }}
+      tlsConfig: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.vmselect.serviceMonitor.metricRelabelings }}
-      metricRelabelings:
-          {{- toYaml . | nindent 8 }}
+      {{- with $serviceMonitor.relabelings }}
+      relabelings: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{ toYaml . | nindent 8 }}
       {{- end }}
   {{- end }}

@@ -194,6 +194,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.service.servicePort | int | `8428` | Service port |
 | server.service.type | string | `"ClusterIP"` | Service type |
 | server.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
+| server.serviceMonitor.basicAuth | object | `{}` | Basic auth params for Service Monitor |
 | server.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for server component. This is Prometheus operator object |
 | server.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | server.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
