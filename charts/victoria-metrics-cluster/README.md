@@ -362,17 +362,17 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
 | vmstorage.vmbackupmanager.image.tag | string | `"v1.102.1-enterprise"` | vmbackupmanager image tag override Chart.AppVersion |
 | vmstorage.vmbackupmanager.image.variant | string | `""` |  |
-| vmstorage.vmbackupmanager.livenessProbe.failureThreshold | int | `10` |  |
-| vmstorage.vmbackupmanager.livenessProbe.initialDelaySeconds | int | `30` |  |
-| vmstorage.vmbackupmanager.livenessProbe.periodSeconds | int | `30` |  |
-| vmstorage.vmbackupmanager.livenessProbe.tcpSocket.port | string | `"manager-http"` |  |
-| vmstorage.vmbackupmanager.livenessProbe.timeoutSeconds | int | `5` |  |
-| vmstorage.vmbackupmanager.readinessProbe.failureThreshold | int | `3` |  |
-| vmstorage.vmbackupmanager.readinessProbe.httpGet.path | string | `"/health"` |  |
-| vmstorage.vmbackupmanager.readinessProbe.httpGet.port | string | `"manager-http"` |  |
-| vmstorage.vmbackupmanager.readinessProbe.initialDelaySeconds | int | `5` |  |
-| vmstorage.vmbackupmanager.readinessProbe.periodSeconds | int | `15` |  |
-| vmstorage.vmbackupmanager.readinessProbe.timeoutSeconds | int | `5` |  |
+| vmstorage.vmbackupmanager.probe.liveness.failureThreshold | int | `10` |  |
+| vmstorage.vmbackupmanager.probe.liveness.initialDelaySeconds | int | `30` |  |
+| vmstorage.vmbackupmanager.probe.liveness.periodSeconds | int | `30` |  |
+| vmstorage.vmbackupmanager.probe.liveness.tcpSocket.port | string | `"manager-http"` |  |
+| vmstorage.vmbackupmanager.probe.liveness.timeoutSeconds | int | `5` |  |
+| vmstorage.vmbackupmanager.probe.readiness.failureThreshold | int | `3` |  |
+| vmstorage.vmbackupmanager.probe.readiness.httpGet.path | string | `"/health"` |  |
+| vmstorage.vmbackupmanager.probe.readiness.httpGet.port | string | `"manager-http"` |  |
+| vmstorage.vmbackupmanager.probe.readiness.initialDelaySeconds | int | `5` |  |
+| vmstorage.vmbackupmanager.probe.readiness.periodSeconds | int | `15` |  |
+| vmstorage.vmbackupmanager.probe.readiness.timeoutSeconds | int | `5` |  |
 | vmstorage.vmbackupmanager.resources | object | `{}` |  |
 | vmstorage.vmbackupmanager.restore | object | `{"onStart":{"enabled":false}}` | Allows to enable restore options for pod. Read more: https://docs.victoriametrics.com/vmbackupmanager.html#restore-commands |
 | vmstorage.vmbackupmanager.retention | object | `{"keepLastDaily":2,"keepLastHourly":2,"keepLastMonthly":2,"keepLastWeekly":2}` | backups' retention settings |
