@@ -69,7 +69,7 @@ vmselect:
   automountServiceAccountToken: true
   # Extra command line arguments for vmselect component
   extraArgs:
-    envflag.enable: "true"
+    envflag.enable: true
     envflag.prefix: VM_
     loggerFormat: json
   annotations: {}
@@ -732,21 +732,22 @@ vmstorage:
     resources: {}
     # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
     env: []
-    readinessProbe:
-      httpGet:
-        path: /health
-        port: manager-http
-      initialDelaySeconds: 5
-      periodSeconds: 15
-      timeoutSeconds: 5
-      failureThreshold: 3
-    livenessProbe:
-      tcpSocket:
-        port: manager-http
-      initialDelaySeconds: 30
-      periodSeconds: 30
-      timeoutSeconds: 5
-      failureThreshold: 10
+    probe:
+      readiness:
+        httpGet:
+          path: /health
+          port: manager-http
+        initialDelaySeconds: 5
+        periodSeconds: 15
+        timeoutSeconds: 5
+        failureThreshold: 3
+      liveness:
+        tcpSocket:
+          port: manager-http
+        initialDelaySeconds: 30
+        periodSeconds: 30
+        timeoutSeconds: 5
+        failureThreshold: 10
     extraSecretMounts:
       []
       # - name: secret

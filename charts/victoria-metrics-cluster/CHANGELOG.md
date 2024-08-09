@@ -3,6 +3,9 @@
 ## Next release
 
 - Added basicAuth support for ServiceMonitor
+- Added ability to override liveness and readiness probes
+- Updated `.Values.vmbackupmanager.readinessProbe` to `.Values.vmbackupmanager.probe.readiness`
+- Updated `.Values.vmbackupmanager.livenessProbe` to `.Values.vmbackupmanager.probe.liveness`
 
 ## 0.11.23
 
