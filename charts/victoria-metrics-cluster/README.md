@@ -181,6 +181,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.service.type | string | `"ClusterIP"` | Service type |
 | vminsert.service.udp | bool | `false` | Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/ |
 | vminsert.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
+| vminsert.serviceMonitor.basicAuth | object | `{}` | Basic auth params for Service Monitor |
 | vminsert.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object |
 | vminsert.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vminsert.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
@@ -260,6 +261,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.service.targetPort | string | `"http"` | Target port |
 | vmselect.service.type | string | `"ClusterIP"` | Service type |
 | vmselect.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
+| vmselect.serviceMonitor.basicAuth | object | `{}` | Basic auth params for Service Monitor |
 | vmselect.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmselect component. This is Prometheus operator object |
 | vmselect.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vmselect.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
@@ -336,6 +338,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.service.vminsertPort | int | `8400` | Port for accepting connections from vminsert |
 | vmstorage.service.vmselectPort | int | `8401` | Port for accepting connections from vmselect |
 | vmstorage.serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
+| vmstorage.serviceMonitor.basicAuth | object | `{}` | Basic auth params for Service Monitor |
 | vmstorage.serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for vmstorage component. This is Prometheus operator object |
 | vmstorage.serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
 | vmstorage.serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
