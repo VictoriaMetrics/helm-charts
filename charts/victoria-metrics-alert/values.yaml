@@ -27,6 +27,7 @@ server:
   name: server
   enabled: true
   image:
+    registry: ""
     repository: victoriametrics/vmalert
     tag: "" # rewrites Chart.AppVersion
     # Variant of the image to use.
@@ -331,8 +332,10 @@ alertmanager:
   podMetadata:
     labels: {}
     annotations: {}
-  image: prom/alertmanager
-  tag: v0.25.0
+  image:
+    registry: ""
+    repository: prom/alertmanager
+    tag: v0.25.0
   retention: 120h
   nodeSelector: {}
   priorityClassName: ""

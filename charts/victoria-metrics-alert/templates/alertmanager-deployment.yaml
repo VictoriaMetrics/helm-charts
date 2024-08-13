@@ -1,3 +1,4 @@
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.alertmanager }}
 {{- if $app.enabled -}}
 apiVersion: apps/v1
@@ -36,7 +37,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: "{{ $app.image }}:{{ $app.tag }}"
+          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
           args:
             - --config.file=/config/alertmanager.yaml
             {{ if $app.persistentVolume.enabled }}

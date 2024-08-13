@@ -1,3 +1,5 @@
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- include "vm.enterprise.only" . -}}
 {{- if not (or .Values.auth.enable .Values.rateLimiter.enable) -}}
   {{- fail "at least one item in `.auth.enable` or `.rateLimiter.enable` must be enable " -}}
 {{- end -}}
@@ -53,7 +55,7 @@ spec:
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}{{- with .Values.image.variant }}-{{ . }}{{- end }}"
+          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
           workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -clusterMode={{ .Values.clusterMode }}

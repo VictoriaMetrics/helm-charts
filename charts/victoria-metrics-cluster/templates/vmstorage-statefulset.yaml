@@ -1,3 +1,4 @@
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vmstorage }}
 {{- if $app.enabled -}}
 {{ include "chart.vmbackupmanager.enforce_license" .}}
@@ -7,7 +8,7 @@ metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := mergeOverwrite (deepCopy .) (dict "extraLabels" $app.extraLabels) }}
+  {{- $ctx := mergeOverwrite (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-metrics.vmstorage.labels" $ctx | nindent 4 }}
   name: {{ template "victoria-metrics.vmstorage.fullname" . }}
   namespace: {{ .Release.Namespace }}
@@ -36,7 +37,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ $app.name }}
-          image: "{{ $app.image.repository }}:{{ default .Chart.AppVersion $app.image.tag }}{{- with $app.image.variant }}-{{ . }}{{- end }}"
+          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
           imagePullPolicy: "{{ $app.image.pullPolicy }}"
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
@@ -113,7 +114,7 @@ spec:
         {{- if $app.vmbackupmanager.enable }}
         {{- $manager := $app.vmbackupmanager -}}
         - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
-          image: "{{ $manager.image.repository }}:{{ default .Chart.AppVersion $manager.image.tag }}{{- with $manager.image.variant }}-{{ . }}{{- end }}"
+          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $manager)) }}
           imagePullPolicy: "{{ $app.image.pullPolicy }}"
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}

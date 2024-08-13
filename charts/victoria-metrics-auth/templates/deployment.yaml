@@ -1,9 +1,10 @@
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.extraLabels) }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" .Values.extraLabels) }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
@@ -30,7 +31,7 @@ spec:
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}{{- with .Values.image.variant }}-{{ . }}{{- end }}"
+          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
           workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -auth.config=/config/auth.yml

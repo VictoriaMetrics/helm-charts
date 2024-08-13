@@ -1,3 +1,4 @@
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.server }}
 {{- if and $app.enabled $app.statefulSet.enabled -}}
 apiVersion: apps/v1
@@ -8,7 +9,7 @@ metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.extraLabels) }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
 spec:
   serviceName: {{ template "victoria-logs.server.fullname" . }}
@@ -21,7 +22,7 @@ spec:
       {{- with $app.podAnnotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.podLabels) }}
+      {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.podLabels) }}
       labels: {{ include "victoria-logs.server.labels" $ctx | nindent 8 }}
     spec:
       {{- with $app.priorityClassName }}
@@ -38,7 +39,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: "{{ $app.image.repository }}:{{ $app.image.tag }}"
+          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
           imagePullPolicy: "{{ $app.image.pullPolicy }}"
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}

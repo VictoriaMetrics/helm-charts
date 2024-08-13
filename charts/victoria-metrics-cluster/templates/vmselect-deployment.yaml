@@ -1,3 +1,4 @@
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vmselect -}}
 {{- if and $app.enabled (not $app.statefulSet.enabled) -}}
 apiVersion: apps/v1
@@ -6,7 +7,7 @@ metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := mergeOverwrite (deepCopy .) (dict "extraLabels" $app.extraLabels) }}
+  {{- $ctx := mergeOverwrite (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
   name: {{ template "victoria-metrics.vmselect.fullname" . }}
   namespace: {{ .Release.Namespace }}
@@ -35,7 +36,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ $app.name }}
-          image: "{{ $app.image.repository }}:{{ default .Chart.AppVersion $app.image.tag }}{{- with $app.image.variant }}-{{ . }}{{- end }}"
+          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
           imagePullPolicy: "{{ $app.image.pullPolicy }}"
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}

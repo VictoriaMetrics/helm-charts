@@ -1,3 +1,4 @@
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.server }}
 {{- if and $app.enabled -}}
 {{- if not $app.extraArgs.rule }}
@@ -27,7 +28,7 @@ spec:
   {{- end }}
   template:
     metadata:
-      {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.podLabels) }}
+      {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.podLabels) }}
       labels: {{ include "vmalert.server.labels" $ctx | nindent 8 }}
       {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/server-alerts-configmap.yaml") . | sha256sum) }}
       {{- $annotations = merge $annotations $app.podAnnotations }}
@@ -46,7 +47,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: "{{ $app.image.repository }}:{{ default .Chart.AppVersion $app.image.tag }}{{- with $app.image.variant }}-{{ . }}{{- end }}"
+          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
           args:
             - -rule=/config/alert-rules.yaml
             - -datasource.url={{ $app.datasource.url}}
