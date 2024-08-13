@@ -144,11 +144,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | probe.liveness.periodSeconds | int | `15` |  |
 | probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
 | probe.liveness.timeoutSeconds | int | `5` |  |
-| probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
-| probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
-| probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
 | probe.readiness.initialDelaySeconds | int | `5` |  |
 | probe.readiness.periodSeconds | int | `15` |  |
+| probe.readiness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
 | probe.startup | object | `{}` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.extraLabels | object | `{}` |  |

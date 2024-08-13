@@ -1,16 +1,16 @@
-
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $fullname := ((printf "%s-kube-proxy" (include "victoria-metrics-k8s-stack.fullname" .)) | trunc 63 | trimSuffix "-") }}
 {{- if .Values.kubeProxy.enabled }}
 {{- if .Values.kubeProxy.endpoints }}
 ---
 apiVersion: v1
 kind: Endpoints
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-proxy" | trunc 63 | trimSuffix "-" }}
-  namespace: kube-system 
-  labels: 
-    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-proxy
-    k8s-app: kube-proxy
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+  name: {{ $fullname }}
+  namespace: kube-system
+  {{- $extraLabels := dict "app" $fullname "k8s-app" "kube-proxy" }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 subsets:
   - addresses:
       {{- range .Values.kubeProxy.endpoints }}
@@ -26,12 +26,11 @@ subsets:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-proxy" | trunc 63 | trimSuffix "-" }}
+  name: {{ $fullname }}
   namespace: kube-system
-  labels:
-    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-proxy
-    jobLabel: kube-proxy
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+  {{- $extraLabels := dict "app" $fullname "jobLabel" "kube-proxy" }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 spec:
   clusterIP: None
   ports:
@@ -39,30 +38,27 @@ spec:
       port: {{ .Values.kubeProxy.service.port }}
       protocol: TCP
       targetPort: {{ .Values.kubeProxy.service.targetPort }}
-{{- if .Values.kubeProxy.endpoints }}{{- else }}
-  selector:
-    {{- if .Values.kubeProxy.service.selector }}
-{{ toYaml .Values.kubeProxy.service.selector | indent 4 }}
-    {{- else}}
-    k8s-app: kube-proxy
-    {{- end}}
-{{- end }}
+  {{- if (empty .Values.kubeProxy.endpoints) }}
+  {{- with .Values.kubeProxy.service.selector }}
+  selector: {{ toYaml . | nindent 4 }}
+  {{- end}}
+  {{- end }}
   type: ClusterIP
 {{- end }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-proxy" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $fullname }}
+  namespace: {{ .Release.Namespace }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec:
+  {{- omit .Values.kubeProxy.spec "selector" "namespaceSelector" | toYaml | nindent 2 }}
   selector:
     matchLabels:
-      app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-proxy
-      app.kubernetes.io/instance: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
+      app: {{ $fullname }}
+      app.kubernetes.io/instance: {{ default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" }}
   namespaceSelector:
     matchNames:
       - "kube-system"
-{{ omit .Values.kubeProxy.spec "selector" "namespaceSelector" | toYaml | indent 2 }}
 {{- end }}

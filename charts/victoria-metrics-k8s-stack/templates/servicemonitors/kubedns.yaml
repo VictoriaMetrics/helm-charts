@@ -1,14 +1,15 @@
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $fullname := ((printf "%s-kubedns" (include "victoria-metrics-k8s-stack.fullname" .)) | trunc 63 | trimSuffix "-") }}
 {{- if .Values.kubeDns.enabled }}
 {{- if .Values.kubeDns.service.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kubedns" | trunc 63 | trimSuffix "-" }}
+  name: {{ $fullname }}
   namespace: kube-system
-  labels:
-    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kubedns
-    jobLabel: kube-dns
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+  {{- $extraLabels := dict "app" $fullname "jobLabel" "kube-dns" }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 spec:
   clusterIP: None
   ports:
@@ -20,26 +21,25 @@ spec:
       port: {{ .Values.kubeDns.service.skydns.port }}
       protocol: TCP
       targetPort: {{ .Values.kubeDns.service.skydns.targetPort }}
-  selector:
-    {{- with .Values.kubeDns.service.selector -}}
-    {{- toYaml . | nindent 4 }}
-    {{- end}}
+  {{- with .Values.kubeDns.service.selector -}}
+  selector: {{ toYaml . | nindent 4 }}
+  {{- end}}
 {{- end }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kubedns" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $fullname }}
+  namespace: {{ .Release.Namespace }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec:
+  {{- omit .Values.kubeDns.spec "selector" "namespaceSelector" | toYaml | nindent 2 }}
   jobLabel: jobLabel
   selector:
     matchLabels:
-      app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kubedns
-      app.kubernetes.io/instance: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
+      app: {{ $fullname }}
+      app.kubernetes.io/instance: {{ default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" }}
   namespaceSelector:
     matchNames:
       - "kube-system"
-{{ omit .Values.kubeDns.spec "selector" "namespaceSelector" | toYaml | indent 2 }}
 {{- end }}

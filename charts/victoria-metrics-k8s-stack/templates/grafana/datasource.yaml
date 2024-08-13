@@ -4,14 +4,14 @@ kind: ConfigMap
 metadata:
   name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "grafana-ds" | trunc 63 | trimSuffix "-" }}
   namespace: {{ .Release.Namespace }}
-{{- if .Values.grafana.sidecar.datasources.annotations }}
-  annotations:
-{{ toYaml .Values.grafana.sidecar.datasources.annotations | indent 4 }}
-{{- end }}
+  {{- with .Values.grafana.sidecar.datasources.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     {{ $.Values.grafana.sidecar.datasources.label }}: "1"
-    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
-{{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+    {{- $app := ((printf "%s-grafana" (include "victoria-metrics-k8s-stack.name" $)) | trunc 63 | trimSuffix "-") }}
+    app: {{ $app }}
+    {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 data:
 {{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled .Values.grafana.additionalDataSources }}
   datasource.yaml: |-

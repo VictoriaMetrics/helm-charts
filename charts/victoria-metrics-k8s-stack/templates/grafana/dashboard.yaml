@@ -38,6 +38,7 @@ Check if dashboard is enabled
 {{- if $dashboardCondition }}
 
 {{- $dashboardResult := toRawJson $dashboardData -}}
+{{- $app := ((printf "%s-grafana" (include "victoria-metrics-k8s-stack.name" $)) | trunc 63 | trimSuffix "-") }}
 {{- if $.Values.grafanaOperatorDashboardsFormat.enabled }}
 ---
 apiVersion: grafana.integreatly.org/v1beta1
@@ -46,12 +47,11 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) $dashboardName | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
-    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    app: {{ $app }}
     {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
 spec:
   {{- with $.Values.grafanaOperatorDashboardsFormat.instanceSelector }}
-  instanceSelector:
-    {{- toYaml . | nindent 4 }}
+  instanceSelector: {{ toYaml . | nindent 4 }}
   {{- end }}
   {{- if $.Values.grafanaOperatorDashboardsFormat.allowCrossNamespaceImport }}
   allowCrossNamespaceImport: true
@@ -73,7 +73,7 @@ metadata:
     {{ $key }}: {{ $val | quote }}
     {{- end }}
     {{- end }}
-    app: {{ include "victoria-metrics-k8s-stack.name" $ }}-grafana
+    app: {{ $app }}
     {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
     {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
   annotations:

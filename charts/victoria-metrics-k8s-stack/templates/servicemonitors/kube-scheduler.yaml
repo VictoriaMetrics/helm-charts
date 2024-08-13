@@ -1,16 +1,16 @@
-
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $fullname := ((printf "%s-kube-scheduler" (include "victoria-metrics-k8s-stack.fullname" .)) | trunc 63 | trimSuffix "-") }}
 {{- if .Values.kubeScheduler.enabled }}
 {{- if .Values.kubeScheduler.endpoints }}
 ---
 apiVersion: v1
 kind: Endpoints
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-scheduler" | trunc 63 | trimSuffix "-" }}
-  namespace: kube-system 
-  labels: 
-    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-scheduler
-    k8s-app: etcd-server
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+  name: {{ $fullname }}
+  namespace: kube-system
+  {{- $extraLabels := dict "app" $fullname "k8s-app" "kube-scheduler" }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 subsets:
   - addresses:
       {{- range .Values.kubeScheduler.endpoints }}
@@ -26,12 +26,11 @@ subsets:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-scheduler" | trunc 63 | trimSuffix "-" }}
+  name: {{ $fullname }}
   namespace: kube-system
-  labels:
-    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-scheduler
-    jobLabel: kube-scheduler
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+  {{- $extraLabels := dict "app" $fullname "jobLabel" "kube-scheduler" }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 spec:
   clusterIP: None
   ports:
@@ -39,30 +38,27 @@ spec:
       port: {{ .Values.kubeScheduler.service.port }}
       protocol: TCP
       targetPort: {{ .Values.kubeScheduler.service.targetPort }}
-{{- if .Values.kubeScheduler.endpoints }}{{- else }}
-  selector:
-    {{- if .Values.kubeScheduler.service.selector }}
-{{ toYaml .Values.kubeScheduler.service.selector | indent 4 }}
-    {{- else}}
-    component: kube-scheduler
-    {{- end}}
-{{- end }}
+  {{- if (empty .Values.kubeScheduler.endpoints) }}
+  {{- with .Values.kubeScheduler.service.selector }}
+  selector: {{ toYaml . | nindent 4 }}
+  {{- end}}
+  {{- end }}
   type: ClusterIP
 {{- end }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-scheduler" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $fullname }}
+  namespace: {{ .Release.Namespace }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec:
+  {{- omit .Values.kubeScheduler.spec "selector" "namespaceSelector" | toYaml | nindent 2 }}
   selector:
     matchLabels:
-      app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-scheduler
-      app.kubernetes.io/instance: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
+      app: {{ $fullname }}
+      app.kubernetes.io/instance: {{ default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" }}
   namespaceSelector:
     matchNames:
       - "kube-system"
-{{ omit .Values.kubeScheduler.spec "selector" "namespaceSelector" | toYaml | indent 2 }}
 {{- end }}
