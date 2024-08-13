@@ -7,6 +7,7 @@
 - Synchronize Etcd dashboards and rules with mixin provided by Etcd
 - Add alerting rules for VictoriaMetrics operator.
 - Updated alerting rules for VictoriaMetrics components.
+- Fixed exact rule annotations propagation to other rules.
 
 ## 0.24.5
 

@@ -85,7 +85,8 @@ Filter out ignore rules
   {{- $ruleCondition := (eq $ruleSpec.condition "true") }}
   {{- $_ := unset $ruleSpec "condition" }}
   {{- $exactRule := index $exactRules $ruleName | default dict }}
-  {{- $resultRule := mergeOverwrite (deepCopy $commonRule) (index $defaultRules $ruleKey) $commonInGroupRule $exactRule }}
+  {{- $defaultRule := deepCopy (index $defaultRules $ruleKey) }}
+  {{- $resultRule := mergeOverwrite (deepCopy $commonRule) $defaultRule $commonInGroupRule $exactRule }}
   {{- if (and (dig "create" true $resultRule) $ruleCondition) }}
     {{- $ruleSpec := mergeOverwrite (deepCopy $ruleSpec) (dig "spec" (default dict) $resultRule) }}
     {{- $filteredRulesSpec = append $filteredRulesSpec $ruleSpec }}
