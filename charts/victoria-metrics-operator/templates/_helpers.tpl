@@ -48,6 +48,9 @@ Selector labels
 {{- define "vm-operator.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "vm-operator.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- with .extraLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end -}}
 
 {{/*

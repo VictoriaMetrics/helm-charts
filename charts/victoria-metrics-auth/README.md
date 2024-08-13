@@ -140,9 +140,18 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podAnnotations | object | `{}` | Annotations to be added to pod |
 | podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | podSecurityContext.enabled | bool | `true` |  |
+| probe.liveness.initialDelaySeconds | int | `5` |  |
+| probe.liveness.periodSeconds | int | `15` |  |
+| probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| probe.liveness.timeoutSeconds | int | `5` |  |
+| probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
+| probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
+| probe.readiness.initialDelaySeconds | int | `5` |  |
+| probe.readiness.periodSeconds | int | `15` |  |
+| probe.startup | object | `{}` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.extraLabels | object | `{}` |  |
-| rbac.pspEnabled | bool | `true` |  |
 | replicaCount | int | `1` | Number of replicas of vmauth |
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
 | secretName | string | `""` | Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html. Configuration in the given secret must be stored under `auth.yml` key. |

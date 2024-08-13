@@ -142,6 +142,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.podMetadata.labels | object | `{}` |  |
 | alertmanager.podSecurityContext.enabled | bool | `false` |  |
 | alertmanager.priorityClassName | string | `""` |  |
+| alertmanager.probe.liveness.httpGet.path | string | `"{{ ternary \"\" .baseURLPrefix (empty .baseURLPrefix) }}/-/healthy"` |  |
+| alertmanager.probe.liveness.httpGet.port | string | `"web"` |  |
+| alertmanager.probe.readiness.httpGet.path | string | `"{{ ternary \"\" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready"` |  |
+| alertmanager.probe.readiness.httpGet.port | string | `"web"` |  |
+| alertmanager.probe.startup.httpGet.path | string | `"{{ ternary \"\" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready"` |  |
+| alertmanager.probe.startup.httpGet.port | string | `"web"` |  |
 | alertmanager.resources | object | `{}` |  |
 | alertmanager.retention | string | `"120h"` |  |
 | alertmanager.securityContext.enabled | bool | `false` |  |
@@ -162,7 +168,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |
 | rbac.namespaced | bool | `false` |  |
-| rbac.pspEnabled | bool | `true` |  |
 | server.affinity | object | `{}` |  |
 | server.annotations | object | `{}` |  |
 | server.config.alerts.groups | list | `[]` |  |
@@ -212,11 +217,16 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.probe.liveness.failureThreshold | int | `3` |  |
 | server.probe.liveness.initialDelaySeconds | int | `5` |  |
 | server.probe.liveness.periodSeconds | int | `15` |  |
+| server.probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
 | server.probe.liveness.timeoutSeconds | int | `5` |  |
 | server.probe.readiness.failureThreshold | int | `3` |  |
+| server.probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
+| server.probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| server.probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
 | server.probe.readiness.initialDelaySeconds | int | `5` |  |
 | server.probe.readiness.periodSeconds | int | `15` |  |
 | server.probe.readiness.timeoutSeconds | int | `5` |  |
+| server.probe.startup | object | `{}` |  |
 | server.remote.read.basicAuth | object | `{"password":"","username":""}` | Basic auth for remote read |
 | server.remote.read.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
 | server.remote.read.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |

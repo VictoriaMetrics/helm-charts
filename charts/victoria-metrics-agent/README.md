@@ -332,11 +332,20 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podLabels | object | `{}` |  |
 | podSecurityContext.enabled | bool | `true` |  |
 | priorityClassName | string | `""` | priority class to be assigned to the pod(s) |
+| probe.liveness.initialDelaySeconds | int | `5` |  |
+| probe.liveness.periodSeconds | int | `15` |  |
+| probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| probe.liveness.timeoutSeconds | int | `5` |  |
+| probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
+| probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
+| probe.readiness.initialDelaySeconds | int | `5` |  |
+| probe.readiness.periodSeconds | int | `15` |  |
+| probe.startup | object | `{}` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |
 | rbac.namespaced | bool | `false` | if true and `rbac.enabled`, will deploy a Role/Rolebinding instead of a ClusterRole/ClusterRoleBinding |
-| rbac.pspEnabled | bool | `true` |  |
 | remoteWriteUrls | list | `[]` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |

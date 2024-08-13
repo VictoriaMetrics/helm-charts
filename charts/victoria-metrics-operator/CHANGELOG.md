@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Removed PodSecurityPolicy
+- Added configurable probes at `.Values.probe`
 
 ## 0.33.6
 

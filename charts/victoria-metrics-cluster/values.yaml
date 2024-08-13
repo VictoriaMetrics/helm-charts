@@ -12,8 +12,6 @@ printNotes: true
 
 rbac:
   create: true
-  # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
-  pspEnabled: true
   namespaced: false
   extraLabels: {}
   # annotations: {}
@@ -69,7 +67,7 @@ vmselect:
   automountServiceAccountToken: true
   # Extra command line arguments for vmselect component
   extraArgs:
-    envflag.enable: "true"
+    envflag.enable: true
     envflag.prefix: VM_
     loggerFormat: json
   annotations: {}
@@ -80,18 +78,27 @@ vmselect:
     #- configMapRef:
     #    name: special-config
 
-  # Readiness & Liveness probes
   probe:
+    # Readiness probe
     readiness:
+      httpGet:
+        path: '{{ include "vm.probe.http.path" . }}'
+        scheme: '{{ include "vm.probe.http.scheme" . }}'
+        port: '{{ include "vm.probe.port" . }}'
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
+    # Liveness probe
     liveness:
+      tcpSocket:
+        port: '{{ include "vm.probe.port" . }}'
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
+    # Startup probe
+    startup: {}
 
   horizontalPodAutoscaler:
     # -- Use HPA for vmselect component
@@ -331,15 +338,22 @@ vminsert:
   # Readiness & Liveness probes
   probe:
     readiness:
+      httpGet:
+        path: '{{ index .app.extraArgs "http.pathPrefix" | default "" | trimSuffix "/" }}/health'
+        scheme: '{{ ternary "HTTPS" "HTTP" (.app.extraArgs.tls | default false) }}'
+        port: '{{ dig "ports" "name" "http" (.app | dict) }}'
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
     liveness:
+      tcpSocket:
+        port: '{{ dig "ports" "name" "http" (.app | dict) }}'
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
+    startup: {}
 
 # Horizontal Pod Autoscaling
   horizontalPodAutoscaler:
@@ -671,19 +685,21 @@ vmstorage:
   probe:
     readiness:
       httpGet:
-        path: /health
-        port: http
+        path: '{{ include "vm.probe.http.path" . }}'
+        scheme: '{{ include "vm.probe.http.scheme" . }}'
+        port: '{{ include "vm.probe.port" . }}'
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
     liveness:
       tcpSocket:
-        port: http
+        port: '{{ include "vm.probe.port" . }}'
       initialDelaySeconds: 30
       periodSeconds: 30
       timeoutSeconds: 5
       failureThreshold: 10
+    startup: {}
   vmbackupmanager:
     # -- enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages
     enable: false
@@ -732,21 +748,24 @@ vmstorage:
     resources: {}
     # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
     env: []
-    readinessProbe:
-      httpGet:
-        path: /health
-        port: manager-http
-      initialDelaySeconds: 5
-      periodSeconds: 15
-      timeoutSeconds: 5
-      failureThreshold: 3
-    livenessProbe:
-      tcpSocket:
-        port: manager-http
-      initialDelaySeconds: 30
-      periodSeconds: 30
-      timeoutSeconds: 5
-      failureThreshold: 10
+    probe:
+      readiness:
+        httpGet:
+          path: '{{ include "vm.probe.http.path" . }}'
+          scheme: '{{ include "vm.probe.http.scheme" . }}'
+          port: manager-http
+        initialDelaySeconds: 5
+        periodSeconds: 15
+        timeoutSeconds: 5
+        failureThreshold: 3
+      liveness:
+        tcpSocket:
+          port: manager-http
+        initialDelaySeconds: 30
+        periodSeconds: 30
+        timeoutSeconds: 5
+        failureThreshold: 10
+      startup: {}
     extraSecretMounts:
       []
       # - name: secret

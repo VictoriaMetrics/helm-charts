@@ -27,39 +27,31 @@ kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "chart.labels" . | nindent 4 }}
+  labels: {{ include "chart.labels" . | nindent 4 }}
   {{- with .Values.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels:
-      {{- include "chart.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      labels:
-        {{- include "chart.selectorLabels" . | nindent 8 }}
-      annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- range $key, $value := .Values.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+      labels: {{ include "chart.selectorLabels" . | nindent 8 }}
+      {{- $annotations := merge (dict "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum)) .Values.podAnnotations }}
+      annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "chart.serviceAccountName" . }}
       {{- if .Values.podSecurityContext.enabled }}
-      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
+      securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           {{- if .Values.securityContext.enabled }}
-          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" $) | nindent 12 }}
+          securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
           {{- end }}
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}{{- with .Values.image.variant }}-{{ . }}{{- end }}"
           workingDir: {{ .Values.containerWorkingDir }}
@@ -90,31 +82,21 @@ spec:
           ports:
             - name: http
               containerPort: 8431
-          {{- if .Values.envFrom }}
-          envFrom:
-            {{- with .Values.envFrom -}}
-            {{ toYaml . | nindent 12 }}
-            {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.env }}
-          env: {{ toYaml . | nindent 10 }}
+          env: {{ toYaml . | nindent 12 }}
           {{- end }}
-          readinessProbe:
-            httpGet:
-            {{- if index  .Values.extraArgs "http.pathPrefix" }}
-              path: {{ trimSuffix "/" (index .Values.extraArgs "http.pathPrefix") }}/health
-            {{- else }}
-              path: /health
-            {{- end }}
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-          livenessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-            timeoutSeconds: 5
+          {{- with (fromYaml (include "vm.probe" (dict "app" .Values "type" "readiness"))) }}
+          readinessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" .Values "type" "liveness"))) }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" .Values "type" "startup"))) }}
+          startupProbe: {{ toYaml . | nindent 12 }} 
+          {{- end }}
           {{- if $isVolumes }}
           volumeMounts:
           {{- if .Values.rateLimiter.enable }}
@@ -133,25 +115,21 @@ spec:
           {{- end }}
           {{- end }}
           {{- with .Values.resources }}
-          resources:
-            {{- toYaml . | nindent 12 }}
+          resources: {{ toYaml . | nindent 12 }}
           {{- end }}
         {{- with .Values.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.affinity }}
-      affinity:
-        {{ toYaml . | nindent 8 }}
+      affinity: {{ toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- if $isVolumes }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if $isVolumes }}
       volumes:
       {{- if .Values.rateLimiter.enable }}
         - name: config
@@ -167,4 +145,4 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- include "chart.license.volume" . | nindent 8 }}
-    {{- end }}
+      {{- end }}

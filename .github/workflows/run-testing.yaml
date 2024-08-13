@@ -6,11 +6,15 @@ on:
       - 'packages/**'
       - 'index.yaml'
       - '**.md'
+    branches:
+      - master
   pull_request:
     paths-ignore:
       - 'packages/**'
       - 'index.yaml'
       - '**.md'
+    branches:
+      - master
 
 env:
   HELM_VERSION: 3.15.1
@@ -40,7 +44,7 @@ jobs:
       - name: Build charts diff
         id: charts-diff
         run: |
-          charts=$(echo "${{ steps.changed-charts.outputs.all_modified_files }}" | sed 's/ /\n/g' | awk -F/ '{print $2}' | sort | uniq | jq -ncR '[inputs]')
+          charts=$(echo "${{ steps.changed-charts.outputs.all_modified_files }}" | sed 's/ /\n/g' | grep -v 'common' | awk -F/ '{print $2}' | sort | uniq | jq -ncR '[inputs]')
           echo "charts=$charts" >> $GITHUB_OUTPUT
 
   install-chart:
@@ -51,7 +55,7 @@ jobs:
     strategy:
       matrix:
         chart: ${{ fromJSON(needs.get-changed-charts.outputs.charts) }}
-        k8s_version: ["v1.28.12", "v1.29.7", "v1.30.3"]
+        k8s_version: ["v1.28.9", "v1.29.4", "v1.30.2"]
       fail-fast: false
     steps:
       - name: Checkout
@@ -75,10 +79,11 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
 
-      - name: Create k3d cluster
-        uses: nolar/setup-k3d-k3s@v1
+      - name: Create Kind cluster
+        uses: helm/kind-action@v1
         with:
-          version: ${{ matrix.k8s_version }}
+          node_image: kindest/node:${{ matrix.k8s_version }}
+          kubectl_version: ${{ matrix.k8s_version }}
 
       - name: Remove node taints
         run: |

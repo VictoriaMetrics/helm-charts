@@ -1,26 +1,22 @@
 {{- if and .Values.vmstorage.enabled .Values.vmstorage.podDisruptionBudget.enabled }}
 {{- if .Capabilities.APIVersions.Has "policy/v1/PodDisruptionBudget" }}
 apiVersion: policy/v1
-{{- else -}}
+{{- else }}
 apiVersion: policy/v1beta1
 {{- end }}
 kind: PodDisruptionBudget
 metadata:
   name: {{ template "victoria-metrics.vmstorage.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "victoria-metrics.vmstorage.labels" . | nindent 4 }}
-  {{- with .Values.vmstorage.podDisruptionBudget.labels }}
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.vmstorage.podDisruptionBudget.labels) }}
+  labels: {{ include "victoria-metrics.vmstorage.labels" $ctx | nindent 4 }}
 spec:
-{{- if .Values.vmstorage.podDisruptionBudget.minAvailable }}
-  minAvailable: {{ .Values.vmstorage.podDisruptionBudget.minAvailable }}
-{{- end }}
-{{- if .Values.vmstorage.podDisruptionBudget.maxUnavailable }}
-  maxUnavailable: {{ .Values.vmstorage.podDisruptionBudget.maxUnavailable }}
-{{- end }}
+  {{- with .Values.vmstorage.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.vmstorage.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
   selector:
-    matchLabels:
-      {{- include "victoria-metrics.vmstorage.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "victoria-metrics.vmstorage.matchLabels" . | nindent 6 }}
 {{- end }}

@@ -19,8 +19,6 @@ serviceAccount:
 
 rbac:
   create: true
-  # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
-  pspEnabled: true
   namespaced: false
   extraLabels: {}
   annotations: {}
@@ -64,15 +62,22 @@ server:
   # Readiness & Liveness probes
   probe:
     readiness:
+      httpGet:
+        path: '{{ include "vm.probe.http.path" . }}'
+        scheme: '{{ include "vm.probe.http.scheme" . }}'
+        port: '{{ include "vm.probe.port" . }}'
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
     liveness:
+      tcpSocket:
+        port: '{{ include "vm.probe.port" . }}'
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
+    startup: {}
 
   replicaCount: 1
 
@@ -334,6 +339,19 @@ alertmanager:
   resources: {}
   tolerations: []
   imagePullSecrets: []
+  probe:
+    readiness:
+      httpGet:
+        path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready'
+        port: web
+    liveness:
+      httpGet:
+        path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/healthy'
+        port: web
+    startup:
+      httpGet:
+        path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready'
+        port: web
   podSecurityContext:
     enabled: false
   securityContext:

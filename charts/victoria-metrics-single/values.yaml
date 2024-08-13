@@ -8,8 +8,6 @@ global:
 
 rbac:
   create: true
-  # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
-  pspEnabled: true
   namespaced: false
   extraLabels: {}
   # annotations: {}
@@ -179,35 +177,33 @@ server:
     #   cpu: 500m
     #   memory: 512Mi
 
+  probe:
   # Indicates whether the Container is ready to service requests. If the readiness probe fails, the endpoints controller removes the Pod's IP address from the endpoints of all Services that match the Pod. The default state of readiness before the initial delay is Failure. If a Container does not provide a readiness probe, the default state is Success.
-  readinessProbe:
-    httpGet:
-      path: /health
-      port: http
-    initialDelaySeconds: 5
-    periodSeconds: 15
-    timeoutSeconds: 5
-    failureThreshold: 3
+    readiness:
+      httpGet:
+        path: '{{ include "vm.probe.http.path" . }}'
+        scheme: '{{ include "vm.probe.http.scheme" . }}'
+        port: '{{ include "vm.probe.port" . }}'
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
 
   # Indicates whether the Container is running. If the liveness probe fails, the kubelet kills the Container, and the Container is subjected to its restart policy. If a Container does not provide a liveness probe, the default state is Success.
-  livenessProbe:
-    httpGet:
-      scheme: HTTP
-      path: /health
-      port: 8428
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    timeoutSeconds: 5
-    failureThreshold: 10
+    liveness:
+      tcpSocket:
+        port: '{{ include "vm.probe.port" . }}'
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 5
+      failureThreshold: 10
 
   # Indicates whether the Container is done with potentially costly initialization. If set it is executed first. If it fails Container is restarted. If it succeeds liveness and readiness probes takes over.
-  startupProbe: {}
-    #tcpSocket:
-    #  port: http
-    #failureThreshold: 30
-    #periodSeconds: 15
-    #successThreshold: 1
-    #timeoutSeconds: 5
+    startup: {}
+      #failureThreshold: 30
+      #periodSeconds: 15
+      #successThreshold: 1
+      #timeoutSeconds: 5
 
   # -- Security context to be added to server pods
   securityContext:
@@ -294,21 +290,24 @@ server:
     resources: {}
     # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
     env: []
-    readinessProbe:
-      httpGet:
-        path: /health
-        port: manager-http
-      initialDelaySeconds: 5
-      periodSeconds: 15
-      timeoutSeconds: 5
-      failureThreshold: 3
-    livenessProbe:
-      tcpSocket:
-        port: manager-http
-      initialDelaySeconds: 30
-      periodSeconds: 30
-      timeoutSeconds: 5
-      failureThreshold: 10
+    probe:
+      readiness:
+        httpGet:
+          port: manager-http
+        initialDelaySeconds: 5
+        periodSeconds: 15
+        timeoutSeconds: 5
+        failureThreshold: 3
+      liveness:
+        tcpSocket:
+          port: manager-http
+        initialDelaySeconds: 30
+        periodSeconds: 30
+        timeoutSeconds: 5
+        failureThreshold: 10
+      startup:
+        httpGet:
+          port: manager-http
   service:
     # -- Service annotations
     annotations: {}

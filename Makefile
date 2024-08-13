@@ -1,5 +1,5 @@
 URL=https://victoriametrics.github.io/helm-charts/
-HELM_IMAGE = alpine/helm:3.12.3
+HELM_IMAGE = alpine/helm:3.15.3
 HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.14.2
 CT_IMAGE = quay.io/helmpack/chart-testing:v3.11.0
 KNOWN_TARGETS=helm

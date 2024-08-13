@@ -223,6 +223,22 @@ write:
   # -- Write endpoint without suffixes, victoriametrics or vminsert. Example http://victoroametrics:8428 or http://vminsert:8480
   url: ""
 
+probe:
+  readiness:
+    httpGet:
+      path: '{{ include "vm.probe.http.path" . }}'
+      scheme: '{{ include "vm.probe.http.scheme" . }}'
+      port: '{{ include "vm.probe.port" . }}'
+    initialDelaySeconds: 5
+    periodSeconds: 15
+  liveness:
+    tcpSocket:
+      port: '{{ include "vm.probe.port" . }}'
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+  startup: {}
+
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
 # Required only for VictoriaMetrics enterprise.
 # Documentation - https://docs.victoriametrics.com/enterprise.html,

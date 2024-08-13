@@ -1,65 +1,54 @@
-{{- if and .Values.vmselect.enabled (not .Values.vmselect.statefulSet.enabled) -}}
+{{- $app := .Values.vmselect -}}
+{{- if and $app.enabled (not $app.statefulSet.enabled) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-{{- with .Values.vmselect.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-{{- end }}
-  labels:
-    {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
-{{- with .Values.vmselect.extraLabels }}
-{{ toYaml . | indent 4 }}
-{{- end }}
+  {{- with $app.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $ctx := mergeOverwrite (deepCopy .) (dict "extraLabels" $app.extraLabels) }}
+  labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
   name: {{ template "victoria-metrics.vmselect.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
-    matchLabels:
-      {{- include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
-{{- if not .Values.vmselect.horizontalPodAutoscaler.enabled }}
-  replicas: {{ .Values.vmselect.replicaCount }}
-{{- end }}
-  {{- with .Values.vmselect.strategy }}
-  strategy:
-    {{- toYaml . | nindent 4 }}
+    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
+  {{- if not $app.horizontalPodAutoscaler.enabled }}
+  replicas: {{ $app.replicaCount }}
+  {{- end }}
+  {{- with $app.strategy }}
+  strategy: {{ toYaml . | nindent 4 }}
   {{- end }}
   template:
     metadata:
-    {{- if .Values.vmselect.podAnnotations }}
-      annotations:
-{{ toYaml .Values.vmselect.podAnnotations | indent 8 }}
-    {{- end }}
-      labels:
-        {{- include "victoria-metrics.vmselect.podLabels" . | nindent 8 }}
-{{- with .Values.vmselect.extraLabels }}
-{{ toYaml . | indent 8 }}
-{{- end }}
+      {{- with $app.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      labels: {{ include "victoria-metrics.vmselect.podLabels" $ctx | nindent 8 }}
     spec:
-{{- if .Values.vmselect.priorityClassName }}
-      priorityClassName: "{{ .Values.vmselect.priorityClassName }}"
-{{- end }}
+      {{- with $ctx.priorityClassName }}
+      priorityClassName: "{{ . }}"
+      {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
-      {{- with .Values.vmselect.initContainers }}
-      initContainers:
-        {{- toYaml . | nindent 8 }}
+      {{- with $app.initContainers }}
+      initContainers: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vmselect.name }}
-          image: "{{ .Values.vmselect.image.repository }}:{{ default .Chart.AppVersion .Values.vmselect.image.tag }}{{- with .Values.vmselect.image.variant }}-{{ . }}{{- end }}"
-          imagePullPolicy: "{{ .Values.vmselect.image.pullPolicy }}"
-          {{- if .Values.vmselect.containerWorkingDir }}
-          workingDir: {{ .Values.vmselect.containerWorkingDir }}
+        - name: {{ template "victoria-metrics.name" . }}-{{ $app.name }}
+          image: "{{ $app.image.repository }}:{{ default .Chart.AppVersion $app.image.tag }}{{- with $app.image.variant }}-{{ . }}{{- end }}"
+          imagePullPolicy: "{{ $app.image.pullPolicy }}"
+          {{- with $app.containerWorkingDir }}
+          workingDir: {{ . }}
           {{- end }}
-          {{- if .Values.vmselect.securityContext.enabled }}
-          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmselect.securityContext "context" $) | nindent 12 }}
+          {{- if $app.securityContext.enabled }}
+          securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
           args:
-            - {{ printf "%s=%s" "--cacheDataPath" .Values.vmselect.cacheMountPath | quote}}
-          {{- if not (or .Values.vmselect.suppressStorageFQDNsRender .Values.vmselect.suppresStorageFQDNsRender )}}
+            - --cacheDataPath={{ $app.cacheMountPath }}
+          {{- if not (or $app.suppressStorageFQDNsRender $app.suppresStorageFQDNsRender) }}
           {{- include "victoria-metrics.vmselect.vmstorage-pod-fqdn" . | nindent 12 }}
           {{- end }}
-          {{- range $key, $value := .Values.vmselect.extraArgs }}
+          {{- range $key, $value := $app.extraArgs }}
           {{- if kindIs "slice" $value }}
           {{- range $v := $value }}
             - --{{ $key }}={{ $v }}
@@ -71,101 +60,77 @@ spec:
           {{- with (include "chart.license.flag" .) }}
             - {{ . }}
           {{- end }}
-          {{- if .Values.vmselect.envFrom }}
-          envFrom:
-            {{- with .Values.vmselect.envFrom -}}
-            {{ toYaml . | nindent 12 }}
-            {{- end }}
+          {{- with $app.envFrom }}
+          envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.vmselect.env }}
-          env: {{ toYaml . | nindent 10 }}
+          {{- with $app.env }}
+          env: {{ toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - name: "{{ .Values.vmselect.ports.name | default "http" }}" 
+            - name: "{{ $app.ports.name | default "http" }}" 
               containerPort: 8481
-          {{- if .Values.vmselect.extraArgs.clusternativeListenAddr }}
+          {{- with $app.extraArgs.clusternativeListenAddr }}
             - name: cluster-tcp
               protocol: TCP
-              containerPort: {{ include "split-host-port" .Values.vmselect.extraArgs.clusternativeListenAddr }}
+              containerPort: {{ include "split-host-port" . }}
           {{- end }}
-          readinessProbe:
-            httpGet:
-            {{- if index  .Values.vmselect.extraArgs "http.pathPrefix" }}
-              path: {{ trimSuffix "/" (index .Values.vmselect.extraArgs "http.pathPrefix") }}/health
-            {{- else }}
-              path: /health
-            {{- end }}
-              port: "{{ .Values.vmselect.ports.name | default "http" }}" 
-            {{- if .Values.vmselect.extraArgs.tls }}
-              scheme: HTTPS
-            {{- else }}
-              scheme: HTTP
-            {{- end }}
-            initialDelaySeconds: {{ .Values.vmselect.probe.readiness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.vmselect.probe.readiness.periodSeconds }}
-            timeoutSeconds: {{ .Values.vmselect.probe.readiness.timeoutSeconds }}
-            failureThreshold: {{ .Values.vmselect.probe.readiness.failureThreshold }}
-          livenessProbe:
-            tcpSocket:
-              port: "{{ .Values.vmselect.ports.name | default "http" }}" 
-            initialDelaySeconds: {{ .Values.vmselect.probe.liveness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.vmselect.probe.liveness.periodSeconds }}
-            timeoutSeconds: {{ .Values.vmselect.probe.liveness.timeoutSeconds }}
-            failureThreshold: {{ .Values.vmselect.probe.liveness.failureThreshold }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
+          readinessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "liveness"))) }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "startup"))) }}
+          startupProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
-            - mountPath: {{ .Values.vmselect.cacheMountPath }}
+            - mountPath: {{ $app.cacheMountPath }}
               name: cache-volume
-            {{- range .Values.vmstorage.extraHostPathMounts }}
+            {{- range $app.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
             {{- end }}
-          {{- with .Values.vmselect.extraVolumeMounts }}
+          {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- include "chart.license.mount" . | nindent 12 }}
-          resources:
-            {{- with .Values.vmselect.resources }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-        {{- with .Values.vmselect.extraContainers }}
+          {{- with $app.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with $app.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-    {{- if .Values.imagePullSecrets }}
-      imagePullSecrets:
-      {{ toYaml .Values.imagePullSecrets | indent 2 }}
-    {{- end }}
-    {{- if .Values.vmselect.nodeSelector }}
-      nodeSelector:
-{{ toYaml .Values.vmselect.nodeSelector | indent 8 }}
-    {{- end }}
-    {{- if .Values.vmselect.podSecurityContext.enabled }}
-      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmselect.podSecurityContext "context" $) | nindent 8 }}
-    {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if $app.podSecurityContext.enabled }}
+      securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
-    {{- if .Values.vmselect.tolerations }}
-      tolerations:
-{{ toYaml .Values.vmselect.tolerations | indent 8 }}
-    {{- end }}
-    {{- if .Values.vmselect.affinity }}
-      affinity:
-{{ toYaml .Values.vmselect.affinity | indent 8 }}
-    {{- end }}
-    {{- if .Values.vmselect.topologySpreadConstraints }}
-      topologySpreadConstraints:
-{{ toYaml .Values.vmselect.topologySpreadConstraints | indent 8 }}
-    {{- end }}
+      {{- with $app.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
-        {{- with .Values.vmselect.extraVolumes }}
+        {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         - name: cache-volume
-        {{- if .Values.vmselect.persistentVolume.enabled }}
+        {{- if $app.persistentVolume.enabled }}
           persistentVolumeClaim:
-            claimName: {{ if .Values.vmselect.persistentVolume.existingClaim }}{{ .Values.vmselect.persistentVolume.existingClaim }}{{- else }}{{ template "victoria-metrics.vmselect.fullname" . }}{{- end }}
-            {{- else }}
+            claimName: {{ if $app.persistentVolume.existingClaim }}{{ $app.persistentVolume.existingClaim }}{{- else }}{{ template "victoria-metrics.vmselect.fullname" . }}{{- end }}
+        {{- else }}
           emptyDir: {}
-            {{- end -}}
+        {{- end -}}
         {{- include "chart.license.volume" . | nindent 8 }}
 {{- end }}

@@ -3,6 +3,10 @@
 ## Next release
 
 - Added basicAuth support for ServiceMonitor
+- Updated `.Values.server.readinessProbe` to `.Values.server.probe.readiness`
+- Updated `.Values.server.livenessProbe` to `.Values.server.probe.liveness`
+- Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
+- Removed PodSecurityPolicy
 
 ## 0.5.4
 

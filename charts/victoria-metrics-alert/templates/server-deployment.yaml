@@ -1,10 +1,11 @@
-{{- if and .Values.server.enabled -}}
-{{- if not .Values.server.extraArgs.rule }}
-{{- if and (eq .Values.server.configMap "") (eq (len .Values.server.config.alerts.groups) 0) -}}
+{{- $app := .Values.server }}
+{{- if and $app.enabled -}}
+{{- if not $app.extraArgs.rule }}
+{{- if and (eq $app.configMap "") (eq (len $app.config.alerts.groups) 0) -}}
 {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
 {{- end -}}
 {{- end -}}
-{{- if eq .Values.server.datasource.url "" -}}
+{{- if eq $app.datasource.url "" -}}
 {{- fail "server.datasource.url datasource URL must be specified" -}}
 {{- end -}}
 apiVersion: apps/v1
@@ -12,61 +13,51 @@ kind: Deployment
 metadata:
   name: {{ include "vmalert.server.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "vmalert.server.labels" . | nindent 4 }}
-  {{- with .Values.server.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  labels: {{ include "vmalert.server.labels" . | nindent 4 }}
+  {{- with $app.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  minReadySeconds: {{ .Values.server.minReadySeconds }}
-  replicas: {{ .Values.server.replicaCount }}
+  minReadySeconds: {{ $app.minReadySeconds }}
+  replicas: {{ $app.replicaCount }}
   selector:
-    matchLabels:
-      {{- include "vmalert.server.matchLabels" . | nindent 6 }}
-  {{- with .Values.server.strategy }}
-  strategy:
-    {{- toYaml . | nindent 4 }}
+    matchLabels: {{ include "vmalert.server.matchLabels" . | nindent 6 }}
+  {{- with $app.strategy }}
+  strategy: {{ toYaml . | nindent 4 }}
   {{- end }}
   template:
     metadata:
-      labels:
-        {{- include "vmalert.server.labels" . | nindent 8 }}
-        {{- range $key, $value := .Values.server.podLabels }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
-      annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/server-alerts-configmap.yaml") . | sha256sum }}
-        {{- range $key, $value := .Values.server.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+      {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.podLabels) }}
+      labels: {{ include "vmalert.server.labels" $ctx | nindent 8 }}
+      {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/server-alerts-configmap.yaml") . | sha256sum) }}
+      {{- $annotations = merge $annotations $app.podAnnotations }}
+      annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-    {{- with .Values.server.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- with $app.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ template "vmalert.serviceAccountName" . }}
-      {{- if .Values.server.podSecurityContext.enabled }}
-      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.podSecurityContext "context" $) | nindent 8 }}
+      {{- if $app.podSecurityContext.enabled }}
+      securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       containers:
-        - name: {{ template "vmalert.name" . }}-{{ .Values.server.name }}
-          {{- if .Values.server.securityContext.enabled }}
-          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.server.securityContext "context" $) | nindent 12 }}
+        - name: {{ template "vmalert.name" . }}-{{ $app.name }}
+          {{- if $app.securityContext.enabled }}
+          securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.server.image.repository }}:{{ default .Chart.AppVersion .Values.server.image.tag }}{{- with .Values.server.image.variant }}-{{ . }}{{- end }}"
+          image: "{{ $app.image.repository }}:{{ default .Chart.AppVersion $app.image.tag }}{{- with $app.image.variant }}-{{ . }}{{- end }}"
           args:
             - -rule=/config/alert-rules.yaml
-            - -datasource.url={{ .Values.server.datasource.url}}
-            {{- if or .Values.server.datasource.basicAuth.password .Values.server.datasource.basicAuth.username  }}
-            - -datasource.basicAuth.password={{ .Values.server.datasource.basicAuth.password}}
-            - -datasource.basicAuth.username={{ .Values.server.datasource.basicAuth.username}}
+            - -datasource.url={{ $app.datasource.url}}
+            {{- if or $app.datasource.basicAuth.password $app.datasource.basicAuth.username  }}
+            - -datasource.basicAuth.password={{ $app.datasource.basicAuth.password}}
+            - -datasource.basicAuth.username={{ $app.datasource.basicAuth.username}}
             {{- end }}
-            {{- with .Values.server.datasource.bearer.token }}
+            {{- with $app.datasource.bearer.token }}
             - -datasource.bearerToken={{ . }}
             {{- end }}
-            {{- with .Values.server.datasource.bearer.tokenFile }}
+            {{- with $app.datasource.bearer.tokenFile }}
             - -datasource.bearerTokenFile={{ . }}
             {{- end }}
             {{- with (include "vmalert.alertmanager.urls" .) }}
@@ -84,33 +75,33 @@ spec:
             {{- with (include "vmalert.alertmanager.bearerTokenFiles" .) }}
             - -notifier.bearerTokenFile={{ . }}
             {{- end }}
-            {{- if .Values.server.remote.read.url }}
-            - -remoteRead.url={{ .Values.server.remote.read.url }}
+            {{- if $app.remote.read.url }}
+            - -remoteRead.url={{ $app.remote.read.url }}
             {{- end }}
-            {{- if or .Values.server.remote.read.basicAuth.password .Values.server.remote.read.basicAuth.username }}
-            - -remoteRead.basicAuth.password={{ .Values.server.remote.read.basicAuth.password }}
-            - -remoteRead.basicAuth.username={{ .Values.server.remote.read.basicAuth.username }}
+            {{- if or $app.remote.read.basicAuth.password $app.remote.read.basicAuth.username }}
+            - -remoteRead.basicAuth.password={{ $app.remote.read.basicAuth.password }}
+            - -remoteRead.basicAuth.username={{ $app.remote.read.basicAuth.username }}
             {{- end }}
-            {{- with .Values.server.remote.read.bearer.token }}
+            {{- with $app.remote.read.bearer.token }}
             - -remoteRead.bearerToken={{ . }}
             {{- end }}
-            {{- with .Values.server.remote.read.bearer.tokenFile }}
+            {{- with $app.remote.read.bearer.tokenFile }}
             - -remoteRead.bearerTokenFile={{ . }}
             {{- end }}
-            {{- if .Values.server.remote.write.url }}
-            - -remoteWrite.url={{ .Values.server.remote.write.url }}
+            {{- if $app.remote.write.url }}
+            - -remoteWrite.url={{ $app.remote.write.url }}
             {{- end }}
-            {{- if or .Values.server.remote.write.basicAuth.password .Values.server.remote.write.basicAuth.username  }}
-            - -remoteWrite.basicAuth.password={{ .Values.server.remote.write.basicAuth.password }}
-            - -remoteWrite.basicAuth.username={{ .Values.server.remote.write.basicAuth.username }}
+            {{- if or $app.remote.write.basicAuth.password $app.remote.write.basicAuth.username  }}
+            - -remoteWrite.basicAuth.password={{ $app.remote.write.basicAuth.password }}
+            - -remoteWrite.basicAuth.username={{ $app.remote.write.basicAuth.username }}
             {{- end }}
-            {{- with .Values.server.remote.write.bearer.token }}
+            {{- with $app.remote.write.bearer.token }}
             - -remoteWrite.bearerToken={{ . }}
             {{- end }}
-            {{- with .Values.server.remote.write.bearer.tokenFile }}
+            {{- with $app.remote.write.bearer.tokenFile }}
             - -remoteWrite.bearerTokenFile={{ . }}
             {{- end }}
-            {{- range $key, $value := .Values.server.extraArgs }}
+            {{- range $key, $value := $app.extraArgs }}
             {{- if kindIs "slice" $value }}
             {{- range $v := $value }}
             - -{{ $key }}={{ $v }}
@@ -124,81 +115,66 @@ spec:
             {{- with (include "vmalert.license.flag" .) }}
             - {{ . }}
             {{- end }}
-          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
-          {{- if .Values.server.envFrom }}
-          envFrom:
-            {{- with .Values.server.envFrom -}}
-            {{ toYaml . | nindent 12 }}
-            {{- end }}
+          imagePullPolicy: {{ $app.image.pullPolicy }}
+          {{- with $app.envFrom }}
+          envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.server.env }}
-          env: {{ toYaml . | nindent 10 }}
+          {{- with $app.env }}
+          env: {{ toYaml . | nindent 12 }}
           {{- end }}
           ports:
             - name: http
               containerPort: 8880
-          readinessProbe:
-            httpGet:
-            {{- if index  .Values.server.extraArgs "http.pathPrefix" }}
-              path: {{ trimSuffix "/" (index .Values.server.extraArgs "http.pathPrefix") }}/health
-            {{- else }}
-              path: /health
-            {{- end }}
-              port: http
-            initialDelaySeconds: {{ .Values.server.probe.readiness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.server.probe.readiness.periodSeconds }}
-            timeoutSeconds: {{ .Values.server.probe.readiness.timeoutSeconds }}
-            failureThreshold: {{ .Values.server.probe.readiness.failureThreshold }}
-          livenessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: {{ .Values.server.probe.liveness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.server.probe.liveness.periodSeconds }}
-            timeoutSeconds: {{ .Values.server.probe.liveness.timeoutSeconds }}
-            failureThreshold: {{ .Values.server.probe.liveness.failureThreshold }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
+          readinessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "liveness"))) }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "startup"))) }}
+          startupProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: alerts-config
               mountPath: /config
-            {{- range .Values.server.extraHostPathMounts }}
+            {{- range $app.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
             {{- end }}
-            {{- with .Values.server.extraVolumeMounts }}
+            {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- include "vmalert.license.mount" . | nindent 12 }}
-          resources:
-            {{- toYaml .Values.server.resources | nindent 12 }}
-        {{- with .Values.server.extraContainers }}
+          {{- with $app.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with $app.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- with .Values.server.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
+      {{- with $app.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.server.priorityClassName }}
-      priorityClassName: {{ .Values.server.priorityClassName | quote }}
+      {{- with $app.priorityClassName }}
+      priorityClassName: {{ . }}
       {{- end }}
-      {{- with .Values.server.affinity }}
-      affinity:
-        {{ toYaml . | nindent 8 }}
+      {{- with $app.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.server.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- with $app.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         - name: alerts-config
           configMap:
             name: {{ include "vmalert.server.configname" . }}
-        {{- range .Values.server.extraHostPathMounts }}
+        {{- range $app.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
             path: {{ .hostPath }}
         {{- end }}
-        {{- with .Values.server.extraVolumes }}
+        {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- include "vmalert.license.volume" . | nindent 8 }}

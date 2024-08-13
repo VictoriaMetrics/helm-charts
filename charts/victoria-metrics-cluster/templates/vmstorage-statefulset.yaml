@@ -1,63 +1,53 @@
-{{- if .Values.vmstorage.enabled -}}
+{{- $app := .Values.vmstorage }}
+{{- if $app.enabled -}}
 {{ include "chart.vmbackupmanager.enforce_license" .}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-{{- with .Values.vmstorage.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-{{- end }}
-  labels:
-    {{- include "victoria-metrics.vmstorage.labels" . | nindent 4 }}
-{{- with .Values.vmstorage.extraLabels }}
-{{ toYaml . | indent 4 }}
-{{- end }}
+  {{- with $app.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $ctx := mergeOverwrite (deepCopy .) (dict "extraLabels" $app.extraLabels) }}
+  labels: {{ include "victoria-metrics.vmstorage.labels" $ctx | nindent 4 }}
   name: {{ template "victoria-metrics.vmstorage.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
   serviceName: {{ template "victoria-metrics.vmstorage.fullname" . }}
   selector:
-    matchLabels:
-      {{- include "victoria-metrics.vmstorage.matchLabels" . | nindent 6 }}
-  replicas: {{ .Values.vmstorage.replicaCount }}
-  podManagementPolicy: {{ .Values.vmstorage.podManagementPolicy }}
+    matchLabels: {{ include "victoria-metrics.vmstorage.matchLabels" . | nindent 6 }}
+  replicas: {{ $app.replicaCount }}
+  podManagementPolicy: {{ $app.podManagementPolicy }}
   template:
     metadata:
-    {{- if .Values.vmstorage.podAnnotations }}
-      annotations:
-{{ toYaml .Values.vmstorage.podAnnotations | indent 8 }}
-    {{- end }}
-      labels:
-        {{- include "victoria-metrics.vmstorage.podLabels" . | nindent 8 }}
-{{- with .Values.vmstorage.extraLabels }}
-{{ toYaml . | indent 8 }}
-{{- end }}
+      {{- with $app.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      labels: {{ include "victoria-metrics.vmstorage.podLabels" $ctx | nindent 8 }}
     spec:
-{{- if .Values.vmstorage.priorityClassName }}
-      priorityClassName: "{{ .Values.vmstorage.priorityClassName }}"
-{{- end }}
-{{- if .Values.vmstorage.schedulerName }}
-      schedulerName: "{{ .Values.vmstorage.schedulerName }}"
-{{- end }}
+      {{- with $app.priorityClassName }}
+      priorityClassName: "{{ . }}"
+      {{- end }}
+      {{- with $app.schedulerName }}
+      schedulerName: "{{ . }}"
+      {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- if eq (include "victoria-metrics.storage.hasInitContainer" . ) "true" }}
-      initContainers:
-        {{- include "victoria-metrics.storage.initContiners" . | nindent 8 }}
+      initContainers: {{ include "victoria-metrics.storage.initContiners" . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ template "victoria-metrics.name" . }}-{{ .Values.vmstorage.name }}
-          image: "{{ .Values.vmstorage.image.repository }}:{{ default .Chart.AppVersion .Values.vmstorage.image.tag }}{{- with .Values.vmstorage.image.variant }}-{{ . }}{{- end }}"
-          imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
-          {{- if .Values.vmstorage.containerWorkingDir }}
-          workingDir: {{ .Values.vmstorage.containerWorkingDir }}
+        - name: {{ template "victoria-metrics.name" . }}-{{ $app.name }}
+          image: "{{ $app.image.repository }}:{{ default .Chart.AppVersion $app.image.tag }}{{- with $app.image.variant }}-{{ . }}{{- end }}"
+          imagePullPolicy: "{{ $app.image.pullPolicy }}"
+          {{- with $app.containerWorkingDir }}
+          workingDir: {{ . }}
           {{- end }}
-          {{- if .Values.vmstorage.securityContext.enabled }}
-          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmstorage.securityContext "context" $) | nindent 12 }}
+          {{- if $app.securityContext.enabled }}
+          securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
           args:
-            - {{ printf "%s=%s" "--retentionPeriod" (toString .Values.vmstorage.retentionPeriod) | quote}}
-            - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
-          {{- range $key, $value := .Values.vmstorage.extraArgs }}
+            - --retentionPeriod={{ toString $app.retentionPeriod }}
+            - --storageDataPath={{ $app.persistentVolume.mountPath }}
+          {{- range $key, $value := $app.extraArgs }}
           {{- if kindIs "slice" $value }}
           {{- range $v := $value }}
             - --{{ $key }}={{ $v }}
@@ -70,110 +60,112 @@ spec:
             - {{ . }}
           {{- end }}
           ports:
-            - name: "{{ .Values.vmstorage.ports.name | default "http" }}" 
+            - name: "{{ $app.ports.name | default "http" }}" 
               containerPort: 8482
             - name: vminsert
               containerPort: 8400
             - name: vmselect
               containerPort: 8401
-          {{- if .Values.vmstorage.envFrom }}
-          envFrom:
-            {{- with .Values.vmstorage.envFrom -}}
-            {{ toYaml . | nindent 12 }}
-            {{- end }}
+          {{- with $app.envFrom }}
+          envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.vmstorage.env }}
-          env: {{ toYaml . | nindent 10 }}
+          {{- with $app.env }}
+          env: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $.Values.vmstorage.probe.liveness }}
-          livenessProbe:
-            {{- toYaml . | nindent 12 }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
+          readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $.Values.vmstorage.probe.readiness }}
-          readinessProbe:
-            {{- toYaml . | nindent 12 }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "liveness"))) }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
-          resources: {{ toYaml .Values.vmstorage.resources | nindent 12 }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "startup"))) }}
+          startupProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $app.resource }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
-            - name: {{ .Values.vmstorage.persistentVolume.name }}
-              mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
-              subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
-          {{- range .Values.vmstorage.extraHostPathMounts }}
+            - name: {{ $app.persistentVolume.name }}
+              mountPath: {{ $app.persistentVolume.mountPath }}
+              subPath: {{ $app.persistentVolume.subPath }}
+          {{- range $app.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
           {{- end }}
-          {{- range .Values.vmstorage.extraConfigmapMounts }}
-            - name: {{ $.Values.vmstorage.name }}-{{ .name }}
+          {{- range $app.extraConfigmapMounts }}
+            - name: {{ $app.name }}-{{ .name }}
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
           {{- end }}
-          {{- range .Values.vmstorage.extraSecretMounts }}
+          {{- range $app.extraSecretMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
           {{- end }}
-          {{- with .Values.vmstorage.extraVolumeMounts }}
+          {{- with $app.extraVolumeMounts }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- include "chart.license.mount" . | nindent 12 }}
-        {{- if .Values.vmstorage.vmbackupmanager.enable }}
+        {{- if $app.vmbackupmanager.enable }}
+        {{- $manager := $app.vmbackupmanager -}}
         - name: {{ template "victoria-metrics.name" . }}-vmbackupmanager
-          image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ default .Chart.AppVersion .Values.vmstorage.vmbackupmanager.image.tag }}{{- with .Values.vmstorage.vmbackupmanager.image.variant }}-{{ . }}{{- end }}"
-          imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
-          {{- if .Values.vmstorage.securityContext.enabled }}
-          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmstorage.securityContext "context" $) | nindent 12 }}
+          image: "{{ $manager.image.repository }}:{{ default .Chart.AppVersion $manager.image.tag }}{{- with $manager.image.variant }}-{{ . }}{{- end }}"
+          imagePullPolicy: "{{ $app.image.pullPolicy }}"
+          {{- if $app.securityContext.enabled }}
+          securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
           args:
-            - {{ printf "%s=%t" "--eula" .Values.vmstorage.vmbackupmanager.eula | quote}}
-            - {{ printf "%s=%t" "--disableHourly" .Values.vmstorage.vmbackupmanager.disableHourly | quote}}
-            - {{ printf "%s=%t" "--disableDaily" .Values.vmstorage.vmbackupmanager.disableDaily | quote}}
-            - {{ printf "%s=%t" "--disableWeekly" .Values.vmstorage.vmbackupmanager.disableWeekly | quote}}
-            - {{ printf "%s=%t" "--disableMonthly" .Values.vmstorage.vmbackupmanager.disableMonthly | quote}}
-            - {{ printf "%s=%d" "--keepLastHourly" (int .Values.vmstorage.vmbackupmanager.retention.keepLastHourly) | quote}}
-            - {{ printf "%s=%d" "--keepLastDaily" (int .Values.vmstorage.vmbackupmanager.retention.keepLastDaily) | quote}}
-            - {{ printf "%s=%d" "--keepLastWeekly" (int .Values.vmstorage.vmbackupmanager.retention.keepLastWeekly) | quote}}
-            - {{ printf "%s=%d" "--keepLastMonthly" (int .Values.vmstorage.vmbackupmanager.retention.keepLastMonthly) | quote}}
-            - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
-            - "--dst={{ .Values.vmstorage.vmbackupmanager.destination }}/$(POD_NAME)"
+            - {{ printf "%s=%t" "--eula" $manager.eula | quote}}
+            - {{ printf "%s=%t" "--disableHourly" $manager.disableHourly | quote}}
+            - {{ printf "%s=%t" "--disableDaily" $manager.disableDaily | quote}}
+            - {{ printf "%s=%t" "--disableWeekly" $manager.disableWeekly | quote}}
+            - {{ printf "%s=%t" "--disableMonthly" $manager.disableMonthly | quote}}
+            - {{ printf "%s=%d" "--keepLastHourly" (int $manager.retention.keepLastHourly) | quote}}
+            - {{ printf "%s=%d" "--keepLastDaily" (int $manager.retention.keepLastDaily) | quote}}
+            - {{ printf "%s=%d" "--keepLastWeekly" (int $manager.retention.keepLastWeekly) | quote}}
+            - {{ printf "%s=%d" "--keepLastMonthly" (int $manager.retention.keepLastMonthly) | quote}}
+            - {{ printf "%s=%s" "--storageDataPath" $app.persistentVolume.mountPath | quote}}
+            - "--dst={{ $manager.destination }}/$(POD_NAME)"
             - "--snapshot.createURL=http://localhost:8482/snapshot/create"
             - "--snapshot.deleteURL=http://localhost:8482/snapshot/delete"
-            {{- range $key, $value := .Values.vmstorage.vmbackupmanager.extraArgs }}
+            {{- range $key, $value := $manager.extraArgs }}
             - --{{ $key }}={{ $value }}
             {{- end }}
             {{- with (include "chart.license.flag" .) }}
             - {{ . }}
             {{- end }}
-          {{- with .Values.vmstorage.vmbackupmanager.resources }}
+          {{- with $manager.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $.Values.vmstorage.vmbackupmanager.livenessProbe }}
-          livenessProbe:
-            {{- toYaml . | nindent 12 }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $manager "type" "readiness"))) }}
+          readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $.Values.vmstorage.vmbackupmanager.readinessProbe }}
-          readinessProbe:
-           {{- toYaml . | nindent 12 }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $manager "type" "liveness"))) }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $manager "type" "startup"))) }}
+          startupProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          {{- with .Values.vmstorage.vmbackupmanager.env }}
+          {{- with $manager.env }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
             - name: manager-http
               containerPort: 8300
           volumeMounts:
-            - name: {{ .Values.vmstorage.persistentVolume.name }}
-              mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
-              subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
-            {{- range .Values.vmstorage.vmbackupmanager.extraSecretMounts }}
+            - name: {{ $app.persistentVolume.name }}
+              mountPath: {{ $app.persistentVolume.mountPath }}
+              subPath: {{ $app.persistentVolume.subPath }}
+            {{- range $manager.extraSecretMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
@@ -181,75 +173,67 @@ spec:
             {{- end }}
             {{- include "chart.license.mount" . | nindent 12 }}
         {{- end }}
-        {{- with .Values.vmstorage.extraContainers }}
+        {{- with $app.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-    {{- if .Values.imagePullSecrets }}
-      imagePullSecrets:
-       {{ toYaml .Values.imagePullSecrets | indent 2 }}
-    {{- end }}
-    {{- if .Values.vmstorage.nodeSelector }}
-      nodeSelector:
-{{ toYaml .Values.vmstorage.nodeSelector | indent 8 }}
-    {{- end }}
-    {{- if .Values.vmstorage.podSecurityContext.enabled }}
-      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.vmstorage.podSecurityContext "context" $) | nindent 8 }}
-    {{- end }}
-      serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
-    {{- if .Values.vmstorage.tolerations }}
-      tolerations:
-{{ toYaml .Values.vmstorage.tolerations | indent 8 }}
-    {{- end }}
-    {{- if .Values.vmstorage.affinity }}
-      affinity:
-{{ toYaml .Values.vmstorage.affinity | indent 8 }}
-    {{- end }}
-     {{- if .Values.vmstorage.topologySpreadConstraints }}
-      topologySpreadConstraints:
-{{ toYaml .Values.vmstorage.topologySpreadConstraints | indent 8 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 8 }}
       {{- end }}
-      terminationGracePeriodSeconds: {{ .Values.vmstorage.terminationGracePeriodSeconds }}
+      {{- with $app.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if $app.podSecurityContext.enabled }}
+      securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
+      {{- with $app.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
+      {{- if or $app.extraVolumes (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim (include "chart.license.volume" .) }}
       volumes:
-        {{- with .Values.vmstorage.extraVolumes }}
+        {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- if not .Values.vmstorage.persistentVolume.enabled }}
+        {{- if not $app.persistentVolume.enabled }}
         - name: vmstorage-volume
           emptyDir: {}
         {{- else }}
-        {{- if .Values.vmstorage.persistentVolume.existingClaim }}
+        {{- if $app.persistentVolume.existingClaim }}
         - name: vmstorage-volume
           persistentVolumeClaim:
-            claimName: {{ .Values.vmstorage.persistentVolume.existingClaim }}
+            claimName: {{ $app.persistentVolume.existingClaim }}
         {{- end }}
         {{- end }}
         {{- include "chart.license.volume" . | nindent 8 }}
-  {{- if and .Values.vmstorage.persistentVolume.enabled (not .Values.vmstorage.persistentVolume.existingClaim) }}
+      {{- end }}
+  {{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ .Values.vmstorage.persistentVolume.name }}
-        {{- if .Values.vmstorage.persistentVolume.annotations }}
-        annotations:
-{{ toYaml .Values.vmstorage.persistentVolume.annotations | indent 10 }}
+        name: {{ $app.persistentVolume.name }}
+        {{- with $app.persistentVolume.annotations }}
+        annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
-        {{- if .Values.vmstorage.persistentVolume.labels }}
-        labels:
-{{ toYaml .Values.vmstorage.persistentVolume.labels | indent 10 }}
+        {{- with $app.persistentVolume.labels }}
+        labels: {{ toYaml . | nindent 10 }}
         {{- end }}
       spec:
-        accessModes:
-{{ toYaml .Values.vmstorage.persistentVolume.accessModes | indent 10 }}
+        {{- with $app.persistentVolume.accessModes }}
+        accessModes: {{ toYaml . | nindent 10 }}
+        {{- end }}
         resources:
           requests:
-            storage: "{{ .Values.vmstorage.persistentVolume.size }}"
-      {{- if .Values.vmstorage.persistentVolume.storageClass }}
-      {{- if (eq "-" .Values.vmstorage.persistentVolume.storageClass) }}
-        storageClassName: ""
-      {{- else }}
-        storageClassName: "{{ .Values.vmstorage.persistentVolume.storageClass }}"
-      {{- end }}
-      {{- end }}
-{{- end }}
+            storage: "{{ $app.persistentVolume.size }}"
+        {{- with $app.persistentVolume.storageClass }}
+        storageClassName: "{{ ternary "" . (eq "-" .) }}"
+        {{- end }}
+  {{- end }}
 {{- end }}

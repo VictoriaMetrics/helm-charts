@@ -3,6 +3,7 @@
 ## Next release
 
 - Added basicAuth support for ServiceMonitor
+- Removed PodSecurityPolicy
 
 ## 0.9.12
 
