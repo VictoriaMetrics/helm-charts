@@ -139,12 +139,18 @@ config:
     # -- For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs
     tenant_id: ""
     # -- Required. PromQL/MetricsQL query to select data in format: QUERY_ALIAS: "QUERY". As accepted by "/query_range?query=%s".
+    # See https://docs.victoriametrics.com/anomaly-detection/components/reader/#per-query-parameters for more details.
     queries: {}
-    #  active_timeseries: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
-    #  churn_rate: 'sum(rate(vm_new_timeseries_created_total[5m]))'
-    #  ingestion_rate: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'
-    #  insertion_rate: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
-    #  slow_inserts: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
+    #  active_timeseries:
+    #    expr: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
+    #  churn_rate:
+    #    expr: 'sum(rate(vm_new_timeseries_created_total[5m]))'
+    #  ingestion_rate:
+    #    expr: 'sum(rate(vm_rows_inserted_total[5m])) by (type,accountID) > 0'
+    #  insertion_rate:
+    #    expr: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
+    #  slow_inserts:
+    #    expr: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
     # -- Frequency of the points returned. Will be converted to "/query_range?step=%s" param (in seconds). **Required** since 1.9.0.
     sampling_period: '1m'
 
