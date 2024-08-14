@@ -2,7 +2,8 @@
 
 ## Next release
 
-- Added basicAuth support for ServiceMonitor
+- add basicAuth support for ServiceMonitor
+- fix license volume mount when using statefulset mode
 
 ## 0.10.13
 
