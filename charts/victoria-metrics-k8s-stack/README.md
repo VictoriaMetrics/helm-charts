@@ -380,6 +380,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.groups.vmagent.rules | object | `{}` |  |
 | defaultRules.groups.vmcluster.create | bool | `true` |  |
 | defaultRules.groups.vmcluster.rules | object | `{}` |  |
+| defaultRules.groups.vmoperator.create | bool | `true` |  |
+| defaultRules.groups.vmoperator.rules | object | `{}` |  |
 | defaultRules.groups.vmsingle.create | bool | `true` |  |
 | defaultRules.groups.vmsingle.rules | object | `{}` |  |
 | defaultRules.labels | object | `{}` | Labels for default rules |
