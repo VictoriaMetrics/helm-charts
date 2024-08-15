@@ -1,17 +1,13 @@
-{{- if and .Values.rbac.create (not .Values.rbac.namespaced) }}
+{{- if and .Values.rbac.create (not .Values.rbac.namespaced) .Values.server.scrape.enabled }}
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ template "victoria-metrics.fullname" . }}-clusterrolebinding
-  labels:
-  {{- include "victoria-metrics.common.metaLabels" . | nindent 4 }}
-  {{- if .Values.rbac.extraLabels }}
-{{ toYaml .Values.rbac.extraLabels | indent 4}}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.rbac.extraLabels) }}
+  labels: {{ include "victoria-metrics.common.metaLabels" $ctx | nindent 4 }}
+  {{- with .Values.rbac.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-{{- with .Values.rbac.annotations }}
-  annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
 subjects:
   - kind: ServiceAccount
     name: {{ template "victoria-metrics.serviceAccountName" . }}

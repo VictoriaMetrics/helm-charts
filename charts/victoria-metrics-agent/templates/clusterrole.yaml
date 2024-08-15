@@ -7,14 +7,10 @@ metadata:
   {{- if $namespaced }}
   namespace: {{ .Release.Namespace }}
   {{- end }}
-  labels:
-    {{- include "chart.labels" . | nindent 4 }}
-{{- with .Values.rbac.extraLabels }}
-{{ toYaml . | indent 4}}
-{{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.rbac.extraLabels) }}
+  labels: {{ include "chart.labels" $ctx | nindent 4 }}
   {{- with .Values.rbac.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 rules:
 - apiGroups:
@@ -43,11 +39,5 @@ rules:
   verbs: ["get", "list", "watch"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
-{{- end }}
-{{- if and .Values.rbac.pspEnabled (.Capabilities.APIVersions.Has "policy/v1beta1/PodSecurityPolicy") }}
-- apiGroups:      ['extensions']
-  resources:      ['podsecuritypolicies']
-  verbs:          ['use']
-  resourceNames:  [{{ template "chart.fullname" . }}]
 {{- end }}
 {{- end -}}

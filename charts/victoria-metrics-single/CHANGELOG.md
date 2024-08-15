@@ -4,6 +4,9 @@
 
 - Added basicAuth support for ServiceMonitor
 - fix inconsistent relabeling `target_label` in default scrape config.
+- Removed PodSecurityPolicy
+- Removed support for policy/v1beta1/PodDisruptionBudget
+- Set minimal kubernetes version to 1.25
 
 ## 0.9.26
 

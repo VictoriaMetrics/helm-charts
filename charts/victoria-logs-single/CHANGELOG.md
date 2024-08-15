@@ -3,6 +3,8 @@
 ## Next release
 
 - Added basicAuth support for ServiceMonitor
+- Set minimal kubernetes version to 1.25
+- Removed support for policy/v1beta1/PodDisruptionBudget
 
 ## 0.5.4
 

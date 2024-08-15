@@ -42,14 +42,14 @@ app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- define "vmalert.common.metaLabels" -}}
 helm.sh/chart: {{ include "vmalert.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
+{{- with .extraLabels }}
+{{ toYaml .}}
+{{- end }}
 {{- end -}}
 
 {{- define "vmalert.server.labels" -}}
 {{ include "vmalert.server.matchLabels" . }}
 {{ include "vmalert.common.metaLabels" . }}
-{{- with .extraLabels }}
-{{ toYaml . }}
-{{- end }}
 {{- end -}}
 
 {{- define "vmalert.server.matchLabels" -}}

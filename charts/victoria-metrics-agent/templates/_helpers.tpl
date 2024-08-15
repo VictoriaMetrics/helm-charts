@@ -41,9 +41,6 @@ helm.sh/chart: {{ include "chart.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
-{{- with .extraLabels }}
-{{ toYaml .}}
-{{- end }}
 {{- end -}}
 
 {{/*
@@ -52,6 +49,9 @@ Selector labels
 {{- define "chart.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "chart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- with .extraLabels }}
+{{ toYaml .}}
+{{- end }}
 {{- end -}}
 
 {{/*
