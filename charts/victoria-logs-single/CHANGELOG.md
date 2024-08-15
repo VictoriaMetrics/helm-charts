@@ -3,10 +3,11 @@
 ## Next release
 
 - Added basicAuth support for ServiceMonitor
+- Set minimal kubernetes version to 1.25
+- Removed support for policy/v1beta1/PodDisruptionBudget
 - Updated `.Values.server.readinessProbe` to `.Values.server.probe.readiness`
 - Updated `.Values.server.livenessProbe` to `.Values.server.probe.liveness`
 - Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
-- Removed PodSecurityPolicy
 
 ## 0.5.4
 

@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Set minimal kubernetes version to 1.25
 
 ## 1.4.1
 

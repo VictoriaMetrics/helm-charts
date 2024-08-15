@@ -3,11 +3,13 @@
 ## Next release
 
 - Added basicAuth support for ServiceMonitor
+- Removed PodSecurityPolicy
+- Set minimal kubernetes version to 1.25
+- Removed support for policy/v1beta1/PodDisruptionBudget
 - Added ability to override liveness and readiness probes
 - Updated `.Values.vmbackupmanager.readinessProbe` to `.Values.vmbackupmanager.probe.readiness`
 - Updated `.Values.vmbackupmanager.livenessProbe` to `.Values.vmbackupmanager.probe.liveness`
 - Updated `.Values.vmbackupmanager.startupProbe` to `.Values.vmbackupmanager.probe.startup`
-- Removed PodSecurityPolicy
 
 ## 0.11.23
 
