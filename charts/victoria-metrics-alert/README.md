@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Alert.
 
- ![Version: 0.9.12](https://img.shields.io/badge/Version-0.9.12-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.9.12](https://img.shields.io/badge/Version-0.9.12-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -162,7 +162,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |
 | rbac.namespaced | bool | `false` |  |
-| rbac.pspEnabled | bool | `true` |  |
 | server.affinity | object | `{}` |  |
 | server.annotations | object | `{}` |  |
 | server.config.alerts.groups | list | `[]` |  |
