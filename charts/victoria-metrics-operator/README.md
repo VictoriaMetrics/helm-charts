@@ -162,6 +162,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| image.registry | string | `""` | Image registry |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
 | image.tag | string | `""` | Image tag override Chart.AppVersion |
 | image.variant | string | `""` |  |
@@ -177,6 +178,19 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podDisruptionBudget.labels | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
+| probe.liveness.failureThreshold | int | `3` |  |
+| probe.liveness.initialDelaySeconds | int | `5` |  |
+| probe.liveness.periodSeconds | int | `15` |  |
+| probe.liveness.tcpSocket.port | string | `"probe"` |  |
+| probe.liveness.timeoutSeconds | int | `5` |  |
+| probe.readiness.failureThreshold | int | `3` |  |
+| probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
+| probe.readiness.httpGet.port | string | `"probe"` |  |
+| probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
+| probe.readiness.initialDelaySeconds | int | `5` |  |
+| probe.readiness.periodSeconds | int | `15` |  |
+| probe.readiness.timeoutSeconds | int | `5` |  |
+| probe.startup | object | `{}` |  |
 | rbac.aggregatedClusterRoles | object | `{"enabled":true,"labels":{"admin":{"rbac.authorization.k8s.io/aggregate-to-admin":"true"},"view":{"rbac.authorization.k8s.io/aggregate-to-view":"true"}}}` | create aggregated clusterRoles for CRD readonly and admin permissions |
 | rbac.aggregatedClusterRoles.labels | object | `{"admin":{"rbac.authorization.k8s.io/aggregate-to-admin":"true"},"view":{"rbac.authorization.k8s.io/aggregate-to-view":"true"}}` | labels attached to according clusterRole |
 | rbac.create | bool | `true` | Specifies whether the RBAC resources should be created |

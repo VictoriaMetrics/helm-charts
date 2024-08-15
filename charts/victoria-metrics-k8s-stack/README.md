@@ -439,7 +439,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kube-state-metrics.enabled | bool | `true` |  |
 | kube-state-metrics.vmServiceScrape.spec | object | `{}` |  |
 | kubeApiServer | object | `{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"https","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"component","namespaceSelector":{"matchNames":["default"]},"selector":{"matchLabels":{"component":"apiserver","provider":"kubernetes"}}}}` | Component scraping the kube api server |
-| kubeControllerManager | object | `{"enabled":true,"endpoints":[],"service":{"enabled":true,"port":10257,"targetPort":10257},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"jobLabel"}}` | Component scraping the kube controller manager |
+| kubeControllerManager | object | `{"enabled":true,"endpoints":[],"service":{"enabled":true,"port":10257,"selector":{"component":"kube-controller-manager"},"targetPort":10257},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"jobLabel"}}` | Component scraping the kube controller manager |
 | kubeDns.enabled | bool | `false` |  |
 | kubeDns.service.dnsmasq.port | int | `10054` |  |
 | kubeDns.service.dnsmasq.targetPort | int | `10054` |  |
@@ -455,6 +455,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeEtcd.endpoints | list | `[]` |  |
 | kubeEtcd.service.enabled | bool | `true` |  |
 | kubeEtcd.service.port | int | `2379` |  |
+| kubeEtcd.service.selector.component | string | `"etcd"` |  |
 | kubeEtcd.service.targetPort | int | `2379` |  |
 | kubeEtcd.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubeEtcd.spec.endpoints[0].port | string | `"http-metrics"` |  |
@@ -465,6 +466,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeProxy.endpoints | list | `[]` |  |
 | kubeProxy.service.enabled | bool | `true` |  |
 | kubeProxy.service.port | int | `10249` |  |
+| kubeProxy.service.selector.k8s-app | string | `"kube-proxy"` |  |
 | kubeProxy.service.targetPort | int | `10249` |  |
 | kubeProxy.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubeProxy.spec.endpoints[0].port | string | `"http-metrics"` |  |
@@ -475,6 +477,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | kubeScheduler.endpoints | list | `[]` |  |
 | kubeScheduler.service.enabled | bool | `true` |  |
 | kubeScheduler.service.port | int | `10259` |  |
+| kubeScheduler.service.selector.component | string | `"kube-scheduler"` |  |
 | kubeScheduler.service.targetPort | int | `10259` |  |
 | kubeScheduler.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
 | kubeScheduler.spec.endpoints[0].port | string | `"http-metrics"` |  |

@@ -120,7 +120,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.extraHostPathMounts | list | `[]` |  |
 | alertmanager.extraVolumeMounts | list | `[]` |  |
 | alertmanager.extraVolumes | list | `[]` |  |
-| alertmanager.image | string | `"prom/alertmanager"` |  |
+| alertmanager.image.registry | string | `""` |  |
+| alertmanager.image.repository | string | `"prom/alertmanager"` |  |
+| alertmanager.image.tag | string | `"v0.25.0"` |  |
 | alertmanager.imagePullSecrets | list | `[]` |  |
 | alertmanager.ingress.annotations | object | `{}` |  |
 | alertmanager.ingress.enabled | bool | `false` |  |
@@ -142,13 +144,18 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.podMetadata.labels | object | `{}` |  |
 | alertmanager.podSecurityContext.enabled | bool | `false` |  |
 | alertmanager.priorityClassName | string | `""` |  |
+| alertmanager.probe.liveness.httpGet.path | string | `"{{ ternary \"\" .baseURLPrefix (empty .baseURLPrefix) }}/-/healthy"` |  |
+| alertmanager.probe.liveness.httpGet.port | string | `"web"` |  |
+| alertmanager.probe.readiness.httpGet.path | string | `"{{ ternary \"\" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready"` |  |
+| alertmanager.probe.readiness.httpGet.port | string | `"web"` |  |
+| alertmanager.probe.startup.httpGet.path | string | `"{{ ternary \"\" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready"` |  |
+| alertmanager.probe.startup.httpGet.port | string | `"web"` |  |
 | alertmanager.resources | object | `{}` |  |
 | alertmanager.retention | string | `"120h"` |  |
 | alertmanager.securityContext.enabled | bool | `false` |  |
 | alertmanager.service.annotations | object | `{}` |  |
 | alertmanager.service.port | int | `9093` |  |
 | alertmanager.service.type | string | `"ClusterIP"` |  |
-| alertmanager.tag | string | `"v0.25.0"` |  |
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
@@ -182,6 +189,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.extraVolumes | list | `[]` | Extra Volumes for the pod |
 | server.fullnameOverride | string | `""` |  |
 | server.image.pullPolicy | string | `"IfNotPresent"` |  |
+| server.image.registry | string | `""` |  |
 | server.image.repository | string | `"victoriametrics/vmalert"` |  |
 | server.image.tag | string | `""` |  |
 | server.image.variant | string | `""` |  |
@@ -211,11 +219,16 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.probe.liveness.failureThreshold | int | `3` |  |
 | server.probe.liveness.initialDelaySeconds | int | `5` |  |
 | server.probe.liveness.periodSeconds | int | `15` |  |
+| server.probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
 | server.probe.liveness.timeoutSeconds | int | `5` |  |
 | server.probe.readiness.failureThreshold | int | `3` |  |
+| server.probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
+| server.probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| server.probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
 | server.probe.readiness.initialDelaySeconds | int | `5` |  |
 | server.probe.readiness.periodSeconds | int | `15` |  |
 | server.probe.readiness.timeoutSeconds | int | `5` |  |
+| server.probe.startup | object | `{}` |  |
 | server.remote.read.basicAuth | object | `{"password":"","username":""}` | Basic auth for remote read |
 | server.remote.read.bearer.token | string | `""` | Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string |
 | server.remote.read.bearer.tokenFile | string | `""` | Token Auth file with Bearer token. You can use one of token or tokenFile |
