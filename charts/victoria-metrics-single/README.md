@@ -105,6 +105,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | automountServiceAccountToken | bool | `true` |  |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
+| global.image.registry | string | `""` |  |
+| global.imagePullSecrets | list | `[]` |  |
 | license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
@@ -135,6 +137,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.image.repository | string | `"victoriametrics/victoria-metrics"` | Image repository |
 | server.image.tag | string | `""` | Image tag |
 | server.image.variant | string | `""` |  |
+| server.imagePullSecrets | list | `[]` |  |
 | server.ingress.annotations | object | `{}` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
