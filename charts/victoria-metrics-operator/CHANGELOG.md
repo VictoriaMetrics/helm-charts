@@ -4,6 +4,7 @@
 
 - Set minimal kubernetes version to 1.25
 - Removed support for policy/v1beta1/PodDisruptionBudget
+- Added configurable probes at `.Values.probe`
 
 ## 0.33.6
 

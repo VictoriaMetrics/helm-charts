@@ -46,14 +46,14 @@ app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- define "victoria-logs.common.metaLabels" -}}
 helm.sh/chart: {{ include "victoria-logs.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
+{{- with .extraLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end -}}
 
 {{- define "victoria-logs.server.labels" -}}
 {{ include "victoria-logs.server.matchLabels" . }}
 {{ include "victoria-logs.common.metaLabels" . }}
-{{- with .extraLabels }}
-{{ toYaml .}}
-{{- end }}
 {{- end -}}
 
 {{- define "victoria-logs.server.matchLabels" -}}

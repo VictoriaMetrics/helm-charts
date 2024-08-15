@@ -4,19 +4,15 @@ kind: PodDisruptionBudget
 metadata:
   name: {{ include "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "chart.labels" . | nindent 4 }}
-  {{- with .Values.podDisruptionBudget.labels }}
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.podDisruptionBudget.labels) }}
+  labels: {{ include "chart.labels" $ctx | nindent 4 }}
 spec:
-{{- if .Values.podDisruptionBudget.minAvailable }}
-  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
-{{- end }}
-{{- if .Values.podDisruptionBudget.maxUnavailable }}
-  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
-{{- end }}
+  {{- with .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
   selector:
-    matchLabels:
-      {{- include "chart.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
 {{- end }}

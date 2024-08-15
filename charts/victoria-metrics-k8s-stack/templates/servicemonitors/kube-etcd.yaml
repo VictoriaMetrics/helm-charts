@@ -1,16 +1,16 @@
-
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $fullname := ((printf "%s-kube-etcd" (include "victoria-metrics-k8s-stack.fullname" .)) | trunc 63 | trimSuffix "-") }}
 {{- if .Values.kubeEtcd.enabled }}
 {{- if .Values.kubeEtcd.endpoints }}
 ---
 apiVersion: v1
 kind: Endpoints
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-etcd" | trunc 63 | trimSuffix "-" }}
-  namespace: kube-system 
-  labels: 
-    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-etcd
-    k8s-app: etcd-server
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+  name: {{ $fullname }}
+  namespace: kube-system
+  {{- $extraLabels := dict "app" $fullname "k8s-app" "etcd-server" }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 subsets:
   - addresses:
       {{- range .Values.kubeEtcd.endpoints }}
@@ -26,12 +26,11 @@ subsets:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-etcd" | trunc 63 | trimSuffix "-" }}
+  name: {{ $fullname }}
   namespace: kube-system
-  labels:
-    app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-etcd
-    jobLabel: kube-etcd
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+  {{- $extraLabels := dict "app" $fullname "jobLabel" "kube-etcd" }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 spec:
   clusterIP: None
   ports:
@@ -39,30 +38,27 @@ spec:
       port: {{ .Values.kubeEtcd.service.port }}
       protocol: TCP
       targetPort: {{ .Values.kubeEtcd.service.targetPort }}
-{{- if .Values.kubeEtcd.endpoints }}{{- else }}
-  selector:
-    {{- if .Values.kubeEtcd.service.selector }}
-{{ toYaml .Values.kubeEtcd.service.selector | indent 4 }}
-    {{- else}}
-    component: etcd
-    {{- end}}
-{{- end }}
+  {{- if (empty .Values.kubeEtcd.endpoints) }}
+  {{- with .Values.kubeEtcd.service.selector }}
+  selector: {{ toYaml . | nindent 4 }}
+  {{- end}}
+  {{- end }}
   type: ClusterIP
 {{- end }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-etcd" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $fullname }}
+  namespace: {{ .Release.Namespace }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec:
+  {{- omit .Values.kubeEtcd.spec "selector" "namespaceSelector" | toYaml | nindent 2 }}
   selector:
     matchLabels:
-      app: {{ include "victoria-metrics-k8s-stack.fullname" . }}-kube-etcd
-      app.kubernetes.io/instance: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
+      app: {{ $fullname }}
+      app.kubernetes.io/instance: {{ default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" }}
   namespaceSelector:
     matchNames:
       - "kube-system"
-{{ omit .Values.kubeEtcd.spec "selector" "namespaceSelector" | toYaml | indent 2 }}
 {{- end }}

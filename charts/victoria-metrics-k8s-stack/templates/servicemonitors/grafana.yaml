@@ -1,23 +1,21 @@
+{{- $fullname := ((printf "%s-grafana" (include "victoria-metrics-k8s-stack.fullname" .)) | trunc 63 | trimSuffix "-") }}
 {{- if and .Values.grafana.enabled .Values.grafana.vmServiceScrape.enabled }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "grafana" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $fullname }}
+  namespace: {{ .Release.Namespace }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec:
+  {{- with (omit .Values.grafana.vmServiceScrape.spec "selector") }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "grafana.name" .Subcharts.grafana }}
-      app.kubernetes.io/instance: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
-{{- if empty .Values.grafana.vmServiceScrape.spec }}
+      app.kubernetes.io/instance: {{ default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" }}
+  {{- if or (empty .Values.grafana.vmServiceScrape.spec) (not (hasKey .Values.grafana.vmServiceScrape.spec "endpoints")) }}
   endpoints:
   - port: {{ .Values.grafana.service.portName }}
-{{ else }}
-{{- if not (hasKey .Values.grafana.vmServiceScrape.spec "endpoints") }}
-  endpoints:
-  - port: {{ .Values.grafana.service.portName }}
-{{- end }}
-{{ omit .Values.grafana.vmServiceScrape.spec "selector" | toYaml | indent 2 }}
-{{- end }}
+  {{- end }}
 {{- end }}

@@ -276,7 +276,7 @@ VMRule name
 */}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.name" -}}
 {{- $id := include "victoria-metrics-k8s-stack.rulegroup.id" . -}}
-{{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) $id }}
+{{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) $id | trunc 63 | trimSuffix "-" | trimSuffix "." }}
 {{- end -}}
 
 {{/*

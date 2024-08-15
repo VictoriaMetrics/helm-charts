@@ -6,7 +6,7 @@ metadata:
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.rbac.extraLabels) }}
   labels: {{ include "victoria-metrics.common.metaLabels" $ctx | nindent 4 }}
   {{- with .Values.rbac.annotations }}
-  annotations: {{ toYaml . | indent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 rules:
   - apiGroups:

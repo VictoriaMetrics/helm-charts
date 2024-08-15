@@ -6,6 +6,7 @@
 - Removed PodSecurityPolicy
 - Set minimal kubernetes version to 1.25
 - Removed support for policy/v1beta1/PodDisruptionBudget
+- Added params to configure probes `.Values.probe.readiness`, `.Values.probe.liveness` and `.Values.probe.startup`
 
 ## 0.4.14
 

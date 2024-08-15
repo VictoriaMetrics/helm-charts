@@ -7,6 +7,13 @@
 - Removed PodSecurityPolicy
 - Removed support for policy/v1beta1/PodDisruptionBudget
 - Set minimal kubernetes version to 1.25
+- Added ability to override liveness and readiness probes
+- Updated `.Values.vmbackupmanager.readinessProbe` to `.Values.vmbackupmanager.probe.readiness`
+- Updated `.Values.vmbackupmanager.livenessProbe` to `.Values.vmbackupmanager.probe.liveness`
+- Updated `.Values.vmbackupmanager.startupProbe` to `.Values.vmbackupmanager.probe.startup`
+- Updated `.Values.server.readinessProbe` to `.Values.server.probe.readiness`
+- Updated `.Values.server.livenessProbe` to `.Values.server.probe.liveness`
+- Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
 
 ## 0.9.26
 

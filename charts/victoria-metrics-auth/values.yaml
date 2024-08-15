@@ -10,6 +10,8 @@ global:
 replicaCount: 1
 
 image:
+  # -- Image registry
+  registry: ""
   # -- Victoria Metrics Auth Docker repository and image name
   repository: victoriametrics/vmauth
   # -- Tag of Docker image
@@ -243,6 +245,20 @@ config:
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []
+
+probe:
+  readiness:
+    tcpSocket:
+      port: '{{ include "vm.probe.port" . }}'
+    initialDelaySeconds: 5
+    periodSeconds: 15
+  liveness:
+    tcpSocket:
+      port: '{{ include "vm.probe.port" . }}'
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+  startup: {}
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
 # Required only for VictoriaMetrics enterprise.

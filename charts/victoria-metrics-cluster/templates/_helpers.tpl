@@ -54,7 +54,7 @@ app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 helm.sh/chart: {{ include "victoria-metrics.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- with .extraLabels }}
-{{ toYaml .}}
+{{ toYaml . }}
 {{- end }}
 {{- end -}}
 
@@ -80,9 +80,6 @@ app: {{ .Values.vmstorage.name }}
 {{- define "victoria-metrics.vmselect.labels" -}}
 {{ include "victoria-metrics.vmselect.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
-{{- with .extraLabels }}
-{{ toYaml .}}
-{{- end }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmselect.podLabels" -}}
@@ -98,9 +95,6 @@ app: {{ .Values.vmselect.name }}
 {{- define "victoria-metrics.vminsert.labels" -}}
 {{ include "victoria-metrics.vminsert.matchLabels" . }}
 {{ include "victoria-metrics.common.metaLabels" . }}
-{{- with .extraLabels }}
-{{ toYaml .}}
-{{- end }}
 {{- end -}}
 
 {{- define "victoria-metrics.vminsert.podLabels" -}}
@@ -169,9 +163,12 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
 {{- $namespace := .Release.Namespace -}}
 {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
+{{- $args := default list -}}
 {{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
-{{- printf "- --storageNode=%s-%d.%s.%s.svc.%s:8400\n" $pod $i $svc $namespace $dnsSuffix -}}
+{{- $value := printf "%s-%d.%s.%s.svc.%s:8400" $pod $i $svc $namespace $dnsSuffix -}}
+{{- $args = append $args (printf "--storageNode=%q" $value) -}}
 {{- end -}}
+{{- toYaml $args -}}
 {{- end -}}
 
 {{- define "victoria-metrics.vmselect.vmstorage-pod-fqdn" -}}
@@ -179,9 +176,12 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
 {{- $namespace := .Release.Namespace -}}
 {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
+{{- $args := default list -}}
 {{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
-{{- printf "- --storageNode=%s-%d.%s.%s.svc.%s:8401\n" $pod $i $svc $namespace $dnsSuffix -}}
+{{- $value := printf "%s-%d.%s.%s.svc.%s:8401" $pod $i $svc $namespace $dnsSuffix -}}
+{{- $args = append $args (printf "--storageNode=%q" $value) -}}
 {{- end -}}
+{{- toYaml $args -}}
 {{- end -}}
 
 {{- define "victoria-metrics.vmselect.vmselect-pod-fqdn" -}}
@@ -189,9 +189,12 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- $svc := include "victoria-metrics.vmselect.fullname" . -}}
 {{- $namespace := .Release.Namespace -}}
 {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
+{{- $args := default list -}}
 {{- range $i := until (.Values.vmselect.replicaCount | int) -}}
-{{- printf "- --selectNode=%s-%d.%s.%s.svc.%s:8481\n" $pod $i $svc $namespace $dnsSuffix -}}
+{{- $value := printf "%s-%d.%s.%s.svc.%s:8481" $pod $i $svc $namespace $dnsSuffix -}}
+{{- $args = append $args (printf "--selectNode=%q" $value) -}}
 {{- end -}}
+{{- toYaml $args -}}
 {{- end -}}
 
 {{- define "split-host-port" -}}
@@ -252,8 +255,8 @@ Return if ingress supports pathType.
   {{- end }}
   args:
     - restore
-    - {{ printf "%s=%t" "--eula" .Values.vmstorage.vmbackupmanager.eula | quote}}
-    - {{ printf "%s=%s" "--storageDataPath" .Values.vmstorage.persistentVolume.mountPath | quote}}
+    - --eula={{ .Values.vmstorage.vmbackupmanager.eula }}
+    - --storageDataPath={{ .Values.vmstorage.persistentVolume.mountPath }}
     {{- range $key, $value := .Values.vmstorage.vmbackupmanager.extraArgs }}
     - --{{ $key }}={{ $value }}
     {{- end }}
@@ -294,7 +297,8 @@ Return license flag if necessary.
 --license={{ .Values.license.key }}
 {{- end }}
 {{- if and .Values.license.secret.name .Values.license.secret.key -}}
---licenseFile=/etc/vm-license-key/{{ .Values.license.secret.key }}
+{{- $value := printf "/etc/vm-license-key/%s" .Values.license.secret.key -}}
+--licenseFile={{ $value }}
 {{- end -}}
 {{- end -}}
 
@@ -348,17 +352,17 @@ Usage:
 {{/*
 Render a compatible securityContext depending on the platform. By default it is maintained as it is. In other platforms like Openshift we remove default user/group values that do not work out of the box with the restricted-v1 SCC
 Usage:
-{{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "context" $) -}}
+{{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "context" $) }}
 */}}
 {{- define "common.compatibility.renderSecurityContext" -}}
 {{- $adaptedContext := .secContext -}}
 {{- if .context.Values.global.compatibility -}}
   {{- if .context.Values.global.compatibility.openshift -}}
     {{- if or (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "force") (and (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "auto") (include "common.compatibility.isOpenshift" .context)) -}}
-      {{/* Remove incompatible user/group values that do not work in Openshift out of the box */}}
+      {{- /* Remove incompatible user/group values that do not work in Openshift out of the box */ -}}
       {{- $adaptedContext = omit $adaptedContext "fsGroup" "runAsUser" "runAsGroup" -}}
       {{- if not .secContext.seLinuxOptions -}}
-      {{/* If it is an empty object, we remove it from the resulting context because it causes validation issues */}}
+      {{- /* If it is an empty object, we remove it from the resulting context because it causes validation issues */ -}}
       {{- $adaptedContext = omit $adaptedContext "seLinuxOptions" -}}
       {{- end -}}
     {{- end -}}

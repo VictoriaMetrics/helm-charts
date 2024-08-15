@@ -300,6 +300,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | horizontalPodAutoscaling.metrics | list | `[]` | Metric for HPA to use to scale vmagent |
 | horizontalPodAutoscaling.minReplicas | int | `1` | Minimum replicas for HPA to use to scale vmagent |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.registry | string | `""` |  |
 | image.repository | string | `"victoriametrics/vmagent"` |  |
 | image.tag | string | `""` |  |
 | image.variant | string | `""` |  |
@@ -332,6 +333,16 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podLabels | object | `{}` |  |
 | podSecurityContext.enabled | bool | `true` |  |
 | priorityClassName | string | `""` | priority class to be assigned to the pod(s) |
+| probe.liveness.initialDelaySeconds | int | `5` |  |
+| probe.liveness.periodSeconds | int | `15` |  |
+| probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| probe.liveness.timeoutSeconds | int | `5` |  |
+| probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
+| probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
+| probe.readiness.initialDelaySeconds | int | `5` |  |
+| probe.readiness.periodSeconds | int | `15` |  |
+| probe.startup | object | `{}` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.extraLabels | object | `{}` |  |

@@ -1,26 +1,23 @@
-{{- if and (index .Values "prometheus-node-exporter" "enabled") (index .Values "prometheus-node-exporter" "vmServiceScrape" "enabled") }}
+{{- $fullname := ((printf "%s-node-exporter" (include "victoria-metrics-k8s-stack.fullname" .)) | trunc 63 | trimSuffix "-") }}
+{{- $node := (index .Values "prometheus-node-exporter") }}
+{{- if and $node.enabled $node.vmServiceScrape.enabled }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "node-exporter" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $fullname }}
+  namespace: {{ .Release.Namespace }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec:
+  {{- omit (index .Values "prometheus-node-exporter" "vmServiceScrape" "spec") "selector" | toYaml | nindent 2 }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}
-{{- if empty (index .Values "prometheus-node-exporter" "vmServiceScrape" "spec") }}
+  {{- if or (empty $node.vmServiceScrape.spec) (not (hasKey $node.vmServiceScrape.spec "endpoints")) }}
   endpoints:
   - port: metrics
     metricRelabelConfigs:
       - action: drop
         source_labels: [ mountpoint ]
         regex: "/var/lib/kubelet/pods.+"
-{{ else }}
-{{- if not (hasKey (index .Values "prometheus-node-exporter" "vmServiceScrape" "spec") "endpoints") }}
-  endpoints:
-  - port: metrics
-{{- end }}
-{{ omit (index .Values "prometheus-node-exporter" "vmServiceScrape" "spec") "selector" | toYaml | indent 2 }}
-{{- end }}
+  {{- end }}
 {{- end }}

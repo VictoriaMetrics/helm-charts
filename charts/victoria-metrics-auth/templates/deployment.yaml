@@ -1,88 +1,71 @@
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "chart.labels" . | nindent 4 }}
-    {{- with .Values.extraLabels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" .Values.extraLabels) }}
+  labels: {{ include "chart.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels:
-      {{- include "chart.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      labels:
-        {{- include "chart.selectorLabels" . | nindent 8 }}
-        {{- with .Values.extraLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-      annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-        {{- range $key, $value := .Values.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+      labels: {{ include "chart.selectorLabels" $ctx | nindent 8 }}
+      {{- $annotations := merge (dict "checksum/config" (include (print .Template.BasePath "/secret.yaml") . | sha256sum)) .Values.podAnnotations }}
+      annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "chart.serviceAccountName" . }}
       {{- if .Values.podSecurityContext.enabled }}
-      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
+      securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           {{- if .Values.securityContext.enabled }}
-          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" $) | nindent 12 }}
+          securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}{{- with .Values.image.variant }}-{{ . }}{{- end }}"
+          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
           workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -auth.config=/config/auth.yml
-          {{- range $key, $value := .Values.extraArgs }}
-          {{- if kindIs "slice" $value }}
-          {{- range $v := $value }}
+            {{- range $key, $value := .Values.extraArgs }}
+            {{- if kindIs "slice" $value }}
+            {{- range $v := $value }}
             - -{{ $key }}={{ $v }}
-          {{- end }}
-          {{- else }}
+            {{- end }}
+            {{- else }}
             - -{{ $key }}={{ $value }}
-          {{- end }}
-          {{- end }}
-          {{- with (include "vmauth.license.flag" .) }}
+            {{- end }}
+            {{- end }}
+            {{- with (include "vmauth.license.flag" .) }}
             - {{ . }}
-          {{- end }}
+            {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8427
-          {{- if .Values.envFrom }}
-          envFrom:
-            {{- with .Values.envFrom -}}
-            {{ toYaml . | nindent 12 }}
-            {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.env }}
-          env: {{ toYaml . | nindent 10 }}
+          env: {{ toYaml . | nindent 12 }}
           {{- end }}
-          readinessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-          livenessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-            timeoutSeconds: 5
+          {{- with (fromYaml (include "vm.probe" (dict "app" .Values "type" "readiness"))) }}
+          readinessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" .Values "type" "liveness"))) }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" .Values "type" "startup"))) }}
+          startupProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /config
@@ -96,23 +79,21 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- include "vmauth.license.mount" . | nindent 12 }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
         {{- with .Values.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.affinity }}
-      affinity:
-        {{ toYaml . | nindent 8 }}
+      affinity: {{ toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         - name: config
           secret:

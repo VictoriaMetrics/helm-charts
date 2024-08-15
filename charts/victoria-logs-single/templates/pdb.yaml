@@ -4,19 +4,15 @@ kind: PodDisruptionBudget
 metadata:
   name: {{ template "victoria-logs.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  labels:
-  {{- include "victoria-logs.common.metaLabels" . | nindent 4 }}
-  {{- if .Values.podDisruptionBudget.extraLabels }}
-{{ toYaml .Values.podDisruptionBudget.extraLabels | indent 4}}
-  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.podDisruptionBudget.labels) }}
+  labels: {{ include "victoria-logs.common.metaLabels" $ctx | nindent 4 }}
 spec:
-{{- if .Values.podDisruptionBudget.minAvailable }}
-  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
-{{- end }}
-{{- if .Values.podDisruptionBudget.maxUnavailable }}
-  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
-{{- end }}
+  {{- with .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
   selector:
-    matchLabels:
-      {{- include "victoria-logs.server.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "victoria-logs.server.matchLabels" . | nindent 6 }}
 {{- end }}

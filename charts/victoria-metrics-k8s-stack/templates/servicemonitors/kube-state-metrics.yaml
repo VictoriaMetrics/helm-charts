@@ -1,16 +1,21 @@
-{{- if (index .Values "kube-state-metrics" "enabled") }}
+{{- $fullname := ((printf "%s-kube-state-metrics" (include "victoria-metrics-k8s-stack.fullname" .)) | trunc 63 | trimSuffix "-") }}
+{{- $ksm := index .Values "kube-state-metrics" }}
+{{- if $ksm.enabled }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "kube-state-metrics" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $fullname }}
+  namespace: {{ .Release.Namespace }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec:
+  {{- with (omit $ksm.vmServiceScrape.spec "selector") }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "kube-state-metrics.name" (index .Subcharts "kube-state-metrics") }}
-      app.kubernetes.io/instance: {{ default $.Release.Name $.Values.argocdReleaseOverride | quote }}
-{{- if empty (index .Values "kube-state-metrics" "vmServiceScrape" "spec") }}
+      app.kubernetes.io/instance: {{ default .Release.Name .Values.argocdReleaseOverride | quote }}
+  {{- if or (empty $ksm.vmServiceScrape.spec) (not (hasKey $ksm.vmServiceScrape.spec "endpoints")) }}
   endpoints:
   - port: http
     honorLabels: true
@@ -18,11 +23,5 @@ spec:
       - action: labeldrop
         regex: (uid|container_id|image_id)
   jobLabel: app.kubernetes.io/name
-{{ else }}
-{{- if not (hasKey (index .Values "kube-state-metrics" "vmServiceScrape" "spec") "endpoints") }}
-  endpoints:
-  - port: http
-{{- end }}
-{{ omit (index .Values "kube-state-metrics" "vmServiceScrape" "spec") "selector" | toYaml | indent 2 }}
-{{- end }}
+  {{- end }}
 {{- end }}
