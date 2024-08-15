@@ -5,6 +5,8 @@
 - Set minimal kubernetes version to 1.25
 - Removed support for policy/v1beta1/PodDisruptionBudget
 - Added configurable probes at `.Values.probe`
+- updates operator to [v0.47.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.47.0) release
+- adds RBAC permissions to VLogs object
 
 ## 0.33.6
 
