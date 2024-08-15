@@ -10688,6 +10688,37 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-cluster-0.1.0.tgz
     version: 0.1.0
+  victoria-metrics-common:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+    apiVersion: v2
+    created: "2024-08-15T16:04:13.717311503Z"
+    description: Victoria Metrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: ab5329eb78a9adc6ac56fa236d33c13a501b0ccf24bb10326fbba3d040b93b0b
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.0.1/victoria-metrics-common-0.0.1.tgz
+    version: 0.0.1
   victoria-metrics-distributed:
   - annotations:
       artifacthub.io/category: monitoring-logging
@@ -18228,6 +18259,53 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - Set minimal kubernetes version to 1.25
+        - Removed support for policy/v1beta1/PodDisruptionBudget
+        - Added configurable probes at `.Values.probe`
+        - updates operator to [v0.47.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.47.0) release
+        - adds RBAC permissions to VLogs object
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/operator
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: v0.47.0
+    created: "2024-08-15T16:04:14.359832623Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: file://../victoria-metrics-common
+      version: 0.0.*
+    description: Victoria Metrics Operator
+    digest: 80b4dab003cb501928af193d2468ed6d1cffab8921c075bb97c4ba79cdd84181
+    home: https://github.com/VictoriaMetrics/operator
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-operator
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    - https://github.com/VictoriaMetrics/operator
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-operator-0.34.0/victoria-metrics-operator-0.34.0.tgz
+    version: 0.34.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - add missing permission to allow patching `horizontalpodautoscalers` when operator watches single namespace.
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -23079,4 +23157,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-08-15T09:10:15.079782232Z"
+generated: "2024-08-15T16:04:14.469408669Z"
