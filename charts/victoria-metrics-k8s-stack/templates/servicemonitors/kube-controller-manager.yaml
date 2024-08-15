@@ -10,7 +10,7 @@ metadata:
   namespace: kube-system
   {{- $extraLabels := dict "app" $fullname "k8s-app" "kube-controller-manager" }}
   {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
-  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | indent 4 }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 subsets:
   - addresses:
       {{- range .Values.kubeControllerManager.endpoints }}

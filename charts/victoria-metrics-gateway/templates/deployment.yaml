@@ -60,26 +60,26 @@ spec:
           args:
             - -clusterMode={{ .Values.clusterMode }}
             - -eula={{ .Values.eula }}
-          {{- if .Values.rateLimiter.enable }}
+            {{- if .Values.rateLimiter.enable }}
             - -ratelimit.config=/config/rate-limiter.yml
             - -datasource.url={{ .Values.rateLimiter.datasource.url }}
-          {{- end }}
+            {{- end }}
             - -enable.rateLimit={{ .Values.rateLimiter.enable }}
             - -enable.auth={{ .Values.auth.enable }}
             - -read.url={{ .Values.read.url }}
             - -write.url={{ .Values.write.url }}
-          {{- range $key, $value := .Values.extraArgs }}
-          {{- if kindIs "slice" $value }}
-          {{- range $v := $value }}
+            {{- range $key, $value := .Values.extraArgs }}
+            {{- if kindIs "slice" $value }}
+            {{- range $v := $value }}
             - -{{ $key }}={{ $v }}
-          {{- end }}
-          {{- else }}
+            {{- end }}
+            {{- else }}
             - -{{ $key }}={{ $value }}
-          {{- end }}
-          {{- end }}
-          {{- with (include "chart.license.flag" .) }}
+            {{- end }}
+            {{- end }}
+            {{- with (include "chart.license.flag" .) }}
             - {{ . }}
-          {{- end }}
+            {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http

@@ -48,11 +48,11 @@ spec:
           workingDir: {{ $app.containerWorkingDir }}
           {{- end }}
           args:
-            - {{ printf "%s=%s" "--retentionPeriod" (toString $app.retentionPeriod) | quote}}
-            - {{ printf "%s=%s" "--storageDataPath" $app.persistentVolume.mountPath | quote}}
-          {{- range $key, $value := $app.extraArgs }}
+            - --retentionPeriod={{ $app.retentionPeriod }}
+            - --storageDataPath={{ $app.persistentVolume.mountPath }}
+            {{- range $key, $value := $app.extraArgs }}
             - --{{ $key }}={{ $value }}
-          {{- end }}
+            {{- end }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}

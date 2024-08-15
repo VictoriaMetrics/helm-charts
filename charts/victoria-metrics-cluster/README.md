@@ -139,9 +139,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.horizontalPodAutoscaler.metrics | list | `[]` | Metric for HPA to use to scale the vminsert component |
 | vminsert.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vminsert component |
 | vminsert.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| vminsert.image.registry | string | `""` | Image registry |
 | vminsert.image.repository | string | `"victoriametrics/vminsert"` | Image repository |
-| vminsert.image.tag | string | `"v1.102.1-cluster"` | Image tag override Chart.AppVersion     |
-| vminsert.image.variant | string | `""` |  |
+| vminsert.image.tag | string | `""` | Image tag override Chart.AppVersion     |
+| vminsert.image.variant | string | `"cluster"` |  |
 | vminsert.ingress.annotations | object | `{}` | Ingress annotations |
 | vminsert.ingress.enabled | bool | `false` | Enable deployment of ingress for vminsert component |
 | vminsert.ingress.extraLabels | object | `{}` |  |
@@ -218,9 +219,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.horizontalPodAutoscaler.metrics | list | `[]` | Metric for HPA to use to scale the vmselect component |
 | vmselect.horizontalPodAutoscaler.minReplicas | int | `2` | Minimum replicas for HPA to use to scale the vmselect component |
 | vmselect.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| vmselect.image.registry | string | `""` | Image registry |
 | vmselect.image.repository | string | `"victoriametrics/vmselect"` | Image repository |
-| vmselect.image.tag | string | `"v1.102.1-cluster"` | Image tag override Chart.AppVersion |
-| vmselect.image.variant | string | `""` |  |
+| vmselect.image.tag | string | `""` | Image tag override Chart.AppVersion |
+| vmselect.image.variant | string | `"cluster"` |  |
 | vmselect.ingress.annotations | object | `{}` | Ingress annotations |
 | vmselect.ingress.enabled | bool | `false` | Enable deployment of ingress for vmselect component |
 | vmselect.ingress.extraLabels | object | `{}` |  |
@@ -303,9 +305,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.extraVolumes | list | `[]` |  |
 | vmstorage.fullnameOverride | string | `nil` | Overrides the full name of vmstorage component |
 | vmstorage.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| vmstorage.image.registry | string | `""` | Image registry |
 | vmstorage.image.repository | string | `"victoriametrics/vmstorage"` | Image repository |
-| vmstorage.image.tag | string | `"v1.102.1-cluster"` | Image tag override Chart.AppVersion |
-| vmstorage.image.variant | string | `""` |  |
+| vmstorage.image.tag | string | `""` | Image tag override Chart.AppVersion |
+| vmstorage.image.variant | string | `"cluster"` |  |
 | vmstorage.initContainers | list | `[]` |  |
 | vmstorage.name | string | `"vmstorage"` | vmstorage container name |
 | vmstorage.nodeSelector | object | `{}` | Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/) |
@@ -370,9 +373,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | vmstorage.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | vmstorage.vmbackupmanager.extraSecretMounts | list | `[]` |  |
+| vmstorage.vmbackupmanager.image.registry | string | `""` | vmbackupmanager image registry |
 | vmstorage.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| vmstorage.vmbackupmanager.image.tag | string | `"v1.102.1-enterprise"` | vmbackupmanager image tag override Chart.AppVersion |
-| vmstorage.vmbackupmanager.image.variant | string | `""` |  |
+| vmstorage.vmbackupmanager.image.tag | string | `""` | vmbackupmanager image tag override Chart.AppVersion |
+| vmstorage.vmbackupmanager.image.variant | string | `"cluster"` |  |
 | vmstorage.vmbackupmanager.probe.liveness.failureThreshold | int | `10` |  |
 | vmstorage.vmbackupmanager.probe.liveness.initialDelaySeconds | int | `30` |  |
 | vmstorage.vmbackupmanager.probe.liveness.periodSeconds | int | `30` |  |

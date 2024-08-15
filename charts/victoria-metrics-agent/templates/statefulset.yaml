@@ -47,68 +47,68 @@ spec:
           args:
             - -promscrape.config=/config/scrape.yml
             - -remoteWrite.tmpDataPath=/tmpData
-          {{- if .Values.statefulset.clusterMode }}
+            {{- if .Values.statefulset.clusterMode }}
             - -promscrape.cluster.membersCount={{ .Values.replicaCount }}
             - -promscrape.cluster.replicationFactor={{ .Values.statefulset.replicationFactor }}
             - -promscrape.cluster.memberNum=$(POD_NAME)
-          {{- end }}
-          {{- range .Values.remoteWriteUrls }}
+            {{- end }}
+            {{- range .Values.remoteWriteUrls }}
             - -remoteWrite.url={{ . }}
-          {{- end }}
-          {{- range .Values.multiTenantUrls }}
+            {{- end }}
+            {{- range .Values.multiTenantUrls }}
             - -remoteWrite.multitenantURL={{ . }}
-          {{- end }}
-          {{- range $key, $value := .Values.extraArgs }}
+            {{- end }}
+            {{- range $key, $value := .Values.extraArgs }}
             - -{{ $key }}={{ $value }}
-          {{- end }}
-          {{- with (include "chart.license.flag" .) }}
+            {{- end }}
+            {{- with (include "chart.license.flag" .) }}
             - {{ . }}
-          {{- end }}
+            {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8429
-          {{- with .Values.extraArgs.graphiteListenAddr }}
+            {{- with .Values.extraArgs.graphiteListenAddr }}
             - name: graphite-tcp
               protocol: TCP
               containerPort: {{ include "split-host-port" . }}
             - name: graphite-udp
               protocol: UDP
               containerPort: {{ include "split-host-port" . }}
-          {{- end }}
-          {{- with .Values.extraArgs.influxListenAddr }}
+            {{- end }}
+            {{- with .Values.extraArgs.influxListenAddr }}
             - name: influx-tcp
               protocol: TCP
               containerPort: {{ include "split-host-port" . }}
             - name: influx-udp
               protocol: UDP
               containerPort: {{ include "split-host-port" . }}
-          {{- end }}
-          {{- with .Values.extraArgs.opentsdbHTTPListenAddr }}
+            {{- end }}
+            {{- with .Values.extraArgs.opentsdbHTTPListenAddr }}
             - name: opentsdbhttp
               protocol: TCP
               containerPort: {{ include "split-host-port" . }}
-          {{- end }}
-          {{- with .Values.extraArgs.opentsdbListenAddr }}
+            {{- end }}
+            {{- with .Values.extraArgs.opentsdbListenAddr }}
             - name: opentsdb-tcp
               protocol: TCP
               containerPort: {{ include "split-host-port" . }}
             - name: opentsdb-udp
               protocol: UDP
               containerPort: {{ include "split-host-port" . }}
-          {{- end }}
+            {{- end }}
           {{- with .Values.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or .Values.env .Values.statefulset.clusterMode}}
+          {{- if or .Values.env .Values.statefulset.clusterMode }}
           env:
-            {{- if .Values.statefulset.clusterMode}}
+            {{- if .Values.statefulset.clusterMode }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
             {{- end -}}
-            {{- with .Values.env  }}
+            {{- with .Values.env }}
             {{ toYaml .| nindent 12 }}
             {{- end }}
           {{- end }}
@@ -172,7 +172,7 @@ spec:
       {{- end }}
         - name: config
           configMap:
-            name: {{ include "chart.configname" .}}
+            name: {{ include "chart.configname" . }}
       {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
@@ -194,7 +194,7 @@ spec:
       {{- with .Values.persistence.extraLabels }}
       labels: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.persistence.annotations  }}
+      {{- with .Values.persistence.annotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
     spec:

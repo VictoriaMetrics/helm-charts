@@ -120,7 +120,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.extraHostPathMounts | list | `[]` |  |
 | alertmanager.extraVolumeMounts | list | `[]` |  |
 | alertmanager.extraVolumes | list | `[]` |  |
-| alertmanager.image | string | `"prom/alertmanager"` |  |
+| alertmanager.image.registry | string | `""` |  |
+| alertmanager.image.repository | string | `"prom/alertmanager"` |  |
+| alertmanager.image.tag | string | `"v0.25.0"` |  |
 | alertmanager.imagePullSecrets | list | `[]` |  |
 | alertmanager.ingress.annotations | object | `{}` |  |
 | alertmanager.ingress.enabled | bool | `false` |  |
@@ -154,7 +156,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.service.annotations | object | `{}` |  |
 | alertmanager.service.port | int | `9093` |  |
 | alertmanager.service.type | string | `"ClusterIP"` |  |
-| alertmanager.tag | string | `"v0.25.0"` |  |
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
@@ -188,6 +189,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.extraVolumes | list | `[]` | Extra Volumes for the pod |
 | server.fullnameOverride | string | `""` |  |
 | server.image.pullPolicy | string | `"IfNotPresent"` |  |
+| server.image.registry | string | `""` |  |
 | server.image.repository | string | `"victoriametrics/vmalert"` |  |
 | server.image.tag | string | `""` |  |
 | server.image.variant | string | `""` |  |

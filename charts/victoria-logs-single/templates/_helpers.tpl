@@ -47,7 +47,7 @@ app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 helm.sh/chart: {{ include "victoria-logs.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- with .extraLabels }}
-{{ toYaml .}}
+{{ toYaml . }}
 {{- end }}
 {{- end -}}
 

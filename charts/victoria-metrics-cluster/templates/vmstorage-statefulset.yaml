@@ -1,7 +1,7 @@
 {{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vmstorage }}
 {{- if $app.enabled -}}
-{{ include "chart.vmbackupmanager.enforce_license" .}}
+{{ include "chart.vmbackupmanager.enforce_license" . }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -48,18 +48,18 @@ spec:
           args:
             - --retentionPeriod={{ toString $app.retentionPeriod }}
             - --storageDataPath={{ $app.persistentVolume.mountPath }}
-          {{- range $key, $value := $app.extraArgs }}
-          {{- if kindIs "slice" $value }}
-          {{- range $v := $value }}
+            {{- range $key, $value := $app.extraArgs }}
+            {{- if kindIs "slice" $value }}
+            {{- range $v := $value }}
             - --{{ $key }}={{ $v }}
-          {{- end }}
-          {{- else }}
+            {{- end }}
+            {{- else }}
             - --{{ $key }}={{ $value }}
-          {{- end }}
-          {{- end }}
-          {{- with (include "chart.license.flag" .) }}
+            {{- end }}
+            {{- end }}
+            {{- with (include "chart.license.flag" .) }}
             - {{ . }}
-          {{- end }}
+            {{- end }}
           ports:
             - name: "{{ $app.ports.name | default "http" }}" 
               containerPort: 8482
@@ -120,19 +120,19 @@ spec:
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
           args:
-            - {{ printf "%s=%t" "--eula" $manager.eula | quote}}
-            - {{ printf "%s=%t" "--disableHourly" $manager.disableHourly | quote}}
-            - {{ printf "%s=%t" "--disableDaily" $manager.disableDaily | quote}}
-            - {{ printf "%s=%t" "--disableWeekly" $manager.disableWeekly | quote}}
-            - {{ printf "%s=%t" "--disableMonthly" $manager.disableMonthly | quote}}
-            - {{ printf "%s=%d" "--keepLastHourly" (int $manager.retention.keepLastHourly) | quote}}
-            - {{ printf "%s=%d" "--keepLastDaily" (int $manager.retention.keepLastDaily) | quote}}
-            - {{ printf "%s=%d" "--keepLastWeekly" (int $manager.retention.keepLastWeekly) | quote}}
-            - {{ printf "%s=%d" "--keepLastMonthly" (int $manager.retention.keepLastMonthly) | quote}}
-            - {{ printf "%s=%s" "--storageDataPath" $app.persistentVolume.mountPath | quote}}
-            - "--dst={{ $manager.destination }}/$(POD_NAME)"
-            - "--snapshot.createURL=http://localhost:8482/snapshot/create"
-            - "--snapshot.deleteURL=http://localhost:8482/snapshot/delete"
+            - --eula={{ $manager.eula }}
+            - --disableHourly={{ $manager.disableHourly }}
+            - --disableDaily={{ $manager.disableDaily }}
+            - --disableWeekly={{ $manager.disableWeekly }}
+            - --disableMonthly={{ $manager.disableMonthly }}
+            - --keepLastHourly={{ $manager.retention.keepLastHourly }}
+            - --keepLastDaily={{ $manager.retention.keepLastDaily }}
+            - --keepLastWeekly={{ $manager.retention.keepLastWeekly }}
+            - --keepLastMonthly={{ $manager.retention.keepLastMonthly }}
+            - --storageDataPath={{ $app.persistentVolume.mountPath }}
+            - --dst={{ $manager.destination }}/$(POD_NAME)
+            - --snapshot.createURL=http://localhost:8482/snapshot/create
+            - --snapshot.deleteURL=http://localhost:8482/snapshot/delete
             {{- range $key, $value := $manager.extraArgs }}
             - --{{ $key }}={{ $value }}
             {{- end }}

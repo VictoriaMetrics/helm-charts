@@ -148,8 +148,10 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.extraVolumeMounts | list | `[]` |  |
 | server.extraVolumes | list | `[]` |  |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| server.image.registry | string | `""` | Image registry |
 | server.image.repository | string | `"victoriametrics/victoria-logs"` | Image repository |
-| server.image.tag | string | `"v0.28.0-victorialogs"` | Image tag |
+| server.image.tag | string | `""` | Image tag |
+| server.image.variant | string | `"victorialogs"` |  |
 | server.ingress.annotations | string | `nil` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |

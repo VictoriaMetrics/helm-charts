@@ -131,6 +131,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.extraVolumes | list | `[]` |  |
 | server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | server.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| server.image.registry | string | `""` | Image registry |
 | server.image.repository | string | `"victoriametrics/victoria-metrics"` | Image repository |
 | server.image.tag | string | `""` | Image tag |
 | server.image.variant | string | `""` |  |
@@ -217,8 +218,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
 | server.vmbackupmanager.extraArgs.loggerFormat | string | `"json"` |  |
 | server.vmbackupmanager.extraVolumeMounts | list | `[]` |  |
+| server.vmbackupmanager.image.registry | string | `""` | vmbackupmanager image registry |
 | server.vmbackupmanager.image.repository | string | `"victoriametrics/vmbackupmanager"` | vmbackupmanager image repository |
-| server.vmbackupmanager.image.tag | string | `"v1.101.0-enterprise"` | vmbackupmanager image tag |
+| server.vmbackupmanager.image.tag | string | `""` | vmbackupmanager image tag |
 | server.vmbackupmanager.image.variant | string | `""` |  |
 | server.vmbackupmanager.probe.liveness.failureThreshold | int | `10` |  |
 | server.vmbackupmanager.probe.liveness.initialDelaySeconds | int | `30` |  |

@@ -47,23 +47,23 @@ spec:
           workingDir: {{ $app.containerWorkingDir }}
           {{- end }}
           args:
-            - {{ printf "%s=%s" "--retentionPeriod" (toString $app.retentionPeriod) | quote}}
-            - {{ printf "%s=%s" "--storageDataPath" $app.persistentVolume.mountPath | quote}}
-          {{- if $app.scrape.enabled }}
+            - --retentionPeriod={{ $app.retentionPeriod }}
+            - --storageDataPath={{ $app.persistentVolume.mountPath }}
+            {{- if $app.scrape.enabled }}
             - --promscrape.config=/scrapeconfig/scrape.yml
-          {{- end }}
-          {{- range $key, $value := $app.extraArgs }}
-          {{- if kindIs "slice" $value }}
-          {{- range $v := $value }}
+            {{- end }}
+            {{- range $key, $value := $app.extraArgs }}
+            {{- if kindIs "slice" $value }}
+            {{- range $v := $value }}
             - --{{ $key }}={{ $v }}
-          {{- end }}
-          {{- else }}
+            {{- end }}
+            {{- else }}
             - --{{ $key }}={{ $value }}
-          {{- end }}
-          {{- end }}
-          {{- with (include "victoria-metrics.license.flag" .) }}
+            {{- end }}
+            {{- end }}
+            {{- with (include "victoria-metrics.license.flag" .) }}
             - {{ . }}
-          {{- end }}
+            {{- end }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -150,19 +150,19 @@ spec:
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $manager)) }}
           imagePullPolicy: "{{ $app.image.pullPolicy }}"
           args:
-            - {{ printf "%s=%t" "--eula" $manager.eula | quote}}
-            - {{ printf "%s=%t" "--disableHourly" $manager.disableHourly | quote}}
-            - {{ printf "%s=%t" "--disableDaily" $manager.disableDaily | quote}}
-            - {{ printf "%s=%t" "--disableWeekly" $manager.disableWeekly | quote}}
-            - {{ printf "%s=%t" "--disableMonthly" $manager.disableMonthly | quote}}
-            - {{ printf "%s=%d" "--keepLastHourly" (int $manager.retention.keepLastHourly) | quote}}
-            - {{ printf "%s=%d" "--keepLastDaily" (int $manager.retention.keepLastDaily) | quote}}
-            - {{ printf "%s=%d" "--keepLastWeekly" (int $manager.retention.keepLastWeekly) | quote}}
-            - {{ printf "%s=%d" "--keepLastMonthly" (int $manager.retention.keepLastMonthly) | quote}}
-            - {{ printf "%s=%s" "--dst" (printf "%s/%s" $manager.destination (include "victoria-metrics.name" .) ) | quote}}
-            - {{ printf "%s=%s" "--storageDataPath" $app.persistentVolume.mountPath | quote}}
-            - "--snapshot.createURL=http://localhost:8428/snapshot/create"
-            - "--snapshot.deleteURL=http://localhost:8428/snapshot/delete"
+            - --eula={{ $manager.eula }}
+            - --disableHourly={{ $manager.disableHourly }}
+            - --disableDaily={{ $manager.disableDaily }}
+            - --disableWeekly={{ $manager.disableWeekly }}
+            - --disableMonthly={{ $manager.disableMonthly }}
+            - --keepLastHourly={{ $manager.retention.keepLastHourly }}
+            - --keepLastDaily={{ $manager.retention.keepLastDaily }}
+            - --keepLastWeekly={{ $manager.retention.keepLastWeekly }}
+            - --keepLastMonthly={{ $manager.retention.keepLastMonthly }}
+            - --dst={{ printf "%s/%s" $manager.destination (include "victoria-metrics.name" .) }}
+            - --storageDataPath={{ $app.persistentVolume.mountPath }}
+            - --snapshot.createURL=http://localhost:8428/snapshot/create
+            - --snapshot.deleteURL=http://localhost:8428/snapshot/delete
             {{- range $key, $value := $manager.extraArgs }}
             - --{{ $key }}={{ $value }}
             {{- end }}
@@ -179,7 +179,7 @@ spec:
           startupProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- with $manager.resources }}
-          resources: {{ toYaml . | nindent 12  }}
+          resources: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}

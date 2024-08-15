@@ -40,11 +40,7 @@ spec:
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
           args:
             - --config.file=/config/alertmanager.yaml
-            {{ if $app.persistentVolume.enabled }}
-            - {{ printf "%s=%s" "--storage.path" $app.persistentVolume.mountPath | quote}}
-            {{- else}}
-            - --storage.path=/data
-            {{- end}}
+            - --storage.path={{ ternary $app.persistentVolume.mountPath "/data" $app.persistentVolume.enabled }}
             - --data.retention={{ $app.retention }}
             - --web.listen-address={{ $app.listenAddress }}
             - --cluster.advertise-address=$(POD_IP):6783
@@ -103,7 +99,7 @@ spec:
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- with $app.resources  }}
+          {{- with $app.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
         {{- with $app.extraContainers }}

@@ -300,6 +300,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | horizontalPodAutoscaling.metrics | list | `[]` | Metric for HPA to use to scale vmagent |
 | horizontalPodAutoscaling.minReplicas | int | `1` | Minimum replicas for HPA to use to scale vmagent |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.registry | string | `""` |  |
 | image.repository | string | `"victoriametrics/vmagent"` |  |
 | image.tag | string | `""` |  |
 | image.variant | string | `""` |  |

@@ -183,8 +183,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` |  |
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
+| image.registry | string | `""` | Victoria Metrics gateway Docker registry |
 | image.repository | string | `"victoriametrics/vmgateway"` | Victoria Metrics gateway Docker repository and image name |
-| image.tag | string | `"v1.101.0-enterprise"` | Tag of Docker image override Chart.AppVersion |
+| image.tag | string | `""` | Tag of Docker image override Chart.AppVersion |
 | image.variant | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |

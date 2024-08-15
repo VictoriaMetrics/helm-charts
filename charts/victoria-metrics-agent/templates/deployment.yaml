@@ -46,57 +46,57 @@ spec:
           args:
             - -promscrape.config=/config/scrape.yml
             - -remoteWrite.tmpDataPath=/tmpData
-          {{- range .Values.remoteWriteUrls }}
+            {{- range .Values.remoteWriteUrls }}
             - -remoteWrite.url={{ . }}
-          {{- end }}
-          {{- range .Values.multiTenantUrls }}
+            {{- end }}
+            {{- range .Values.multiTenantUrls }}
             - -remoteWrite.multitenantURL={{ . }}
-          {{- end }}
-          {{- range $key, $value := .Values.extraArgs }}
-          {{- if kindIs "slice" $value }}
-          {{- range $v := $value }}
+            {{- end }}
+            {{- range $key, $value := .Values.extraArgs }}
+            {{- if kindIs "slice" $value }}
+            {{- range $v := $value }}
             - -{{ $key }}={{ $v }}
-          {{- end }}
-          {{- else }}
+            {{- end }}
+            {{- else }}
             - -{{ $key }}={{ $value }}
-          {{- end }}
-          {{- end }}
-          {{- with (include "chart.license.flag" .) }}
+            {{- end }}
+            {{- end }}
+            {{- with (include "chart.license.flag" .) }}
             - {{ . }}
-          {{- end }}
+            {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8429
-          {{- with .Values.extraArgs.graphiteListenAddr }}
+            {{- with .Values.extraArgs.graphiteListenAddr }}
             - name: graphite-tcp
               protocol: TCP
               containerPort: {{ include "split-host-port" . }}
             - name: graphite-udp
               protocol: UDP
               containerPort: {{ include "split-host-port" . }}
-          {{- end }}
-          {{- with .Values.extraArgs.influxListenAddr }}
+            {{- end }}
+            {{- with .Values.extraArgs.influxListenAddr }}
             - name: influx-tcp
               protocol: TCP
               containerPort: {{ include "split-host-port" . }}
             - name: influx-udp
               protocol: UDP
               containerPort: {{ include "split-host-port" . }}
-          {{- end }}
-          {{- with .Values.extraArgs.opentsdbHTTPListenAddr }}
+            {{- end }}
+            {{- with .Values.extraArgs.opentsdbHTTPListenAddr }}
             - name: opentsdbhttp
               protocol: TCP
               containerPort: {{ include "split-host-port" . }}
-          {{- end }}
-          {{- with .Values.extraArgs.opentsdbListenAddr }}
+            {{- end }}
+            {{- with .Values.extraArgs.opentsdbListenAddr }}
             - name: opentsdb-tcp
               protocol: TCP
               containerPort: {{ include "split-host-port" . }}
             - name: opentsdb-udp
               protocol: UDP
               containerPort: {{ include "split-host-port" . }}
-          {{- end }}
+            {{- end }}
           {{- with .Values.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}

@@ -137,8 +137,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | fullnameOverride | string | `""` |  |
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
-| image.repository | string | `"docker.io/victoriametrics/vmanomaly"` | Victoria Metrics anomaly Docker repository and image name |
-| image.tag | string | `""` | Tag of Docker image |
+| image.registry | string | `""` | Victoria Metrics anomaly Docker registry |
+| image.repository | string | `"victoriametrics/vmanomaly"` | Victoria Metrics anomaly Docker repository and image name |
+| image.tag | string | `"v1.15.4"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
 | license | object | `{"key":"","secret":{"key":"","name":""}}` | License key configuration for vmanomaly. See [docs](https://docs.victoriametrics.com/vmanomaly.html#licensing) Required starting from v1.5.0. |
 | license.key | string | `""` | License key for vmanomaly |

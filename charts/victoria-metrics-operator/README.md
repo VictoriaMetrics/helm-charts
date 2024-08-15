@@ -162,6 +162,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` | Overrides the full name of server component |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| image.registry | string | `""` | Image registry |
 | image.repository | string | `"victoriametrics/operator"` | Image repository |
 | image.tag | string | `""` | Image tag override Chart.AppVersion |
 | image.variant | string | `""` |  |

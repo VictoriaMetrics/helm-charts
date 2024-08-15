@@ -51,9 +51,9 @@ spec:
           args:
             - -rule=/config/alert-rules.yaml
             - -datasource.url={{ $app.datasource.url}}
-            {{- if or $app.datasource.basicAuth.password $app.datasource.basicAuth.username  }}
-            - -datasource.basicAuth.password={{ $app.datasource.basicAuth.password}}
-            - -datasource.basicAuth.username={{ $app.datasource.basicAuth.username}}
+            {{- if or $app.datasource.basicAuth.password $app.datasource.basicAuth.username }}
+            - -datasource.basicAuth.password={{ $app.datasource.basicAuth.password }}
+            - -datasource.basicAuth.username={{ $app.datasource.basicAuth.username }}
             {{- end }}
             {{- with $app.datasource.bearer.token }}
             - -datasource.bearerToken={{ . }}
@@ -92,7 +92,7 @@ spec:
             {{- if $app.remote.write.url }}
             - -remoteWrite.url={{ $app.remote.write.url }}
             {{- end }}
-            {{- if or $app.remote.write.basicAuth.password $app.remote.write.basicAuth.username  }}
+            {{- if or $app.remote.write.basicAuth.password $app.remote.write.basicAuth.username }}
             - -remoteWrite.basicAuth.password={{ $app.remote.write.basicAuth.password }}
             - -remoteWrite.basicAuth.username={{ $app.remote.write.basicAuth.username }}
             {{- end }}
