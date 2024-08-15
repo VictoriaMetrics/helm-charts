@@ -34,14 +34,14 @@ spec:
       {{- $annotations = merge $annotations $app.podAnnotations }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-      {{- with $app.imagePullSecrets }}
-      imagePullSecrets: {{ toYaml . | nindent 8 }}
-      {{- end }}
       serviceAccountName: {{ template "vmalert.serviceAccountName" . }}
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
+      {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      imagePullSecrets: {{ . }}
+      {{- end }}
       containers:
         - name: {{ template "vmalert.name" . }}-{{ $app.name }}
           {{- if $app.securityContext.enabled }}
