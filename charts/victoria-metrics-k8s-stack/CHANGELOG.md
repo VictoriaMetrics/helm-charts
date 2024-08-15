@@ -8,6 +8,7 @@
 - Add alerting rules for VictoriaMetrics operator.
 - Updated alerting rules for VictoriaMetrics components.
 - Fixed exact rule annotations propagation to other rules.
+- Set minimal kubernetes version to 1.25
 
 ## 0.24.5
 
