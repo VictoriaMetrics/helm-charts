@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.34.0
+
+**Release date:** 2024-08-15
+
+![AppVersion: v0.47.0](https://img.shields.io/static/v1?label=AppVersion&message=v0.47.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Set minimal kubernetes version to 1.25
 - Removed support for policy/v1beta1/PodDisruptionBudget
 - Added configurable probes at `.Values.probe`
