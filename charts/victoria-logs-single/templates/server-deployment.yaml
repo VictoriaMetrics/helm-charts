@@ -127,6 +127,6 @@ spec:
           persistentVolumeClaim:
             claimName: {{ if $app.persistentVolume.existingClaim }}{{ $app.persistentVolume.existingClaim }}{{- else }}{{ template "victoria-logs.server.fullname" . }}{{- end }}
         {{- else }}
-          emptyDir: {{ $app.emptyDir | toYaml 12 }}
+          emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
         {{- end }}
 {{- end }}
