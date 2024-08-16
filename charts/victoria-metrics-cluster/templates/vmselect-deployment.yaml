@@ -131,7 +131,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ if $app.persistentVolume.existingClaim }}{{ $app.persistentVolume.existingClaim }}{{- else }}{{ template "victoria-metrics.vmselect.fullname" . }}{{- end }}
         {{- else }}
-          emptyDir: {}
+          emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
         {{- end -}}
         {{- include "chart.license.volume" . | nindent 8 }}
 {{- end }}

@@ -158,7 +158,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "chart.fullname" .) }}
       {{- else }}
-          emptyDir: {}
+          emptyDir: {{ .Values.emptyDir | toYaml 12 }}
       {{- end }}
         - name: config
           configMap:

@@ -204,7 +204,7 @@ spec:
         {{- end }}
         {{- if not $app.persistentVolume.enabled }}
         - name: vmstorage-volume
-          emptyDir: {}
+          emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
         {{- else }}
         {{- if $app.persistentVolume.existingClaim }}
         - name: vmstorage-volume

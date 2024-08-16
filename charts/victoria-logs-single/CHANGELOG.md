@@ -10,6 +10,7 @@
 - Updated `.Values.server.readinessProbe` to `.Values.server.probe.readiness`
 - Updated `.Values.server.livenessProbe` to `.Values.server.probe.liveness`
 - Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
+- Added `.Values.server.emptyDir` to customize default data directory
 
 ## 0.5.4
 

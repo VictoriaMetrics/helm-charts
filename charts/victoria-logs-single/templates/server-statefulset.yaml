@@ -118,7 +118,7 @@ spec:
       volumes:
         {{- if not $app.persistentVolume.enabled }}
         - name: server-volume
-          emptyDir: {}
+          emptyDir: {{ $app.emptyDir | toYaml 12 }}
         {{- else }}
         {{- with $app.persistentVolume.existingClaim }}
         - name: server-volume
