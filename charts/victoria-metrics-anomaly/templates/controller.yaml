@@ -34,6 +34,9 @@ spec:
       {{- if .Values.podSecurityContext}}
       securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
+      {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      imagePullSecrets: {{ . }}
+      {{- end }}
       containers:
         - name: model
           image: {{ include "vm.image" (merge $global (dict "app" .Values)) }}

@@ -136,6 +136,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumes | list | `[]` | Extra Volumes for the pod |
 | fullnameOverride | string | `""` |  |
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
+| global.image.registry | string | `""` |  |
+| global.imagePullSecrets | list | `[]` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
 | image.registry | string | `""` | Victoria Metrics anomaly Docker registry |
 | image.repository | string | `"victoriametrics/vmanomaly"` | Victoria Metrics anomaly Docker repository and image name |

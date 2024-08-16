@@ -35,6 +35,9 @@ spec:
       {{- if eq (include "victoria-metrics.storage.hasInitContainer" . ) "true" }}
       initContainers: {{ include "victoria-metrics.storage.initContiners" . | nindent 8 }}
       {{- end }}
+      {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      imagePullSecrets: {{ . }}
+      {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ $app.name }}
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
@@ -177,9 +180,6 @@ spec:
         {{- with $app.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 8 }}
-      {{- end }}
       {{- with $app.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

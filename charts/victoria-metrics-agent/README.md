@@ -294,6 +294,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | extraVolumes | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
+| global.image.registry | string | `""` |  |
+| global.imagePullSecrets | list | `[]` |  |
 | horizontalPodAutoscaling | object | `{"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1}` | Horizontal Pod Autoscaling. Note that it is not intended to be used for vmagents which perform scraping. In order to scale scraping vmagents see: https://docs.victoriametrics.com/vmagent/#scraping-big-number-of-targets |
 | horizontalPodAutoscaling.enabled | bool | `false` | Use HPA for vmagent |
 | horizontalPodAutoscaling.maxReplicas | int | `10` | Maximum replicas for HPA to use to to scale vmagent |
