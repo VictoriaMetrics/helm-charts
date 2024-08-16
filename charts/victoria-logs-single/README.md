@@ -128,6 +128,8 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | fluent-bit.enabled | bool | `false` | Enable deployment of fluent-bit |
 | fluent-bit.resources | object | `{}` |  |
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
+| global.image.registry | string | `""` |  |
+| global.imagePullSecrets | list | `[]` |  |
 | global.nameOverride | string | `""` |  |
 | global.victoriaLogs.server.fullnameOverride | string | `nil` | Overrides the full name of server component |
 | global.victoriaLogs.server.name | string | `"server"` | Server container name |
@@ -152,6 +154,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.image.repository | string | `"victoriametrics/victoria-logs"` | Image repository |
 | server.image.tag | string | `""` | Image tag |
 | server.image.variant | string | `"victorialogs"` |  |
+| server.imagePullSecrets | list | `[]` | Image pull secrets |
 | server.ingress.annotations | string | `nil` | Ingress annotations |
 | server.ingress.enabled | bool | `false` | Enable deployment of ingress for server component |
 | server.ingress.extraLabels | object | `{}` | Ingress extra labels |
