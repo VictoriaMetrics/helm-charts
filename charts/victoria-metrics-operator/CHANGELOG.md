@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added global imagePullSecrets and image.registry
 
 ## 0.34.0
 

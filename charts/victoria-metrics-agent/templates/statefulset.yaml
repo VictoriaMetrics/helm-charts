@@ -27,9 +27,6 @@ spec:
       {{- $annotations := merge (dict "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum)) (deepCopy .Values.podAnnotations) }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets: {{ toYaml . | nindent 8 }}
-      {{- end }}
       serviceAccountName: {{ include "chart.serviceAccountName" . }}
       {{- if .Values.podSecurityContext.enabled }}
       securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" .) | nindent 8 }}
@@ -37,12 +34,16 @@ spec:
       {{- with .Values.initContainers }}
       initContainers: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      imagePullSecrets: {{ . }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
           {{- end }}
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           workingDir: {{ .Values.containerWorkingDir }}
           args:
             - -promscrape.config=/config/scrape.yml
@@ -64,7 +65,6 @@ spec:
             {{- with (include "chart.license.flag" .) }}
             - {{ . }}
             {{- end }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8429

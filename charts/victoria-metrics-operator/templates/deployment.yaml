@@ -22,13 +22,13 @@ spec:
       {{- $ctx := merge (deepCopy $global) (dict "extraLabels" .Values.podLabels) }}
       labels: {{ include "vm-operator.selectorLabels" $ctx | nindent 8}}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets: {{ toYaml . | nindent 8 }}
-      {{- end }}
       {{- with .Values.podSecurityContext }}
       securityContext: {{ toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ template "vm-operator.serviceAccountName" . }}
+      {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      imagePullSecrets: {{ . }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}

@@ -14,6 +14,7 @@
 - Updated `.Values.server.readinessProbe` to `.Values.server.probe.readiness`
 - Updated `.Values.server.livenessProbe` to `.Values.server.probe.liveness`
 - Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
+- Added global imagePullSecrets and image.registry
 
 ## 0.9.26
 

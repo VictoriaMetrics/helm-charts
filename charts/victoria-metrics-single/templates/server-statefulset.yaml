@@ -36,6 +36,9 @@ spec:
       {{- if eq (include "victoria-metrics.hasInitContainer" . ) "true" }}
       initContainers: {{ include "victoria-metrics.initContiners" . | nindent 8 }}
       {{- end }}
+      {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      imagePullSecrets: {{ . }}
+      {{- end }}
       containers:
         - name: {{ template "victoria-metrics.name" . }}-{{ $app.name }}
           {{- if $app.securityContext.enabled }}
@@ -201,9 +204,6 @@ spec:
         {{- end }}
       {{- with $app.extraContainers }}
       {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with $app.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
