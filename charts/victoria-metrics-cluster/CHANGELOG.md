@@ -11,6 +11,7 @@
 - Updated `.Values.vmbackupmanager.livenessProbe` to `.Values.vmbackupmanager.probe.liveness`
 - Updated `.Values.vmbackupmanager.startupProbe` to `.Values.vmbackupmanager.probe.startup`
 - Added global imagePullSecrets and image.registry
+- Fix templating of Ingress port when using custom port name.
 
 ## 0.11.23
 

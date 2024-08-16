@@ -37,7 +37,7 @@ spec:
             service:
               name: {{ $serviceName }}
               port:
-                number: {{ $servicePort }}
+                number: {{ .port | default $servicePort }}
             {{- else }}
             serviceName: {{ $serviceName }}
             servicePort: {{ .port | default "http"}}
