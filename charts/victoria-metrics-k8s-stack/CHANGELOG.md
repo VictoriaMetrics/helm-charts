@@ -2,6 +2,7 @@
 
 ## Next release
 
+- * Update Notes: it requires to update CRD dependency manually before upgrade
 - Moved dashboards templating logic out of sync script to Helm template
 - Allow to disable default grafana datasource
 - Synchronize Etcd dashboards and rules with mixin provided by Etcd
@@ -9,6 +10,7 @@
 - Updated alerting rules for VictoriaMetrics components.
 - Fixed exact rule annotations propagation to other rules.
 - Set minimal kubernetes version to 1.25
+- updates operator to v0.47.0 version
 
 ## 0.24.5
 
