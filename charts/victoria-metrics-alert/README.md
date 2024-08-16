@@ -113,6 +113,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.config.route.receiver | string | `"devnull"` |  |
 | alertmanager.config.route.repeat_interval | string | `"24h"` |  |
 | alertmanager.configMap | string | `""` |  |
+| alertmanager.emptyDir | object | `{}` |  |
 | alertmanager.enabled | bool | `false` |  |
 | alertmanager.envFrom | list | `[]` |  |
 | alertmanager.extraArgs | object | `{}` |  |

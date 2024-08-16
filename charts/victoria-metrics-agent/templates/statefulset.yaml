@@ -164,7 +164,7 @@ spec:
       volumes:
       {{- if not .Values.persistence.enabled }}
         - name: tmpdata
-          emptyDir: {}
+          emptyDir: {{ toYaml .Values.emptyDir | nindent 12 }}
       {{- else if .Values.persistence.existingClaim }}
         - name: tmpdata
           persistentVolumeClaim:

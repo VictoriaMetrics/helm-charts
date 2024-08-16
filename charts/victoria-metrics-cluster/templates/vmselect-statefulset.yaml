@@ -126,7 +126,7 @@ spec:
       {{- end }}
       {{- if not $app.persistentVolume.enabled }}
       - name: cache-volume
-        emptyDir: {}
+        emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
       {{- end }}
       {{- include "chart.license.volume" . | nindent 8 }}
   {{- if $app.persistentVolume.enabled }}

@@ -123,7 +123,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ if $app.persistentVolume.existingClaim }}{{ $app.persistentVolume.existingClaim }}{{- else }}{{ include "vmalert.alertmanager.fullname" . }}{{- end }}
           {{- else }}
-          emptyDir: {}
+          emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
         - name: config
           configMap:

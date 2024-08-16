@@ -203,6 +203,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.automountServiceAccountToken | bool | `true` |  |
 | vmselect.cacheMountPath | string | `"/cache"` | Cache root folder |
 | vmselect.containerWorkingDir | string | `""` | Container workdir |
+| vmselect.emptyDir | object | `{}` |  |
 | vmselect.enabled | bool | `true` | Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet |
 | vmselect.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables |
 | vmselect.envFrom | list | `[]` |  |
@@ -293,6 +294,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.annotations | object | `{}` |  |
 | vmstorage.automountServiceAccountToken | bool | `true` |  |
 | vmstorage.containerWorkingDir | string | `""` | Container workdir |
+| vmstorage.emptyDir | object | `{}` |  |
 | vmstorage.enabled | bool | `true` | Enable deployment of vmstorage component. StatefulSet is used |
 | vmstorage.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables |
 | vmstorage.envFrom | list | `[]` |  |

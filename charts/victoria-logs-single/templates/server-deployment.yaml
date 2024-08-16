@@ -122,14 +122,14 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
       volumes:
-      {{- with $app.extraVolumes }}
-      {{- toYaml . | nindent 6 }}
-      {{- end }}
-      - name: server-volume
-      {{- if $app.persistentVolume.enabled }}
-        persistentVolumeClaim:
-          claimName: {{ if $app.persistentVolume.existingClaim }}{{ $app.persistentVolume.existingClaim }}{{- else }}{{ template "victoria-logs.server.fullname" . }}{{- end }}
-      {{- else }}
-        emptyDir: {}
-      {{- end }}
+        {{- with $app.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - name: server-volume
+        {{- if $app.persistentVolume.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if $app.persistentVolume.existingClaim }}{{ $app.persistentVolume.existingClaim }}{{- else }}{{ template "victoria-logs.server.fullname" . }}{{- end }}
+        {{- else }}
+          emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
+        {{- end }}
 {{- end }}
