@@ -138,6 +138,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | printNotes | bool | `true` | Print chart notes |
 | server.affinity | object | `{}` | Pod affinity |
 | server.containerWorkingDir | string | `""` | Container workdir |
+| server.emptyDir | object | `{}` |  |
 | server.enabled | bool | `true` | Enable deployment of server component. Deployed as StatefulSet |
 | server.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | server.envFrom | list | `[]` |  |
