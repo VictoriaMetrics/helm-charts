@@ -127,7 +127,7 @@ notifierConfigRef:
 {{- $alertManagerReplicas := .Values.alertmanager.spec.replicaCount | default 1 }}
 notifiers:
     {{- range $n := until (int $alertManagerReplicas) }}
-    - url: {{ printf "http://%s-%s-%d.%s-%s.%s.svc:9093" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" $) $n "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" $) $.Release.Namespace }}
+    - url: {{ printf "http://%s-%s-%d.%s-%s.%s.svc:9093%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" $) $n "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" $) $.Release.Namespace (.Values.alertmanager.spec.routePrefix) }}
     {{- end }}
 {{- end }}
 {{- end }}
