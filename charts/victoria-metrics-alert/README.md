@@ -155,7 +155,16 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.retention | string | `"120h"` |  |
 | alertmanager.securityContext.enabled | bool | `false` |  |
 | alertmanager.service.annotations | object | `{}` |  |
+| alertmanager.service.clusterIP | string | `""` |  |
+| alertmanager.service.externalIPs | list | `[]` | Ref: https://kubernetes.io/docs/user-guide/services/#external-ips |
+| alertmanager.service.externalTrafficPolicy | string | `""` | Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip |
+| alertmanager.service.healthCheckNodePort | string | `""` |  |
+| alertmanager.service.labels | object | `{}` |  |
+| alertmanager.service.loadBalancerIP | string | `""` |  |
+| alertmanager.service.loadBalancerSourceRanges | list | `[]` |  |
+| alertmanager.service.nodePort | string | `""` | if you want to force a specific nodePort. Must be use with service.type=NodePort |
 | alertmanager.service.port | int | `9093` |  |
+| alertmanager.service.servicePort | int | `8880` |  |
 | alertmanager.service.type | string | `"ClusterIP"` |  |
 | alertmanager.templates | object | `{}` |  |
 | alertmanager.tolerations | list | `[]` |  |
@@ -247,6 +256,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.service.annotations | object | `{}` |  |
 | server.service.clusterIP | string | `""` |  |
 | server.service.externalIPs | list | `[]` |  |
+| server.service.externalTrafficPolicy | string | `""` |  |
+| server.service.healthCheckNodePort | string | `""` |  |
 | server.service.labels | object | `{}` |  |
 | server.service.loadBalancerIP | string | `""` |  |
 | server.service.loadBalancerSourceRanges | list | `[]` |  |

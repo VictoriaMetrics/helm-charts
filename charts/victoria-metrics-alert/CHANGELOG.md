@@ -8,6 +8,7 @@
 - Removed support for policy/v1beta1/PodDisruptionBudget
 - Added global imagePullSecrets and image.registry
 - Added `.Values.alertmanager.emptyDir` to customize default cache directory
+- Addded alertmanager service `.Values.alertmanager.service.externalTrafficPolicy` and `.Values.alertmanager.service.healthCheckNodePort`
 
 ## 0.9.12
 

@@ -15,6 +15,7 @@
 - Updated `.Values.server.livenessProbe` to `.Values.server.probe.liveness`
 - Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
 - Added global imagePullSecrets and image.registry
+- Merged headless and non-headless services, removed statefulset service specific variables
 
 ## 0.9.26
 

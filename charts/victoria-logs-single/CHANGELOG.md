@@ -12,6 +12,7 @@
 - Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
 - Added global imagePullSecrets and image.registry
 - Added `.Values.server.emptyDir` to customize default data directory
+- Merged headless and non-headless services, removed statefulset service specific variables
 
 ## 0.5.4
 
