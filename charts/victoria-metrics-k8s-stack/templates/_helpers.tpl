@@ -84,6 +84,9 @@ Selector labels
 {{- define "victoria-metrics-k8s-stack.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "victoria-metrics-k8s-stack.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .extraLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end }}
 
 
@@ -152,12 +155,20 @@ configMaps:
 VMAlert spec
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAlertSpec" -}}
-{{- $extraArgs := default dict -}}
+{{- $extraArgs := dict "remoteWrite.disablePathAppend" "true" -}}
 {{- if .Values.vmalert.templateFiles -}}
-{{- $_ := set $extraArgs "rule.templates" (print "/etc/vm/configs/" (printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmalert-extra-tpl" | trunc 63 | trimSuffix "-" ) "/*.tmpl") -}}
+  {{- $ruleTmpl := (printf "/etc/vm/configs/%s-vmalert-extra-tpl/*.tmpl" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") -}}
+  {{- $_ := set $extraArgs "rule.templates" $ruleTmpl -}}
 {{- end -}}
-{{- $_ := set $extraArgs "remoteWrite.disablePathAppend" "true" -}}
-{{ tpl (deepCopy .Values.vmalert.spec | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertRemotes" . | fromYaml) | mergeOverwrite (include "victoria-metrics-k8s-stack.vmAlertTemplates" . | fromYaml) | mergeOverwrite (dict "extraArgs" $extraArgs) | toYaml) . }}
+{{- $vmAlertRemotes := (include "victoria-metrics-k8s-stack.vmAlertRemotes" . | fromYaml) -}}
+{{- $vmAlertTemplates := (include "victoria-metrics-k8s-stack.vmAlertTemplates" . | fromYaml) -}}
+{{- $spec := dict "extraArgs" $extraArgs -}}
+{{- if or .Values.global.license.key .Values.global.license.keyRef.name -}}
+  {{- with .Values.global.license -}}
+    {{- $_ := set $spec "license" . -}}
+  {{- end -}}
+{{- end -}}
+{{- tpl (deepCopy .Values.vmalert.spec | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec | toYaml) . -}}
 {{- end }}
 
 
@@ -178,7 +189,13 @@ remoteWrite:
 VMAgent spec
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAgentSpec" -}}
-{{ tpl (deepCopy .Values.vmagent.spec | mergeOverwrite ( include "victoria-metrics-k8s-stack.vmAgentRemoteWrite" . | fromYaml) | toYaml) . }}
+{{- $spec := (include "victoria-metrics-k8s-stack.vmAgentRemoteWrite" . | fromYaml) -}}
+{{- if or .Values.global.license.key .Values.global.license.keyRef.name -}}
+  {{- with .Values.global.license -}}
+    {{- $_ := set $spec "license" . -}}
+  {{- end -}}
+{{- end -}}
+{{ tpl (deepCopy .Values.vmagent.spec | mergeOverwrite $spec | toYaml) . }}
 {{- end }}
 
 
@@ -225,11 +242,17 @@ templates:
 Single spec
 */}}
 {{ define "victoria-metrics-k8s-stack.VMSingleSpec" }}
-{{- $extraArgsProxy := default dict -}}
+{{- $extraArgs := default dict -}}
 {{- if .Values.vmalert.enabled }}
-{{- $_ := set $extraArgsProxy "vmalert.proxyURL" (include "vmalertProxyURL" . ) -}}
+  {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vmalertProxyURL" . ) -}}
 {{- end }}
-{{ tpl (deepCopy .Values.vmsingle.spec | mergeOverwrite (dict "extraArgs" $extraArgsProxy) | toYaml) . }}
+{{- $spec := dict "extraArgs" $extraArgs -}}
+{{- if or .Values.global.license.key .Values.global.license.keyRef.name -}}
+  {{- with .Values.global.license -}}
+    {{- $_ := set $spec "license" . -}}
+  {{- end -}}
+{{- end -}}
+{{ tpl (deepCopy .Values.vmsingle.spec | mergeOverwrite $spec | toYaml) . }}
 {{- end }}
 
 
@@ -244,7 +267,13 @@ vmselect:
 
 
 {{ define "victoria-metrics-k8s-stack.VMClusterSpec"}}
-{{ tpl (deepCopy .Values.vmcluster.spec | mergeOverwrite ( include "vmselectSpec" . | fromYaml) | toYaml) . }}
+{{- $spec := (include "vmselectSpec" . | fromYaml) -}}
+{{- if or .Values.global.license.key .Values.global.license.keyRef.name -}}
+  {{- with .Values.global.license -}}
+    {{- $_ := set $spec "license" . -}}
+  {{- end -}}
+{{- end -}}
+{{ tpl (deepCopy .Values.vmcluster.spec | mergeOverwrite $spec | toYaml) . }}
 {{- end }}
 
 {{/*

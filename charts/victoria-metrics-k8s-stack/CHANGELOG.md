@@ -1,5 +1,10 @@
 # CHANGELOG for `victoria-metrics-k8s-stack` helm-chart
 
+## Next release
+
+- fixed vmalert url to alertmanager by including its path prefix
+- added `global.license` configuration
+- fixed extraLabels rendering, See [issue](https://github.com/VictoriaMetrics/helm-charts/issues/1248)
 - Fixed vmalert url to alertmanager by including its path prefix
 - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 

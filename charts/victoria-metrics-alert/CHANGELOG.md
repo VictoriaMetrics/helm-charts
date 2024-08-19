@@ -2,6 +2,9 @@
 
 ## Next release
 
+**Update note**: `vmalert` main container name was changed to `vmalert`, which will recreate a pod.
+**Update note**: `alertmanager` main container name was changed to `alertmanager`, which will recreate a pod.
+
 - Added basicAuth support for ServiceMonitor
 - Removed PodSecurityPolicy
 - Set minimal kubernetes version to 1.25
@@ -9,6 +12,7 @@
 - Added global imagePullSecrets and image.registry
 - Added `.Values.alertmanager.emptyDir` to customize default cache directory
 - Addded alertmanager service `.Values.alertmanager.service.externalTrafficPolicy` and `.Values.alertmanager.service.healthCheckNodePort`
+- Use static container names in a pod
 - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 
 ## 0.9.12

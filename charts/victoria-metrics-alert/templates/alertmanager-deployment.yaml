@@ -33,7 +33,7 @@ spec:
       imagePullSecrets: {{ . }}
       {{- end }}
       containers:
-        - name: {{ template "vmalert.name" . }}-alertmanager
+        - name: alertmanager
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}

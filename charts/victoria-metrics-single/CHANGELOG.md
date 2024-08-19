@@ -2,6 +2,8 @@
 
 ## Next release
 
+**Update note**: main container name was changed to `vmsingle`, which will recreate a pod.
+
 - Added basicAuth support for ServiceMonitor
 - fix inconsistent relabeling `target_label` in default scrape config.
 - Removed PodSecurityPolicy
@@ -16,6 +18,7 @@
 - Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
 - Added global imagePullSecrets and image.registry
 - Merged headless and non-headless services, removed statefulset service specific variables
+- Use static container names in a pod
 - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 
 ## 0.9.26
