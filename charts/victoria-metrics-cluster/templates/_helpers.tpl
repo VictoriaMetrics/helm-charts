@@ -247,8 +247,8 @@ Return if ingress supports pathType.
 {{ toYaml . }}
 {{- end -}}
 {{- if .Values.vmstorage.vmbackupmanager.restore.onStart.enabled }}
-- name: {{ template "victoria-metrics.name" . }}-vmbackupmanager-restore
-  image: "{{ .Values.vmstorage.vmbackupmanager.image.repository }}:{{ default .Chart.AppVersion .Values.vmstorage.vmbackupmanager.image.tag }}{{- with .Values.vmstorage.vmbackupmanager.image.variant }}-{{ . }}{{- end }}"
+- name: vmbackupmanager-restore
+  image: {{ include "vm.image" (merge (deepCopy .) (dict "app" .Values.server.vmbackupmanager)) }}
   imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
   {{- with .Values.vmstorage.podSecurityContext }}
   securityContext:  {{ toYaml . | nindent 4 }}

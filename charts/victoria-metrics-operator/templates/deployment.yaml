@@ -30,7 +30,7 @@ spec:
       imagePullSecrets: {{ . }}
       {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: operator
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.envFrom }}
