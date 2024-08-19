@@ -1,6 +1,6 @@
 # CHANGELOG for `victoria-metrics-k8s-stack` helm-chart
 
-## Next release
+## fixed vmalert url to alertmanager by including its path prefix
 
 - TODO
 
