@@ -13,6 +13,10 @@
 - Added global imagePullSecrets and image.registry
 - Fix templating of Ingress port when using custom port name.
 - Added `.Values.vmselect.emptyDir` and `.Values.vmstorage.emptyDir` to customize default cache directory
+- Merged headless and non-headless services, removed statefulset service specific variables
+- Added `.Values.vmselect.service.healthCheckNodePort` and `.Values.vmselect.service.externalTrafficPolicy`
+- Added `.Values.vmstorage.service.healthCheckNodePort` and `.Values.vmstorage.service.externalTrafficPolicy`
+- Added `.Values.vminsert.service.healthCheckNodePort` and `.Values.vminsert.service.externalTrafficPolicy`
 
 ## 0.11.23
 

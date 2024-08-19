@@ -1,35 +1,34 @@
-{{- if and .Values.service.enabled -}}
+{{- if .Values.service.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-{{- with .Values.service.annotations }}
-  annotations:
-{{ toYaml . | indent 4}}
-{{- end }}
-  labels:
-    {{- include "chart.labels" . | nindent 4 }}
-{{- with .Values.service.extraLabels }}
-{{ toYaml . | indent 4}}
-{{- end }}
+  {{- with .Values.service.annotations }}
+  annotations: {{ toYaml . | nindent 4}}
+  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.service.extraLabels) }}
+  labels: {{ include "chart.labels" $ctx | nindent 4 }}
   name: {{ template "chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
-{{- if .Values.service.clusterIP }}
-  clusterIP: {{ .Values.service.clusterIP }}
-{{- end }}
-{{- if .Values.service.externalIPs }}
-  externalIPs:
-{{ toYaml .Values.service.externalIPs | indent 4 }}
-{{- end }}
-{{- if .Values.service.loadBalancerIP }}
-  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
-{{- end }}
-{{- if .Values.service.loadBalancerSourceRanges }}
-  loadBalancerSourceRanges:
-  {{- range $cidr := .Values.service.loadBalancerSourceRanges }}
-    - {{ $cidr }}
+  {{- with .Values.service.clusterIP }}
+  clusterIP: {{ . }}
   {{- end }}
-{{- end }}
+  {{- with .Values.service.externalIPs }}
+  externalIPs: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- with .Values.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  type: {{ .Values.service.type }}
+  {{- with .Values.service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with .Values.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
   ports:
     - name: http
       port: {{ .Values.service.servicePort }}
@@ -38,55 +37,40 @@ spec:
       {{- with .Values.service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
-{{- if .Values.extraArgs.graphiteListenAddr }}
+    {{- with .Values.extraArgs.graphiteListenAddr }}
     - name: graphite-tcp
       protocol: TCP
-      port: {{ include "split-host-port" .Values.extraArgs.graphiteListenAddr }}
+      port: {{ include "split-host-port" . }}
       targetPort: graphite-tcp
-{{- end }}
-{{- if .Values.extraArgs.graphiteListenAddr }}
     - name: graphite-udp
       protocol: UDP
-      port: {{ include "split-host-port" .Values.extraArgs.graphiteListenAddr }}
+      port: {{ include "split-host-port" . }}
       targetPort: graphite-udp
-{{- end }}
-{{- if .Values.extraArgs.influxListenAddr }}
+    {{- end }}
+    {{- with .Values.extraArgs.influxListenAddr }}
     - name: influx-tcp
       protocol: TCP
-      port: {{ include "split-host-port" .Values.extraArgs.influxListenAddr }}
+      port: {{ include "split-host-port" . }}
       targetPort: influx-tcp
-{{- end }}
-{{- if .Values.extraArgs.influxListenAddr }}
     - name: influx-udp
       protocol: UDP
-      port: {{ include "split-host-port" .Values.extraArgs.influxListenAddr }}
+      port: {{ include "split-host-port" . }}
       targetPort: influx-udp
-{{- end }}
-{{- if .Values.extraArgs.opentsdbHTTPListenAddr }}
+    {{- end }}
+    {{- with .Values.extraArgs.opentsdbHTTPListenAddr }}
     - name: opentsdbhttp
-      port: {{ include "split-host-port" .Values.extraArgs.opentsdbHTTPListenAddr }}
+      port: {{ include "split-host-port" . }}
       targetPort: opentsdbhttp
-{{- end }}
-{{- if .Values.extraArgs.opentsdbListenAddr }}
+    {{- end }}
+    {{- with .Values.extraArgs.opentsdbListenAddr }}
     - name: opentsdb-udp
       protocol: UDP
-      port: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
+      port: {{ include "split-host-port" . }}
       targetPort: opentsdb-udp
-{{- end }}
-{{- if .Values.extraArgs.opentsdbListenAddr }}
     - name: opentsdb-tcp
       protocol: TCP
-      port: {{ include "split-host-port" .Values.extraArgs.opentsdbListenAddr }}
+      port: {{ include "split-host-port" . }}
       targetPort: opentsdb-tcp
-{{- end }}
-
-  selector:
-    {{- include "chart.selectorLabels" . | nindent 4 }}
-  type: "{{ .Values.service.type }}"
-  {{- with .Values.service.healthCheckNodePort }}
-  healthCheckNodePort: {{ . }}
-  {{- end }}
-  {{- with .Values.service.externalTrafficPolicy }}
-  externalTrafficPolicy: {{ . }}
-  {{- end }}
+    {{- end }}
+  selector: {{ include "chart.selectorLabels" . | nindent 4 }}
 {{- end }}

@@ -1,39 +1,42 @@
-{{- if .Values.vmstorage.enabled -}}
+{{- $app := .Values.vmstorage }}
+{{- if $app.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-{{- if .Values.vmstorage.service.annotations }}
-  annotations:
-{{ toYaml .Values.vmstorage.service.annotations | indent 4 }}
-{{- end }}
-  labels:
-    {{- include "victoria-metrics.vmstorage.labels" . | nindent 4 }}
-{{- if .Values.vmstorage.service.labels }}
-{{ toYaml .Values.vmstorage.service.labels | indent 4 }}
-{{- end }}
+  {{- with $app.service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
+  labels: {{ include "victoria-metrics.vmstorage.labels" $ctx | nindent 4 }}
   name: {{ template "victoria-metrics.vmstorage.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
   clusterIP: None
+  type: ClusterIP
+  {{- with $app.service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with $app.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
   ports:
-    - port: {{ .Values.vmstorage.service.servicePort }}
+    - port: {{ $app.service.servicePort }}
       targetPort: http
       protocol: TCP
       name: http
-    - port: {{ .Values.vmstorage.service.vmselectPort }}
+    - port: {{ $app.service.vmselectPort }}
       targetPort: vmselect
       protocol: TCP
       name: vmselect
-    - port: {{ .Values.vmstorage.service.vminsertPort }}
+    - port: {{ $app.service.vminsertPort }}
       targetPort: vminsert
       protocol: TCP
       name: vminsert
-  {{- range .Values.vmstorage.service.extraPorts }}
+    {{- range $app.service.extraPorts }}
     - name: {{ .name }}
       port: {{ .port }}
       protocol: TCP
       targetPort: {{ .targetPort }}
-  {{- end }}
-  selector:
-    {{- include "victoria-metrics.vmstorage.matchLabels" . | nindent 4 }}
+    {{- end }}
+  selector: {{ include "victoria-metrics.vmstorage.matchLabels" . | nindent 4 }}
 {{- end -}}

@@ -211,8 +211,8 @@ server:
     # nodePort: 30000
     type: ClusterIP
     # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
-    # externalTrafficPolicy: "local"
-    # healthCheckNodePort: 0
+    externalTrafficPolicy: ""
+    healthCheckNodePort: ""
 
   ingress:
     enabled: false
@@ -393,10 +393,20 @@ alertmanager:
   #  alertmanager.tmpl: |-
   service:
     annotations: {}
+    labels: {}
+    clusterIP: ""
     type: ClusterIP
     port: 9093
-    # if you want to force a specific nodePort. Must be use with service.type=NodePort
-    # nodePort:
+    # -- if you want to force a specific nodePort. Must be use with service.type=NodePort
+    nodePort: ""
+    # -- Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+    externalIPs: []
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    servicePort: 8880
+    # -- Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    externalTrafficPolicy: ""
+    healthCheckNodePort: ""
   ingress:
     enabled: false
     annotations: {}

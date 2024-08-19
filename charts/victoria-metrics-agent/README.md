@@ -358,7 +358,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | service.clusterIP | string | `""` |  |
 | service.enabled | bool | `false` |  |
 | service.externalIPs | list | `[]` |  |
+| service.externalTrafficPolicy | string | `""` |  |
 | service.extraLabels | object | `{}` |  |
+| service.healthCheckNodePort | string | `""` |  |
 | service.loadBalancerIP | string | `""` |  |
 | service.loadBalancerSourceRanges | list | `[]` |  |
 | service.servicePort | int | `8429` |  |
