@@ -3,6 +3,7 @@
 ## Next release
 
 - Added global imagePullSecrets and image.registry
+- updated operator service scrape config
 
 ## 0.34.0
 
