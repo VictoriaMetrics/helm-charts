@@ -4,7 +4,8 @@
 
 - fixed vmalert url to alertmanager by including its path prefix
 - added `global.license` configuration
-- fixed extraLabels rendering, See [issue](https://github.com/VictoriaMetrics/helm-charts/issues/1248)
+- fixed extraLabels rendering. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1248)
+- fixed kubedns servicemonitor template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1255)
 
 ## 0.25.0
 
