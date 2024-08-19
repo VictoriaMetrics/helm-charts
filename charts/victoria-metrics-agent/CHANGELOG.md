@@ -8,6 +8,7 @@
 - Added params to configure probes `.Values.probe.readiness`, `.Values.probe.liveness` and `.Values.probe.startup`
 - Added global imagePullSecrets and image.registry
 - Added `.Values.emptyDir` to customize default cache directory
+- Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 
 ## 0.10.14
 

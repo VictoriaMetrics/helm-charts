@@ -1,81 +1,47 @@
-{{ if and .Values.vmagent.enabled .Values.vmagent.ingress.enabled -}}
-{{- $servicePort := 8429 -}}
-{{- $ingressPath := .Values.vmagent.ingress.path -}}
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $app := .Values.vmagent }}
+{{- if and $app.enabled $app.ingress.enabled -}}
 {{- $serviceName := printf "%s-%s" "vmagent" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
-{{- $ingressPathType := .Values.vmagent.ingress.pathType | default "" -}}
-{{- $extraPaths := .Values.vmagent.ingress.extraPaths -}}
-{{- $newAPI := .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
-{{- if $newAPI -}}
+{{- $servicePort := $app.spec.port | default 8429 }}
 apiVersion: networking.k8s.io/v1
-{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
-apiVersion: networking.k8s.io/v1beta1
-{{- else }}
-apiVersion: extensions/v1beta1
-{{- end }}
 kind: Ingress
 metadata:
-  name: {{ .Values.vmagent.name | default $serviceName }}
+  name: {{ $app.name | default $serviceName }}
   namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-vmagent
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
-{{- if .Values.vmagent.ingress.labels }}
-{{ toYaml .Values.vmagent.ingress.labels | indent 4 }}
-{{- end }}
-  {{- if .Values.vmagent.ingress.annotations }}
-  annotations:
-    {{- range $key, $value := .Values.vmagent.ingress.annotations }}
-    {{ $key }}: {{ tpl $value $ | quote }}
-    {{- end }}
+  {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-vmagent" (include "victoria-metrics-k8s-stack.name" .)) }}
+  {{- $ctx := merge (deepCopy $global) ("extraLabels" (merge $extraLabels $app.ingress.labels)) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
+  {{- with $app.ingress.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.vmagent.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.vmagent.ingress.ingressClassName }}
-  {{- end -}}
-{{- if .Values.vmagent.ingress.tls }}
-  tls:
-{{ tpl (toYaml .Values.vmagent.ingress.tls) $ | indent 4 }}
-{{- end }}
-  rules:
-  {{- if .Values.vmagent.ingress.hosts  }}
-  {{- range .Values.vmagent.ingress.hosts }}
-    - host: {{ tpl . $}}
-      http:
-        paths:
-{{- if $extraPaths }}
-{{ toYaml $extraPaths | indent 10 }}
-{{- end }}
-          - path: {{ $ingressPath }}
-            {{- if $newAPI }}
-            pathType: {{ $ingressPathType }}
-            {{- end }}
-            backend:
-              {{- if $newAPI }}
-              service:
-                name: {{ $serviceName }}
-                port:
-                  number: {{ $servicePort }}
-              {{- else }}
-              serviceName: {{ $serviceName }}
-              servicePort: {{ $servicePort }}
-              {{- end }}
+  {{- with $app.ingress.ingressClassName }}
+  ingressClassName: {{ . }}
   {{- end }}
-  {{- else }}
+  {{- with $app.ingress.tls }}
+  tls: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- $hosts := $app.ingress.hosts | default (list "") }}
+    {{- range $hosts }}
     - http:
         paths:
+         {{- with $app.ingress.extraPaths }}
+         {{- toYaml  | nindent 10 }}
+         {{- end }}
           - backend:
-              {{- if $newAPI }}
               service:
                 name: {{ $serviceName }}
                 port:
                   number: {{ $servicePort }}
-            pathType: {{ $ingressPathType }}
-              {{- else }}
-              serviceName: {{ $serviceName }}
-              servicePort: {{ $servicePort }}
-              {{- end }}
-          {{- if $ingressPath }}
-            path: {{ $ingressPath }}
+            {{- with $app.ingress.path }}
+            path: {{ . }}
             {{- end }}
-  {{- end -}}
+            {{- with $app.ingress.pathType }}
+            pathType: {{ . }}
+            {{- end }}
+      {{- with . }}
+      host: {{ tpl . $ }}
+      {{- end }}
+    {{- end }}
 {{- end }}

@@ -1,8 +1,7 @@
 # CHANGELOG for `victoria-metrics-k8s-stack` helm-chart
 
-## fixed vmalert url to alertmanager by including its path prefix
-
-- TODO
+- Fixed vmalert url to alertmanager by including its path prefix
+- Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 
 ## 0.25.0
 

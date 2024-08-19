@@ -16,6 +16,7 @@
 - Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
 - Added global imagePullSecrets and image.registry
 - Merged headless and non-headless services, removed statefulset service specific variables
+- Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 
 ## 0.9.26
 

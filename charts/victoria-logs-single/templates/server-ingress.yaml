@@ -1,50 +1,36 @@
-{{- if and .Values.server.enabled .Values.server.ingress.enabled  }}
-{{- $ingressApiIsStable := eq (include "victoria-logs.ingress.isStable" .) "true" -}}
-{{- $ingressSupportsIngressClassName := eq (include "victoria-logs.ingress.supportsIngressClassName" .) "true" -}}
-{{- $ingressSupportsPathType := eq (include "victoria-logs.ingress.supportsPathType" .) "true" -}}
-{{- $servicePort := .Values.server.service.servicePort -}}
-{{- $ingressPathType := .Values.server.ingress.pathType -}}
-apiVersion: {{ include "victoria-logs.ingress.apiVersion" . }}
+{{- $app := .Values.server }}
+{{- if and $app.enabled $app.ingress.enabled  }}
+{{- $serviceName := include "victoria-logs.server.fullname" . }}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-{{- if .Values.server.ingress.annotations }}
-  annotations:
-{{ toYaml .Values.server.ingress.annotations | indent 4 }}
-{{- end }}
-  labels:
-  {{- include "victoria-logs.server.labels" . | nindent 4 }}
-  {{ if .Values.server.ingress.extraLabels }}
-{{ toYaml .Values.server.ingress.extraLabels | indent 4 }}
-  {{ end }}
-  name: {{ template "victoria-logs.server.fullname" . }}
+  {{- with $app.ingress.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.ingress.extraLabels) }}
+  labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
+  name: {{ $serviceName }}
   namespace: {{ .Release.Namespace }}
 spec:
-  {{- if and $ingressSupportsIngressClassName .Values.server.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.server.ingress.ingressClassName }}
+  {{- with $app.ingress.ingressClassName }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with $app.ingress.tls }}
+  tls: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   rules:
-  {{- $serviceName := include "victoria-logs.server.fullname" . }}
-  {{- range .Values.server.ingress.hosts }}
-  - host: {{ .name }}
-    http:
-      paths:
-        - path: {{ .path }}
-          {{- if $ingressSupportsPathType }}
-          pathType: {{ $ingressPathType }}
-          {{- end }}
-          backend:
-            {{- if $ingressApiIsStable }}
-            service:
-              name: {{ $serviceName }}
-              port:
-                number: {{ $servicePort }}
-            {{- else }}
-            serviceName: {{ $serviceName }}
-            servicePort: {{ .port | default "http"}}
+    {{- range $app.ingress.hosts }}
+    - host: {{ tpl .name $ }}
+      http:
+        paths:
+          - path: {{ .path }}
+            {{- with $app.ingress.pathType }}
+            pathType: {{ . }}
             {{- end }}
-    {{- end -}}
-{{- if .Values.server.ingress.tls }}
-  tls:
-{{ toYaml .Values.server.ingress.tls | indent 4 }}
-{{- end -}}
-{{- end -}}
+            backend:
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ .port | default $app.service.servicePort }}
+    {{- end }}
+{{- end }}

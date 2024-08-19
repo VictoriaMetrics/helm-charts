@@ -8,6 +8,7 @@
 - Removed support for policy/v1beta1/PodDisruptionBudget
 - Added params to configure probes `.Values.probe.readiness`, `.Values.probe.liveness` and `.Values.probe.startup`
 - Added global imagePullSecrets and image.registry
+- Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 
 ## 0.4.14
 

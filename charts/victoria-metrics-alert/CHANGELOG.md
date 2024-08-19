@@ -9,6 +9,7 @@
 - Added global imagePullSecrets and image.registry
 - Added `.Values.alertmanager.emptyDir` to customize default cache directory
 - Addded alertmanager service `.Values.alertmanager.service.externalTrafficPolicy` and `.Values.alertmanager.service.healthCheckNodePort`
+- Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 
 ## 0.9.12
 
