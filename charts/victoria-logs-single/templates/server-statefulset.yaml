@@ -38,7 +38,7 @@ spec:
       imagePullSecrets: {{ . }}
       {{- end }}
       containers:
-        - name: {{ template "victoria-logs.name" . }}-{{ .Values.global.victoriaLogs.server.name }}
+        - name: vlogs
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}

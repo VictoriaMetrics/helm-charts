@@ -212,6 +212,8 @@ vmselect:
     targetPort: http
     # -- Service type
     type: ClusterIP
+    healthCheckNodePort: ""
+    externalTrafficPolicy: ""
   ingress:
     # -- Enable deployment of ingress for vmselect component
     enabled: false
@@ -241,14 +243,6 @@ vmselect:
     enabled: false
     # -- Deploy order policy for StatefulSet pods
     podManagementPolicy: OrderedReady
-    ## Headless service for statefulset
-    service:
-      # -- Headless service annotations
-      annotations: {}
-      # -- Headless service labels
-      labels: {}
-      # -- Headless service port
-      servicePort: 8481
   emptyDir: {}
   persistentVolume:
     # -- Create/use Persistent Volume Claim for vmselect component. Empty dir if false. If true, vmselect will create/use a Persistent Volume Claim
@@ -462,6 +456,8 @@ vminsert:
     # -- Enable UDP port. used if you have "spec.opentsdbListenAddr" specified
     # -- Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
     udp: false
+    healthCheckNodePort: ""
+    externalTrafficPolicy: ""
   ingress:
     # -- Enable deployment of ingress for vminsert component
     enabled: false
@@ -691,6 +687,8 @@ vmstorage:
     vmselectPort: 8401
     # -- Extra service ports
     extraPorts: []
+    healthCheckNodePort: ""
+    externalTrafficPolicy: ""
   # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60
   probe:

@@ -1,21 +1,40 @@
-{{- if .Values.alertmanager.enabled -}}
+{{- $app := .Values.alertmanager }}
+{{- if $app.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
   namespace: {{ .Release.Namespace }}
-  {{- with .Values.alertmanager.service.annotations }}
+  {{- with $app.service.annotations }}
   annotations:
   {{- toYaml . | nindent 4 }}
   {{- end }}
-  labels:
-    {{- include "vmalert.alertmanager.labels" . | nindent 4 }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
+  labels: {{ include "vmalert.alertmanager.labels" $ctx | nindent 4 }}
   name: {{ template "vmalert.alertmanager.fullname" . }}
 spec:
+  {{- with $app.service.clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
+  {{- with $app.service.externalIPs }}
+  externalIPs: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $app.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- with $app.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  type: {{ $app.service.type }}
+  {{- with $app.service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with $app.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
   ports:
     - name: web
       port: 9093
       targetPort: web
       protocol: TCP
-  selector:
-    {{- include "vmalert.alertmanager.matchLabels" . | nindent 4 }}
+  selector: {{ include "vmalert.alertmanager.matchLabels" . | nindent 4 }}
 {{- end }}

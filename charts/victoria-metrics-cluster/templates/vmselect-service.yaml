@@ -1,53 +1,55 @@
-{{- if and .Values.vmselect.enabled (not .Values.vmselect.statefulSet.enabled) -}}
+{{- $app := .Values.vmselect }}
+{{- if $app.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-{{- if .Values.vmselect.service.annotations }}
-  annotations:
-{{ toYaml .Values.vmselect.service.annotations | indent 4}}
-{{- end }}
-  labels:
-    {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
-{{- if .Values.vmselect.service.labels }}
-{{ toYaml .Values.vmselect.service.labels | indent 4}}
-{{- end }}
+  {{- with $app.service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
+  labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
   name: {{ template "victoria-metrics.vmselect.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
-{{- if .Values.vmselect.service.clusterIP }}
-  clusterIP: {{ .Values.vmselect.service.clusterIP }}
-{{- end }}
-{{- if .Values.vmselect.service.externalIPs }}
-  externalIPs:
-{{ toYaml .Values.vmselect.service.externalIPs | indent 4 }}
-{{- end }}
-{{- if .Values.vmselect.service.loadBalancerIP }}
-  loadBalancerIP: {{ .Values.vmselect.service.loadBalancerIP }}
-{{- end }}
-{{- if .Values.vmselect.service.loadBalancerSourceRanges }}
-  loadBalancerSourceRanges:
-  {{- range $cidr := .Values.vmselect.service.loadBalancerSourceRanges }}
-    - {{ $cidr }}
+  {{- $clusterIP := ternary "None" $app.service.clusterIP $app.statefulSet.enabled }}
+  {{- with $clusterIP }}
+  clusterIP: {{ . }}
   {{- end }}
-{{- end }}
+  {{- $externalIPs := ternary (default list) $app.service.externalIPs $app.statefulSet.enabled }}
+  {{- with $externalIPs }}
+  externalIPs: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $loadBalancerIP := ternary "" $app.service.loadBalancerIP $app.statefulSet.enabled }}
+  {{- with $loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- $loadBalancerSourceRanges := ternary (default list) $app.service.loadBalancerSourceRanges $app.statefulSet.enabled }}
+  {{- with $loadBalancerSourceRanges }}
+  loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  type: {{ ternary "ClusterIP" $app.service.type $app.statefulSet.enabled }}
+  {{- with $app.service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with $app.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
   ports:
     - name: http
-      port: {{ .Values.vmselect.service.servicePort }}
+      port: {{ $app.service.servicePort }}
       protocol: TCP
-      targetPort: {{ .Values.vmselect.service.targetPort }}
-  {{- range .Values.vmselect.service.extraPorts }}
+      targetPort: {{ $app.service.targetPort }}
+    {{- range $app.service.extraPorts }}
     - name: {{ .name }}
       port: {{ .port }}
       protocol: TCP
       targetPort: {{ .targetPort }}
-  {{- end }}
-  {{- if .Values.vmselect.extraArgs.clusternativeListenAddr }}
+    {{- end }}
+    {{- with $app.extraArgs.clusternativeListenAddr }}
     - name: cluster-tcp
       protocol: TCP
-      port: {{ include "split-host-port" .Values.vmselect.extraArgs.clusternativeListenAddr }}
+      port: {{ include "split-host-port" . }}
       targetPort: cluster-tcp
-  {{- end }}
-  selector:
-    {{- include "victoria-metrics.vmselect.matchLabels" . | nindent 4 }}
-  type: "{{ .Values.vmselect.service.type }}"
+    {{- end }}
+  selector: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 4 }}
 {{- end }}
