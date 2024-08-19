@@ -191,6 +191,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.service.annotations | object | `{}` | Service annotations |
 | server.service.clusterIP | string | `""` | Service ClusterIP |
 | server.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
+| server.service.externalTrafficPolicy | string | `""` |  |
+| server.service.healthCheckNodePort | string | `""` |  |
 | server.service.labels | object | `{}` | Service labels |
 | server.service.loadBalancerIP | string | `""` | Service load balacner IP |
 | server.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
@@ -204,9 +206,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | server.statefulSet.enabled | bool | `true` | Creates statefulset instead of deployment, useful when you want to keep the cache |
 | server.statefulSet.podManagementPolicy | string | `"OrderedReady"` | Deploy order policy for StatefulSet pods |
-| server.statefulSet.service.annotations | object | `{}` | Headless service annotations |
-| server.statefulSet.service.labels | object | `{}` | Headless service labels |
-| server.statefulSet.service.servicePort | int | `8428` | Headless service port |
 | server.terminationGracePeriodSeconds | int | `60` | Pod's termination grace period in seconds |
 | server.tolerations | list | `[]` | Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | server.vmbackupmanager.destination | string | `""` | backup destination at S3, GCS or local filesystem. Release name will be included to path! |

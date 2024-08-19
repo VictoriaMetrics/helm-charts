@@ -179,7 +179,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.service.annotations | object | `{}` | Service annotations |
 | vminsert.service.clusterIP | string | `""` | Service ClusterIP |
 | vminsert.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
+| vminsert.service.externalTrafficPolicy | string | `""` |  |
 | vminsert.service.extraPorts | list | `[]` | Extra service ports |
+| vminsert.service.healthCheckNodePort | string | `""` |  |
 | vminsert.service.labels | object | `{}` | Service labels |
 | vminsert.service.loadBalancerIP | string | `""` | Service load balancer IP |
 | vminsert.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
@@ -267,7 +269,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.service.annotations | object | `{}` | Service annotations |
 | vmselect.service.clusterIP | string | `""` | Service ClusterIP |
 | vmselect.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips](https://kubernetes.io/docs/user-guide/services/#external-ips) |
+| vmselect.service.externalTrafficPolicy | string | `""` |  |
 | vmselect.service.extraPorts | list | `[]` | Extra service ports |
+| vmselect.service.healthCheckNodePort | string | `""` |  |
 | vmselect.service.labels | object | `{}` | Service labels |
 | vmselect.service.loadBalancerIP | string | `""` | Service load balacner IP |
 | vmselect.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
@@ -283,9 +287,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
 | vmselect.statefulSet.enabled | bool | `false` | Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data. |
 | vmselect.statefulSet.podManagementPolicy | string | `"OrderedReady"` | Deploy order policy for StatefulSet pods |
-| vmselect.statefulSet.service.annotations | object | `{}` | Headless service annotations |
-| vmselect.statefulSet.service.labels | object | `{}` | Headless service labels |
-| vmselect.statefulSet.service.servicePort | int | `8481` | Headless service port |
 | vmselect.strategy | object | `{}` |  |
 | vmselect.suppressStorageFQDNsRender | bool | `false` | Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs |
 | vmselect.tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
@@ -350,7 +351,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.retentionPeriod | int | `1` | Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month |
 | vmstorage.securityContext | object | `{"enabled":false}` | Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | vmstorage.service.annotations | object | `{}` | Service annotations |
+| vmstorage.service.externalTrafficPolicy | string | `""` |  |
 | vmstorage.service.extraPorts | list | `[]` | Extra service ports |
+| vmstorage.service.healthCheckNodePort | string | `""` |  |
 | vmstorage.service.labels | object | `{}` | Service labels |
 | vmstorage.service.servicePort | int | `8482` | Service port |
 | vmstorage.service.vminsertPort | int | `8400` | Port for accepting connections from vminsert |
