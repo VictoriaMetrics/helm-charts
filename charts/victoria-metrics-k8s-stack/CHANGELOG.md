@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed extraLabels rendering, See [issue](https://github.com/VictoriaMetrics/helm-charts/issues/1248)
 
 ## 0.25.0
 

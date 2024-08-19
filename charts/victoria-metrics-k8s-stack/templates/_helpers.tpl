@@ -84,6 +84,9 @@ Selector labels
 {{- define "victoria-metrics-k8s-stack.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "victoria-metrics-k8s-stack.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .extraLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end }}
 
 
