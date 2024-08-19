@@ -199,6 +199,15 @@ Change the values according to the need of the environment in ``victoria-metrics
 | replicaCount | int | `1` |  |
 | resources | object | `{}` | Resource object |
 | securityContext | object | `{}` |  |
+| service.annotations | object | `{}` |  |
+| service.clusterIP | string | `""` |  |
+| service.externalIPs | string | `""` |  |
+| service.externalTrafficPolicy | string | `""` |  |
+| service.healthCheckNodePort | string | `""` |  |
+| service.labels | object | `{}` |  |
+| service.loadBalancerIP | string | `""` |  |
+| service.loadBalancerSourceRanges | list | `[]` |  |
+| service.type | string | `"ClusterIP"` |  |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | serviceMonitor | object | `{"annotations":{},"enabled":false,"extraLabels":{},"relabelings":[]}` | configures monitoring with serviceScrape. VMServiceScrape must be pre-installed |
