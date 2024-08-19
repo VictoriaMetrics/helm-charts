@@ -398,6 +398,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | externalVM.write.url | string | `""` |  |
 | extraObjects | list | `[]` | Add extra objects dynamically to this chart |
 | fullnameOverride | string | `""` |  |
+| global.license.key | string | `""` |  |
+| global.license.keyRef | object | `{}` |  |
 | grafana.additionalDataSources | list | `[]` |  |
 | grafana.dashboardProviders."dashboardproviders.yaml".apiVersion | int | `1` |  |
 | grafana.dashboardProviders."dashboardproviders.yaml".providers[0].disableDeletion | bool | `false` |  |
