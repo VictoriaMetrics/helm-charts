@@ -146,13 +146,13 @@ Return if ingress supports pathType.
 {{ toYaml . }}
 {{- end -}}
 {{- if .Values.server.vmbackupmanager.restore.onStart.enabled }}
-- name: {{ template "victoria-metrics.name" . }}-vmbackupmanager-restore
-  image: "{{ .Values.server.vmbackupmanager.image.repository }}:{{ .Values.server.vmbackupmanager.image.tag }}"
+- name: vmbackupmanager-restore
+  image: {{ include "vm.image" (merge (deepCopy .) (dict "app" .Values.server.vmbackupmanager)) }}
   imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
   args:
     - restore
-    - {{ printf "%s=%t" "--eula" .Values.server.vmbackupmanager.eula | quote}}
-    - {{ printf "%s=%s" "--storageDataPath" .Values.server.persistentVolume.mountPath | quote}}
+    - --eula={{ .Values.server.vmbackupmanager.eula }}
+    - --storageDataPath={{ .Values.server.persistentVolume.mountPath }}
     {{- range $key, $value := .Values.server.vmbackupmanager.extraArgs }}
     - --{{ $key }}={{ $value }}
     {{- end }}
