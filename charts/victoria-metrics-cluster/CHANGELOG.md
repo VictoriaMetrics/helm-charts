@@ -2,6 +2,10 @@
 
 ## Next release
 
+**Update note**: `vmselect` main container name was changed to `vmselect`, which will recreate a pod.
+**Update note**: `vmstorage` main container name was changed to `vmstorage`, which will recreate a pod.
+**Update note**: `vminsert` main container name was changed to `vminsert`, which will recreate a pod.
+
 - Added basicAuth support for ServiceMonitor
 - Removed PodSecurityPolicy
 - Set minimal kubernetes version to 1.25
@@ -17,6 +21,7 @@
 - Added `.Values.vmselect.service.healthCheckNodePort` and `.Values.vmselect.service.externalTrafficPolicy`
 - Added `.Values.vmstorage.service.healthCheckNodePort` and `.Values.vmstorage.service.externalTrafficPolicy`
 - Added `.Values.vminsert.service.healthCheckNodePort` and `.Values.vminsert.service.externalTrafficPolicy`
+- Use static container names in a pod
 
 ## 0.11.23
 

@@ -2,7 +2,10 @@
 
 ## Next release
 
+**Update note**: main container name was changed to `operator`, which will recreate a pod.
+
 - Added global imagePullSecrets and image.registry
+- Use static container names in a pod
 
 ## 0.34.0
 
