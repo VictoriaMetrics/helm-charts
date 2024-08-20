@@ -2,8 +2,8 @@
 
 ## Next release
 
-- Set minimal kubernetes version to 1.25
-- Added global imagePullSecrets and image.registry
+- Set minimal kubernetes version to `1.25`
+- Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
 
 ## 1.4.1
 

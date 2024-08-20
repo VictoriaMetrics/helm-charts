@@ -3,18 +3,20 @@
 ## Next release
 
 **Update note**: `vmselect` main container name was changed to `vmselect`, which will recreate a pod.
+
 **Update note**: `vmstorage` main container name was changed to `vmstorage`, which will recreate a pod.
+
 **Update note**: `vminsert` main container name was changed to `vminsert`, which will recreate a pod.
 
-- Added basicAuth support for ServiceMonitor
-- Removed PodSecurityPolicy
-- Set minimal kubernetes version to 1.25
-- Removed support for policy/v1beta1/PodDisruptionBudget
+- Added `basicAuth` support for `ServiceMonitor`
+- Removed `PodSecurityPolicy`
+- Set minimal kubernetes version to `1.25`
+- Removed support for `policy/v1beta1/PodDisruptionBudget`
 - Added ability to override liveness and readiness probes
 - Updated `.Values.vmbackupmanager.readinessProbe` to `.Values.vmbackupmanager.probe.readiness`
 - Updated `.Values.vmbackupmanager.livenessProbe` to `.Values.vmbackupmanager.probe.liveness`
 - Updated `.Values.vmbackupmanager.startupProbe` to `.Values.vmbackupmanager.probe.startup`
-- Added global imagePullSecrets and image.registry
+- Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
 - Fix templating of Ingress port when using custom port name.
 - Added `.Values.vmselect.emptyDir` and `.Values.vmstorage.emptyDir` to customize default cache directory
 - Merged headless and non-headless services, removed statefulset service specific variables
