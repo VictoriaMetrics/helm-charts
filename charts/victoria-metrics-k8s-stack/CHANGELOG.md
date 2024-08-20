@@ -2,10 +2,12 @@
 
 ## Next release
 
-- fixed vmalert url to alertmanager by including its path prefix
-- added `global.license` configuration
-- fixed extraLabels rendering. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1248)
-- fixed kubedns servicemonitor template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1255)
+- Fixed vmalert url to alertmanager by including its path prefix
+- Added `global.license` configuration
+- Fixed extraLabels rendering. See [this issue](https://github.com/VictoriaMetrics/helm
+- Fixed vmalert url to alertmanager by including its path prefix
+- Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+- Fixed kubedns servicemonitor template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1255)
 
 ## 0.25.0
 

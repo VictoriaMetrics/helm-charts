@@ -1,81 +1,47 @@
-{{ if and .Values.vmsingle.enabled .Values.vmsingle.ingress.enabled -}}
-{{- $servicePort := 8429 -}}
-{{- $ingressPath := .Values.vmsingle.ingress.path -}}
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $app := .Values.vmsingle }}
+{{ if and $app.enabled $app.ingress.enabled -}}
 {{- $serviceName := printf "%s-%s" "vmsingle" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
-{{- $ingressPathType := .Values.vmsingle.ingress.pathType | default "" -}}
-{{- $extraPaths := .Values.vmsingle.ingress.extraPaths -}}
-{{- $newAPI := .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
-{{- if $newAPI -}}
+{{- $servicePort := $app.spec.port | default 8429 -}}
 apiVersion: networking.k8s.io/v1
-{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
-apiVersion: networking.k8s.io/v1beta1
-{{- else }}
-apiVersion: extensions/v1beta1
-{{- end }}
 kind: Ingress
 metadata:
-  name: {{ .Values.vmsingle.name | default $serviceName }}
+  name: {{ $app.name | default $serviceName }}
   namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-vmsingle
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
-{{- if .Values.vmsingle.ingress.labels }}
-{{ toYaml .Values.vmsingle.ingress.labels | indent 4 }}
-{{- end }}
-  {{- if .Values.vmsingle.ingress.annotations }}
-  annotations:
-    {{- range $key, $value := .Values.vmsingle.ingress.annotations }}
-    {{ $key }}: {{ tpl $value $ | quote }}
-    {{- end }}
+  {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-vmsingle" (include "victoria-metrics-k8s-stack.name" .)) }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" (merge $extraLabels $app.ingress.labels)) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
+  {{- with $app.ingress.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.vmsingle.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.vmsingle.ingress.ingressClassName }}
-  {{- end -}}
-{{- if .Values.vmsingle.ingress.tls }}
-  tls:
-{{ tpl (toYaml .Values.vmsingle.ingress.tls) $ | indent 4 }}
-{{- end }}
-  rules:
-  {{- if .Values.vmsingle.ingress.hosts  }}
-  {{- range .Values.vmsingle.ingress.hosts }}
-    - host: {{ tpl . $}}
-      http:
-        paths:
-{{- if $extraPaths }}
-{{ toYaml $extraPaths | indent 10 }}
-{{- end }}
-          - path: {{ $ingressPath }}
-            {{- if $newAPI }}
-            pathType: {{ $ingressPathType }}
-            {{- end }}
-            backend:
-              {{- if $newAPI }}
-              service:
-                name: {{ $serviceName }}
-                port:
-                  number: {{ $servicePort }}
-              {{- else }}
-              serviceName: {{ $serviceName }}
-              servicePort: {{ $servicePort }}
-              {{- end }}
+  {{- with $app.ingress.ingressClassName }}
+  ingressClassName: {{ . }}
   {{- end }}
-  {{- else }}
-    - http:
+  {{- with $app.ingress.tls }}
+  tls: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- $hosts := $app.ingress.hosts | default (list "") }}
+    {{- range $hosts }}
+    - http:       
         paths:
+         {{- with $app.ingress.extraPaths }}
+         {{- toYaml  | nindent 10 }}
+         {{- end }}
           - backend:
-              {{- if $newAPI }}
               service:
                 name: {{ $serviceName }}
                 port:
                   number: {{ $servicePort }}
-            pathType: {{ $ingressPathType }}
-              {{- else }}
-              serviceName: {{ $serviceName }}
-              servicePort: {{ $servicePort }}
-              {{- end }}
-          {{- if $ingressPath }}
-            path: {{ $ingressPath }}
+            {{- with $app.ingress.path }}
+            path: {{ . }}
             {{- end }}
-  {{- end -}}
+            {{- with $app.ingress.pathType }}
+            pathType: {{ . }}
+            {{- end }}
+      {{- with . }}
+      host: {{ tpl . $ }}
+      {{- end }}
+    {{- end }}
 {{- end }}

@@ -88,40 +88,6 @@ and .Chart.Name will be "fluent-bit" in sub-chart context.
 {{- printf "%s" $hp._1 -}}
 {{- end -}}
 
-{{/*
-Return the appropriate apiVersion for ingress.
-*/}}
-{{- define "victoria-logs.ingress.apiVersion" -}}
-  {{- if and (.Capabilities.APIVersions.Has "networking.k8s.io/v1") -}}
-      {{- print "networking.k8s.io/v1" -}}
-  {{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" -}}
-    {{- print "networking.k8s.io/v1beta1" -}}
-  {{- else -}}
-    {{- print "extensions/v1beta1" -}}
-  {{- end -}}
-{{- end -}}
-
-{{/*
-Return if ingress is stable.
-*/}}
-{{- define "victoria-logs.ingress.isStable" -}}
-  {{- eq (include "victoria-logs.ingress.apiVersion" .) "networking.k8s.io/v1" -}}
-{{- end -}}
-
-{{/*
-Return if ingress supports ingressClassName.
-*/}}
-{{- define "victoria-logs.ingress.supportsIngressClassName" -}}
-  {{- or (eq (include "victoria-logs.ingress.isStable" .) "true") (and (eq (include "victoria-logs.ingress.apiVersion" .) "networking.k8s.io/v1beta1")) -}}
-{{- end -}}
-
-{{/*
-Return if ingress supports pathType.
-*/}}
-{{- define "victoria-logs.ingress.supportsPathType" -}}
-  {{- or (eq (include "victoria-logs.ingress.isStable" .) "true") (and (eq (include "victoria-logs.ingress.apiVersion" .) "networking.k8s.io/v1beta1")) -}}
-{{- end -}}
-
 {{- define "victoria-logs.hasInitContainer" -}}
     {{- (gt (len .Values.server.initContainers) 0) -}}
 {{- end -}}
