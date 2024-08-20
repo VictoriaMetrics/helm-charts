@@ -20,6 +20,11 @@ spec:
   {{- end }}
   rules:
     {{- range $app.ingress.hosts }}
+    {{- $port := dict "name" "web" }}
+    {{- with .port }}
+    {{- $numberTypes := list "int" "float64" }}
+    {{- $port = dict (ternary "number" "name" (has (kindOf .) $numberTypes)) . }}
+    {{- end }}
     - host: {{ tpl .name $ }}
       http:
         paths:
@@ -30,7 +35,6 @@ spec:
             backend:
               service:
                 name: {{ $serviceName }}
-                port:
-                  number: {{ .port | default $app.service.servicePort }}
+                port: {{ toYaml $port | nindent 18 }}
     {{- end }}
 {{- end }}
