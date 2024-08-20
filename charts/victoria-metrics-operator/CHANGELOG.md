@@ -6,6 +6,7 @@
 
 - Added global imagePullSecrets and image.registry
 - Use static container names in a pod
+- updated operator service scrape config
 
 ## 0.34.0
 
