@@ -30,7 +30,6 @@ spec:
             backend:
               service:
                 name: {{ $serviceName }}
-                port:
-                  number: {{ .port | default $app.service.servicePort }}
+                port: {{ include "vm.ingress.port" . | nindent 18 }}
     {{- end }}
 {{- end }}
