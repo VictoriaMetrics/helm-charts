@@ -22,6 +22,7 @@
 - Added `.Values.vmstorage.service.healthCheckNodePort` and `.Values.vmstorage.service.externalTrafficPolicy`
 - Added `.Values.vminsert.service.healthCheckNodePort` and `.Values.vminsert.service.externalTrafficPolicy`
 - Use static container names in a pod
+- Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 
 ## 0.11.23
 

@@ -82,40 +82,6 @@ Defines the name of configuration map
 {{- end -}}
 
 {{/*
-Return the appropriate apiVersion for ingress.
-*/}}
-{{- define "vmagent.ingress.apiVersion" -}}
-  {{- if and (.Capabilities.APIVersions.Has "networking.k8s.io/v1") -}}
-      {{- print "networking.k8s.io/v1" -}}
-  {{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" -}}
-    {{- print "networking.k8s.io/v1beta1" -}}
-  {{- else -}}
-    {{- print "extensions/v1beta1" -}}
-  {{- end -}}
-{{- end -}}
-
-{{/*
-Return if ingress is stable.
-*/}}
-{{- define "vmagent.ingress.isStable" -}}
-  {{- eq (include "vmagent.ingress.apiVersion" .) "networking.k8s.io/v1" -}}
-{{- end -}}
-
-{{/*
-Return if ingress supports ingressClassName.
-*/}}
-{{- define "vmagent.ingress.supportsIngressClassName" -}}
-  {{- or (eq (include "vmagent.ingress.isStable" .) "true") (and (eq (include "vmagent.ingress.apiVersion" .) "networking.k8s.io/v1beta1")) -}}
-{{- end -}}
-
-{{/*
-Return if ingress supports pathType.
-*/}}
-{{- define "vmagent.ingress.supportsPathType" -}}
-  {{- or (eq (include "vmagent.ingress.isStable" .) "true") (and (eq (include "vmagent.ingress.apiVersion" .) "networking.k8s.io/v1beta1")) -}}
-{{- end -}}
-
-{{/*
 Return license flag if necessary.
 */}}
 {{- define "chart.license.flag" -}}

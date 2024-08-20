@@ -1,50 +1,36 @@
-{{- if .Values.ingressInternal.enabled }}
-{{- $ingressApiIsStable := eq (include "vmauth.ingress.isStable" .) "true" -}}
-{{- $ingressSupportsIngressClassName := eq (include "vmauth.ingress.supportsIngressClassName" .) "true" -}}
-{{- $ingressSupportsPathType := eq (include "vmauth.ingress.supportsPathType" .) "true" -}}
-{{- $servicePort := .Values.service.servicePort -}}
-{{- $ingressPathType := .Values.ingress.pathType -}}
-apiVersion: {{ include "vmauth.ingress.apiVersion" . }}
+{{- $app := .Values }}
+{{- if $app.ingressInternal.enabled }}
+{{- $serviceName := include "chart.fullname" . }}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-{{- if .Values.ingressInternal.annotations }}
-  annotations:
-{{ toYaml .Values.ingressInternal.annotations | indent 4 }}
-{{- end }}
-  labels:
-  {{- include "chart.labels" . | nindent 4 }}
-  {{ with .Values.ingressInternal.extraLabels }}
-{{ toYaml . | indent 4 }}
-  {{ end }}
-  name: {{ template "chart.fullname" . }}-internal
+  {{- with $app.ingressInternal.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.ingressInternal.extraLabels) }}
+  labels: {{ include "chart.labels" . | nindent 4 }}
+  name: {{ $serviceName }}-internal
   namespace: {{ .Release.Namespace }}
 spec:
-  {{- if and $ingressSupportsIngressClassName .Values.ingressInternal.ingressClassName }}
-  ingressClassName: {{ .Values.ingressInternal.ingressClassName }}
+  {{- with $app.ingressInternal.ingressClassName }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with $app.ingressInternal.tls }}
+  tls: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   rules:
-  {{- $serviceName := include "chart.fullname" . }}
-  {{- range .Values.ingressInternal.hosts }}
-  - host: {{ .name }}
-    http:
-      paths:
-        - path: {{ .path }}
-          {{- if $ingressSupportsPathType }}
-          pathType: {{ $ingressPathType }}
-          {{- end }}
-          backend:
-            {{- if $ingressApiIsStable }}
-            service:
-              name: {{ $serviceName }}
-              port:
-                number: {{ $servicePort }}
-            {{- else }}
-            serviceName: {{ $serviceName }}
-            servicePort: {{ .port | default "http"}}
+    {{- range $app.ingressInternal.hosts }}
+    - host: {{ tpl .name $ }}
+      http:
+        paths:
+          - path: {{ .path }}
+            {{- with .Values.ingressInternal.pathType }}
+            pathType: {{ . }}
             {{- end }}
-  {{- end -}}
-{{- if .Values.ingressInternal.tls }}
-  tls:
-{{ toYaml .Values.ingressInternal.tls | indent 4 }}
-{{- end -}}
-{{- end -}}
+            backend:
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ .port | default $app.service.servicePort }}
+    {{- end }}
+{{- end }}

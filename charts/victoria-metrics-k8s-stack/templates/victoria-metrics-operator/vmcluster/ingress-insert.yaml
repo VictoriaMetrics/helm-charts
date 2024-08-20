@@ -1,83 +1,48 @@
-{{- $newAPI := .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
-{{ if and .Values.vmcluster.enabled .Values.vmcluster.ingress.insert.enabled -}}
-{{- with .Values.vmcluster.ingress.insert }}
-{{- $servicePort := $.Values.vmcluster.spec.vminsert.port | default 8480 -}}
-{{- $serviceName := (include "victoria-metrics-k8s-stack.vminsertName" $) }}
-{{- $ingressPath := .path -}}
-{{- $ingressPathType := .pathType | default "" -}}
-{{- $extraPaths := .extraPaths -}}
-{{- if $newAPI -}}
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $app := .Values.vmcluster }}
+{{- if and $app.enabled $app.ingress.insert.enabled }}
+{{- $ingress := $app.ingress.insert }}
+{{- $serviceName := (include "victoria-metrics-k8s-stack.vminsertName" .) }}
+{{- $servicePort := $app.spec.vminsert.port | default 8480 -}}
 apiVersion: networking.k8s.io/v1
-{{- else if $.Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
-apiVersion: networking.k8s.io/v1beta1
-{{- else }}
-apiVersion: extensions/v1beta1
-{{- end }}
 kind: Ingress
 metadata:
   name: {{ $serviceName }}
-  namespace: {{ $.Release.Namespace }}
-  labels:
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-vmcluster
-{{ include "victoria-metrics-k8s-stack.labels" $ | indent 4 }}
-{{- if .labels }}
-{{ toYaml .labels | indent 4 }}
-{{- end }}
-  {{- if .annotations }}
-  annotations:
-    {{- range $key, $value := .annotations }}
-    {{ $key }}: {{ tpl $value $ | quote }}
-    {{- end }}
+  namespace: {{ .Release.Namespace }}
+  {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-vmcluster" (include "victoria-metrics-k8s-stack.name" .)) }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $ingress.labels) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
+  {{- with $ingress.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .ingressClassName }}
-  ingressClassName: {{ .ingressClassName }}
-  {{- end -}}
-{{- if .tls }}
-  tls:
-{{ tpl (toYaml .tls) $ | indent 4 }}
-{{- end }}
-  rules:
-  {{- if .hosts  }}
-  {{- range .hosts }}
-    - host: {{ tpl . $}}
-      http:
-        paths:
-{{- if $extraPaths }}
-{{ toYaml $extraPaths | indent 10 }}
-{{- end }}
-          - path: {{ $ingressPath }}
-            {{- if $newAPI }}
-            pathType: {{ $ingressPathType }}
-            {{- end }}
-            backend:
-              {{- if $newAPI }}
-              service:
-                name: {{ $serviceName }}
-                port:
-                  number: {{ $servicePort }}
-              {{- else }}
-              serviceName: {{ $serviceName }}
-              servicePort: {{ $servicePort }}
-              {{- end }}
+  {{- with $ingress.ingressClassName }}
+  ingressClassName: {{ . }}
   {{- end }}
-  {{- else }}
+  {{- with $ingress.tls }}
+  tls: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- $hosts := $ingress.hosts | default (list "") }}
+    {{- range $hosts }}
     - http:
         paths:
+          {{- with $ingress.extraPaths }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           - backend:
-              {{- if $newAPI }}
               service:
                 name: {{ $serviceName }}
                 port:
                   number: {{ $servicePort }}
-            pathType: {{ $ingressPathType }}
-              {{- else }}
-              serviceName: {{ $serviceName }}
-              servicePort: {{ $servicePort }}
-              {{- end }}
-          {{- if $ingressPath }}
-            path: {{ $ingressPath }}
+            {{- with $ingress.path }}
+            path: {{ . }}
             {{- end }}
-  {{- end -}}
-{{- end }}
+            {{- with $ingress.pathType }}
+            pathType: {{ . }}
+            {{- end }}
+      {{- with . }}
+      host: {{ tpl . $ }}
+      {{- end }}
+    {{- end }}
 {{- end }}

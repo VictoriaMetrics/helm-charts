@@ -686,6 +686,20 @@ server:
 
     # -- Extra scrape configs that will be appended to `server.scrape.config`
     extraScrapeConfigs: []
+    # - job_name: 'prometheus-blackbox-exporter'
+    #   metrics_path: /probe
+    #   params:
+    #     module: [http_2xx]
+    #   static_configs:
+    #     - targets:
+    #       - https://example.com
+    #   relabel_configs:
+    #     - source_labels: [__address__]
+    #       target_label: __param_target
+    #     - source_labels: [__param_target]
+    #       target_label: instance
+    #     - target_label: __address__
+    #       replacement: prometheus-blackbox-exporter:9115
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []
