@@ -21,9 +21,9 @@ spec:
       port: {{ .Values.kubeDns.service.skydns.port }}
       protocol: TCP
       targetPort: {{ .Values.kubeDns.service.skydns.targetPort }}
-  {{- with .Values.kubeDns.service.selector -}}
+  {{- with .Values.kubeDns.service.selector }}
   selector: {{ toYaml . | nindent 4 }}
-  {{- end}}
+  {{- end }}
 {{- end }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
