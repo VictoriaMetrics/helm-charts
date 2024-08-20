@@ -210,7 +210,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| serviceMonitor | object | `{"annotations":{},"enabled":false,"extraLabels":{},"relabelings":[]}` | configures monitoring with serviceScrape. VMServiceScrape must be pre-installed |
+| serviceMonitor | object | `{"annotations":{},"basicAuth":{},"enabled":false,"extraLabels":{},"interval":"","relabelings":[],"scheme":"","scrapeTimeout":"","tlsConfig":{}}` | configures monitoring with serviceScrape. VMServiceScrape must be pre-installed |
 | tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | topologySpreadConstraints | list | `[]` | Pod Topology Spread Constraints. Ref: [https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
 | watchNamespace | string | `""` |  |
