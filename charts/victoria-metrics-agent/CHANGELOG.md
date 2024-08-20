@@ -12,6 +12,7 @@
 - Added `.Values.emptyDir` to customize default cache directory
 - Use static container names in a pod
 - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+- Added `.Values.service.ipFamilies` and `.Values.service.ipFamilyPolicy` for service IP family management
 
 ## 0.10.14
 

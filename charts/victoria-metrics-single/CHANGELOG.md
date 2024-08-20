@@ -20,6 +20,7 @@
 - Merged headless and non-headless services, removed statefulset service specific variables
 - Use static container names in a pod
 - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+- Added `.Values.server.service.ipFamilies` and `.Values.server.service.ipFamilyPolicy` for service IP family management
 
 ## 0.9.26
 

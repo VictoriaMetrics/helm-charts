@@ -6,7 +6,8 @@
 
 - Added global imagePullSecrets and image.registry
 - Use static container names in a pod
-- updated operator service scrape config
+- Updated operator service scrape config
+- Added `.Values.vmstorage.service.ipFamilies` and `.Values.vmstorage.service.ipFamilyPolicy` for service IP family management
 
 ## 0.34.0
 

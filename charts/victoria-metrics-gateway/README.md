@@ -231,6 +231,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | service.enabled | bool | `true` |  |
 | service.externalIPs | list | `[]` |  |
 | service.extraLabels | object | `{}` |  |
+| service.ipFamilies | list | `[]` |  |
+| service.ipFamilyPolicy | string | `""` |  |
 | service.loadBalancerIP | string | `""` |  |
 | service.loadBalancerSourceRanges | list | `[]` |  |
 | service.servicePort | int | `8431` |  |

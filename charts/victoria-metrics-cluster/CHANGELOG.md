@@ -23,6 +23,9 @@
 - Added `.Values.vminsert.service.healthCheckNodePort` and `.Values.vminsert.service.externalTrafficPolicy`
 - Use static container names in a pod
 - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+- Added `.Values.vmstorage.service.ipFamilies` and `.Values.vmstorage.service.ipFamilyPolicy` for service IP family management
+- Added `.Values.vmselect.service.ipFamilies` and `.Values.vmselect.service.ipFamilyPolicy` for service IP family management
+- Added `.Values.vminsert.service.ipFamilies` and `.Values.vminsert.service.ipFamilyPolicy` for service IP family management
 
 ## 0.11.23
 
