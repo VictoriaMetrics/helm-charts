@@ -182,6 +182,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.service.externalTrafficPolicy | string | `""` |  |
 | vminsert.service.extraPorts | list | `[]` | Extra service ports |
 | vminsert.service.healthCheckNodePort | string | `""` |  |
+| vminsert.service.ipFamilies | list | `[]` |  |
+| vminsert.service.ipFamilyPolicy | string | `""` |  |
 | vminsert.service.labels | object | `{}` | Service labels |
 | vminsert.service.loadBalancerIP | string | `""` | Service load balancer IP |
 | vminsert.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
@@ -272,6 +274,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.service.externalTrafficPolicy | string | `""` |  |
 | vmselect.service.extraPorts | list | `[]` | Extra service ports |
 | vmselect.service.healthCheckNodePort | string | `""` |  |
+| vmselect.service.ipFamilies | list | `[]` |  |
+| vmselect.service.ipFamilyPolicy | string | `""` |  |
 | vmselect.service.labels | object | `{}` | Service labels |
 | vmselect.service.loadBalancerIP | string | `""` | Service load balacner IP |
 | vmselect.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |
@@ -354,6 +358,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.service.externalTrafficPolicy | string | `""` |  |
 | vmstorage.service.extraPorts | list | `[]` | Extra service ports |
 | vmstorage.service.healthCheckNodePort | string | `""` |  |
+| vmstorage.service.ipFamilies | list | `[]` |  |
+| vmstorage.service.ipFamilyPolicy | string | `""` |  |
 | vmstorage.service.labels | object | `{}` | Service labels |
 | vmstorage.service.servicePort | int | `8482` | Service port |
 | vmstorage.service.vminsertPort | int | `8400` | Port for accepting connections from vminsert |
