@@ -199,6 +199,8 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.service.externalIPs | list | `[]` | Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips) |
 | server.service.externalTrafficPolicy | string | `""` |  |
 | server.service.healthCheckNodePort | string | `""` |  |
+| server.service.ipFamilies | list | `[]` |  |
+| server.service.ipFamilyPolicy | string | `""` |  |
 | server.service.labels | object | `{}` | Service labels |
 | server.service.loadBalancerIP | string | `""` | Service load balacner IP |
 | server.service.loadBalancerSourceRanges | list | `[]` | Load balancer source range |

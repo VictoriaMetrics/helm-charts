@@ -204,6 +204,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | service.externalIPs | string | `""` |  |
 | service.externalTrafficPolicy | string | `""` |  |
 | service.healthCheckNodePort | string | `""` |  |
+| service.ipFamilies | list | `[]` |  |
+| service.ipFamilyPolicy | string | `""` |  |
 | service.labels | object | `{}` |  |
 | service.loadBalancerIP | string | `""` |  |
 | service.loadBalancerSourceRanges | list | `[]` |  |
