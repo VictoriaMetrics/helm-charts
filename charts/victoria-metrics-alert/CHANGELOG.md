@@ -14,6 +14,7 @@
 - Addded alertmanager service `.Values.alertmanager.service.externalTrafficPolicy` and `.Values.alertmanager.service.healthCheckNodePort`
 - Use static container names in a pod
 - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+- Added `.Values.server.service.ipFamilies`, `.Values.server.service.ipFamilyPolicy`, `.Values.alertmanager.service.ipFamilies` and `.Values.alertmanager.service.ipFamilyPolicy` for services IP family management
 
 ## 0.9.12
 

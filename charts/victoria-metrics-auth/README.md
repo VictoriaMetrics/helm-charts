@@ -164,6 +164,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | service.externalTrafficPolicy | string | `""` |  |
 | service.extraLabels | object | `{}` |  |
 | service.healthCheckNodePort | string | `""` |  |
+| service.ipFamilies | list | `[]` |  |
+| service.ipFamilyPolicy | string | `""` |  |
 | service.loadBalancerIP | string | `""` |  |
 | service.loadBalancerSourceRanges | list | `[]` |  |
 | service.servicePort | int | `8427` |  |

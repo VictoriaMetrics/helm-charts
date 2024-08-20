@@ -10,6 +10,7 @@
 - Added params to configure probes `.Values.probe.readiness`, `.Values.probe.liveness` and `.Values.probe.startup`
 - Added global imagePullSecrets and image.registry
 - Use static container names in a pod
+- Added `.Values.service.ipFamilies` and `.Values.service.ipFamilyPolicy` for service IP family management
 
 ## 0.1.64
 
