@@ -1,4 +1,17 @@
 server:
+  ingress:
+    enabled: true
+    annotations:
+      annotationName: annotationValue
+    extraLabels:
+      labelName: labelValue
+    hosts:
+      - name: example.com
+        path: /prefix
+        port: test
+      - name: some.example.com
+        path: /prefix
+        port: 8080
   notifier:
     alertmanager:
       url: foo
@@ -27,6 +40,19 @@ server:
 
 alertmanager:
   enabled: true
+  ingress:
+    enabled: true
+    annotations:
+      annotationName: annotationValue
+    extraLabels:
+      labelName: labelValue
+    hosts:
+      - name: example.com
+        path: /prefix
+        port: test
+      - name: some.example.com
+        path: /prefix
+        port: 8080
   envFrom:
     - configMapRef:
         name: alertmanager-config
