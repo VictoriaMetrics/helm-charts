@@ -10,7 +10,7 @@ metadata:
   name: {{ $serviceName }}
   namespace: {{ .Release.Namespace }}
   {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-vmcluster" (include "victoria-metrics-k8s-stack.name" .)) }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $ingress.labels) }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" (merge $extraLabels $ingress.labels)) }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
   {{- with $ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
