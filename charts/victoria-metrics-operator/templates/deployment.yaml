@@ -114,8 +114,7 @@ spec:
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+          resources: {{ toYaml .Values.resources | nindent 12 }}
           {{- with .Values.securityContext }}
           securityContext: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -142,12 +141,12 @@ spec:
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-      {{- if .Values.admissionWebhooks.enabled }}
+        {{- if .Values.admissionWebhooks.enabled }}
         - name: cert
           secret:
             defaultMode: 420
             secretName: {{ template "vm-operator.fullname" . }}-validation
-      {{- end }}
-      {{- with .Values.extraVolumes }}
-      {{- toYaml .| nindent 10 }}
-      {{- end }}
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml .| nindent 8 }}
+        {{- end }}

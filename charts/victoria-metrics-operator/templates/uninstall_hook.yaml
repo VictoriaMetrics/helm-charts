@@ -14,7 +14,7 @@ metadata:
 spec:
   template:
     metadata:
-      name: "{{ .Release.Name }}"
+      name: {{ .Release.Name }}
       labels: {{ include "vm-operator.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "vm-operator.cleanupHookName" . }}
@@ -23,8 +23,8 @@ spec:
       {{- end }}
       containers:
         - name: kubectl
-          image: "{{ (index .Values "cleanupImage" "repository") }}:{{ (index .Values "cleanupImage" "tag" | default (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor | replace "+" "")) }}"
-          imagePullPolicy: "{{ (index .Values "cleanupImage" "pullPolicy") }}"
+          image: {{ (index .Values "cleanupImage" "repository") }}:{{ (index .Values "cleanupImage" "tag" | default (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor | replace "+" "")) }}
+          imagePullPolicy: {{ (index .Values "cleanupImage" "pullPolicy") }}
           resources:
             limits:
               cpu: "500m"

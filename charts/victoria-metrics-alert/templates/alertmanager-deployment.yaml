@@ -82,19 +82,19 @@ spec:
           {{- end }}
           volumeMounts:
             - name: storage
-              {{- if $app.persistentVolume.enabled }}
-              mountPath: {{ $app.persistentVolume.mountPath }}
-              {{- else }}
-              mountPath: /data
-              {{- end }}
+              mountPath: {{ ternary $app.persistentVolume.mountPath "/data" $app.persistentVolume.enabled }}
             - name: config
               mountPath: /config
               readOnly: true
             {{- range $app.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+              {{- with .readOnly }}
+              readOnly: {{ . }}
+              {{- end }}
             {{- end }}
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}

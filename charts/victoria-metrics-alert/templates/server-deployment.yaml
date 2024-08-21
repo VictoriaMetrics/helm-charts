@@ -141,8 +141,12 @@ spec:
             {{- range $app.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+              {{- with .readOnly }}
+              readOnly: {{ . }}
+              {{- end }}
             {{- end }}
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
@@ -179,4 +183,4 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- include "vmalert.license.volume" . | nindent 8 }}
-{{- end -}}
+{{- end }}

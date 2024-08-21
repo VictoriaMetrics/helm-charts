@@ -26,10 +26,10 @@ spec:
       labels: {{ include "victoria-metrics.vmstorage.podLabels" $ctx | nindent 8 }}
     spec:
       {{- with $app.priorityClassName }}
-      priorityClassName: "{{ . }}"
+      priorityClassName: {{ . }}
       {{- end }}
       {{- with $app.schedulerName }}
-      schedulerName: "{{ . }}"
+      schedulerName: {{ . }}
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- if eq (include "victoria-metrics.storage.hasInitContainer" . ) "true" }}
@@ -41,7 +41,7 @@ spec:
       containers:
         - name: vmstorage
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
-          imagePullPolicy: "{{ $app.image.pullPolicy }}"
+          imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
           {{- end }}
@@ -64,7 +64,7 @@ spec:
             - {{ . }}
             {{- end }}
           ports:
-            - name: "{{ $app.ports.name | default "http" }}" 
+            - name: {{ $app.ports.name | default "http" }}
               containerPort: 8482
             - name: vminsert
               containerPort: 8400
@@ -89,36 +89,52 @@ spec:
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: {{ $app.persistentVolume.name }}
-              mountPath: {{ $app.persistentVolume.mountPath }}
-              subPath: {{ $app.persistentVolume.subPath }}
-          {{- range $app.extraHostPathMounts }}
+            {{- with $app.persistentVolume }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
-          {{- end }}
-          {{- range $app.extraConfigmapMounts }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- range $app.extraHostPathMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+              {{- with .readOnly }}
+              readOnly: {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- range $app.extraConfigmapMounts }}
             - name: {{ $app.name }}-{{ .name }}
               mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
-          {{- end }}
-          {{- range $app.extraSecretMounts }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+              {{- with .readOnly }}
+              readOnly: {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- range $app.extraSecretMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
-          {{- end }}
-          {{- with $app.extraVolumeMounts }}
-          {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- include "chart.license.mount" . | nindent 12 }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+              {{- with .readOnly }}
+              readOnly: {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- with $app.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- include "chart.license.mount" . | nindent 12 }}
         {{- if $app.vmbackupmanager.enable }}
         {{- $manager := $app.vmbackupmanager -}}
         - name: vmbackupmanager
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $manager)) }}
-          imagePullPolicy: "{{ $app.image.pullPolicy }}"
+          imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
@@ -166,14 +182,22 @@ spec:
             - name: manager-http
               containerPort: 8300
           volumeMounts:
-            - name: {{ $app.persistentVolume.name }}
-              mountPath: {{ $app.persistentVolume.mountPath }}
-              subPath: {{ $app.persistentVolume.subPath }}
+            {{- with $app.persistentVolume }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+            {{- end }}
             {{- range $manager.extraSecretMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+              {{- with .readOnly }}
+              readOnly: {{ . }}
+              {{- end }}
             {{- end }}
             {{- include "chart.license.mount" . | nindent 12 }}
         {{- end }}
@@ -232,9 +256,9 @@ spec:
         {{- end }}
         resources:
           requests:
-            storage: "{{ $app.persistentVolume.size }}"
+            storage: {{ $app.persistentVolume.size }}
         {{- with $app.persistentVolume.storageClass }}
-        storageClassName: "{{ ternary "" . (eq "-" .) }}"
+        storageClassName: {{ ternary "" . (eq "-" .) }}
         {{- end }}
   {{- end }}
 {{- end }}

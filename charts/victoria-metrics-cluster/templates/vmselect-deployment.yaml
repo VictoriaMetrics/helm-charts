@@ -28,7 +28,7 @@ spec:
       labels: {{ include "victoria-metrics.vmselect.podLabels" $ctx | nindent 8 }}
     spec:
       {{- with $ctx.priorityClassName }}
-      priorityClassName: "{{ . }}"
+      priorityClassName: {{ . }}
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- with $app.initContainers }}
@@ -40,7 +40,7 @@ spec:
       containers:
         - name: vmselect
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
-          imagePullPolicy: "{{ $app.image.pullPolicy }}"
+          imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
           {{- end }}
@@ -71,7 +71,7 @@ spec:
           env: {{ toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - name: "{{ $app.ports.name | default "http" }}" 
+            - name: {{ $app.ports.name | default "http" }}
               containerPort: 8481
             {{- with $app.extraArgs.clusternativeListenAddr }}
             - name: cluster-tcp
@@ -93,13 +93,17 @@ spec:
             {{- range $app.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+              {{- with .readOnly }}
+              readOnly: {{ . }}
+              {{- end }}
             {{- end }}
-          {{- with $app.extraVolumeMounts }}
+            {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- include "chart.license.mount" . | nindent 12 }}
+            {{- end }}
+            {{- include "chart.license.mount" . | nindent 12 }}
           {{- with $app.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -127,11 +131,11 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         - name: cache-volume
-        {{- if $app.persistentVolume.enabled }}
+          {{- if $app.persistentVolume.enabled }}
           persistentVolumeClaim:
             claimName: {{ if $app.persistentVolume.existingClaim }}{{ $app.persistentVolume.existingClaim }}{{- else }}{{ template "victoria-metrics.vmselect.fullname" . }}{{- end }}
-        {{- else }}
+          {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
-        {{- end -}}
+          {{- end }}
         {{- include "chart.license.volume" . | nindent 8 }}
 {{- end }}
