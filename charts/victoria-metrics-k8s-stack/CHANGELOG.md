@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- fixed vmalert ingress name. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1271)
+- fixed alertmanager ingress host template rendering. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1270)
 
 ## 0.25.1
 

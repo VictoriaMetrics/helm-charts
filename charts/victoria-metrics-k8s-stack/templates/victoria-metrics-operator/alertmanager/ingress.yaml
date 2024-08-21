@@ -22,7 +22,7 @@ spec:
   tls: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   rules:
-    {{- $hosts := $app.ingress.hosts | list "" }}
+    {{- $hosts := $app.ingress.hosts | default (list "") }}
     {{- range $hosts }}
     - http:       
         paths:

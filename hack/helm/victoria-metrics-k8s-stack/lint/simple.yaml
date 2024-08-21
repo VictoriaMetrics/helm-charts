@@ -1,2 +1,26 @@
 grafanaOperatorDashboardsFormat:
   enabled: true
+alertmanager:
+  enabled: true
+  spec:
+    selectAllByDefault: true
+    externalURL: https://monitoring.example.com/alertmanager
+    routePrefix: "/alertmanager/"
+  monzoTemplate:
+    enabled: true
+  ingress:
+    enabled: true
+    annotations:
+      annotationName: annotationValue
+    labels: {}
+    path: /alertmanager/
+    pathType: Prefix
+    hosts:
+      - monitoring.example.com
+    tls:
+      - secretName: alertmanager-ingress-tls
+        hosts:
+          - monitoring.example.com
+vmalert:
+  ingress:
+    enabled: true
