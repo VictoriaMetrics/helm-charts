@@ -62,6 +62,39 @@ vmagent:
       - url: "https://insert.vmcluster.domain.com/insert/0/prometheus/api/v1/write"
 ```
 
+### ArgoCD issues
+
+When deploying K8s stack using ArgoCD without Cert Manager (`.Values.victoria-metrics-operator.admissionWebhooks.certManager.enabled: false`)
+it will rerender operator's webhook certificates on each sync since Helm `lookup` function is not respected by ArgoCD.
+To prevent this please update you K8s stack Application `spec.syncPolicy` and `spec.ignoreDifferences` with a following:
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+...
+spec:
+  ...
+  syncPolicy:
+    syncOptions:
+    # https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/#respect-ignore-difference-configs
+    # argocd must also ignore difference during apply stage
+    # otherwise it ll silently override changes and cause a problem
+    - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: <fullname>-validation
+      namespace: kube-system
+      jsonPointers:
+        - /data
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      name: <fullname>-admission
+      jqPathExpressions:
+      - '.webhooks[]?.clientConfig.caBundle'
+```
+where `<fullname>` is output of `{{"{{"}} include "vm-operator.fullname" {{"}}"}}` for your setup
+
 ### Rules and dashboards
 
 This chart by default install multiple dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
