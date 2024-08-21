@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.12.0
+
+**Release date:** 2024-08-21
+
+![AppVersion: v1.102.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 **Update note**: `vmselect` main container name was changed to `vmselect`, which will recreate a pod.
 
 **Update note**: `vmstorage` main container name was changed to `vmstorage`, which will recreate a pod.
