@@ -2,9 +2,8 @@
 
 ## Next release
 
-- Fixed vmalert url to alertmanager by including its path prefix
-- Added `global.license` configuration
-- Fixed extraLabels rendering. See [this issue](https://github.com/VictoriaMetrics/helm
+- Added `.Values.global.license` configuration
+- Fixed extraLabels rendering. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1248)
 - Fixed vmalert url to alertmanager by including its path prefix
 - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 - Fixed kubedns servicemonitor template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1255)
@@ -16,7 +15,8 @@
 ![AppVersion: v1.102.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.1&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-- * Update Notes: it requires to update CRD dependency manually before upgrade
+* Update Notes: it requires to update CRD dependency manually before upgrade
+
 - Moved dashboards templating logic out of sync script to Helm template
 - Allow to disable default grafana datasource
 - Synchronize Etcd dashboards and rules with mixin provided by Etcd

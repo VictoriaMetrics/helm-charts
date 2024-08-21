@@ -114,24 +114,26 @@ url: {{ printf "http://%s.%s.svc:%s%s/insert/%s/prometheus/api/v1/write" (includ
 VMAlert remotes 
 */}}
 {{- define "victoria-metrics-k8s-stack.vmAlertRemotes" -}}
+{{- $fullname := (include "victoria-metrics-k8s-stack.fullname" .) -}}
+{{- $pathPrefix := (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "") -}}
 remoteWrite:
 {{- if or .Values.vmalert.remoteWriteVMAgent }}
-     url: {{ printf "http://vmagent-%s.%s.svc:%s%s/api/v1/write" (.Values.vmagent.name | default (include "victoria-metrics-k8s-stack.fullname" .)) .Release.Namespace (.Values.vmagent.spec.port | default "8429") (index .Values "vmsingle" "spec" "extraArgs" "http.pathPrefix" | default "") }}
+  url: {{ printf "http://vmagent-%s.%s.svc:%s%s/api/v1/write" (.Values.vmagent.name | default $fullname) .Release.Namespace (.Values.vmagent.spec.port | default "8429") $pathPrefix }}
 {{- else }}
-     {{- include "victoria-metrics-k8s-stack.vmWriteEndpoint" . | nindent 2 }}
+  {{- include "victoria-metrics-k8s-stack.vmWriteEndpoint" . | nindent 2 }}
 {{- end }}
 remoteRead: {{ include "victoria-metrics-k8s-stack.vmReadEndpoint" . | nindent 2 }}
 datasource: {{ include "victoria-metrics-k8s-stack.vmReadEndpoint" . | nindent 2 }}
 {{- if .Values.vmalert.additionalNotifierConfigs }}
 notifierConfigRef:
-    name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "vmalert-additional-notifier" | trimSuffix "-" }}
-    key: notifier-configs.yaml
+  name: {{ (printf "%s-vmalert-additional-notifier" $fullname) | trimSuffix "-" }}
+  key: notifier-configs.yaml
 {{- else if .Values.alertmanager.enabled }}
 {{- $alertManagerReplicas := .Values.alertmanager.spec.replicaCount | default 1 }}
 notifiers:
-    {{- range $n := until (int $alertManagerReplicas) }}
-    - url: {{ printf "http://%s-%s-%d.%s-%s.%s.svc:9093%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" $) $n "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" $) $.Release.Namespace ($.Values.alertmanager.spec.routePrefix) }}
-    {{- end }}
+  {{- range $n := until (int $alertManagerReplicas) }}
+  - url: {{ printf "http://vmalertmanager-%s-%d.vmalertmanager-%s.%s.svc:9093%s" $fullname $n $fullname $.Release.Namespace ($.Values.alertmanager.spec.routePrefix | default "") }}
+  {{- end }}
 {{- end }}
 {{- end }}
 
