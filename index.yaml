@@ -4,6 +4,63 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '**Update note**: The VictoriaMetrics components image tag template has been updated. This change introduces `.Values.<component>.image.variant` to specify tag suffixes like `-scratch`, `-cluster`, `-enterprise`. Additionally, you can now omit `.Values.<component>.image.tag` to automatically use the version specified in `.Chart.AppVersion`.'
+        - ""
+        - '**Update note**: main container name was changed to `vlogs`, which will recreate a pod.'
+        - ""
+        - Added `basicAuth` support for `ServiceMonitor`
+        - Set minimal kubernetes version to `1.25`
+        - Removed support for `policy/v1beta1/PodDisruptionBudget`
+        - Updated `.Values.server.readinessProbe` to `.Values.server.probe.readiness`
+        - Updated `.Values.server.livenessProbe` to `.Values.server.probe.liveness`
+        - Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
+        - Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
+        - Added `.Values.server.emptyDir` to customize default data directory
+        - Merged headless and non-headless services, removed statefulset service specific variables
+        - Use static container names in a pod
+        - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+        - Added `.Values.server.service.ipFamilies` and `.Values.server.service.ipFamilyPolicy` for service IP family management
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/VictoriaLogs/
+    apiVersion: v2
+    appVersion: v0.28.0
+    created: "2024-08-21T07:12:08.635331435Z"
+    dependencies:
+    - condition: fluent-bit.enabled
+      name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.46.7
+    - name: victoria-metrics-common
+      repository: file://../victoria-metrics-common
+      version: 0.0.*
+    description: Victoria Logs Single version - high-performance, cost-effective and
+      scalable logs storage
+    digest: 1d0d26f57e50649f2bbe943c7d064fadc1be703623420d63360aab148643559e
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - victorialogs
+    - logs
+    - kubernetes
+    - observability
+    - logsql
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-logs-single
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-single-0.6.0/victoria-logs-single-0.6.0.tgz
+    version: 0.6.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - update VictoriaLogs to [v0.28.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.28.0-victorialogs).
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -654,6 +711,59 @@ entries:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-logs-single-0.0.1.tgz
     version: 0.0.1
   victoria-metrics-agent:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - '**Update note**: main container name was changed to `vmagent`, which will recreate a pod.'
+        - ""
+        - Removed `PodSecurityPolicy`
+        - Set minimal kubernetes version to `1.25`
+        - Removed support for `policy/v1beta1/PodDisruptionBudget`
+        - Added params to configure probes `.Values.probe.readiness`, `.Values.probe.liveness` and `.Values.probe.startup`
+        - Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
+        - Added `.Values.emptyDir` to customize default cache directory
+        - Use static container names in a pod
+        - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+        - Added `.Values.service.ipFamilies` and `.Values.service.ipFamilyPolicy` for service IP family management
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/vmagent.html
+    apiVersion: v2
+    appVersion: v1.102.1
+    created: "2024-08-21T07:12:08.747904981Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: file://../victoria-metrics-common
+      version: 0.0.*
+    description: Victoria Metrics Agent - collects metrics from various sources and
+      stores them to VictoriaMetrics
+    digest: eaabfffccedaa17290e32ecd6edf20ff3584c848b3de2f87b5751f1d79919824
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmagent
+    - agent
+    - collector
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    - servicediscovery
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-agent
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-agent-0.11.0/victoria-metrics-agent-0.11.0.tgz
+    version: 0.11.0
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
@@ -3222,6 +3332,62 @@ entries:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-agent-0.1.0.tgz
     version: 0.1.0
   victoria-metrics-alert:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - '**Update note**: `vmalert` main container name was changed to `vmalert`, which will recreate a pod.'
+        - ""
+        - '**Update note**: `alertmanager` main container name was changed to `alertmanager`, which will recreate a pod.'
+        - ""
+        - Added `basicAuth` support for `ServiceMonitor`
+        - Removed `PodSecurityPolicy`
+        - Set minimal kubernetes version to `1.25`
+        - Removed support for `policy/v1beta1/PodDisruptionBudget`
+        - Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
+        - Added `.Values.alertmanager.emptyDir` to customize default cache directory
+        - Addded alertmanager service `.Values.alertmanager.service.externalTrafficPolicy` and `.Values.alertmanager.service.healthCheckNodePort`
+        - Use static container names in a pod
+        - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+        - Added `.Values.server.service.ipFamilies`, `.Values.server.service.ipFamilyPolicy`, `.Values.alertmanager.service.ipFamilies` and `.Values.alertmanager.service.ipFamilyPolicy` for services IP family management
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/vmalert.html
+    apiVersion: v2
+    appVersion: v1.102.1
+    created: "2024-08-21T07:12:08.886652215Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: file://../victoria-metrics-common
+      version: 0.0.*
+    description: Victoria Metrics Alert - executes a list of given MetricsQL expressions
+      (rules) and sends alerts to Alert Manager.
+    digest: 6dd7c506d5155199048e2129fe43cbe1aabc7de2e3808e8975b54f0aa167fac8
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmalert
+    - alerting
+    - alerts
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    - rules
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-alert
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-alert-0.10.0/victoria-metrics-alert-0.10.0.tgz
+    version: 0.10.0
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
@@ -6342,6 +6508,59 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '**Update note**: main container name was changed to `vmauth`, which will recreate a pod.'
+        - ""
+        - Added `basicAuth` support for `ServiceMonitor`
+        - Removed `PodSecurityPolicy`
+        - Set minimal kubernetes version to `1.25`
+        - Removed support for `policy/v1beta1/PodDisruptionBudget`
+        - Added params to configure probes `.Values.probe.readiness`, `.Values.probe.liveness` and `.Values.probe.startup`
+        - Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
+        - Use static container names in a pod
+        - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+        - Added `.Values.service.ipFamilies` and `.Values.service.ipFamilyPolicy` for service IP family management
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/vmauth.html
+    apiVersion: v2
+    appVersion: v1.102.1
+    created: "2024-08-21T07:12:09.110777859Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: file://../victoria-metrics-common
+      version: 0.0.*
+    description: Victoria Metrics Auth - is a simple auth proxy and router for VictoriaMetrics.
+    digest: f71a578499a101bd3712b4a8d36eee72d4bd20e1582fe438a45e1c0e64911e61
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmauth
+    - auth
+    - proxy
+    - router
+    - balancer
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-auth
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-auth-0.5.0/victoria-metrics-auth-0.5.0.tgz
+    version: 0.5.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - bump version of VM components to [v1.102.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.102.1)
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -7886,6 +8105,76 @@ entries:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-auth-0.1.0.tgz
     version: 0.1.0
   victoria-metrics-cluster:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - '**Update note**: `vmselect` main container name was changed to `vmselect`, which will recreate a pod.'
+        - ""
+        - '**Update note**: `vmstorage` main container name was changed to `vmstorage`, which will recreate a pod.'
+        - ""
+        - '**Update note**: `vminsert` main container name was changed to `vminsert`, which will recreate a pod.'
+        - ""
+        - Added `basicAuth` support for `ServiceMonitor`
+        - Removed `PodSecurityPolicy`
+        - Set minimal kubernetes version to `1.25`
+        - Removed support for `policy/v1beta1/PodDisruptionBudget`
+        - Added ability to override liveness and readiness probes
+        - Updated `.Values.vmbackupmanager.readinessProbe` to `.Values.vmbackupmanager.probe.readiness`
+        - Updated `.Values.vmbackupmanager.livenessProbe` to `.Values.vmbackupmanager.probe.liveness`
+        - Updated `.Values.vmbackupmanager.startupProbe` to `.Values.vmbackupmanager.probe.startup`
+        - Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
+        - Fix templating of Ingress port when using custom port name.
+        - Added `.Values.vmselect.emptyDir` and `.Values.vmstorage.emptyDir` to customize default cache directory
+        - Merged headless and non-headless services, removed statefulset service specific variables
+        - Added `.Values.vmselect.service.healthCheckNodePort` and `.Values.vmselect.service.externalTrafficPolicy`
+        - Added `.Values.vmstorage.service.healthCheckNodePort` and `.Values.vmstorage.service.externalTrafficPolicy`
+        - Added `.Values.vminsert.service.healthCheckNodePort` and `.Values.vminsert.service.externalTrafficPolicy`
+        - Use static container names in a pod
+        - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+        - Added `.Values.vmstorage.service.ipFamilies` and `.Values.vmstorage.service.ipFamilyPolicy` for service IP family management
+        - Added `.Values.vmselect.service.ipFamilies` and `.Values.vmselect.service.ipFamilyPolicy` for service IP family management
+        - Added `.Values.vminsert.service.ipFamilies` and `.Values.vminsert.service.ipFamilyPolicy` for service IP family management
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html
+    apiVersion: v2
+    appVersion: v1.102.1
+    created: "2024-08-21T07:12:09.219686774Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: file://../victoria-metrics-common
+      version: 0.0.*
+    description: Victoria Metrics Cluster version - high-performance, cost-effective
+      and scalable TSDB, long-term remote storage for Prometheus
+    digest: d0f1eaca39e8ab905d3ad1b5a65fb944f4c22e2ae4ad488f667bbf7efbcc4368
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmcluster
+    - vmselect
+    - vminsert
+    - vmstorage
+    - tsdb
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-cluster
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-cluster-0.12.0/victoria-metrics-cluster-0.12.0.tgz
+    version: 0.12.0
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
@@ -10923,6 +11212,59 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '**Update note**: main container name was changed to `vmgateway`, which will reacreate a pod.'
+        - ""
+        - Added `basicAuth` support for `ServiceMonitor`
+        - Set minimal kubernetes version to `1.25`
+        - Removed support for `policy/v1beta1/PodDisruptionBudget`
+        - Added params to configure probes `.Values.probe.readiness`, `.Values.probe.liveness` and `.Values.probe.startup`
+        - Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
+        - Use static container names in a pod
+        - Added `.Values.service.ipFamilies` and `.Values.service.ipFamilyPolicy` for service IP family management
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/vmgateway.html
+    apiVersion: v2
+    appVersion: v1.102.1
+    created: "2024-08-21T07:12:09.448967244Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: file://../victoria-metrics-common
+      version: 0.0.*
+    description: Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria
+      Metrics
+    digest: 0e724630b040538fdae70b2998e5ed56c5ee4b034d9f8db6d4dc69d74e2f15a7
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmgateway
+    - auth
+    - proxy
+    - gateway
+    - router
+    - balancer
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-gateway
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-gateway-0.2.0/victoria-metrics-gateway-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - bump version of VM components to [v1.102.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.102.1)
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -12174,6 +12516,74 @@ entries:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-gateway-0.1.0.tgz
     version: 0.1.0
   victoria-metrics-k8s-stack:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - Added `.Values.global.license` configuration
+        - Fixed extraLabels rendering. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1248)
+        - Fixed vmalert url to alertmanager by including its path prefix
+        - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+        - Fixed kubedns servicemonitor template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1255)
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://docs.victoriametrics.com/vmgateway.html
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: v1.102.1
+    created: "2024-08-21T07:12:09.612022345Z"
+    dependencies:
+    - condition: victoria-metrics-operator.enabled
+      name: victoria-metrics-operator
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.34.*
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.16.*
+    - condition: prometheus-node-exporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.27.*
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 8.3.*
+    - condition: crds.enabled
+      name: crds
+      repository: ""
+      version: 0.0.0
+    - condition: prometheus-operator-crds.enabled
+      name: prometheus-operator-crds
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 11.0.*
+    description: Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics
+      Operator, Grafana dashboards, ServiceScrapes and VMRules
+    digest: c3d1145c064f4a6da78da4eb8c4dcbeea2b0f1e955229db5befc01a3fa9393c6
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-k8s-stack
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-k8s-stack-0.25.1/victoria-metrics-k8s-stack-0.25.1.tgz
+    version: 0.25.1
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
@@ -20946,6 +21356,65 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '**Update note**: main container name was changed to `vmsingle`, which will recreate a pod.'
+        - ""
+        - Added `basicAuth` support for `ServiceMonitor`
+        - fix inconsistent relabeling `target_label` in default scrape config.
+        - Removed `PodSecurityPolicy`
+        - Removed support for `policy/v1beta1/PodDisruptionBudget`
+        - Set minimal kubernetes version to `1.25`
+        - Added ability to override liveness and readiness probes
+        - Updated `.Values.vmbackupmanager.readinessProbe` to `.Values.vmbackupmanager.probe.readiness`
+        - Updated `.Values.vmbackupmanager.livenessProbe` to `.Values.vmbackupmanager.probe.liveness`
+        - Updated `.Values.vmbackupmanager.startupProbe` to `.Values.vmbackupmanager.probe.startup`
+        - Updated `.Values.server.readinessProbe` to `.Values.server.probe.readiness`
+        - Updated `.Values.server.livenessProbe` to `.Values.server.probe.liveness`
+        - Updated `.Values.server.startupProbe` to `.Values.server.probe.startup`
+        - Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
+        - Merged headless and non-headless services, removed statefulset service specific variables
+        - Use static container names in a pod
+        - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
+        - Added `.Values.server.service.ipFamilies` and `.Values.server.service.ipFamilyPolicy` for service IP family management
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html
+    apiVersion: v2
+    appVersion: v1.102.1
+    created: "2024-08-21T07:12:09.831005233Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: file://../victoria-metrics-common
+      version: 0.0.*
+    description: Victoria Metrics Single version - high-performance, cost-effective
+      and scalable TSDB, long-term remote storage for Prometheus
+    digest: fb41ec46caa7e1de5febe958aa574773805e95d60b44c5cf7201ab6b4b10a210
+    keywords:
+    - victoriametrics
+    - vmsingle
+    - single
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-single
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-single-0.10.0/victoria-metrics-single-0.10.0.tgz
+    version: 0.10.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - bump version of VM components to [v1.102.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.102.1)
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -23229,4 +23698,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-08-16T09:50:11.096340079Z"
+generated: "2024-08-21T07:12:09.833868867Z"
