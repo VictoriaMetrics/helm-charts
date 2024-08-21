@@ -13,6 +13,8 @@
 
 **Update note**: main container name was changed to `vmauth`, which will recreate a pod.
 
+**Update note**: requires Helm 3.14+
+
 - Added `basicAuth` support for `ServiceMonitor`
 - Removed `PodSecurityPolicy`
 - Set minimal kubernetes version to `1.25`

@@ -13,6 +13,8 @@
 
 **Update note**: main container name was changed to `vmagent`, which will recreate a pod.
 
+**Update note**: requires Helm 3.14+
+
 - Removed `PodSecurityPolicy`
 - Set minimal kubernetes version to `1.25`
 - Removed support for `policy/v1beta1/PodDisruptionBudget`

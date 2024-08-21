@@ -25,7 +25,9 @@
 ![AppVersion: v1.102.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.1&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-* Update Notes: it requires to update CRD dependency manually before upgrade
+**Update note**: it requires to update CRD dependency manually before upgrade
+
+**Update note**: requires Helm 3.14+
 
 - Moved dashboards templating logic out of sync script to Helm template
 - Allow to disable default grafana datasource
