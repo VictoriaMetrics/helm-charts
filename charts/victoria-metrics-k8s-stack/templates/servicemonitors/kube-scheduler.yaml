@@ -1,5 +1,7 @@
 {{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $fullname := ((printf "%s-kube-scheduler" (include "victoria-metrics-k8s-stack.fullname" .)) | trunc 63 | trimSuffix "-") }}
+{{- $extraLabels := dict "app" $fullname "jobLabel" "kube-scheduler" }}
+{{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
 {{- if .Values.kubeScheduler.enabled }}
 {{- if .Values.kubeScheduler.endpoints }}
 ---
@@ -8,8 +10,6 @@ kind: Endpoints
 metadata:
   name: {{ $fullname }}
   namespace: kube-system
-  {{- $extraLabels := dict "app" $fullname "k8s-app" "kube-scheduler" }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 subsets:
   - addresses:
@@ -28,8 +28,6 @@ kind: Service
 metadata:
   name: {{ $fullname }}
   namespace: kube-system
-  {{- $extraLabels := dict "app" $fullname "jobLabel" "kube-scheduler" }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 spec:
   clusterIP: None
@@ -55,10 +53,7 @@ metadata:
 spec:
   {{- omit .Values.kubeScheduler.spec "selector" "namespaceSelector" | toYaml | nindent 2 }}
   selector:
-    matchLabels:
-      app: {{ $fullname }}
-      app.kubernetes.io/instance: {{ default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" }}
+    matchLabels: {{ include "victoria-metrics-k8s-stack.selectorLabels" $ctx | nindent 6 }}
   namespaceSelector:
-    matchNames:
-      - "kube-system"
+    matchNames: [kube-system]
 {{- end }}

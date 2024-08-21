@@ -14,7 +14,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "kube-state-metrics.name" (index .Subcharts "kube-state-metrics") }}
-      app.kubernetes.io/instance: {{ default .Release.Name .Values.argocdReleaseOverride | quote }}
+      app.kubernetes.io/instance: {{ include "vm.release" . }}
   {{- if or (empty $ksm.vmServiceScrape.spec) (not (hasKey $ksm.vmServiceScrape.spec "endpoints")) }}
   endpoints:
   - port: http

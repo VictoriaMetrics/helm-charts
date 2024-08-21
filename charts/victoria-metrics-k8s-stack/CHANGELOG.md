@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Build `app.kubernetes.io/instance` label consistently. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1282)
 
 ## 0.25.2
 

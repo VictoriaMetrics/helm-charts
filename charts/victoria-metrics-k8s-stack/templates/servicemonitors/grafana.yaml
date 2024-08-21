@@ -13,7 +13,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "grafana.name" .Subcharts.grafana }}
-      app.kubernetes.io/instance: {{ default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" }}
+      app.kubernetes.io/instance: {{ include "vm.release" . }}
   {{- if or (empty .Values.grafana.vmServiceScrape.spec) (not (hasKey .Values.grafana.vmServiceScrape.spec "endpoints")) }}
   endpoints:
   - port: {{ .Values.grafana.service.portName }}
