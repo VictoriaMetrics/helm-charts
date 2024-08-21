@@ -15,6 +15,8 @@
 
 **Update note**: main container name was changed to `vlogs`, which will recreate a pod.
 
+**Update note**: requires Helm 3.14+
+
 - Added `basicAuth` support for `ServiceMonitor`
 - Set minimal kubernetes version to `1.25`
 - Removed support for `policy/v1beta1/PodDisruptionBudget`
