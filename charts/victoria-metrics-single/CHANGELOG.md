@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.10.0
+
+**Release date:** 2024-08-21
+
+![AppVersion: v1.102.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 **Update note**: main container name was changed to `vmsingle`, which will recreate a pod.
 
 - Added `basicAuth` support for `ServiceMonitor`

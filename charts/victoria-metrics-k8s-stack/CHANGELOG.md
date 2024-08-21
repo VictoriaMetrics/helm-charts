@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.25.1
+
+**Release date:** 2024-08-21
+
+![AppVersion: v1.102.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Added `.Values.global.license` configuration
 - Fixed extraLabels rendering. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1248)
 - Fixed vmalert url to alertmanager by including its path prefix
