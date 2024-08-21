@@ -64,8 +64,8 @@ spec:
             - {{ . }}
             {{- end }}
           ports:
-            - name: "{{ $app.ports.name | default "http" }}" 
-              containerPort: 8482
+            - name: "{{ $app.ports.name | default "http" }}"
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8482") }}
             - name: vminsert
               containerPort: 8400
             - name: vmselect

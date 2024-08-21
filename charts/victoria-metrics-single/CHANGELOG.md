@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added ability to configure container port
 
 ## 0.10.0
 

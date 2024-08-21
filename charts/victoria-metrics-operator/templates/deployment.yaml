@@ -87,14 +87,14 @@ spec:
             {{- end }}
             {{- end }}
           ports:
-            - containerPort: 8080
-              name: http
+            - name: http
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" (index .Values.extraArgs "metrics-bind-address") "default" "8080") }}
               protocol: TCP
-            - containerPort: 8081
-              name: probe
+            - name: probe
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" (index .Values.extraArgs "health-probe-bind-address") "default" "8081") }}
               protocol: TCP
-            - containerPort: 9443
-              name: webhook
+            - name: webhook
+              containerPort: 9443
               protocol: TCP
           {{- with (fromYaml (include "vm.probe" (dict "app" .Values "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
