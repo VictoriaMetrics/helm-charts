@@ -55,33 +55,32 @@ jobs:
 
       - name: Generate release notes
         run: |
-          for changelog in $(find charts/*/CHANGELOG.md)
+          for CHANGELOG in $(find charts/*/CHANGELOG.md)
           do
-              if grep -q "^## Next release$" $changelog
+              if grep -q "^## Next release$" $CHANGELOG
               then
-                echo "Processing $changelog"
+                echo "Processing $CHANGELOG"
               else
-                echo "ERROR: Not found 'Next release' section in $changelog"
+                echo "ERROR: Not found 'Next release' section in $CHANGELOG"
                 exit 1
               fi
               
               # Useful variables
-              export CHART_FILE="$(dirname $changelog)/Chart.yaml"
+              export CHART_FILE="$(dirname $CHANGELOG)/Chart.yaml"
               export APP_VERSION="$(yq -M '.appVersion' $CHART_FILE)"
               export CHART_VERSION="$(yq -M '.version' $CHART_FILE)"
               
               # If version already released
-              if grep -q "^## $CHART_VERSION$" $changelog
+              if grep -q "^## $CHART_VERSION$" $CHANGELOG
               then
-                echo "There is nothing to release for $changelog"
+                echo "There is nothing to release for $CHANGELOG"
               else
                 # Release notes file
-                export RN_FILE="$(dirname $changelog)/RELEASE_NOTES.md"
-                export RN_CONTENT="$(awk '/^## Next release/{flag=1;next}/^## /{flag=0}flag' $changelog | awk 'NF {p=1} p')"
-                export CHANGELOG=$changelog
+                export RN_FILE="$(dirname $CHANGELOG)/RELEASE_NOTES.md"
+                export RN_CONTENT="$(awk '/^## Next release/{flag=1;next}/^## /{flag=0}flag' $CHANGELOG | awk 'NF {p=1} p')"
           
                 # ArtifactHub annotation in Chart.yaml file
-                yq -M -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | .changes | split("\n") | .[] |= sub("^[\s]*-[\s]+", "") | to_yaml)' $CHART_FILE
+                yq -M -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | .changes | split("\n") | .[] |= sub("^[\s]*-[\s]+", "") | filter(length > 0) | to_yaml)' $CHART_FILE
           
                 # Create release notes
                 echo "# Release notes for version $CHART_VERSION" > $RN_FILE
@@ -95,24 +94,24 @@ jobs:
                 echo "" >> $RN_FILE 
           
                 # Update chart version in CHANGELOG
-                cp $changelog $changelog.copy
-                : > $changelog
+                cp $CHANGELOG $CHANGELOG.copy
+                : > $CHANGELOG
                 while read -r line; do 
-                  echo "$line" >> $changelog
+                  echo "$line" >> $CHANGELOG
                   if [[ $line == "## Next release" ]]
                   then
-                    echo "" >> $changelog
-                    echo "- TODO" >> $changelog
-                    echo "" >> $changelog
-                    echo "## $CHART_VERSION" >> $changelog
-                    echo "" >> $changelog
-                    echo "**Release date:** $(date -I)" >> $changelog
-                    echo "" >> $changelog
-                    echo "![AppVersion: $APP_VERSION](https://img.shields.io/static/v1?label=AppVersion&message=$APP_VERSION&color=success&logo=)" >> $changelog
-                    echo "![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)" >> $changelog
+                    echo "" >> $CHANGELOG
+                    echo "- TODO" >> $CHANGELOG
+                    echo "" >> $CHANGELOG
+                    echo "## $CHART_VERSION" >> $CHANGELOG
+                    echo "" >> $CHANGELOG
+                    echo "**Release date:** $(date -I)" >> $CHANGELOG
+                    echo "" >> $CHANGELOG
+                    echo "![AppVersion: $APP_VERSION](https://img.shields.io/static/v1?label=AppVersion&message=$APP_VERSION&color=success&logo=)" >> $CHANGELOG
+                    echo "![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)" >> $CHANGELOG
                   fi 
-                done < $changelog.copy
-                rm $changelog.copy
+                done < $CHANGELOG.copy
+                rm $CHANGELOG.copy
               fi
           done
 
