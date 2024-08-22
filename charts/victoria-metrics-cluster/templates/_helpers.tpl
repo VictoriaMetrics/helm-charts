@@ -191,7 +191,11 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
 {{- $args := default list -}}
 {{- range $i := until (.Values.vmselect.replicaCount | int) -}}
-{{- $value := printf "%s-%d.%s.%s.svc.%s:8481" $pod $i $svc $namespace $dnsSuffix -}}
+{{- $port := "8481" }}
+{{- with .Values.vmselect.extraArgs.httpListenAddr }}
+{{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" }}
+{{- end }}
+{{- $value := printf "%s-%d.%s.%s.svc.%s:%s" $pod $i $svc $namespace $dnsSuffix $port -}}
 {{- $args = append $args (printf "--selectNode=%q" $value) -}}
 {{- end -}}
 {{- toYaml $args -}}

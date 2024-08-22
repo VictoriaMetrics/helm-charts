@@ -125,7 +125,7 @@ spec:
           {{- end }}
           ports:
             - name: http
-              containerPort: 8880
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8880") }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}

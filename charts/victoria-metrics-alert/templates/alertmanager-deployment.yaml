@@ -61,7 +61,7 @@ spec:
             {{- end }}
           ports:
             - name: web
-              containerPort: 9093
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.listenAddress "default" "9093") }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
