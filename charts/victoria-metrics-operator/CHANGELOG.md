@@ -11,6 +11,7 @@
 - Enabled webhook by default
 - Generate webhook certificate when Cert Manager is not enabled
 - Added ability to configure container port
+- Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
 
 ## 0.34.0
 

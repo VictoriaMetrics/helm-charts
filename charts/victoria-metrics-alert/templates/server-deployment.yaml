@@ -40,7 +40,7 @@ spec:
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
-      imagePullSecrets: {{ . }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: vmalert

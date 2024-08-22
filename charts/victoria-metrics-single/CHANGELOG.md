@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
 
 ## 0.10.1
 

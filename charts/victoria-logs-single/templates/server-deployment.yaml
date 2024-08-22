@@ -38,7 +38,7 @@ spec:
       initContainers: {{ include "victoria-logs.initContiners" . | nindent 8 }}
       {{- end }}
       {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
-      imagePullSecrets: {{ . }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: vlogs
@@ -122,7 +122,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- with .Values.imagePullSecrets }}
-      imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 8 }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with $app.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
