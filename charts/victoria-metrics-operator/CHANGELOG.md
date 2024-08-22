@@ -8,6 +8,8 @@
 - Use static container names in a pod
 - Updated operator service scrape config
 - Added `.Values.vmstorage.service.ipFamilies` and `.Values.vmstorage.service.ipFamilyPolicy` for service IP family management
+- Enabled webhook by default
+- Generate webhook certificate when Cert Manager is not enabled
 - Added ability to configure container port
 
 ## 0.34.0

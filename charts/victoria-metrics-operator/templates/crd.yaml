@@ -3,13 +3,13 @@
 {{- /* see this pull request https://github.com/VictoriaMetrics/helm-charts/pull/771 for details */ -}}
 {{- if .Values.createCRD }}
 {{- $files := .Files }}
-{{- $fileContentsList := $files.Get "crd.yaml" | splitList "---" }}
-{{- range $fileContentsList }}
-    {{- $fileContents := . | fromYaml }}
-    {{- $newAnnotations := dict "helm.sh/resource-policy" "keep" | merge $fileContents.metadata.annotations }}
-    {{- $newMetadata := dict "annotations" $newAnnotations | merge $fileContents.metadata }}
-    {{- $newFileContents := dict "metadata" $newMetadata | merge $fileContents }}
-    {{- $newFileContents | toYaml }}
+{{- $crds := $files.Get "crd.yaml" | splitList "---" }}
+{{- $labels := (include "vm-operator.labels" .) | fromYaml -}}
+{{- $annotations := (include "vm-operator.annotations" .) | fromYaml -}}
+{{- $extra := dict "metadata" (dict "annotations" $annotations "labels" $labels) -}}
+{{- range $crds }}
+    {{- $crd := . | fromYaml }}
+    {{- toYaml (merge $crd $extra) }}
     {{- print "\n---\n" }}
 {{- end }}
 {{- end }}
