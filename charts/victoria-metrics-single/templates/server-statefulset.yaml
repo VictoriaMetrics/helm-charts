@@ -75,7 +75,7 @@ spec:
           {{- end }}
           ports:
             - name: http
-              containerPort: 8428
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8428") }}
             {{- with $app.extraArgs.graphiteListenAddr }}
             - name: graphite-tcp
               protocol: TCP

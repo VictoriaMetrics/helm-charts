@@ -70,7 +70,7 @@ spec:
           {{- end }}
           ports:
             - name: http
-              containerPort: 8481
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8481") }}
             {{- if $app.extraArgs.clusternativeListenAddr }}
             - name: cluster-tcp
               protocol: TCP
