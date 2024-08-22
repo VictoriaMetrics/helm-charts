@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Added ability to configure container port
+- Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
 
 ## 0.11.0
 

@@ -27,7 +27,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ template "vm-operator.serviceAccountName" . }}
       {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
-      imagePullSecrets: {{ . }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: operator
