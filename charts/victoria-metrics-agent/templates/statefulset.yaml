@@ -126,16 +126,20 @@ spec:
               mountPath: /tmpData
             - name: config
               mountPath: /config
-          {{- range .Values.extraHostPathMounts }}
+            {{- range .Values.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
-          {{- end }}
-          {{- with .Values.extraVolumeMounts }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+              {{- with .readOnly }}
+              readOnly: {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- include "chart.license.mount" . | nindent 12 }}
+            {{- end }}
+            {{- include "chart.license.mount" . | nindent 12 }}
           {{- with .Values.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -162,25 +166,25 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
-      {{- if not .Values.persistence.enabled }}
+        {{- if not .Values.persistence.enabled }}
         - name: tmpdata
           emptyDir: {{ toYaml .Values.emptyDir | nindent 12 }}
-      {{- else if .Values.persistence.existingClaim }}
+        {{- else if .Values.persistence.existingClaim }}
         - name: tmpdata
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim }}
-      {{- end }}
+        {{- end }}
         - name: config
           configMap:
             name: {{ include "chart.configname" . }}
-      {{- range .Values.extraHostPathMounts }}
+        {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
             path: {{ .hostPath }}
-      {{- end }}
-      {{- with .Values.extraVolumes }}
-      {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}

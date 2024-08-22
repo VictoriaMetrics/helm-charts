@@ -69,16 +69,20 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
-          {{- range .Values.extraHostPathMounts }}
+            {{- range .Values.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
-          {{- end }}
-          {{- with .Values.extraVolumeMounts }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+              {{- with .readOnly }}
+              readOnly: {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- include "vmauth.license.mount" . | nindent 12 }}
+            {{- end }}
+            {{- include "vmauth.license.mount" . | nindent 12 }}
           {{- with .Values.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -97,17 +101,13 @@ spec:
       volumes:
         - name: config
           secret:
-          {{- if .Values.secretName }}
-            secretName: {{ .Values.secretName }}
-          {{- else }}
-            secretName: {{ include "chart.fullname" .}}
-          {{- end }}
-      {{- range .Values.extraHostPathMounts }}
+            secretName: {{ ternary (include "chart.fullname" .) .Values.secretName (empty .Values.secretName) }}
+        {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
             path: {{ .hostPath }}
-      {{- end }}
-      {{- with .Values.extraVolumes }}
+        {{- end }}
+        {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- include "vmauth.license.volume" . | nindent 8 }}
+        {{- end }}
+        {{- include "vmauth.license.volume" . | nindent 8 }}

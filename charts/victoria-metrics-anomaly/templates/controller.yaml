@@ -73,11 +73,11 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/config
-          {{- include "chart.license.mount" . | nindent 12 }}
-          {{- if .Values.persistentVolume.enabled }}
+            {{- include "chart.license.mount" . | nindent 12 }}
+            {{- if .Values.persistentVolume.enabled }}
             - name: models-dump
               mountPath: /tmp/vmanomaly-model-dumps
-          {{- end }}
+            {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -91,12 +91,12 @@ spec:
         - name: config
           configMap:
             name: {{ include "chart.fullname" . }}
-      {{- include "chart.license.volume" . | nindent 8}}
-      {{- if .Values.persistentVolume.existingClaim }}
+        {{- include "chart.license.volume" . | nindent 8 }}
+        {{- if .Values.persistentVolume.existingClaim }}
         - name: models-dump
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolume.existingClaim }}
-      {{- end }}
+        {{- end }}
   {{- if and .Values.persistentVolume.enabled (not .Values.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1
@@ -112,9 +112,9 @@ spec:
         {{- end }}
         resources:
           requests:
-            storage: "{{ .Values.persistentVolume.size }}"
+            storage: {{ .Values.persistentVolume.size }}
         {{- with .Values.persistentVolume.storageClass }}
-        storageClassName: {{ "" . (eq "-" .) }}
+        storageClassName: {{ ternary "" . (eq "-" .) }}
         {{- end }}
         {{- with .Values.persistentVolume.matchLabels }}
         selector:

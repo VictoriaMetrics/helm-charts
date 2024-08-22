@@ -101,20 +101,24 @@ spec:
           {{- end }}
           {{- if $isVolumes }}
           volumeMounts:
-          {{- if .Values.rateLimiter.enable }}
+            {{- if .Values.rateLimiter.enable }}
             - name: config
               mountPath: /config
-          {{- end }}
-          {{- range .Values.extraHostPathMounts }}
+            {{- end }}
+            {{- range .Values.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
-              subPath: {{ .subPath }}
-              readOnly: {{ .readOnly }}
-          {{- end }}
-          {{- include "chart.license.mount" . | nindent 12 }}
-          {{- with .Values.extraVolumeMounts }}
+              {{- with .subPath }}
+              subPath: {{ . }}
+              {{- end }}
+              {{- with .readOnly }}
+              readOnly: {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- include "chart.license.mount" . | nindent 12 }}
+            {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- end }}
           {{- end }}
           {{- with .Values.resources }}
           resources: {{ toYaml . | nindent 12 }}
@@ -133,18 +137,18 @@ spec:
       {{- end }}
       {{- if $isVolumes }}
       volumes:
-      {{- if .Values.rateLimiter.enable }}
+        {{- if .Values.rateLimiter.enable }}
         - name: config
           configMap:
             name: {{ include "chart.fullname" .}}
-      {{- end }}
-      {{- range .Values.extraHostPathMounts }}
+        {{- end }}
+        {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
             path: {{ .hostPath }}
-      {{- end }}
-      {{- with .Values.extraVolumes }}
+        {{- end }}
+        {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- include "chart.license.volume" . | nindent 8 }}
+        {{- end }}
+        {{- include "chart.license.volume" . | nindent 8 }}
       {{- end }}

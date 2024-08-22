@@ -3,6 +3,7 @@
 ## Next release
 
 - Added ability to configure container port
+- Fixed volume template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1280)
 
 ## 0.10.0
 

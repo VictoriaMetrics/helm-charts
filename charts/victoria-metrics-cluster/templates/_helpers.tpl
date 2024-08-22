@@ -218,7 +218,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- if .Values.vmstorage.vmbackupmanager.restore.onStart.enabled }}
 - name: vmbackupmanager-restore
   image: {{ include "vm.image" (merge (deepCopy .) (dict "app" .Values.server.vmbackupmanager)) }}
-  imagePullPolicy: "{{ .Values.vmstorage.image.pullPolicy }}"
+  imagePullPolicy: {{ .Values.vmstorage.image.pullPolicy }}
   {{- with .Values.vmstorage.podSecurityContext }}
   securityContext:  {{ toYaml . | nindent 4 }}
   {{- end }}

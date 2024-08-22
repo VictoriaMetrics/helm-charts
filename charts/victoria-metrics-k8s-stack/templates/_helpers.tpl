@@ -78,17 +78,20 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
+{{- define "vm.release" -}}
+{{ default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
 {{/*
 Selector labels
 */}}
 {{- define "victoria-metrics-k8s-stack.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "victoria-metrics-k8s-stack.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ include "vm.release" . }}
 {{- with .extraLabels }}
 {{ toYaml . }}
 {{- end }}
 {{- end }}
-
 
 {{- define "victoria-metrics-k8s-stack.vmReadEndpoint" -}}
 {{- if .Values.vmsingle.enabled -}}
