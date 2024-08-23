@@ -126,6 +126,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.writer.datasource_url | string | `""` | Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/" |
 | config.writer.tenant_id | string | `""` | For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs |
 | containerWorkingDir | string | `"/vmanomaly"` |  |
+| emptyDir | object | `{}` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) |
 | envFrom | list | `[]` |  |
 | eula | bool | `false` | should be true and means that you have the legal right to run a vmanomaly that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/esa/ |
