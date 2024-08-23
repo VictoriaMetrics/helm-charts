@@ -329,7 +329,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.persistentVolume.mountPath | string | `"/storage"` | Data root path. Vmstorage data Persistent Volume mount root path |
 | vmstorage.persistentVolume.name | string | `"vmstorage-volume"` |  |
 | vmstorage.persistentVolume.size | string | `"8Gi"` | Size of the volume. |
-| vmstorage.persistentVolume.storageClass | string | `""` | Storage class name. Will be empty if not setted |
+| vmstorage.persistentVolume.storageClassName | string | `""` | Storage class name. Will be empty if not setted |
 | vmstorage.persistentVolume.subPath | string | `""` | Mount subpath |
 | vmstorage.podAnnotations | object | `{}` | Pod's annotations |
 | vmstorage.podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |

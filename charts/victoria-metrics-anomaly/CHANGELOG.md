@@ -6,6 +6,8 @@
 - Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
 - Fixed volume template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1280)
 - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
+- Renamed `.Values.persistentVolume.storageClass` to `.Values.persistentVolume.storageClassName`
+- Removed necessity to set `.Values.persistentVolume.existingClaim` when it should be created by chart. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/189)
 
 ## 1.4.1
 

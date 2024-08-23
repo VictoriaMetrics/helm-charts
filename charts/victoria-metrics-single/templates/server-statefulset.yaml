@@ -257,16 +257,13 @@ spec:
           configMap:
             name: {{ include "victoria-metrics.server.relabel.configname" . }}
         {{- end }}
-        {{- if not $app.persistentVolume.enabled }}
         - name: server-volume
-          emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
-        {{- else }}
-        {{- if $app.persistentVolume.existingClaim }}
-        - name: server-volume
+          {{- if $app.persistentVolume.enabled }}
           persistentVolumeClaim:
-            claimName: {{ $app.persistentVolume.existingClaim }}
-        {{- end }}
-        {{- end }}
+            claimName: {{ $app.persistentVolume.existingClaim | default "server-volume" }}
+          {{- else }}
+          emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
+          {{- end }}
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -287,7 +284,7 @@ spec:
         resources:
           requests:
             storage: {{ $app.persistentVolume.size }}
-        {{- with $app.persistentVolume.storageClass }}
+        {{- with $app.persistentVolume.storageClassName }}
         storageClassName: {{ ternary "" . (eq "-" .) }}
         {{- end }}
         {{- with $app.persistentVolume.matchLabels }}

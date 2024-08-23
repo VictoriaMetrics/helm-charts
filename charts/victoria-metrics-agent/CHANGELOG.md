@@ -4,6 +4,7 @@
 
 - Added ability to configure container port
 - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
+- Removed necessity to set `.Values.persistentVolume.existingClaim` when volume is expected to be created by chart. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/189)
 
 ## 0.11.0
 

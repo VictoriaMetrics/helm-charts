@@ -92,11 +92,13 @@ spec:
           configMap:
             name: {{ include "chart.fullname" . }}
         {{- include "chart.license.volume" . | nindent 8 }}
-        {{- if .Values.persistentVolume.existingClaim }}
         - name: models-dump
+          {{- if .Values.persistentVolume.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistentVolume.existingClaim }}
-        {{- end }}
+            claimName: {{ .Values.persistentVolume.existingClaim | default "models-dump" }}
+          {{- else }}
+          emptyDir: {{ .Values.emptyDir | nindent 12 }}
+          {{- end }}
   {{- if and .Values.persistentVolume.enabled (not .Values.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1
@@ -113,7 +115,7 @@ spec:
         resources:
           requests:
             storage: {{ .Values.persistentVolume.size }}
-        {{- with .Values.persistentVolume.storageClass }}
+        {{- with .Values.persistentVolume.storageClassName }}
         storageClassName: {{ ternary "" . (eq "-" .) }}
         {{- end }}
         {{- with .Values.persistentVolume.matchLabels }}

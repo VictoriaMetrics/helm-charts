@@ -1,5 +1,6 @@
 {{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.server }}
+{{- $fullname := (include "victoria-metrics.server.fullname" .) }}
 {{- if and $app.enabled (not $app.statefulSet.enabled) -}}
 {{ include "victoria-metrics.vmbackupmanager.enforce_license" . }}
 apiVersion: apps/v1
@@ -10,7 +11,7 @@ metadata:
   {{- end }}
   {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-metrics.server.labels" $ctx | nindent 4 }}
-  name: {{ template "victoria-metrics.server.fullname" . }}
+  name: {{ $fullname }}
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
@@ -263,7 +264,7 @@ spec:
         - name: server-volume
           {{- if $app.persistentVolume.enabled }}
           persistentVolumeClaim:
-            claimName: {{ if $app.persistentVolume.existingClaim }}{{ $app.persistentVolume.existingClaim }}{{- else }}{{ template "victoria-metrics.server.fullname" . }}{{- end }}
+            claimName: {{ $app.persistentVolume.existingClaim | default $fullname }}
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}

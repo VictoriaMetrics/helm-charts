@@ -4,6 +4,8 @@
 
 - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
 - Added global relabelConfig. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/207)
+- Renamed `.Values.server.persistentVolume.storageClass` to `.Values.server.persistentVolume.storageClassName`
+- Removed necessity to set `.Values.server.persistentVolume.existingClaim` when it should be created by chart. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/189)
 
 ## 0.10.1
 
