@@ -97,7 +97,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolume.existingClaim | default "models-dump" }}
           {{- else }}
-          emptyDir: {{ .Values.emptyDir | nindent 12 }}
+          emptyDir: {{ toYaml .Values.emptyDir | nindent 12 }}
           {{- end }}
   {{- if and .Values.persistentVolume.enabled (not .Values.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
