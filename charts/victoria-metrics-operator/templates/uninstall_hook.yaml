@@ -4,6 +4,7 @@
 "helm.sh/hook-delete-policy": hook-succeeded
 {{- end }}
 {{- if .Values.cleanupCRD }}
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -34,7 +35,7 @@ spec:
               memory: "56Mi"
           args:
             - delete
-            - vmagents,vmalertmanagers,vmalerts,vmauths,vmclusters,vmsingles
+            - {{ join "," (keys .Values.admissionWebhooks.enabledCRDValidation) }}
             - --all
             - --ignore-not-found=true
       restartPolicy: OnFailure
@@ -82,13 +83,9 @@ metadata:
 rules:
   - apiGroups: ["operator.victoriametrics.com"]
     resources:
-      - vmagents
-      - vmalertmanagers
-      - vmalerts
-      - vmauths
-      - vmclusters
-      - vmsingles
-    verbs: ["get", "list", "watch","delete"]
----
+      {{- range $crd, $config := .Values.admissionWebhooks.enabledCRDValidation }}
+      - {{ $crd }}
+      {{- end }}
+    verbs: ["*"]
 {{- end }}
 
