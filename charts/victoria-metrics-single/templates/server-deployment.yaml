@@ -58,6 +58,9 @@ spec:
             {{- if $app.scrape.enabled }}
             - --promscrape.config=/scrapeconfig/scrape.yml
             {{- end }}
+            {{- if $app.relabel.enabled }}
+            - --relabelConfig=/relabelconfig/relabel.yml
+            {{- end }}
             {{- range $key, $value := $app.extraArgs }}
             {{- if kindIs "slice" $value }}
             {{- range $v := $value }}
@@ -131,6 +134,10 @@ spec:
             {{- if $app.scrape.enabled }}
             - name: scrapeconfig
               mountPath: /scrapeconfig
+            {{- end }}
+            {{- if $app.relabel.enabled }}
+            - name: relabelconfig
+              mountPath: /relabelconfig
             {{- end }}
             {{- range $app.extraHostPathMounts }}
             - name: {{ .name }}
@@ -244,6 +251,11 @@ spec:
         - name: scrapeconfig
           configMap:
             name: {{ include "victoria-metrics.server.scrape.configname" . }}
+        {{- end }}
+        {{- if $app.relabel.enabled }}
+        - name: relabelconfig
+          configMap
+            name: {{ include "victoria-metrics.server.relabel.configname" . }}
         {{- end }}
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}

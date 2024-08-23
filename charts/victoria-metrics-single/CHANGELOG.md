@@ -3,6 +3,7 @@
 ## Next release
 
 - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
+- Added global relabelConfig. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/207)
 
 ## 0.10.1
 
