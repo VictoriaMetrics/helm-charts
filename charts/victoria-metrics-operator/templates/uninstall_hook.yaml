@@ -1,6 +1,6 @@
 {{- define "cleanupHookName.annotations" -}}
 "helm.sh/hook": pre-delete
-"helm.sh/hook-weight": "-5"
+"helm.sh/hook-weight": "{{ .hookWeight }}"
 "helm.sh/hook-delete-policy": hook-succeeded
 {{- end }}
 {{- if .Values.cleanupCRD }}
@@ -11,6 +11,7 @@ metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  {{ $_ := set . "hookWeight" "-3" }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 spec:
   template:
@@ -55,6 +56,7 @@ metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  {{ $_ := set . "hookWeight" "-5" }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -63,6 +65,7 @@ metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  {{ $_ := set . "hookWeight" "-4" }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -79,6 +82,7 @@ metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  {{ $_ := set . "hookWeight" "-5" }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 rules:
   - apiGroups: ["operator.victoriametrics.com"]
@@ -88,4 +92,3 @@ rules:
       {{- end }}
     verbs: ["*"]
 {{- end }}
-
