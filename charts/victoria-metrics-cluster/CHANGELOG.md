@@ -3,6 +3,8 @@
 ## Next release
 
 - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
+- Renamed `.Values.vmstorage.persistentVolume.storageClass` to `.Values.vmstorage.persistentVolume.storageClassName`
+- Removed necessity to set `.Values.vmstorage.persistentVolume.existintClaim` when it should be created by chart. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/189)
 
 ## 0.12.1
 

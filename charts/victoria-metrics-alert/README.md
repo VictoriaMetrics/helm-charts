@@ -139,7 +139,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.persistentVolume.existingClaim | string | `""` | Existing Claim name. If defined, PVC must be created manually before volume will be bound |
 | alertmanager.persistentVolume.mountPath | string | `"/data"` | Mount path. Alertmanager data Persistent Volume mount root path. |
 | alertmanager.persistentVolume.size | string | `"50Mi"` | Size of the volume. Better to set the same as resource limit memory property. |
-| alertmanager.persistentVolume.storageClass | string | `""` | StorageClass to use for persistent volume. Requires alertmanager.persistentVolume.enabled: true. If defined, PVC created automatically |
+| alertmanager.persistentVolume.storageClassName | string | `""` | StorageClass to use for persistent volume. Requires alertmanager.persistentVolume.enabled: true. If defined, PVC created automatically |
 | alertmanager.persistentVolume.subPath | string | `""` | Mount subpath |
 | alertmanager.podMetadata.annotations | object | `{}` |  |
 | alertmanager.podMetadata.labels | object | `{}` |  |

@@ -128,10 +128,13 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- if not $app.persistentVolume.enabled }}
         - name: cache-volume
+          {{- if $app.persistentVolume.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $app.persistentVolume.existingClaim | default "cache-volume" }}
+          {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
-        {{- end }}
+          {{- end }}
         {{- include "chart.license.volume" . | nindent 8 }}
   {{- if $app.persistentVolume.enabled }}
   volumeClaimTemplates:
@@ -152,7 +155,7 @@ spec:
         resources:
           requests:
             storage: {{ $app.persistentVolume.size }}
-        {{- with $app.persistentVolume.storageClass }}
+        {{- with $app.persistentVolume.storageClassName }}
         storageClassName: {{ ternary "" . (eq "-" .) }}
         {{- end }}
   {{- end }}

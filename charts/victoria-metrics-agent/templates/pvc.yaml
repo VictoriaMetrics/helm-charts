@@ -7,26 +7,23 @@ metadata:
   labels:
     {{- include "chart.labels" . | nindent 4 }}
     {{- with .Values.persistence.extraLabels }}
-      {{- toYaml . | nindent 4}}
+    {{- toYaml . | nindent 4}}
     {{- end }}
   {{- with .Values.persistence.annotations  }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  accessModes:
-    {{- range .Values.persistence.accessModes }}
-    - {{ . | quote }}
-    {{- end }}
+  {{- with .Values.persistence.accessModes }}
+  accessModes: {{ toYaml . | nindent 4 }}
+  {{- end }}
   resources:
     requests:
-      storage: {{ .Values.persistence.size | quote }}
-  {{- if .Values.persistence.storageClassName }}
-  storageClassName: {{ .Values.persistence.storageClassName }}
+      storage: {{ .Values.persistence.size }}
+  {{- with .Values.persistence.storageClassName }}
+  storageClassName: {{ . }}
   {{- end -}}
   {{- with .Values.persistence.matchLabels }}
   selector:
-    matchLabels:
-      {{- toYaml . | nindent 6 }}
+    matchLabels: {{ toYaml . | nindent 6 }}
   {{- end }}
 {{- end -}}

@@ -4,6 +4,7 @@
 
 - Added ability to configure container port
 - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
+- Renamed `.Values.alertmanager.persistentVolume.storageClass` to `.Values.alertmanager.persistentVolume.storageClassName`
 
 ## 0.10.0
 

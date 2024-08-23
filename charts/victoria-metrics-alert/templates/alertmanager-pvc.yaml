@@ -5,22 +5,19 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ include "vmalert.alertmanager.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "vmalert.alertmanager.labels" . | nindent 4 }}
+  labels: {{ include "vmalert.alertmanager.labels" . | nindent 4 }}
   {{- with .Values.alertmanager.persistentVolume.annotations  }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  accessModes:
-    {{- range .Values.alertmanager.persistentVolume.accessModes }}
-    - {{ . | quote }}
-    {{- end }}
+  {{- with .Values.alertmanager.persistentVolume.accessModes }}
+  accessModes: {{ toYaml . | nindent 4 }}
+  {{- end }}
   resources:
     requests:
-      storage: {{ .Values.alertmanager.persistentVolume.size | quote }}
-  {{- if .Values.alertmanager.persistentVolume.storageClass }}
-  storageClassName: {{ .Values.alertmanager.persistentVolume.storageClass }}
-  {{- end -}}
-{{- end -}}
-{{- end -}}
+      storage: {{ .Values.alertmanager.persistentVolume.size }}
+  {{- with .Values.alertmanager.persistentVolume.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
+{{- end }}
+{{- end }}
