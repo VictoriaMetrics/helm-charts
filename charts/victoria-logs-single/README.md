@@ -171,7 +171,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.persistentVolume.matchLabels | object | `{}` | Bind Persistent Volume by labels. Must match all labels of targeted PV. |
 | server.persistentVolume.mountPath | string | `"/storage"` | Mount path. Server data Persistent Volume mount root path. |
 | server.persistentVolume.size | string | `"3Gi"` | Size of the volume. Should be calculated based on the logs you send and retention policy you set. |
-| server.persistentVolume.storageClass | string | `""` | StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically |
+| server.persistentVolume.storageClassName | string | `""` | StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically |
 | server.persistentVolume.subPath | string | `""` | Mount subpath |
 | server.podAnnotations | object | `{}` | Pod's annotations |
 | server.podLabels | object | `{}` | Pod's additional labels |
