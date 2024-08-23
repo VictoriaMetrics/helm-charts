@@ -102,6 +102,17 @@ Defines the name of scrape configuration map
 {{- end -}}
 {{- end -}}
 
+{{/*
+Defines the name of relabel configuration map
+*/}}
+{{- define "victoria-metrics.server.relabel.configname" -}}
+{{- if .Values.server.relabel.configMap -}}
+{{- .Values.server.relabel.configMap -}}
+{{- else -}}
+{{- include "victoria-metrics.server.fullname" . -}}-relabelconfig
+{{- end -}}
+{{- end -}}
+
 {{- define "victoria-metrics.hasInitContainer" -}}
     {{- or (gt (len .Values.server.initContainers) 0)  .Values.server.vmbackupmanager.restore.onStart.enabled -}}
 {{- end -}}

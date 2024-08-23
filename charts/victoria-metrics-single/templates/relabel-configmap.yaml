@@ -1,0 +1,10 @@
+{{- if and .Values.server.relabel.enabled (eq .Values.server.relabel.configMap "") }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "victoria-metrics.server.fullname" . }}-relabelconfig
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "victoria-metrics.server.labels" . | nindent 4 }}
+data:
+  relabel.yml: |{{ toYaml .Values.server.relabel.config | nindent 4 }}
+{{- end }}

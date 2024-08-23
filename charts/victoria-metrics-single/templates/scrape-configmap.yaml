@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "victoria-metrics.server.fullname" . }}-scrapeconfig
   namespace: {{ .Release.Namespace }}
-  labels: {{- include "victoria-metrics.server.labels" . | nindent 4 }}
+  labels: {{ include "victoria-metrics.server.labels" . | nindent 4 }}
 data:
   scrape.yml: |
     {{- range $k, $v := .Values.server.scrape.config }}

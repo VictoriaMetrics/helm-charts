@@ -372,12 +372,20 @@ server:
     # -- Service Monitor metricRelabelings
     metricRelabelings: []
 
+  # -- Global relabel configuration
+  relabel:
+    enabled: false
+    config: []
+    # -- Use existing configmap if specified
+    # otherwise .config values will be used. Relabel config **should** reside under `relabel.yml` key
+    configMap: ""
+
   # -- Scrape configuration for victoriametrics
   scrape:
     # -- If true scrapes targets, creates config map or use specified one with scrape targets
     enabled: false
     # -- Use existing configmap if specified
-    # otherwise .config values will be used
+    # otherwise .config values will be used. Scrape config **should** reside under `scrape.yml` key
     configMap: ""
     # -- Scrape config
     config:
