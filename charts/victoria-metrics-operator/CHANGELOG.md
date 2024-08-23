@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.34.1
+
+**Release date:** 2024-08-23
+
+![AppVersion: v0.47.1](https://img.shields.io/static/v1?label=AppVersion&message=v0.47.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 **Update note**: main container name was changed to `operator`, which will recreate a pod.
 
 - Updated operator to v0.47.1 release
