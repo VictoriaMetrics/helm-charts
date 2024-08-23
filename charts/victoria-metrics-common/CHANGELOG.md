@@ -2,7 +2,9 @@
 
 ## Next release
 
-- TODO
+- Moved license templates from other charts `vm.license.volume`, `vm.license.mount`, `vm.license.flag`
+- Moved `vm.compatibility.renderSecurityContext` template
+- Fixed a case, when null is passed to a `.Values.global`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1296)
 
 ## 0.0.2
 
