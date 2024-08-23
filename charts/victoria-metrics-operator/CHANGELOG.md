@@ -4,6 +4,7 @@
 
 **Update note**: main container name was changed to `operator`, which will recreate a pod.
 
+- Updated operator to v0.47.1 release
 - Added global imagePullSecrets and image.registry
 - Use static container names in a pod
 - Updated operator service scrape config
