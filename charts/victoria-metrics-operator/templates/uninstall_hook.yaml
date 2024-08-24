@@ -1,15 +1,17 @@
 {{- define "cleanupHookName.annotations" -}}
 "helm.sh/hook": pre-delete
-"helm.sh/hook-weight": "-5"
+"helm.sh/hook-weight": "{{ .hookWeight }}"
 "helm.sh/hook-delete-policy": hook-succeeded
 {{- end }}
 {{- if .Values.cleanupCRD }}
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  {{ $_ := set . "hookWeight" "-3" }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 spec:
   template:
@@ -34,7 +36,7 @@ spec:
               memory: "56Mi"
           args:
             - delete
-            - vmagents,vmalertmanagers,vmalerts,vmauths,vmclusters,vmsingles
+            - {{ join "," (keys .Values.admissionWebhooks.enabledCRDValidation) }}
             - --all
             - --ignore-not-found=true
       restartPolicy: OnFailure
@@ -54,6 +56,7 @@ metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  {{ $_ := set . "hookWeight" "-5" }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -62,6 +65,7 @@ metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  {{ $_ := set . "hookWeight" "-4" }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -78,17 +82,13 @@ metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  {{ $_ := set . "hookWeight" "-5" }}
   annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
 rules:
   - apiGroups: ["operator.victoriametrics.com"]
     resources:
-      - vmagents
-      - vmalertmanagers
-      - vmalerts
-      - vmauths
-      - vmclusters
-      - vmsingles
-    verbs: ["get", "list", "watch","delete"]
----
+      {{- range $crd, $config := .Values.admissionWebhooks.enabledCRDValidation }}
+      - {{ $crd }}
+      {{- end }}
+    verbs: ["*"]
 {{- end }}
-
