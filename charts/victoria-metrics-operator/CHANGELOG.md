@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- set `admissionWebhooks.keepTLSSecret` to `true` by default
+- fixed indent, for Issuer crd, when `cert-manager.enabled: true`
 
 ## 0.34.1
 

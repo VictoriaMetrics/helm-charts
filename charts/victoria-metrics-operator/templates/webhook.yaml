@@ -1,5 +1,6 @@
 {{- if .Values.admissionWebhooks.enabled }}
 {{- $tls := fromYaml (include "vm-operator.certs" .) }}
+---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
@@ -41,11 +42,11 @@ webhooks:
           - UPDATE
         resources:
           - {{ $name }}{{ ternary "" "s" (hasSuffix "s" $name) }}
----
 {{- end }}
 {{- end }}
 {{- if .Values.admissionWebhooks.certManager.enabled }}
-{{- if not .Values.admissionWebhooks.certManager.issuer -}}
+{{- if not .Values.admissionWebhooks.certManager.issuer }}
+---
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
