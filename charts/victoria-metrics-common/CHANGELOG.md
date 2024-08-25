@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Updated `vm.probe.*` templates to remove Helm 3.14 restriction.
+- Added `vm.args` template for cmd args generation
 
 ## 0.0.3
 

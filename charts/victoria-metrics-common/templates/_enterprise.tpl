@@ -54,9 +54,8 @@ Return license flag if necessary.
 {{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
 {{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
 {{- if $licenseKey -}}
--license={{ $licenseKey }}
-{{- end }}
-{{- if and $licenseSecretName $licenseSecretKey -}}
--licenseFile=/etc/vm-license-key/{{ $licenseSecretKey }}
+license: {{ $licenseKey }}
+{{- else if and $licenseSecretName $licenseSecretKey -}}
+licenseFile: /etc/vm-license-key/{{ $licenseSecretKey }}
 {{- end -}}
 {{- end -}}
