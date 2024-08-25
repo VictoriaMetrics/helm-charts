@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.3
+
+**Release date:** 2024-08-25
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Moved license templates from other charts `vm.license.volume`, `vm.license.mount`, `vm.license.flag`
 - Moved `vm.compatibility.renderSecurityContext` template
 - Fixed a case, when null is passed to a `.Values.global`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1296)
