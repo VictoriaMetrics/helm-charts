@@ -103,8 +103,8 @@ rules:
   - operator.victoriametrics.com
   resources:
   {{- range $crd, $config := .Values.admissionWebhooks.enabledCRDValidation }}
-  - {{ $crd }}
-  - {{ $crd }}/finalizers
+  - {{ include "vm-operator.pluralise_crd" $crd }}
+  - {{ include "vm-operator.pluralise_crd" $crd }}/finalizers
   {{- end }}
   verbs:
   - "*"
@@ -112,7 +112,7 @@ rules:
   - operator.victoriametrics.com
   resources:
   {{- range $crd, $config := .Values.admissionWebhooks.enabledCRDValidation }}
-  - {{ $crd }}/status
+  - {{ include "vm-operator.pluralise_crd" $crd }}/status
   {{- end }}
   verbs:
   - get

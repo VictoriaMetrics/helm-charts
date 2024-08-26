@@ -108,3 +108,12 @@ clientCert: {{ $cert.Cert | b64enc }}
 clientKey: {{ $cert.Key | b64enc }}
 {{- end -}}
 {{- end -}}
+
+
+{{/*
+Pluralize CRD name.
+All CRDs apart from "vlogs" should be pluralized. "vlogs" plural form is "vlogs".
+*/}}
+{{- define "vm-operator.pluralise_crd" -}}
+{{ (eq . "vlogs") | ternary . (printf "%ss" .) }}
+{{- end -}}
