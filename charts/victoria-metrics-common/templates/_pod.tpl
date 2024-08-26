@@ -89,13 +89,15 @@ Net probe port
 command line arguments
 */ -}}
 {{- define "vm.args" -}}
-{{- range $key, $value := . }}
-{{- if kindIs "slice" $value }}
-{{- range $v := $value }}
-- -{{ $key }}={{ $v }}
-{{- end }}
-{{- else }}
-- -{{ $key }}={{ $value }}
-{{- end }}
-{{- end }}
+{{- $args := default list -}}
+{{- range $key, $value := . -}}
+{{- if kindIs "slice" $value -}}
+{{- range $v := $value -}}
+{{- $args = append $args (printf "-%s=%s" $key (toString $v)) -}}
+{{- end -}}
+{{- else -}}
+{{- $args = append $args (printf "-%s=%s" $key (toString $value)) -}}
+{{- end -}}
+{{- end -}}
+{{- toYaml $args -}}
 {{- end -}}
