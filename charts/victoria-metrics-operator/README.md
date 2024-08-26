@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics Operator.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.34.1](https://img.shields.io/badge/Version-0.34.1-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.34.3](https://img.shields.io/badge/Version-0.34.3-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-operator)
 
 Victoria Metrics Operator
@@ -171,7 +171,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| admissionWebhooks | object | `{"certManager":{"enabled":false,"issuer":{}},"enabled":true,"enabledCRDValidation":{"vlogs":true,"vmagent":true,"vmalert":true,"vmalertmanager":true,"vmalertmanagerconfig":true,"vmauth":true,"vmcluster":true,"vmnodescrape":true,"vmpodscrape":true,"vmprobe":true,"vmrule":true,"vmscrapeconfig":true,"vmservicescrape":true,"vmsingle":true,"vmstaticscrape":true,"vmuser":true},"keepTLSSecret":true,"policy":"Fail","tls":{"caCert":null,"cert":null,"key":null}}` | Configures resource validation |
+| admissionWebhooks | object | `{"certManager":{"enabled":false,"issuer":{}},"enabled":true,"enabledCRDValidation":{"vlogs":true,"vmagent":true,"vmalert":true,"vmalertmanager":true,"vmalertmanagerconfig":true,"vmauth":true,"vmcluster":true,"vmrule":true,"vmsingle":true,"vmuser":true},"keepTLSSecret":true,"policy":"Fail","tls":{"caCert":null,"cert":null,"key":null}}` | Configures resource validation |
 | admissionWebhooks.certManager | object | `{"enabled":false,"issuer":{}}` | with keys: tls.key, tls.crt, ca.crt |
 | admissionWebhooks.certManager.enabled | bool | `false` | Enables cert creation and injection by cert-manager. |
 | admissionWebhooks.certManager.issuer | object | `{}` | If needed, provide own issuer. Operator will create self-signed if empty. |
