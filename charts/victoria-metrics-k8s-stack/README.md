@@ -431,6 +431,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | externalVM.write.url | string | `""` |  |
 | extraObjects | list | `[]` | Add extra objects dynamically to this chart |
 | fullnameOverride | string | `""` |  |
+| global.clusterLabel | string | `"cluster"` |  |
 | global.license.key | string | `""` |  |
 | global.license.keyRef | object | `{}` |  |
 | grafana.additionalDataSources | list | `[]` |  |
@@ -444,7 +445,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.dashboardProviders."dashboardproviders.yaml".providers[0].type | string | `"file"` |  |
 | grafana.dashboards.default.nodeexporter.datasource | string | `"VictoriaMetrics"` |  |
 | grafana.dashboards.default.nodeexporter.gnetId | int | `1860` |  |
-| grafana.dashboards.default.nodeexporter.revision | int | `22` |  |
+| grafana.dashboards.default.nodeexporter.revision | int | `37` |  |
 | grafana.defaultDashboardsTimezone | string | `"utc"` |  |
 | grafana.defaultDatasourceType | string | `"prometheus"` |  |
 | grafana.enabled | bool | `true` |  |
