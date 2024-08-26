@@ -1,5 +1,4 @@
 ## minimum set of parameters for vmgateway to run it as rate limiter
-eula: true
 clusterMode: true
 rateLimiter:
   enable: true
@@ -35,10 +34,9 @@ podDisruptionBudget:
   enabled: true
 
 license:
-#  key: "asdf"
   secret:
-    name: "victoria-metrics-license"
-    key: "license"
+    name: vmgateway-license
+    key: license
 
 serviceMonitor:
   enabled: true
@@ -56,10 +54,10 @@ serviceMonitor:
   relabelings:
   - sourceLabels: ["prometheus_replica"]
     regex: ".*"
-    targetLabel: "another_prometheus_replica"
+    targetLabel: another_prometheus_replica
     action: replace
   metricRelabelings:
-  - regex: "prometheus_replica"
+  - regex: prometheus_replica
     action: labeldrop
 
 ingress:

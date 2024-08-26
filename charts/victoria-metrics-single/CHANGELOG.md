@@ -6,6 +6,7 @@
 - Added global relabelConfig. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/207)
 - Renamed `.Values.server.persistentVolume.storageClass` to `.Values.server.persistentVolume.storageClassName`
 - Removed necessity to set `.Values.server.persistentVolume.existingClaim` when it should be created by chart. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/189)
+- Removed `eula` support
 
 ## 0.10.1
 

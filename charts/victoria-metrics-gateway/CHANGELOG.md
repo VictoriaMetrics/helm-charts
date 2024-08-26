@@ -4,6 +4,7 @@
 
 - Added ability to configure container port
 - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
+- Removed `eula` support
 
 ## 0.2.0
 

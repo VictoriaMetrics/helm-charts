@@ -224,7 +224,6 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
   {{- end }}
   args:
     - restore
-    - --eula={{ .Values.vmstorage.vmbackupmanager.eula }}
     - --storageDataPath={{ .Values.vmstorage.persistentVolume.mountPath }}
     {{- range $key, $value := .Values.vmstorage.vmbackupmanager.extraArgs }}
     - --{{ $key }}={{ $value }}
@@ -298,8 +297,8 @@ Return license volume mount for container
 Enforce license for vmbackupmanager
 */}}
 {{- define "chart.vmbackupmanager.enforce_license" -}}
-{{ if and .Values.vmstorage.vmbackupmanager.enable (not (or .Values.vmstorage.vmbackupmanager.eula .Values.license.key .Values.license.secret.name)) }}
-{{ fail `Pass -eula command-line flag or valid license at .Values.license if you have an enterprise license for running this software.
+{{ if and .Values.vmstorage.vmbackupmanager.enable (not (or .Values.license.key .Values.license.secret.name)) }}
+{{ fail `Pass valid license at .Values.license if you have an enterprise license for running this software.
   See https://victoriametrics.com/legal/esa/ for details.
   Documentation - https://docs.victoriametrics.com/enterprise.html
   for more information, visit https://victoriametrics.com/products/enterprise/

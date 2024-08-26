@@ -128,7 +128,6 @@ Defines the name of relabel configuration map
   imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
   args:
     - restore
-    - --eula={{ .Values.server.vmbackupmanager.eula }}
     - --storageDataPath={{ .Values.server.persistentVolume.mountPath }}
     {{- range $key, $value := .Values.server.vmbackupmanager.extraArgs }}
     - --{{ $key }}={{ $value }}
@@ -197,8 +196,8 @@ Return license volume mount for container
 Enforce license for vmbackupmanager
 */}}
 {{- define "victoria-metrics.vmbackupmanager.enforce_license" -}}
-{{ if and .Values.server.vmbackupmanager.enable (not (or .Values.server.vmbackupmanager.eula .Values.license.key .Values.license.secret.name)) }}
-{{ fail `Pass -eula command-line flag or valid license at .Values.license if you have an enterprise license for running this software.
+{{ if and .Values.server.vmbackupmanager.enable (not (or .Values.license.key .Values.license.secret.name)) }}
+{{ fail `Pass valid license at .Values.license if you have an enterprise license for running this software.
   See https://victoriametrics.com/legal/esa/ for details.
   Documentation - https://docs.victoriametrics.com/enterprise.html
   for more information, visit https://victoriametrics.com/products/enterprise/

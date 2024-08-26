@@ -107,5 +107,5 @@ command line arguments
 {{- $args = append $args (include "vm.arg" (dict "key" $key "value" $value)) -}}
 {{- end -}}
 {{- end -}}
-{{- toYaml $args -}}
+{{- toYaml (dict "args" $args) -}}
 {{- end -}}
