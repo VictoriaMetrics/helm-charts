@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.4
+
+**Release date:** 2024-08-26
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Updated `vm.probe.*` templates to remove Helm 3.14 restriction.
 - Added `vm.args` template for cmd args generation
 
