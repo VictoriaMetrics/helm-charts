@@ -28,11 +28,11 @@ rules:
     summary: 'Kubelet is running at capacity.'
   condition: '{{ true }}'
   expr: |-
-    count by(cluster, node) (
-      (kube_pod_status_phase{job="kube-state-metrics",phase="Running"} == 1) * on(instance,pod,namespace,cluster) group_left(node) topk by(instance,pod,namespace,cluster) (1, kube_pod_info{job="kube-state-metrics"})
+    count by (node,{{ .Values.global.clusterLabel }}) (
+      (kube_pod_status_phase{job="kube-state-metrics",phase="Running"} == 1) * on (instance,pod,namespace,{{ .Values.global.clusterLabel }}) group_left(node) topk by (instance,pod,namespace,{{ .Values.global.clusterLabel }}) (1, kube_pod_info{job="kube-state-metrics"})
     )
     /
-    max by(cluster, node) (
+    max by (node,{{ .Values.global.clusterLabel }}) (
       kube_node_status_capacity{job="kube-state-metrics",resource="pods"} != 1
     ) > 0.95
   for: 15m
@@ -44,7 +44,7 @@ rules:
     runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubenodereadinessflapping'
     summary: 'Node readiness status is flapping.'
   condition: '{{ true }}'
-  expr: sum(changes(kube_node_status_condition{job="kube-state-metrics",status="true",condition="Ready"}[15m])) by (cluster, node) > 2
+  expr: sum(changes(kube_node_status_condition{job="kube-state-metrics",status="true",condition="Ready"}[15m])) by (node,{{ .Values.global.clusterLabel }}) > 2
   for: 15m
   labels:
     severity: warning
@@ -64,7 +64,7 @@ rules:
     runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubeletpodstartuplatencyhigh'
     summary: 'Kubelet Pod startup latency is too high.'
   condition: '{{ true }}'
-  expr: histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{job="kubelet", metrics_path="/metrics"}[5m])) by (cluster, instance, le)) * on(cluster, instance) group_left(node) kubelet_node_name{job="kubelet", metrics_path="/metrics"} > 60
+  expr: histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{job="kubelet", metrics_path="/metrics"}[5m])) by (instance,le,{{ .Values.global.clusterLabel }})) * on (instance,{{ .Values.global.clusterLabel }}) group_left(node) kubelet_node_name{job="kubelet", metrics_path="/metrics"} > 60
   for: 15m
   labels:
     severity: warning

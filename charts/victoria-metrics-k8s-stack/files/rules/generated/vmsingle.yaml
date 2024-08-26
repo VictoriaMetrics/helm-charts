@@ -28,10 +28,10 @@ rules:
     summary: 'Instance {{`{{`}} $labels.instance {{`}}`}} (job={{`{{`}} $labels.job {{`}}`}}) will run out of disk space soon'
   condition: '{{ true }}'
   expr: |-
-    sum(vm_data_size_bytes) by(job, instance) /
+    sum(vm_data_size_bytes) by (job,instance,{{ .Values.global.clusterLabel }}) /
     (
-     sum(vm_free_disk_space_bytes) by(job, instance) +
-     sum(vm_data_size_bytes) by(job, instance)
+     sum(vm_free_disk_space_bytes) by (job,instance,{{ .Values.global.clusterLabel }}) +
+     sum(vm_data_size_bytes) by (job,instance,{{ .Values.global.clusterLabel }})
     ) > 0.8
   for: 30m
   labels:
@@ -64,9 +64,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-       sum(rate(vm_new_timeseries_created_total[5m])) by(instance)
+       sum(rate(vm_new_timeseries_created_total[5m])) by (instance,{{ .Values.global.clusterLabel }})
        /
-       sum(rate(vm_rows_inserted_total[5m])) by (instance)
+       sum(rate(vm_rows_inserted_total[5m])) by (instance,{{ .Values.global.clusterLabel }})
      ) > 0.1
   for: 15m
   labels:
@@ -78,9 +78,9 @@ rules:
     summary: 'Too high number of new series on "{{`{{`}} $labels.instance {{`}}`}}" created over last 24h'
   condition: '{{ true }}'
   expr: |-
-    sum(increase(vm_new_timeseries_created_total[24h])) by(instance)
+    sum(increase(vm_new_timeseries_created_total[24h])) by (instance,{{ .Values.global.clusterLabel }})
     >
-    (sum(vm_cache_entries{type="storage/hour_metric_ids"}) by(instance) * 3)
+    (sum(vm_cache_entries{type="storage/hour_metric_ids"}) by (instance,{{ .Values.global.clusterLabel }}) * 3)
   for: 15m
   labels:
     severity: warning
@@ -92,9 +92,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-       sum(rate(vm_slow_row_inserts_total[5m])) by(instance)
+       sum(rate(vm_slow_row_inserts_total[5m])) by (instance,{{ .Values.global.clusterLabel }})
        /
-       sum(rate(vm_rows_inserted_total[5m])) by (instance)
+       sum(rate(vm_rows_inserted_total[5m])) by (instance,{{ .Values.global.clusterLabel }})
      ) > 0.05
   for: 15m
   labels:
