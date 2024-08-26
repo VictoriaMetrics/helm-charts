@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- removes not implemented scrape CRDs from validation webhook
 
 ## 0.34.2
 
