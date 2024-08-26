@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.25.4
+
+**Release date:** 2024-08-26
+
+![AppVersion: v1.102.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - updates operator to [v0.47.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.47.2)
 - kube-state-metrics - 5.16.4 -> 5.25.1
 - prometheus-node-exporter - 4.27.0 -> 4.29.0
