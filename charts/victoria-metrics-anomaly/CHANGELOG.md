@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 1.4.2
+
+**Release date:** 2024-08-26
+
+![AppVersion: v1.15.6](https://img.shields.io/static/v1?label=AppVersion&message=v1.15.6&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Set minimal kubernetes version to `1.25`
 - Added `.Values.global.imagePullSecrets` and `.Values.global.image.registry`
 - Fixed volume template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1280)
