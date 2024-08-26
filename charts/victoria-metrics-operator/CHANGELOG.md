@@ -4,6 +4,7 @@
 
 - set `admissionWebhooks.keepTLSSecret` to `true` by default
 - fixed indent, for Issuer crd, when `cert-manager.enabled: true`
+- updates operator to [v0.47.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.47.2) version
 
 ## 0.34.1
 
