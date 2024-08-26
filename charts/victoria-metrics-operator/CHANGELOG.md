@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.34.4
+
+**Release date:** 2024-08-26
+
+![AppVersion: v0.47.2](https://img.shields.io/static/v1?label=AppVersion&message=v0.47.2&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - fixes RBAC by rollback <https://github.com/VictoriaMetrics/helm-charts/commit/7d75b93525bb0a99a8011b700d0a51b6b762321c>
 
 ## 0.34.3
