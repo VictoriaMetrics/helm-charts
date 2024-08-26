@@ -36,8 +36,8 @@ serviceAccount:
 # -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
 podDisruptionBudget:
   enabled: false
-  # minAvailable: 1
-  # maxUnavailable: 1
+  minAvailable: 1
+  maxUnavailable: 1
   labels: {}
 
 extraArgs:
@@ -56,26 +56,27 @@ extraHostPathMounts: []
   #   mountPath: /etc/kubernetes/certs
   #   subPath: ""
   #   hostPath: /etc/kubernetes/certs
-#   readOnly: true
+  #   readOnly: true
 
 # -- Extra Volumes for the pod
 extraVolumes: []
+
   # - name: example
   #   configMap:
-#     name: example
+  #     name: example
 
 # -- Extra Volume Mounts for the container
 extraVolumeMounts: []
   # - name: example
-#   mountPath: /example
+  #   mountPath: /example
 
 extraContainers: []
   # - name: config-reloader
-#   image: reloader-image
+  #   image: reloader-image
 
 podSecurityContext:
   enabled: true
-# fsGroup: 2000
+  # fsGroup: 2000
 
 ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 securityContext:
@@ -94,7 +95,7 @@ resources: {}
   #   memory: 128Mi
   # requests:
   #   cpu: 100m
-#   memory: 128Mi
+  #   memory: 128Mi
 
 # -- Annotations to be added to the deployment
 annotations: {}
@@ -109,13 +110,13 @@ nodeSelector: {}
 tolerations: []
   # - key: "key"
   #   operator: "Equal|Exists"
-#   value: "value"
-#   effect: "NoSchedule|PreferNoSchedule"
+  #   value: "value"
+  #   effect: "NoSchedule|PreferNoSchedule"
 
 # -- Affinity configurations
 affinity: {}
 
-serviceMonitor:
+podMonitor:
   enabled: false
   extraLabels: {}
   annotations: {}

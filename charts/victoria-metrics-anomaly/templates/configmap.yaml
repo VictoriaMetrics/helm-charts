@@ -5,9 +5,4 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels: {{- include "chart.labels" . | nindent 4 }}
 data:
-  config.yml: |
-    {{ with .Values.config }}
-    {{-  . | toYaml | nindent 4}}
-    {{ end -}}
-
-
+  config.yml: |{{ toYaml (.Values.config | default dict) | nindent 4 }}
