@@ -171,7 +171,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| admissionWebhooks | object | `{"certManager":{"enabled":false,"issuer":{}},"enabled":true,"enabledCRDValidation":{"vlogs":true,"vmagent":true,"vmalert":true,"vmalertmanager":true,"vmalertmanagerconfig":true,"vmauth":true,"vmcluster":true,"vmnodescrapes":true,"vmpodscrapes":true,"vmprobes":true,"vmrule":true,"vmrules":true,"vmscrapeconfigs":true,"vmservicescrapes":true,"vmsingle":true,"vmstaticscrapes":true,"vmuser":true},"keepTLSSecret":true,"policy":"Fail","tls":{"caCert":null,"cert":null,"key":null}}` | Configures resource validation |
+| admissionWebhooks | object | `{"certManager":{"enabled":false,"issuer":{}},"enabled":true,"enabledCRDValidation":{"vlogs":true,"vmagent":true,"vmalert":true,"vmalertmanager":true,"vmalertmanagerconfig":true,"vmauth":true,"vmcluster":true,"vmnodescrape":true,"vmpodscrape":true,"vmprobe":true,"vmrule":true,"vmscrapeconfig":true,"vmservicescrape":true,"vmsingle":true,"vmstaticscrape":true,"vmuser":true},"keepTLSSecret":true,"policy":"Fail","tls":{"caCert":null,"cert":null,"key":null}}` | Configures resource validation |
 | admissionWebhooks.certManager | object | `{"enabled":false,"issuer":{}}` | with keys: tls.key, tls.crt, ca.crt |
 | admissionWebhooks.certManager.enabled | bool | `false` | Enables cert creation and injection by cert-manager. |
 | admissionWebhooks.certManager.issuer | object | `{}` | If needed, provide own issuer. Operator will create self-signed if empty. |
