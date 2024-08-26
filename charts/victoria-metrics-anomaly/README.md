@@ -1,6 +1,6 @@
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 1.4.1](https://img.shields.io/badge/Version-1.4.1-informational?style=flat-square)
+![Version: 1.4.2](https://img.shields.io/badge/Version-1.4.2-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-anomaly)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
@@ -160,7 +160,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | persistentVolume.size | string | `"1Gi"` | Size of the volume. Should be calculated based on the metrics you send and retention policy you set. |
 | persistentVolume.storageClassName | string | `""` | StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
-| podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
+| podDisruptionBudget | object | `{"enabled":false,"labels":{},"maxUnavailable":1,"minAvailable":1}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
+| podMonitor.annotations | object | `{}` |  |
+| podMonitor.enabled | bool | `false` |  |
+| podMonitor.extraLabels | object | `{}` |  |
 | podSecurityContext.enabled | bool | `true` |  |
 | resources | object | `{}` |  |
 | securityContext.enabled | bool | `true` |  |
@@ -170,7 +173,4 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `nil` |  |
-| serviceMonitor.annotations | object | `{}` |  |
-| serviceMonitor.enabled | bool | `false` |  |
-| serviceMonitor.extraLabels | object | `{}` |  |
 | tolerations | list | `[]` | Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
