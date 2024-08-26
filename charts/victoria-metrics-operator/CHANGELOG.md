@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixes RBAC by rollback <https://github.com/VictoriaMetrics/helm-charts/commit/7d75b93525bb0a99a8011b700d0a51b6b762321c>
 
 ## 0.34.3
 

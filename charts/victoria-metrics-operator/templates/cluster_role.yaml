@@ -109,18 +109,60 @@ rules:
 - apiGroups:
   - operator.victoriametrics.com
   resources:
-  {{- range $crd, $config := .Values.admissionWebhooks.enabledCRDValidation }}
-  - {{ include "vm-operator.pluralise_crd" $crd }}
-  - {{ include "vm-operator.pluralise_crd" $crd }}/finalizers
-  {{- end }}
+  - vlogs
+    - vlogs/finalizers
+    - vmagents
+    - vmagents/finalizers
+    - vmalertmanagers
+    - vmalertmanagers/finalizers
+    - vmalertmanagerconfigs
+    - vmalertmanagerconfigs/finalizers
+    - vmalerts
+    - vmalerts/finalizers
+    - vmauths
+    - vmauths/finalizers
+    - vmusers
+    - vmusers/finalizers
+    - vmclusters
+    - vmclusters/finalizers
+    - vmpodscrapes
+    - vmpodscrapes/finalizers
+    - vmrules
+    - vmrules/finalizers
+    - vmservicescrapes
+    - vmservicescrapes/finalizers
+    - vmprobes
+    - vmprobes/finalizers
+    - vmsingles
+    - vmsingles/finalizers
+    - vmnodescrapes
+    - vmnodescrapes/finalizers
+    - vmstaticscrapes
+    - vmstaticscrapes/finalizers
+    - vmscrapeconfigs
+    - vmscrapeconfigs/finalizers
   verbs:
-  - "*"
+      - '*'
 - apiGroups:
   - operator.victoriametrics.com
   resources:
-  {{- range $crd, $config := .Values.admissionWebhooks.enabledCRDValidation }}
-  - {{ include "vm-operator.pluralise_crd" $crd }}/status
-  {{- end }}
+  - vlogs/status
+  - vmagents/status
+  - vmalertmanagers/status
+  - vmalertmanagerconfigs/status
+  - vmalerts/status
+  - vmclusters/status
+  - vmpodscrapes/status
+  - vmscrapeconfigs/status
+  - vmrules/status
+  - vmservicescrapes/status
+  - vmprobes/status
+  - vmsingles/status
+  - vmscrapeconfig/status
+  - vmusers/status
+  - vmauths/status
+  - vmstaticscrapes/status
+  - vmnodescrapes/status
   verbs:
   - get
   - patch
