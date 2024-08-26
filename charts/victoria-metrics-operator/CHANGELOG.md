@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixes typo at clean webhook. vmlogs->vlogs.
 
 ## 0.34.4
 
