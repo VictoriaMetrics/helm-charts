@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Fixed `vm.enterprise.only` template to check if at least one of both global.licence.eula and .Values.license.eula are defined
+- Convert `vm.args` bool `true` values to flags without values
 
 ## 0.0.4
 

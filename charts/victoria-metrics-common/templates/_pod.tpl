@@ -85,6 +85,14 @@ Net probe port
 {{- dig "ports" "name" "http" (.app | dict) -}}
 {{- end -}}
 
+{{- define "vm.arg" -}}
+{{- if and (kindIs "bool" .value) .value -}}
+-{{ .key }}
+{{- else -}}
+-{{ .key }}={{ .value }}
+{{- end -}}
+{{- end -}}
+
 {{- /*
 command line arguments
 */ -}}
@@ -93,10 +101,10 @@ command line arguments
 {{- range $key, $value := . -}}
 {{- if kindIs "slice" $value -}}
 {{- range $v := $value -}}
-{{- $args = append $args (printf "-%s=%s" $key (toString $v)) -}}
+{{- $args = append $args (include "vm.arg" (dict "key" $key "value" $v)) -}}
 {{- end -}}
 {{- else -}}
-{{- $args = append $args (printf "-%s=%s" $key (toString $value)) -}}
+{{- $args = append $args (include "vm.arg" (dict "key" $key "value" $value)) -}}
 {{- end -}}
 {{- end -}}
 {{- toYaml $args -}}
