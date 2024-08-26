@@ -5,6 +5,7 @@ from os.path import realpath, dirname, join
 from urllib.parse import urlparse
 
 import json
+import re
 import pathlib
 import _jsonnet
 import requests
@@ -91,6 +92,20 @@ def escape(s):
     )
 
 
+def cluster_label_var(mo):
+    labels = ["[[ .Values.global.clusterLabel ]]"]
+    labelsStr = mo.group(2).strip()
+    group = mo.group(1)
+    if len(labelsStr) > 0:
+        labels = [
+            l.strip()
+            for l in labelsStr.split(",")
+            if l.strip() != "" and l.strip() != "cluster"
+        ] + labels
+    output = ",".join(labels)
+    return f"{group} ({output})"
+
+
 replacement_map = {
     "https://runbooks.prometheus-operator.dev/runbooks": {
         "replacement": "[[ .Values.defaultRules.runbookUrl ]]",
@@ -113,6 +128,9 @@ replacement_map = {
     'namespace="monitoring"': {
         "replacement": 'namespace="[[ .Release.Namespace ]]"',
         "limitGroup": ["alertmanager.rules"],
+    },
+    "(by|on)\\s*\\(([\\w\\s,]*)\\)": {
+        "replacement": cluster_label_var,
     },
 }
 
@@ -163,12 +181,13 @@ def write_group_to_file(group, url, destination):
     # add replacements of custom variables and include their initialisation in case it's needed
     lines = ""
     for line in replacement_map:
-        if (
-            group_name in replacement_map[line].get("limitGroup", [group_name])
-            and line in rules
-        ):
+        if group_name in replacement_map[line].get(
+            "limitGroup", [group_name]
+        ) and re.findall(line, rules):
             print(f"Applying replace rule for '{line}' in {group_name}")
-            rules = rules.replace(line, replacement_map[line]["replacement"])
+            rules = re.sub(
+                line, replacement_map[line]["replacement"], rules, flags=re.I
+            )
 
     # rules themselves
     lines += rules

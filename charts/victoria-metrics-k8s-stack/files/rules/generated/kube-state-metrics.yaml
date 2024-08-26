@@ -8,9 +8,9 @@ rules:
     summary: 'kube-state-metrics is experiencing errors in list operations.'
   condition: '{{ true }}'
   expr: |-
-    (sum(rate(kube_state_metrics_list_total{job="kube-state-metrics",result="error"}[5m])) by (cluster)
+    (sum(rate(kube_state_metrics_list_total{job="kube-state-metrics",result="error"}[5m])) by ({{ .Values.global.clusterLabel }})
       /
-    sum(rate(kube_state_metrics_list_total{job="kube-state-metrics"}[5m])) by (cluster))
+    sum(rate(kube_state_metrics_list_total{job="kube-state-metrics"}[5m])) by ({{ .Values.global.clusterLabel }}))
     > 0.01
   for: 15m
   labels:
@@ -22,9 +22,9 @@ rules:
     summary: 'kube-state-metrics is experiencing errors in watch operations.'
   condition: '{{ true }}'
   expr: |-
-    (sum(rate(kube_state_metrics_watch_total{job="kube-state-metrics",result="error"}[5m])) by (cluster)
+    (sum(rate(kube_state_metrics_watch_total{job="kube-state-metrics",result="error"}[5m])) by ({{ .Values.global.clusterLabel }})
       /
-    sum(rate(kube_state_metrics_watch_total{job="kube-state-metrics"}[5m])) by (cluster))
+    sum(rate(kube_state_metrics_watch_total{job="kube-state-metrics"}[5m])) by ({{ .Values.global.clusterLabel }}))
     > 0.01
   for: 15m
   labels:
@@ -35,7 +35,7 @@ rules:
     runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kube-state-metrics/kubestatemetricsshardingmismatch'
     summary: 'kube-state-metrics sharding is misconfigured.'
   condition: '{{ true }}'
-  expr: stdvar (kube_state_metrics_total_shards{job="kube-state-metrics"}) by (cluster) != 0
+  expr: stdvar (kube_state_metrics_total_shards{job="kube-state-metrics"}) by ({{ .Values.global.clusterLabel }}) != 0
   for: 15m
   labels:
     severity: critical
@@ -46,9 +46,9 @@ rules:
     summary: 'kube-state-metrics shards are missing.'
   condition: '{{ true }}'
   expr: |-
-    2^max(kube_state_metrics_total_shards{job="kube-state-metrics"}) by (cluster) - 1
+    2^max(kube_state_metrics_total_shards{job="kube-state-metrics"}) by ({{ .Values.global.clusterLabel }}) - 1
       -
-    sum( 2 ^ max by (cluster, shard_ordinal) (kube_state_metrics_shard_ordinal{job="kube-state-metrics"}) ) by (cluster)
+    sum( 2 ^ max by (shard_ordinal,{{ .Values.global.clusterLabel }}) (kube_state_metrics_shard_ordinal{job="kube-state-metrics"}) ) by ({{ .Values.global.clusterLabel }})
     != 0
   for: 15m
   labels:

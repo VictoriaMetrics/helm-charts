@@ -24,8 +24,8 @@ rules:
     # Without max_over_time, failed scrapes could create false negatives, see
     # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
       max_over_time(alertmanager_cluster_members{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[5m])
-    < on (namespace,service) group_left
-      count by (namespace,service) (max_over_time(alertmanager_cluster_members{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[5m]))
+    < on (namespace,service,{{ .Values.global.clusterLabel }}) group_left
+      count by (namespace,service,{{ .Values.global.clusterLabel }}) (max_over_time(alertmanager_cluster_members{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[5m]))
   for: 15m
   labels:
     severity: critical
@@ -52,7 +52,7 @@ rules:
     summary: 'All Alertmanager instances in a cluster failed to send notifications to a critical integration.'
   condition: '{{ true }}'
   expr: |-
-    min by (namespace,service, integration) (
+    min by (namespace,service,integration,{{ .Values.global.clusterLabel }}) (
       rate(alertmanager_notifications_failed_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}", integration=~`.*`}[5m])
     /
       ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}", integration=~`.*`}[5m])
@@ -68,7 +68,7 @@ rules:
     summary: 'All Alertmanager instances in a cluster failed to send notifications to a non-critical integration.'
   condition: '{{ true }}'
   expr: |-
-    min by (namespace,service, integration) (
+    min by (namespace,service,integration,{{ .Values.global.clusterLabel }}) (
       rate(alertmanager_notifications_failed_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}", integration!~`.*`}[5m])
     /
       ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}", integration!~`.*`}[5m])
@@ -84,8 +84,8 @@ rules:
     summary: 'Alertmanager instances within the same cluster have different configurations.'
   condition: '{{ true }}'
   expr: |-
-    count by (namespace,service) (
-      count_values by (namespace,service) ("config_hash", alertmanager_config_hash{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"})
+    count by (namespace,service,{{ .Values.global.clusterLabel }}) (
+      count_values by (namespace,service,{{ .Values.global.clusterLabel }}) ("config_hash", alertmanager_config_hash{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"})
     )
     != 1
   for: 20m
@@ -99,11 +99,11 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      count by (namespace,service) (
+      count by (namespace,service,{{ .Values.global.clusterLabel }}) (
         avg_over_time(up{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[5m]) < 0.5
       )
     /
-      count by (namespace,service) (
+      count by (namespace,service,{{ .Values.global.clusterLabel }}) (
         up{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}
       )
     )
@@ -119,11 +119,11 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      count by (namespace,service) (
+      count by (namespace,service,{{ .Values.global.clusterLabel }}) (
         changes(process_start_time_seconds{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[10m]) > 4
       )
     /
-      count by (namespace,service) (
+      count by (namespace,service,{{ .Values.global.clusterLabel }}) (
         up{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}
       )
     )

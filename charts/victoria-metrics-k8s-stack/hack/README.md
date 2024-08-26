@@ -13,9 +13,9 @@ Currently following imported:
 - [etcd-io/website rules set](https://github.com/etcd-io/website/blob/main/content/en/docs/v3.4/op-guide/etcd3_alert.rules.yml)
 
 
-## [sync_grafana_dashboards.py](sync_grafana_dashboards.py)
+## [sync_dashboards.py](sync_dashboards.py)
 
-This script generates grafana dashboards from json files, splitting them to separate files based on group name.
+This script generates dashboards from json files, splitting them to separate files based on group name.
 
 Currently following imported:
 

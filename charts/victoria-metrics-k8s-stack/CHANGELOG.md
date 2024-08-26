@@ -5,6 +5,7 @@
 - kube-state-metrics - 5.16.4 -> 5.25.1
 - prometheus-node-exporter - 4.27.0 -> 4.29.0
 - grafana - 8.3.8 -> 8.4.7
+- added configurable `.Values.global.clusterLabel` to all alerting and recording rules `by` and `on` expressions
 
 ## 0.25.3
 

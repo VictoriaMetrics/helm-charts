@@ -28,10 +28,10 @@ rules:
     summary: 'Instance {{`{{`}} $labels.instance {{`}}`}} (job={{`{{`}} $labels.job {{`}}`}}) will run out of disk space soon'
   condition: '{{ true }}'
   expr: |-
-    sum(vm_data_size_bytes) by(job, instance) /
+    sum(vm_data_size_bytes) by (job,instance,{{ .Values.global.clusterLabel }}) /
     (
-     sum(vm_free_disk_space_bytes) by(job, instance) +
-     sum(vm_data_size_bytes) by(job, instance)
+     sum(vm_free_disk_space_bytes) by (job,instance,{{ .Values.global.clusterLabel }}) +
+     sum(vm_data_size_bytes) by (job,instance,{{ .Values.global.clusterLabel }})
     ) > 0.8
   for: 30m
   labels:
@@ -55,11 +55,11 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-     sum(increase(vm_rpc_connection_errors_total[5m])) by(job, instance)
+     sum(increase(vm_rpc_connection_errors_total[5m])) by (job,instance,{{ .Values.global.clusterLabel }})
      +
-     sum(increase(vm_rpc_dial_errors_total[5m])) by(job, instance)
+     sum(increase(vm_rpc_dial_errors_total[5m])) by (job,instance,{{ .Values.global.clusterLabel }})
      +
-     sum(increase(vm_rpc_handshake_errors_total[5m])) by(job, instance)
+     sum(increase(vm_rpc_handshake_errors_total[5m])) by (job,instance,{{ .Values.global.clusterLabel }})
     ) > 0
   for: 15m
   labels:
