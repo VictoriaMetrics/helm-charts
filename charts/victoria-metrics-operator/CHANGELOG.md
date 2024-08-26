@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.34.2
+
+**Release date:** 2024-08-26
+
+![AppVersion: v0.47.2](https://img.shields.io/static/v1?label=AppVersion&message=v0.47.2&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - set `admissionWebhooks.keepTLSSecret` to `true` by default
 - fixed indent, for Issuer crd, when `cert-manager.enabled: true`
 - updates operator to [v0.47.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.47.2) version
