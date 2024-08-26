@@ -2,6 +2,7 @@
 
 ## Next release
 
+- updates operator to [v0.47.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.47.2)
 - kube-state-metrics - 5.16.4 -> 5.25.1
 - prometheus-node-exporter - 4.27.0 -> 4.29.0
 - grafana - 8.3.8 -> 8.4.7
