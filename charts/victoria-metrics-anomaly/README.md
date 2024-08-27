@@ -159,7 +159,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | persistentVolume.size | string | `"1Gi"` | Size of the volume. Should be calculated based on the metrics you send and retention policy you set. |
 | persistentVolume.storageClassName | string | `""` | StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically |
 | podAnnotations | object | `{}` | Annotations to be added to pod |
-| podDisruptionBudget | object | `{"enabled":false,"labels":{},"maxUnavailable":1,"minAvailable":1}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
+| podDisruptionBudget | object | `{"enabled":false,"labels":{},"minAvailable":1}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | podMonitor.annotations | object | `{}` |  |
 | podMonitor.enabled | bool | `false` |  |
 | podMonitor.extraLabels | object | `{}` |  |
