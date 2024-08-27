@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Fetch dashboards from provided urls into this chart."""
 import json
+import base64
 import pathlib
+import re
 from urllib.parse import urlparse
 from os import makedirs
 from os.path import dirname, join, realpath
@@ -18,10 +20,6 @@ dashboardsDir = join(
 
 # https://stackoverflow.com/a/20863889/961092
 class literal(str):
-    pass
-
-
-class quoted(str):
     pass
 
 
@@ -85,19 +83,27 @@ def escape(s):
         .replace("}}", "}}`}}")
         .replace("{{`{{", "{{`{{`}}")
         .replace("}}`}}", "{{`}}`}}")
+        .replace("'[[", "{{")
         .replace("[[", "{{")
+        .replace("]]'", "}}")
         .replace("]]", "}}")
     )
-
-
-def quoted_presenter(dumper, data):
-    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="'")
 
 
 def init_yaml_styles():
     represent_literal_str = change_style("|", SafeRepresenter.represent_str)
     yaml.add_representer(literal, represent_literal_str)
-    yaml.add_representer(quoted, quoted_presenter)
+
+
+def fix_query(query):
+    query = re.sub(
+        '[\\s]*cluster[\\s]*=[~]*[\\s]*\\"',
+        ' [[ $.Values.global.clusterLabel ]]=~"',
+        query.rstrip(),
+    )
+    if "\n" in query:
+        query = literal(query)
+    return query
 
 
 def fix_expr(target):
@@ -105,9 +111,7 @@ def fix_expr(target):
     due to yaml import specifics;
     convert multiline expressions to literal style, |-"""
     if "expr" in target:
-        target["expr"] = target["expr"].rstrip()
-        if "\n" in target["expr"]:
-            target["expr"] = literal(target["expr"])
+        target["expr"] = fix_query(target["expr"])
 
 
 def replace_ds_type_in_panel(panel):
@@ -137,20 +141,43 @@ def replace_ds_type_in_panel(panel):
 
 
 def patch_dashboard(dashboard, name):
+    for panel in dashboard.get("panels", []):
+        replace_ds_type_in_panel(panel)
+
     ## multicluster
     if "templating" in dashboard:
         for variable in dashboard["templating"].get("list", []):
             if variable.get("name", "") == "cluster":
+                if "definition" in variable and "cluster" in variable["definition"]:
+                    variable["definition"] = variable["definition"].replace(
+                        "cluster", "[[ $.Values.global.clusterLabel ]]"
+                    )
+                variable["type"] = (
+                    '[[ ternary "query" "constant" $.Values.grafana.sidecar.dashboards.multicluster ]]'
+                )
                 variable["hide"] = (
                     "[[ ternary 0 2 $.Values.grafana.sidecar.dashboards.multicluster ]]"
                 )
-            if (
-                variable.get("type", "") == "datasource"
-                and variable.get("query", "") == "prometheus"
-            ):
                 variable["query"] = (
-                    '[[ default "prometheus" .Values.grafana.defaultDatasourceType ]]'
+                    f'[[ ternary (b64dec "%(query)s" | replace "cluster" $.Values.global.clusterLabel) ".*" $.Values.grafana.sidecar.dashboards.multicluster ]]'
+                    % {
+                        "query": base64.b64encode(
+                            json.dumps(variable["query"]).encode("ascii")
+                        ).decode("utf-8")
+                    }
                 )
+            else:
+                if "definition" in variable:
+                    variable["definition"] = fix_query(variable["definition"])
+                if "query" in variable:
+                    if "query" in variable["query"]:
+                        variable["query"]["query"] = fix_query(
+                            variable["query"]["query"]
+                        )
+                if variable.get("type", "") == "datasource":
+                    variable["query"] = (
+                        '[[ default "prometheus" .Values.grafana.defaultDatasourceType ]]'
+                    )
 
     ## fix drilldown links. see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/659
     for row in dashboard.get("rows", []):
@@ -159,9 +186,6 @@ def patch_dashboard(dashboard, name):
             for style in panel.get("styles", []):
                 if "linkUrl" in style and style["linkUrl"].startswith("./d"):
                     style["linkUrl"] = style["linkUrl"].replace("./d", "/d")
-
-    for panel in dashboard.get("panels", []):
-        replace_ds_type_in_panel(panel)
 
     if "tags" in dashboard:
         dashboard["tags"].append("vm-k8s-stack")
