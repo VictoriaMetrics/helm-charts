@@ -68,12 +68,11 @@ Create the name of the service account to use
 {{- define "vmgateway.args" -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "clusterMode" .Values.clusterMode -}}
-  {{- $_ := set $args "eula" .Values.eula -}}
   {{- if .Values.rateLimiter.enable -}}
     {{- $_ := set $args "ratelimit.config" "/config/rate-limiter.yml" -}}
     {{- $_ := set $args "datasource.url" .Values.rateLimiter.datasource.url -}}
+    {{- $_ := set $args "enable.rateLimit" .Values.rateLimiter.enable -}}
   {{- end -}}
-  {{- $_ := set $args "enable.rateLimit" .Values.rateLimiter.enable -}}
   {{- $_ := set $args "enable.auth" .Values.auth.enable -}}
   {{- $_ := set $args "read.url" .Values.read.url -}}
   {{- $_ := set $args "write.url" .Values.write.url -}}

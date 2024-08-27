@@ -103,7 +103,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | automountServiceAccountToken | bool | `true` |  |
-| eula | bool | `false` | should be true and means that you have the legal right to run a backup manager that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/esa/ |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | global.image.registry | string | `""` |  |
