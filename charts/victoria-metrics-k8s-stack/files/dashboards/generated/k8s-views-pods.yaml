@@ -113,7 +113,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: kube_pod_info{namespace="$namespace", pod="$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: kube_pod_info{namespace="$namespace", pod="$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}
     instant: true
     interval: ''
     legendFormat: '{{`{{`}} created_by_kind {{`}}`}}: {{`{{`}} created_by_name {{`}}`}}'
@@ -163,7 +163,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: kube_pod_info{namespace="$namespace", pod="$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: kube_pod_info{namespace="$namespace", pod="$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}
     instant: true
     interval: ''
     legendFormat: '{{`{{`}} node {{`}}`}}'
@@ -210,7 +210,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: kube_pod_info{namespace="$namespace", pod="$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: kube_pod_info{namespace="$namespace", pod="$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}
     instant: true
     interval: ''
     legendFormat: '{{`{{`}} pod_ip {{`}}`}}'
@@ -257,7 +257,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: kube_pod_info{namespace="$namespace", pod="$pod", priority_class!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: kube_pod_info{namespace="$namespace", pod="$pod", priority_class!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}
     format: time_series
     instant: true
     interval: ''
@@ -323,7 +323,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: kube_pod_status_qos_class{namespace="$namespace", pod="$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"} > 0
+    expr: kube_pod_status_qos_class{namespace="$namespace", pod="$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"} > 0
     instant: true
     interval: ''
     legendFormat: '{{`{{`}} qos_class {{`}}`}}'
@@ -371,7 +371,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: kube_pod_container_status_last_terminated_reason{namespace="$namespace", pod="$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: kube_pod_container_status_last_terminated_reason{namespace="$namespace", pod="$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}
     instant: true
     interval: ''
     legendFormat: '{{`{{`}} reason {{`}}`}}'
@@ -421,7 +421,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: kube_pod_container_status_last_terminated_exitcode{namespace="$namespace", pod="$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: kube_pod_container_status_last_terminated_exitcode{namespace="$namespace", pod="$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}
     instant: true
     interval: ''
     legendFormat: __auto
@@ -495,7 +495,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) / sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"})
+    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) / sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"})
     instant: true
     interval: $resolution
     legendFormat: Requests
@@ -547,7 +547,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) / sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"})
+    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) / sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"})
     instant: true
     interval: $resolution
     legendFormat: Limits
@@ -602,7 +602,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}) / sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"})
+    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}) / sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"})
     instant: true
     interval: $resolution
     legendFormat: Requests
@@ -654,7 +654,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}) / sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"})
+    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}) / sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"})
     instant: true
     interval: $resolution
     legendFormat: Limits
@@ -729,7 +729,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
+    expr: sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
     format: table
     instant: true
     interval: ''
@@ -741,7 +741,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
+    expr: sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
     format: table
     instant: true
     interval: ''
@@ -753,7 +753,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
+    expr: sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
     format: table
     instant: true
     interval: ''
@@ -764,7 +764,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
+    expr: sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
     format: table
     instant: true
     interval: ''
@@ -775,7 +775,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="", container!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container)
+    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="", container!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container)
     format: table
     hide: false
     instant: true
@@ -787,7 +787,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: false
-    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="", container!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
+    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="", container!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
     format: table
     hide: false
     instant: true
@@ -948,7 +948,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: true
-    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
+    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
     interval: $resolution
     legendFormat: '{{`{{`}} container {{`}}`}}  REQUESTS'
     range: true
@@ -957,7 +957,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     editorMode: code
-    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
+    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
     hide: false
     legendFormat: '{{`{{`}} container {{`}}`}}  LIMITS'
     range: true
@@ -1041,7 +1041,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: true
-    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container) / sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
+    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container) / sum(kube_pod_container_resource_requests{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
     interval: ''
     legendFormat: '{{`{{`}} container {{`}}`}} REQUESTS'
     range: true
@@ -1050,7 +1050,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     editorMode: code
-    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container) / sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
+    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container) / sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
     hide: false
     legendFormat: '{{`{{`}} container {{`}}`}} LIMITS'
     range: true
@@ -1137,7 +1137,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: true
-    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="", container!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container)
+    expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="", container!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container)
     interval: $resolution
     legendFormat: '{{`{{`}} container {{`}}`}}'
     range: true
@@ -1216,7 +1216,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: true
-    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="", container!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
+    expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="", container!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (container)
     interval: ''
     legendFormat: '{{`{{`}} container {{`}}`}}'
     range: true
@@ -1298,7 +1298,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: true
-    expr: sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=~"$namespace", pod=~"$pod", image!="", container!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container)
+    expr: sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=~"$namespace", pod=~"$pod", image!="", container!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container)
     interval: $resolution
     legendFormat: '{{`{{`}} container {{`}}`}}'
     range: true
@@ -1392,7 +1392,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: true
-    expr: sum(increase(container_oom_events_total{namespace="${namespace}", pod="${pod}", container!="",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container)
+    expr: sum(increase(container_oom_events_total{namespace="${namespace}", pod="${pod}", container!="", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container)
     interval: ''
     legendFormat: '{{`{{`}} container {{`}}`}}'
     range: true
@@ -1476,7 +1476,7 @@ panels:
       uid: ${datasource}
     editorMode: code
     exemplar: true
-    expr: sum(increase(kube_pod_container_status_restarts_total{namespace=~"${namespace}", pod="${pod}", container!="", job=~"$job",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container)
+    expr: sum(increase(kube_pod_container_status_restarts_total{namespace=~"${namespace}", pod="${pod}", container!="", job=~"$job", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container)
     interval: ''
     legendFormat: '{{`{{`}} container {{`}}`}}'
     range: true
@@ -1566,7 +1566,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(container_network_receive_bytes_total{namespace="$namespace", pod=~"$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(container_network_receive_bytes_total{namespace="$namespace", pod=~"$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: Received
     refId: A
@@ -1574,7 +1574,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: '- sum(rate(container_network_transmit_bytes_total{namespace="$namespace", pod=~"$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
+    expr: '- sum(rate(container_network_transmit_bytes_total{namespace="$namespace", pod=~"$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
     interval: $resolution
     legendFormat: Transmitted
     refId: B
@@ -1645,7 +1645,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(container_network_receive_packets_total{namespace="$namespace", pod=~"$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(container_network_receive_packets_total{namespace="$namespace", pod=~"$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: Received
     refId: A
@@ -1653,7 +1653,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: '- sum(rate(container_network_transmit_packets_total{namespace="$namespace", pod=~"$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
+    expr: '- sum(rate(container_network_transmit_packets_total{namespace="$namespace", pod=~"$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
     interval: $resolution
     legendFormat: Transmitted
     refId: B
@@ -1724,7 +1724,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(container_network_receive_packets_dropped_total{namespace="$namespace", pod=~"$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(container_network_receive_packets_dropped_total{namespace="$namespace", pod=~"$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: Received
     refId: A
@@ -1732,7 +1732,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: '- sum(rate(container_network_transmit_packets_dropped_total{namespace="$namespace", pod=~"$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
+    expr: '- sum(rate(container_network_transmit_packets_dropped_total{namespace="$namespace", pod=~"$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
     interval: $resolution
     legendFormat: Transmitted
     refId: B
@@ -1803,7 +1803,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(container_network_receive_errors_total{namespace="$namespace", pod=~"$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(container_network_receive_errors_total{namespace="$namespace", pod=~"$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: Received
     refId: A
@@ -1811,7 +1811,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: '- sum(rate(container_network_transmit_errors_total{namespace="$namespace", pod=~"$pod",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
+    expr: '- sum(rate(container_network_transmit_errors_total{namespace="$namespace", pod=~"$pod", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
     interval: $resolution
     legendFormat: Transmitted
     refId: B
@@ -1867,14 +1867,14 @@ templating:
     datasource:
       type: prometheus
       uid: ${datasource}
-    definition: label_values(kube_pod_info{{{ $.Values.global.clusterLabel }}=~"$cluster"}, namespace)
+    definition: label_values(kube_pod_info{ {{ $.Values.global.clusterLabel }}=~"$cluster"}, namespace)
     hide: 0
     includeAll: false
     multi: false
     name: namespace
     options: []
     query:
-      query: label_values(kube_pod_info{{{ $.Values.global.clusterLabel }}=~"$cluster"}, namespace)
+      query: label_values(kube_pod_info{ {{ $.Values.global.clusterLabel }}=~"$cluster"}, namespace)
       refId: Prometheus-namespace-Variable-Query
     refresh: 1
     regex: ''
@@ -1891,14 +1891,14 @@ templating:
     datasource:
       type: prometheus
       uid: ${datasource}
-    definition: label_values(kube_pod_info{namespace="$namespace",{{ $.Values.global.clusterLabel }}=~"$cluster"}, pod)
+    definition: label_values(kube_pod_info{namespace="$namespace", {{ $.Values.global.clusterLabel }}=~"$cluster"}, pod)
     hide: 0
     includeAll: true
     multi: true
     name: pod
     options: []
     query:
-      query: label_values(kube_pod_info{namespace="$namespace",{{ $.Values.global.clusterLabel }}=~"$cluster"}, pod)
+      query: label_values(kube_pod_info{namespace="$namespace", {{ $.Values.global.clusterLabel }}=~"$cluster"}, pod)
       refId: Prometheus-pod-Variable-Query
     refresh: 2
     regex: ''
@@ -1946,7 +1946,7 @@ templating:
     datasource:
       type: prometheus
       uid: ${datasource}
-    definition: label_values(kube_pod_info{namespace="$namespace",{{ $.Values.global.clusterLabel }}=~"$cluster"},job)
+    definition: label_values(kube_pod_info{namespace="$namespace", {{ $.Values.global.clusterLabel }}=~"$cluster"},job)
     hide: 0
     includeAll: false
     multi: true
@@ -1954,7 +1954,7 @@ templating:
     options: []
     query:
       qryType: 1
-      query: label_values(kube_pod_info{namespace="$namespace",{{ $.Values.global.clusterLabel }}=~"$cluster"},job)
+      query: label_values(kube_pod_info{namespace="$namespace", {{ $.Values.global.clusterLabel }}=~"$cluster"},job)
       refId: PrometheusVariableQueryEditor-VariableQuery
     refresh: 1
     regex: ''

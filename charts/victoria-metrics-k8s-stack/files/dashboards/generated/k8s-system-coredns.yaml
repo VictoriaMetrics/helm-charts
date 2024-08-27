@@ -92,7 +92,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: up{job=~"$job", instance=~"$instance",{{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: up{job=~"$job", instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}
     interval: ''
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -164,7 +164,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: rate(process_cpu_seconds_total{job=~"$job", instance=~"$instance",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
+    expr: rate(process_cpu_seconds_total{job=~"$job", instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -235,7 +235,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: process_resident_memory_bytes{job=~"$job", instance=~"$instance",{{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: process_resident_memory_bytes{job=~"$job", instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}
     interval: ''
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -306,7 +306,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(coredns_dns_requests_total{instance=~"$instance",proto="$protocol",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(coredns_dns_requests_total{instance=~"$instance",proto="$protocol", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: total $protocol requests
     refId: A
@@ -377,7 +377,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(coredns_dns_request_size_bytes_sum{instance=~"$instance",proto="$protocol",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (proto) / sum(rate(coredns_dns_request_size_bytes_count{instance=~"$instance",proto="$protocol",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (proto)
+    expr: sum(rate(coredns_dns_request_size_bytes_sum{instance=~"$instance",proto="$protocol", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (proto) / sum(rate(coredns_dns_request_size_bytes_count{instance=~"$instance",proto="$protocol", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (proto)
     interval: $resolution
     legendFormat: average $protocol packet size
     refId: A
@@ -448,7 +448,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(coredns_dns_requests_total{instance=~"$instance",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
+    expr: sum(rate(coredns_dns_requests_total{instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
     interval: $resolution
     legendFormat: '{{`{{`}} type {{`}}`}}'
     refId: A
@@ -519,7 +519,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(coredns_dns_responses_total{instance=~"$instance",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (rcode)
+    expr: sum(rate(coredns_dns_responses_total{instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (rcode)
     interval: $resolution
     legendFormat: '{{`{{`}} rcode {{`}}`}}'
     refId: A
@@ -590,7 +590,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(coredns_forward_requests_total{{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(coredns_forward_requests_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: total forward requests
     refId: A
@@ -661,7 +661,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(coredns_forward_responses_total{rcode=~"SERVFAIL|REFUSED",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (rcode)
+    expr: sum(rate(coredns_forward_responses_total{rcode=~"SERVFAIL|REFUSED", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (rcode)
     interval: $resolution
     legendFormat: '{{`{{`}} rcode {{`}}`}}'
     refId: A
@@ -732,7 +732,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(coredns_cache_hits_total{instance=~"$instance",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
+    expr: sum(rate(coredns_cache_hits_total{instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
     interval: $resolution
     legendFormat: '{{`{{`}} type {{`}}`}}'
     refId: A
@@ -740,7 +740,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(coredns_cache_misses_total{instance=~"$instance",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
+    expr: sum(rate(coredns_cache_misses_total{instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
     interval: $resolution
     legendFormat: misses
     refId: B
@@ -811,7 +811,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(coredns_cache_entries{{{ $.Values.global.clusterLabel }}=~"$cluster"}) by (type)
+    expr: sum(coredns_cache_entries{ {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (type)
     interval: ''
     legendFormat: '{{`{{`}} type {{`}}`}}'
     refId: A
@@ -869,7 +869,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     editorMode: code
-    expr: sum(increase(coredns_dns_request_duration_seconds_bucket{instance=~"$instance",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
+    expr: sum(increase(coredns_dns_request_duration_seconds_bucket{instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
     format: heatmap
     legendFormat: '{{`{{`}}le{{`}}`}}'
     range: true
@@ -928,7 +928,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     editorMode: code
-    expr: sum(increase(coredns_dns_request_size_bytes_bucket{instance=~"$instance", le!="0",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
+    expr: sum(increase(coredns_dns_request_size_bytes_bucket{instance=~"$instance", le!="0", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
     format: heatmap
     legendFormat: '{{`{{`}}le{{`}}`}}'
     range: true
@@ -987,7 +987,7 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     editorMode: code
-    expr: sum(increase(coredns_dns_response_size_bytes_bucket{instance=~"$instance", le!="0",{{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
+    expr: sum(increase(coredns_dns_response_size_bytes_bucket{instance=~"$instance", le!="0", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
     format: heatmap
     legendFormat: '{{`{{`}}le{{`}}`}}'
     range: true
@@ -1044,7 +1044,7 @@ templating:
     datasource:
       type: prometheus
       uid: ${datasource}
-    definition: label_values(up{job="$job",{{ $.Values.global.clusterLabel }}=~"$cluster"},instance)
+    definition: label_values(up{job="$job", {{ $.Values.global.clusterLabel }}=~"$cluster"},instance)
     hide: 0
     includeAll: true
     label: ''
@@ -1053,7 +1053,7 @@ templating:
     options: []
     query:
       qryType: 1
-      query: label_values(up{job="$job",{{ $.Values.global.clusterLabel }}=~"$cluster"},instance)
+      query: label_values(up{job="$job", {{ $.Values.global.clusterLabel }}=~"$cluster"},instance)
       refId: PrometheusVariableQueryEditor-VariableQuery
     refresh: 1
     regex: ''
@@ -1071,7 +1071,7 @@ templating:
     datasource:
       type: prometheus
       uid: ${datasource}
-    definition: label_values(coredns_dns_requests_total{{{ $.Values.global.clusterLabel }}=~"$cluster"}, proto)
+    definition: label_values(coredns_dns_requests_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}, proto)
     hide: 0
     includeAll: false
     label: ''
@@ -1079,7 +1079,7 @@ templating:
     name: protocol
     options: []
     query:
-      query: label_values(coredns_dns_requests_total{{{ $.Values.global.clusterLabel }}=~"$cluster"}, proto)
+      query: label_values(coredns_dns_requests_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}, proto)
       refId: StandardVariableQuery
     refresh: 1
     regex: ''
@@ -1129,7 +1129,7 @@ templating:
     datasource:
       type: prometheus
       uid: ${datasource}
-    definition: label_values(coredns_build_info{{{ $.Values.global.clusterLabel }}=~"$cluster"},job)
+    definition: label_values(coredns_build_info{ {{ $.Values.global.clusterLabel }}=~"$cluster"},job)
     hide: 0
     includeAll: false
     multi: true
@@ -1137,7 +1137,7 @@ templating:
     options: []
     query:
       qryType: 1
-      query: label_values(coredns_build_info{{{ $.Values.global.clusterLabel }}=~"$cluster"},job)
+      query: label_values(coredns_build_info{ {{ $.Values.global.clusterLabel }}=~"$cluster"},job)
       refId: PrometheusVariableQueryEditor-VariableQuery
     refresh: 1
     regex: ''

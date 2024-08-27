@@ -98,7 +98,7 @@ def init_yaml_styles():
 def fix_query(query):
     query = re.sub(
         '[\\s]*cluster[\\s]*=[~]*[\\s]*\\"',
-        '[[ $.Values.global.clusterLabel ]]=~"',
+        ' [[ $.Values.global.clusterLabel ]]=~"',
         query.rstrip(),
     )
     if "\n" in query:
