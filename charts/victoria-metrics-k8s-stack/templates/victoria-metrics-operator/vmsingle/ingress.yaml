@@ -1,7 +1,8 @@
 {{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vmsingle }}
 {{ if and $app.enabled $app.ingress.enabled -}}
-{{- $serviceName := printf "%s-%s" "vmsingle" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- $ctx := dict "global" $global "vmService" "vmsingle" -}}
+{{- $serviceName := include "vm.service" $ctx -}}
 {{- $servicePort := $app.spec.port | default 8429 -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress

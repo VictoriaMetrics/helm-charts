@@ -35,25 +35,6 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
-{{- /* Create the name for VMSingle */ -}}
-{{- define "victoria-metrics-k8s-stack.vmsingleName" -}}
-{{- .Values.vmsingle.name | default (printf "vmsingle-%s" (include "victoria-metrics-k8s-stack.fullname" .))}}
-{{- end }}
-
-{{- /* Create the name for VMCluster and its components */ -}}
-{{- define "victoria-metrics-k8s-stack.vmclusterName" -}}
-{{ .Values.vmcluster.name | default (include "victoria-metrics-k8s-stack.fullname" .) }}
-{{- end }}
-{{- define "victoria-metrics-k8s-stack.vmstorageName" -}}
-{{- printf "%s-%s" "vmstorage" (include "victoria-metrics-k8s-stack.vmclusterName" $) | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- define "victoria-metrics-k8s-stack.vmselectName" -}}
-{{- printf "%s-%s" "vmselect" (include "victoria-metrics-k8s-stack.vmclusterName" $) | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- define "victoria-metrics-k8s-stack.vminsertName" -}}
-{{- printf "%s-%s" "vminsert" (include "victoria-metrics-k8s-stack.vmclusterName" $) | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
 {{- /* Common labels */ -}}
 {{- define "victoria-metrics-k8s-stack.labels" -}}
 helm.sh/chart: {{ include "victoria-metrics-k8s-stack.chart" . }}
