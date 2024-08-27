@@ -129,7 +129,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | emptyDir | object | `{}` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) |
 | envFrom | list | `[]` |  |
-| eula | bool | `false` | should be true and means that you have the legal right to run a vmanomaly that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/esa/ |
 | extraArgs.loggerFormat | string | `"json"` |  |
 | extraContainers | list | `[]` |  |
 | extraHostPathMounts | list | `[]` | Additional hostPath mounts |
