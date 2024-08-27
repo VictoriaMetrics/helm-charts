@@ -179,10 +179,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | admissionWebhooks.policy | string | `"Fail"` | What to do in case, when operator not available to validate request. |
 | affinity | object | `{}` | Pod affinity |
 | annotations | object | `{}` | Annotations to be added to the all resources |
-| cleanupCRD | bool | `false` | Tells helm to clean up all the vm resources under this release's namespace when uninstalling |
-| cleanupImage.pullPolicy | string | `"IfNotPresent"` |  |
-| cleanupImage.repository | string | `"bitnami/kubectl"` |  |
-| createCRD | bool | `true` | with this option, if you remove this chart, all crd resources will be deleted with it. |
+| cleanupCRD | bool | `false` | deprecated. See `crd.cleanup.enabled` |
+| cleanupImage | object | `{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl","tag":"{{ printf \"%s.%s\" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor | replace \"+\" \"\" }}"}` | deprecated. See `crd.cleanup.image` |
+| crd.cleanup.enabled | bool | `false` | Tells helm to clean up all the vm resources under this release's namespace when uninstalling |
+| crd.cleanup.image.pullPolicy | string | `"IfNotPresent"` |  |
+| crd.cleanup.image.repository | string | `"bitnami/kubectl"` |  |
+| crd.cleanup.image.tag | string | `"{{ printf \"%s.%s\" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor | replace \"+\" \"\" }}"` |  |
+| crd.create | bool | `true` | with this option, if you remove this chart, all crd resources will be deleted with it. |
+| createCRD | bool | `true` | deprecated. See `crd.create` |
 | env | list | `[]` | extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD) |
 | envFrom | list | `[]` |  |
 | extraArgs | object | `{}` | operator container additional commandline arguments |
@@ -248,4 +252,5 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceMonitor | object | `{"annotations":{},"basicAuth":{},"enabled":false,"extraLabels":{},"interval":"","relabelings":[],"scheme":"","scrapeTimeout":"","tlsConfig":{}}` | configures monitoring with serviceScrape. VMServiceScrape must be pre-installed |
 | tolerations | list | `[]` | Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) |
 | topologySpreadConstraints | list | `[]` | Pod Topology Spread Constraints. Ref: [https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
-| watchNamespace | string | `""` |  |
+| watchNamespace | string | `""` | deprecated. See `watchNamespaces` |
+| watchNamespaces | list | `[]` |  |

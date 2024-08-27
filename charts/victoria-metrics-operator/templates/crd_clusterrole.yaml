@@ -3,18 +3,26 @@
 {{- /* kubernetes clusterrole aggregation feature to include these */ -}}
 {{- /* cluster roles into the default view and admin roles */ -}}
 {{- /* See https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles */ -}}
-{{- if .Values.createCRD }}
-{{- if .Values.rbac.aggregatedClusterRoles.enabled }}
+{{- if or .Values.createCRD .Values.crd.create .Values.rbac.aggregatedClusterRoles.enabled }}
 {{- $files := .Files }}
 {{- $fileContentsList := $files.Get "crd.yaml" | splitList "---" }}
 {{- $groups := dict }}
 {{- range $fileContentsList }}
-    {{- $fileContents := . | fromYaml }}
-    {{- $group := $fileContents.spec.group }}
-    {{- $plural:= $fileContents.spec.names.plural }}
-    {{- $resources := get $groups $group | default (list) }}
-    {{- $resources := append $resources $plural }}
-    {{- $groups := set $groups $group $resources }}
+  {{- $fileContents := . | fromYaml }}
+  {{- $group := $fileContents.spec.group }}
+  {{- $plural:= $fileContents.spec.names.plural }}
+  {{- $resources := get $groups $group | default (list) }}
+  {{- $resources = append $resources $plural }}
+  {{- $groups = set $groups $group $resources }}
+{{- end }}
+
+{{- $clusterRules := default list }}
+{{- $rules := default list }}
+{{- $clusterVerbs := list "*" }}
+{{- $verbs := list "get" "list" "watch" }}
+{{- range $group, $resources := $groups }}
+  {{- $rules = append $rules (dict "apiGroups" (list $group) "resources" $resources "verbs" $verbs) }}
+  {{- $clusterRules = append $clusterRules (dict "apiGroups" (list $group) "resources" $resources "verbs" $clusterVerbs) }}
 {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -24,23 +32,7 @@ metadata:
   labels:
     {{- include "vm-operator.labels" . | nindent 4 }}
     {{- .Values.rbac.aggregatedClusterRoles.labels.admin | toYaml | nindent 4 }}
-rules:
-- apiGroups: 
-  {{- range $group, $resources := $groups }}
-  - {{ $group }}
-  resources:
-  {{- range $resource := $resources }}
-  - {{ $resource }}
-  {{- end }}
-  {{- end }}
-  verbs:
-  - create
-  - update
-  - patch
-  - delete
-  - get
-  - list
-  - watch
+rules: {{ toYaml $clusterRules | nindent 2 }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -49,18 +41,5 @@ metadata:
   labels:
     {{- include "vm-operator.labels" . | nindent 4 }}
     {{- .Values.rbac.aggregatedClusterRoles.labels.view | toYaml | nindent 4 }}
-rules:
-- apiGroups:
-  {{- range $group, $resources := $groups }}
-  - {{ $group }}
-  resources:
-  {{- range $resource := $resources }}
-  - {{ $resource }}
-  {{- end }}
-  {{- end }}
-  verbs:
-  - get
-  - list
-  - watch
-{{- end }}
+rules: {{ toYaml $rules | nindent 2 }}
 {{- end }}

@@ -37,12 +37,14 @@ spec:
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
           env:
-          {{- range .Values.env }}
+            {{- range .Values.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}
-          {{- end }}
+            {{- end }}
+            {{- if or .Values.watchNamespace .Values.watchNamespaces }}
             - name: WATCH_NAMESPACE
-              value: {{ .Values.watchNamespace | quote }}
+              value: {{ ternary .Values.watchNamespace (.Values.watchNamespaces | join "," | quote) (empty .Values.watchNamespaces) }}
+            {{- end }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:
