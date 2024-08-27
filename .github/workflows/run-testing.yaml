@@ -91,10 +91,10 @@ jobs:
 
       - name: Run chart-testing (install)
         env:
-          VMANOMALY_LICENSE_CICD: ${{ secrets.ENTERPRISE_COMPONENTS_LICENSE_KEY }}
+          LICENSE_KEY: ${{ secrets.ENTERPRISE_COMPONENTS_LICENSE_KEY }}
         run: |
           kubectl create namespace ${{ matrix.chart }}-testing
-          kubectl create secret -n=${{ matrix.chart }}-testing generic vmanomaly-license --from-literal=license=$VMANOMALY_LICENSE_CICD
+          kubectl create secret -n=${{ matrix.chart }}-testing generic license --from-literal=key=$LICENSE_KEY
           helm dep update charts/${{ matrix.chart }}
           # Skip run for k8s stack chart as it fails CRD check
           if [ "${{ matrix.chart }}" != "victoria-metrics-k8s-stack" ] && [ "${{ matrix.chart }}" != "victoria-metrics-distributed" ]; then

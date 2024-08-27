@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Changed structure of `vm.args` template output
+- Removed `eula` support
 
 ## 0.0.5
 

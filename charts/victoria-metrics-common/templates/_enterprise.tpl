@@ -14,9 +14,8 @@
   {{- $licenseKey := (include "vm.license.key" .) -}}
   {{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
   {{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
-  {{- $eula := or .Values.eula ((.Values.global).eula | default false) -}}
-  {{- if and (empty $licenseKey) (and (empty $licenseSecretName) (empty $licenseSecretKey)) (not $eula) -}}
-    {{ fail "Pass -eula command-line flag or valid license at .Values.license or .Values.global.license if you have an enterprise license for running this software. See https://victoriametrics.com/legal/esa/ for details"}}
+  {{- if and (empty $licenseKey) (and (empty $licenseSecretName) (empty $licenseSecretKey)) -}}
+    {{ fail "Pass valid license at .Values.license or .Values.global.license if you have an enterprise license for running this software. See https://victoriametrics.com/legal/esa/ for details"}}
   {{- end -}}
 {{- end -}}
 

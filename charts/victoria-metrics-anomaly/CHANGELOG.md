@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Removed `eula` support
 
 ## 1.4.2
 
