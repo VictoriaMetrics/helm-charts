@@ -91,7 +91,7 @@ jobs:
 
       - name: Run chart-testing (install)
         env:
-          VMANOMALY_LICENSE_CICD: ${{ secrets.VMANOMALY_LICENSE_CICD }}
+          VMANOMALY_LICENSE_CICD: ${{ secrets.ENTERPRISE_COMPONENTS_LICENSE_KEY }}
         run: |
           kubectl create namespace ${{ matrix.chart }}-testing
           kubectl create secret -n=${{ matrix.chart }}-testing generic vmanomaly-license --from-literal=license=$VMANOMALY_LICENSE_CICD
