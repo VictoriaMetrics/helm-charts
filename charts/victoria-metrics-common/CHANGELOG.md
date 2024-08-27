@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.6
+
+**Release date:** 2024-08-27
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Changed structure of `vm.args` template output
 - Removed `eula` support
 
