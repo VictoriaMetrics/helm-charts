@@ -107,8 +107,8 @@ metadata:
   {{- with (include "victoria-metrics-k8s-stack.rulegroup.labels" $ctx) }}
   labels: {{ . | nindent 4 }}
   {{- end }}
-  {{- with (include "victoria-metrics-k8s-stack.rulegroup.annotations" $ctx) }}
-  annotations: {{ . | nindent 4 }}
+  {{- with $.Values.defaultRules.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
   groups:

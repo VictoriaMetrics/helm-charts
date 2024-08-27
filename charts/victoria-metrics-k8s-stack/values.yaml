@@ -248,6 +248,7 @@ vmsingle:
   # spec for VMSingle crd
   # https://docs.victoriametrics.com/operator/api.html#vmsinglespec
   spec:
+    port: "8429"
     image:
       tag: v1.102.1
     # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
@@ -322,6 +323,7 @@ vmcluster:
         #   cpu: "1"
         #   memory: 1500Mi
     vmselect:
+      port: "8481"
       image:
         tag: v1.102.1-cluster
       replicaCount: 2
@@ -342,6 +344,7 @@ vmcluster:
         #   cpu: "0.5"
         #   memory: "500Mi"
     vminsert:
+      port: "8480"
       image:
         tag: v1.102.1-cluster
       replicaCount: 2
@@ -468,6 +471,7 @@ alertmanager:
   # spec for VMAlertmanager crd
   # https://docs.victoriametrics.com/operator/api.html#vmalertmanagerspec
   spec:
+    port: "9093"
     selectAllByDefault: true
     image:
       tag: v0.25.0
@@ -638,6 +642,7 @@ vmalert:
   # spec for VMAlert crd
   # https://docs.victoriametrics.com/operator/api.html#vmalertspec
   spec:
+    port: "8080"
     selectAllByDefault: true
     image:
       tag: v1.102.1
@@ -712,6 +717,7 @@ vmagent:
   # spec for VMAgent crd
   # https://docs.victoriametrics.com/operator/api.html#vmagentspec
   spec:
+    port: "8429"
     selectAllByDefault: true
     image:
       tag: v1.102.1

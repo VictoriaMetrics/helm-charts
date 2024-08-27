@@ -10,24 +10,22 @@ metadata:
   name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-alertmanager
   namespace: {{ .Release.Namespace }}
   labels: 
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-alertmanager
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" . }}-alertmanager
+    {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 stringData:
-  alertmanager.yaml: {{ toYaml .Values.alertmanager.config | quote }}
+  alertmanager.yaml: |{{ toYaml .Values.alertmanager.config | nindent 4 }}
 {{- end }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlertmanager
 metadata:
   {{- with .Values.alertmanager.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
   name: {{ .Values.alertmanager.name | default (include "victoria-metrics-k8s-stack.fullname" .) }}
   namespace: {{ .Release.Namespace }}
   labels: 
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-alertmanager
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
-spec:
-{{ include "victoria-metrics-k8s-stack.alertmanagerSpec" . | indent 2}}
+    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" . }}-alertmanager
+    {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+spec: {{ include "vm.alertmanager.spec" . | nindent 2}}
 {{- end }}
