@@ -4,6 +4,8 @@
 
 - Removed `eula` support
 - Disable PodMonitor, when pull port is not defined
+- Upgraded application version to 1.15.9
+- Fixed default podDisruptionBudget configuration
 
 ## 1.4.2
 
