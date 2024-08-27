@@ -37,7 +37,7 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
-condition: '{{ (index .Values "victoria-metrics-operator" "enabled") }}'
+condition: {{ (index .Values "victoria-metrics-operator" "enabled") }}
 description: Overview for operator VictoriaMetrics v0.25.0 or higher
 editable: false
 fiscalYearStartMonth: 0
@@ -48,10 +48,10 @@ liveNow: false
 panels:
 - collapsed: false
   datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: PB894574A363DF0AF
   gridPos:
-    '{{ .yaxis }}': 0
+    {{ .yaxis }}: 0
     h: 1
     w: 24
     x: 0
@@ -59,16 +59,16 @@ panels:
   panels: []
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: PB894574A363DF0AF
     refId: A
   title: Overview
   type: row
 - datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: $ds
   gridPos:
-    '{{ .yaxis }}': 1
+    {{ .yaxis }}: 1
     h: 3
     w: 4
     x: 0
@@ -83,13 +83,13 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     refId: A
   title: Version
   type: text
 - datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: $ds
   description: Number of objects at kubernetes cluster per each controller
   fieldConfig:
@@ -106,7 +106,7 @@ panels:
           value: 80
     overrides: []
   gridPos:
-    '{{ .yaxis }}': 1
+    {{ .yaxis }}: 1
     h: 7
     w: 20
     x: 4
@@ -128,7 +128,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: max(operator_controller_objects_count{job=~"$job",instance=~"$instance"}) by (controller)
@@ -138,7 +138,7 @@ panels:
   title: CRD Objects count by controller
   type: stat
 - datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: $ds
   fieldConfig:
     defaults:
@@ -155,7 +155,7 @@ panels:
       unit: s
     overrides: []
   gridPos:
-    '{{ .yaxis }}': 4
+    {{ .yaxis }}: 4
     h: 4
     w: 4
     x: 0
@@ -176,7 +176,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     exemplar: false
@@ -190,7 +190,7 @@ panels:
   title: Uptime
   type: stat
 - datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: $ds
   fieldConfig:
     defaults:
@@ -234,7 +234,7 @@ panels:
       unit: short
     overrides: []
   gridPos:
-    '{{ .yaxis }}': 8
+    {{ .yaxis }}: 8
     h: 13
     w: 12
     x: 0
@@ -253,7 +253,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(rate(controller_runtime_reconcile_total{job=~"$job",instance=~"$instance",result=~"requeue_after|requeue|success"}[$__rate_interval])) by(controller) > 0
@@ -263,7 +263,7 @@ panels:
   title: Reconciliation rate by controller
   type: timeseries
 - datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: $ds
   description: ''
   fieldConfig:
@@ -308,7 +308,7 @@ panels:
       unit: short
     overrides: []
   gridPos:
-    '{{ .yaxis }}': 8
+    {{ .yaxis }}: 8
     h: 13
     w: 12
     x: 12
@@ -327,7 +327,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(rate(operator_log_messages_total{job=~"$job",instance=~"$instance"}[$__rate_interval])) by (level)
@@ -338,17 +338,17 @@ panels:
   type: timeseries
 - collapsed: true
   datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: PB894574A363DF0AF
   gridPos:
-    '{{ .yaxis }}': 21
+    {{ .yaxis }}: 21
     h: 1
     w: 24
     x: 0
   id: 6
   panels:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     description: Non zero metrics indicates about error with CR object definition (typos or incorrect values) or errors with kubernetes API connection.
     fieldConfig:
@@ -393,7 +393,7 @@ panels:
         unit: short
       overrides: []
     gridPos:
-      '{{ .yaxis }}': 2
+      {{ .yaxis }}: 2
       h: 8
       w: 12
       x: 0
@@ -412,7 +412,7 @@ panels:
     pluginVersion: 10.4.0
     targets:
     - datasource:
-        type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       exemplar: false
@@ -422,7 +422,7 @@ panels:
       range: true
       refId: A
     - datasource:
-        type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: sum(rate(controller_runtime_reconcile_total{job=~"$job",instance=~"$instance",result="error"}[$__rate_interval])) by(controller) > 0
@@ -433,7 +433,7 @@ panels:
     title: reconcile errors by controller
     type: timeseries
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     description: "Operator limits number of reconcilation events to 5 events per 2 seconds.\n For now, this limit is applied only for vmalert and vmagent controllers.\n It should reduce load at kubernetes cluster and increase operator performance."
     fieldConfig:
@@ -478,7 +478,7 @@ panels:
         unit: short
       overrides: []
     gridPos:
-      '{{ .yaxis }}': 2
+      {{ .yaxis }}: 2
       h: 8
       w: 12
       x: 12
@@ -495,7 +495,7 @@ panels:
     pluginVersion: 10.4.0
     targets:
     - datasource:
-        type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: sum(rate(operator_reconcile_throttled_events_total[$__rate_interval])) by(controller)
@@ -505,7 +505,7 @@ panels:
     title: throttled reconcilation events
     type: timeseries
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     description: Number of objects waiting in the queue for reconciliation. Non-zero values indicate that operator cannot process CR objects changes with the given resources.
     fieldConfig:
@@ -550,7 +550,7 @@ panels:
         unit: short
       overrides: []
     gridPos:
-      '{{ .yaxis }}': 10
+      {{ .yaxis }}: 10
       h: 11
       w: 12
       x: 0
@@ -569,7 +569,7 @@ panels:
     pluginVersion: 10.4.0
     targets:
     - datasource:
-        type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: max(workqueue_depth{job=~"$job",instance=~"$instance"}) by (name)
@@ -579,7 +579,7 @@ panels:
     title: Working queue depth
     type: timeseries
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     description: " For controllers with StatefulSet it's ok to see latency greater then 3 seconds. It could be vmalertmanager,vmcluster or vmagent in statefulMode.\n\n For other controllers, latency greater then 1 second may indicate issues with kubernetes cluster or operator's performance.\n "
     fieldConfig:
@@ -624,7 +624,7 @@ panels:
         unit: s
       overrides: []
     gridPos:
-      '{{ .yaxis }}': 10
+      {{ .yaxis }}: 10
       h: 11
       w: 12
       x: 12
@@ -643,7 +643,7 @@ panels:
     pluginVersion: 10.4.0
     targets:
     - datasource:
-        type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: histogram_quantile(0.99, sum(rate(controller_runtime_reconcile_time_seconds_bucket[$__rate_interval])) by(le,controller))
@@ -654,17 +654,17 @@ panels:
     type: timeseries
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: PB894574A363DF0AF
     refId: A
   title: Troubleshooting
   type: row
 - collapsed: false
   datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: PB894574A363DF0AF
   gridPos:
-    '{{ .yaxis }}': 22
+    {{ .yaxis }}: 22
     h: 1
     w: 24
     x: 0
@@ -672,13 +672,13 @@ panels:
   panels: []
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: PB894574A363DF0AF
     refId: A
   title: resources
   type: row
 - datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: $ds
   fieldConfig:
     defaults:
@@ -722,7 +722,7 @@ panels:
       unit: bytes
     overrides: []
   gridPos:
-    '{{ .yaxis }}': 23
+    {{ .yaxis }}: 23
     h: 8
     w: 12
     x: 0
@@ -742,7 +742,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(go_memstats_sys_bytes{job=~"$job", instance=~"$instance"})
@@ -750,7 +750,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(go_memstats_heap_inuse_bytes{job=~"$job", instance=~"$instance"})
@@ -759,7 +759,7 @@ panels:
     range: true
     refId: B
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(go_memstats_stack_inuse_bytes{job=~"$job", instance=~"$instance"})
@@ -768,7 +768,7 @@ panels:
     range: true
     refId: C
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(process_resident_memory_bytes{job=~"$job", instance=~"$instance"})
@@ -779,7 +779,7 @@ panels:
   title: Memory usage ($instance)
   type: timeseries
 - datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: $ds
   fieldConfig:
     defaults:
@@ -824,7 +824,7 @@ panels:
       unit: short
     overrides: []
   gridPos:
-    '{{ .yaxis }}': 23
+    {{ .yaxis }}: 23
     h: 8
     w: 12
     x: 12
@@ -841,7 +841,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: rate(process_cpu_seconds_total{job=~"$job", instance=~"$instance"}[$__rate_interval])
@@ -851,7 +851,7 @@ panels:
   title: CPU ($instance)
   type: timeseries
 - datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: $ds
   fieldConfig:
     defaults:
@@ -895,7 +895,7 @@ panels:
       unit: short
     overrides: []
   gridPos:
-    '{{ .yaxis }}': 31
+    {{ .yaxis }}: 31
     h: 8
     w: 12
     x: 0
@@ -912,7 +912,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(go_goroutines{job=~"$job", instance=~"$instance"})
@@ -922,7 +922,7 @@ panels:
   title: Goroutines ($instance)
   type: timeseries
 - datasource:
-    type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: $ds
   fieldConfig:
     defaults:
@@ -966,7 +966,7 @@ panels:
       unit: s
     overrides: []
   gridPos:
-    '{{ .yaxis }}': 31
+    {{ .yaxis }}: 31
     h: 8
     w: 12
     x: 12
@@ -985,7 +985,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: |-
@@ -1014,7 +1014,7 @@ templating:
     multi: false
     name: ds
     options: []
-    query: '{{ default "prometheus" .Values.grafana.defaultDatasourceType }}'
+    query: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     queryValue: ''
     refresh: 1
     regex: ''
@@ -1079,7 +1079,7 @@ time:
   from: now-15m
   to: now
 timepicker: {}
-timezone: '{{ .Values.grafana.defaultDashboardsTimezone }}'
+timezone: {{ .Values.grafana.defaultDashboardsTimezone }}
 title: VictoriaMetrics - operator
 uid: 1H179hunk
 version: 1
