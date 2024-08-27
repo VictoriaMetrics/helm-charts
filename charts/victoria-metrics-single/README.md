@@ -103,11 +103,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | automountServiceAccountToken | bool | `true` |  |
+| eula | bool | `false` | should be true and means that you have the legal right to run a backup manager that can either be a signed contract or an email with confirmation to run the service in a trial period https://victoriametrics.com/legal/esa/ |
 | extraObjects | list | `[]` | Add extra specs dynamically to this chart |
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | global.image.registry | string | `""` |  |
 | global.imagePullSecrets | list | `[]` |  |
-| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
 | license.secret.key | string | `""` | Key in secret with license key |
@@ -165,12 +166,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.probe.liveness.failureThreshold | int | `10` |  |
 | server.probe.liveness.initialDelaySeconds | int | `30` |  |
 | server.probe.liveness.periodSeconds | int | `30` |  |
-| server.probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| server.probe.liveness.tcpSocket | object | `{}` |  |
 | server.probe.liveness.timeoutSeconds | int | `5` |  |
 | server.probe.readiness.failureThreshold | int | `3` |  |
-| server.probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
-| server.probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
-| server.probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
+| server.probe.readiness.httpGet | object | `{}` |  |
 | server.probe.readiness.initialDelaySeconds | int | `5` |  |
 | server.probe.readiness.periodSeconds | int | `15` |  |
 | server.probe.readiness.timeoutSeconds | int | `5` |  |
@@ -240,7 +239,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.probe.readiness.timeoutSeconds | int | `5` |  |
 | server.vmbackupmanager.probe.startup.httpGet.port | string | `"manager-http"` |  |
 | server.vmbackupmanager.resources | object | `{}` |  |
-| server.vmbackupmanager.restore | object | `{"onStart":{"enabled":false}}` | Allows to enable restore options for pod. Read more: https://docs.victoriametrics.com/vmbackupmanager.html#restore-commands |
+| server.vmbackupmanager.restore | object | `{"onStart":{"enabled":false}}` | Allows to enable restore options for pod. Read more: https://docs.victoriametrics.com/vmbackupmanager#restore-commands |
 | server.vmbackupmanager.retention | object | `{"keepLastDaily":2,"keepLastHourly":2,"keepLastMonthly":2,"keepLastWeekly":2}` | backups' retention settings |
 | server.vmbackupmanager.retention.keepLastDaily | int | `2` | keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off |
 | server.vmbackupmanager.retention.keepLastHourly | int | `2` | keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off |

@@ -90,7 +90,7 @@ Remove application with command.
 helm uninstall vmgateway -n NAMESPACE
 ```
 
-# How to use [JWT signature verification](https://docs.victoriametrics.com/vmgateway.html#jwt-signature-verification)
+# How to use [JWT signature verification](https://docs.victoriametrics.com/vmgateway#jwt-signature-verification)
 
 Kubernetes best-practice is to store sensitive configuration parts in secrets. For example, 2 keys will be stored as:
 ```yaml
@@ -165,10 +165,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity configurations |
 | annotations | object | `{}` | Annotations to be added to the deployment |
-| auth | object | `{"enable":false}` | Access Control configuration. https://docs.victoriametrics.com/vmgateway.html#access-control |
+| auth | object | `{"enable":false}` | Access Control configuration. https://docs.victoriametrics.com/vmgateway#access-control |
 | auth.enable | bool | `false` | Enable/Disable access-control |
 | clusterMode | bool | `false` | Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting |
-| configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmgateway.html |
+| configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://docs.victoriametrics.com/vmgateway |
 | containerWorkingDir | string | `"/"` |  |
 | env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
 | envFrom | list | `[]` |  |
@@ -195,7 +195,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingress.hosts | list | `[]` |  |
 | ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | ingress.tls | list | `[]` |  |
-| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
 | license.secret.key | string | `""` | Key in secret with license key |
@@ -207,15 +207,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podSecurityContext.enabled | bool | `true` |  |
 | probe.liveness.initialDelaySeconds | int | `5` |  |
 | probe.liveness.periodSeconds | int | `15` |  |
-| probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| probe.liveness.tcpSocket | object | `{}` |  |
 | probe.liveness.timeoutSeconds | int | `5` |  |
-| probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
-| probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
-| probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
+| probe.readiness.httpGet | object | `{}` |  |
 | probe.readiness.initialDelaySeconds | int | `5` |  |
 | probe.readiness.periodSeconds | int | `15` |  |
 | probe.startup | object | `{}` |  |
-| rateLimiter | object | `{"config":{},"datasource":{"url":""},"enable":false}` | Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway.html#rate-limiter |
+| rateLimiter | object | `{"config":{},"datasource":{"url":""},"enable":false}` | Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway#rate-limiter |
 | rateLimiter.datasource.url | string | `""` | Datasource VictoriaMetrics or vmselects. Required. Example http://victoroametrics:8428 or http://vmselect:8481/select/0/prometheus |
 | rateLimiter.enable | bool | `false` | Enable/Disable rate-limiting |
 | read.url | string | `""` | Read endpoint without suffixes, victoriametrics or vmselect. Example http://victoroametrics:8428 or http://vmselect:8481 |

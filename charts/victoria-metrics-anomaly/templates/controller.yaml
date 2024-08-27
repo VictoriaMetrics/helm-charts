@@ -32,7 +32,7 @@ spec:
       labels: {{ include "chart.selectorLabels" . | nindent 8 }}
     spec:
       {{- if .Values.podSecurityContext}}
-      securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" .) | nindent 8 }}
+      securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
       {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
@@ -48,11 +48,7 @@ spec:
               name: metrics
           {{- end }}
           {{- end }}
-          args:
-            - /etc/config/config.yml
-            {{- with (include "chart.license.flag" .) }}
-            - {{ . }}
-            {{- end}}
+          args: {{ include "vmanomaly.args" . | nindent 12 }}
           {{- with .Values.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -64,7 +60,7 @@ spec:
           env: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- if .Values.securityContext.enabled }}
-          securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
           {{- end }}
           {{- with .Values.image.pullPolicy }}
           imagePullPolicy: {{ . }}
@@ -75,7 +71,7 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/config
-            {{- include "chart.license.mount" . | nindent 12 }}
+            {{- include "vm.license.mount" . | nindent 12 }}
             {{- if .Values.persistentVolume.enabled }}
             - name: models-dump
               mountPath: /tmp/vmanomaly-model-dumps
@@ -96,7 +92,7 @@ spec:
         - name: config
           configMap:
             name: {{ include "chart.fullname" . }}
-        {{- include "chart.license.volume" . | nindent 8 }}
+        {{- include "vm.license.volume" . | nindent 8 }}
         - name: models-dump
           {{- if .Values.persistentVolume.enabled }}
           persistentVolumeClaim:

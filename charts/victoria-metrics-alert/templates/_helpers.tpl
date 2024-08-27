@@ -230,70 +230,82 @@ http://{{- include "vmalert.alertmanager.fullname" . -}}:9093{{ .Values.alertman
 {{- end -}}
 {{- end -}}
 
-{{/*
-Return license flag if necessary.
-*/}}
-{{- define "vmalert.license.flag" -}}
-{{- if .Values.license.key -}}
--license={{ .Values.license.key }}
-{{- end }}
-{{- if and .Values.license.secret.name .Values.license.secret.key -}}
--licenseFile=/etc/vm-license-key/{{ .Values.license.secret.key }}
-{{- end -}}
-{{- end -}}
-
-
-{{/*
-Return license volume mount
-*/}}
-{{- define "vmalert.license.volume" -}}
-{{- if and .Values.license.secret.name .Values.license.secret.key -}}
-- name: license-key
-  secret:
-    secretName: {{ .Values.license.secret.name }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return license volume mount for container
-*/}}
-{{- define "vmalert.license.mount" -}}
-{{- if and .Values.license.secret.name .Values.license.secret.key -}}
-- name: license-key
-  mountPath: /etc/vm-license-key
-  readOnly: true
-{{- end -}}
-{{- end -}}
-
-{{/* 
-Return true if the detected platform is Openshift
-Usage:
-{{- include "common.compatibility.isOpenshift" . -}}
-*/}}
-{{- define "common.compatibility.isOpenshift" -}}
-{{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
-{{- true -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Render a compatible securityContext depending on the platform. By default it is maintained as it is. In other platforms like Openshift we remove default user/group values that do not work out of the box with the restricted-v1 SCC
-Usage:
-{{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "context" $) -}}
-*/}}
-{{- define "common.compatibility.renderSecurityContext" -}}
-{{- $adaptedContext := .secContext -}}
-{{- if .context.Values.global.compatibility -}}
-  {{- if .context.Values.global.compatibility.openshift -}}
-    {{- if or (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "force") (and (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "auto") (include "common.compatibility.isOpenshift" .context)) -}}
-      {{/* Remove incompatible user/group values that do not work in Openshift out of the box */}}
-      {{- $adaptedContext = omit $adaptedContext "fsGroup" "runAsUser" "runAsGroup" -}}
-      {{- if not .secContext.seLinuxOptions -}}
-      {{/* If it is an empty object, we remove it from the resulting context because it causes validation issues */}}
-      {{- $adaptedContext = omit $adaptedContext "seLinuxOptions" -}}
-      {{- end -}}
-    {{- end -}}
+{{- define "alertmanager.args" -}}
+  {{- $app := .Values.alertmanager -}}
+  {{- $args := default dict -}}
+  {{- $_ := set $args "config.file" "/config/alertmanager.yaml" -}}
+  {{- $_ := set $args "storage.path" (ternary $app.persistentVolume.mountPath "/data" $app.persistentVolume.enabled) -}}
+  {{- $_ := set $args "data.retention" $app.retention -}}
+  {{- $_ := set $args "web.listen-address" $app.listenAddress -}}
+  {{- $_ := set $args "cluster.advertise-address" "$(POD_IP):6783" -}}
+  {{- with $app.baseURL -}}
+    {{- $_ := set $args "web.external-url" $app.baseURL -}}
   {{- end -}}
+  {{ with $app.baseURLPrefix }}
+    {{- $_ := set $args "web.route-prefix" $app.baseURLPrefix -}}
+  {{- end -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
-{{- omit $adaptedContext "enabled" | toYaml -}}
+
+{{- define "vmalert.args" -}}
+  {{- $app := .Values.server -}}
+  {{- $args := default dict -}}
+  {{- $_ := set $args "rule" "/config/alert-rules.yaml" -}}
+  {{- $_ := set $args "datasource.url" $app.datasource.url -}}
+  {{- if or $app.datasource.basicAuth.password $app.datasource.basicAuth.username -}}
+    {{- $_ := set $args "datasource.basicAuth.password" $app.datasource.basicAuth.password -}}
+    {{- $_ := set $args "datasource.basicAuth.username" $app.datasource.basicAuth.username -}}
+  {{- end -}}
+  {{- with $app.datasource.bearer.token -}}
+    {{- $_ := set $args "datasource.bearerToken" . -}}
+  {{- end -}}
+  {{- with $app.datasource.bearer.tokenFile -}}
+    {{- $_ := set $args "datasource.bearerTokenFile" . -}}
+  {{- end -}}
+  {{- with (include "vmalert.alertmanager.urls" .) }}
+    {{- $_ := set $args "notifier.url" . -}}
+  {{- end -}}
+  {{- with (include "vmalert.alertmanager.passwords" .) -}}
+    {{- $_ := set $args "notifier.basicAuth.password" . -}}
+  {{- end }}
+  {{- with (include "vmalert.alertmanager.usernames" .) -}}
+    {{- $_ := set $args "notifier.basicAuth.username" . -}}
+  {{- end -}}
+  {{- with (include "vmalert.alertmanager.bearerTokens" .) -}}
+    {{- $_ := set $args "notifier.bearerToken" . -}}
+  {{- end -}}
+  {{- with (include "vmalert.alertmanager.bearerTokenFiles" .) -}}
+    {{- $_ := set $args "notifier.bearerTokenFile" . -}}
+  {{- end -}}
+  {{- with $app.remote.read.url }}
+    {{- $_ := set $args "remoteRead.url" . -}}
+  {{- end -}}
+  {{- if or $app.remote.read.basicAuth.password $app.remote.read.basicAuth.username -}}
+    {{- $_ := set $args "remoteRead.basicAuth.password" $app.remote.read.basicAuth.password -}}
+    {{- $_ := set $args "remoteRead.basicAuth.username" $app.remote.read.basicAuth.username -}}
+  {{- end -}}
+  {{- with $app.remote.read.bearer.token }}
+    {{- $_ := set $args "remoteRead.bearerToken" . -}}
+  {{- end -}}
+  {{- with $app.remote.read.bearer.tokenFile -}}
+    {{- $_ := set $args "remoteRead.bearerTokenFile" . -}}
+  {{- end -}}
+  {{- with $app.remote.write.url -}}
+    {{- $_ := set $args "remoteWrite.url" . -}}
+  {{- end -}}
+  {{- if or $app.remote.write.basicAuth.password $app.remote.write.basicAuth.username -}}
+    {{- $_ := set $args "remoteWrite.basicAuth.password" $app.remote.write.basicAuth.password -}}
+    {{- $_ := set $args "remoteWrite.basicAuth.username" $app.remote.write.basicAuth.username -}}
+  {{- end -}}
+  {{- with $app.remote.write.bearer.token -}}
+    {{- $_ := set $args "remoteWrite.bearerToken" . -}}
+  {{- end -}}
+  {{- with $app.remote.write.bearer.tokenFile -}}
+    {{- $_ := set $args "remoteWrite.bearerTokenFile" . -}}
+  {{- end -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}

@@ -66,17 +66,13 @@ server:
   # Readiness & Liveness probes
   probe:
     readiness:
-      httpGet:
-        path: '{{ include "vm.probe.http.path" . }}'
-        scheme: '{{ include "vm.probe.http.scheme" . }}'
-        port: '{{ include "vm.probe.port" . }}'
+      httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
     liveness:
-      tcpSocket:
-        port: '{{ include "vm.probe.port" . }}'
+      tcpSocket: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
@@ -484,7 +480,7 @@ extraObjects: []
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
 # Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# Documentation - https://docs.victoriametrics.com/enterprise,
 # for more information, visit https://victoriametrics.com/products/enterprise/ .
 # To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
 # Supported starting from VictoriaMetrics v1.94.0

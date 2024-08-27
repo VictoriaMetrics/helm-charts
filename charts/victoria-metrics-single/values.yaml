@@ -187,10 +187,7 @@ server:
   probe:
   # Indicates whether the Container is ready to service requests. If the readiness probe fails, the endpoints controller removes the Pod's IP address from the endpoints of all Services that match the Pod. The default state of readiness before the initial delay is Failure. If a Container does not provide a readiness probe, the default state is Success.
     readiness:
-      httpGet:
-        path: '{{ include "vm.probe.http.path" . }}'
-        scheme: '{{ include "vm.probe.http.scheme" . }}'
-        port: '{{ include "vm.probe.port" . }}'
+      httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
@@ -198,8 +195,7 @@ server:
 
   # Indicates whether the Container is running. If the liveness probe fails, the kubelet kills the Container, and the Container is subjected to its restart policy. If a Container does not provide a liveness probe, the default state is Success.
     liveness:
-      tcpSocket:
-        port: '{{ include "vm.probe.port" . }}'
+      tcpSocket: {}
       initialDelaySeconds: 30
       periodSeconds: 30
       timeoutSeconds: 5
@@ -288,7 +284,7 @@ server:
       # - name: example
       #   mountPath: /example
     # -- Allows to enable restore options for pod.
-    # Read more: https://docs.victoriametrics.com/vmbackupmanager.html#restore-commands
+    # Read more: https://docs.victoriametrics.com/vmbackupmanager#restore-commands
     restore:
       onStart:
         enabled: false
@@ -713,7 +709,7 @@ extraObjects: []
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
 # Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# Documentation - https://docs.victoriametrics.com/enterprise,
 # for more information, visit https://victoriametrics.com/products/enterprise/ .
 # To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
 # Supported starting from VictoriaMetrics v1.94.0

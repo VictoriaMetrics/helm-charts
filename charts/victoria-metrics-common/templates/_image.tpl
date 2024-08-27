@@ -6,7 +6,7 @@ Victoria Metrics Image
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $image := (tpl (printf "%s:%s" .app.image.repository (.app.image.tag | default $Chart.AppVersion)) .) -}}
   {{- $license := $Values.license | default dict }}
-  {{- if and (or $license.key $Values.eula (dig "secret" "name" "" $license)) (empty .app.image.tag) -}}
+  {{- if and (or $license.key (dig "secret" "name" "" $license)) (empty .app.image.tag) -}}
     {{- $_ := set .app.image "variant" "enterprise" -}}
   {{- end -}}
   {{- with .app.image.variant -}}

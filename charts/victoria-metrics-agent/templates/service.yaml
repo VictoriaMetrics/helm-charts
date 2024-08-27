@@ -46,36 +46,36 @@ spec:
     {{- with .Values.extraArgs.graphiteListenAddr }}
     - name: graphite-tcp
       protocol: TCP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: graphite-tcp
     - name: graphite-udp
       protocol: UDP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: graphite-udp
     {{- end }}
     {{- with .Values.extraArgs.influxListenAddr }}
     - name: influx-tcp
       protocol: TCP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: influx-tcp
     - name: influx-udp
       protocol: UDP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: influx-udp
     {{- end }}
     {{- with .Values.extraArgs.opentsdbHTTPListenAddr }}
     - name: opentsdbhttp
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: opentsdbhttp
     {{- end }}
     {{- with .Values.extraArgs.opentsdbListenAddr }}
     - name: opentsdb-udp
       protocol: UDP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: opentsdb-udp
     - name: opentsdb-tcp
       protocol: TCP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: opentsdb-tcp
     {{- end }}
   selector: {{ include "chart.selectorLabels" . | nindent 4 }}
