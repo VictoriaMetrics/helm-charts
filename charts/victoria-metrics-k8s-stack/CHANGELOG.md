@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added `dashboards.<dashboardName>` bool flag to enable dashboard even if component it is for is not installed.
 
 ## 0.25.5
 
