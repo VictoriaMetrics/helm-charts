@@ -41,7 +41,7 @@ spec:
         - name: model
           image: {{ include "vm.image" (merge $global (dict "app" .Values)) }}
           workingDir: {{ .Values.containerWorkingDir }}
-          {{- with (dig "monitoring" "pull" "port" "" .Values.config) }}
+          {{- with (((.Values.config).monitoring).pull).port }}
           ports:
             - containerPort: {{ . }}
               name: metrics

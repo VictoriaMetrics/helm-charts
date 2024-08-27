@@ -1,4 +1,4 @@
-{{- if .Values.podMonitor.enabled -}}
+{{- if and .Values.podMonitor.enabled (((.Values.config).monitoring).pull).port -}}
 {{- $podMonitor := .Values.podMonitor -}}
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor

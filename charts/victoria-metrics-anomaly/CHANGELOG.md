@@ -3,6 +3,7 @@
 ## Next release
 
 - Removed `eula` support
+- Disable PodMonitor, when pull port is not defined
 
 ## 1.4.2
 
