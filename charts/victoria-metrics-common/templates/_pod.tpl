@@ -86,10 +86,12 @@ Net probe port
 {{- end -}}
 
 {{- define "vm.arg" -}}
-{{- if and (kindIs "bool" .value) .value -}}
--{{ .key }}
+{{- if empty .value }}
+{{ .key }}
+{{- else if and (kindIs "bool" .value) .value -}}
+-{{ ternary "" "-" (eq (len .key) 1) }}{{ .key }}
 {{- else -}}
--{{ .key }}={{ .value }}
+-{{ ternary "" "-" (eq (len .key) 1) }}{{ .key }}={{ .value }}
 {{- end -}}
 {{- end -}}
 
@@ -97,15 +99,18 @@ Net probe port
 command line arguments
 */ -}}
 {{- define "vm.args" -}}
-{{- $args := default list -}}
-{{- range $key, $value := . -}}
-{{- if kindIs "slice" $value -}}
-{{- range $v := $value -}}
-{{- $args = append $args (include "vm.arg" (dict "key" $key "value" $v)) -}}
-{{- end -}}
-{{- else -}}
-{{- $args = append $args (include "vm.arg" (dict "key" $key "value" $value)) -}}
-{{- end -}}
-{{- end -}}
-{{- toYaml (dict "args" $args) -}}
+  {{- $args := default list -}}
+  {{- range $key, $value := . -}}
+    {{- if not $key -}}
+      {{- fail "Empty key in command line args is not allowed" -}}
+    {{- end -}}
+    {{- if kindIs "slice" $value -}}
+      {{- range $v := $value -}}
+        {{- $args = append $args (include "vm.arg" (dict "key" $key "value" $v)) -}}
+      {{- end -}}
+    {{- else -}}
+      {{- $args = append $args (include "vm.arg" (dict "key" $key "value" $value)) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- toYaml (dict "args" $args) -}}
 {{- end -}}

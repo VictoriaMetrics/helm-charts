@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Support short and long args flags in `vm.args`
+- Updated `vm.enterprise.only` error message
 
 ## 0.0.6
 
