@@ -41,10 +41,12 @@ spec:
         - name: model
           image: {{ include "vm.image" (merge $global (dict "app" .Values)) }}
           workingDir: {{ .Values.containerWorkingDir }}
+          {{- if (((.Values.config).monitoring).pull).enabled }}
           {{- with (((.Values.config).monitoring).pull).port }}
           ports:
             - containerPort: {{ . }}
               name: metrics
+          {{- end }}
           {{- end }}
           args:
             - /etc/config/config.yml

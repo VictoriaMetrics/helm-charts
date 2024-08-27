@@ -1,4 +1,7 @@
-{{- if and .Values.podMonitor.enabled (((.Values.config).monitoring).pull).port -}}
+{{- if .Values.podMonitor.enabled }}
+{{- if or (not (((.Values.config).monitoring).pull).port) (not (((.Values.config).monitoring).pull).enabled) -}}
+  {{- fail "`config.monitoring.pull.port` is required and `config.monitoring.pull.enabled` should be `true`, when PodMonitor is enabled" -}}
+{{- end -}}
 {{- $podMonitor := .Values.podMonitor -}}
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
