@@ -337,86 +337,16 @@ Change the values according to the need of the environment in ``victoria-metrics
 | argocdReleaseOverride | string | `""` | For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
 | coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}],"jobLabel":"jobLabel"}}` | Component scraping coreDns. Use either this or kubeDns |
 | crds.enabled | bool | `true` |  |
-| defaultDashboardsEnabled | bool | `true` |  |
+| dashboards | object | `{"operator":false,"vmalert":false}` | Enable dashboards despite it's dependency is not installed |
+| defaultDashboardsEnabled | bool | `true` | Create default dashboards |
+| defaultRules | object | `{"alerting":{"spec":{"annotations":{},"labels":{}}},"annotations":{},"create":true,"group":{"spec":{"params":{}}},"groups":{"alertmanager":{"create":true,"rules":{}},"etcd":{"create":true,"rules":{}},"general":{"create":true,"rules":{}},"k8sContainerCpuUsageSecondsTotal":{"create":true,"rules":{}},"k8sContainerMemoryCache":{"create":true,"rules":{}},"k8sContainerMemoryRss":{"create":true,"rules":{}},"k8sContainerMemorySwap":{"create":true,"rules":{}},"k8sContainerMemoryWorkingSetBytes":{"create":true,"rules":{}},"k8sContainerResource":{"create":true,"rules":{}},"k8sPodOwner":{"create":true,"rules":{}},"kubeApiserver":{"create":true,"rules":{}},"kubeApiserverAvailability":{"create":true,"rules":{}},"kubeApiserverBurnrate":{"create":true,"rules":{}},"kubeApiserverHistogram":{"create":true,"rules":{}},"kubeApiserverSlos":{"create":true,"rules":{}},"kubePrometheusGeneral":{"create":true,"rules":{}},"kubePrometheusNodeRecording":{"create":true,"rules":{}},"kubeScheduler":{"create":true,"rules":{}},"kubeStateMetrics":{"create":true,"rules":{}},"kubelet":{"create":true,"rules":{}},"kubernetesApps":{"create":true,"rules":{},"targetNamespace":".*"},"kubernetesResources":{"create":true,"rules":{}},"kubernetesStorage":{"create":true,"rules":{},"targetNamespace":".*"},"kubernetesSystem":{"create":true,"rules":{}},"kubernetesSystemApiserver":{"create":true,"rules":{}},"kubernetesSystemControllerManager":{"create":true,"rules":{}},"kubernetesSystemKubelet":{"create":true,"rules":{}},"kubernetesSystemScheduler":{"create":true,"rules":{}},"node":{"create":true,"rules":{}},"nodeNetwork":{"create":true,"rules":{}},"vmHealth":{"create":true,"rules":{}},"vmagent":{"create":true,"rules":{}},"vmcluster":{"create":true,"rules":{}},"vmoperator":{"create":true,"rules":{}},"vmsingle":{"create":true,"rules":{}}},"labels":{},"recording":{"spec":{"annotations":{},"labels":{}}},"rule":{"spec":{"annotations":{},"labels":{}}},"rules":{},"runbookUrl":"https://runbooks.prometheus-operator.dev/runbooks"}` | Create default rules for monitoring the cluster |
 | defaultRules.alerting | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for VMRules alerts |
 | defaultRules.alerting.spec.annotations | object | `{}` | Additional annotations for VMRule alerts |
 | defaultRules.alerting.spec.labels | object | `{}` | Additional labels for VMRule alerts |
 | defaultRules.annotations | object | `{}` | Annotations for default rules |
-| defaultRules.create | bool | `true` |  |
 | defaultRules.group | object | `{"spec":{"params":{}}}` | Common properties for VMRule groups |
 | defaultRules.group.spec.params | object | `{}` | Optional HTTP URL parameters added to each rule request |
-| defaultRules.groups.alertmanager.create | bool | `true` |  |
-| defaultRules.groups.alertmanager.rules | object | `{}` |  |
-| defaultRules.groups.etcd.create | bool | `true` |  |
 | defaultRules.groups.etcd.rules | object | `{}` | Common properties for all rules in a group |
-| defaultRules.groups.general.create | bool | `true` |  |
-| defaultRules.groups.general.rules | object | `{}` |  |
-| defaultRules.groups.k8sContainerCpuUsageSecondsTotal.create | bool | `true` |  |
-| defaultRules.groups.k8sContainerCpuUsageSecondsTotal.rules | object | `{}` |  |
-| defaultRules.groups.k8sContainerMemoryCache.create | bool | `true` |  |
-| defaultRules.groups.k8sContainerMemoryCache.rules | object | `{}` |  |
-| defaultRules.groups.k8sContainerMemoryRss.create | bool | `true` |  |
-| defaultRules.groups.k8sContainerMemoryRss.rules | object | `{}` |  |
-| defaultRules.groups.k8sContainerMemorySwap.create | bool | `true` |  |
-| defaultRules.groups.k8sContainerMemorySwap.rules | object | `{}` |  |
-| defaultRules.groups.k8sContainerMemoryWorkingSetBytes.create | bool | `true` |  |
-| defaultRules.groups.k8sContainerMemoryWorkingSetBytes.rules | object | `{}` |  |
-| defaultRules.groups.k8sContainerResource.create | bool | `true` |  |
-| defaultRules.groups.k8sContainerResource.rules | object | `{}` |  |
-| defaultRules.groups.k8sPodOwner.create | bool | `true` |  |
-| defaultRules.groups.k8sPodOwner.rules | object | `{}` |  |
-| defaultRules.groups.kubeApiserver.create | bool | `true` |  |
-| defaultRules.groups.kubeApiserver.rules | object | `{}` |  |
-| defaultRules.groups.kubeApiserverAvailability.create | bool | `true` |  |
-| defaultRules.groups.kubeApiserverAvailability.rules | object | `{}` |  |
-| defaultRules.groups.kubeApiserverBurnrate.create | bool | `true` |  |
-| defaultRules.groups.kubeApiserverBurnrate.rules | object | `{}` |  |
-| defaultRules.groups.kubeApiserverHistogram.create | bool | `true` |  |
-| defaultRules.groups.kubeApiserverHistogram.rules | object | `{}` |  |
-| defaultRules.groups.kubeApiserverSlos.create | bool | `true` |  |
-| defaultRules.groups.kubeApiserverSlos.rules | object | `{}` |  |
-| defaultRules.groups.kubePrometheusGeneral.create | bool | `true` |  |
-| defaultRules.groups.kubePrometheusGeneral.rules | object | `{}` |  |
-| defaultRules.groups.kubePrometheusNodeRecording.create | bool | `true` |  |
-| defaultRules.groups.kubePrometheusNodeRecording.rules | object | `{}` |  |
-| defaultRules.groups.kubeScheduler.create | bool | `true` |  |
-| defaultRules.groups.kubeScheduler.rules | object | `{}` |  |
-| defaultRules.groups.kubeStateMetrics.create | bool | `true` |  |
-| defaultRules.groups.kubeStateMetrics.rules | object | `{}` |  |
-| defaultRules.groups.kubelet.create | bool | `true` |  |
-| defaultRules.groups.kubelet.rules | object | `{}` |  |
-| defaultRules.groups.kubernetesApps.create | bool | `true` |  |
-| defaultRules.groups.kubernetesApps.rules | object | `{}` |  |
-| defaultRules.groups.kubernetesApps.targetNamespace | string | `".*"` |  |
-| defaultRules.groups.kubernetesResources.create | bool | `true` |  |
-| defaultRules.groups.kubernetesResources.rules | object | `{}` |  |
-| defaultRules.groups.kubernetesStorage.create | bool | `true` |  |
-| defaultRules.groups.kubernetesStorage.rules | object | `{}` |  |
-| defaultRules.groups.kubernetesStorage.targetNamespace | string | `".*"` |  |
-| defaultRules.groups.kubernetesSystem.create | bool | `true` |  |
-| defaultRules.groups.kubernetesSystem.rules | object | `{}` |  |
-| defaultRules.groups.kubernetesSystemApiserver.create | bool | `true` |  |
-| defaultRules.groups.kubernetesSystemApiserver.rules | object | `{}` |  |
-| defaultRules.groups.kubernetesSystemControllerManager.create | bool | `true` |  |
-| defaultRules.groups.kubernetesSystemControllerManager.rules | object | `{}` |  |
-| defaultRules.groups.kubernetesSystemKubelet.create | bool | `true` |  |
-| defaultRules.groups.kubernetesSystemKubelet.rules | object | `{}` |  |
-| defaultRules.groups.kubernetesSystemScheduler.create | bool | `true` |  |
-| defaultRules.groups.kubernetesSystemScheduler.rules | object | `{}` |  |
-| defaultRules.groups.node.create | bool | `true` |  |
-| defaultRules.groups.node.rules | object | `{}` |  |
-| defaultRules.groups.nodeNetwork.create | bool | `true` |  |
-| defaultRules.groups.nodeNetwork.rules | object | `{}` |  |
-| defaultRules.groups.vmHealth.create | bool | `true` |  |
-| defaultRules.groups.vmHealth.rules | object | `{}` |  |
-| defaultRules.groups.vmagent.create | bool | `true` |  |
-| defaultRules.groups.vmagent.rules | object | `{}` |  |
-| defaultRules.groups.vmcluster.create | bool | `true` |  |
-| defaultRules.groups.vmcluster.rules | object | `{}` |  |
-| defaultRules.groups.vmoperator.create | bool | `true` |  |
-| defaultRules.groups.vmoperator.rules | object | `{}` |  |
-| defaultRules.groups.vmsingle.create | bool | `true` |  |
-| defaultRules.groups.vmsingle.rules | object | `{}` |  |
 | defaultRules.labels | object | `{}` | Labels for default rules |
 | defaultRules.recording | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for VMRules recording rules |
 | defaultRules.recording.spec.annotations | object | `{}` | Additional annotations for VMRule recording rules |
@@ -426,7 +356,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | defaultRules.rule.spec.labels | object | `{}` | Additional labels for all VMRules |
 | defaultRules.rules | object | `{}` | Per rule properties |
 | defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
-| experimentalDashboardsEnabled | bool | `true` |  |
+| experimentalDashboardsEnabled | bool | `true` | Create experimental dashboards |
 | externalVM.read.url | string | `""` |  |
 | externalVM.write.url | string | `""` |  |
 | extraObjects | list | `[]` | Add extra objects dynamically to this chart |
@@ -469,9 +399,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.datasources.jsonData | object | `{}` |  |
 | grafana.vmServiceScrape.enabled | bool | `true` |  |
 | grafana.vmServiceScrape.spec | object | `{}` |  |
-| grafanaOperatorDashboardsFormat.allowCrossNamespaceImport | bool | `false` |  |
-| grafanaOperatorDashboardsFormat.enabled | bool | `false` |  |
-| grafanaOperatorDashboardsFormat.instanceSelector.matchLabels.dashboards | string | `"grafana"` |  |
+| grafanaOperatorDashboardsFormat | object | `{"allowCrossNamespaceImport":false,"enabled":false,"instanceSelector":{"matchLabels":{"dashboards":"grafana"}}}` | Create dashboards as CRDs (reuqires grafana-operator to be installed) |
 | kube-state-metrics.enabled | bool | `true` |  |
 | kube-state-metrics.vmServiceScrape.spec | object | `{}` |  |
 | kubeApiServer | object | `{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"https","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"component","namespaceSelector":{"matchNames":["default"]},"selector":{"matchLabels":{"component":"apiserver","provider":"kubernetes"}}}}` | Component scraping the kube api server |

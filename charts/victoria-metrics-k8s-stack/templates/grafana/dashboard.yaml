@@ -25,7 +25,7 @@ Get dashboard data from file
 {{- /*
 Save condition for a dashboard from file
 */}}
-{{- $dashboardCondition := (eq $dashboardData.condition "true") -}}
+{{- $dashboardCondition := or $dashboardData.condition (dig $dashboardName false $.Values.dashboards) -}}
 
 {{- /*
 Delete condition from dashboard
