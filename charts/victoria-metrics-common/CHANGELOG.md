@@ -3,7 +3,7 @@
 ## Next release
 
 - Added `vm.service` for unified service name generation
-- Added `vm.url` to construct service DNS name
+- Added `vm.url` to construct service base url
 - Added `vm.name` for chart name
 - Added `vm.fullname` which is actively used in resource name construction
 - Added `vm.chart` to construct chart name label value
