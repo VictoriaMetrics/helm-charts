@@ -1,4 +1,3 @@
-{{- if .Values.rbac.create -}}
 {{- $files := .Files }}
 {{- $fileContentsList := $files.Get "crd.yaml" | splitList "---" }}
 {{- $groups := dict }}
@@ -11,12 +10,18 @@
   {{- $groups = set $groups $group $resources }}
 {{- end }}
 
-{{- $rules := default list }}
-{{- $verbs := list "*" }}
+{{- $rules := default dict }}
+{{- $verbs := dict "admin" (list "*") "view" (list "get" "list" "watch") }}
 {{- range $group, $resources := $groups }}
-  {{- $rules = append $rules (dict "apiGroups" (list $group) "resources" $resources "verbs" (list "*")) }}
+  {{- range $name, $v := $verbs }}
+    {{- $r := index $rules $name | default list -}}
+    {{- $r = append $r (dict "apiGroups" (list $group) "resources" $resources "verbs" $v) -}}
+    {{- $_ := set $rules $name $r }}
+  {{- end }}
 {{- end -}}
 
+{{- if .Values.rbac.create }}
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -143,5 +148,42 @@ rules:
   - list
   - watch
   - get
-{{ toYaml $rules }}
-{{- end -}}
+{{ toYaml $rules.admin }}
+{{- end }}
+{{- if or .Values.cleanupCRD .Values.crd.cleanup.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "vm-operator.cleanupHookName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-5") | nindent 4 }}
+rules: {{ toYaml $rules.admin | nindent 2 }}
+{{- end }}
+
+{{- if or .Values.createCRD .Values.crd.create .Values.rbac.aggregatedClusterRoles.enabled }}
+{{- /* This template generates readonly and admin cluster roles for */ -}}
+{{- /* each CRD present in the helm chart.  The clusterroles use the */ -}}
+{{- /* kubernetes clusterrole aggregation feature to include these */ -}}
+{{- /* cluster roles into the default view and admin roles */ -}}
+{{- /* See https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles */}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: victoriametrics:admin
+  labels:
+    {{- include "vm-operator.labels" . | nindent 4 }}
+    {{- .Values.rbac.aggregatedClusterRoles.labels.admin | toYaml | nindent 4 }}
+rules: {{ toYaml $rules.admin | nindent 2 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: victoriametrics:view
+  labels:
+    {{- include "vm-operator.labels" . | nindent 4 }}
+    {{- .Values.rbac.aggregatedClusterRoles.labels.view | toYaml | nindent 4 }}
+rules: {{ toYaml $rules.view | nindent 2 }}
+{{- end }}
