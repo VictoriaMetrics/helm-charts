@@ -2,7 +2,15 @@
 
 ## Next release
 
-- TODO
+- Added `vm.service` for unified service name generation
+- Added `vm.url` to construct service DNS name
+- Added `vm.name` for chart name
+- Added `vm.fullname` which is actively used in resource name construction
+- Added `vm.chart` to construct chart name label value
+- Added `vm.labels` for common labels
+- Added `vm.sa` for service account name
+- Added `vm.release` for release name
+- Added `vm.selectorLabels` for common selector labels
 
 ## 0.0.7
 
