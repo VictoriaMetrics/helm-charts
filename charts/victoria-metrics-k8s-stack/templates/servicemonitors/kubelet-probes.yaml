@@ -1,9 +1,0 @@
-{{- if and .Values.kubelet.enabled .Values.kubelet.probes }}
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMNodeScrape
-metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "probes" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ .Release.Namespace }}
-  labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
-spec: {{ deepCopy .Values.kubelet.spec | mergeOverwrite (dict "path" "/metrics/probes") | toYaml | nindent 2 }}
-{{- end }}
