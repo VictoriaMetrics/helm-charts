@@ -33,8 +33,9 @@ Return license volume mount
   {{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
   {{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
   {{- if and $licenseSecretName $licenseSecretKey -}}
-    {{- $volume := list (dict "name" "license-key" "secret" (dict "secretName" $licenseSecretName)) -}}
-    {{- toYaml $volume -}}
+- name: license-key
+  secret:
+    secretName: {{ $licenseSecretName }}
   {{- end -}}
 {{- end -}}
 
@@ -45,8 +46,9 @@ Return license volume mount for container
   {{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
   {{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
   {{- if and $licenseSecretName $licenseSecretKey -}}
-    {{- $mount := list (dict "name" "license-key" "mountPath" "/etc/vm-license-key" "readOnly" true) -}}
-    {{- toYaml $mount -}}
+- name: license-key
+  mountPath: /etc/vm-license-key
+  readOnly: true
   {{- end -}}
 {{- end -}}
 
