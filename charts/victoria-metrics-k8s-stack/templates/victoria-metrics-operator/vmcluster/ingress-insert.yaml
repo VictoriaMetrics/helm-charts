@@ -5,7 +5,7 @@
 {{- with $helm.Values.vmcluster.name -}}
   {{- $_ := set $helm.Values.vmcluster.vminsert.name . }}
 {{- end }}
-{{- $ctx := dict "helm" $helm "vmService" "vminsert" -}}
+{{- $ctx := dict "helm" $helm "appKey" "vminsert" -}}
 {{- $_ := set $ctx.global.Values "vminsert" $helm.Values.vmcluster.vminsert }}
 {{- $serviceName := include "vm.service" $ctx -}}
 {{- $servicePort := $app.spec.vminsert.port | default 8480 -}}

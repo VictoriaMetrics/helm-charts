@@ -63,13 +63,13 @@ If release name contains chart name it will be used as a full name.
   {{- $helm := .helm -}}
   {{- $Values := $helm.Values -}}
   {{- $name := (include "victoria-metrics-k8s-stack.fullname" $helm) -}}
-  {{- with .vmService -}}
+  {{- with .appKey -}}
     {{- $service := (index $Values .) | default dict -}}
     {{- $prefix := ternary . (printf "vm%s" .) (hasPrefix "vm" .) -}}
     {{- $name = ($service).name | default (printf "%s-%s" $prefix $name) -}}
   {{- end -}}
-  {{- if hasKey . "vmIdx" -}}
-    {{- $name = (printf "%s-%d.%s" $name .vmIdx $name) -}}
+  {{- if hasKey . "appIdx" -}}
+    {{- $name = (printf "%s-%d.%s" $name .appIdx $name) -}}
   {{- end -}}
   {{- $name -}}
 {{- end }}
@@ -81,12 +81,12 @@ If release name contains chart name it will be used as a full name.
   {{- $ns := $Release.Namespace -}}
   {{- $proto := "http" -}}
   {{- $port := 80 -}}
-  {{- $path := .vmRoute | default "/" -}}
+  {{- $path := .appRoute | default "/" -}}
   {{- $isSecure := false -}}
-  {{- if .vmSecure -}}
-    {{- $isSecure = .vmSecure -}}
+  {{- if .appSecure -}}
+    {{- $isSecure = .appSecure -}}
   {{- end -}}
-  {{- with .vmService -}}
+  {{- with .appKey -}}
     {{- $service := index ($Values) . | default dict -}}
     {{- $spec := $service.spec | default dict -}}
     {{- $isSecure = ($spec.extraArgs).tls | default $isSecure -}}
@@ -103,12 +103,12 @@ If release name contains chart name it will be used as a full name.
   {{- $Values := .helm.Values -}}
   {{- $endpoint := default dict -}}
   {{- if $Values.vmsingle.enabled -}}
-    {{- $_ := set $ctx "vmService" "vmsingle" -}}
+    {{- $_ := set $ctx "appKey" "vmsingle" -}}
     {{- $_ := set $endpoint "url" (include "vm.url" $ctx) -}}
   {{- else if $Values.vmcluster.enabled -}}
     {{- $_ := set $Values.vmcluster.spec.vmselect "name" $Values.vmcluster.name -}}
     {{- $_ := set $Values "vmselect" (dict "spec" $Values.vmcluster.spec.vmselect) -}}
-    {{- $_ := set $ctx "vmService" "vmselect" -}}
+    {{- $_ := set $ctx "appKey" "vmselect" -}}
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
     {{- $tenant := ($Values.tenant | default 0) -}}
     {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
@@ -123,13 +123,13 @@ If release name contains chart name it will be used as a full name.
   {{- $Values := .helm.Values -}}
   {{- $endpoint := default dict -}}
   {{- if $Values.vmsingle.enabled -}}
-    {{- $_ := set $ctx "vmService" "vmsingle" -}}
+    {{- $_ := set $ctx "appKey" "vmsingle" -}}
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
     {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
   {{- else if $Values.vmcluster.enabled -}}
     {{- $_ := set $Values.vmcluster.spec.vminsert "name" $Values.vmcluster.name -}}
     {{- $_ := set $Values "vminsert" (dict "spec" $Values.vmcluster.spec.vminsert) -}}
-    {{- $_ := set $ctx "vmService" "vminsert" -}}
+    {{- $_ := set $ctx "appKey" "vminsert" -}}
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
     {{- $tenant := ($Values.tenant | default 0) -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
@@ -146,7 +146,7 @@ If release name contains chart name it will be used as a full name.
   {{- $ctx := dict "helm" . -}}
   {{- $remoteWrite := (include "vm.write.endpoint" $ctx | fromYaml) -}}
   {{- if .Values.vmalert.remoteWriteVMAgent -}}
-    {{- $ctx := dict "helm" . "vmService" "vmagent" -}}
+    {{- $ctx := dict "helm" . "appKey" "vmagent" -}}
     {{- $remoteWrite = dict "url" (printf "%s/api/v1/write" (include "vm.url" $ctx)) -}}
   {{- end -}}
   {{- $ctx := dict "helm" . -}}
@@ -160,11 +160,11 @@ If release name contains chart name it will be used as a full name.
     {{- $_ := set $remotes "notifierConfigRef" $notifierConfigRef -}}
   {{- else if .Values.alertmanager.enabled -}}
     {{- $notifiers := default list -}}
-    {{- $vmSecure := (not (empty (((.Values.alertmanager).spec).webConfig).tls_server_config)) -}}
-    {{- $ctx := dict "helm" . "vmService" "alertmanager" "vmSecure" $vmSecure "vmRoute" ((.Values.alertmanager).spec).routePrefix -}}
+    {{- $appSecure := (not (empty (((.Values.alertmanager).spec).webConfig).tls_server_config)) -}}
+    {{- $ctx := dict "helm" . "appKey" "alertmanager" "appSecure" $appSecure "appRoute" ((.Values.alertmanager).spec).routePrefix -}}
     {{- $alertManagerReplicas := (.Values.alertmanager.spec.replicaCount | default 1 | int) -}}
     {{- range until $alertManagerReplicas -}}
-      {{- $_ := set $ctx "vmIdx" . -}}
+      {{- $_ := set $ctx "appIdx" . -}}
       {{- $notifiers = append $notifiers (dict "url" (include "vm.url" $ctx)) -}}
     {{- end }}
     {{- $_ := set $remotes "notifiers" $notifiers -}}
@@ -247,7 +247,7 @@ If release name contains chart name it will be used as a full name.
 {{- define "vm.single.spec" -}}
   {{- $extraArgs := default dict -}}
   {{- if .Values.vmalert.enabled }}
-    {{- $ctx := dict "helm" . "vmService" "vmalert" -}}
+    {{- $ctx := dict "helm" . "appKey" "vmalert" -}}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" $ctx) -}}
   {{- end -}}
   {{- $spec := dict "extraArgs" $extraArgs -}}
@@ -263,7 +263,7 @@ If release name contains chart name it will be used as a full name.
 {{- define "vm.select.spec" -}}
   {{- $extraArgs := default dict -}}
   {{- if .Values.vmalert.enabled -}}
-    {{- $ctx := dict "helm" . "vmService" "vmalert" -}}
+    {{- $ctx := dict "helm" . "appKey" "vmalert" -}}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" $ctx) -}}
   {{- end -}}
   {{- $spec := dict "extraArgs" $extraArgs -}}
@@ -319,7 +319,7 @@ jsonData: {{ .jsonData | default dict | toYaml | nindent 2 }}
     {{- if .Values.grafana.sidecar.datasources.createVMReplicasDatasources -}}
       {{- $ctx := dict "helm" . -}}
       {{- range until (int .Values.vmsingle.spec.replicaCount) -}}
-        {{- $_ := set $ctx "vmIdx" . -}}
+        {{- $_ := set $ctx "appIdx" . -}}
         {{- $readEndpoint:= (include "vm.read.endpoint" $ctx | fromYaml) }}
         {{- $args := dict "name" (printf "VictoriaMetrics-%d" .) "type" $dsType "url" $readEndpoint.url "jsonData" $jsonData -}}
         {{- $datasources = append $datasources (fromYaml (include "vm.data.source" $args)) -}}

@@ -1,7 +1,7 @@
 {{- $helm := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vmsingle }}
 {{ if and $app.enabled $app.ingress.enabled -}}
-{{- $ctx := dict "helm" $helm "vmService" "vmsingle" -}}
+{{- $ctx := dict "helm" $helm "appKey" "vmsingle" -}}
 {{- $serviceName := include "vm.service" $ctx -}}
 {{- $servicePort := $app.spec.port | default 8429 -}}
 apiVersion: networking.k8s.io/v1
