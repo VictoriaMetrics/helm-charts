@@ -1,31 +1,30 @@
 {{- /* Create the name for VM service */ -}}
 {{- define "vm.service" -}}
-  {{- $global := .global -}}
-  {{- $value := (include "vm.fullname" $global) -}}
-  {{- with .vmService -}}
-    {{- $service := (index $global .) | default dict -}}
+  {{- include "vm.validate.args" . -}}
+  {{- $Values := .helm.Values | default .Values -}}
+  {{- $name := (include "vm.fullname" .) -}}
+  {{- with .appKey -}}
+    {{- $service := (index $Values .) | default dict -}}
     {{- $prefix := ternary . (printf "vm%s" .) (hasPrefix "vm" .) -}}
-    {{- $value = ($service).name | default (printf "%s-%s" $prefix $value) -}}
+    {{- $name = ($service).name | default (printf "%s-%s" $prefix $name) -}}
   {{- end -}}
-  {{- if hasKey . "vmIdx" -}}
-    {{- $value = (printf "%s-%d.%s" $value .vmIdx $value) -}}
+  {{- if hasKey . "appIdx" -}}
+    {{- $name = (printf "%s-%d.%s" $name .appIdx $name) -}}
   {{- end -}}
   {{- $value -}}
 {{- end }}
 
 {{- define "vm.url" -}}
   {{- $name := (include "vm.service" .) -}}
-  {{- $global := .global -}}
-  {{- $ns := $global.Release.Namespace -}}
+  {{- $Release := .helm.Release | default .Release -}}
+  {{- $Values := .helm.Values | default .Values -}}
+  {{- $ns := $Release.Namespace -}}
   {{- $proto := "http" -}}
   {{- $port := 80 -}}
-  {{- $path := .vmRoute | default "/" -}}
-  {{- $isSecure := false -}}
-  {{- if .vmSecure -}}
-    {{- $isSecure = .vmSecure -}}
-  {{- end -}}
-  {{- with .vmService -}}
-    {{- $service := index ($global.Values) . | default dict -}}
+  {{- $path := .appRoute | default "/" -}}
+  {{- $isSecure := ternary false true (empty .appSecure) -}}
+  {{- with .appKey -}}
+    {{- $service := index $Values . | default dict -}}
     {{- $spec := $service.spec | default dict -}}
     {{- $isSecure = ($spec.extraArgs).tls | default $isSecure -}}
     {{- $proto = (ternary "https" "http" $isSecure) -}}

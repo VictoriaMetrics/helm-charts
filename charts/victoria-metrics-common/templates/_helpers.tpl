@@ -1,7 +1,17 @@
+{{- define "vm.validate.args" -}}
+  {{- $Chart .helm.Chart | default .Chart -}}
+  {{- if empty $Chart -}}
+    {{- fail "invalid template data" -}}
+  {{- end -}}
+{{- end -}}
+
 {{- /* Expand the name of the chart. */ -}}
 {{- define "vm.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
-{{- end }}
+  {{- include "vm.validate.args" . -}}
+  {{- $Chart := .helm.Chart | default .Chart -}}
+  {{- $Values := .helm.Values | default .Values -}}
+  {{- $Values.nameOverride | default $Values.global.nameOverride | default $Chart.Name | trunc 63 | trimSuffix "-" }}
+{{- end -}}
 
 {{- /*
 Create a default fully qualified app name.
@@ -9,51 +19,84 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */ -}}
 {{- define "vm.fullname" -}}
-{{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
-{{- if contains $name .Release.Name }}
-{{- .Release.Name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- end }}
+  {{- include "vm.validate.args" . -}}
+  {{- $Values := .helm.Values | default .Values -}}
+  {{- $Chart := .helm.Chart | default .Chart -}}
+  {{- $Release := helm.Release | default .Release -}}
+  {{- $appKey := .appKey -}}
+  {{- $fullname := default list -}}
+  {{- if $Values.fullnameOverride -}}
+    {{- $fullname = append $fullname .Values.fullnameOverride -}}
+  {{- else if and $appKey (dig $Chart.Name $appKey "fullnameOverride" "" ($Values.global) -}}
+    {{- $fullname = append $fullname (index .Values.global $Chart.Name $appKey "fullnameOverride") -}}
+  {{- else }}
+    {{- $name := default $Chart.Name $Values.nameOverride -}}
+    {{- $fullname = append $fullname $Release.Name -}}
+    {{- if not (contains $name $fullname) -}}
+      {{- $fullname = append $fullname $name -}}
+    {{- end -}}
+    {{- if $appKey -}}
+      {{- $suffix := index $Values $appKey "name" | default (index $Values.global $appKey "name") -}}
+      {{- if $suffix -}}
+        {{- $fullname = append $fullname $suffix -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end }}
+  {{- $fullname | join "-" | trunc 63 | trimSuffix "-" -}}
 {{- end }}
 
 {{- /* Create chart name and version as used by the chart label. */ -}}
 {{- define "vm.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+  {{- include "vm.validate.args" . -}}
+  {{- $Chart := .helm.Chart | default .Chart -}}
+  {{- printf "%s-%s" $Chart.Name $Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{- /* Create the name of the service account to use */ -}}
-{{- define "vm.sa" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "vm.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
+{{- define "vm.sa.name" -}}
+  {{- include "vm.validate.args" . -}}
+  {{- $Values := .helm.Values | default .Values -}}
+  {{- if $Values.serviceAccount.create }}
+    {{- default (include "vm.fullname" .) $Values.serviceAccount.name }}
+  {{- else -}}
+    {{- default "default" $Values.serviceAccount.name -}}
+  {{- end }}
 {{- end }}
 
 {{- /* Common labels */ -}}
 {{- define "vm.labels" -}}
-helm.sh/chart: {{ include "vm.chart" . }}
-{{ include "vm.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end }}
+  {{- include "vm.validate.args" . -}}
+  {{- $Release := .helm.Release | default .Release -}}
+  {{- $Chart := .helm.Chart | default .Chart -}}
+  {{- $labels := fromYaml (include "vm.selectorLabels" .) -}}
+  {{- $_ := set $labels "helm.sh/chart" (include "vm.chart" .) -}}
+  {{- $_ := set $labels "app.kubernetes.io/managed-by" $Release.Service -}}
+  {{- with $Chart.AppVersion -}}
+    {{- $_ := set $labels "app.kubernetes.io/version" ($Chart.AppVersion) -}}
+  {{- end -}}
+  {{- toYaml $labels -}}
+{{- end -}}
 
 {{- define "vm.release" -}}
-{{ default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" }}
+  {{- include "vm.validate.args" . -}}
+  {{- $Release := .helm.Release | default .Release -}}
+  {{- $Values := .helm.Values | default .Values -}}
+  {{- default $Release.Name $Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- /* Selector labels */ -}}
 {{- define "vm.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "vm.name" . }}
-app.kubernetes.io/instance: {{ include "vm.release" . }}
-{{- with .extraLabels }}
-{{ toYaml . }}
-{{- end }}
+  {{- $labels := ternary (default dict) (.extraLabels | default dict) (empty .helm) -}}
+  {{- $_ := set $labels "app.kubernetes.io/name" (include "vm.name" .) -}}
+  {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
+  {{- if .appKey -}}
+    {{- $Values := .helm.Values | default .Values -}}
+    {{- $Chart := .helm.Chart | default .Chart -}}
+    {{- if dig .appKey "name" "" $Values -}}
+      {{- $_ := set $labels "app" (index $Values .appKey "name") -}}
+    {{- else if dig $Chart.Name .appKey "name" "" ($Values.global) -}}
+      {{- $_ := set $labels "app" (index $Values.global $Chart.Name .appKey "name") -}}
+    {{- end -}}
+  {{- end -}}
+  {{- toYaml $labels -}}
 {{- end }}
