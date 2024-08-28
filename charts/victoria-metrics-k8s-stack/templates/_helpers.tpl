@@ -183,6 +183,20 @@ If release name contains chart name it will be used as a full name.
   {{- toYaml $output -}}
 {{- end -}}
 
+{{- define "vm.license.global" -}}
+  {{- $license := (deepCopy (.Values.global).license) | default dict -}}
+  {{- if $license.key -}}
+    {{- if hasKey $license "keyRef" -}}
+      {{- $_ := unset $license "keyRef" -}}
+    {{- end -}}
+  {{- else if $license.keyRef.name -}}
+    {{- if hasKey $license "key" -}}
+      {{- $_ := unset $license "key" -}}
+    {{- end -}}
+  {{- end -}}
+  {{- toYaml $license -}}
+{{- end -}}
+
 {{- /* VMAlert spec */ -}}
 {{- define "vm.alert.spec" -}}
   {{- $extraArgs := dict "remoteWrite.disablePathAppend" "true" -}}
@@ -193,10 +207,8 @@ If release name contains chart name it will be used as a full name.
   {{- $vmAlertRemotes := (include "vm.alert.remotes" . | fromYaml) -}}
   {{- $vmAlertTemplates := (include "vm.alert.templates" . | fromYaml) -}}
   {{- $spec := dict "extraArgs" $extraArgs -}}
-  {{- if or .Values.global.license.key .Values.global.license.keyRef.name -}}
-    {{- with .Values.global.license -}}
-      {{- $_ := set $spec "license" . -}}
-    {{- end -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
   {{- $_ := set $vmAlertRemotes "notifiers" (concat $vmAlertRemotes.notifiers (.Values.vmalert.spec.notifiers | default list)) -}}
   {{- tpl (deepCopy (omit .Values.vmalert.spec "notifiers") | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec | toYaml) . -}}
@@ -215,10 +227,8 @@ If release name contains chart name it will be used as a full name.
 {{- /* VMAgent spec */ -}}
 {{- define "vm.agent.spec" -}}
   {{- $spec := (include "vm.agent.remote.write" . | fromYaml) -}}
-  {{- if or .Values.global.license.key .Values.global.license.keyRef.name -}}
-    {{- with .Values.global.license -}}
-      {{- $_ := set $spec "license" . -}}
-    {{- end -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
   {{- tpl (deepCopy .Values.vmagent.spec | mergeOverwrite $spec | toYaml) . -}}
 {{- end }}
@@ -251,10 +261,8 @@ If release name contains chart name it will be used as a full name.
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" $ctx) -}}
   {{- end -}}
   {{- $spec := dict "extraArgs" $extraArgs -}}
-  {{- if or .Values.global.license.key .Values.global.license.keyRef.name -}}
-    {{- with .Values.global.license -}}
-      {{- $_ := set $spec "license" . -}}
-    {{- end -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
   {{- tpl (deepCopy .Values.vmsingle.spec | mergeOverwrite $spec | toYaml) . -}}
 {{- end }}
@@ -272,12 +280,10 @@ If release name contains chart name it will be used as a full name.
 
 {{- define "vm.cluster.spec" -}}
   {{- $spec := (include "vm.select.spec" . | fromYaml) -}}
-  {{- if or .Values.global.license.key .Values.global.license.keyRef.name -}}
-    {{- with .Values.global.license -}}
-      {{- $_ := set $spec "license" . -}}
-    {{- end -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- tpl (deepCopy .Values.vmcluster.spec | mergeOverwrite $spec | toYaml) . -}}
+  {{- tpl (deepCopy .Values.vmcluster.spec | mergeOverwrite (dict "vmselect" $spec) | toYaml) . -}}
 {{- end -}}
 
 {{- define "vm.data.source" -}}
