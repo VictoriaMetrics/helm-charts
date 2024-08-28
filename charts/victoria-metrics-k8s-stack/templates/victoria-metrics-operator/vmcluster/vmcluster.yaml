@@ -6,7 +6,7 @@ metadata:
   {{- with .Values.vmcluster.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-  {{- $ctx := dict "global" . "vmService" "vmcluster" }}
+  {{- $ctx := dict "helm" . "appKey" "vmcluster" }}
   name: {{ include "vm.service" $ctx }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}

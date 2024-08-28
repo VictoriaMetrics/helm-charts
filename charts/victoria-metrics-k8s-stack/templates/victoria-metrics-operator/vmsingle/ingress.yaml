@@ -1,7 +1,7 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $helm := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vmsingle }}
 {{ if and $app.enabled $app.ingress.enabled -}}
-{{- $ctx := dict "global" $global "vmService" "vmsingle" -}}
+{{- $ctx := dict "helm" $helm "appKey" "vmsingle" -}}
 {{- $serviceName := include "vm.service" $ctx -}}
 {{- $servicePort := $app.spec.port | default 8429 -}}
 apiVersion: networking.k8s.io/v1
@@ -10,7 +10,7 @@ metadata:
   name: {{ $app.name | default $serviceName }}
   namespace: {{ .Release.Namespace }}
   {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-vmsingle" (include "victoria-metrics-k8s-stack.name" .)) }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" (merge $extraLabels $app.ingress.labels)) }}
+  {{- $ctx := merge (deepCopy $helm) (dict "extraLabels" (merge $extraLabels $app.ingress.labels)) }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
   {{- with $app.ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
