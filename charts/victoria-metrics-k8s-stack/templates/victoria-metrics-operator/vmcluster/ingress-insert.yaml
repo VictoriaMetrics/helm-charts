@@ -6,7 +6,7 @@
   {{- $_ := set $helm.Values.vmcluster.vminsert.name . }}
 {{- end }}
 {{- $ctx := dict "helm" $helm "appKey" "vminsert" -}}
-{{- $_ := set $ctx.global.Values "vminsert" $helm.Values.vmcluster.vminsert }}
+{{- $_ := set $ctx.helm.Values "vminsert" $helm.Values.vmcluster.vminsert }}
 {{- $serviceName := include "vm.service" $ctx -}}
 {{- $servicePort := $app.spec.vminsert.port | default 8480 -}}
 apiVersion: networking.k8s.io/v1

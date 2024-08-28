@@ -6,7 +6,7 @@
   {{- $_ := set $helm.Values.vmcluster.vmstorage.name . }}
 {{- end }}
 {{- $ctx := dict "helm" $helm "appKey" "vmstorage" -}}
-{{- $_ := set $ctx.global.Values "vmstorage" $helm.Values.vmcluster.vmstorage }}
+{{- $_ := set $ctx.helm.Values "vmstorage" $helm.Values.vmcluster.vmstorage }}
 {{- $serviceName := include "vm.service" $ctx -}}
 {{- $servicePort := $app.spec.vmstorage.port | default 8482 }}
 apiVersion: networking.k8s.io/v1
