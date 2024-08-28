@@ -1,6 +1,6 @@
 {{- /* Expand the name of the chart. */ -}}
 {{- define "victoria-metrics-k8s-stack.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+  {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{- /*
@@ -9,74 +9,76 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */ -}}
 {{- define "victoria-metrics-k8s-stack.fullname" -}}
-{{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
-{{- if contains $name .Release.Name }}
-{{- .Release.Name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- end }}
+  {{- if .Values.fullnameOverride }}
+    {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+  {{- else }}
+    {{- $name := default .Chart.Name .Values.nameOverride }}
+    {{- if contains $name .Release.Name }}
+      {{- .Release.Name | trunc 63 | trimSuffix "-" }}
+    {{- else }}
+      {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 {{- /* Create chart name and version as used by the chart label. */ -}}
 {{- define "victoria-metrics-k8s-stack.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+  {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end }}
 
 {{- /* Create the name of the service account to use */ -}}
 {{- define "victoria-metrics-k8s-stack.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "victoria-metrics-k8s-stack.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
+  {{- if .Values.serviceAccount.create -}}
+    {{- default (include "victoria-metrics-k8s-stack.fullname" .) .Values.serviceAccount.name -}}
+  {{- else -}}
+    {{- default "default" .Values.serviceAccount.name -}}
+  {{- end }}
 {{- end }}
 
 {{- /* Common labels */ -}}
 {{- define "victoria-metrics-k8s-stack.labels" -}}
-helm.sh/chart: {{ include "victoria-metrics-k8s-stack.chart" . }}
-{{ include "victoria-metrics-k8s-stack.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{- $labels := (fromYaml (include "victoria-metrics-k8s-stack.selectorLabels" .)) -}}
+  {{- $_ := set $labels "helm.sh/chart" (include "victoria-metrics-k8s-stack.chart" .) -}}
+  {{- $_ := set $labels "app.kubernetes.io/managed-by" .Release.Service -}}
+  {{- with .Chart.AppVersion }}
+    {{- $_ := set $labels "app.kubernetes.io/version" . -}}
+  {{- end -}}
+  {{- toYaml $labels -}}
 {{- end }}
 
 {{- define "vm.release" -}}
-{{ default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" }}
+  {{- default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- /* Selector labels */ -}}
 {{- define "victoria-metrics-k8s-stack.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "victoria-metrics-k8s-stack.name" . }}
-app.kubernetes.io/instance: {{ include "vm.release" . }}
-{{- with .extraLabels }}
-{{ toYaml . }}
-{{- end }}
+  {{- $labels := .extraLabels | default dict -}}
+  {{- $_ := set $labels "app.kubernetes.io/name" (include "victoria-metrics-k8s-stack.name" .) -}}
+  {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
+  {{- toYaml $labels -}}
 {{- end }}
 
 {{- /* Create the name for VM service */ -}}
 {{- define "vm.service" -}}
-  {{- $global := .global -}}
-  {{- $value := (include "victoria-metrics-k8s-stack.fullname" $global) -}}
+  {{- $helm := .helm -}}
+  {{- $Values := $helm.Values -}}
+  {{- $name := (include "victoria-metrics-k8s-stack.fullname" $helm) -}}
   {{- with .vmService -}}
-    {{- $service := (index $global .) | default dict -}}
+    {{- $service := (index $Values .) | default dict -}}
     {{- $prefix := ternary . (printf "vm%s" .) (hasPrefix "vm" .) -}}
-    {{- $value = ($service).name | default (printf "%s-%s" $prefix $value) -}}
+    {{- $name = ($service).name | default (printf "%s-%s" $prefix $name) -}}
   {{- end -}}
   {{- if hasKey . "vmIdx" -}}
-    {{- $value = (printf "%s-%d.%s" $value .vmIdx $value) -}}
+    {{- $name = (printf "%s-%d.%s" $name .vmIdx $name) -}}
   {{- end -}}
-  {{- $value -}}
+  {{- $name -}}
 {{- end }}
 
 {{- define "vm.url" -}}
   {{- $name := (include "vm.service" .) -}}
-  {{- $global := .global -}}
-  {{- $ns := $global.Release.Namespace -}}
+  {{- $Release := .helm.Release -}}
+  {{- $Values := .helm.Values -}}
+  {{- $ns := $Release.Namespace -}}
   {{- $proto := "http" -}}
   {{- $port := 80 -}}
   {{- $path := .vmRoute | default "/" -}}
@@ -85,7 +87,7 @@ app.kubernetes.io/instance: {{ include "vm.release" . }}
     {{- $isSecure = .vmSecure -}}
   {{- end -}}
   {{- with .vmService -}}
-    {{- $service := index ($global.Values) . | default dict -}}
+    {{- $service := index ($Values) . | default dict -}}
     {{- $spec := $service.spec | default dict -}}
     {{- $isSecure = ($spec.extraArgs).tls | default $isSecure -}}
     {{- $proto = (ternary "https" "http" $isSecure) -}}
@@ -98,41 +100,41 @@ app.kubernetes.io/instance: {{ include "vm.release" . }}
 
 {{- define "vm.read.endpoint" -}}
   {{- $ctx := . -}}
-  {{- $values := $ctx.global.Values -}}
+  {{- $Values := .helm.Values -}}
   {{- $endpoint := default dict -}}
-  {{- if $values.vmsingle.enabled -}}
+  {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set $ctx "vmService" "vmsingle" -}}
     {{- $_ := set $endpoint "url" (include "vm.url" $ctx) -}}
-  {{- else if $values.vmcluster.enabled -}}
-    {{- $_ := set $values.vmcluster.spec.vmselect "name" $values.vmcluster.name -}}
-    {{- $_ := set $values "vmselect" (dict "spec" $values.vmcluster.spec.vmselect) -}}
+  {{- else if $Values.vmcluster.enabled -}}
+    {{- $_ := set $Values.vmcluster.spec.vmselect "name" $Values.vmcluster.name -}}
+    {{- $_ := set $Values "vmselect" (dict "spec" $Values.vmcluster.spec.vmselect) -}}
     {{- $_ := set $ctx "vmService" "vmselect" -}}
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
-    {{- $tenant := ($values.tenant | default 0) -}}
+    {{- $tenant := ($Values.tenant | default 0) -}}
     {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
-  {{- else if $values.externalVM.read.url -}}
-    {{- $endpoint := $values.externalVM.read -}}
+  {{- else if $Values.externalVM.read.url -}}
+    {{- $endpoint := $Values.externalVM.read -}}
   {{- end -}}
   {{- toYaml $endpoint -}}
 {{- end }}
 
 {{- define "vm.write.endpoint" -}}
   {{- $ctx := . -}}
-  {{- $values := $ctx.global.Values -}}
+  {{- $Values := .helm.Values -}}
   {{- $endpoint := default dict -}}
-  {{- if $values.vmsingle.enabled -}}
+  {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set $ctx "vmService" "vmsingle" -}}
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
     {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
-  {{- else if $values.vmcluster.enabled -}}
-    {{- $_ := set $values.vmcluster.spec.vminsert "name" $values.vmcluster.name -}}
-    {{- $_ := set $values "vminsert" (dict "spec" $values.vmcluster.spec.vminsert) -}}
+  {{- else if $Values.vmcluster.enabled -}}
+    {{- $_ := set $Values.vmcluster.spec.vminsert "name" $Values.vmcluster.name -}}
+    {{- $_ := set $Values "vminsert" (dict "spec" $Values.vmcluster.spec.vminsert) -}}
     {{- $_ := set $ctx "vmService" "vminsert" -}}
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
-    {{- $tenant := ($values.tenant | default 0) -}}
+    {{- $tenant := ($Values.tenant | default 0) -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
-  {{- else if $values.externalVM.write.url -}}
-    {{- $endpoint := $values.externalVM.write -}}
+  {{- else if $Values.externalVM.write.url -}}
+    {{- $endpoint := $Values.externalVM.write -}}
   {{- end -}}
   {{- toYaml $endpoint -}}
 {{- end -}}
@@ -141,13 +143,13 @@ app.kubernetes.io/instance: {{ include "vm.release" . }}
 {{- define "vm.alert.remotes" -}}
   {{- $remotes := default dict -}}
   {{- $fullname := (include "victoria-metrics-k8s-stack.fullname" .) -}}
-  {{- $ctx := dict "global" . -}}
+  {{- $ctx := dict "helm" . -}}
   {{- $remoteWrite := (include "vm.write.endpoint" $ctx | fromYaml) -}}
   {{- if .Values.vmalert.remoteWriteVMAgent -}}
-    {{- $ctx := dict "global" . "vmService" "vmagent" -}}
+    {{- $ctx := dict "helm" . "vmService" "vmagent" -}}
     {{- $remoteWrite = dict "url" (printf "%s/api/v1/write" (include "vm.url" $ctx)) -}}
   {{- end -}}
-  {{- $ctx := dict "global" . -}}
+  {{- $ctx := dict "helm" . -}}
   {{- $remoteRead := (fromYaml (include "vm.read.endpoint" $ctx)) -}}
   {{- $_ := set $remotes "remoteWrite" $remoteWrite -}}
   {{- $_ := set $remotes "remoteRead" $remoteRead -}}
@@ -159,7 +161,7 @@ app.kubernetes.io/instance: {{ include "vm.release" . }}
   {{- else if .Values.alertmanager.enabled -}}
     {{- $notifiers := default list -}}
     {{- $vmSecure := (not (empty (((.Values.alertmanager).spec).webConfig).tls_server_config)) -}}
-    {{- $ctx := dict "global" . "vmService" "alertmanager" "vmSecure" $vmSecure "vmRoute" ((.Values.alertmanager).spec).routePrefix -}}
+    {{- $ctx := dict "helm" . "vmService" "alertmanager" "vmSecure" $vmSecure "vmRoute" ((.Values.alertmanager).spec).routePrefix -}}
     {{- $alertManagerReplicas := (.Values.alertmanager.spec.replicaCount | default 1 | int) -}}
     {{- range until $alertManagerReplicas -}}
       {{- $_ := set $ctx "vmIdx" . -}}
@@ -204,7 +206,7 @@ app.kubernetes.io/instance: {{ include "vm.release" . }}
 {{- define "vm.agent.remote.write" -}}
   {{- $remoteWrites := .Values.vmagent.additionalRemoteWrites | default list -}}
   {{- if or .Values.vmsingle.enabled .Values.vmcluster.enabled .Values.externalVM.write.url -}}
-    {{- $ctx := dict "global" . -}}
+    {{- $ctx := dict "helm" . -}}
     {{- $remoteWrites = append $remoteWrites (fromYaml (include "vm.write.endpoint" $ctx)) -}}
   {{- end -}}
   {{- toYaml (dict "remoteWrite" $remoteWrites) -}}
@@ -245,7 +247,7 @@ app.kubernetes.io/instance: {{ include "vm.release" . }}
 {{- define "vm.single.spec" -}}
   {{- $extraArgs := default dict -}}
   {{- if .Values.vmalert.enabled }}
-    {{- $ctx := dict "global" . "vmService" "vmalert" -}}
+    {{- $ctx := dict "helm" . "vmService" "vmalert" -}}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" $ctx) -}}
   {{- end -}}
   {{- $spec := dict "extraArgs" $extraArgs -}}
@@ -261,7 +263,7 @@ app.kubernetes.io/instance: {{ include "vm.release" . }}
 {{- define "vm.select.spec" -}}
   {{- $extraArgs := default dict -}}
   {{- if .Values.vmalert.enabled -}}
-    {{- $ctx := dict "global" . "vmService" "vmalert" -}}
+    {{- $ctx := dict "helm" . "vmService" "vmalert" -}}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" $ctx) -}}
   {{- end -}}
   {{- $spec := dict "extraArgs" $extraArgs -}}
@@ -269,14 +271,14 @@ app.kubernetes.io/instance: {{ include "vm.release" . }}
 {{- end -}}
 
 {{- define "vm.cluster.spec" -}}
-{{- $spec := (include "vm.select.spec" . | fromYaml) -}}
-{{- if or .Values.global.license.key .Values.global.license.keyRef.name -}}
-  {{- with .Values.global.license -}}
-    {{- $_ := set $spec "license" . -}}
+  {{- $spec := (include "vm.select.spec" . | fromYaml) -}}
+  {{- if or .Values.global.license.key .Values.global.license.keyRef.name -}}
+    {{- with .Values.global.license -}}
+      {{- $_ := set $spec "license" . -}}
+    {{- end -}}
   {{- end -}}
+  {{- tpl (deepCopy .Values.vmcluster.spec | mergeOverwrite $spec | toYaml) . -}}
 {{- end -}}
-{{ tpl (deepCopy .Values.vmcluster.spec | mergeOverwrite $spec | toYaml) . }}
-{{- end }}
 
 {{- define "vm.data.source" -}}
 name: {{ .name | default "VictoriaMetrics" }}
@@ -299,7 +301,7 @@ jsonData: {{ .jsonData | default dict | toYaml | nindent 2 }}
     {{- end }}
   {{- end }}
   {{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled -}}
-    {{- $ctx := dict "global" . -}}
+    {{- $ctx := dict "helm" . -}}
     {{- $readEndpoint:= (include "vm.read.endpoint" $ctx | fromYaml) -}}
     {{- $jsonData := .Values.grafana.sidecar.datasources.jsonData | default dict -}}
     {{- $dsType := (default "prometheus" .Values.grafana.defaultDatasourceType) -}}
@@ -315,7 +317,7 @@ jsonData: {{ .jsonData | default dict | toYaml | nindent 2 }}
       {{- $datasources = append $datasources (fromYaml (include "vm.data.source" $args)) -}}
     {{- end }}
     {{- if .Values.grafana.sidecar.datasources.createVMReplicasDatasources -}}
-      {{- $ctx := dict "global" . -}}
+      {{- $ctx := dict "helm" . -}}
       {{- range until (int .Values.vmsingle.spec.replicaCount) -}}
         {{- $_ := set $ctx "vmIdx" . -}}
         {{- $readEndpoint:= (include "vm.read.endpoint" $ctx | fromYaml) }}
@@ -329,30 +331,29 @@ jsonData: {{ .jsonData | default dict | toYaml | nindent 2 }}
 
 {{- /* VMRule name */ -}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.name" -}}
-{{- $id := include "victoria-metrics-k8s-stack.rulegroup.id" . -}}
-{{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) $id | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  {{- $id := include "victoria-metrics-k8s-stack.rulegroup.id" . -}}
+  {{- printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) $id | trunc 63 | trimSuffix "-" | trimSuffix "." -}}
 {{- end -}}
 
 {{- /* VMRule labels */ -}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.labels" -}}
-app: {{ include "victoria-metrics-k8s-stack.name" . }}
-{{ include "victoria-metrics-k8s-stack.labels" . }}
-{{- with .Values.defaultRules.labels }}
-{{ toYaml . }}
-{{- end }}
+  {{- $labels := (fromYaml (include "victoria-metrics-k8s-stack.labels" .)) -}}
+  {{- $_ := set $labels "app" (include "victoria-metrics-k8s-stack.name" .) -}}
+  {{- $labels = mergeOverwrite $labels (deepCopy .Values.defaultRules.labels) -}}
+  {{- toYaml $labels -}}
 {{- end }}
 
 {{- /* VMRule key */ -}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.key" -}}
-{{ without (regexSplit "[-_.]" .name -1) "exporter" "rules" | join "-" | camelcase | untitle }}
+  {{- without (regexSplit "[-_.]" .name -1) "exporter" "rules" | join "-" | camelcase | untitle -}}
 {{- end -}}
 
 {{- /* VMRule ID */ -}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.id" -}}
-{{ .name | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
+  {{- .name | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." -}}
 {{- end -}}
 
 {{- /* VMAlertmanager name */ -}}
 {{- define "victoria-metrics-k8s-stack.alertmanager.name" -}}
-{{ .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") }}
+  {{- .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") -}}
 {{- end -}}

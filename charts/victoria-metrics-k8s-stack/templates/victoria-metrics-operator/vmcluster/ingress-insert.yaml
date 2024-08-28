@@ -1,12 +1,12 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $helm := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vmcluster }}
 {{- if and $app.enabled $app.ingress.insert.enabled }}
 {{- $ingress := $app.ingress.insert }}
-{{- with $global.Values.vmcluster.name -}}
-  {{- $_ := set $global.Values.vmcluster.vminsert.name . }}
+{{- with $helm.Values.vmcluster.name -}}
+  {{- $_ := set $helm.Values.vmcluster.vminsert.name . }}
 {{- end }}
-{{- $ctx := dict "global" $global "vmService" "vminsert" -}}
-{{- $_ := set $ctx.global.Values "vminsert" $global.Values.vmcluster.vminsert }}
+{{- $ctx := dict "helm" $helm "vmService" "vminsert" -}}
+{{- $_ := set $ctx.global.Values "vminsert" $helm.Values.vmcluster.vminsert }}
 {{- $serviceName := include "vm.service" $ctx -}}
 {{- $servicePort := $app.spec.vminsert.port | default 8480 -}}
 apiVersion: networking.k8s.io/v1
@@ -15,7 +15,7 @@ metadata:
   name: {{ $serviceName }}
   namespace: {{ .Release.Namespace }}
   {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-vmcluster" (include "victoria-metrics-k8s-stack.name" .)) }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" (merge $extraLabels $ingress.labels)) }}
+  {{- $ctx := merge (deepCopy $helm) (dict "extraLabels" (merge $extraLabels $ingress.labels)) }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
   {{- with $ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
