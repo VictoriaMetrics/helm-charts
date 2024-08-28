@@ -1,88 +1,61 @@
-{{- if  and .Values.rbac.create  (not .Values.watchNamespace) -}}
+{{- $files := .Files }}
+{{- $fileContentsList := $files.Get "crd.yaml" | splitList "---" }}
+{{- $groups := dict }}
+{{- range $fileContentsList }}
+  {{- $fileContents := . | fromYaml }}
+  {{- $group := $fileContents.spec.group }}
+  {{- $plural:= $fileContents.spec.names.plural }}
+  {{- $resources := get $groups $group | default (list) }}
+  {{- $resources = concat $resources (list $plural (printf "%s/finalizers" $plural) (printf "%s/status" $plural)) }}
+  {{- $groups = set $groups $group $resources }}
+{{- end }}
+
+{{- $rules := default dict }}
+{{- $verbs := dict "admin" (list "*") "view" (list "get" "list" "watch") }}
+{{- range $group, $resources := $groups }}
+  {{- range $name, $v := $verbs }}
+    {{- $r := index $rules $name | default list -}}
+    {{- $r = append $r (dict "apiGroups" (list $group) "resources" $resources "verbs" $v) -}}
+    {{- $_ := set $rules $name $r }}
+  {{- end }}
+{{- end -}}
+
+{{- if .Values.rbac.create }}
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ template "vm-operator.fullname" . }}
-  labels:
-{{ include "vm-operator.labels" . | indent 4 }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.extraLabels) }}
+  labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
 rules:
 - apiGroups:
   - ""
   resources:
   - configmaps
   - configmaps/finalizers
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
   - endpoints
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
   - events
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
   - persistentvolumeclaims
   - persistentvolumeclaims/finalizers
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
   - pods
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
   - secrets
   - secrets/finalizers
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
   - services
   - services/finalizers
+  - serviceaccounts
+  - serviceaccounts/finalizers
   verbs:
   - "*"
 - apiGroups:
   - ""
   resources:
-    - serviceaccounts
-    - serviceaccounts/finalizers
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-- apiGroups:
-  - ""
-  resources:
+  - configmaps/status
   - nodes
   - nodes/proxy
-  - services
-  - endpoints
-  - pods
-  - endpointslices
-  - configmaps
   - nodes/metrics
   - namespaces
   verbs:
@@ -106,76 +79,6 @@ rules:
   - "*"
   verbs:
   - "*"
-- apiGroups:
-  - operator.victoriametrics.com
-  resources:
-  - vlogs
-  - vlogs/finalizers
-  - vmagents
-  - vmagents/finalizers
-  - vmalertmanagers
-  - vmalertmanagers/finalizers
-  - vmalertmanagerconfigs
-  - vmalertmanagerconfigs/finalizers
-  - vmalerts
-  - vmalerts/finalizers
-  - vmauths
-  - vmauths/finalizers
-  - vmusers
-  - vmusers/finalizers
-  - vmclusters
-  - vmclusters/finalizers
-  - vmpodscrapes
-  - vmpodscrapes/finalizers
-  - vmrules
-  - vmrules/finalizers
-  - vmservicescrapes
-  - vmservicescrapes/finalizers
-  - vmprobes
-  - vmprobes/finalizers
-  - vmsingles
-  - vmsingles/finalizers
-  - vmnodescrapes
-  - vmnodescrapes/finalizers
-  - vmstaticscrapes
-  - vmstaticscrapes/finalizers
-  - vmscrapeconfigs
-  - vmscrapeconfigs/finalizers
-  verbs:
-      - '*'
-- apiGroups:
-  - operator.victoriametrics.com
-  resources:
-  - vlogs/status
-  - vmagents/status
-  - vmalertmanagers/status
-  - vmalertmanagerconfigs/status
-  - vmalerts/status
-  - vmclusters/status
-  - vmpodscrapes/status
-  - vmscrapeconfigs/status
-  - vmrules/status
-  - vmservicescrapes/status
-  - vmprobes/status
-  - vmsingles/status
-  - vmscrapeconfig/status
-  - vmusers/status
-  - vmauths/status
-  - vmstaticscrapes/status
-  - vmnodescrapes/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - extensions
-  - networking.k8s.io
-  resources:
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
 - nonResourceURLs:
   - /metrics
   - /metrics/resources
@@ -225,17 +128,11 @@ rules:
   - horizontalpodautoscalers
 - apiGroups:
   - networking.k8s.io
-  - extensions
   resources:
   - ingresses
   - ingresses/finalizers
   verbs:
-  - create
-  - delete
-  - get
-  - patch
-  - update
-  - watch
+  - "*"
 - apiGroups:
   - apiextensions.k8s.io
   resources:
@@ -251,4 +148,42 @@ rules:
   - list
   - watch
   - get
-{{- end -}}
+{{ toYaml $rules.admin }}
+{{- end }}
+{{- if or .Values.cleanupCRD .Values.crd.cleanup.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "vm-operator.cleanupHookName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-5") | nindent 4 }}
+rules: {{ toYaml $rules.admin | nindent 2 }}
+{{- end }}
+
+{{- if or .Values.createCRD .Values.crd.create .Values.rbac.aggregatedClusterRoles.enabled }}
+{{- /* This template generates readonly and admin cluster roles for */ -}}
+{{- /* each CRD present in the helm chart.  The clusterroles use the */ -}}
+{{- /* kubernetes clusterrole aggregation feature to include these */ -}}
+{{- /* cluster roles into the default view and admin roles */ -}}
+{{- /* See https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles */}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: victoriametrics:admin
+  labels:
+    {{- include "vm-operator.labels" . | nindent 4 }}
+    {{- .Values.rbac.aggregatedClusterRoles.labels.admin | toYaml | nindent 4 }}
+rules: {{ toYaml $rules.admin | nindent 2 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: victoriametrics:view
+  labels:
+    {{- include "vm-operator.labels" . | nindent 4 }}
+    {{- .Values.rbac.aggregatedClusterRoles.labels.view | toYaml | nindent 4 }}
+rules: {{ toYaml $rules.view | nindent 2 }}
+{{- end }}

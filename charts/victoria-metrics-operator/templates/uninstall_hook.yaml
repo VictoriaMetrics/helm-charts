@@ -1,9 +1,6 @@
-{{- define "cleanupHookName.annotations" -}}
-"helm.sh/hook": pre-delete
-"helm.sh/hook-weight": "{{ .hookWeight }}"
-"helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-{{- end }}
-{{- if .Values.cleanupCRD }}
+{{- if or .Values.cleanupCRD .Values.crd.cleanup.enabled }}
+{{- $app := ternary .Values.crd.cleanup (dict "image" .Values.cleanupImage) .Values.crd.cleanup.enabled }}
+{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template) "Capabilities" (deepCopy .Capabilities)) }}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -11,8 +8,7 @@ metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
-  {{ $_ := set . "hookWeight" "-3" }}
-  annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
+  annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-3") | nindent 4 }}
 spec:
   template:
     metadata:
@@ -25,8 +21,8 @@ spec:
       {{- end }}
       containers:
         - name: kubectl
-          image: {{ (index .Values "cleanupImage" "repository") }}:{{ (index .Values "cleanupImage" "tag" | default (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor | replace "+" "")) }}
-          imagePullPolicy: {{ (index .Values "cleanupImage" "pullPolicy") }}
+          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
+          imagePullPolicy: {{ $app.image.pullPolicy }}
           resources:
             limits:
               cpu: "500m"
@@ -36,7 +32,7 @@ spec:
               memory: "56Mi"
           args:
             - delete
-            - vlogs,vmagents,vmalertmanagers,vmalerts,vmauths,vmclusters,vmsingles,vmusers
+            - {{ (keys .Values.admissionWebhooks.enabledCRDValidation) | join "," }}
             - --all
             - --ignore-not-found=true
       restartPolicy: OnFailure
@@ -49,46 +45,4 @@ spec:
       {{- with .Values.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: {{ include "vm-operator.cleanupHookName" . }}
-  namespace: {{ .Release.Namespace }}
-  labels: {{ include "vm-operator.labels" . | nindent 4 }}
-  {{ $_ := set . "hookWeight" "-5" }}
-  annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: {{ include "vm-operator.cleanupHookName" . }}
-  namespace: {{ .Release.Namespace }}
-  labels: {{ include "vm-operator.labels" . | nindent 4 }}
-  {{ $_ := set . "hookWeight" "-4" }}
-  annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: {{ include "vm-operator.cleanupHookName" . }}
-subjects:
-  - kind: ServiceAccount
-    name: {{ include "vm-operator.cleanupHookName" . }}
-    namespace: {{ .Release.Namespace }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: {{ include "vm-operator.cleanupHookName" . }}
-  namespace: {{ .Release.Namespace }}
-  labels: {{ include "vm-operator.labels" . | nindent 4 }}
-  {{ $_ := set . "hookWeight" "-5" }}
-  annotations: {{ include "cleanupHookName.annotations" . | nindent 4 }}
-rules:
-  - apiGroups: ["operator.victoriametrics.com"]
-    resources:
-      {{- range $crd, $config := .Values.admissionWebhooks.enabledCRDValidation }}
-      - {{ $crd }}
-      {{- end }}
-    verbs: ["*"]
 {{- end }}
