@@ -159,55 +159,55 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "victoria-metrics.vminsert.vmstorage-pod-fqdn" -}}
-{{- $pod := include "victoria-metrics.vmstorage.fullname" . -}}
-{{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
-{{- $namespace := .Release.Namespace -}}
-{{- $dnsSuffix := .Values.clusterDomainSuffix -}}
-{{- $args := default list -}}
-{{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
-{{- $value := printf "%s-%d.%s.%s.svc.%s:8400" $pod $i $svc $namespace $dnsSuffix -}}
-{{- $args = append $args (printf "--storageNode=%q" $value) -}}
-{{- end -}}
-{{- toYaml $args -}}
+  {{- $pod := include "victoria-metrics.vmstorage.fullname" . -}}
+  {{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
+  {{- $namespace := .Release.Namespace -}}
+  {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
+  {{- $args := default list -}}
+  {{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
+    {{- $value := printf "%s-%d.%s.%s.svc.%s:8400" $pod $i $svc $namespace $dnsSuffix -}}
+    {{- $args = append $args (printf "--storageNode=%q" $value) -}}
+  {{- end -}}
+  {{- toYaml $args -}}
 {{- end -}}
 
 {{- define "victoria-metrics.vmselect.vmstorage-pod-fqdn" -}}
-{{- $pod := include "victoria-metrics.vmstorage.fullname" . -}}
-{{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
-{{- $namespace := .Release.Namespace -}}
-{{- $dnsSuffix := .Values.clusterDomainSuffix -}}
-{{- $args := default list -}}
-{{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
-{{- $value := printf "%s-%d.%s.%s.svc.%s:8401" $pod $i $svc $namespace $dnsSuffix -}}
-{{- $args = append $args (printf "--storageNode=%q" $value) -}}
-{{- end -}}
-{{- toYaml $args -}}
+  {{- $pod := include "victoria-metrics.vmstorage.fullname" . -}}
+  {{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
+  {{- $namespace := .Release.Namespace -}}
+  {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
+  {{- $args := default list -}}
+  {{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
+    {{- $value := printf "%s-%d.%s.%s.svc.%s:8401" $pod $i $svc $namespace $dnsSuffix -}}
+    {{- $args = append $args (printf "--storageNode=%q" $value) -}}
+  {{- end -}}
+  {{- toYaml $args -}}
 {{- end -}}
 
 {{- define "victoria-metrics.vmselect.vmselect-pod-fqdn" -}}
-{{- $pod := include "victoria-metrics.vmselect.fullname" . -}}
-{{- $svc := include "victoria-metrics.vmselect.fullname" . -}}
-{{- $namespace := .Release.Namespace -}}
-{{- $dnsSuffix := .Values.clusterDomainSuffix -}}
-{{- $args := default list -}}
-{{- range $i := until (.Values.vmselect.replicaCount | int) -}}
-{{- $port := "8481" }}
-{{- with .Values.vmselect.extraArgs.httpListenAddr }}
-{{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" }}
-{{- end }}
-{{- $value := printf "%s-%d.%s.%s.svc.%s:%s" $pod $i $svc $namespace $dnsSuffix $port -}}
-{{- $args = append $args (printf "--selectNode=%q" $value) -}}
-{{- end -}}
-{{- toYaml $args -}}
+  {{- $pod := include "victoria-metrics.vmselect.fullname" . -}}
+  {{- $svc := include "victoria-metrics.vmselect.fullname" . -}}
+  {{- $namespace := .Release.Namespace -}}
+  {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
+  {{- $port := "8481" }}
+  {{- with .Values.vmselect.extraArgs.httpListenAddr }}
+    {{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" }}
+  {{- end -}}
+  {{- $args := default list -}}
+  {{- range $i := until (.Values.vmselect.replicaCount | int) -}}
+    {{- $value := printf "%s-%d.%s.%s.svc.%s:%s" $pod $i $svc $namespace $dnsSuffix $port -}}
+    {{- $args = append $args (printf "--selectNode=%q" $value) -}}
+  {{- end -}}
+  {{- toYaml $args -}}
 {{- end -}}
 
 {{- define "split-host-port" -}}
-{{- $hp := split ":" . -}}
-{{- printf "%s" $hp._1 -}}
+  {{- $hp := split ":" . -}}
+  {{- printf "%s" $hp._1 -}}
 {{- end -}}
 
 {{- define "victoria-metrics.storage.hasInitContainer" -}}
-    {{- or (gt (len .Values.vmstorage.initContainers) 0)  .Values.vmstorage.vmbackupmanager.restore.onStart.enabled -}}
+  {{- or (gt (len .Values.vmstorage.initContainers) 0)  .Values.vmstorage.vmbackupmanager.restore.onStart.enabled -}}
 {{- end -}}
 
 {{- define "victoria-metrics.storage.initContiners" -}}
