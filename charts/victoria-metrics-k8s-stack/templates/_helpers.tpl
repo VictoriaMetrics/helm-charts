@@ -280,10 +280,11 @@ If release name contains chart name it will be used as a full name.
 
 {{- define "vm.cluster.spec" -}}
   {{- $spec := (include "vm.select.spec" . | fromYaml) -}}
+  {{- $clusterSpec := (deepCopy .Values.vmcluster.spec) -}}
   {{- with (include "vm.license.global" .) -}}
-    {{- $_ := set $spec "license" (fromYaml .) -}}
+    {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- tpl (deepCopy .Values.vmcluster.spec | mergeOverwrite (dict "vmselect" $spec) | toYaml) . -}}
+  {{- tpl ($clusterSpec | mergeOverwrite (dict "vmselect" $spec) | toYaml) . -}}
 {{- end -}}
 
 {{- define "vm.data.source" -}}
