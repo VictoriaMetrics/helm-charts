@@ -2,7 +2,12 @@
 {{- $app := .Values.vmcluster }}
 {{- if and $app.enabled $app.ingress.storage.enabled }}
 {{- $ingress := $app.ingress.storage }}
-{{- $serviceName := (include "victoria-metrics-k8s-stack.vmstorageName" .) }}
+{{- with $global.Values.vmcluster.name -}}
+  {{- $_ := set $global.Values.vmcluster.vmstorage.name . }}
+{{- end }}
+{{- $ctx := dict "global" $global "vmService" "vmstorage" -}}
+{{- $_ := set $ctx.global.Values "vmstorage" $global.Values.vmcluster.vmstorage }}
+{{- $serviceName := include "vm.service" $ctx -}}
 {{- $servicePort := $app.spec.vmstorage.port | default 8482 }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress

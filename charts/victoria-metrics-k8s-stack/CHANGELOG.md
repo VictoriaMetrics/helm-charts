@@ -3,6 +3,9 @@
 ## Next release
 
 - Added `dashboards.<dashboardName>` bool flag to enable dashboard even if component it is for is not installed.
+- Allow extra `vmalert.notifiers` without dropping default notifier if `alertmanager.enabled: true`
+- Do not drop default notifier, when vmalert.additionalNotifierConfigs is set
+- Replaced static url proto with a template, which selects proto depending on a present tls configuration
 
 ## 0.25.5
 

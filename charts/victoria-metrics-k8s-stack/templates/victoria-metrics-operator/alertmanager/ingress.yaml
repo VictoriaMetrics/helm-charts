@@ -9,7 +9,7 @@ metadata:
   name: {{ $app.name | default $serviceName }}
   namespace: {{ .Release.Namespace }}
   {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-alertmanager" (include "victoria-metrics-k8s-stack.name" .)) }}
-  {{- $ctx := merge (deepCopy $) (dict "extraLabels" (merge $extraLabels $app.ingress.labels)) }}
+  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" (merge $extraLabels $app.ingress.labels)) }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
   {{- with $app.ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
