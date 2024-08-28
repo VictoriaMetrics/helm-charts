@@ -1,13 +1,16 @@
 {{- define "vm.license.secret.key" -}}
-{{- ((.Values.license).secret).key | default (((.Values.global).license).secret).key | default "" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- (($Values.license).secret).key | default ((($Values.global).license).secret).key | default "" -}}
 {{- end -}}
 
 {{- define "vm.license.secret.name" -}}
-{{- ((.Values.license).secret).name | default (((.Values.global).license).secret).name | default "" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- (($Values.license).secret).name | default ((($Values.global).license).secret).name | default "" -}}
 {{- end -}}
 
 {{- define "vm.license.key" -}}
-{{- (.Values.license).key | default ((.Values.global).license).key | default "" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- ($Values.license).key | default (($Values.global).license).key | default "" -}}
 {{- end -}}
 
 {{- define "vm.enterprise.only" -}}
@@ -27,38 +30,36 @@
 Return license volume mount
 */}}
 {{- define "vm.license.volume" -}}
-{{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
-{{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
-{{- if and $licenseSecretName $licenseSecretKey -}}
-- name: license-key
-  secret:
-    secretName: {{ $licenseSecretName }}
-{{- end -}}
+  {{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
+  {{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
+  {{- if and $licenseSecretName $licenseSecretKey -}}
+    {{- $volume := list (dict "name" "license-key" "secret" (dict "secretName" $licenseSecretName)) -}}
+    {{- toYaml $volume -}}
+  {{- end -}}
 {{- end -}}
 
 {{/*
 Return license volume mount for container
 */}}
 {{- define "vm.license.mount" -}}
-{{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
-{{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
-{{- if and $licenseSecretName $licenseSecretKey -}}
-- name: license-key
-  mountPath: /etc/vm-license-key
-  readOnly: true
-{{- end -}}
+  {{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
+  {{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
+  {{- if and $licenseSecretName $licenseSecretKey -}}
+    {{- $mount := list (dict "name" "license-key" "mountPath" "/etc/vm-license-key" "readOnly" true) -}}
+    {{- toYaml $mount -}}
+  {{- end -}}
 {{- end -}}
 
 {{/*
 Return license flag if necessary.
 */}}
 {{- define "vm.license.flag" -}}
-{{- $licenseKey := (include "vm.license.key" .) -}}
-{{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
-{{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
-{{- if $licenseKey -}}
-license: {{ $licenseKey }}
-{{- else if and $licenseSecretName $licenseSecretKey -}}
-licenseFile: /etc/vm-license-key/{{ $licenseSecretKey }}
-{{- end -}}
+  {{- $licenseKey := (include "vm.license.key" .) -}}
+  {{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
+  {{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
+  {{- if $licenseKey -}}
+    license: {{ $licenseKey }}
+  {{- else if and $licenseSecretName $licenseSecretKey -}}
+    licenseFile: /etc/vm-license-key/{{ $licenseSecretKey }}
+  {{- end -}}
 {{- end -}}

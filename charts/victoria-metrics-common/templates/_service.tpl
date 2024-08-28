@@ -1,7 +1,7 @@
 {{- /* Create the name for VM service */ -}}
 {{- define "vm.service" -}}
   {{- include "vm.validate.args" . -}}
-  {{- $Values := .helm.Values | default .Values -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $name := (include "vm.fullname" .) -}}
   {{- with .appKey -}}
     {{- $service := (index $Values .) | default dict -}}
@@ -11,13 +11,13 @@
   {{- if hasKey . "appIdx" -}}
     {{- $name = (printf "%s-%d.%s" $name .appIdx $name) -}}
   {{- end -}}
-  {{- $value -}}
+  {{- $name -}}
 {{- end }}
 
 {{- define "vm.url" -}}
   {{- $name := (include "vm.service" .) -}}
-  {{- $Release := .helm.Release | default .Release -}}
-  {{- $Values := .helm.Values | default .Values -}}
+  {{- $Release := (.helm).Release | default .Release -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $ns := $Release.Namespace -}}
   {{- $proto := "http" -}}
   {{- $port := 80 -}}
