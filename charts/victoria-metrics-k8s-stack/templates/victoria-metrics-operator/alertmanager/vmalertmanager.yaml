@@ -22,7 +22,8 @@ metadata:
   {{- with .Values.alertmanager.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-  name: {{ .Values.alertmanager.name | default (include "victoria-metrics-k8s-stack.fullname" .) }}
+  {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
+  name: {{ include "victoria-metrics-k8s-stack.fullname" $ctx }}
   namespace: {{ .Release.Namespace }}
   labels: 
     app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" . }}-alertmanager

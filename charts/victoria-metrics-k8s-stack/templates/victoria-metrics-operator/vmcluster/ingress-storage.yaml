@@ -1,12 +1,11 @@
-{{- $helm := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vmcluster }}
 {{- if and $app.enabled $app.ingress.storage.enabled }}
 {{- $ingress := $app.ingress.storage }}
-{{- with $helm.Values.vmcluster.name -}}
-  {{- $_ := set $helm.Values.vmcluster.vmstorage.name . }}
+{{- with .Values.vmcluster.name -}}
+  {{- $_ := set $.Values.vmcluster.vmstorage.name . }}
 {{- end }}
-{{- $ctx := dict "helm" $helm "appKey" "vmstorage" -}}
-{{- $_ := set $ctx.helm.Values "vmstorage" $helm.Values.vmcluster.vmstorage }}
+{{- $ctx := dict "helm" . "appKey" "vmstorage" -}}
+{{- $_ := set $ctx.helm.Values "vmstorage" .Values.vmcluster.vmstorage }}
 {{- $serviceName := include "vm.service" $ctx -}}
 {{- $servicePort := $app.spec.vmstorage.port | default 8482 }}
 apiVersion: networking.k8s.io/v1
@@ -15,7 +14,7 @@ metadata:
   name: {{ $serviceName }}
   namespace: {{ .Release.Namespace }}
   {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-vmcluster" (include "victoria-metrics-k8s-stack.name" .)) }}
-  {{- $ctx := merge (deepCopy $helm) (dict "extraLabels" (merge $extraLabels $ingress.labels)) }}
+  {{- $_ := set $ctx "extraLabels" (merge $extraLabels $ingress.labels) }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
   {{- with $ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}

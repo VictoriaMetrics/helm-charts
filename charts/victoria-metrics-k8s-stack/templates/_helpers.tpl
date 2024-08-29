@@ -1,6 +1,8 @@
 {{- /* Expand the name of the chart. */ -}}
 {{- define "victoria-metrics-k8s-stack.name" -}}
-  {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+  {{- $Chart := (.helm).Chart | default .Chart -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- default $Chart.Name $Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end }}
 
 {{- /*
@@ -9,45 +11,63 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */ -}}
 {{- define "victoria-metrics-k8s-stack.fullname" -}}
-  {{- if .Values.fullnameOverride }}
-    {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
-  {{- else }}
-    {{- $name := default .Chart.Name .Values.nameOverride }}
-    {{- if contains $name .Release.Name }}
-      {{- .Release.Name | trunc 63 | trimSuffix "-" }}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $Chart := (.helm).Chart | default .Chart -}}
+  {{- $Release := (.helm).Release | default .Release -}}
+  {{- $fullname := $Values.fullnameOverride -}}
+  {{- if .appKey -}}
+    {{- if (index $Values .appKey).name -}}
+      {{- $fullname = (index $Values .appKey).name -}}
+    {{- else if (dig $Chart.Name .appKey "name" "" ($Values.global)) -}}
+      {{- $fullname = (dig $Chart.Name .appKey "name" "" ($Values.global)) -}}
+    {{- else if (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
+      {{- $fullname = (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if empty $fullname -}}
+    {{- $name := default $Chart.Name $Values.nameOverride }}
+    {{- if contains $name $Release.Name }}
+      {{- $fullname = $Release.Name -}}
     {{- else }}
-      {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+      {{- $fullname = (printf "%s-%s" $Release.Name $name) }}
     {{- end }}
-  {{- end }}
-{{- end }}
+  {{- end -}}
+  {{- $fullname | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 
 {{- /* Create chart name and version as used by the chart label. */ -}}
 {{- define "victoria-metrics-k8s-stack.chart" -}}
-  {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+  {{- $Chart := (.helm).Chart | default .Chart -}}
+  {{- printf "%s-%s" $Chart.Name $Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end }}
 
 {{- /* Create the name of the service account to use */ -}}
 {{- define "victoria-metrics-k8s-stack.serviceAccountName" -}}
-  {{- if .Values.serviceAccount.create -}}
-    {{- default (include "victoria-metrics-k8s-stack.fullname" .) .Values.serviceAccount.name -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- if $Values.serviceAccount.create -}}
+    {{- default (include "victoria-metrics-k8s-stack.fullname" .) $Values.serviceAccount.name -}}
   {{- else -}}
-    {{- default "default" .Values.serviceAccount.name -}}
+    {{- default "default" $Values.serviceAccount.name -}}
   {{- end }}
 {{- end }}
 
 {{- /* Common labels */ -}}
 {{- define "victoria-metrics-k8s-stack.labels" -}}
+  {{- $Release := (.helm).Release | default .Release -}}
+  {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $labels := (fromYaml (include "victoria-metrics-k8s-stack.selectorLabels" .)) -}}
   {{- $_ := set $labels "helm.sh/chart" (include "victoria-metrics-k8s-stack.chart" .) -}}
-  {{- $_ := set $labels "app.kubernetes.io/managed-by" .Release.Service -}}
-  {{- with .Chart.AppVersion }}
+  {{- $_ := set $labels "app.kubernetes.io/managed-by" $Release.Service -}}
+  {{- with $Chart.AppVersion }}
     {{- $_ := set $labels "app.kubernetes.io/version" . -}}
   {{- end -}}
   {{- toYaml $labels -}}
 {{- end }}
 
 {{- define "vm.release" -}}
-  {{- default .Release.Name .Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" -}}
+  {{- $Release := (.helm).Release | default .Release -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- default $Release.Name $Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- /* Selector labels */ -}}
@@ -60,13 +80,11 @@ If release name contains chart name it will be used as a full name.
 
 {{- /* Create the name for VM service */ -}}
 {{- define "vm.service" -}}
-  {{- $helm := .helm -}}
-  {{- $Values := $helm.Values -}}
-  {{- $name := (include "victoria-metrics-k8s-stack.fullname" $helm) -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $name := (include "victoria-metrics-k8s-stack.fullname" .) -}}
   {{- with .appKey -}}
-    {{- $service := (index $Values .) | default dict -}}
     {{- $prefix := ternary . (printf "vm%s" .) (hasPrefix "vm" .) -}}
-    {{- $name = ($service).name | default (printf "%s-%s" $prefix $name) -}}
+    {{- $name = printf "%s-%s" $prefix $name -}}
   {{- end -}}
   {{- if hasKey . "appIdx" -}}
     {{- $name = (printf "%s-%d.%s" $name .appIdx $name) -}}
@@ -76,8 +94,8 @@ If release name contains chart name it will be used as a full name.
 
 {{- define "vm.url" -}}
   {{- $name := (include "vm.service" .) -}}
-  {{- $Release := .helm.Release -}}
-  {{- $Values := .helm.Values -}}
+  {{- $Release := (.helm).Release | default .Release -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $ns := $Release.Namespace -}}
   {{- $proto := "http" -}}
   {{- $port := 80 -}}
@@ -100,7 +118,7 @@ If release name contains chart name it will be used as a full name.
 
 {{- define "vm.read.endpoint" -}}
   {{- $ctx := . -}}
-  {{- $Values := .helm.Values -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $endpoint := default dict -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set $ctx "appKey" "vmsingle" -}}
@@ -120,7 +138,7 @@ If release name contains chart name it will be used as a full name.
 
 {{- define "vm.write.endpoint" -}}
   {{- $ctx := . -}}
-  {{- $Values := .helm.Values -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $endpoint := default dict -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set $ctx "appKey" "vmsingle" -}}
@@ -141,11 +159,12 @@ If release name contains chart name it will be used as a full name.
 
 {{- /* VMAlert remotes */ -}}
 {{- define "vm.alert.remotes" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $remotes := default dict -}}
   {{- $fullname := (include "victoria-metrics-k8s-stack.fullname" .) -}}
   {{- $ctx := dict "helm" . -}}
   {{- $remoteWrite := (include "vm.write.endpoint" $ctx | fromYaml) -}}
-  {{- if .Values.vmalert.remoteWriteVMAgent -}}
+  {{- if $Values.vmalert.remoteWriteVMAgent -}}
     {{- $ctx := dict "helm" . "appKey" "vmagent" -}}
     {{- $remoteWrite = dict "url" (printf "%s/api/v1/write" (include "vm.url" $ctx)) -}}
   {{- end -}}
@@ -154,11 +173,11 @@ If release name contains chart name it will be used as a full name.
   {{- $_ := set $remotes "remoteWrite" $remoteWrite -}}
   {{- $_ := set $remotes "remoteRead" $remoteRead -}}
   {{- $_ := set $remotes "datasource" $remoteRead -}}
-  {{- if .Values.vmalert.additionalNotifierConfigs }}
+  {{- if $Values.vmalert.additionalNotifierConfigs }}
     {{- $configName := ((printf "%s-vmalert-additional-notifier" $fullname) | trunc 63 | trimSuffix "-") -}}
     {{- $notifierConfigRef := dict "name" $configName "key" "notifier-configs.yaml" -}}
     {{- $_ := set $remotes "notifierConfigRef" $notifierConfigRef -}}
-  {{- else if .Values.alertmanager.enabled -}}
+  {{- else if $Values.alertmanager.enabled -}}
     {{- $notifiers := default list -}}
     {{- $appSecure := (not (empty (((.Values.alertmanager).spec).webConfig).tls_server_config)) -}}
     {{- $ctx := dict "helm" . "appKey" "alertmanager" "appSecure" $appSecure "appRoute" ((.Values.alertmanager).spec).routePrefix -}}
@@ -174,8 +193,9 @@ If release name contains chart name it will be used as a full name.
 
 {{- /* VMAlert templates */ -}}
 {{- define "vm.alert.templates" -}}
-  {{- $cms :=  (.Values.vmalert.spec.configMaps | default list) -}}
-  {{- if .Values.vmalert.templateFiles -}}
+  {{- $Values := (.helm).Values | default .Values}}
+  {{- $cms :=  ($Values.vmalert.spec.configMaps | default list) -}}
+  {{- if $Values.vmalert.templateFiles -}}
     {{- $fullname := (include "victoria-metrics-k8s-stack.fullname" .) -}}
     {{- $cms = append $cms ((printf "%s-vmalert-extra-tpl" $fullname) | trunc 63 | trimSuffix "-") -}}
   {{- end -}}
@@ -201,8 +221,9 @@ If release name contains chart name it will be used as a full name.
 
 {{- /* VMAlert spec */ -}}
 {{- define "vm.alert.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
   {{- $extraArgs := dict "remoteWrite.disablePathAppend" "true" -}}
-  {{- if .Values.vmalert.templateFiles -}}
+  {{- if $Values.vmalert.templateFiles -}}
     {{- $ruleTmpl := (printf "/etc/vm/configs/%s-vmalert-extra-tpl/*.tmpl" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") -}}
     {{- $_ := set $extraArgs "rule.templates" $ruleTmpl -}}
   {{- end -}}
@@ -213,13 +234,14 @@ If release name contains chart name it will be used as a full name.
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
   {{- $_ := set $vmAlertRemotes "notifiers" (concat $vmAlertRemotes.notifiers (.Values.vmalert.spec.notifiers | default list)) -}}
-  {{- tpl (deepCopy (omit .Values.vmalert.spec "notifiers") | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec | toYaml) . -}}
+  {{- tpl (deepCopy (omit $Values.vmalert.spec "notifiers") | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec | toYaml) . -}}
 {{- end }}
 
 {{- /* VM Agent remoteWrites */ -}}
 {{- define "vm.agent.remote.write" -}}
-  {{- $remoteWrites := .Values.vmagent.additionalRemoteWrites | default list -}}
-  {{- if or .Values.vmsingle.enabled .Values.vmcluster.enabled .Values.externalVM.write.url -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $remoteWrites := $Values.vmagent.additionalRemoteWrites | default list -}}
+  {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled $Values.externalVM.write.url -}}
     {{- $ctx := dict "helm" . -}}
     {{- $remoteWrites = append $remoteWrites (fromYaml (include "vm.write.endpoint" $ctx)) -}}
   {{- end -}}
@@ -228,22 +250,24 @@ If release name contains chart name it will be used as a full name.
 
 {{- /* VMAgent spec */ -}}
 {{- define "vm.agent.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
   {{- $spec := (include "vm.agent.remote.write" . | fromYaml) -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- tpl (deepCopy .Values.vmagent.spec | mergeOverwrite $spec | toYaml) . -}}
+  {{- tpl (deepCopy $Values.vmagent.spec | mergeOverwrite $spec | toYaml) . -}}
 {{- end }}
 
 {{- /* Alermanager spec */ -}}
 {{- define "vm.alertmanager.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
   {{- $fullname := (include "victoria-metrics-k8s-stack.fullname" .) -}}
-  {{- $spec := .Values.alertmanager.spec -}}
-  {{- if and (not .Values.alertmanager.spec.configRawYaml) (not .Values.alertmanager.spec.configSecret) -}}
+  {{- $spec := $Values.alertmanager.spec -}}
+  {{- if and (not $Values.alertmanager.spec.configRawYaml) (not $Values.alertmanager.spec.configSecret) -}}
     {{- $_ := set $spec "configSecret" (printf "%s-alertmanager" $fullname) -}}
   {{- end -}}
   {{- $templates := default list -}}
-  {{- if .Values.alertmanager.monzoTemplate.enabled -}}
+  {{- if $Values.alertmanager.monzoTemplate.enabled -}}
     {{- $configMap := ((printf "%s-alertmanager-monzo-tpl" $fullname) | trunc 63 | trimSuffix "-") -}}
     {{- $templates = append $templates (dict "name" $configMap "key" "monzo.tmpl") -}}
   {{- end -}}
@@ -257,8 +281,9 @@ If release name contains chart name it will be used as a full name.
 
 {{- /* Single spec */ -}}
 {{- define "vm.single.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
   {{- $extraArgs := default dict -}}
-  {{- if .Values.vmalert.enabled }}
+  {{- if $Values.vmalert.enabled }}
     {{- $ctx := dict "helm" . "appKey" "vmalert" -}}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" $ctx) -}}
   {{- end -}}
@@ -266,13 +291,14 @@ If release name contains chart name it will be used as a full name.
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- tpl (deepCopy .Values.vmsingle.spec | mergeOverwrite $spec | toYaml) . -}}
+  {{- tpl (deepCopy $Values.vmsingle.spec | mergeOverwrite $spec | toYaml) . -}}
 {{- end }}
 
 {{- /* Cluster spec */ -}}
 {{- define "vm.select.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
   {{- $extraArgs := default dict -}}
-  {{- if .Values.vmalert.enabled -}}
+  {{- if $Values.vmalert.enabled -}}
     {{- $ctx := dict "helm" . "appKey" "vmalert" -}}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" $ctx) -}}
   {{- end -}}
@@ -281,8 +307,9 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{- define "vm.cluster.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
   {{- $spec := (include "vm.select.spec" . | fromYaml) -}}
-  {{- $clusterSpec := (deepCopy .Values.vmcluster.spec) -}}
+  {{- $clusterSpec := (deepCopy $Values.vmcluster.spec) -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
   {{- end -}}
@@ -300,34 +327,35 @@ jsonData: {{ .jsonData | default dict | toYaml | nindent 2 }}
 
 {{- /* Datasources */ -}}
 {{- define "vm.data.sources" -}}
-  {{- $datasources := .Values.grafana.additionalDataSources | default list -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $datasources := $Values.grafana.additionalDataSources | default list -}}
   {{- $vmDSPluginEnabled := false }}
-  {{- if .Values.grafana.plugins }}
-    {{- range $value := .Values.grafana.plugins }}
+  {{- if $Values.grafana.plugins }}
+    {{- range $value := $Values.grafana.plugins }}
       {{- if (contains "victoriametrics-datasource" $value) }}
         {{- $vmDSPluginEnabled = true }}
       {{- end }}
     {{- end }}
   {{- end }}
-  {{- if or .Values.vmsingle.enabled  .Values.vmcluster.enabled -}}
+  {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled -}}
     {{- $ctx := dict "helm" . -}}
     {{- $readEndpoint:= (include "vm.read.endpoint" $ctx | fromYaml) -}}
-    {{- $jsonData := .Values.grafana.sidecar.datasources.jsonData | default dict -}}
-    {{- $dsType := (default "prometheus" .Values.grafana.defaultDatasourceType) -}}
-    {{- $vmAllowUnsigned := contains "victoriametrics-datasource" (dig "grafana.ini" "plugins" "allow_loading_unsigned_plugins" "" .Values.grafana) -}}
+    {{- $jsonData := $Values.grafana.sidecar.datasources.jsonData | default dict -}}
+    {{- $dsType := (default "prometheus" $Values.grafana.defaultDatasourceType) -}}
+    {{- $vmAllowUnsigned := contains "victoriametrics-datasource" (dig "grafana.ini" "plugins" "allow_loading_unsigned_plugins" "" $Values.grafana) -}}
     {{- if (and $vmDSPluginEnabled $vmAllowUnsigned) -}}
       {{- $args := dict "name" "VictoriaMetrics (DS)" "type" "victoriametrics-datasource" "url" $readEndpoint.url "jsonData" $jsonData -}}
       {{- $datasources = append $datasources (fromYaml (include "vm.data.source" $args)) -}}
     {{- else -}}
       {{- $dsType = "prometheus" -}}
     {{- end }}
-    {{- if .Values.grafana.provisionDefaultDatasource -}}
+    {{- if $Values.grafana.provisionDefaultDatasource -}}
       {{- $args := dict "type" $dsType "isDefault" true "url" $readEndpoint.url "jsonData" $jsonData -}}
       {{- $datasources = append $datasources (fromYaml (include "vm.data.source" $args)) -}}
     {{- end }}
-    {{- if .Values.grafana.sidecar.datasources.createVMReplicasDatasources -}}
+    {{- if $Values.grafana.sidecar.datasources.createVMReplicasDatasources -}}
       {{- $ctx := dict "helm" . -}}
-      {{- range until (int .Values.vmsingle.spec.replicaCount) -}}
+      {{- range until (int $Values.vmsingle.spec.replicaCount) -}}
         {{- $_ := set $ctx "appIdx" . -}}
         {{- $readEndpoint:= (include "vm.read.endpoint" $ctx | fromYaml) }}
         {{- $args := dict "name" (printf "VictoriaMetrics-%d" .) "type" $dsType "url" $readEndpoint.url "jsonData" $jsonData -}}
@@ -346,9 +374,10 @@ jsonData: {{ .jsonData | default dict | toYaml | nindent 2 }}
 
 {{- /* VMRule labels */ -}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.labels" -}}
+  {{- $Values := (.helm).Values | default .Values }}
   {{- $labels := (fromYaml (include "victoria-metrics-k8s-stack.labels" .)) -}}
   {{- $_ := set $labels "app" (include "victoria-metrics-k8s-stack.name" .) -}}
-  {{- $labels = mergeOverwrite $labels (deepCopy .Values.defaultRules.labels) -}}
+  {{- $labels = mergeOverwrite $labels (deepCopy $Values.defaultRules.labels) -}}
   {{- toYaml $labels -}}
 {{- end }}
 
@@ -364,5 +393,6 @@ jsonData: {{ .jsonData | default dict | toYaml | nindent 2 }}
 
 {{- /* VMAlertmanager name */ -}}
 {{- define "victoria-metrics-k8s-stack.alertmanager.name" -}}
-  {{- .Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") -}}
 {{- end -}}
