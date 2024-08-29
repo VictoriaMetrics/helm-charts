@@ -70,7 +70,7 @@ helm history vmalert -n NAMESPACE
 
 There is no option on this chart to set up Alertmanager with [HA mode](https://github.com/prometheus/alertmanager#high-availability).
 To enable the HA configuration, you can use:
-- [VictoriaMetrics Operator](https://docs.victoriametrics.com/operator/VictoriaMetrics-Operator.html)
+- [VictoriaMetrics Operator](https://docs.victoriametrics.com/operator/)
 - official [Alertmanager Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager)
 
 ## How to uninstall
@@ -174,7 +174,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | global.image.registry | string | `""` |  |
 | global.imagePullSecrets | list | `[]` |  |
-| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
 | license.secret.key | string | `""` | Key in secret with license key |
@@ -233,12 +233,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.probe.liveness.failureThreshold | int | `3` |  |
 | server.probe.liveness.initialDelaySeconds | int | `5` |  |
 | server.probe.liveness.periodSeconds | int | `15` |  |
-| server.probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| server.probe.liveness.tcpSocket | object | `{}` |  |
 | server.probe.liveness.timeoutSeconds | int | `5` |  |
 | server.probe.readiness.failureThreshold | int | `3` |  |
-| server.probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
-| server.probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
-| server.probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
+| server.probe.readiness.httpGet | object | `{}` |  |
 | server.probe.readiness.initialDelaySeconds | int | `5` |  |
 | server.probe.readiness.periodSeconds | int | `15` |  |
 | server.probe.readiness.timeoutSeconds | int | `5` |  |
