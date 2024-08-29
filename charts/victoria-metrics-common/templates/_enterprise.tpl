@@ -20,7 +20,7 @@
   {{- if and (empty $licenseKey) (and (empty $licenseSecretName) (empty $licenseSecretKey)) -}}
     {{ fail `Pass valid license at .Values.license or .Values.global.license if you have an enterprise license for running this software.
        See https://victoriametrics.com/legal/esa/ for details.
-       Documentation - https://docs.victoriametrics.com/enterprise.html
+       Documentation - https://docs.victoriametrics.com/enterprise
        for more information, visit https://victoriametrics.com/products/enterprise/
        To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/` }}
   {{- end -}}
