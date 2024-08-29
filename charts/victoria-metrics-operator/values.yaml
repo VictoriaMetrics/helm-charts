@@ -30,7 +30,7 @@ cleanupCRD: false
 # -- deprecated. See `crd.cleanup.image`
 cleanupImage:
   repository: bitnami/kubectl
-  tag: '{{ printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor | replace "+" "" }}'
+  tag: ""
   pullPolicy: IfNotPresent
 
 crd:
@@ -39,11 +39,11 @@ crd:
   create: true
   cleanup:
     # -- Tells helm to clean up all the vm resources under this release's namespace when uninstalling
-    enabled: false
+    enabled: true
     image:
       repository: bitnami/kubectl
       # use image tag that matches k8s API version by default
-      tag: '{{ printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor | replace "+" "" }}'
+      tag: ""
       pullPolicy: IfNotPresent
     
 replicaCount: 1

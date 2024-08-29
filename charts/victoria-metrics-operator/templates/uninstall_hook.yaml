@@ -1,6 +1,10 @@
 {{- if or .Values.cleanupCRD .Values.crd.cleanup.enabled }}
 {{- $app := ternary .Values.crd.cleanup (dict "image" .Values.cleanupImage) .Values.crd.cleanup.enabled }}
 {{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template) "Capabilities" (deepCopy .Capabilities)) }}
+{{- if empty ($app.image).tag }}
+  {{- $tag := (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor) | replace "+" "" -}}
+  {{- $_ := set $app.image "tag" $tag }}
+{{- end }}
 ---
 apiVersion: batch/v1
 kind: Job

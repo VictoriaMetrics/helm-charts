@@ -86,18 +86,14 @@ vmselect:
   probe:
     # Readiness probe
     readiness:
-      httpGet:
-        path: '{{ include "vm.probe.http.path" . }}'
-        scheme: '{{ include "vm.probe.http.scheme" . }}'
-        port: '{{ include "vm.probe.port" . }}'
+      httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
     # Liveness probe
     liveness:
-      tcpSocket:
-        port: '{{ include "vm.probe.port" . }}'
+      tcpSocket: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
@@ -342,17 +338,13 @@ vminsert:
   # Readiness & Liveness probes
   probe:
     readiness:
-      httpGet:
-        path: '{{ index .app.extraArgs "http.pathPrefix" | default "" | trimSuffix "/" }}/health'
-        scheme: '{{ ternary "HTTPS" "HTTP" (.app.extraArgs.tls | default false) }}'
-        port: '{{ dig "ports" "name" "http" (.app | dict) }}'
+      httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
     liveness:
-      tcpSocket:
-        port: '{{ dig "ports" "name" "http" (.app | dict) }}'
+      tcpSocket: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
@@ -699,17 +691,13 @@ vmstorage:
   terminationGracePeriodSeconds: 60
   probe:
     readiness:
-      httpGet:
-        path: '{{ include "vm.probe.http.path" . }}'
-        scheme: '{{ include "vm.probe.http.scheme" . }}'
-        port: '{{ include "vm.probe.port" . }}'
+      httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
     liveness:
-      tcpSocket:
-        port: '{{ include "vm.probe.port" . }}'
+      tcpSocket: {}
       initialDelaySeconds: 30
       periodSeconds: 30
       timeoutSeconds: 5
@@ -754,7 +742,7 @@ vmstorage:
       envflag.prefix: VM_
       loggerFormat: json
     # -- Allows to enable restore options for pod.
-    # Read more: https://docs.victoriametrics.com/vmbackupmanager.html#restore-commands
+    # Read more: https://docs.victoriametrics.com/vmbackupmanager#restore-commands
     restore:
       onStart:
         enabled: false
@@ -764,8 +752,6 @@ vmstorage:
     probe:
       readiness:
         httpGet:
-          path: '{{ include "vm.probe.http.path" . }}'
-          scheme: '{{ include "vm.probe.http.scheme" . }}'
           port: manager-http
         initialDelaySeconds: 5
         periodSeconds: 15
@@ -812,7 +798,7 @@ vmstorage:
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
 # Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# Documentation - https://docs.victoriametrics.com/enterprise,
 # for more information, visit https://victoriametrics.com/products/enterprise/ .
 # To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
 # Supported starting from VictoriaMetrics v1.94.0
