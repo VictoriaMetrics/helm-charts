@@ -180,11 +180,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | affinity | object | `{}` | Pod affinity |
 | annotations | object | `{}` | Annotations to be added to the all resources |
 | cleanupCRD | bool | `false` | deprecated. See `crd.cleanup.enabled` |
-| cleanupImage | object | `{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl","tag":"{{ printf \"%s.%s\" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor | replace \"+\" \"\" }}"}` | deprecated. See `crd.cleanup.image` |
-| crd.cleanup.enabled | bool | `false` | Tells helm to clean up all the vm resources under this release's namespace when uninstalling |
+| cleanupImage | object | `{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl","tag":""}` | deprecated. See `crd.cleanup.image` |
+| crd.cleanup.enabled | bool | `true` | Tells helm to clean up all the vm resources under this release's namespace when uninstalling |
 | crd.cleanup.image.pullPolicy | string | `"IfNotPresent"` |  |
 | crd.cleanup.image.repository | string | `"bitnami/kubectl"` |  |
-| crd.cleanup.image.tag | string | `"{{ printf \"%s.%s\" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor | replace \"+\" \"\" }}"` |  |
+| crd.cleanup.image.tag | string | `""` |  |
 | crd.create | bool | `true` | with this option, if you remove this chart, all crd resources will be deleted with it. |
 | createCRD | bool | `true` | deprecated. See `crd.create` |
 | env | list | `[]` | extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD) |
