@@ -2,6 +2,7 @@
 
 ## Next release
 
+- updates operator to [v0.47.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.47.3) version
 - Made `cleanupCRD` deprecated in a favour of `crd.cleanup.enabled`
 - Made `cleanupImage` deprecated in a favour of `crd.cleanup.image`
 - Made `watchNamespace` string deprecated in a favour of `watchNamespaces` slice
