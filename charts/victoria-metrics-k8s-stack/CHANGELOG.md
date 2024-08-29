@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.25.6
+
+**Release date:** 2024-08-29
+
+![AppVersion: v1.102.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 **Update note**: Update `kubeProxy.spec` to `kubeProxy.vmScrape.spec`
 
 **Update note**: Update `kubeScheduler.spec` to `kubeScheduler.vmScrape.spec`
