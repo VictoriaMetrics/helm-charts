@@ -2,6 +2,7 @@
 
 ## Next release
 
+- bump version of VM components to [v1.103.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.103.0)
 - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
 - Added global relabelConfig. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/207)
 - Renamed `.Values.server.persistentVolume.storageClass` to `.Values.server.persistentVolume.storageClassName`

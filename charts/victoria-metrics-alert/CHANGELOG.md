@@ -2,6 +2,7 @@
 
 ## Next release
 
+- bump version of VM components to [v1.103.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.103.0)
 - Added ability to configure container port
 - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
 - Renamed `.Values.alertmanager.persistentVolume.storageClass` to `.Values.alertmanager.persistentVolume.storageClassName`
