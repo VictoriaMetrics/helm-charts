@@ -181,7 +181,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | annotations | object | `{}` | Annotations to be added to the all resources |
 | cleanupCRD | bool | `false` | deprecated. See `crd.cleanup.enabled` |
 | cleanupImage | object | `{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl","tag":""}` | deprecated. See `crd.cleanup.image` |
-| crd.cleanup.enabled | bool | `true` | Tells helm to clean up all the vm resources under this release's namespace when uninstalling |
+| crd.cleanup.enabled | bool | `false` | Tells helm to clean up all the vm resources under this release's namespace when uninstalling |
 | crd.cleanup.image.pullPolicy | string | `"IfNotPresent"` |  |
 | crd.cleanup.image.repository | string | `"bitnami/kubectl"` |  |
 | crd.cleanup.image.tag | string | `""` |  |
