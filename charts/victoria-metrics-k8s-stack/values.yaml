@@ -945,13 +945,13 @@ kube-state-metrics:
         matchLabels:
           app.kubernetes.io/name: '{{ include "kube-state-metrics.name" (index .Subcharts "kube-state-metrics") }}'
           app.kubernetes.io/instance: '{{ include "vm.release" . }}'
-        endpoints:
-          - port: http
-            honorLabels: true
-            metricRelabelConfigs:
-              - action: labeldrop
-                regex: (uid|container_id|image_id)
-        jobLabel: app.kubernetes.io/name
+      endpoints:
+        - port: http
+          honorLabels: true
+          metricRelabelConfigs:
+            - action: labeldrop
+              regex: (uid|container_id|image_id)
+      jobLabel: app.kubernetes.io/name
 
 #################################################
 ###              Service Monitors           #####
