@@ -5,6 +5,7 @@
 - Made `cleanupCRD` deprecated in a favour of `crd.cleanup.enabled`
 - Made `cleanupImage` deprecated in a favour of `crd.cleanup.image`
 - Made `watchNamespace` string deprecated in a favour of `watchNamespaces` slice
+- Decreased rendering time by 2 seconds
 
 ## 0.34.5
 

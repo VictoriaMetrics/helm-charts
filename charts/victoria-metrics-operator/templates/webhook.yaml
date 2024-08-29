@@ -10,7 +10,7 @@ metadata:
     certmanager.k8s.io/inject-ca-from: {{ printf "%s/%s-validation" .Release.Namespace ( include "vm-operator.fullname" .) | quote }}
     cert-manager.io/inject-ca-from: {{ printf "%s/%s-validation" .Release.Namespace (include "vm-operator.fullname" .) | quote }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.extraLabels) }}
+  {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
 webhooks:
 {{- range $name, $enabled := .Values.admissionWebhooks.enabledCRDValidation }}

@@ -3,10 +3,9 @@ kind: Service
 metadata:
   namespace: {{ .Release.Namespace }}
   {{- with .Values.service.annotations }}
-  annotations:
-  {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.extraLabels) }}
+  {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
   name: {{ template "vm-operator.fullname" . }}
 spec:

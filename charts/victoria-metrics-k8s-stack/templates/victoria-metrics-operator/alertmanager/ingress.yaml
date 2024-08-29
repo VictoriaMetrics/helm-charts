@@ -1,15 +1,15 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.alertmanager }}
 {{- if and $app.enabled $app.ingress.enabled }}
-{{- $serviceName := printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- $ctx := dict "helm" . "appKey" "alertmanager" -}}
+{{- $serviceName := include "vm.service" $ctx -}}
 {{- $servicePort := 9093 -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $app.name | default $serviceName }}
+  name: {{ $serviceName }}
   namespace: {{ .Release.Namespace }}
   {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-alertmanager" (include "victoria-metrics-k8s-stack.name" .)) }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" (merge $extraLabels $app.ingress.labels)) }}
+  {{- $_ := set $ctx "extraLabels" (merge $extraLabels $app.ingress.labels) }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
   {{- with $app.ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}

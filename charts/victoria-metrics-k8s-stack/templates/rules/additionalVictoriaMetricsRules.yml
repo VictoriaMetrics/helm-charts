@@ -1,4 +1,3 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := (include "victoria-metrics-k8s-stack.name" .) }}
 {{- $fullname := ((printf "%s-additional-victoria-metrics-rules" (include "victoria-metrics-k8s-stack.fullname" .)) | trunc 63 | trimSuffix "-") }}
 {{- if .Values.additionalVictoriaMetricsMap }}
@@ -16,7 +15,7 @@ items:
       name: {{ $name }}
       namespace: {{ $.Release.Namespace }}
       {{- $extraLabels := merge (dict "app" $app) (deepCopy ($VMRule.additionalLabels | default dict)) }}
-      {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $extraLabels) }}
+      {{- $ctx := dict "helm" . "extraLabels" $extraLabels }}
       labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 8 }}
     spec:
       groups: {{ toYaml $VMRule.groups | nindent 8 }}
