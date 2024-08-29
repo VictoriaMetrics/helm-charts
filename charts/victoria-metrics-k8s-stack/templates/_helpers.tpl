@@ -193,6 +193,8 @@ If release name contains chart name it will be used as a full name.
     {{- if hasKey $license "key" -}}
       {{- $_ := unset $license "key" -}}
     {{- end -}}
+  {{- else -}}
+    {{- $license = default dict -}}
   {{- end -}}
   {{- toYaml $license -}}
 {{- end -}}

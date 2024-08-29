@@ -2,10 +2,36 @@
 
 ## Next release
 
+**Update note**: Update `kubeProxy.spec` to `kubeProxy.vmScrape.spec`
+
+**Update note**: Update `kubeScheduler.spec` to `kubeScheduler.vmScrape.spec`
+
+**Update note**: Update `kubeEtcd.spec` to `kubeEtcd.vmScrape.spec`
+
+**Update note**: Update `coreDns.spec` to `coreDns.vmScrape.spec`
+
+**Update note**: Update `kubeDns.spec` to `kubeDns.vmScrape.spec`
+
+**Update note**: Update `kubeProxy.spec` to `kubeProxy.vmScrape.spec`
+
+**Update note**: Update `kubeControllerManager.spec` to `kubeControllerManager.vmScrape.spec`
+
+**Update note**: Update `kubeApiServer.spec` to `kubeApiServer.vmScrape.spec`
+
+**Update note**: Update `kubelet.spec` to `kubelet.vmScrape.spec`
+
+**Update note**: Update `kube-state-metrics.spec` to `kube-state-metrics.vmScrape.spec`
+
+**Update note**: Update `prometheus-node-exporter.spec` to `prometheus-node-exporter.vmScrape.spec`
+
+**Update note**: Update `grafana.spec` to `grafana.vmScrape.spec`
+
 - Added `dashboards.<dashboardName>` bool flag to enable dashboard even if component it is for is not installed.
 - Allow extra `vmalert.notifiers` without dropping default notifier if `alertmanager.enabled: true`
 - Do not drop default notifier, when vmalert.additionalNotifierConfigs is set
 - Replaced static url proto with a template, which selects proto depending on a present tls configuration
+- Moved kubernetes components monitoring config from `spec` config to `vmScrape.spec`
+- Merged servicemonitor templates
 
 ## 0.25.5
 
