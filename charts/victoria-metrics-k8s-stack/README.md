@@ -336,7 +336,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 | alertmanager.spec.selectAllByDefault | bool | `true` |  |
 | alertmanager.templateFiles | object | `{}` |  |
 | argocdReleaseOverride | string | `""` | For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
-| coreDns | object | `{"enabled":true,"service":{"enabled":true,"port":9153,"selector":{"k8s-app":"kube-dns"},"targetPort":9153},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}],"jobLabel":"jobLabel"}}` | Component scraping coreDns. Use either this or kubeDns |
+| coreDns.enabled | bool | `true` |  |
+| coreDns.service.enabled | bool | `true` |  |
+| coreDns.service.port | int | `9153` |  |
+| coreDns.service.selector.k8s-app | string | `"kube-dns"` |  |
+| coreDns.service.targetPort | int | `9153` |  |
+| coreDns.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | crds.enabled | bool | `true` |  |
 | dashboards | object | `{"operator":false,"vmalert":false}` | Enable dashboards despite it's dependency is not installed |
 | defaultDashboardsEnabled | bool | `true` | Create default dashboards |
@@ -398,92 +403,60 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.datasources.enabled | bool | `true` |  |
 | grafana.sidecar.datasources.initDatasources | bool | `true` |  |
 | grafana.sidecar.datasources.jsonData | object | `{}` |  |
-| grafana.vmServiceScrape.enabled | bool | `true` |  |
-| grafana.vmServiceScrape.spec | object | `{}` |  |
+| grafana.vmScrape | object | `{"enabled":true,"spec":{"endpoints":[{"port":"{{ .Values.grafana.service.portName }}"}],"selector":{"matchLabels":{"app.kubernetes.io/name":"{{ include \"grafana.name\" .Subcharts.grafana }}"}}}}` | node exporter VM scrape config |
 | grafanaOperatorDashboardsFormat | object | `{"allowCrossNamespaceImport":false,"enabled":false,"instanceSelector":{"matchLabels":{"dashboards":"grafana"}}}` | Create dashboards as CRDs (reuqires grafana-operator to be installed) |
 | kube-state-metrics.enabled | bool | `true` |  |
-| kube-state-metrics.vmServiceScrape.spec | object | `{}` |  |
-| kubeApiServer | object | `{"enabled":true,"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"https","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"component","namespaceSelector":{"matchNames":["default"]},"selector":{"matchLabels":{"component":"apiserver","provider":"kubernetes"}}}}` | Component scraping the kube api server |
-| kubeControllerManager | object | `{"enabled":true,"endpoints":[],"service":{"enabled":true,"port":10257,"selector":{"component":"kube-controller-manager"},"targetPort":10257},"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"jobLabel"}}` | Component scraping the kube controller manager |
+| kube-state-metrics.vmScrape | object | `{"enabled":true,"spec":{"endpoints":[{"honorLabels":true,"metricRelabelConfigs":[{"action":"labeldrop","regex":"(uid|container_id|image_id)"}],"port":"http"}],"jobLabel":"app.kubernetes.io/name","selector":{"matchLabels":{"app.kubernetes.io/instance":"{{ include \"vm.release\" . }}","app.kubernetes.io/name":"{{ include \"kube-state-metrics.name\" (index .Subcharts \"kube-state-metrics\") }}"}}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
+| kubeApiServer.enabled | bool | `true` |  |
+| kubeApiServer.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"https","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"component","namespaceSelector":{"matchNames":["default"]},"selector":{"matchLabels":{"component":"apiserver","provider":"kubernetes"}}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
+| kubeControllerManager.enabled | bool | `true` |  |
+| kubeControllerManager.endpoints | list | `[]` |  |
+| kubeControllerManager.service.enabled | bool | `true` |  |
+| kubeControllerManager.service.port | int | `10257` |  |
+| kubeControllerManager.service.selector.component | string | `"kube-controller-manager"` |  |
+| kubeControllerManager.service.targetPort | int | `10257` |  |
+| kubeControllerManager.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | kubeDns.enabled | bool | `false` |  |
-| kubeDns.service.dnsmasq.port | int | `10054` |  |
-| kubeDns.service.dnsmasq.targetPort | int | `10054` |  |
 | kubeDns.service.enabled | bool | `false` |  |
+| kubeDns.service.ports.dnsmasq.port | int | `10054` |  |
+| kubeDns.service.ports.dnsmasq.targetPort | int | `10054` |  |
+| kubeDns.service.ports.skydns.port | int | `10055` |  |
+| kubeDns.service.ports.skydns.targetPort | int | `10055` |  |
 | kubeDns.service.selector.k8s-app | string | `"kube-dns"` |  |
-| kubeDns.service.skydns.port | int | `10055` |  |
-| kubeDns.service.skydns.targetPort | int | `10055` |  |
-| kubeDns.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeDns.spec.endpoints[0].port | string | `"http-metrics-dnsmasq"` |  |
-| kubeDns.spec.endpoints[1].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeDns.spec.endpoints[1].port | string | `"http-metrics-skydns"` |  |
+| kubeDns.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics-dnsmasq"},{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics-skydns"}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | kubeEtcd.enabled | bool | `true` |  |
 | kubeEtcd.endpoints | list | `[]` |  |
 | kubeEtcd.service.enabled | bool | `true` |  |
 | kubeEtcd.service.port | int | `2379` |  |
 | kubeEtcd.service.selector.component | string | `"etcd"` |  |
 | kubeEtcd.service.targetPort | int | `2379` |  |
-| kubeEtcd.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeEtcd.spec.endpoints[0].port | string | `"http-metrics"` |  |
-| kubeEtcd.spec.endpoints[0].scheme | string | `"https"` |  |
-| kubeEtcd.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
-| kubeEtcd.spec.jobLabel | string | `"jobLabel"` |  |
+| kubeEtcd.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"}}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | kubeProxy.enabled | bool | `false` |  |
 | kubeProxy.endpoints | list | `[]` |  |
 | kubeProxy.service.enabled | bool | `true` |  |
 | kubeProxy.service.port | int | `10249` |  |
 | kubeProxy.service.selector.k8s-app | string | `"kube-proxy"` |  |
 | kubeProxy.service.targetPort | int | `10249` |  |
-| kubeProxy.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeProxy.spec.endpoints[0].port | string | `"http-metrics"` |  |
-| kubeProxy.spec.endpoints[0].scheme | string | `"https"` |  |
-| kubeProxy.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
-| kubeProxy.spec.jobLabel | string | `"jobLabel"` |  |
+| kubeProxy.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"}}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | kubeScheduler.enabled | bool | `true` |  |
 | kubeScheduler.endpoints | list | `[]` |  |
 | kubeScheduler.service.enabled | bool | `true` |  |
 | kubeScheduler.service.port | int | `10259` |  |
 | kubeScheduler.service.selector.component | string | `"kube-scheduler"` |  |
 | kubeScheduler.service.targetPort | int | `10259` |  |
-| kubeScheduler.spec.endpoints[0].bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubeScheduler.spec.endpoints[0].port | string | `"http-metrics"` |  |
-| kubeScheduler.spec.endpoints[0].scheme | string | `"https"` |  |
-| kubeScheduler.spec.endpoints[0].tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
-| kubeScheduler.spec.jobLabel | string | `"jobLabel"` |  |
-| kubelet.cadvisor | bool | `true` | Enable scraping /metrics/cadvisor from kubelet's service |
+| kubeScheduler.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"}}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | kubelet.enabled | bool | `true` |  |
-| kubelet.probes | bool | `true` | Enable scraping /metrics/probes from kubelet's service |
-| kubelet.spec.bearerTokenFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/token"` |  |
-| kubelet.spec.honorLabels | bool | `true` |  |
-| kubelet.spec.honorTimestamps | bool | `false` |  |
-| kubelet.spec.interval | string | `"30s"` |  |
-| kubelet.spec.metricRelabelConfigs[0].action | string | `"labeldrop"` |  |
-| kubelet.spec.metricRelabelConfigs[0].regex | string | `"(uid)"` |  |
-| kubelet.spec.metricRelabelConfigs[1].action | string | `"labeldrop"` |  |
-| kubelet.spec.metricRelabelConfigs[1].regex | string | `"(id|name)"` |  |
-| kubelet.spec.metricRelabelConfigs[2].action | string | `"drop"` |  |
-| kubelet.spec.metricRelabelConfigs[2].regex | string | `"(rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)"` |  |
-| kubelet.spec.metricRelabelConfigs[2].source_labels[0] | string | `"__name__"` |  |
-| kubelet.spec.relabelConfigs[0].action | string | `"labelmap"` |  |
-| kubelet.spec.relabelConfigs[0].regex | string | `"__meta_kubernetes_node_label_(.+)"` |  |
-| kubelet.spec.relabelConfigs[1].sourceLabels[0] | string | `"__metrics_path__"` |  |
-| kubelet.spec.relabelConfigs[1].targetLabel | string | `"metrics_path"` |  |
-| kubelet.spec.relabelConfigs[2].replacement | string | `"kubelet"` |  |
-| kubelet.spec.relabelConfigs[2].targetLabel | string | `"job"` |  |
-| kubelet.spec.scheme | string | `"https"` |  |
-| kubelet.spec.scrapeTimeout | string | `"5s"` |  |
-| kubelet.spec.tlsConfig.caFile | string | `"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"` |  |
-| kubelet.spec.tlsConfig.insecureSkipVerify | bool | `true` |  |
+| kubelet.vmScrape | object | `{"kind":"VMNodeScrape","spec":{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","honorLabels":true,"honorTimestamps":false,"interval":"30s","metricRelabelConfigs":[{"action":"labeldrop","regex":"(uid)"},{"action":"labeldrop","regex":"(id|name)"},{"action":"drop","regex":"(rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)","source_labels":["__name__"]}],"relabelConfigs":[{"action":"labelmap","regex":"__meta_kubernetes_node_label_(.+)"},{"sourceLabels":["__metrics_path__"],"targetLabel":"metrics_path"},{"replacement":"kubelet","targetLabel":"job"}],"scheme":"https","scrapeTimeout":"5s","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","insecureSkipVerify":true}}}` | spec for VMNodeScrape crd https://docs.victoriametrics.com/operator/api.html#vmnodescrapespec |
+| kubelet.vmScrapes.cadvisor | object | `{"enabled":true,"spec":{"path":"/metrics/cadvisor"}}` | Enable scraping /metrics/cadvisor from kubelet's service |
+| kubelet.vmScrapes.kubelet.spec | object | `{}` |  |
+| kubelet.vmScrapes.probes | object | `{"enabled":true,"spec":{"path":"/metrics/probes"}}` | Enable scraping /metrics/probes from kubelet's service |
 | nameOverride | string | `""` |  |
 | prometheus-node-exporter.enabled | bool | `true` |  |
 | prometheus-node-exporter.extraArgs[0] | string | `"--collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"` |  |
 | prometheus-node-exporter.extraArgs[1] | string | `"--collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"` |  |
 | prometheus-node-exporter.podLabels.jobLabel | string | `"node-exporter"` |  |
-| prometheus-node-exporter.vmServiceScrape.enabled | bool | `true` |  |
-| prometheus-node-exporter.vmServiceScrape.spec.endpoints[0].metricRelabelConfigs[0].action | string | `"drop"` |  |
-| prometheus-node-exporter.vmServiceScrape.spec.endpoints[0].metricRelabelConfigs[0].regex | string | `"/var/lib/kubelet/pods.+"` |  |
-| prometheus-node-exporter.vmServiceScrape.spec.endpoints[0].metricRelabelConfigs[0].source_labels[0] | string | `"mountpoint"` |  |
-| prometheus-node-exporter.vmServiceScrape.spec.endpoints[0].port | string | `"metrics"` |  |
-| prometheus-node-exporter.vmServiceScrape.spec.jobLabel | string | `"jobLabel"` |  |
+| prometheus-node-exporter.vmScrape | object | `{"enabled":true,"spec":{"endpoints":[{"metricRelabelConfigs":[{"action":"drop","regex":"/var/lib/kubelet/pods.+","source_labels":["mountpoint"]}],"port":"metrics"}],"jobLabel":"jobLabel","selector":{"matchLabels":{"app.kubernetes.io/name":"{{ include \"prometheus-node-exporter.name\" (index .Subcharts \"prometheus-node-exporter\") }}"}}}}` | node exporter VM scrape config |
+| prometheus-node-exporter.vmScrape.spec | object | `{"endpoints":[{"metricRelabelConfigs":[{"action":"drop","regex":"/var/lib/kubelet/pods.+","source_labels":["mountpoint"]}],"port":"metrics"}],"jobLabel":"jobLabel","selector":{"matchLabels":{"app.kubernetes.io/name":"{{ include \"prometheus-node-exporter.name\" (index .Subcharts \"prometheus-node-exporter\") }}"}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | prometheus-operator-crds.enabled | bool | `false` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
