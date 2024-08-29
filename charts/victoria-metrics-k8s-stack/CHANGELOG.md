@@ -26,6 +26,7 @@
 
 **Update note**: Update `grafana.spec` to `grafana.vmScrape.spec`
 
+- bump version of VM components to [v1.103.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.103.0)
 - Added `dashboards.<dashboardName>` bool flag to enable dashboard even if component it is for is not installed.
 - Allow extra `vmalert.notifiers` without dropping default notifier if `alertmanager.enabled: true`
 - Do not drop default notifier, when vmalert.additionalNotifierConfigs is set
