@@ -55,7 +55,7 @@ Optionally, you can push data to any of the per-zone vmagents, and they will rep
 ### How to query data?
 
 The chart provides `vmauth-global-read` as global read entrypoint, it picks the first available zone (see [first_available](https://docs.victoriametrics.com/vmauth/#high-availability) policy) as it's preferred datasource and switches automatically to next zone if first one is unavailable, check [vmauth `first_available`](https://docs.victoriametrics.com/vmauth/#high-availability) for more details.  
-If you have services like [vmalert](https://docs.victoriametrics.com/vmalert.html) or Grafana deployed in each zone, then configure them to use local `vmauth-read-proxy`. Per-zone `vmauth-read-proxy` always prefers "local" vmcluster for querying and reduces cross-zone traffic. 
+If you have services like [vmalert](https://docs.victoriametrics.com/vmalert) or Grafana deployed in each zone, then configure them to use local `vmauth-read-proxy`. Per-zone `vmauth-read-proxy` always prefers "local" vmcluster for querying and reduces cross-zone traffic. 
 
 You can also pick other proxies like kubernetes service which supports [Topology Aware Routing](https://kubernetes.io/docs/concepts/services-networking/topology-aware-routing/) as global read entrypoint.
 
@@ -206,14 +206,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | availabilityZones[0].vmagent | object | `{"annotations":{},"enabled":true,"name":"","spec":{}}` | vmagent here only meant to proxy write requests to each az, doesn't support customized other remote write address. |
 | availabilityZones[0].vmauthCrossAZQuery | object | `{"enabled":true,"name":"","spec":{}}` | set up a vmauth with all the zone with `allowQuery: true` as query backends |
 | availabilityZones[0].vmauthIngest.name | string | `""` | override the name of the vmauth object |
-| availabilityZones[0].vmcluster.spec | object | `{"replicationFactor":2,"retentionPeriod":"14","vminsert":{"extraArgs":{},"replicaCount":2,"resources":{}},"vmselect":{"extraArgs":{},"replicaCount":2,"resources":{}},"vmstorage":{"replicaCount":2,"resources":{},"storageDataPath":"/vm-data"}}` | spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api.html#vmclusterspec |
+| availabilityZones[0].vmcluster.spec | object | `{"replicationFactor":2,"retentionPeriod":"14","vminsert":{"extraArgs":{},"replicaCount":2,"resources":{}},"vmselect":{"extraArgs":{},"replicaCount":2,"resources":{}},"vmstorage":{"replicaCount":2,"resources":{},"storageDataPath":"/vm-data"}}` | spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api#vmclusterspec |
 | availabilityZones[1].allowIngest | bool | `true` | allow data ingestion to this zone |
 | availabilityZones[1].allowQuery | bool | `true` | allow data query from this zone through global query endpoint |
 | availabilityZones[1].extraAffinity | object | `{}` | extraAffinity adds user defined custom affinity rules |
 | availabilityZones[1].nodeSelector | object | `{"topology.kubernetes.io/zone":"zone-us-1"}` | nodeselector to restrict where pods of this zone can be placed. usually provided by cloud providers. |
 | availabilityZones[1].topologySpreadConstraints | list | `[{"maxSkew":1,"topologyKey":"kubernetes.io/hostname","whenUnsatisfiable":"ScheduleAnyway"}]` | topologySpreadConstraints allows to customize the default topologySpreadConstraints. |
 | availabilityZones[1].vmagent | object | `{"annotations":{},"enabled":true,"name":"","spec":{}}` | vmagent only meant to proxy write requests to each az, doesn't support customized remote write address |
-| availabilityZones[1].vmcluster.spec | object | `{"replicationFactor":2,"retentionPeriod":"14","vminsert":{"extraArgs":{},"replicaCount":2,"resources":{}},"vmselect":{"extraArgs":{},"replicaCount":2,"resources":{}},"vmstorage":{"replicaCount":2,"resources":{},"storageDataPath":"/vm-data"}}` | spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api.html#vmclusterspec |
+| availabilityZones[1].vmcluster.spec | object | `{"replicationFactor":2,"retentionPeriod":"14","vminsert":{"extraArgs":{},"replicaCount":2,"resources":{}},"vmselect":{"extraArgs":{},"replicaCount":2,"resources":{}},"vmstorage":{"replicaCount":2,"resources":{},"storageDataPath":"/vm-data"}}` | spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api#vmclusterspec |
 | enableMultitenancy | bool | `false` | enable multitenancy mode see https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy |
 | extraVMAgent | object | `{"enabled":true,"spec":{"selectAllByDefault":true}}` | set up an extra vmagent to scrape all the scrape objects by default, and write data to above vmauth-global-ingest endpoint. |
 | fullnameOverride | string | `""` | overrides the chart's computed fullname. |

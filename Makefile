@@ -63,21 +63,21 @@ helm-repo-update:
 lint: helm-repo-update
 	$(foreach values,$(wildcard hack/helm/*/lint/*.yaml), \
 		$(eval chart := $(word 3, $(subst /, ,$(values)))) \
-		CMD="dependency build charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
+		CMD="dep build charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
 		CMD="lint charts/$(chart) -f $(values)" $(MAKE) $(HELM) || exit 1; \
 	)
 
 update: helm-repo-update
 	$(foreach values,$(wildcard hack/helm/*/lint/*.yaml), \
 		$(eval chart := $(word 3, $(subst /, ,$(values)))) \
-		CMD="dependency update charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
+		CMD="dep update charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
         )
 
 # Run template for helm charts
 template: helm-repo-update
 	$(foreach values,$(wildcard hack/helm/*/lint/*.yaml), \
 		$(eval chart := $(word 3, $(subst /, ,$(values)))) \
-		CMD="dependency build charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
+		CMD="dep build charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
 		CMD="template charts/$(chart) -f $(values)" $(MAKE) $(HELM) || exit 1; \
 	)
 

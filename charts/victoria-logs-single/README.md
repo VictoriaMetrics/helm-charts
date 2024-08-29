@@ -181,12 +181,10 @@ Change the values according to the need of the environment in ``victoria-logs-si
 | server.probe.liveness.failureThreshold | int | `10` |  |
 | server.probe.liveness.initialDelaySeconds | int | `30` |  |
 | server.probe.liveness.periodSeconds | int | `30` |  |
-| server.probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| server.probe.liveness.tcpSocket | object | `{}` |  |
 | server.probe.liveness.timeoutSeconds | int | `5` |  |
 | server.probe.readiness.failureThreshold | int | `3` |  |
-| server.probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
-| server.probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
-| server.probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
+| server.probe.readiness.httpGet | object | `{}` |  |
 | server.probe.readiness.initialDelaySeconds | int | `5` |  |
 | server.probe.readiness.periodSeconds | int | `15` |  |
 | server.probe.readiness.timeoutSeconds | int | `5` |  |

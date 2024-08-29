@@ -143,7 +143,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | image.repository | string | `"victoriametrics/vmanomaly"` | Victoria Metrics anomaly Docker repository and image name |
 | image.tag | string | `"v1.15.4"` | Tag of Docker image |
 | imagePullSecrets | list | `[]` |  |
-| license | object | `{"key":"","secret":{"key":"","name":""}}` | License key configuration for vmanomaly. See [docs](https://docs.victoriametrics.com/vmanomaly.html#licensing) Required starting from v1.5.0. |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | License key configuration for vmanomaly. See [docs](https://docs.victoriametrics.com/vmanomaly#licensing) Required starting from v1.5.0. |
 | license.key | string | `""` | License key for vmanomaly |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key for vmanomaly |
 | license.secret.key | string | `""` | Key in secret with license key |

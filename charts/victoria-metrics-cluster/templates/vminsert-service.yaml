@@ -50,44 +50,44 @@ spec:
     {{- with $app.extraArgs.clusternativeListenAddr }}
     - name: cluster-tcp
       protocol: TCP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: cluster-tcp
     {{- end }}
     {{- with $app.extraArgs.graphiteListenAddr }}
     - name: graphite-tcp
       protocol: TCP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: graphite-tcp
     - name: graphite-udp
       protocol: UDP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: graphite-udp
     {{- end }}
     {{- with $app.extraArgs.influxListenAddr }}
     - name: influx-tcp
       protocol: TCP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: influx-tcp
     - name: influx-udp
       protocol: UDP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: influx-udp
     {{- end }}
     {{- with $app.extraArgs.opentsdbHTTPListenAddr }}
     - name: opentsdbhttp
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: opentsdbhttp
     {{- end }}
     {{- with $app.extraArgs.opentsdbListenAddr }}
     {{- if or $app.service.udp (ne $app.service.type "LoadBalancer") }}
     - name: opentsdb-udp
       protocol: UDP
-      port: {{ include "split-host-port" $app.extraArgs.opentsdbListenAddr }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: opentsdb-udp
     {{- end }}
     - name: opentsdb-tcp
       protocol: TCP
-      port: {{ include "split-host-port" $app.extraArgs.opentsdbListenAddr }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: opentsdb-tcp
     {{- end }}
   selector: {{ include "victoria-metrics.vminsert.matchLabels" . | nindent 4 }}

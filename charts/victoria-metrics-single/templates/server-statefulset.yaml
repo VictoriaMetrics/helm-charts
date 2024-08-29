@@ -1,7 +1,6 @@
 {{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.server }}
 {{- if and $app.enabled $app.statefulSet.enabled -}}
-{{ include "victoria-metrics.vmbackupmanager.enforce_license" . }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -33,8 +32,44 @@ spec:
       schedulerName: {{ . }}
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
-      {{- if eq (include "victoria-metrics.hasInitContainer" . ) "true" }}
-      initContainers: {{ include "victoria-metrics.initContiners" . | nindent 8 }}
+      {{- if or $app.initContainers $app.vmbackupmanager.restore.onStart.enabled }}
+      initContainers:
+      {{- with $app.initContainers -}}
+      {{- toYaml . | nindent 6 }}
+      {{- end -}}
+      {{- if $app.vmbackupmanager.restore.onStart.enabled }}
+      {{- include "vm.enterprise.only" . }}
+      - name: vmbackupmanager-restore
+        image: {{ include "vm.image" (merge (deepCopy .) (dict "app" $app.vmbackupmanager)) }}
+        imagePullPolicy: {{ $app.image.pullPolicy }}
+        {{- with $app.podSecurityContext }}
+        securityContext:  {{ toYaml . | nindent 10 }}
+        {{- end }}
+        args: {{ include "vmbackupmanager.restore.args" . | nindent 12 }}
+        {{- with $app.vmbackupmanager.resources }}
+        resources: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        {{- with $app.vmbackupmanager.env }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        ports:
+        - name: manager-http
+          containerPort: 8300
+        volumeMounts:
+        - name: vmstorage-volume
+          mountPath: {{ $app.persistentVolume.mountPath }}
+          subPath: {{ $app.persistentVolume.subPath }}
+        {{- range $app.vmbackupmanager.extraSecretMounts }}
+        - name: {{ .name }}
+          mountPath: {{ .mountPath }}
+          subPath: {{ .subPath }}
+        {{- end }}
+      {{- end }}
       {{- end }}
       {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
@@ -42,34 +77,14 @@ spec:
       containers:
         - name: vmsingle
           {{- if $app.securityContext.enabled }}
-          securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.containerWorkingDir }}
           workingDir: {{ $app.containerWorkingDir }}
           {{- end }}
-          args:
-            - --retentionPeriod={{ $app.retentionPeriod }}
-            - --storageDataPath={{ $app.persistentVolume.mountPath }}
-            {{- if $app.scrape.enabled }}
-            - --promscrape.config=/scrapeconfig/scrape.yml
-            {{- end }}
-            {{- if $app.relabel.enabled }}
-            - --relabelConfig=/relabelconfig/relabel.yml
-            {{- end }}
-            {{- range $key, $value := $app.extraArgs }}
-            {{- if kindIs "slice" $value }}
-            {{- range $v := $value }}
-            - --{{ $key }}={{ $v }}
-            {{- end }}
-            {{- else }}
-            - --{{ $key }}={{ $value }}
-            {{- end }}
-            {{- end }}
-            {{- with (include "victoria-metrics.license.flag" .) }}
-            - {{ . }}
-            {{- end }}
+          args: {{ include "vmsingle.args" . | nindent 12 }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -82,31 +97,31 @@ spec:
             {{- with $app.extraArgs.graphiteListenAddr }}
             - name: graphite-tcp
               protocol: TCP
-              containerPort: {{ include "split-host-port" . }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
             - name: graphite-udp
               protocol: UDP
-              containerPort: {{ include "split-host-port" . }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
             {{- end }}
             {{- with $app.extraArgs.influxListenAddr }}
             - name: influx-tcp
               protocol: TCP
-              containerPort: {{ include "split-host-port" . }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
             - name: influx-udp
               protocol: UDP
-              containerPort: {{ include "split-host-port" . }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
             {{- end }}
             {{- with $app.extraArgs.opentsdbHTTPListenAddr }}
             - name: opentsdbhttp
               protocol: TCP
-              containerPort: {{ include "split-host-port" . }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
             {{- end }}
             {{- with $app.extraArgs.opentsdbListenAddr }}
             - name: opentsdb-tcp
               protocol: TCP
-              containerPort: {{ include "split-host-port" . }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
             - name: opentsdb-udp
               protocol: UDP
-              containerPort: {{ include "split-host-port" . }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
             {{- end }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
@@ -166,34 +181,17 @@ spec:
               readOnly: {{ . }}
               {{- end }}
             {{- end }}
-            {{- include "victoria-metrics.license.mount" . | nindent 12 }}
+            {{- include "vm.license.mount" . | nindent 12 }}
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
         {{- $manager := $app.vmbackupmanager }}
         {{- if $manager.enable }}
+        {{- include "vm.enterprise.only" . }}
         - name: vmbackupmanager
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $manager)) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
-          args:
-            - --disableHourly={{ $manager.disableHourly }}
-            - --disableDaily={{ $manager.disableDaily }}
-            - --disableWeekly={{ $manager.disableWeekly }}
-            - --disableMonthly={{ $manager.disableMonthly }}
-            - --keepLastHourly={{ $manager.retention.keepLastHourly }}
-            - --keepLastDaily={{ $manager.retention.keepLastDaily }}
-            - --keepLastWeekly={{ $manager.retention.keepLastWeekly }}
-            - --keepLastMonthly={{ $manager.retention.keepLastMonthly }}
-            - --dst={{ printf "%s/%s" $manager.destination (include "victoria-metrics.name" .) }}
-            - --storageDataPath={{ $app.persistentVolume.mountPath }}
-            - --snapshot.createURL=http://localhost:8428/snapshot/create
-            - --snapshot.deleteURL=http://localhost:8428/snapshot/delete
-            {{- range $key, $value := $manager.extraArgs }}
-            - --{{ $key }}={{ $value }}
-            {{- end }}
-            {{- with (include "victoria-metrics.license.flag" .) }}
-            - {{ . }}
-            {{- end }}
+          args: {{ include "vmbackupmanager.args" . | nindent 12 }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $manager "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -207,7 +205,7 @@ spec:
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- if $app.securityContext.enabled }}
-          securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
           {{- with $manager.env }}
           env: {{ toYaml . | nindent 12 }}
@@ -226,7 +224,7 @@ spec:
             {{- with $manager.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-            {{- include "victoria-metrics.license.mount" . | nindent 12 }}
+            {{- include "vm.license.mount" . | nindent 12 }}
         {{- end }}
       {{- with $app.extraContainers }}
       {{- toYaml . | nindent 8 }}
@@ -235,7 +233,7 @@ spec:
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- if $app.podSecurityContext.enabled }}
-      securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
+      securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
       {{- with $app.tolerations }}
@@ -266,7 +264,7 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- include "victoria-metrics.license.volume" . | nindent 8 }}
+        {{- include "vm.license.volume" . | nindent 8 }}
   {{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1

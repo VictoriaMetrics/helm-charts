@@ -223,9 +223,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | probe.liveness.tcpSocket.port | string | `"probe"` |  |
 | probe.liveness.timeoutSeconds | int | `5` |  |
 | probe.readiness.failureThreshold | int | `3` |  |
-| probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
 | probe.readiness.httpGet.port | string | `"probe"` |  |
-| probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
 | probe.readiness.initialDelaySeconds | int | `5` |  |
 | probe.readiness.periodSeconds | int | `15` |  |
 | probe.readiness.timeoutSeconds | int | `5` |  |

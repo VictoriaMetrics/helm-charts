@@ -24,7 +24,7 @@ deployment:
 # ref:  https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
 statefulset:
   enabled: false
-  # -- create cluster of vmagents. See https://docs.victoriametrics.com/vmagent.html#scraping-big-number-of-targets
+  # -- create cluster of vmagents. See https://docs.victoriametrics.com/vmagent#scraping-big-number-of-targets
   # available since 1.77.2 version https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.2
   clusterMode: false
   # -- replication factor for vmagent in cluster mode
@@ -91,7 +91,7 @@ extraArgs:
   # promscrape.maxScrapeSize: "167772160"
 
   # Uncomment and specify the port if you want to support any of the protocols:
-  # https://victoriametrics.github.io/vmagent.html#features
+  # https://docs.victoriametrics.com/vmagent#features
   # graphiteListenAddr: ":2003"
   # influxListenAddr: ":8189"
   # opentsdbHTTPListenAddr: ":4242"
@@ -607,15 +607,11 @@ extraScrapeConfigs: []
 
 probe:
   readiness:
-    httpGet:
-      path: '{{ include "vm.probe.http.path" . }}'
-      scheme: '{{ include "vm.probe.http.scheme" . }}'
-      port: '{{ include "vm.probe.port" . }}'
+    httpGet: {}
     initialDelaySeconds: 5
     periodSeconds: 15
   liveness:
-    tcpSocket:
-      port: '{{ include "vm.probe.port" . }}'
+    tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
     timeoutSeconds: 5
@@ -626,7 +622,7 @@ extraObjects: []
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
 # Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# Documentation - https://docs.victoriametrics.com/enterprise,
 # for more information, visit https://victoriametrics.com/products/enterprise/ .
 # To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
 # Supported starting from VictoriaMetrics v1.94.0
