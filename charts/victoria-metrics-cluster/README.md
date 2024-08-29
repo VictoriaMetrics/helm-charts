@@ -108,7 +108,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
 | global.image.registry | string | `""` |  |
 | global.imagePullSecrets | list | `[]` |  |
-| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
 | license.secret.key | string | `""` | Key in secret with license key |
@@ -163,12 +163,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vminsert.probe.liveness.failureThreshold | int | `3` |  |
 | vminsert.probe.liveness.initialDelaySeconds | int | `5` |  |
 | vminsert.probe.liveness.periodSeconds | int | `15` |  |
-| vminsert.probe.liveness.tcpSocket.port | string | `"{{ dig \"ports\" \"name\" \"http\" (.app | dict) }}"` |  |
+| vminsert.probe.liveness.tcpSocket | object | `{}` |  |
 | vminsert.probe.liveness.timeoutSeconds | int | `5` |  |
 | vminsert.probe.readiness.failureThreshold | int | `3` |  |
-| vminsert.probe.readiness.httpGet.path | string | `"{{ index .app.extraArgs \"http.pathPrefix\" | default \"\" | trimSuffix \"/\" }}/health"` |  |
-| vminsert.probe.readiness.httpGet.port | string | `"{{ dig \"ports\" \"name\" \"http\" (.app | dict) }}"` |  |
-| vminsert.probe.readiness.httpGet.scheme | string | `"{{ ternary \"HTTPS\" \"HTTP\" (.app.extraArgs.tls | default false) }}"` |  |
+| vminsert.probe.readiness.httpGet | object | `{}` |  |
 | vminsert.probe.readiness.initialDelaySeconds | int | `5` |  |
 | vminsert.probe.readiness.periodSeconds | int | `15` |  |
 | vminsert.probe.readiness.timeoutSeconds | int | `5` |  |
@@ -255,12 +253,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmselect.probe.liveness.failureThreshold | int | `3` |  |
 | vmselect.probe.liveness.initialDelaySeconds | int | `5` |  |
 | vmselect.probe.liveness.periodSeconds | int | `15` |  |
-| vmselect.probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| vmselect.probe.liveness.tcpSocket | object | `{}` |  |
 | vmselect.probe.liveness.timeoutSeconds | int | `5` |  |
 | vmselect.probe.readiness.failureThreshold | int | `3` |  |
-| vmselect.probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
-| vmselect.probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
-| vmselect.probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
+| vmselect.probe.readiness.httpGet | object | `{}` |  |
 | vmselect.probe.readiness.initialDelaySeconds | int | `5` |  |
 | vmselect.probe.readiness.periodSeconds | int | `15` |  |
 | vmselect.probe.readiness.timeoutSeconds | int | `5` |  |
@@ -340,12 +336,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.probe.liveness.failureThreshold | int | `10` |  |
 | vmstorage.probe.liveness.initialDelaySeconds | int | `30` |  |
 | vmstorage.probe.liveness.periodSeconds | int | `30` |  |
-| vmstorage.probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| vmstorage.probe.liveness.tcpSocket | object | `{}` |  |
 | vmstorage.probe.liveness.timeoutSeconds | int | `5` |  |
 | vmstorage.probe.readiness.failureThreshold | int | `3` |  |
-| vmstorage.probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
-| vmstorage.probe.readiness.httpGet.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
-| vmstorage.probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
+| vmstorage.probe.readiness.httpGet | object | `{}` |  |
 | vmstorage.probe.readiness.initialDelaySeconds | int | `5` |  |
 | vmstorage.probe.readiness.periodSeconds | int | `15` |  |
 | vmstorage.probe.readiness.timeoutSeconds | int | `5` |  |
@@ -395,15 +389,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 | vmstorage.vmbackupmanager.probe.liveness.tcpSocket.port | string | `"manager-http"` |  |
 | vmstorage.vmbackupmanager.probe.liveness.timeoutSeconds | int | `5` |  |
 | vmstorage.vmbackupmanager.probe.readiness.failureThreshold | int | `3` |  |
-| vmstorage.vmbackupmanager.probe.readiness.httpGet.path | string | `"{{ include \"vm.probe.http.path\" . }}"` |  |
 | vmstorage.vmbackupmanager.probe.readiness.httpGet.port | string | `"manager-http"` |  |
-| vmstorage.vmbackupmanager.probe.readiness.httpGet.scheme | string | `"{{ include \"vm.probe.http.scheme\" . }}"` |  |
 | vmstorage.vmbackupmanager.probe.readiness.initialDelaySeconds | int | `5` |  |
 | vmstorage.vmbackupmanager.probe.readiness.periodSeconds | int | `15` |  |
 | vmstorage.vmbackupmanager.probe.readiness.timeoutSeconds | int | `5` |  |
 | vmstorage.vmbackupmanager.probe.startup | object | `{}` |  |
 | vmstorage.vmbackupmanager.resources | object | `{}` |  |
-| vmstorage.vmbackupmanager.restore | object | `{"onStart":{"enabled":false}}` | Allows to enable restore options for pod. Read more: https://docs.victoriametrics.com/vmbackupmanager.html#restore-commands |
+| vmstorage.vmbackupmanager.restore | object | `{"onStart":{"enabled":false}}` | Allows to enable restore options for pod. Read more: https://docs.victoriametrics.com/vmbackupmanager#restore-commands |
 | vmstorage.vmbackupmanager.retention | object | `{"keepLastDaily":2,"keepLastHourly":2,"keepLastMonthly":2,"keepLastWeekly":2}` | backups' retention settings |
 | vmstorage.vmbackupmanager.retention.keepLastDaily | int | `2` | keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off |
 | vmstorage.vmbackupmanager.retention.keepLastHourly | int | `2` | keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off |
