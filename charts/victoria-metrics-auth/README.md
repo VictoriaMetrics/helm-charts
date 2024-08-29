@@ -133,7 +133,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | ingressInternal.hosts | list | `[]` |  |
 | ingressInternal.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
 | ingressInternal.tls | list | `[]` |  |
-| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise.html, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
+| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
 | license.key | string | `""` | License key |
 | license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
 | license.secret.key | string | `""` | Key in secret with license key |
@@ -145,17 +145,17 @@ Change the values according to the need of the environment in ``victoria-metrics
 | podSecurityContext.enabled | bool | `true` |  |
 | probe.liveness.initialDelaySeconds | int | `5` |  |
 | probe.liveness.periodSeconds | int | `15` |  |
-| probe.liveness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| probe.liveness.tcpSocket | object | `{}` |  |
 | probe.liveness.timeoutSeconds | int | `5` |  |
 | probe.readiness.initialDelaySeconds | int | `5` |  |
 | probe.readiness.periodSeconds | int | `15` |  |
-| probe.readiness.tcpSocket.port | string | `"{{ include \"vm.probe.port\" . }}"` |  |
+| probe.readiness.tcpSocket | object | `{}` |  |
 | probe.startup | object | `{}` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.extraLabels | object | `{}` |  |
 | replicaCount | int | `1` | Number of replicas of vmauth |
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
-| secretName | string | `""` | Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html. Configuration in the given secret must be stored under `auth.yml` key. |
+| secretName | string | `""` | Use existing secret if specified otherwise .config values will be used. Ref: https://docs.victoriametrics.com/vmauth. Configuration in the given secret must be stored under `auth.yml` key. |
 | securityContext.enabled | bool | `true` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |

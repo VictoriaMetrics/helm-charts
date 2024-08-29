@@ -76,75 +76,18 @@ Defines the name of configuration map
 {{- end -}}
 {{- end -}}
 
-{{- define "split-host-port" -}}
-{{- $hp := split ":" . -}}
-{{- printf "%s" $hp._1 -}}
-{{- end -}}
-
-{{/*
-Return license flag if necessary.
-*/}}
-{{- define "chart.license.flag" -}}
-{{- if .Values.license.key -}}
--license={{ .Values.license.key }}
-{{- end }}
-{{- if and .Values.license.secret.name .Values.license.secret.key -}}
--licenseFile=/etc/vm-license-key/{{ .Values.license.secret.key }}
-{{- end -}}
-{{- end -}}
-
-
-{{/*
-Return license volume mount
-*/}}
-{{- define "chart.license.volume" -}}
-{{- if and .Values.license.secret.name .Values.license.secret.key -}}
-- name: license-key
-  secret:
-    secretName: {{ .Values.license.secret.name }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return license volume mount for container
-*/}}
-{{- define "chart.license.mount" -}}
-{{- if and .Values.license.secret.name .Values.license.secret.key -}}
-- name: license-key
-  mountPath: /etc/vm-license-key
-  readOnly: true
-{{- end -}}
-{{- end -}}
-
-{{/* 
-Return true if the detected platform is Openshift
-Usage:
-{{- include "common.compatibility.isOpenshift" . -}}
-*/}}
-{{- define "common.compatibility.isOpenshift" -}}
-{{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
-{{- true -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Render a compatible securityContext depending on the platform. By default it is maintained as it is. In other platforms like Openshift we remove default user/group values that do not work out of the box with the restricted-v1 SCC
-Usage:
-{{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "context" $) -}}
-*/}}
-{{- define "common.compatibility.renderSecurityContext" -}}
-{{- $adaptedContext := .secContext -}}
-{{- if .context.Values.global.compatibility -}}
-  {{- if .context.Values.global.compatibility.openshift -}}
-    {{- if or (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "force") (and (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "auto") (include "common.compatibility.isOpenshift" .context)) -}}
-      {{/* Remove incompatible user/group values that do not work in Openshift out of the box */}}
-      {{- $adaptedContext = omit $adaptedContext "fsGroup" "runAsUser" "runAsGroup" -}}
-      {{- if not .secContext.seLinuxOptions -}}
-      {{/* If it is an empty object, we remove it from the resulting context because it causes validation issues */}}
-      {{- $adaptedContext = omit $adaptedContext "seLinuxOptions" -}}
-      {{- end -}}
-    {{- end -}}
+{{- define "vmagent.args" -}}
+  {{- $args := default dict -}}
+  {{- $_ := set $args "promscrape.config" "/config/scrape.yml" -}}
+  {{- $_ := set $args "remoteWrite.tmpDataPath" "/tmpData" -}}
+  {{- $_ := set $args "remoteWrite.url" .Values.remoteWriteUrls -}}
+  {{- $_ := set $args "remoteWrite.multitenantURL" .Values.multiTenantUrls -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args .Values.extraArgs -}}
+  {{- if and .Values.statefulset.enabled .Values.statefulset.clusterMode }}
+    {{- $_ := set $args "promscrape.cluster.membersCount" .Values.replicaCount -}}
+    {{- $_ := set $args "promscrape.cluster.replicationFactor" .Values.statefulset.replicationFactor -}}
+    {{- $_ := set $args "promscrape.cluster.memberNum" "$(POD_NAME)" -}}
   {{- end -}}
-{{- end -}}
-{{- omit $adaptedContext "enabled" | toYaml -}}
+  {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}

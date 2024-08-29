@@ -213,7 +213,7 @@ serviceMonitor:
 #    tlsConfig:
 #      insecureSkipVerify: true
 
-# -- Use existing secret if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmauth.html.
+# -- Use existing secret if specified otherwise .config values will be used. Ref: https://docs.victoriametrics.com/vmauth.
 # Configuration in the given secret must be stored under `auth.yml` key.
 secretName: ""
 
@@ -253,13 +253,11 @@ extraObjects: []
 
 probe:
   readiness:
-    tcpSocket:
-      port: '{{ include "vm.probe.port" . }}'
+    tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
   liveness:
-    tcpSocket:
-      port: '{{ include "vm.probe.port" . }}'
+    tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
     timeoutSeconds: 5
@@ -267,7 +265,7 @@ probe:
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
 # Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# Documentation - https://docs.victoriametrics.com/enterprise,
 # for more information, visit https://victoriametrics.com/products/enterprise/ .
 # To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
 # Supported starting from VictoriaMetrics v1.94.0

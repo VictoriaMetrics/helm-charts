@@ -159,33 +159,30 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "victoria-metrics.vminsert.vmstorage-pod-fqdn" -}}
-  {{- $pod := include "victoria-metrics.vmstorage.fullname" . -}}
   {{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
   {{- $namespace := .Release.Namespace -}}
   {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
-  {{- $args := default list -}}
+  {{- $storageNodes := default list -}}
   {{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
-    {{- $value := printf "%s-%d.%s.%s.svc.%s:8400" $pod $i $svc $namespace $dnsSuffix -}}
-    {{- $args = append $args (printf "--storageNode=%q" $value) -}}
+    {{- $value := printf "%s-%d.%s.%s.svc.%s:8400" $svc $i $svc $namespace $dnsSuffix -}}
+    {{- $storageNodes = append $storageNodes $value -}}
   {{- end -}}
-  {{- toYaml $args -}}
+  {{- toYaml (dict "storageNode" $storageNodes) -}}
 {{- end -}}
 
 {{- define "victoria-metrics.vmselect.vmstorage-pod-fqdn" -}}
-  {{- $pod := include "victoria-metrics.vmstorage.fullname" . -}}
   {{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
   {{- $namespace := .Release.Namespace -}}
   {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
-  {{- $args := default list -}}
+  {{- $storageNodes := default list -}}
   {{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
-    {{- $value := printf "%s-%d.%s.%s.svc.%s:8401" $pod $i $svc $namespace $dnsSuffix -}}
-    {{- $args = append $args (printf "--storageNode=%q" $value) -}}
+    {{- $value := printf "%s-%d.%s.%s.svc.%s:8401" $svc $i $svc $namespace $dnsSuffix -}}
+    {{- $storageNodes = append $storageNodes $value -}}
   {{- end -}}
-  {{- toYaml $args -}}
+  {{- toYaml (dict "storageNode" $storageNodes) -}}
 {{- end -}}
 
 {{- define "victoria-metrics.vmselect.vmselect-pod-fqdn" -}}
-  {{- $pod := include "victoria-metrics.vmselect.fullname" . -}}
   {{- $svc := include "victoria-metrics.vmselect.fullname" . -}}
   {{- $namespace := .Release.Namespace -}}
   {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
@@ -193,148 +190,81 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
   {{- with .Values.vmselect.extraArgs.httpListenAddr }}
     {{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" }}
   {{- end -}}
-  {{- $args := default list -}}
+  {{- $selectNodes := default list -}}
   {{- range $i := until (.Values.vmselect.replicaCount | int) -}}
-    {{- $value := printf "%s-%d.%s.%s.svc.%s:%s" $pod $i $svc $namespace $dnsSuffix $port -}}
-    {{- $args = append $args (printf "--selectNode=%q" $value) -}}
+    {{- $value := printf "%s-%d.%s.%s.svc.%s:%s" $svc $i $svc $namespace $dnsSuffix $port -}}
+    {{- $selectNodes = append $selectNodes $value -}}
   {{- end -}}
-  {{- toYaml $args -}}
+  {{- toYaml (dict "selectNode" $selectNodes) -}}
 {{- end -}}
 
-{{- define "split-host-port" -}}
-  {{- $hp := split ":" . -}}
-  {{- printf "%s" $hp._1 -}}
+{{- define "vminsert.args" -}}
+  {{- $app := .Values.vminsert -}}
+  {{- $args := default dict -}}
+  {{- if not (or $app.suppresStorageFQDNsRender $app.suppressStorageFQDNsRender) }}
+    {{- $args = (fromYaml (include "victoria-metrics.vminsert.vmstorage-pod-fqdn" .)) }}
+  {{- end -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
-{{- define "victoria-metrics.storage.hasInitContainer" -}}
-  {{- or (gt (len .Values.vmstorage.initContainers) 0)  .Values.vmstorage.vmbackupmanager.restore.onStart.enabled -}}
-{{- end -}}
-
-{{- define "victoria-metrics.storage.initContiners" -}}
-{{- if eq (include "victoria-metrics.storage.hasInitContainer" . ) "true" -}}
-{{- with .Values.vmstorage.initContainers -}}
-{{ toYaml . }}
-{{- end -}}
-{{- if .Values.vmstorage.vmbackupmanager.restore.onStart.enabled }}
-- name: vmbackupmanager-restore
-  image: {{ include "vm.image" (merge (deepCopy .) (dict "app" .Values.server.vmbackupmanager)) }}
-  imagePullPolicy: {{ .Values.vmstorage.image.pullPolicy }}
-  {{- with .Values.vmstorage.podSecurityContext }}
-  securityContext:  {{ toYaml . | nindent 4 }}
-  {{- end }}
-  args:
-    - restore
-    - --storageDataPath={{ .Values.vmstorage.persistentVolume.mountPath }}
-    {{- range $key, $value := .Values.vmstorage.vmbackupmanager.extraArgs }}
-    - --{{ $key }}={{ $value }}
-    {{- end }}
-  {{- with .Values.vmstorage.vmbackupmanager.resources }}
-  resources: {{ toYaml . | nindent 4 }}
-  {{- end }}
-  env:
-    - name: POD_NAME
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.name
-  {{- with .Values.vmstorage.vmbackupmanager.env }}
-  {{- toYaml . | nindent 4 }}
-  {{- end }}
-  ports:
-    - name: manager-http
-      containerPort: 8300
-  volumeMounts:
-    - name: vmstorage-volume
-      mountPath: {{ .Values.vmstorage.persistentVolume.mountPath }}
-      subPath: {{ .Values.vmstorage.persistentVolume.subPath }}
-    {{- range .Values.vmstorage.vmbackupmanager.extraSecretMounts }}
-    - name: {{ .name }}
-      mountPath: {{ .mountPath }}
-      subPath: {{ .subPath }}
-    {{- end }}
-{{- end }}
-{{- else -}}
-[]
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return license flag if necessary.
-*/}}
-{{- define "chart.license.flag" -}}
-{{- if .Values.license.key -}}
---license={{ .Values.license.key }}
-{{- end }}
-{{- if and .Values.license.secret.name .Values.license.secret.key -}}
-{{- $value := printf "/etc/vm-license-key/%s" .Values.license.secret.key -}}
---licenseFile={{ $value }}
-{{- end -}}
-{{- end -}}
-
-
-{{/*
-Return license volume mount
-*/}}
-{{- define "chart.license.volume" -}}
-{{- if and .Values.license.secret.name .Values.license.secret.key -}}
-- name: license-key
-  secret:
-    secretName: {{ .Values.license.secret.name }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return license volume mount for container
-*/}}
-{{- define "chart.license.mount" -}}
-{{- if and .Values.license.secret.name .Values.license.secret.key -}}
-- name: license-key
-  mountPath: /etc/vm-license-key
-  readOnly: true
-{{- end -}}
-{{- end -}}
-
-{{/*
-Enforce license for vmbackupmanager
-*/}}
-{{- define "chart.vmbackupmanager.enforce_license" -}}
-{{ if and .Values.vmstorage.vmbackupmanager.enable (not (or .Values.license.key .Values.license.secret.name)) }}
-{{ fail `Pass valid license at .Values.license if you have an enterprise license for running this software.
-  See https://victoriametrics.com/legal/esa/ for details.
-  Documentation - https://docs.victoriametrics.com/enterprise.html
-  for more information, visit https://victoriametrics.com/products/enterprise/
-  To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/`}}
-{{- end -}}
-{{- end -}}
-
-{{/* 
-Return true if the detected platform is Openshift
-Usage:
-{{- include "common.compatibility.isOpenshift" . -}}
-*/}}
-{{- define "common.compatibility.isOpenshift" -}}
-{{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
-{{- true -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Render a compatible securityContext depending on the platform. By default it is maintained as it is. In other platforms like Openshift we remove default user/group values that do not work out of the box with the restricted-v1 SCC
-Usage:
-{{ include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "context" $) }}
-*/}}
-{{- define "common.compatibility.renderSecurityContext" -}}
-{{- $adaptedContext := .secContext -}}
-{{- if .context.Values.global.compatibility -}}
-  {{- if .context.Values.global.compatibility.openshift -}}
-    {{- if or (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "force") (and (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "auto") (include "common.compatibility.isOpenshift" .context)) -}}
-      {{- /* Remove incompatible user/group values that do not work in Openshift out of the box */ -}}
-      {{- $adaptedContext = omit $adaptedContext "fsGroup" "runAsUser" "runAsGroup" -}}
-      {{- if not .secContext.seLinuxOptions -}}
-      {{- /* If it is an empty object, we remove it from the resulting context because it causes validation issues */ -}}
-      {{- $adaptedContext = omit $adaptedContext "seLinuxOptions" -}}
-      {{- end -}}
+{{- define "vmselect.args" -}}
+  {{- $app := .Values.vmselect -}}
+  {{- $args := default dict -}}
+  {{- if not (or $app.suppressStorageFQDNsRender $app.suppresStorageFQDNsRender) }}
+    {{- $args = (fromYaml (include "victoria-metrics.vmselect.vmstorage-pod-fqdn" .)) -}}
+  {{- end -}}
+  {{- if .Values.vmselect.statefulSet.enabled }}
+    {{- with (include "victoria-metrics.vmselect.vmselect-pod-fqdn" .) -}}
+      {{- $args = mergeOverwrite $args (fromYaml .) -}}
     {{- end -}}
   {{- end -}}
+  {{- $_ := set $args "cacheDataPath" $app.cacheMountPath -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
-{{- omit $adaptedContext "enabled" | toYaml -}}
+
+{{- define "vmstorage.args" -}}
+  {{- $app := .Values.vmstorage -}}
+  {{- $args := default dict -}}
+  {{- $_ := set $args "retentionPeriod" (toString $app.retentionPeriod) -}}
+  {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
+{{- end -}}
+
+{{- define "vmbackupmanager.args" -}}
+  {{- $app := .Values.vmstorage -}}
+  {{- $manager := $app.vmbackupmanager -}}
+  {{- $args := default dict -}}
+  {{- $_ := set $args "disableHourly" $manager.disableHourly -}}
+  {{- $_ := set $args "disableDaily" $manager.disableDaily -}}
+  {{- $_ := set $args "disableWeekly" $manager.disableWeekly -}}
+  {{- $_ := set $args "disableMonthly" $manager.disableMonthly -}}
+  {{- $_ := set $args "keepLastHourly" $manager.retention.keepLastHourly -}}
+  {{- $_ := set $args "keepLastDaily" $manager.retention.keepLastDaily -}}
+  {{- $_ := set $args "keepLastWeekly" $manager.retention.keepLastWeekly -}}
+  {{- $_ := set $args "keepLastMonthly" $manager.retention.keepLastMonthly -}}
+  {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
+  {{- $_ := set $args "dst" (printf "%s/$(POD_NAME)" $manager.destination) -}}
+  {{- $_ := set $args "snapshot.createURL" "http://localhost:8482/snapshot/create" -}}
+  {{- $_ := set $args "snapshot.deleteURL" "http://localhost:8482/snapshot/delete" -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args $manager.extraArgs -}}
+  {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
+{{- end -}}
+
+{{- define "vmbackupmanager.restore.args" -}}
+  {{- $app := .Values.server -}}
+  {{- $manager := $app.vmbackupmanager -}}
+  {{- $args := default dict -}}
+  {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args $manager.extraArgs -}}
+  {{- $output := (fromYaml (include "vm.args" $args)).args -}}
+  {{- $output = concat (list "restore") $output -}}
+  {{- toYaml $output -}}
 {{- end -}}

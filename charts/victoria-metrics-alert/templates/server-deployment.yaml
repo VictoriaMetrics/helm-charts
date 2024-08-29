@@ -36,7 +36,7 @@ spec:
     spec:
       serviceAccountName: {{ template "vmalert.serviceAccountName" . }}
       {{- if $app.podSecurityContext.enabled }}
-      securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
+      securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
@@ -45,77 +45,10 @@ spec:
       containers:
         - name: vmalert
           {{- if $app.securityContext.enabled }}
-          securityContext: {{ include "common.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
-          args:
-            - -rule=/config/alert-rules.yaml
-            - -datasource.url={{ $app.datasource.url}}
-            {{- if or $app.datasource.basicAuth.password $app.datasource.basicAuth.username }}
-            - -datasource.basicAuth.password={{ $app.datasource.basicAuth.password }}
-            - -datasource.basicAuth.username={{ $app.datasource.basicAuth.username }}
-            {{- end }}
-            {{- with $app.datasource.bearer.token }}
-            - -datasource.bearerToken={{ . }}
-            {{- end }}
-            {{- with $app.datasource.bearer.tokenFile }}
-            - -datasource.bearerTokenFile={{ . }}
-            {{- end }}
-            {{- with (include "vmalert.alertmanager.urls" .) }}
-            - -notifier.url={{ . }}
-            {{- end }}
-            {{- with (include "vmalert.alertmanager.passwords" .) }}
-            - -notifier.basicAuth.password={{ . }}
-            {{- end }}
-            {{- with (include "vmalert.alertmanager.usernames" .) }}
-            - -notifier.basicAuth.username={{ . }}
-            {{- end }}
-            {{- with (include "vmalert.alertmanager.bearerTokens" .) }}
-            - -notifier.bearerToken={{ . }}
-            {{- end }}
-            {{- with (include "vmalert.alertmanager.bearerTokenFiles" .) }}
-            - -notifier.bearerTokenFile={{ . }}
-            {{- end }}
-            {{- if $app.remote.read.url }}
-            - -remoteRead.url={{ $app.remote.read.url }}
-            {{- end }}
-            {{- if or $app.remote.read.basicAuth.password $app.remote.read.basicAuth.username }}
-            - -remoteRead.basicAuth.password={{ $app.remote.read.basicAuth.password }}
-            - -remoteRead.basicAuth.username={{ $app.remote.read.basicAuth.username }}
-            {{- end }}
-            {{- with $app.remote.read.bearer.token }}
-            - -remoteRead.bearerToken={{ . }}
-            {{- end }}
-            {{- with $app.remote.read.bearer.tokenFile }}
-            - -remoteRead.bearerTokenFile={{ . }}
-            {{- end }}
-            {{- if $app.remote.write.url }}
-            - -remoteWrite.url={{ $app.remote.write.url }}
-            {{- end }}
-            {{- if or $app.remote.write.basicAuth.password $app.remote.write.basicAuth.username }}
-            - -remoteWrite.basicAuth.password={{ $app.remote.write.basicAuth.password }}
-            - -remoteWrite.basicAuth.username={{ $app.remote.write.basicAuth.username }}
-            {{- end }}
-            {{- with $app.remote.write.bearer.token }}
-            - -remoteWrite.bearerToken={{ . }}
-            {{- end }}
-            {{- with $app.remote.write.bearer.tokenFile }}
-            - -remoteWrite.bearerTokenFile={{ . }}
-            {{- end }}
-            {{- range $key, $value := $app.extraArgs }}
-            {{- if kindIs "slice" $value }}
-            {{- range $v := $value }}
-            - -{{ $key }}={{ $v }}
-            {{- end }}
-            {{- else if eq $key "rule" }}
-            - -{{ $key }}={{ $value | quote }}
-            {{- else }}
-            - -{{ $key }}={{ $value }}
-            {{- end }}
-            {{- end }}
-            {{- with (include "vmalert.license.flag" .) }}
-            - {{ . }}
-            {{- end }}
+          args: {{ include "vmalert.args" . | nindent 12 }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
@@ -151,7 +84,7 @@ spec:
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- include "vmalert.license.mount" . | nindent 12 }}
+          {{- include "vm.license.mount" . | nindent 12 }}
           {{- with $app.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -182,5 +115,5 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- include "vmalert.license.volume" . | nindent 8 }}
+        {{- include "vm.license.volume" . | nindent 8 }}
 {{- end }}

@@ -4,6 +4,22 @@
 
 - TODO
 
+## 0.0.8
+
+**Release date:** 2024-08-29
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Added `vm.service` for unified service name generation
+- Added `vm.url` to construct service base url
+- Added `vm.name` for chart name
+- Added `vm.fullname` which is actively used in resource name construction
+- Added `vm.chart` to construct chart name label value
+- Added `vm.labels` for common labels
+- Added `vm.sa` for service account name
+- Added `vm.release` for release name
+- Added `vm.selectorLabels` for common selector labels
+
 ## 0.0.7
 
 **Release date:** 2024-08-27

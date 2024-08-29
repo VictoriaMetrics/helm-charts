@@ -54,7 +54,7 @@ spec:
     {{- with $app.extraArgs.clusternativeListenAddr }}
     - name: cluster-tcp
       protocol: TCP
-      port: {{ include "split-host-port" . }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: cluster-tcp
     {{- end }}
   selector: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 4 }}

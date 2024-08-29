@@ -184,18 +184,18 @@ serviceMonitor:
   #    tlsConfig:
   #      insecureSkipVerify: true
 
-# -- Use existing configmap if specified otherwise .config values will be used. Ref: https://victoriametrics.github.io/vmgateway.html
+# -- Use existing configmap if specified otherwise .config values will be used. Ref: https://docs.victoriametrics.com/vmgateway
 configMap: ""
 
 # -- Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting
 clusterMode: false
 
-# -- Access Control configuration. https://docs.victoriametrics.com/vmgateway.html#access-control
+# -- Access Control configuration. https://docs.victoriametrics.com/vmgateway#access-control
 auth:
   # -- Enable/Disable access-control
   enable: false
 
-# -- Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway.html#rate-limiter
+# -- Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway#rate-limiter
 rateLimiter:
   # -- Enable/Disable rate-limiting
   enable: false
@@ -227,15 +227,11 @@ write:
 
 probe:
   readiness:
-    httpGet:
-      path: '{{ include "vm.probe.http.path" . }}'
-      scheme: '{{ include "vm.probe.http.scheme" . }}'
-      port: '{{ include "vm.probe.port" . }}'
+    httpGet: {}
     initialDelaySeconds: 5
     periodSeconds: 15
   liveness:
-    tcpSocket:
-      port: '{{ include "vm.probe.port" . }}'
+    tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
     timeoutSeconds: 5
@@ -243,7 +239,7 @@ probe:
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
 # Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise.html,
+# Documentation - https://docs.victoriametrics.com/enterprise,
 # for more information, visit https://victoriametrics.com/products/enterprise/ .
 # To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
 # Supported starting from VictoriaMetrics v1.94.0
