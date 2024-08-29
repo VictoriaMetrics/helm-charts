@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.34.6
+
+**Release date:** 2024-08-29
+
+![AppVersion: v0.47.3](https://img.shields.io/static/v1?label=AppVersion&message=v0.47.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - updates operator to [v0.47.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.47.3) version
 - Made `cleanupCRD` deprecated in a favour of `crd.cleanup.enabled`
 - Made `cleanupImage` deprecated in a favour of `crd.cleanup.image`
