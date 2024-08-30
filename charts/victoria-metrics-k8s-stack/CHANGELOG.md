@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed external notifiers rendering, when alertmanager is disabled. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1378)
 
 ## 0.25.7
 
