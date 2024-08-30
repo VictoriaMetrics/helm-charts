@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed extra rules template context
 
 ## 0.25.6
 

@@ -14,8 +14,9 @@ items:
       {{- $name := ((printf "%s-%s" $app $VMRuleName) | trunc 63 | trimSuffix "-") }}
       name: {{ $name }}
       namespace: {{ $.Release.Namespace }}
-      {{- $extraLabels := merge (dict "app" $app) (deepCopy ($VMRule.additionalLabels | default dict)) }}
-      {{- $ctx := dict "helm" . "extraLabels" $extraLabels }}
+      {{- $extraLabels := (deepCopy ($VMRule.additionalLabels | default dict)) -}}
+      {{- $_ := set $extraLabels "app" $app -}}
+      {{- $ctx := dict "helm" $ "extraLabels" $extraLabels }}
       labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 8 }}
     spec:
       groups: {{ toYaml $VMRule.groups | nindent 8 }}
