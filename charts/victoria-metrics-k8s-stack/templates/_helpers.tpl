@@ -131,7 +131,7 @@ If release name contains chart name it will be used as a full name.
     {{- $tenant := ($Values.tenant | default 0) -}}
     {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
   {{- else if $Values.externalVM.read.url -}}
-    {{- $endpoint := $Values.externalVM.read -}}
+    {{- $endpoint = $Values.externalVM.read -}}
   {{- end -}}
   {{- toYaml $endpoint -}}
 {{- end }}
@@ -152,7 +152,7 @@ If release name contains chart name it will be used as a full name.
     {{- $tenant := ($Values.tenant | default 0) -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
   {{- else if $Values.externalVM.write.url -}}
-    {{- $endpoint := $Values.externalVM.write -}}
+    {{- $endpoint = $Values.externalVM.write -}}
   {{- end -}}
   {{- toYaml $endpoint -}}
 {{- end -}}

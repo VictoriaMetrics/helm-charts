@@ -26,9 +26,9 @@ spec:
     {{- range $hosts }}
     - http:
         paths:
-         {{- with $app.ingress.extraPaths }}
-         {{- toYaml  | nindent 10 }}
-         {{- end }}
+          {{- with $app.ingress.extraPaths }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           - backend:
               service:
                 name: {{ $serviceName }}
