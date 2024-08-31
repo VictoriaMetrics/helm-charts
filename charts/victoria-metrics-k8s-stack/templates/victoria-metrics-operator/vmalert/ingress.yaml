@@ -1,7 +1,7 @@
 {{- $app := .Values.vmalert }}
 {{ if and $app.enabled $app.ingress.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "vmalert" }}
-{{- $serviceName := include "victoria-metrics-k8s-stack.fullname" $ctx }}
+{{- $serviceName := include "vm.service" $ctx }}
 {{- $servicePort := $app.spec.port | default 8080 -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
