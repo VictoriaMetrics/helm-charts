@@ -241,7 +241,7 @@ grafanaOperatorDashboardsFormat:
       dashboards: "grafana"
   allowCrossNamespaceImport: false
 
-# Provide custom recording or alerting rules to be deployed into the cluster.
+## -- Provide custom recording or alerting rules to be deployed into the cluster.
 additionalVictoriaMetricsMap:
 #    rule-name:
 #     groups:
@@ -264,12 +264,11 @@ externalVM:
 
 ##############
 
-# -- Configures vmsingle params
+## -- Configures vmsingle params
 vmsingle:
   annotations: {}
   enabled: true
-  # spec for VMSingle crd
-  # https://docs.victoriametrics.com/operator/api#vmsinglespec
+  # -- full spec for VMSingle CRD. Allowed values describe [here](https://docs.victoriametrics.com/operator/api#vmsinglespec)
   spec:
     port: "8429"
     image:
@@ -323,8 +322,7 @@ vmsingle:
 vmcluster:
   enabled: false
   annotations: {}
-  # spec for VMCluster crd
-  # https://docs.victoriametrics.com/operator/api#vmclusterspec
+  # -- full spec for VMCluster CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
   spec:
     # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
     retentionPeriod: "1"
@@ -491,8 +489,7 @@ vmcluster:
 alertmanager:
   enabled: true
   annotations: {}
-  # spec for VMAlertmanager crd
-  # https://docs.victoriametrics.com/operator/api#vmalertmanagerspec
+  # -- (object) full spec for VMAlertmanager CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmalertmanagerspec)
   spec:
     port: "9093"
     selectAllByDefault: true
@@ -501,9 +498,9 @@ alertmanager:
     externalURL: ""
     routePrefix: /
 
-    # if this one defined, it will be used for alertmanager configuration and config parameter will be ignored
-    # configSecret: "alertmanager-config"
-
+  # -- (string) if this one defined, it will be used for alertmanager configuration and config parameter will be ignored
+  configSecret: ""
+  # -- (object) alertmanager configuration
   config:
     templates:
       - "/etc/vm/configs/**/*.tmpl"
@@ -611,7 +608,7 @@ alertmanager:
   monzoTemplate:
     enabled: true
 
-  # extra alert templates
+  # -- (object) extra alert templates
   templateFiles:
     {}
     # template_1.tmpl: |-
@@ -620,6 +617,7 @@ alertmanager:
     #   {{- end }}
     # template_2.tmpl: ""
 
+  # -- (object) alertmanager ingress configuration
   ingress:
     enabled: false
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
@@ -662,8 +660,7 @@ vmalert:
 
   # Controls whether VMAlert should use VMAgent or VMInsert as a target for remotewrite
   remoteWriteVMAgent: false
-  # spec for VMAlert crd
-  # https://docs.victoriametrics.com/operator/api#vmalertspec
+  # -- (object) full spec for VMAlert CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmalertspec)
   spec:
     port: "8080"
     selectAllByDefault: true
@@ -674,7 +671,7 @@ vmalert:
     # External labels to add to all generated recording rules and alerts
     externalLabels: {}
 
-  # extra vmalert annotation templates
+  # -- (object) extra vmalert annotation templates
   templateFiles:
     {}
     # template_1.tmpl: |-
@@ -692,7 +689,7 @@ vmalert:
     #       - my.domain.com
     #     type: 'A'
     #     port: 9093
-
+  # -- (object) vmalert ingress config
   ingress:
     enabled: false
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
@@ -732,13 +729,11 @@ vmalert:
 vmagent:
   enabled: true
   annotations: {}
-  # https://docs.victoriametrics.com/operator/api#vmagentremotewritespec
-  # defined spec will be added to the remoteWrite configuration of VMAgent
+  # -- remoteWrite configuration of VMAgent, allowed parameters defined in a [spec](https://docs.victoriametrics.com/operator/api#vmagentremotewritespec)
   additionalRemoteWrites:
     []
     #- url: http://some-remote-write/api/v1/write
-  # spec for VMAgent crd
-  # https://docs.victoriametrics.com/operator/api#vmagentspec
+  # -- (object) full spec for VMAgent CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmagentspec)
   spec:
     port: "8429"
     selectAllByDefault: true
@@ -754,6 +749,7 @@ vmagent:
       # Do not store original labels in vmagent's memory by default. This reduces the amount of memory used by vmagent
       # but makes vmagent debugging UI less informative. See: https://docs.victoriametrics.com/vmagent/#relabel-debug
       promscrape.dropOriginalLabels: "true"
+  # -- (object) vmagent ingress configuration
   ingress:
     enabled: false
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
@@ -771,7 +767,7 @@ vmagent:
 
     hosts:
       - vmagent.domain.com
-    ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+    # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
     # - path: /*
     #   backend:
@@ -897,8 +893,7 @@ grafana:
     # whether we should create a service scrape resource for grafana
     enabled: true
 
-    # spec for VMServiceScrape crd
-    # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
+    # -- [Scrape configuration](https://docs.victoriametrics.com/operator/api#vmservicescrapespec) for Grafana
     spec:
       selector:
         matchLabels:
@@ -923,8 +918,7 @@ prometheus-node-exporter:
     # whether we should create a service scrape resource for node-exporter
     enabled: true
 
-    # -- spec for VMServiceScrape crd
-    # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
+    # -- [Scrape configuration](https://docs.victoriametrics.com/operator/api#vmservicescrapespec) for Node Exporter
     spec:
       jobLabel: jobLabel
       selector:
@@ -941,8 +935,7 @@ kube-state-metrics:
   enabled: true
   ## all values for kube-state-metrics helm chart can be specified here
 
-  # -- spec for VMServiceScrape crd
-  # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
+  # -- [Scrape configuration](https://docs.victoriametrics.com/operator/api#vmservicescrapespec) for Kube State Metrics
   vmScrape:
     enabled: true
     spec:
@@ -1075,6 +1068,7 @@ kubeControllerManager:
 # Component scraping kubeDns. Use either this or coreDns
 kubeDns:
   enabled: false
+  # -- 
   service:
     enabled: false
     ports:

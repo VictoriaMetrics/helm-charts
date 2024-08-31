@@ -29,6 +29,7 @@ rbac:
 server:
   name: server
   enabled: true
+  # -- vmalert image configuration
   image:
     registry: ""
     repository: victoriametrics/vmalert
@@ -41,8 +42,7 @@ server:
   fullnameOverride: ""
   imagePullSecrets: []
 
-  ## See `kubectl explain poddisruptionbudget.spec` for more
-  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  ## -- See `kubectl explain poddisruptionbudget.spec` for more. Or check [docs](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   podDisruptionBudget:
     enabled: false
     # minAvailable: 1
@@ -63,20 +63,22 @@ server:
     #- configMapRef:
     #    name: special-config
 
-  # Readiness & Liveness probes
   probe:
+    # -- readiness probe
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
+    # -- liveness probe
     liveness:
       tcpSocket: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
+    # -- startup probe
     startup: {}
 
   replicaCount: 1
@@ -333,6 +335,7 @@ alertmanager:
   podMetadata:
     labels: {}
     annotations: {}
+  # -- alertmanager image configuration
   image:
     registry: ""
     repository: prom/alertmanager
@@ -344,14 +347,17 @@ alertmanager:
   tolerations: []
   imagePullSecrets: []
   probe:
+    # -- readiness probe
     readiness:
       httpGet:
         path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready'
         port: web
+    # -- liveness probe
     liveness:
       httpGet:
         path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/healthy'
         port: web
+    # -- startup probe
     startup:
       httpGet:
         path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready'
@@ -432,7 +438,7 @@ alertmanager:
   persistentVolume:
     # -- Create/use Persistent Volume Claim for alertmanager component. Empty dir if false
     enabled: false
-    # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/)
+    # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](http://kubernetes.io/docs/user-guide/persistent-volumes/)
     accessModes:
       - ReadWriteOnce
     # -- Persistant volume annotations
