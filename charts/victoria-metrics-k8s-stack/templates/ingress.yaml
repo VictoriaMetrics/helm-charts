@@ -1,6 +1,6 @@
 {{- $ns := .Release.Namespace }}
 {{- range $name, $config := .Values }}
-  {{- if and (kindIs "map" $config) (hasKey $config "ingress") ($config.enabled) }}
+  {{- if and (kindIs "map" $config) (hasKey $config "ingress") ($config.enabled) (empty (index $.Subcharts $name)) }}
     {{- $ingresses := ternary (dict $name $config.ingress) $config.ingress (hasKey $config.ingress "enabled") }}
     {{- range $ingName, $ingress := $ingresses }}
       {{- if $ingress.enabled }}
