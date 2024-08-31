@@ -26,6 +26,19 @@ victoria-metrics-operator:
     # use image tag that matches k8s API version by default
     # tag: 1.29.6
     pullPolicy: IfNotPresent
+  # -- operator VM scrape config
+  vmScrape:
+    # -- spec for VMServiceScrape crd
+    # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: victoria-metrics-operator
+      endpoints:
+        - port: http
+      namespaceSelector:
+        matchNames:
+         - '{{ .Release.Namespace }}'
 
   createCRD: false # we disable crd creation by operator chart as we create them in this chart
   operator:
@@ -887,7 +900,7 @@ grafana:
     #    hosts:
     #      - grafana.domain.com
 
-  # -- node exporter VM scrape config
+  # -- grafana VM scrape config
   vmScrape:
     # whether we should create a service scrape resource for grafana
     enabled: true

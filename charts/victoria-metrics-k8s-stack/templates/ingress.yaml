@@ -1,19 +1,19 @@
-{{- $app := .Values.vmcluster }}
-{{- if and $app.enabled $app.ingress.select.enabled }}
-{{- $ingress := $app.ingress.select }}
-{{- with .Values.vmcluster.name -}}
-  {{- $_ := set $.Values.vmcluster.vmselect.name . }}
-{{- end }}
-{{- $ctx := dict "helm" . "appKey" "vmselect" -}}
-{{- $_ := set $ctx.helm.Values "vmselect" .Values.vmcluster.vmselect }}
-{{- $serviceName := include "vm.service" $ctx -}}
-{{- $servicePort := $app.spec.vmselect.port | default 8481 -}}
+{{- $ns := .Release.Namespace }}
+{{- range $name, $config := .Values }}
+  {{- if and (kindIs "map" $config) (hasKey $config "ingress") ($config.enabled) }}
+    {{- $ingresses := ternary (dict $name $config.ingress) $config.ingress (hasKey $config.ingress "enabled") }}
+    {{- range $ingName, $ingress := $ingresses }}
+      {{- if $ingress.enabled }}
+        {{- $appKey := ternary $name (list $name $ingName) (eq $name $ingName) -}}
+        {{- $ctx := dict "helm" $ "appKey" $appKey -}}
+        {{- $serviceName := include "vm.service" $ctx }}
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $serviceName }}
-  namespace: {{ .Release.Namespace }}
-  {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-vmcluster" (include "victoria-metrics-k8s-stack.name" .)) }}
+  namespace: {{ $ns }}
+  {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-%s" (include "victoria-metrics-k8s-stack.name" $) $name) }}
   {{- $_ := set $ctx "extraLabels" (merge $extraLabels $ingress.labels) }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
   {{- with $ingress.annotations }}
@@ -27,7 +27,7 @@ spec:
   tls: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   rules:
-    {{- $hosts := $ingress.hosts  | default (list "") }}
+    {{- $hosts := $ingress.hosts | default (list "") }}
     {{- range $hosts }}
     - http:
         paths:
@@ -38,7 +38,7 @@ spec:
               service:
                 name: {{ $serviceName }}
                 port:
-                  number: {{ $servicePort }}
+                  name: {{ $ingress.serviceName | default "http" }}
             {{- with $ingress.path }}
             path: {{ . }}
             {{- end }}
@@ -49,4 +49,8 @@ spec:
       host: {{ tpl . $ }}
       {{- end }}
     {{- end }}
+
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
