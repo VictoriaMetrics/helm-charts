@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.25.9
+
+**Release date:** 2024-08-31
+
+![AppVersion: v1.102.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.102.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - fixed vmalert ingress name typo
 
 ## 0.25.8
