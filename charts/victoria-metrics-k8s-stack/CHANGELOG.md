@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed ingress extraPaths and externalVM urls rendering
 
 ## 0.25.9
 
