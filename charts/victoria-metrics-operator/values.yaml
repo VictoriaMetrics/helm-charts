@@ -29,6 +29,7 @@ crd:
   cleanup:
     # -- Tells helm to clean up all the vm resources under this release's namespace when uninstalling
     enabled: false
+    # -- Image configuration for CRD cleanup Job
     image:
       repository: bitnami/kubectl
       # use image tag that matches k8s API version by default
@@ -85,7 +86,7 @@ operator:
   # It should reduce  vmagent and vmauth config sync-time and make it predictable.
   useCustomConfigReloader: false
 
-# By default, the operator will watch all the namespaces
+# -- By default, the operator will watch all the namespaces
 # If you want to override this behavior, specify the namespace.
 # Operator supports multiple namespaces for watching.
 watchNamespaces: []
@@ -109,7 +110,7 @@ service:
   ipFamilyPolicy: ""
   ipFamilies: []
 
-## -- See `kubectl explain poddisruptionbudget.spec` for more or check [these docs](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+# -- See `kubectl explain poddisruptionbudget.spec` for more or check [these docs](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
 podDisruptionBudget:
   enabled: false
   # minAvailable: 1

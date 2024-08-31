@@ -10,14 +10,14 @@ global:
       adaptSecurityContext: "auto"
       
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
+  # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
-  # mount API token to pod directly
+  # -- mount API token to pod directly
   automountToken: true
 
 rbac:
@@ -42,7 +42,7 @@ server:
   fullnameOverride: ""
   imagePullSecrets: []
 
-  ## -- See `kubectl explain poddisruptionbudget.spec` for more. Or check [docs](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Or check [docs](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   podDisruptionBudget:
     enabled: false
     # minAvailable: 1
@@ -83,18 +83,18 @@ server:
 
   replicaCount: 1
 
-  # deployment strategy, set to standard k8s default
+  # -- deployment strategy, set to standard k8s default
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 25%
       maxUnavailable: 25%
 
-  # specifies the minimum number of seconds for which a newly created Pod should be ready without any of its containers crashing/terminating
+  # -- specifies the minimum number of seconds for which a newly created Pod should be ready without any of its containers crashing/terminating
   # 0 is the standard k8s default
   minReadySeconds: 0
 
-  # vmalert reads metrics from source, next section represents its configuration. It can be any service which supports
+  # -- vmalert reads metrics from source, next section represents its configuration. It can be any service which supports
   # MetricsQL or PromQL.
   datasource:
     url: ""
@@ -263,12 +263,12 @@ server:
     #   cpu: 100m
   #   memory: 128Mi
 
-  # Annotations to be added to the deployment
+  # -- Annotations to be added to the deployment
   annotations: {}
-  # labels to be added to the deployment
+  # -- labels to be added to the deployment
   labels: {}
 
-  # Annotations to be added to pod
+  # -- Annotations to be added to pod
   podAnnotations: {}
 
   podLabels: {}
@@ -281,7 +281,7 @@ server:
 
   affinity: {}
 
-  # vmalert alert rules configuration configuration:
+  # -- vmalert alert rules configuration configuration:
   # use existing configmap if specified
   # otherwise .config values will be used
   configMap: ""
@@ -370,11 +370,11 @@ alertmanager:
   extraArgs: {}
   # key: value
   envFrom: []
-  # external URL, that alertmanager will expose to receivers
+  # -- external URL, that alertmanager will expose to receivers
   baseURL: ""
-  # external URL Prefix, Prefix for the internal routes of web endpoints
+  # -- external URL Prefix, Prefix for the internal routes of web endpoints
   baseURLPrefix: ""
-  # use existing configmap if specified
+  # -- use existing configmap if specified
   # otherwise .config values will be used
   configMap: ""
   config:
@@ -454,7 +454,7 @@ alertmanager:
     # -- Size of the volume. Better to set the same as resource limit memory property.
     size: 50Mi
 
-  # Additional hostPath mounts
+  # -- Additional hostPath mounts
   extraHostPathMounts:
     []
     # - name: certs-dir
@@ -463,14 +463,14 @@ alertmanager:
     #   hostPath: /etc/kubernetes/certs
   #   readOnly: true
 
-  # Extra Volumes for the pod
+  # -- Extra Volumes for the pod
   extraVolumes:
     []
     #- name: example
     #  configMap:
     #    name: example
 
-  # Extra Volume Mounts for the container
+  # -- Extra Volume Mounts for the container
   extraVolumeMounts:
     []
     # - name: example

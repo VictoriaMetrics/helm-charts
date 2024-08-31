@@ -290,31 +290,16 @@ false
 </td>
     </tr>
     <tr>
-      <td>crd.cleanup.image.pullPolicy</td>
-      <td>string</td>
-      <td><pre lang="">
-IfNotPresent
+      <td>crd.cleanup.image</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+pullPolicy: IfNotPresent
+repository: bitnami/kubectl
+tag: ""
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>crd.cleanup.image.repository</td>
-      <td>string</td>
-      <td><pre lang="">
-bitnami/kubectl
-</pre>
+      <td><p>Image configuration for CRD cleanup Job</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>crd.cleanup.image.tag</td>
-      <td>string</td>
-      <td><pre lang="">
-""
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>crd.create</td>
@@ -586,22 +571,15 @@ false
 </td>
     </tr>
     <tr>
-      <td>podDisruptionBudget.enabled</td>
-      <td>bool</td>
-      <td><pre lang="">
-false
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>podDisruptionBudget.labels</td>
+      <td>podDisruptionBudget</td>
       <td>object</td>
       <td><pre lang="plaintext">
-{}
+enabled: false
+labels: {}
 </pre>
 </td>
-      <td></td>
+      <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more or check <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">these docs</a></p>
+</td>
     </tr>
     <tr>
       <td>podLabels</td>
@@ -891,7 +869,8 @@ tlsConfig: {}
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>By default, the operator will watch all the namespaces If you want to override this behavior, specify the namespace. Operator supports multiple namespaces for watching.</p>
+</td>
     </tr>
   </tbody>
 </table>

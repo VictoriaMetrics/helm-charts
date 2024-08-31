@@ -119,7 +119,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 {}
 </pre>
 </td>
-      <td></td>
+      <td><p>Annotations to be added to the deployment</p>
+</td>
     </tr>
     <tr>
       <td>config.global.scrape_interval</td>
@@ -385,7 +386,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 ""
 </pre>
 </td>
-      <td></td>
+      <td><p>vmagent scraping configuration: <a href="https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/docs/vmagent.md#how-to-collect-metrics-in-prometheus-format" target="_blank">https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/docs/vmagent.md#how-to-collect-metrics-in-prometheus-format</a> use existing configmap if specified otherwise .config values will be used</p>
+</td>
     </tr>
     <tr>
       <td>containerWorkingDir</td>
@@ -397,22 +399,15 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td></td>
     </tr>
     <tr>
-      <td>deployment.enabled</td>
-      <td>bool</td>
-      <td><pre lang="">
-true
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>deployment.strategy</td>
+      <td>deployment</td>
       <td>object</td>
       <td><pre lang="plaintext">
-{}
+enabled: true
+strategy: {}
 </pre>
 </td>
-      <td></td>
+      <td><p>ref: <a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">https://kubernetes.io/docs/concepts/workloads/controllers/deployment/</a></p>
+</td>
     </tr>
     <tr>
       <td>emptyDir</td>
@@ -470,7 +465,8 @@ loggerFormat: json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Additional hostPath mounts</p>
+</td>
     </tr>
     <tr>
       <td>extraLabels</td>
@@ -479,7 +475,8 @@ loggerFormat: json
 {}
 </pre>
 </td>
-      <td></td>
+      <td><p>extra Labels for Pods, Deployment and Statefulset</p>
+</td>
     </tr>
     <tr>
       <td>extraObjects</td>
@@ -488,7 +485,8 @@ loggerFormat: json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Add extra specs dynamically to this chart</p>
+</td>
     </tr>
     <tr>
       <td>extraScrapeConfigs</td>
@@ -507,7 +505,8 @@ loggerFormat: json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volume Mounts for the container</p>
+</td>
     </tr>
     <tr>
       <td>extraVolumes</td>
@@ -516,7 +515,8 @@ loggerFormat: json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volumes for the pod</p>
+</td>
     </tr>
     <tr>
       <td>fullnameOverride</td>
@@ -623,7 +623,8 @@ IfNotPresent
 ""
 </pre>
 </td>
-      <td></td>
+      <td><p>Image registry</p>
+</td>
     </tr>
     <tr>
       <td>image.repository</td>
@@ -632,7 +633,8 @@ IfNotPresent
 victoriametrics/vmagent
 </pre>
 </td>
-      <td></td>
+      <td><p>Image repository</p>
+</td>
     </tr>
     <tr>
       <td>image.tag</td>
@@ -641,7 +643,8 @@ victoriametrics/vmagent
 ""
 </pre>
 </td>
-      <td></td>
+      <td><p>Image tag, set to <code>Chart.AppVersion</code> by default</p>
+</td>
     </tr>
     <tr>
       <td>image.variant</td>
@@ -650,7 +653,8 @@ victoriametrics/vmagent
 ""
 </pre>
 </td>
-      <td></td>
+      <td><p>Variant of the image to use. e.g. enterprise, scratch</p>
+</td>
     </tr>
     <tr>
       <td>imagePullSecrets</td>
@@ -877,25 +881,19 @@ false
 {}
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>podDisruptionBudget.enabled</td>
-      <td>bool</td>
-      <td><pre lang="">
-false
-</pre>
+      <td><p>Annotations to be added to pod</p>
 </td>
-      <td></td>
     </tr>
     <tr>
-      <td>podDisruptionBudget.labels</td>
+      <td>podDisruptionBudget</td>
       <td>object</td>
       <td><pre lang="plaintext">
-{}
+enabled: false
+labels: {}
 </pre>
 </td>
-      <td></td>
+      <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more ref: <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">https://kubernetes.io/docs/tasks/run-application/configure-pdb/</a></p>
+</td>
     </tr>
     <tr>
       <td>podLabels</td>
@@ -904,7 +902,8 @@ false
 {}
 </pre>
 </td>
-      <td></td>
+      <td><p>extra Labels for Pods only</p>
+</td>
     </tr>
     <tr>
       <td>podSecurityContext.enabled</td>
@@ -1004,7 +1003,8 @@ false
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>WARN: need to specify at least one remote write url or one multi tenant url</p>
+</td>
     </tr>
     <tr>
       <td>replicaCount</td>
@@ -1157,7 +1157,8 @@ ClusterIP
 {}
 </pre>
 </td>
-      <td></td>
+      <td><p>Annotations to add to the service account</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.create</td>
@@ -1166,7 +1167,8 @@ ClusterIP
 true
 </pre>
 </td>
-      <td></td>
+      <td><p>Specifies whether a service account should be created</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.name</td>
@@ -1175,7 +1177,8 @@ true
 null
 </pre>
 </td>
-      <td></td>
+      <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
+</td>
     </tr>
     <tr>
       <td>serviceMonitor.annotations</td>
@@ -1238,6 +1241,19 @@ false
 </td>
     </tr>
     <tr>
+      <td>statefulset</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+clusterMode: false
+enabled: false
+replicationFactor: 1
+updateStrategy: {}
+</pre>
+</td>
+      <td><p>ref: <a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/" target="_blank">https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/</a></p>
+</td>
+    </tr>
+    <tr>
       <td>statefulset.clusterMode</td>
       <td>bool</td>
       <td><pre lang="">
@@ -1248,15 +1264,6 @@ false
 </td>
     </tr>
     <tr>
-      <td>statefulset.enabled</td>
-      <td>bool</td>
-      <td><pre lang="">
-false
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
       <td>statefulset.replicationFactor</td>
       <td>int</td>
       <td><pre lang="">
@@ -1265,15 +1272,6 @@ false
 </td>
       <td><p>replication factor for vmagent in cluster mode</p>
 </td>
-    </tr>
-    <tr>
-      <td>statefulset.updateStrategy</td>
-      <td>object</td>
-      <td><pre lang="plaintext">
-{}
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>tolerations</td>

@@ -692,40 +692,17 @@ true
       <td></td>
     </tr>
     <tr>
-      <td>securityContext.enabled</td>
-      <td>bool</td>
-      <td><pre lang="">
-true
+      <td>securityContext</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: true
+runAsGroup: 1000
+runAsNonRoot: true
+runAsUser: 1000
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>securityContext.runAsGroup</td>
-      <td>int</td>
-      <td><pre lang="">
-1000
-</pre>
+      <td><p>Ref: <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">https://kubernetes.io/docs/tasks/configure-pod-container/security-context/</a></p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>securityContext.runAsNonRoot</td>
-      <td>bool</td>
-      <td><pre lang="">
-true
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>securityContext.runAsUser</td>
-      <td>int</td>
-      <td><pre lang="">
-1000
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>serviceAccount.annotations</td>
@@ -734,7 +711,8 @@ true
 {}
 </pre>
 </td>
-      <td></td>
+      <td><p>Annotations to add to the service account</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.create</td>
@@ -743,7 +721,8 @@ true
 true
 </pre>
 </td>
-      <td></td>
+      <td><p>Specifies whether a service account should be created</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.name</td>
@@ -752,7 +731,8 @@ true
 null
 </pre>
 </td>
-      <td></td>
+      <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
+</td>
     </tr>
     <tr>
       <td>tolerations</td>

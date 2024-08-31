@@ -675,40 +675,17 @@ false
 </td>
     </tr>
     <tr>
-      <td>securityContext.enabled</td>
-      <td>bool</td>
-      <td><pre lang="">
-true
+      <td>securityContext</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: true
+runAsGroup: 1000
+runAsNonRoot: true
+runAsUser: 1000
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>securityContext.runAsGroup</td>
-      <td>int</td>
-      <td><pre lang="">
-1000
-</pre>
+      <td><p>Ref: <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">https://kubernetes.io/docs/tasks/configure-pod-container/security-context/</a></p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>securityContext.runAsNonRoot</td>
-      <td>bool</td>
-      <td><pre lang="">
-true
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>securityContext.runAsUser</td>
-      <td>int</td>
-      <td><pre lang="">
-1000
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>service.annotations</td>

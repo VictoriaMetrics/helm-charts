@@ -127,7 +127,8 @@ Change the values according to the need of the environment in ``victoria-logs-si
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Add extra specs dynamically to this chart</p>
+</td>
     </tr>
     <tr>
       <td>fluent-bit.config.filters</td>
@@ -388,7 +389,8 @@ true
 {}
 </pre>
 </td>
-      <td></td>
+      <td><p>Use an alternate scheduler, e.g. &ldquo;stork&rdquo;. ref: <a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/" target="_blank">https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/</a>  schedulerName:</p>
+</td>
     </tr>
     <tr>
       <td>server.enabled</td>
@@ -420,31 +422,16 @@ true
       <td></td>
     </tr>
     <tr>
-      <td>server.extraArgs."envflag.enable"</td>
-      <td>string</td>
-      <td><pre lang="">
-"true"
+      <td>server.extraArgs</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+envflag.enable: "true"
+envflag.prefix: VM_
+loggerFormat: json
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.extraArgs."envflag.prefix"</td>
-      <td>string</td>
-      <td><pre lang="">
-VM_
-</pre>
+      <td><p>Extra command line arguments for container of component</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.extraArgs.loggerFormat</td>
-      <td>string</td>
-      <td><pre lang="">
-json
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>server.extraContainers</td>
@@ -453,7 +440,8 @@ json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra containers to run in a pod with Victoria Logs container</p>
+</td>
     </tr>
     <tr>
       <td>server.extraHostPathMounts</td>
@@ -462,7 +450,8 @@ json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Additional hostPath mounts</p>
+</td>
     </tr>
     <tr>
       <td>server.extraLabels</td>
@@ -481,7 +470,8 @@ json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volume Mounts for the container</p>
+</td>
     </tr>
     <tr>
       <td>server.extraVolumes</td>
@@ -490,7 +480,8 @@ json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volumes for the pod</p>
+</td>
     </tr>
     <tr>
       <td>server.image.pullPolicy</td>
@@ -617,7 +608,8 @@ Prefix
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Init containers for Victoria Logs Pod</p>
+</td>
     </tr>
     <tr>
       <td>server.nodeSelector</td>

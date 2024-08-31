@@ -117,7 +117,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 ""
 </pre>
 </td>
-      <td></td>
+      <td><p>external URL, that alertmanager will expose to receivers</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.baseURLPrefix</td>
@@ -126,7 +127,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 ""
 </pre>
 </td>
-      <td></td>
+      <td><p>external URL Prefix, Prefix for the internal routes of web endpoints</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.config.global.resolve_timeout</td>
@@ -198,7 +200,8 @@ devnull
 ""
 </pre>
 </td>
-      <td></td>
+      <td><p>use existing configmap if specified otherwise .config values will be used</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.emptyDir</td>
@@ -252,7 +255,8 @@ false
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Additional hostPath mounts</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.extraVolumeMounts</td>
@@ -261,7 +265,8 @@ false
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volume Mounts for the container</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.extraVolumes</td>
@@ -270,7 +275,8 @@ false
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volumes for the pod</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.image</td>
@@ -835,7 +841,8 @@ false
 {}
 </pre>
 </td>
-      <td></td>
+      <td><p>Annotations to be added to the deployment</p>
+</td>
     </tr>
     <tr>
       <td>server.config.alerts.groups</td>
@@ -853,7 +860,24 @@ false
 ""
 </pre>
 </td>
-      <td></td>
+      <td><p>vmalert alert rules configuration configuration: use existing configmap if specified otherwise .config values will be used</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.datasource</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+basicAuth:
+    password: ""
+    username: ""
+bearer:
+    token: ""
+    tokenFile: ""
+url: ""
+</pre>
+</td>
+      <td><p>vmalert reads metrics from source, next section represents its configuration. It can be any service which supports MetricsQL or PromQL.</p>
+</td>
     </tr>
     <tr>
       <td>server.datasource.basicAuth</td>
@@ -885,15 +909,6 @@ username: ""
 </td>
       <td><p>Token Auth file with Bearer token. You can use one of token or tokenFile</p>
 </td>
-    </tr>
-    <tr>
-      <td>server.datasource.url</td>
-      <td>string</td>
-      <td><pre lang="">
-""
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>server.enabled</td>
@@ -1084,7 +1099,8 @@ Prefix
 {}
 </pre>
 </td>
-      <td></td>
+      <td><p>labels to be added to the deployment</p>
+</td>
     </tr>
     <tr>
       <td>server.minReadySeconds</td>
@@ -1093,7 +1109,8 @@ Prefix
 0
 </pre>
 </td>
-      <td></td>
+      <td><p>specifies the minimum number of seconds for which a newly created Pod should be ready without any of its containers crashing/terminating 0 is the standard k8s default</p>
+</td>
     </tr>
     <tr>
       <td>server.name</td>
@@ -1187,25 +1204,19 @@ username: ""
 {}
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.podDisruptionBudget.enabled</td>
-      <td>bool</td>
-      <td><pre lang="">
-false
-</pre>
+      <td><p>Annotations to be added to pod</p>
 </td>
-      <td></td>
     </tr>
     <tr>
-      <td>server.podDisruptionBudget.labels</td>
+      <td>server.podDisruptionBudget</td>
       <td>object</td>
       <td><pre lang="plaintext">
-{}
+enabled: false
+labels: {}
 </pre>
 </td>
-      <td></td>
+      <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more. Or check <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">docs</a></p>
+</td>
     </tr>
     <tr>
       <td>server.podLabels</td>
@@ -1499,31 +1510,17 @@ ClusterIP
       <td></td>
     </tr>
     <tr>
-      <td>server.strategy.rollingUpdate.maxSurge</td>
-      <td>string</td>
-      <td><pre lang="">
-25%
+      <td>server.strategy</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+rollingUpdate:
+    maxSurge: 25%
+    maxUnavailable: 25%
+type: RollingUpdate
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.strategy.rollingUpdate.maxUnavailable</td>
-      <td>string</td>
-      <td><pre lang="">
-25%
-</pre>
+      <td><p>deployment strategy, set to standard k8s default</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.strategy.type</td>
-      <td>string</td>
-      <td><pre lang="">
-RollingUpdate
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>server.tolerations</td>
@@ -1561,7 +1558,8 @@ false
 {}
 </pre>
 </td>
-      <td></td>
+      <td><p>Annotations to add to the service account</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.automountToken</td>
@@ -1570,7 +1568,8 @@ false
 true
 </pre>
 </td>
-      <td></td>
+      <td><p>mount API token to pod directly</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.create</td>
@@ -1579,7 +1578,8 @@ true
 true
 </pre>
 </td>
-      <td></td>
+      <td><p>Specifies whether a service account should be created</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.name</td>
@@ -1588,7 +1588,8 @@ true
 null
 </pre>
 </td>
-      <td></td>
+      <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
+</td>
     </tr>
     <tr>
       <td>serviceMonitor.annotations</td>

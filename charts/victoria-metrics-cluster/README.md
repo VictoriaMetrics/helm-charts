@@ -1118,7 +1118,8 @@ json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Additional hostPath mounts</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.extraLabels</td>
@@ -1136,7 +1137,8 @@ json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volume Mounts for the container</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.extraVolumes</td>
@@ -1145,7 +1147,8 @@ json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volumes for the pod</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.fullnameOverride</td>
@@ -1849,7 +1852,8 @@ true
 {}
 </pre>
 </td>
-      <td></td>
+      <td><p>Use an alternate scheduler, e.g. &ldquo;stork&rdquo;. ref: <a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/" target="_blank">https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/</a>  schedulerName:</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.enabled</td>
@@ -1923,7 +1927,8 @@ json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Additional hostPath mounts</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.extraLabels</td>
@@ -1950,7 +1955,8 @@ json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volume Mounts for the container</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.extraVolumes</td>
@@ -1959,7 +1965,8 @@ json
 []
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volumes for the pod</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.fullnameOverride</td>
