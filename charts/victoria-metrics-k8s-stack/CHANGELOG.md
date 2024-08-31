@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed vmalert ingress name typo
 
 ## 0.25.8
 
