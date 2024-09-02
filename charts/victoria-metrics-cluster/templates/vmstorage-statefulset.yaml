@@ -232,13 +232,15 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- if or (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
         - name: vmstorage-volume
           {{- if $app.persistentVolume.enabled }}
           persistentVolumeClaim: 
-            claimName: {{ $app.persistentVolume.existingClaim | default $app.persistentVolume.name }}
+            claimName: {{ $app.persistentVolume.existingClaim }}
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
+        {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
       {{- end }}
   {{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}

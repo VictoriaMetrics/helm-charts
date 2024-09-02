@@ -111,15 +111,17 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- if or (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
         - name: cache-volume
           {{- if $app.persistentVolume.enabled }}
           persistentVolumeClaim:
-            claimName: {{ $app.persistentVolume.existingClaim | default "cache-volume" }}
+            claimName: {{ $app.persistentVolume.existingClaim }}
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
+        {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
-  {{- if $app.persistentVolume.enabled }}
+  {{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
