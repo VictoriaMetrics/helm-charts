@@ -214,7 +214,7 @@ metadata:
 rules: {{ toYaml $rules.admin | nindent 2 }}
 {{- end }}
 
-{{- if or .Values.crd.create .Values.rbac.aggregatedClusterRoles.enabled }}
+{{- if and .Values.crd.create .Values.rbac.aggregatedClusterRoles.enabled }}
 {{- /* This template generates readonly and admin cluster roles for */ -}}
 {{- /* each CRD present in the helm chart.  The clusterroles use the */ -}}
 {{- /* kubernetes clusterrole aggregation feature to include these */ -}}
