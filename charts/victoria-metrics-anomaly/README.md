@@ -116,14 +116,14 @@ Change the values according to the need of the environment in ``victoria-metrics
 | config.preset | string | `""` | Whether to use preset configuration. If not empty, preset name should be specified. |
 | config.reader | object | `{"class":"vm","datasource_url":"","queries":{},"sampling_period":"1m","tenant_id":""}` | [Reader section](https://docs.victoriametrics.com/anomaly-detection/components/reader/) |
 | config.reader.class | string | `"vm"` | Name of the class needed to enable reading from VictoriaMetrics or Prometheus. VmReader is the default option, if not specified. |
-| config.reader.datasource_url | string | `""` | Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/" |
+| config.reader.datasource_url | string | `""` | Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480 |
 | config.reader.queries | object | `{}` | Required. PromQL/MetricsQL query to select data in format: QUERY_ALIAS: "QUERY". As accepted by "/query_range?query=%s". See https://docs.victoriametrics.com/anomaly-detection/components/reader/#per-query-parameters for more details. |
 | config.reader.sampling_period | string | `"1m"` | Frequency of the points returned. Will be converted to "/query_range?step=%s" param (in seconds). **Required** since 1.9.0. |
 | config.reader.tenant_id | string | `""` | For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs |
 | config.schedulers | object | `{}` | [Scheduler section](https://docs.victoriametrics.com/anomaly-detection/components/scheduler/) |
 | config.writer | object | `{"class":"vm","datasource_url":"","tenant_id":""}` | [Writer section](https://docs.victoriametrics.com/anomaly-detection/components/writer/) |
 | config.writer.class | string | `"vm"` | Name of the class needed to enable writing to VictoriaMetrics or Prometheus. VmWriter is the default option, if not specified. |
-| config.writer.datasource_url | string | `""` | Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/" |
+| config.writer.datasource_url | string | `""` | Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480" |
 | config.writer.tenant_id | string | `""` | For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs |
 | containerWorkingDir | string | `"/vmanomaly"` |  |
 | emptyDir | object | `{}` |  |

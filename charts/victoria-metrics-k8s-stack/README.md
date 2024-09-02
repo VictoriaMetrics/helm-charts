@@ -371,17 +371,6 @@ Change the values according to the need of the environment in ``victoria-metrics
 | global.license.key | string | `""` |  |
 | global.license.keyRef | object | `{}` |  |
 | grafana.additionalDataSources | list | `[]` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".apiVersion | int | `1` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].disableDeletion | bool | `false` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].editable | bool | `true` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].folder | string | `""` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].name | string | `"default"` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].options.path | string | `"/var/lib/grafana/dashboards/default"` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].orgId | int | `1` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].type | string | `"file"` |  |
-| grafana.dashboards.default.nodeexporter.datasource | string | `"VictoriaMetrics"` |  |
-| grafana.dashboards.default.nodeexporter.gnetId | int | `1860` |  |
-| grafana.dashboards.default.nodeexporter.revision | int | `37` |  |
 | grafana.defaultDashboardsTimezone | string | `"utc"` |  |
 | grafana.defaultDatasourceType | string | `"prometheus"` |  |
 | grafana.enabled | bool | `true` |  |
@@ -394,15 +383,18 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.ingress.path | string | `"/"` |  |
 | grafana.ingress.pathType | string | `"Prefix"` |  |
 | grafana.ingress.tls | list | `[]` |  |
-| grafana.provisionDefaultDatasource | bool | `true` |  |
 | grafana.sidecar.dashboards.additionalDashboardAnnotations | object | `{}` |  |
 | grafana.sidecar.dashboards.additionalDashboardLabels | object | `{}` |  |
+| grafana.sidecar.dashboards.defaultFolderName | string | `"default"` |  |
 | grafana.sidecar.dashboards.enabled | bool | `true` |  |
+| grafana.sidecar.dashboards.folder | string | `"/var/lib/grafana/dashboards"` |  |
 | grafana.sidecar.dashboards.multicluster | bool | `false` |  |
+| grafana.sidecar.dashboards.provider.name | string | `"default"` |  |
+| grafana.sidecar.dashboards.provider.orgid | int | `1` |  |
 | grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |
+| grafana.sidecar.datasources.default | list | `[{"isDefault":true,"name":"VictoriaMetrics"},{"isDefault":false,"name":"VictoriaMetrics (DS)","type":"victoriametrics-datasource"}]` | list of default prometheus compatible datasource configurations. VM `url` will be added to each of them in templates and `type` will be set to defaultDatasourceType if not defined |
 | grafana.sidecar.datasources.enabled | bool | `true` |  |
 | grafana.sidecar.datasources.initDatasources | bool | `true` |  |
-| grafana.sidecar.datasources.jsonData | object | `{}` |  |
 | grafana.vmScrape | object | `{"enabled":true,"spec":{"endpoints":[{"port":"{{ .Values.grafana.service.portName }}"}],"selector":{"matchLabels":{"app.kubernetes.io/name":"{{ include \"grafana.name\" .Subcharts.grafana }}"}}}}` | grafana VM scrape config |
 | grafanaOperatorDashboardsFormat | object | `{"allowCrossNamespaceImport":false,"enabled":false,"instanceSelector":{"matchLabels":{"dashboards":"grafana"}}}` | Create dashboards as CRDs (reuqires grafana-operator to be installed) |
 | kube-state-metrics.enabled | bool | `true` |  |
@@ -462,10 +454,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
 | tenant | string | `"0"` |  |
-| victoria-metrics-operator | object | `{"cleanupCRD":true,"cleanupImage":{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl"},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":false},"vmScrape":{"spec":{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ .Release.Namespace }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars |
-| victoria-metrics-operator.cleanupCRD | bool | `true` | Tells helm to clean up vm cr resources when uninstalling |
+| victoria-metrics-operator | object | `{"crd":{"cleanup":{"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl"}},"create":false},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":false},"vmScrape":{"spec":{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ .Release.Namespace }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars |
+| victoria-metrics-operator.crd.cleanup | object | `{"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl"}}` | tells helm to clean up vm cr resources when uninstalling |
+| victoria-metrics-operator.crd.create | bool | `false` | we disable crd creation by operator chart as we create them in this chart |
+| victoria-metrics-operator.createCRD | bool | `false` | deprecated, will be removed after operator release |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `false` | By default, operator converts prometheus-operator objects. |
-| victoria-metrics-operator.vmScrape | object | `{"spec":{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ .Release.Namespace }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}}` | operator VM scrape config |
 | victoria-metrics-operator.vmScrape.spec | object | `{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ .Release.Namespace }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | vmagent.additionalRemoteWrites | list | `[]` |  |
 | vmagent.annotations | object | `{}` |  |
