@@ -165,8 +165,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity configurations |
 | annotations | object | `{}` | Annotations to be added to the deployment |
-| auth | object | `{"enable":false}` | Access Control configuration. https://docs.victoriametrics.com/vmgateway#access-control |
-| auth.enable | bool | `false` | Enable/Disable access-control |
+| auth | object | `{"enabled":false}` | Access Control configuration. https://docs.victoriametrics.com/vmgateway#access-control |
+| auth.enabled | bool | `false` | Enable/Disable access-control |
 | clusterMode | bool | `false` | Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting |
 | configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://docs.victoriametrics.com/vmgateway |
 | containerWorkingDir | string | `"/"` |  |
@@ -213,9 +213,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | probe.readiness.initialDelaySeconds | int | `5` |  |
 | probe.readiness.periodSeconds | int | `15` |  |
 | probe.startup | object | `{}` |  |
-| rateLimiter | object | `{"config":{},"datasource":{"url":""},"enable":false}` | Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway#rate-limiter |
+| rateLimiter | object | `{"config":{},"datasource":{"url":""},"enabled":false}` | Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway#rate-limiter |
 | rateLimiter.datasource.url | string | `""` | Datasource VictoriaMetrics or vmselects. Required. Example http://victoroametrics:8428 or http://vmselect:8481/select/0/prometheus |
-| rateLimiter.enable | bool | `false` | Enable/Disable rate-limiting |
+| rateLimiter.enabled | bool | `false` | Enable/Disable rate-limiting |
 | read.url | string | `""` | Read endpoint without suffixes, victoriametrics or vmselect. Example http://victoroametrics:8428 or http://vmselect:8481 |
 | replicaCount | int | `1` | Number of replicas of vmgateway |
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
