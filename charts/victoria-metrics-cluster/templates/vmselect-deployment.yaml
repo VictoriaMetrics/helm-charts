@@ -11,7 +11,7 @@ metadata:
   {{- $ctx := mergeOverwrite (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
   name: {{ $fullname }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
 spec:
   selector:
     matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
@@ -101,7 +101,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
+      serviceAccountName: {{ include "victoria-metrics.serviceAccountName" . }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

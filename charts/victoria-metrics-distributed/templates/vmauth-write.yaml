@@ -4,7 +4,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
   name: {{ include "victoria-metrics-distributed.vmauthIngestGlobalName" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
   {{- with .Values.vmauthIngestGlobal.annotations }}
   annotations:

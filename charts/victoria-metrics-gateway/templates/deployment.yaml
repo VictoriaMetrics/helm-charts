@@ -34,7 +34,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "chart.labels" . | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}

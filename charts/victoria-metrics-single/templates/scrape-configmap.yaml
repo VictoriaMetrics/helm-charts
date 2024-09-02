@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "victoria-metrics.server.fullname" . }}-scrapeconfig
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "victoria-metrics.server.fullname" . }}-scrapeconfig
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "victoria-metrics.server.labels" . | nindent 4 }}
 data:
   scrape.yml: |

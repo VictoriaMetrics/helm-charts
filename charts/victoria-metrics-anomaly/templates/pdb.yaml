@@ -2,8 +2,8 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "chart.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "chart.fullname" . }}
+  namespace: {{ include "vm.namespace" . }}
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.podDisruptionBudget.extraLabels) }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}
 spec:

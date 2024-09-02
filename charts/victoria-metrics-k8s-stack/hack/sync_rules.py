@@ -126,7 +126,7 @@ replacement_map = {
         "replacement": 'job="[[ include "victoria-metrics-k8s-stack.alertmanager.name" . ]]"',
     },
     'namespace="monitoring"': {
-        "replacement": 'namespace="[[ .Release.Namespace ]]"',
+        "replacement": 'namespace="[[ include "vm.namespace" . ]]"',
         "limitGroup": ["alertmanager.rules"],
     },
     "(by|on)\\s*\\(([\\w\\s,]*)\\)": {

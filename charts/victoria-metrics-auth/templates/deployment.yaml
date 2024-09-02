@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   {{- $ctx := merge (deepCopy $global) (dict "extraLabels" .Values.extraLabels) }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}

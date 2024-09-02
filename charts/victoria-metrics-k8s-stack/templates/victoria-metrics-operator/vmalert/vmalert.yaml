@@ -7,7 +7,7 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
   name: {{ include "victoria-metrics-k8s-stack.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec: {{ include "vm.alert.spec" . | nindent 2 }}
 {{- end }}

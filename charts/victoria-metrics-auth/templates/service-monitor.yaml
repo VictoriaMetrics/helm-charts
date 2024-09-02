@@ -8,14 +8,14 @@ metadata:
   {{- end }}
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" $serviceMonitor.extraLabels) }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}
-  name: {{ template "chart.fullname" . }}
+  name: {{ include "chart.fullname" . }}
   {{- with $serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
 spec:
   namespaceSelector:
     matchNames:
-      - {{ .Release.Namespace }}
+      - {{ include "vm.namespace" . }}
   selector:
     matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
   endpoints:

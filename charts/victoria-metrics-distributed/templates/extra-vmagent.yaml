@@ -5,7 +5,6 @@ kind: VMAgent
 metadata:
   labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
   name: test-vmagent
-  namespace: {{ .Release.Namespace }}
-spec:
-{{ include "victoria-metrics-distributed.extravmagentSpec" . | indent 2 }}
+  namespace: {{ include "vm.namespace" . }}
+spec: {{ include "victoria-metrics-distributed.extravmagentSpec" . | nindent 2 }}
 {{- end }}

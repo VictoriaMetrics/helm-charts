@@ -11,7 +11,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end  }}
   name: {{ $zone.vmagent.name | default (printf "vmagent-%s" $zone.name ) }}
-  namespace: {{ $top.Release.Namespace }}
+  namespace: {{ $topinclude "vm.namespace" . }}
 spec:
 {{- if and $zone.vmagent.spec $zone.vmagent.spec.remoteWrite }}
 {{- fail "Error: distributed vmagent doesn't support customized remoteWrite address" }}

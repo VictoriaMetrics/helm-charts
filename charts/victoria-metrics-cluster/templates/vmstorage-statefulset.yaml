@@ -9,10 +9,10 @@ metadata:
   {{- end }}
   {{- $ctx := mergeOverwrite (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-metrics.vmstorage.labels" $ctx | nindent 4 }}
-  name: {{ template "victoria-metrics.vmstorage.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "victoria-metrics.vmstorage.fullname" . }}
+  namespace: {{ include "vm.namespace" . }}
 spec:
-  serviceName: {{ template "victoria-metrics.vmstorage.fullname" . }}
+  serviceName: {{ include "victoria-metrics.vmstorage.fullname" . }}
   selector:
     matchLabels: {{ include "victoria-metrics.vmstorage.matchLabels" . | nindent 6 }}
   replicas: {{ $app.replicaCount }}
@@ -216,7 +216,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ template "victoria-metrics.serviceAccountName" . }}
+      serviceAccountName: {{ include "victoria-metrics.serviceAccountName" . }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

@@ -2,7 +2,7 @@
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ template "victoria-metrics.fullname" . }}-clusterrolebinding
+  name: {{ include "victoria-metrics.fullname" . }}-clusterrolebinding
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.rbac.extraLabels) }}
   labels: {{ include "victoria-metrics.common.metaLabels" $ctx | nindent 4 }}
   {{- with .Values.rbac.annotations }}
@@ -10,10 +10,10 @@ metadata:
   {{- end }}
 subjects:
   - kind: ServiceAccount
-    name: {{ template "victoria-metrics.serviceAccountName" . }}
-    namespace: {{ .Release.Namespace }}
+    name: {{ include "victoria-metrics.serviceAccountName" . }}
+    namespace: {{ include "vm.namespace" . }}
 roleRef:
   kind: ClusterRole
-  name: {{ template "victoria-metrics.fullname" . }}-clusterrole
+  name: {{ include "victoria-metrics.fullname" . }}-clusterrole
   apiGroup: rbac.authorization.k8s.io
 {{- end -}}

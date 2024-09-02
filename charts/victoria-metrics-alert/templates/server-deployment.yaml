@@ -13,7 +13,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "vmalert.server.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vmalert.server.labels" . | nindent 4 }}
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
@@ -34,7 +34,7 @@ spec:
       {{- $annotations = merge $annotations $app.podAnnotations }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-      serviceAccountName: {{ template "vmalert.serviceAccountName" . }}
+      serviceAccountName: {{ include "vmalert.serviceAccountName" . }}
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}

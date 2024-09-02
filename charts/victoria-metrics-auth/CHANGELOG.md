@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
 
 ## 0.6.0
 

@@ -2,8 +2,8 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "victoria-metrics.vminsert.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "victoria-metrics.vminsert.fullname" . }}
+  namespace: {{ include "vm.namespace" . }}
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.vminsert.podDisruptionBudget.labels) }}
   labels: {{ include "victoria-metrics.vminsert.labels" $ctx | nindent 4 }}
 spec:

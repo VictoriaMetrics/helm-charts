@@ -160,7 +160,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 {{- define "victoria-metrics.vminsert.vmstorage-pod-fqdn" -}}
   {{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
-  {{- $namespace := .Release.Namespace -}}
+  {{- $namespace := (include "vm.namespace" .) -}}
   {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
   {{- $storageNodes := default list -}}
   {{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
@@ -172,7 +172,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 {{- define "victoria-metrics.vmselect.vmstorage-pod-fqdn" -}}
   {{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
-  {{- $namespace := .Release.Namespace -}}
+  {{- $namespace := (include "vm.namespace" .) -}}
   {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
   {{- $storageNodes := default list -}}
   {{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
@@ -184,7 +184,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 {{- define "victoria-metrics.vmselect.vmselect-pod-fqdn" -}}
   {{- $svc := include "victoria-metrics.vmselect.fullname" . -}}
-  {{- $namespace := .Release.Namespace -}}
+  {{- $namespace := (include "vm.namespace" .) -}}
   {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
   {{- $port := "8481" }}
   {{- with .Values.vmselect.extraArgs.httpListenAddr }}

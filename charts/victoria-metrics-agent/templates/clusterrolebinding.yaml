@@ -3,9 +3,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ ternary "RoleBinding" "ClusterRoleBinding" $namespaced }}
 metadata:
-  name: {{ template "chart.fullname" . }}{{- ternary "" "-clusterrolebinding" $namespaced }}
+  name: {{ include "chart.fullname" . }}{{- ternary "" "-clusterrolebinding" $namespaced }}
   {{- if $namespaced }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   {{- end }}
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.rbac.extraLabels) }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}
@@ -15,9 +15,9 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: {{ ternary "Role" "ClusterRole" $namespaced }}
-  name: {{ template "chart.fullname" . }}{{- ternary "" "-clusterrole" $namespaced }}
+  name: {{ include "chart.fullname" . }}{{- ternary "" "-clusterrole" $namespaced }}
 subjects:
   - kind: ServiceAccount
-    name: {{ template "chart.serviceAccountName" . }}
-    namespace: {{ .Release.Namespace }}
+    name: {{ include "chart.serviceAccountName" . }}
+    namespace: {{ include "vm.namespace" . }}
 {{- end -}}

@@ -8,7 +8,7 @@ metadata:
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.service.extraLabels) }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}
   name: {{ template "chart.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
 spec:
   {{- with .Values.service.clusterIP }}
   clusterIP: {{ . }}

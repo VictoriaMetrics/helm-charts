@@ -8,14 +8,14 @@ metadata:
   {{- end }}
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" $serviceMonitor.extraLabels) }}
   labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
-  name: {{ template "victoria-logs.server.fullname" . }}
+  name: {{ include "victoria-logs.server.fullname" . }}
   {{- with $serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
 spec:
   namespaceSelector:
     matchNames:
-      - {{ .Release.Namespace }}
+      - {{ include "vm.namespace" . }}
   selector:
     matchLabels: {{ include "victoria-logs.server.matchLabels" . | nindent 6 }}
   endpoints:

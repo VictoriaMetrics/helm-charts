@@ -10,7 +10,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end  }}
   name: vmcluster-{{ $zoneName }}
-  namespace: {{ $top.Release.Namespace }}
+  namespace: {{ $topinclude "vm.namespace" . }}
   labels: {{ include "victoria-metrics-distributed.labels" $top | nindent 4 }}
 spec:
 {{- toYaml (deepCopy $rolloutZone) | nindent 2 }}

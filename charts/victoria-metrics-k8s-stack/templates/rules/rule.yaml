@@ -102,7 +102,7 @@ Check if group is enabled
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
-  namespace: {{ $.Release.Namespace }}
+  namespace: {{ include "vm.namespace" $ }}
   name: {{ include "victoria-metrics-k8s-stack.rulegroup.name" $ctx }}
   {{- with (include "victoria-metrics-k8s-stack.rulegroup.labels" $ctx) }}
   labels: {{ . | nindent 4 }}
