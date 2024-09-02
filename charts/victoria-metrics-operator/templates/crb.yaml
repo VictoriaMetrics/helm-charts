@@ -3,7 +3,7 @@
 {{- $watchSelfNamespace := (and (eq (len $watchNamespaces) 1) (eq (first $watchNamespaces) $selfNamespace)) }}
 
 {{- if and .Values.rbac.create (not $watchSelfNamespace) }}
-kind: ClusterRole
+kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ include "vm-operator.fullname" . }}
@@ -17,7 +17,7 @@ subjects:
   name: {{ template "vm-operator.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 roleRef:
-  kind: {{ ternary "Role" "ClusterRole"  (eq (len .Values.watchNamespaces) 1) }}
+  kind: ClusterRole
   name: {{ include "vm-operator.fullname" . }}
   apiGroup: rbac.authorization.k8s.io
 {{- end -}}
