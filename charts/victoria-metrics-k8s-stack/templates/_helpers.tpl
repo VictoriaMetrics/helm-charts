@@ -14,22 +14,33 @@ If release name contains chart name it will be used as a full name.
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $Release := (.helm).Release | default .Release -}}
-  {{- $fullname := $Values.fullnameOverride -}}
+  {{- $fullname := "" -}}
   {{- if .appKey -}}
-    {{- if (index $Values .appKey).name -}}
-      {{- $fullname = (index $Values .appKey).name -}}
-    {{- else if (dig $Chart.Name .appKey "name" "" ($Values.global)) -}}
-      {{- $fullname = (dig $Chart.Name .appKey "name" "" ($Values.global)) -}}
-    {{- else if (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
-      {{- $fullname = (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
-    {{- end -}}
+    {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
+    {{- $values := $Values -}}
+    {{- $global := (index $Values.global $Chart.Name) | default dict -}}
+    {{- range $ak := $appKey }}
+      {{- $values = (index $values $ak) | default dict -}}
+      {{- $global = (index $global $ak) | default dict -}}
+      {{- if $values.name -}}
+        {{- $fullname = $values.name -}}
+      {{- else if $global.name -}}
+        {{- $fullname = $global.name -}}
+      {{- end -}}
+    {{- end }}
   {{- end -}}
   {{- if empty $fullname -}}
-    {{- $name := default $Chart.Name $Values.nameOverride }}
-    {{- if contains $name $Release.Name }}
-      {{- $fullname = $Release.Name -}}
-    {{- else }}
-      {{- $fullname = (printf "%s-%s" $Release.Name $name) }}
+    {{- if $Values.fullnameOverride -}}
+      {{- $fullname = $Values.fullnameOverride -}}
+    {{- else if (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
+      {{- $fullname = (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
+    {{- else -}}
+      {{- $name := default $Chart.Name $Values.nameOverride -}}
+      {{- if contains $name $Release.Name -}}
+        {{- $fullname = $Release.Name -}}
+      {{- else -}}
+        {{- $fullname = (printf "%s-%s" $Release.Name $name) }}
+      {{- end -}}
     {{- end }}
   {{- end -}}
   {{- $fullname | trunc 63 | trimSuffix "-" -}}
@@ -83,7 +94,11 @@ If release name contains chart name it will be used as a full name.
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $name := (include "victoria-metrics-k8s-stack.fullname" .) -}}
   {{- with .appKey -}}
-    {{- $prefix := ternary . (printf "vm%s" .) (hasPrefix "vm" .) -}}
+    {{- $prefix := . -}}
+    {{- if kindIs "slice" $prefix }}
+      {{- $prefix = last $prefix -}}
+    {{- end -}}
+    {{- $prefix = ternary $prefix (printf "vm%s" $prefix) (hasPrefix "vm" $prefix) -}}
     {{- $name = printf "%s-%s" $prefix $name -}}
   {{- end -}}
   {{- if hasKey . "appIdx" -}}
@@ -104,9 +119,17 @@ If release name contains chart name it will be used as a full name.
   {{- if .appSecure -}}
     {{- $isSecure = .appSecure -}}
   {{- end -}}
-  {{- with .appKey -}}
-    {{- $service := index ($Values) . | default dict -}}
-    {{- $spec := $service.spec | default dict -}}
+  {{- if .appKey -}}
+    {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
+    {{- $spec := $Values -}}
+    {{- range $ak := $appKey -}}
+      {{- if hasKey $spec $ak -}}
+        {{- $spec = (index $spec $ak) -}}
+      {{- end -}}
+      {{- if hasKey $spec "spec" -}}
+        {{- $spec = $spec.spec -}}
+      {{- end -}}
+    {{- end -}}
     {{- $isSecure = ($spec.extraArgs).tls | default $isSecure -}}
     {{- $proto = (ternary "https" "http" $isSecure) -}}
     {{- $port = (ternary 443 80 $isSecure) -}}
@@ -124,9 +147,7 @@ If release name contains chart name it will be used as a full name.
     {{- $_ := set $ctx "appKey" "vmsingle" -}}
     {{- $_ := set $endpoint "url" (include "vm.url" $ctx) -}}
   {{- else if $Values.vmcluster.enabled -}}
-    {{- $_ := set $Values.vmcluster.spec.vmselect "name" $Values.vmcluster.name -}}
-    {{- $_ := set $Values "vmselect" (dict "spec" $Values.vmcluster.spec.vmselect) -}}
-    {{- $_ := set $ctx "appKey" "vmselect" -}}
+    {{- $_ := set $ctx "appKey" (list "vmcluster" "vmselect") -}}
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
     {{- $tenant := ($Values.tenant | default 0) -}}
     {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
@@ -145,9 +166,7 @@ If release name contains chart name it will be used as a full name.
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
     {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
   {{- else if $Values.vmcluster.enabled -}}
-    {{- $_ := set $Values.vmcluster.spec.vminsert "name" $Values.vmcluster.name -}}
-    {{- $_ := set $Values "vminsert" (dict "spec" $Values.vmcluster.spec.vminsert) -}}
-    {{- $_ := set $ctx "appKey" "vminsert" -}}
+    {{- $_ := set $ctx "appKey" (list "vmcluster" "vminsert") -}}
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
     {{- $tenant := ($Values.tenant | default 0) -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}

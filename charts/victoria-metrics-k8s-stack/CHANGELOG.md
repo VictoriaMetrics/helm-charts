@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Merged ingress templates
+- Removed custom VMServiceScrape for operator
 
 ## 0.25.10
 
