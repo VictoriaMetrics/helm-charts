@@ -150,7 +150,7 @@ rules:
   - get
 {{ toYaml $rules.admin }}
 {{- end }}
-{{- if or .Values.cleanupCRD .Values.crd.cleanup.enabled }}
+{{- if .Values.crd.cleanup.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -162,7 +162,7 @@ metadata:
 rules: {{ toYaml $rules.admin | nindent 2 }}
 {{- end }}
 
-{{- if or .Values.createCRD .Values.crd.create .Values.rbac.aggregatedClusterRoles.enabled }}
+{{- if or .Values.crd.create .Values.rbac.aggregatedClusterRoles.enabled }}
 {{- /* This template generates readonly and admin cluster roles for */ -}}
 {{- /* each CRD present in the helm chart.  The clusterroles use the */ -}}
 {{- /* kubernetes clusterrole aggregation feature to include these */ -}}

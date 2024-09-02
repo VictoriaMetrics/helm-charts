@@ -45,6 +45,7 @@ sources = [
     "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json",
     "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml",
     "https://raw.githubusercontent.com/etcd-io/etcd/main/contrib/mixin/mixin.libsonnet",
+    "https://grafana.com/api/dashboards/1860/revisions/37/download",
 ]
 
 allowed_dashboards = [
@@ -65,15 +66,15 @@ condition_map = {
     "node-rsrc-use": '(index .Values "prometheus-node-exporter" "enabled")',
     "node-cluster-rsrc-use": '(index .Values "prometheus-node-exporter" "enabled")',
     "victoriametrics-cluster": ".Values.vmcluster.enabled",
-    "victoriametrics": ".Values.vmsingle.enabled",
-    "vmalert": ".Values.vmalert.enabled",
-    "operator": '(index .Values "victoria-metrics-operator" "enabled")',
-    "k8s-system-coredns": "and .Values.experimentalDashboardsEnabled .Values.coreDns.enabled",
+    "victoriametrics-single-node": ".Values.vmsingle.enabled",
+    "victoriametrics-vmalert": ".Values.vmalert.enabled",
+    "victoriametrics-operator": '(index .Values "victoria-metrics-operator" "enabled")',
+    "kubernetes-system-coredns": "and .Values.experimentalDashboardsEnabled .Values.coreDns.enabled",
     "k8s-system-api-server": "and .Values.experimentalDashboardsEnabled .Values.kubeApiServer.enabled",
-    "k8s-views-pods": "and .Values.experimentalDashboardsEnabled .Values.kubelet.enabled",
+    "kubernetes-views-pods": "and .Values.experimentalDashboardsEnabled .Values.kubelet.enabled",
     "k8s-views-nodes": "and .Values.experimentalDashboardsEnabled .Values.kubelet.enabled",
-    "k8s-views-namespace": "and .Values.experimentalDashboardsEnabled .Values.kubelet.enabled",
-    "k8s-views-global": "and .Values.experimentalDashboardsEnabled .Values.kubelet.enabled",
+    "kubernetes-views-namespaces": "and .Values.experimentalDashboardsEnabled .Values.kubelet.enabled",
+    "kubernetes-views-global": "and .Values.experimentalDashboardsEnabled .Values.kubelet.enabled",
 }
 
 
@@ -259,8 +260,11 @@ def main():
         raw_text = response.text
         dashboards = {}
         path = pathlib.Path(src)
-        if path.suffix in [".json", ".libsonnet"]:
-            if path.suffix == ".libsonnet":
+        suffix = path.suffix
+        if not suffix:
+            suffix = ".json"
+        if suffix in [".json", ".libsonnet"]:
+            if suffix == ".libsonnet":
                 raw_text = _jsonnet.evaluate_snippet(
                     src,
                     "(" + raw_text + ").grafanaDashboards",
@@ -271,14 +275,15 @@ def main():
             # is it already a dashboard structure or is it nested (etcd case)?
             flat_structure = bool(data.get("annotations"))
             if flat_structure:
-                dashboards[path.name.replace(path.suffix, "")] = data
+                name = re.sub("[ /-]+", "-", data["title"].lower())
+                dashboards[name] = data
             else:
                 for r in data:
                     name = r.replace(".json", "")
                     if name not in allowed_dashboards:
                         continue
                     dashboards[name] = data[r]
-        elif path.suffix == ".yaml":
+        elif suffix == ".yaml":
             data = yaml.full_load(raw_text)
             for group in data["items"]:
                 for r in group["data"]:
@@ -287,7 +292,7 @@ def main():
                         continue
                     dashboards[name] = json.loads(group["data"][r])
         else:
-            print(f"Format {path.suffix} is not supported")
+            print(f"Format {suffix} is not supported")
             continue
         for d in dashboards:
             dashboard = dashboards[d]

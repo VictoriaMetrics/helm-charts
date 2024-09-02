@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Deprecated `server.vmbackupmanager.enable` in a favour of `server.vmbackupmanager.enabled`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/940).
 
 ## 0.11.0
 

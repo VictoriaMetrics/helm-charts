@@ -19,14 +19,20 @@ argocdReleaseOverride: ""
 # -- also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars
 victoria-metrics-operator:
   enabled: true
-  # -- Tells helm to clean up vm cr resources when uninstalling
-  cleanupCRD: true
-  cleanupImage:
-    repository: bitnami/kubectl
-    # use image tag that matches k8s API version by default
-    # tag: 1.29.6
-    pullPolicy: IfNotPresent
-  # -- operator VM scrape config
+  # -- deprecated, will be removed after operator release
+  createCRD: false
+  crd:
+    # -- we disable crd creation by operator chart as we create them in this chart
+    create: false
+
+    # -- tells helm to clean up vm cr resources when uninstalling
+    cleanup:
+      enabled: true
+      image:
+        repository: bitnami/kubectl
+        # use image tag that matches k8s API version by default
+        # tag: 1.29.6
+        pullPolicy: IfNotPresent
   vmScrape:
     # -- spec for VMServiceScrape crd
     # https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec
@@ -39,8 +45,7 @@ victoria-metrics-operator:
       namespaceSelector:
         matchNames:
          - '{{ .Release.Namespace }}'
-
-  createCRD: false # we disable crd creation by operator chart as we create them in this chart
+    
   operator:
     # -- By default, operator converts prometheus-operator objects.
     disable_prometheus_converter: false
@@ -795,22 +800,29 @@ grafana:
   sidecar:
     datasources:
       enabled: true
+      # -- list of default prometheus compatible datasource configurations.
+      # VM `url` will be added to each of them in templates and `type` will be set to defaultDatasourceType if not defined
+      default:
+        - name: VictoriaMetrics
+          isDefault: true
+        - name: VictoriaMetrics (DS)
+          isDefault: false
+          type: victoriametrics-datasource
       initDatasources: true
       createVMReplicasDatasources: false
-      # JSON options for VM datasources
-      # See https://grafana.com/docs/grafana/latest/administration/provisioning/#json-data
-      jsonData: {}
-      #  timeInterval: "1m"
     dashboards:
+      provider:
+        name: default
+        orgid: 1
       additionalDashboardLabels: {}
+      folder: /var/lib/grafana/dashboards
+      defaultFolderName: default
       additionalDashboardAnnotations: {}
       enabled: true
       multicluster: false
 
   ## ForceDeployDatasource Create datasource configmap even if grafana deployment has been disabled
   forceDeployDatasource: false
-  # Set to false to disable the default datasource connected directly to victoria-metrics
-  provisionDefaultDatasource: true
 
   ## Configure additional grafana datasources (passed through tpl)
   ## ref: http://docs.grafana.org/administration/provisioning/#datasources
@@ -827,26 +839,6 @@ grafana:
   #   type: prometheus
   #   url: https://{{ printf "%s-prometheus.svc" .Release.Name }}:9090
   #   version: 1
-
-  dashboardProviders:
-    dashboardproviders.yaml:
-      apiVersion: 1
-      providers:
-        - name: "default"
-          orgId: 1
-          folder: ""
-          type: file
-          disableDeletion: false
-          editable: true
-          options:
-            path: /var/lib/grafana/dashboards/default
-
-  dashboards:
-    default:
-      nodeexporter:
-        gnetId: 1860
-        revision: 37
-        datasource: VictoriaMetrics
 
   defaultDashboardsTimezone: utc
 

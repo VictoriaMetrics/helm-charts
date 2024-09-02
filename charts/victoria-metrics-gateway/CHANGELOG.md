@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Deprecated `rateLimiter.enable` in a favour of `rateLimiter.enabled`
+- Deprecated `auth.enable` in a favour of `auth.enabled`
 
 ## 0.3.0
 

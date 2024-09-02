@@ -335,50 +335,54 @@ If release name contains chart name it will be used as a full name.
   {{- tpl ($clusterSpec | mergeOverwrite (dict "vmselect" $spec) | toYaml) . -}}
 {{- end -}}
 
-{{- define "vm.data.source" -}}
-name: {{ .name | default "VictoriaMetrics" }}
-type: {{ .type | default ""}}
-url: {{ .url }}
-access: proxy
-isDefault: {{ .isDefault | default false }}
-jsonData: {{ .jsonData | default dict | toYaml | nindent 2 }}
-{{- end }}
+{{- define "vm.data.source.enabled" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $grafana := $Values.grafana -}}
+  {{- $isEnabled := false -}}
+  {{- if $grafana.plugins -}}
+    {{- range $value := $grafana.plugins -}}
+      {{- if contains "victoriametrics-datasource" $value -}}
+        {{- $isEnabled = true -}}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- $unsignedPlugins := ((index $grafana "grafana.ini").plugins).allow_loading_unsigned_plugins | default "" -}}
+  {{- $allowUnsigned := contains "victoriametrics-datasource" $unsignedPlugins -}}
+  {{- ternary "true" "" (and $isEnabled $allowUnsigned) -}}
+{{- end -}}
 
 {{- /* Datasources */ -}}
 {{- define "vm.data.sources" -}}
   {{- $Values := (.helm).Values | default .Values }}
+  {{- $grafana := $Values.grafana -}}
   {{- $datasources := $Values.grafana.additionalDataSources | default list -}}
-  {{- $vmDSPluginEnabled := false }}
-  {{- if $Values.grafana.plugins }}
-    {{- range $value := $Values.grafana.plugins }}
-      {{- if (contains "victoriametrics-datasource" $value) }}
-        {{- $vmDSPluginEnabled = true }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
+  {{- $vmDatasource := "victoriametrics-datasource" -}}
+  {{- $allowVMDatasource := (ternary false true (empty (include "vm.data.source.enabled" .))) -}}
   {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled -}}
     {{- $ctx := dict "helm" . -}}
     {{- $readEndpoint:= (include "vm.read.endpoint" $ctx | fromYaml) -}}
-    {{- $jsonData := $Values.grafana.sidecar.datasources.jsonData | default dict -}}
-    {{- $dsType := (default "prometheus" $Values.grafana.defaultDatasourceType) -}}
-    {{- $vmAllowUnsigned := contains "victoriametrics-datasource" (dig "grafana.ini" "plugins" "allow_loading_unsigned_plugins" "" $Values.grafana) -}}
-    {{- if (and $vmDSPluginEnabled $vmAllowUnsigned) -}}
-      {{- $args := dict "name" "VictoriaMetrics (DS)" "type" "victoriametrics-datasource" "url" $readEndpoint.url "jsonData" $jsonData -}}
-      {{- $datasources = append $datasources (fromYaml (include "vm.data.source" $args)) -}}
-    {{- else -}}
-      {{- $dsType = "prometheus" -}}
+    {{- $defaultDatasources := default list -}}
+    {{- range $ds := $grafana.sidecar.datasources.default }}
+      {{- if not $ds.type -}}
+        {{- $_ := set $ds "type" $Values.grafana.defaultDatasourceType }}
+      {{- end -}}
+      {{- if or (ne $ds.type $vmDatasource) $allowVMDatasource -}}
+        {{- $_ := set $ds "url" $readEndpoint.url -}}
+        {{- $defaultDatasources = append $defaultDatasources $ds -}}
+      {{- end -}}
     {{- end }}
-    {{- if $Values.grafana.provisionDefaultDatasource -}}
-      {{- $args := dict "type" $dsType "isDefault" true "url" $readEndpoint.url "jsonData" $jsonData -}}
-      {{- $datasources = append $datasources (fromYaml (include "vm.data.source" $args)) -}}
-    {{- end }}
-    {{- if $Values.grafana.sidecar.datasources.createVMReplicasDatasources -}}
-      {{- $ctx := dict "helm" . -}}
-      {{- range until (int $Values.vmsingle.spec.replicaCount) -}}
-        {{- $_ := set $ctx "appIdx" . -}}
-        {{- $readEndpoint:= (include "vm.read.endpoint" $ctx | fromYaml) }}
-        {{- $args := dict "name" (printf "VictoriaMetrics-%d" .) "type" $dsType "url" $readEndpoint.url "jsonData" $jsonData -}}
-        {{- $datasources = append $datasources (fromYaml (include "vm.data.source" $args)) -}}
+    {{- $datasources = concat $datasources $defaultDatasources -}}
+    {{- if and $grafana.sidecar.datasources.createVMReplicasDatasources $defaultDatasources -}}
+      {{- range $id := until (int $Values.vmsingle.spec.replicaCount) -}}
+        {{- $_ := set $ctx "appIdx" $id -}}
+        {{- $readEndpoint := (include "vm.read.endpoint" $ctx | fromYaml) -}}
+        {{- range $ds := $defaultDatasources -}}
+          {{- $ds = (deepCopy $ds) -}}
+          {{- $_ := set $ds "url" $readEndpoint.url -}}
+          {{- $_ := set $ds "name" (printf "%s-%d" $ds.name $id) -}}
+          {{- $_ := set $ds "isDefault" false -}}
+          {{- $datasources = append $datasources $ds -}}
+        {{- end -}}
       {{- end -}}
     {{- end -}}
   {{- end -}}
