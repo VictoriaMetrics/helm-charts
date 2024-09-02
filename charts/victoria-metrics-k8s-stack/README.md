@@ -403,7 +403,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.datasources.enabled | bool | `true` |  |
 | grafana.sidecar.datasources.initDatasources | bool | `true` |  |
 | grafana.sidecar.datasources.jsonData | object | `{}` |  |
-| grafana.vmScrape | object | `{"enabled":true,"spec":{"endpoints":[{"port":"{{ .Values.grafana.service.portName }}"}],"selector":{"matchLabels":{"app.kubernetes.io/name":"{{ include \"grafana.name\" .Subcharts.grafana }}"}}}}` | node exporter VM scrape config |
+| grafana.vmScrape | object | `{"enabled":true,"spec":{"endpoints":[{"port":"{{ .Values.grafana.service.portName }}"}],"selector":{"matchLabels":{"app.kubernetes.io/name":"{{ include \"grafana.name\" .Subcharts.grafana }}"}}}}` | grafana VM scrape config |
 | grafanaOperatorDashboardsFormat | object | `{"allowCrossNamespaceImport":false,"enabled":false,"instanceSelector":{"matchLabels":{"dashboards":"grafana"}}}` | Create dashboards as CRDs (reuqires grafana-operator to be installed) |
 | kube-state-metrics.enabled | bool | `true` |  |
 | kube-state-metrics.vmScrape | object | `{"enabled":true,"spec":{"endpoints":[{"honorLabels":true,"metricRelabelConfigs":[{"action":"labeldrop","regex":"(uid|container_id|image_id)"}],"port":"http"}],"jobLabel":"app.kubernetes.io/name","selector":{"matchLabels":{"app.kubernetes.io/instance":"{{ include \"vm.release\" . }}","app.kubernetes.io/name":"{{ include \"kube-state-metrics.name\" (index .Subcharts \"kube-state-metrics\") }}"}}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
@@ -462,9 +462,11 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
 | tenant | string | `"0"` |  |
-| victoria-metrics-operator | object | `{"cleanupCRD":true,"cleanupImage":{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl"},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":false}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars |
+| victoria-metrics-operator | object | `{"cleanupCRD":true,"cleanupImage":{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl"},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":false},"vmScrape":{"spec":{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ .Release.Namespace }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars |
 | victoria-metrics-operator.cleanupCRD | bool | `true` | Tells helm to clean up vm cr resources when uninstalling |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `false` | By default, operator converts prometheus-operator objects. |
+| victoria-metrics-operator.vmScrape | object | `{"spec":{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ .Release.Namespace }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}}` | operator VM scrape config |
+| victoria-metrics-operator.vmScrape.spec | object | `{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ .Release.Namespace }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | vmagent.additionalRemoteWrites | list | `[]` |  |
 | vmagent.annotations | object | `{}` |  |
 | vmagent.enabled | bool | `true` |  |
