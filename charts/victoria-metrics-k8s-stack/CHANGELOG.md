@@ -6,6 +6,8 @@
 - Removed custom VMServiceScrape for operator
 - Added ability to override default Prometheus-compatible datatasources with all available parameters. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/860).
 - Do not use `grafana.dashboards` and `grafana.dashboardProviders`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1312).
+- Migrated Node Exporter dashboard into chart
+- Deprecated `grafana.sidecar.jsonData`, `grafana.provisionDefaultDatasource` in a favour of `grafana.sidecar.datasources.default` slice of datasources.
 
 ## 0.25.10
 
