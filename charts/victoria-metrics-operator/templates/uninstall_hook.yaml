@@ -1,5 +1,11 @@
-{{- if or .Values.cleanupCRD .Values.crd.cleanup.enabled }}
-{{- $app := ternary .Values.crd.cleanup (dict "image" .Values.cleanupImage) .Values.crd.cleanup.enabled }}
+{{- if hasKey .Values "cleanupCRD" }}
+  {{- fail "`cleanupCRD` is deprecated. Use `crd.cleanup.enabled` instead" -}}
+{{- end }}
+{{- if hasKey .Values "cleanupImage" }}
+  {{- fail "`cleanupImage` is deprecated. Use `crd.cleanup.image` instead" -}}
+{{- end }}
+{{- if .Values.crd.cleanup.enabled }}
+{{- $app := .Values.crd.cleanup }}
 {{- if empty ($app.image).tag }}
   {{- $tag := (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor) | replace "+" "" -}}
   {{- $_ := set $app.image "tag" $tag }}

@@ -1,10 +1,16 @@
 {{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- include "vm.enterprise.only" . -}}
-{{- if not (or .Values.auth.enable .Values.rateLimiter.enable) -}}
-  {{- fail "at least one item in `.auth.enable` or `.rateLimiter.enable` must be enable " -}}
+{{- if hasKey .Values.rateLimiter "enable" }}
+  {{- fail "`rateLimiter.enable` is deprecated. Use `rateLimiter.enabled` instead" }}
+{{- end }}
+{{- if hasKey .Values.auth "enable" }}
+  {{- fail "`auth.enable` is deprecated. Use `auth.enabled` instead" }}
+{{- end }}
+{{- if not (or .Values.auth.enabled .Values.rateLimiter.enabled) -}}
+  {{- fail "at least one item in `.auth.enabled` or `.rateLimiter.enabled` must be set to `true`" -}}
 {{- end -}}
 
-{{- if .Values.rateLimiter.enable -}}
+{{- if .Values.rateLimiter.enabled -}}
   {{- if not .Values.rateLimiter.datasource.url -}}
   {{- fail "please specify datasource url (`.rateLimiter.datasource.url`) for Rate Limiting" -}}
   {{- end -}}
@@ -22,7 +28,7 @@
 {{- end -}}
 {{- $isHost := gt (len .Values.extraHostPathMounts) 0 -}}
 {{- $isExtraVolumes := or $isHost (gt (len .Values.extraVolumes) 0)  -}}
-{{- $isVolumes := or $isExtraVolumes .Values.rateLimiter.enable (and .Values.license.secret.name .Values.license.secret.key) -}}
+{{- $isVolumes := or $isExtraVolumes .Values.rateLimiter.enabled  (and .Values.license.secret.name .Values.license.secret.key) -}}
 
 apiVersion: apps/v1
 kind: Deployment
@@ -79,7 +85,7 @@ spec:
           {{- end }}
           {{- if $isVolumes }}
           volumeMounts:
-            {{- if .Values.rateLimiter.enable }}
+            {{- if .Values.rateLimiter.enabled }}
             - name: config
               mountPath: /config
             {{- end }}
@@ -115,7 +121,7 @@ spec:
       {{- end }}
       {{- if $isVolumes }}
       volumes:
-        {{- if .Values.rateLimiter.enable }}
+        {{- if .Values.rateLimiter.enabled }}
         - name: config
           configMap:
             name: {{ include "chart.fullname" .}}

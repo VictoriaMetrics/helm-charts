@@ -31,21 +31,22 @@ spec:
       schedulerName: {{ . }}
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
-      {{- if or $app.initContainers $app.vmbackupmanager.restore.onStart.enabled }}
+      {{- $manager := $app.vmbackupmanager }}
+      {{- if or $app.initContainers $manager.restore.onStart.enabled }}
       initContainers:
       {{- with $app.initContainers -}}
       {{- toYaml . | nindent 6 }}
       {{- end -}}
-      {{- if $app.vmbackupmanager.restore.onStart.enabled }}
+      {{- if $manager.restore.onStart.enabled }}
       {{- include "vm.enterprise.only" . }}
       - name: vmbackupmanager-restore
-        image: {{ include "vm.image" (merge (deepCopy .) (dict "app" $app.vmbackupmanager)) }}
+        image: {{ include "vm.image" (merge (deepCopy .) (dict "app" $manager)) }}
         imagePullPolicy: {{ $app.image.pullPolicy }}
         {{- with $app.podSecurityContext }}
         securityContext:  {{ toYaml . | nindent 10 }}
         {{- end }}
         args: {{ include "vmbackupmanager.restore.args" . | nindent 12 }}
-        {{- with $app.vmbackupmanager.resources }}
+        {{- with $manager.resources }}
         resources: {{ toYaml . | nindent 10 }}
         {{- end }}
         env:
@@ -53,7 +54,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        {{- with $app.vmbackupmanager.env }}
+        {{- with $manager.env }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         ports:
@@ -63,7 +64,7 @@ spec:
         - name: vmstorage-volume
           mountPath: {{ $app.persistentVolume.mountPath }}
           subPath: {{ $app.persistentVolume.subPath }}
-        {{- range $app.vmbackupmanager.extraSecretMounts }}
+        {{- range $manager.extraSecretMounts }}
         - name: {{ .name }}
           mountPath: {{ .mountPath }}
           subPath: {{ .subPath }}
@@ -151,9 +152,11 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
             {{- include "vm.license.mount" . | nindent 12 }}
-        {{- if $app.vmbackupmanager.enable }}
+        {{- if hasKey $manager "enable" }}
+          {{- fail "`vmstorage.vmbackupmanager.enable` is deprecated. Use `vmstorage.vmbackupmanager.enabled` instead" }}
+        {{- end }}
+        {{- if $manager.enabled }}
         {{- include "vm.enterprise.only" . }}
-        {{- $manager := $app.vmbackupmanager -}}
         - name: vmbackupmanager
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $manager)) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}

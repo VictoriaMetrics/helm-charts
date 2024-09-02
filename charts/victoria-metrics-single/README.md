@@ -216,7 +216,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | server.vmbackupmanager.disableHourly | bool | `false` | disable hourly backups |
 | server.vmbackupmanager.disableMonthly | bool | `false` | disable monthly backups |
 | server.vmbackupmanager.disableWeekly | bool | `false` | disable weekly backups |
-| server.vmbackupmanager.enable | bool | `false` | enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages |
+| server.vmbackupmanager.enabled | bool | `false` | enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages |
 | server.vmbackupmanager.env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables |
 | server.vmbackupmanager.extraArgs."envflag.enable" | string | `"true"` |  |
 | server.vmbackupmanager.extraArgs."envflag.prefix" | string | `"VM_"` |  |
