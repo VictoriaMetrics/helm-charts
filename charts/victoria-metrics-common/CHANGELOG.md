@@ -2,7 +2,10 @@
 
 ## Next release
 
-- TODO
+- Allow `appKey` argument to be a list to support deeply nested objects
+- Added `vm.namespace`, which returns `namespaceOverride` or `global.namespaceOverride` or `Release.Namespace` as a default
+- Added `vm.managed.fullname`, which returns default fullname prefixed by `appKey`
+- Added `vm.plain.fullname`, which returns default fullname suffixed by `appKey`
 
 ## 0.0.8
 
