@@ -4,9 +4,13 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $name := (include "vm.fullname" .) -}}
   {{- with .appKey -}}
-    {{- $service := (index $Values .) | default dict -}}
-    {{- $prefix := ternary . (printf "vm%s" .) (hasPrefix "vm" .) -}}
-    {{- $name = ($service).name | default (printf "%s-%s" $prefix $name) -}}
+    {{- $prefix := . -}}
+    {{- $prefix := . -}}
+    {{- if kindIs "slice" $prefix }}
+      {{- $prefix = last $prefix -}}
+    {{- end -}}
+    {{- $prefix = ternary $prefix (printf "vm%s" $prefix) (hasPrefix "vm" $prefix) -}}
+    {{- $name = printf "%s-%s" $prefix $name -}}
   {{- end -}}
   {{- if hasKey . "appIdx" -}}
     {{- $name = (printf "%s-%d.%s" $name .appIdx $name) -}}
@@ -23,9 +27,17 @@
   {{- $port := 80 -}}
   {{- $path := .appRoute | default "/" -}}
   {{- $isSecure := ternary false true (empty .appSecure) -}}
-  {{- with .appKey -}}
-    {{- $service := index $Values . | default dict -}}
-    {{- $spec := $service.spec | default dict -}}
+  {{- if .appKey -}}
+    {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
+    {{- $spec := $Values -}}
+    {{- range $ak := $appKey -}}
+      {{- if hasKey $spec $ak -}}
+        {{- $spec = (index $spec $ak) -}}
+      {{- end -}}
+      {{- if hasKey $spec "spec" -}}
+        {{- $spec = $spec.spec -}}
+      {{- end -}}
+    {{- end -}}
     {{- $isSecure = ($spec.extraArgs).tls | default $isSecure -}}
     {{- $proto = (ternary "https" "http" $isSecure) -}}
     {{- $port = (ternary 443 80 $isSecure) -}}

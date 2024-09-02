@@ -1,3 +1,9 @@
+{{- define "vm.namespace" -}}
+  {{- $Release := (.helm).Release | default .Release -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $Values.namespaceOverride | default ($Values.global).namespaceOverride | default $Release.Namespace -}}
+{{- end -}}
+
 {{- define "vm.validate.args" -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- if empty $Chart -}}
@@ -23,27 +29,68 @@ If release name contains chart name it will be used as a full name.
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $Release := (.helm).Release | default .Release -}}
-  {{- $appKey := .appKey -}}
-  {{- $fullname := default list -}}
-  {{- if $Values.fullnameOverride -}}
-    {{- $fullname = append $fullname .Values.fullnameOverride -}}
-  {{- else if and $appKey (dig $Chart.Name $appKey "fullnameOverride" "" ($Values.global)) -}}
-    {{- $fullname = append $fullname (index .Values.global $Chart.Name $appKey "fullnameOverride") -}}
-  {{- else }}
-    {{- $fullname = append $fullname $Release.Name -}}
-    {{- $name := default $Chart.Name $Values.nameOverride -}}
-    {{- if not (contains $name ($fullname | join "-")) -}}
-      {{- $fullname = append $fullname $name -}}
-    {{- end -}}
-    {{- if $appKey -}}
-      {{- $suffix := (index $Values $appKey "name") | default (dig $Chart.Name $appKey "name" "" $Values.global) -}}
-      {{- if $suffix -}}
-        {{- $fullname = append $fullname $suffix -}}
+  {{- $fullname := "" -}}
+  {{- if .appKey -}}
+    {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
+    {{- $values := $Values -}}
+    {{- $global := (index $Values.global $Chart.Name) | default dict -}}
+    {{- range $ak := $appKey }}
+      {{- $values = (index $values $ak) | default dict -}}
+      {{- $global = (index $global $ak) | default dict -}}
+      {{- if $values.name -}}
+        {{- $fullname = $values.name -}}
+      {{- else if $global.name -}}
+        {{- $fullname = $global.name -}}
+      {{- end -}}
+    {{- end }}
+  {{- end -}}
+  {{- if empty $fullname -}}
+    {{- if $Values.fullnameOverride -}}
+      {{- $fullname = $Values.fullnameOverride -}}
+    {{- else if (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
+      {{- $fullname = (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
+    {{- else -}}
+      {{- $name := default $Chart.Name $Values.nameOverride -}}
+      {{- if contains $name $Release.Name -}}
+        {{- $fullname = $Release.Name -}}
+      {{- else -}}
+        {{- $fullname = (printf "%s-%s" $Release.Name $name) }}
       {{- end -}}
     {{- end -}}
-  {{- end }}
-  {{- $fullname | join "-" | trunc 63 | trimSuffix "-" -}}
+  {{- end -}}
+  {{- with .prefix -}}
+    {{- $fullname = printf "%s-%s" . $fullname -}}
+  {{- end -}}
+  {{- with .suffix -}}
+    {{- $fullname = printf "%s-%s" $fullname . -}}
+  {{- end -}}
+  {{- $fullname | trunc 63 | trimSuffix "-" -}}
 {{- end }}
+
+{{- define "vm.managed.fullname" -}}
+  {{- with .appKey -}}
+    {{- $prefix := . -}}
+    {{- if kindIs "list" $prefix -}}
+      {{- $prefix = last $prefix -}}
+    {{- end -}}
+    {{- $_ := set $ "prefix" $prefix -}}
+  {{- end -}}
+  {{- include "vm.fullname" . -}}
+{{- end -}}
+
+{{- define "vm.plain.fullname" -}}
+  {{- $suffix := .appKey -}}
+  {{- if kindIs "list" $suffix -}}
+    {{- $suffix = last $suffix }}
+  {{- end -}}
+  {{- if $suffix -}}
+    {{- with .suffix -}}
+      {{- $suffix = printf "%s-%s" $suffix . -}}
+    {{- end -}}
+    {{- $_ := set . "suffix" $suffix -}}
+  {{- end -}}
+  {{- include "vm.fullname" . -}}
+{{- end -}}
 
 {{- /* Create chart name and version as used by the chart label. */ -}}
 {{- define "vm.chart" -}}
