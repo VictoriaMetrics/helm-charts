@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Do not create ClusterRole if `watchNamespaces` contains only namespace, where operator is deployed
 
 ## 0.34.6
 
