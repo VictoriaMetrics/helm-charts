@@ -147,13 +147,15 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
+        {{- if or (not .Values.persistence.enabled) .Values.persistence.existingClaim }}
         - name: tmpdata
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default "tmpdata" }}
+            claimName: {{ .Values.persistence.existingClaim }}
           {{- else }}
           emptyDir: {{ toYaml .Values.emptyDir | nindent 12 }}
           {{- end }}
+        {{- end }}
         - name: config
           configMap:
             name: {{ include "chart.configname" . }}

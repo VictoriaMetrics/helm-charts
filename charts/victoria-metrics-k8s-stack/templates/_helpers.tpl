@@ -252,7 +252,13 @@ If release name contains chart name it will be used as a full name.
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- $_ := set $vmAlertRemotes "notifiers" (concat ($vmAlertRemotes.notifiers | default list) (.Values.vmalert.spec.notifiers | default list)) -}}
+  {{- with concat ($vmAlertRemotes.notifiers | default list) (.Values.vmalert.spec.notifiers | default list) }}
+    {{- $_ := set $vmAlertRemotes "notifiers" . }}
+  {{- end }}
+  {{- $spec := deepCopy (omit $Values.vmalert.spec "notifiers") | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec }}
+  {{- if not (or (hasKey $spec "notifier") (hasKey $spec "notifiers") (hasKey $spec "notifierConfigRef")) }}
+    {{- fail "`notifier`, `notifiers` or `notifierConfigRef` should be set for vmalert"}}
+  {{- end }}
   {{- tpl (deepCopy (omit $Values.vmalert.spec "notifiers") | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec | toYaml) . -}}
 {{- end }}
 

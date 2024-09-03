@@ -93,13 +93,15 @@ spec:
           configMap:
             name: {{ include "chart.fullname" . }}
         {{- include "vm.license.volume" . | nindent 8 }}
+        {{- if or (not .Values.persistentVolume.enabled) .Values.persistentVolume.existingClaim }}
         - name: models-dump
           {{- if .Values.persistentVolume.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistentVolume.existingClaim | default "models-dump" }}
+            claimName: {{ .Values.persistentVolume.existingClaim }}
           {{- else }}
           emptyDir: {{ toYaml .Values.emptyDir | nindent 12 }}
           {{- end }}
+        {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

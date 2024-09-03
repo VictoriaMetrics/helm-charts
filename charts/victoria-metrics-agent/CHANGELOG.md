@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fixed PVC in StatefulSet
 
 ## 0.12.0
 

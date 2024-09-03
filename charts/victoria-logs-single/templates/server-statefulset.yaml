@@ -131,13 +131,15 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
       volumes:
+        {{- if or (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
         - name: server-volume
           {{- if $app.persistentVolume.enabled }}
           persistentVolumeClaim:
-            claimName: {{ $app.persistentVolume.existingClaim | default "server-volume" }}
+            claimName: {{ $app.persistentVolume.existingClaim }}
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
+        {{- end }}
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

@@ -8,6 +8,7 @@
 - Do not use `grafana.dashboards` and `grafana.dashboardProviders`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1312).
 - Migrated Node Exporter dashboard into chart
 - Deprecated `grafana.sidecar.jsonData`, `grafana.provisionDefaultDatasource` in a favour of `grafana.sidecar.datasources.default` slice of datasources.
+- Fail if no notifiers are set, do not set `notifiers` to null if empty
 
 ## 0.25.10
 

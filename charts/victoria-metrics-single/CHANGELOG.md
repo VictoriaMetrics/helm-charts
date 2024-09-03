@@ -3,6 +3,7 @@
 ## Next release
 
 - Deprecated `server.vmbackupmanager.enable` in a favour of `server.vmbackupmanager.enabled`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/940).
+- Fixed PVC in StatefulSet
 
 ## 0.11.0
 
