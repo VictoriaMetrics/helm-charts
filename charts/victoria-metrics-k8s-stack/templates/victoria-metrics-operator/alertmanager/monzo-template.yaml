@@ -3,7 +3,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) "alertmanager-monzo-tpl" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   labels: 
     app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-alertmanager
 {{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
@@ -53,7 +53,7 @@ data:
     {{ define "slack.monzo.title" -}}
         [{{ .Status | toUpper -}}
         {{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{- end -}}
-        ] {{ template "__alert_severity_prefix_title" . }} {{ .CommonLabels.alertname }}
+        ] {{ include "__alert_severity_prefix_title" . }} {{ .CommonLabels.alertname }}
     {{- end }}
 
 

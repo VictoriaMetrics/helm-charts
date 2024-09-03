@@ -2,8 +2,8 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "vmalert.server.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "vmalert.server.fullname" . }}
+  namespace: {{ include "vm.namespace" . }}
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.server.podDisruptionBudget.labels) }}
   labels: {{ include "vmalert.server.labels" $ctx | nindent 4 }}
 spec:

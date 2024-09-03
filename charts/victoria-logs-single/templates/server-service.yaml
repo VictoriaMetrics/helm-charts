@@ -3,13 +3,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   {{- with $app.service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
   labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
-  name: {{ template "victoria-logs.server.fullname" . }}
+  name: {{ include "victoria-logs.server.fullname" . }}
 spec:
   {{- $clusterIP := ternary "None" $app.service.clusterIP $app.statefulSet.enabled }}
   {{- with $clusterIP }}

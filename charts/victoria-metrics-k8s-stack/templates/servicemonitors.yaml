@@ -1,7 +1,7 @@
 {{- $global := dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template) -}}
 {{- $scrapeLabels := (include "victoria-metrics-k8s-stack.labels" .) }}
 {{- $prefix := include "victoria-metrics-k8s-stack.fullname" . }}
-{{- $namespace := .Release.Namespace }}
+{{- $namespace := include "vm.namespace" . }}
 {{- range $name, $config := .Values }}
   {{- if and (kindIs "map" $config) $config.enabled (hasKey $config "vmScrape") }}
     {{- $svc := kebabcase $name }}

@@ -15,7 +15,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
   annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-3") | nindent 4 }}
 spec:

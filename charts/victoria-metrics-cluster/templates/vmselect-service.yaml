@@ -8,8 +8,8 @@ metadata:
   {{- end }}
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
   labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
-  name: {{ template "victoria-metrics.vmselect.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "victoria-metrics.vmselect.fullname" . }}
+  namespace: {{ include "vm.namespace" . }}
 spec:
   {{- $clusterIP := ternary "None" $app.service.clusterIP $app.statefulSet.enabled }}
   {{- with $clusterIP }}

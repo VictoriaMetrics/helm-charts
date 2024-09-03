@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ printf "%s-%s" .Release.Name "grafana-ds" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
     {{ index .Values "victoria-metrics-k8s-stack" "grafana" "sidecar" "datasources" "label" }}: "1"
 data:

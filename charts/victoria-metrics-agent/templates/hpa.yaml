@@ -12,7 +12,7 @@ metadata:
 {{ toYaml . | indent 4 }}
 {{- end }}
   name: {{ include "chart.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
 spec:
   maxReplicas: {{ .Values.horizontalPodAutoscaling.maxReplicas }}
   minReplicas: {{ .Values.horizontalPodAutoscaling.minReplicas }}

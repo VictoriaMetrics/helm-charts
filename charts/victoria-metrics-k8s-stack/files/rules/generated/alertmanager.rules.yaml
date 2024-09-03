@@ -10,7 +10,7 @@ rules:
   expr: |-
     # Without max_over_time, failed scrapes could create false negatives, see
     # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
-    max_over_time(alertmanager_config_last_reload_successful{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[5m]) == 0
+    max_over_time(alertmanager_config_last_reload_successful{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[5m]) == 0
   for: 10m
   labels:
     severity: critical
@@ -23,9 +23,9 @@ rules:
   expr: |-
     # Without max_over_time, failed scrapes could create false negatives, see
     # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
-      max_over_time(alertmanager_cluster_members{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[5m])
+      max_over_time(alertmanager_cluster_members{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[5m])
     < on (namespace,service,{{ .Values.global.clusterLabel }}) group_left
-      count by (namespace,service,{{ .Values.global.clusterLabel }}) (max_over_time(alertmanager_cluster_members{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[5m]))
+      count by (namespace,service,{{ .Values.global.clusterLabel }}) (max_over_time(alertmanager_cluster_members{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[5m]))
   for: 15m
   labels:
     severity: critical
@@ -37,9 +37,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      rate(alertmanager_notifications_failed_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[5m])
+      rate(alertmanager_notifications_failed_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[5m])
     /
-      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[5m])
+      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[5m])
     )
     > 0.01
   for: 5m
@@ -53,9 +53,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     min by (namespace,service,integration,{{ .Values.global.clusterLabel }}) (
-      rate(alertmanager_notifications_failed_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}", integration=~`.*`}[5m])
+      rate(alertmanager_notifications_failed_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration=~`.*`}[5m])
     /
-      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}", integration=~`.*`}[5m])
+      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration=~`.*`}[5m])
     )
     > 0.01
   for: 5m
@@ -69,9 +69,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     min by (namespace,service,integration,{{ .Values.global.clusterLabel }}) (
-      rate(alertmanager_notifications_failed_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}", integration!~`.*`}[5m])
+      rate(alertmanager_notifications_failed_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration!~`.*`}[5m])
     /
-      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}", integration!~`.*`}[5m])
+      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration!~`.*`}[5m])
     )
     > 0.01
   for: 5m
@@ -85,7 +85,7 @@ rules:
   condition: '{{ true }}'
   expr: |-
     count by (namespace,service,{{ .Values.global.clusterLabel }}) (
-      count_values by (namespace,service,{{ .Values.global.clusterLabel }}) ("config_hash", alertmanager_config_hash{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"})
+      count_values by (namespace,service,{{ .Values.global.clusterLabel }}) ("config_hash", alertmanager_config_hash{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"})
     )
     != 1
   for: 20m
@@ -100,11 +100,11 @@ rules:
   expr: |-
     (
       count by (namespace,service,{{ .Values.global.clusterLabel }}) (
-        avg_over_time(up{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[5m]) < 0.5
+        avg_over_time(up{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[5m]) < 0.5
       )
     /
       count by (namespace,service,{{ .Values.global.clusterLabel }}) (
-        up{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}
+        up{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}
       )
     )
     >= 0.5
@@ -120,11 +120,11 @@ rules:
   expr: |-
     (
       count by (namespace,service,{{ .Values.global.clusterLabel }}) (
-        changes(process_start_time_seconds{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}[10m]) > 4
+        changes(process_start_time_seconds{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[10m]) > 4
       )
     /
       count by (namespace,service,{{ .Values.global.clusterLabel }}) (
-        up{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ .Release.Namespace }}"}
+        up{job="{{ include "victoria-metrics-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}
       )
     )
     >= 0.5

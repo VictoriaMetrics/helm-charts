@@ -1,4 +1,3 @@
-{{- $top := . -}}
 {{- range $zone := .Values.availabilityZones }}
 {{- if $zone.vmauthIngest.enabled }}
 ---
@@ -6,19 +5,17 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
   name: {{ $zone.vmauthIngest.name | default (printf "vmauth-write-balancer-%s" $zone.name ) }}
-  namespace: {{ $top.Release.Namespace }}
-  labels: {{ include "victoria-metrics-distributed.labels" $top | nindent 4 }}
+  namespace: {{ include "vm.namespace" $ }}
+  labels: {{ include "victoria-metrics-distributed.labels" $ | nindent 4 }}
   {{- with $zone.vmauthIngest.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
 spec:
 {{- $nodeSelector := deepCopy $zone.nodeSelector }}
 {{- if $zone.vmauthIngest.spec.nodeSelector }}
 {{- $nodeSelector = mergeOverwrite (deepCopy $zone.nodeSelector) $zone.vmauthIngest.spec.nodeSelector }}
 {{- end }}
-  nodeSelector:
-{{- toYaml $nodeSelector | nindent 4 }}
+  nodeSelector: {{ toYaml $nodeSelector | nindent 4 }}
 {{- if or $zone.extraAffinity ( and $zone.vmauthIngest.spec $zone.vmauthIngest.spec.affinity ) }}
 {{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmauthIngest.spec.affinity | default (dict)) }}
   affinity:
@@ -28,8 +25,7 @@ spec:
 {{- if $zone.vmauthIngest.spec.topologySpreadConstraints }}
 {{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmauthIngest.spec.topologySpreadConstraints }}
 {{- end }}
-  topologySpreadConstraints:
-{{- toYaml $topologySpreadConstraints | nindent 4 }}
+  topologySpreadConstraints: {{ toYaml $topologySpreadConstraints | nindent 4 }}
   unauthorizedAccessConfig:
     - src_paths:
         - "/insert/.+"

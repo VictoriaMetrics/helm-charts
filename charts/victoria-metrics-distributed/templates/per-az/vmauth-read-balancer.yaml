@@ -6,7 +6,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
   name: {{ $zone.vmauthQueryPerZone.name | default (printf "vmauth-read-balancer-%s" $zone.name ) }}
-  namespace: {{ $top.Release.Namespace }}
+  namespace: {{ include "vm.namespace" $ }}
   labels: {{ include "victoria-metrics-distributed.labels" $top | nindent 4 }}
   {{- with $zone.vmauthQueryPerZone.annotations }}
   annotations:

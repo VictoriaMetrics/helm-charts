@@ -43,7 +43,7 @@ Check if dashboard is enabled
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  namespace: {{ $.Release.Namespace }}
+  namespace: {{ include "vm.namespace" $ }}
   name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) $dashboardName | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     app: {{ $app }}
@@ -61,7 +61,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ $.Release.Namespace }}
+  namespace: {{ include "vm.namespace" $ }}
   name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) $dashboardName | trunc 63 | trimSuffix "-" | trimSuffix "." }}
   labels:
     {{- if $.Values.grafana.sidecar.dashboards.label }}

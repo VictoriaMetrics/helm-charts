@@ -4,8 +4,8 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ template "victoria-logs.server.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "victoria-logs.server.fullname" . }}
+  namespace: {{ include "vm.namespace" . }}
   {{- with .Values.server.persistentVolume.annotations  }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}

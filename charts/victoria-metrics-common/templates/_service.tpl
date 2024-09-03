@@ -22,7 +22,7 @@
   {{- $name := (include "vm.service" .) -}}
   {{- $Release := (.helm).Release | default .Release -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $ns := $Release.Namespace -}}
+  {{- $ns := (include "vm.namespace .) -}}
   {{- $proto := "http" -}}
   {{- $port := 80 -}}
   {{- $path := .appRoute | default "/" -}}

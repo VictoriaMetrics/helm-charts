@@ -10,7 +10,7 @@ metadata:
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.ingressInternal.extraLabels) }}
   labels: {{ include "chart.labels" . | nindent 4 }}
   name: {{ $serviceName }}-internal
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
 spec:
   {{- with $app.ingressInternal.ingressClassName }}
   ingressClassName: {{ . }}

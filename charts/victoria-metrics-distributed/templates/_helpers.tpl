@@ -159,7 +159,7 @@ Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstrai
 Gets global query entrance as grafana default datasource
 */}}
 {{- define "victoria-metrics-distributed.globalQueryAddr" -}}
-url: {{ printf "http://vmauth-%s.%s.svc:%s/select/0/prometheus/" (include "victoria-metrics-distributed.vmauthQueryGlobalName" .) .Release.Namespace (.Values.vmauthQueryGlobal.spec.port | default "8427") }}
+url: {{ printf "http://vmauth-%s.%s.svc:%s/select/0/prometheus/" (include "victoria-metrics-distributed.vmauthQueryGlobalName" .) (include "vm.namespace" .) (.Values.vmauthQueryGlobal.spec.port | default "8427") }}
 {{- end }}
 
 
@@ -167,6 +167,6 @@ url: {{ printf "http://vmauth-%s.%s.svc:%s/select/0/prometheus/" (include "victo
 Remote write spec for test-vmagent
 */}}
 {{- define "victoria-metrics-distributed.extravmagentSpec" -}}
-{{- $remoteWriteSpec := dict "remoteWrite" (list ( dict "url" (printf "http://vmauth-%s.%s.svc:%s/prometheus/api/v1/write" (include "victoria-metrics-distributed.vmauthIngestGlobalName" .) .Release.Namespace (.Values.vmauthIngestGlobal.spec.port | default "8427") ) )) }}
+{{- $remoteWriteSpec := dict "remoteWrite" (list ( dict "url" (printf "http://vmauth-%s.%s.svc:%s/prometheus/api/v1/write" (include "victoria-metrics-distributed.vmauthIngestGlobalName" .) (include "vm.namespace" .) (.Values.vmauthIngestGlobal.spec.port | default "8427") ) )) }}
 {{- tpl (deepCopy .Values.extraVMAgent.spec | mergeOverwrite $remoteWriteSpec | toYaml) . }}
 {{- end }}

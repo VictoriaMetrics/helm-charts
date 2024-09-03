@@ -1,17 +1,15 @@
-{{- $top := . -}}
 {{- range $zone := .Values.availabilityZones }}
 {{- if $zone.vmagent.enabled }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAgent
 metadata:
-  labels: {{ include "victoria-metrics-distributed.labels" $top | nindent 4 }}
+  labels: {{ include "victoria-metrics-distributed.labels" $ | nindent 4 }}
   {{- with $zone.vmagent.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
   name: {{ $zone.vmagent.name | default (printf "vmagent-%s" $zone.name ) }}
-  namespace: {{ $top.Release.Namespace }}
+  namespace: {{ include "vm.namespace" $ }}
 spec:
 {{- if and $zone.vmagent.spec $zone.vmagent.spec.remoteWrite }}
 {{- fail "Error: distributed vmagent doesn't support customized remoteWrite address" }}
@@ -20,21 +18,18 @@ spec:
 {{- if and $zone.vmagent.spec $zone.vmagent.spec.nodeSelector }}
 {{- $nodeSelector = mergeOverwrite (deepCopy $zone.nodeSelector) $zone.vmagent.spec.nodeSelector }}
 {{- end }}
-  nodeSelector:
-{{- toYaml $nodeSelector | nindent 4 }}
+  nodeSelector: {{ toYaml $nodeSelector | nindent 4 }}
 {{- if or $zone.extraAffinity ( and $zone.vmagent.spec $zone.vmagent.spec.affinity ) }}
 {{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmagent.spec.affinity | default (dict)) }}
-  affinity:
-{{- toYaml $affinity | nindent 4 }}
+  affinity: {{ toYaml $affinity | nindent 4 }}
 {{- end }}
 {{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
 {{- if and $zone.vmagent.spec $zone.vmagent.spec.topologySpreadConstraints }}
 {{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmagent.spec.topologySpreadConstraints }}
 {{- end }}
-  topologySpreadConstraints:
-{{- toYaml $topologySpreadConstraints | nindent 2 }}
+  topologySpreadConstraints: {{ toYaml $topologySpreadConstraints | nindent 4 }}
   remoteWrite:
-{{- default "{}" (include "per-zone-vmagent.remoteWriteAddr" $top) }}
+{{- default "{}" (include "per-zone-vmagent.remoteWriteAddr" $) }}
 {{- $spec := deepCopy $zone.vmagent.spec }}
 {{- $spec := unset $spec "nodeSelector" }}
 {{- $spec := unset $spec "affinity" }}
@@ -45,8 +40,7 @@ spec:
 {{- end }}
 {{- if $.Values.enableMultitenancy }}
   {{- $mergedSettings := merge (default (default dict) $zone.vmagent.spec.remoteWriteSettings) (dict "useMultiTenantMode" true) }}
-  remoteWriteSettings:
-    {{- toYaml $mergedSettings | nindent 4 }}
+  remoteWriteSettings: {{ toYaml $mergedSettings | nindent 4 }}
 {{- end }}
 {{- end }}
 {{- end }}

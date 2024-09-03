@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "victoria-metrics.server.fullname" . }}-relabelconfig
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "victoria-metrics.server.fullname" . }}-relabelconfig
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "victoria-metrics.server.labels" . | nindent 4 }}
 data:
   relabel.yml: |{{ toYaml .Values.server.relabel.config | nindent 4 }}

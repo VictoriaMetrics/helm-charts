@@ -24,13 +24,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ template "vm-operator.fullname" . }}
+  name: {{ include "vm-operator.fullname" . }}
   {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
 rules:
 - apiGroups:
   - ""
@@ -69,7 +69,7 @@ rules:
   - leases
 
 {{- $watchNamespaces := (fromYaml (tpl (toYaml (dict "ns" .Values.watchNamespaces)) .)).ns }}
-{{- $selfNamespace := .Release.Namespace }}
+{{- $selfNamespace := (include "vm.namespace" .) }}
 {{- $watchSelfNamespace := (and (eq (len $watchNamespaces) 1) (eq (first $watchNamespaces) $selfNamespace)) }}
 {{- if not $watchSelfNamespace }}
 ---
@@ -208,7 +208,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ include "vm-operator.cleanupHookName" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
   annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-5") | nindent 4 }}
 rules: {{ toYaml $rules.admin | nindent 2 }}

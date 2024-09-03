@@ -4,7 +4,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "vmalert.alertmanager.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vmalert.alertmanager.labels" . | nindent 4 }}
   {{- with .Values.alertmanager.persistentVolume.annotations  }}
   annotations: {{ toYaml . | nindent 4 }}

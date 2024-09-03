@@ -1,4 +1,3 @@
-{{- $top := . -}}
 {{- range $i, $zone := .Values.availabilityZones }}
 {{- if and $zone.vmauthCrossAZQuery.enabled $zone.vmauthQueryPerZone.enabled}}
 ---
@@ -6,30 +5,26 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
   name: {{ $zone.vmauthCrossAZQuery.name | default (printf "vmauth-read-proxy-%s" $zone.name ) }}
-  namespace: {{ $top.Release.Namespace }}
-  labels: {{ include "victoria-metrics-distributed.labels" $top | nindent 4 }}
+  namespace: {{ include "vm.namespace" $ }}
+  labels: {{ include "victoria-metrics-distributed.labels" $ | nindent 4 }}
   {{- with $zone.vmauthCrossAZQuery.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
 spec:
 {{- $nodeSelector := deepCopy $zone.nodeSelector }}
 {{- if $zone.vmauthCrossAZQuery.spec.nodeSelector }}
 {{- $nodeSelector = mergeOverwrite (deepCopy $zone.nodeSelector) $zone.vmauthCrossAZQuery.spec.nodeSelector }}
 {{- end }}
-  nodeSelector:
-{{- toYaml $nodeSelector | nindent 4 }}
+  nodeSelector: {{ toYaml $nodeSelector | nindent 4 }}
 {{- if or $zone.extraAffinity ( and $zone.vmauthCrossAZQuery.spec $zone.vmauthCrossAZQuery.spec.affinity ) }}
 {{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmauthCrossAZQuery.spec.affinity | default (dict)) }}
-  affinity:
-{{- toYaml $affinity | nindent 4 }}
+  affinity: {{ toYaml $affinity | nindent 4 }}
 {{- end }}
 {{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
 {{- if $zone.vmauthCrossAZQuery.spec.topologySpreadConstraints }}
 {{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmauthCrossAZQuery.spec.topologySpreadConstraints }}
 {{- end }}
-  topologySpreadConstraints:
-{{- toYaml $topologySpreadConstraints | nindent 4 }}
+  topologySpreadConstraints: {{ toYaml $topologySpreadConstraints | nindent 4 }}
   unauthorizedAccessConfig:
     - src_paths:
         - "/select/.+"

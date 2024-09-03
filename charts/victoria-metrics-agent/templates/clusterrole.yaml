@@ -3,9 +3,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ ternary "Role" "ClusterRole" $namespaced }}
 metadata:
-  name: {{ template "chart.fullname" . }}{{- ternary "" "-clusterrole" $namespaced }}
+  name: {{ include "chart.fullname" . }}{{- ternary "" "-clusterrole" $namespaced }}
   {{- if $namespaced }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vm.namespace" . }}
   {{- end }}
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.rbac.extraLabels) }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}

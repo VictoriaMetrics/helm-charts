@@ -1,4 +1,3 @@
-{{- $top := . -}}
 {{- $zonesMap := include "per-zone-vmcluster.vmclusterSpec" . | fromYaml -}}
 {{- range $zoneName, $rolloutZone := $zonesMap }}
 ---
@@ -6,12 +5,11 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMCluster
 metadata:
   {{- with $rolloutZone.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
   name: vmcluster-{{ $zoneName }}
-  namespace: {{ $top.Release.Namespace }}
-  labels: {{ include "victoria-metrics-distributed.labels" $top | nindent 4 }}
+  namespace: {{ include "vm.namespace" $ }}
+  labels: {{ include "victoria-metrics-distributed.labels" $ | nindent 4 }}
 spec:
 {{- toYaml (deepCopy $rolloutZone) | nindent 2 }}
 {{- end }}

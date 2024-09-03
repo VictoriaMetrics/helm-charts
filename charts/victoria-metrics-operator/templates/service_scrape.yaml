@@ -5,8 +5,8 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ template "vm-operator.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "vm-operator.fullname" . }}
+  namespace: {{ include "vm.namespace" . }}
   {{- $ctx := dict "helm" . "extraLabels" $mergedVMServiceScrapeLabels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
   {{- with $mergedVMServiceScrapeAnnotations }}
@@ -37,5 +37,5 @@ spec:
       {{- end }}
   namespaceSelector:
     matchNames:
-      - {{ .Release.Namespace }}
+      - {{ include "vm.namespace" . }}
 {{- end }}
