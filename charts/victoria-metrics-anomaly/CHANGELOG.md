@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 1.4.4
+
+**Release date:** 2024-09-03
+
+![AppVersion: v1.15.9](https://img.shields.io/static/v1?label=AppVersion&message=v1.15.9&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Fixed PVC in StatefulSet
 
 ## 1.4.3
