@@ -94,9 +94,9 @@ spec:
 ```
 where `<fullname>` is output of `{{ include "vm-operator.fullname" }}` for your setup
 
-#### `metadata.annotations: Too long: must have at most` on dashboards
+#### `metadata.annotations: Too long: must have at most 262144 bytes` on dashboards
 
-If one of dashboards ConfigMap is failing with error `metadata.annotations: Too long: must have at most`, please make sure you've added `argocd.argoproj.io/sync-options: ServerSideApply=true` annotation to your dashboards:
+If one of dashboards ConfigMap is failing with error `Too long: must have at most 262144 bytes`, please make sure you've added `argocd.argoproj.io/sync-options: ServerSideApply=true` annotation to your dashboards:
 
 ```yaml
 grafana:
