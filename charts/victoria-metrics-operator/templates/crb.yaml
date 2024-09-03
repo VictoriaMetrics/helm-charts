@@ -1,4 +1,8 @@
-{{- if .Values.rbac.create -}}
+{{- $watchNamespaces := (fromYaml (tpl (toYaml (dict "ns" .Values.watchNamespaces)) .)).ns }}
+{{- $selfNamespace := .Release.Namespace }}
+{{- $watchSelfNamespace := (and (eq (len $watchNamespaces) 1) (eq (first $watchNamespaces) $selfNamespace)) }}
+
+{{- if and .Values.rbac.create (not $watchSelfNamespace) }}
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:

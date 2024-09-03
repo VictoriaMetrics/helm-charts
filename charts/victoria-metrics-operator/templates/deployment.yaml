@@ -45,7 +45,7 @@ spec:
             {{- end }}
             {{- if .Values.watchNamespaces }}
             - name: WATCH_NAMESPACE
-              value: {{ .Values.watchNamespaces | join "," | quote }}
+              value: {{ (tpl (.Values.watchNamespaces | join ",") .) | quote }}
             {{- end }}
             - name: POD_NAME
               valueFrom:
