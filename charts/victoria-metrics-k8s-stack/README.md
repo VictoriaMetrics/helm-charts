@@ -115,6 +115,39 @@ kubelet:
     interval: "30s"
 ```
 
+### Using externally managed Grafana
+
+If you want to use an externally managed Grafana instance but still want to use the dashboards provided by this chart you can set
+ `grafana.enabled` to `false` and set `defaultDashboardsEnabled` to `true`. This will install the dashboards
+ but will not install Grafana.
+
+For example:
+```yaml
+defaultDashboardsEnabled: true
+
+grafana:
+  enabled: false
+```
+
+This will create ConfigMaps with dashboards to be imported into Grafana.
+
+If additional configuration for labels or annotations is needed in order to import dashboard to an existing Grafana you can
+set `.grafana.sidecar.dashboards.additionalDashboardLabels` or `.grafana.sidecar.dashboards.additionalDashboardAnnotations` in `values.yaml`:
+
+For example:
+```yaml
+defaultDashboardsEnabled: true
+
+grafana:
+  enabled: false
+  sidecar:
+    dashboards:
+      additionalDashboardLabels:
+        key: value
+      additionalDashboardAnnotations:
+        key: value
+```
+
 ## Prerequisites
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
