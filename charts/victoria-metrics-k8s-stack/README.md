@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.25.11](https://img.shields.io/badge/Version-0.25.11-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.25.12](https://img.shields.io/badge/Version-0.25.12-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -104,11 +104,6 @@ This chart installs multiple scrape configurations for kubernetes monitoring. Th
 ```yaml
 kubelet:
   enabled: true
-
-  # -- Enable scraping /metrics/cadvisor from kubelet's service
-  cadvisor: true
-  # -- Enable scraping /metrics/probes from kubelet's service
-  probes: true
   # spec for VMNodeScrape crd
   # https://docs.victoriametrics.com/operator/api#vmnodescrapespec
   spec:
@@ -343,7 +338,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 | coreDns.service.targetPort | int | `9153` |  |
 | coreDns.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | crds.enabled | bool | `true` |  |
-| dashboards | object | `{"operator":false,"vmalert":false}` | Enable dashboards despite it's dependency is not installed |
+| dashboards | object | `{"node-exporter-full":true,"operator":false,"vmalert":false}` | Enable dashboards despite it's dependency is not installed |
+| dashboards.node-exporter-full | bool | `true` | in ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1409) |
 | defaultDashboardsEnabled | bool | `true` | Create default dashboards |
 | defaultRules | object | `{"alerting":{"spec":{"annotations":{},"labels":{}}},"annotations":{},"create":true,"group":{"spec":{"params":{}}},"groups":{"alertmanager":{"create":true,"rules":{}},"etcd":{"create":true,"rules":{}},"general":{"create":true,"rules":{}},"k8sContainerCpuUsageSecondsTotal":{"create":true,"rules":{}},"k8sContainerMemoryCache":{"create":true,"rules":{}},"k8sContainerMemoryRss":{"create":true,"rules":{}},"k8sContainerMemorySwap":{"create":true,"rules":{}},"k8sContainerMemoryWorkingSetBytes":{"create":true,"rules":{}},"k8sContainerResource":{"create":true,"rules":{}},"k8sPodOwner":{"create":true,"rules":{}},"kubeApiserver":{"create":true,"rules":{}},"kubeApiserverAvailability":{"create":true,"rules":{}},"kubeApiserverBurnrate":{"create":true,"rules":{}},"kubeApiserverHistogram":{"create":true,"rules":{}},"kubeApiserverSlos":{"create":true,"rules":{}},"kubePrometheusGeneral":{"create":true,"rules":{}},"kubePrometheusNodeRecording":{"create":true,"rules":{}},"kubeScheduler":{"create":true,"rules":{}},"kubeStateMetrics":{"create":true,"rules":{}},"kubelet":{"create":true,"rules":{}},"kubernetesApps":{"create":true,"rules":{},"targetNamespace":".*"},"kubernetesResources":{"create":true,"rules":{}},"kubernetesStorage":{"create":true,"rules":{},"targetNamespace":".*"},"kubernetesSystem":{"create":true,"rules":{}},"kubernetesSystemApiserver":{"create":true,"rules":{}},"kubernetesSystemControllerManager":{"create":true,"rules":{}},"kubernetesSystemKubelet":{"create":true,"rules":{}},"kubernetesSystemScheduler":{"create":true,"rules":{}},"node":{"create":true,"rules":{}},"nodeNetwork":{"create":true,"rules":{}},"vmHealth":{"create":true,"rules":{}},"vmagent":{"create":true,"rules":{}},"vmcluster":{"create":true,"rules":{}},"vmoperator":{"create":true,"rules":{}},"vmsingle":{"create":true,"rules":{}}},"labels":{},"recording":{"spec":{"annotations":{},"labels":{}}},"rule":{"spec":{"annotations":{},"labels":{}}},"rules":{},"runbookUrl":"https://runbooks.prometheus-operator.dev/runbooks"}` | Create default rules for monitoring the cluster |
 | defaultRules.alerting | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for VMRules alerts |
@@ -388,7 +384,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.dashboards.defaultFolderName | string | `"default"` |  |
 | grafana.sidecar.dashboards.enabled | bool | `true` |  |
 | grafana.sidecar.dashboards.folder | string | `"/var/lib/grafana/dashboards"` |  |
-| grafana.sidecar.dashboards.multicluster | bool | `false` |  |
+| grafana.sidecar.dashboards.multicluster | bool | `true` |  |
 | grafana.sidecar.dashboards.provider.name | string | `"default"` |  |
 | grafana.sidecar.dashboards.provider.orgid | int | `1` |  |
 | grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |

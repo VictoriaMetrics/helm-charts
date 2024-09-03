@@ -23,6 +23,15 @@ class literal(str):
     pass
 
 
+class CustomDumper(yaml.Dumper):
+    def represent_data(self, data):
+        # workaround for strings values, that are automatically transformed to "true" in fromYaml helm template function
+        if isinstance(data, str) and data in ["y", "n", "yes", "no", "on", "off"]:
+            return self.represent_scalar("tag:yaml.org,2002:str", data, style="'")
+
+        return super(CustomDumper, self).represent_data(data)
+
+
 def change_style(style, representer):
     def new_representer(dumper, data):
         scalar = representer(dumper, data)
@@ -65,6 +74,7 @@ condition_map = {
     "scheduler": ".Values.kubeScheduler.enabled",
     "node-rsrc-use": '(index .Values "prometheus-node-exporter" "enabled")',
     "node-cluster-rsrc-use": '(index .Values "prometheus-node-exporter" "enabled")',
+    "node-exporter-full": "false",
     "victoriametrics-cluster": ".Values.vmcluster.enabled",
     "victoriametrics-single-node": ".Values.vmsingle.enabled",
     "victoriametrics-vmalert": ".Values.vmalert.enabled",
@@ -116,13 +126,6 @@ def fix_expr(target):
 
 
 def replace_ds_type_in_panel(panel):
-    if "gridPos" in panel:
-
-        # workaround for 'y' key, as it's automatically transformed to "true" in fromYaml helm template function
-        if "y" in panel["gridPos"]:
-            y = panel["gridPos"]["y"]
-            del panel["gridPos"]["y"]
-            panel["gridPos"]["[[ .yaxis ]]"] = y
     if "datasource" in panel:
         if "type" in panel["datasource"]:
             panel["datasource"][
@@ -205,6 +208,7 @@ def yaml_dump(struct):
         struct,
         width=1000,  # to disable line wrapping
         default_flow_style=False,  # to disable multiple items on single line
+        Dumper=CustomDumper,
     )
 
 

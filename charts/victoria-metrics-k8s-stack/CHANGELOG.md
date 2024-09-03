@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- Fixed dashboards rendering. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1414)
+- Fixed service monitor label name.
 
 ## 0.25.11
 

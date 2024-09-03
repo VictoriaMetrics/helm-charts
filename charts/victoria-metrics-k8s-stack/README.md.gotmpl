@@ -64,6 +64,7 @@ vmagent:
 
 ### ArgoCD issues
 
+#### Operator self signed certificates
 When deploying K8s stack using ArgoCD without Cert Manager (`.Values.victoria-metrics-operator.admissionWebhooks.certManager.enabled: false`)
 it will rerender operator's webhook certificates on each sync since Helm `lookup` function is not respected by ArgoCD.
 To prevent this please update you K8s stack Application `spec.syncPolicy` and `spec.ignoreDifferences` with a following:
@@ -95,6 +96,20 @@ spec:
 ```
 where `<fullname>` is output of `{{"{{"}} include "vm-operator.fullname" {{"}}"}}` for your setup
 
+#### `metadata.annotations: Too long: must have at most` on dashboards
+
+If one of dashboards ConfigMap is failing with error `metadata.annotations: Too long: must have at most`, please make sure you've added `argocd.argoproj.io/sync-options: ServerSideApply=true` annotation to your dashboards:
+
+```yaml
+grafana:
+  sidecar:
+    dashboards:
+      additionalDashboardAnnotations
+        argocd.argoproj.io/sync-options: ServerSideApply=true
+```
+
+argocd.argoproj.io/sync-options: ServerSideApply=true 
+
 ### Rules and dashboards
 
 This chart by default install multiple dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
@@ -106,11 +121,6 @@ This chart installs multiple scrape configurations for kubernetes monitoring. Th
 ```yaml
 kubelet:
   enabled: true
-
-  # -- Enable scraping /metrics/cadvisor from kubelet's service
-  cadvisor: true
-  # -- Enable scraping /metrics/probes from kubelet's service
-  probes: true
   # spec for VMNodeScrape crd
   # https://docs.victoriametrics.com/operator/api#vmnodescrapespec
   spec:
