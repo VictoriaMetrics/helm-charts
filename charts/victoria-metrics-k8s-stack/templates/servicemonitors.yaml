@@ -43,7 +43,7 @@ subsets:
     {{- end }}
     {{- $selector := default dict }}
     {{- if and ($config.service).enabled (empty (index $.Subcharts $name)) }}
-      {{- $extraLabels := dict "app" $fullname "jobName" $svc }}
+      {{- $extraLabels := dict "app" $fullname "jobLabel" $svc }}
       {{- $_ := set $ctx "extraLabels" $extraLabels }}
       {{- $selector = dict "matchLabels" (fromYaml (include "victoria-metrics-k8s-stack.selectorLabels" $ctx)) }}
 ---
