@@ -1,6 +1,6 @@
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.25.10](https://img.shields.io/badge/Version-0.25.10-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.25.11](https://img.shields.io/badge/Version-0.25.11-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -454,10 +454,9 @@ Change the values according to the need of the environment in ``victoria-metrics
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
 | tenant | string | `"0"` |  |
-| victoria-metrics-operator | object | `{"crd":{"cleanup":{"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl"}},"create":false},"createCRD":false,"enabled":true,"operator":{"disable_prometheus_converter":false},"vmScrape":{"spec":{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ .Release.Namespace }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars |
+| victoria-metrics-operator | object | `{"crd":{"cleanup":{"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl"}},"create":false},"enabled":true,"operator":{"disable_prometheus_converter":false},"vmScrape":{"spec":{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ .Release.Namespace }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars |
 | victoria-metrics-operator.crd.cleanup | object | `{"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl"}}` | tells helm to clean up vm cr resources when uninstalling |
 | victoria-metrics-operator.crd.create | bool | `false` | we disable crd creation by operator chart as we create them in this chart |
-| victoria-metrics-operator.createCRD | bool | `false` | deprecated, will be removed after operator release |
 | victoria-metrics-operator.operator.disable_prometheus_converter | bool | `false` | By default, operator converts prometheus-operator objects. |
 | victoria-metrics-operator.vmScrape.spec | object | `{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ .Release.Namespace }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
 | vmagent.additionalRemoteWrites | list | `[]` |  |
