@@ -1905,16 +1905,8 @@ crd:
 enabled: true
 operator:
     disable_prometheus_converter: false
-vmScrape:
-    spec:
-        endpoints:
-            - port: http
-        namespaceSelector:
-            matchNames:
-                - '{{ include "vm.namespace" . }}'
-        selector:
-            matchLabels:
-                app.kubernetes.io/name: victoria-metrics-operator
+serviceMonitor:
+    enabled: true
 </pre>
 </td>
       <td><p>also checkout here possible ENV variables to configure operator behaviour <a href="https://docs.victoriametrics.com/operator/vars" target="_blank">https://docs.victoriametrics.com/operator/vars</a></p>
@@ -1951,23 +1943,6 @@ false
 </pre>
 </td>
       <td><p>By default, operator converts prometheus-operator objects.</p>
-</td>
-    </tr>
-    <tr>
-      <td>victoria-metrics-operator.vmScrape.spec</td>
-      <td>object</td>
-      <td><pre lang="plaintext">
-endpoints:
-    - port: http
-namespaceSelector:
-    matchNames:
-        - '{{ include "vm.namespace" . }}'
-selector:
-    matchLabels:
-        app.kubernetes.io/name: victoria-metrics-operator
-</pre>
-</td>
-      <td><p>spec for VMServiceScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec</a></p>
 </td>
     </tr>
     <tr>
