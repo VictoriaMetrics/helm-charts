@@ -62,6 +62,7 @@ vmagent:
 
 ### ArgoCD issues
 
+#### Operator self signed certificates
 When deploying K8s stack using ArgoCD without Cert Manager (`.Values.victoria-metrics-operator.admissionWebhooks.certManager.enabled: false`)
 it will rerender operator's webhook certificates on each sync since Helm `lookup` function is not respected by ArgoCD.
 To prevent this please update you K8s stack Application `spec.syncPolicy` and `spec.ignoreDifferences` with a following:
@@ -92,6 +93,20 @@ spec:
       - '.webhooks[]?.clientConfig.caBundle'
 ```
 where `<fullname>` is output of `{{ include "vm-operator.fullname" }}` for your setup
+
+#### `metadata.annotations: Too long: must have at most` on dashboards
+
+If one of dashboards ConfigMap is failing with error `metadata.annotations: Too long: must have at most`, please make sure you've added `argocd.argoproj.io/sync-options: ServerSideApply=true` annotation to your dashboards:
+
+```yaml
+grafana:
+  sidecar:
+    dashboards:
+      additionalDashboardAnnotations
+        argocd.argoproj.io/sync-options: ServerSideApply=true
+```
+
+argocd.argoproj.io/sync-options: ServerSideApply=true
 
 ### Rules and dashboards
 
@@ -384,7 +399,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 | grafana.sidecar.dashboards.defaultFolderName | string | `"default"` |  |
 | grafana.sidecar.dashboards.enabled | bool | `true` |  |
 | grafana.sidecar.dashboards.folder | string | `"/var/lib/grafana/dashboards"` |  |
-| grafana.sidecar.dashboards.multicluster | bool | `true` |  |
+| grafana.sidecar.dashboards.multicluster | bool | `false` |  |
 | grafana.sidecar.dashboards.provider.name | string | `"default"` |  |
 | grafana.sidecar.dashboards.provider.orgid | int | `1` |  |
 | grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |
