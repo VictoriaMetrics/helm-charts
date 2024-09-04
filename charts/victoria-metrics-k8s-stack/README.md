@@ -1,6 +1,7 @@
+
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.25.12](https://img.shields.io/badge/Version-0.25.12-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.25.12](https://img.shields.io/badge/Version-0.25.12-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -355,234 +356,2182 @@ The following tables lists the configurable parameters of the chart and their de
 
 Change the values according to the need of the environment in ``victoria-metrics-k8s-stack/values.yaml`` file.
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| additionalVictoriaMetricsMap | string | `nil` |  |
-| alertmanager.annotations | object | `{}` |  |
-| alertmanager.config.receivers[0].name | string | `"blackhole"` |  |
-| alertmanager.config.route.receiver | string | `"blackhole"` |  |
-| alertmanager.config.templates[0] | string | `"/etc/vm/configs/**/*.tmpl"` |  |
-| alertmanager.enabled | bool | `true` |  |
-| alertmanager.ingress.annotations | object | `{}` |  |
-| alertmanager.ingress.enabled | bool | `false` |  |
-| alertmanager.ingress.extraPaths | list | `[]` |  |
-| alertmanager.ingress.hosts[0] | string | `"alertmanager.domain.com"` |  |
-| alertmanager.ingress.labels | object | `{}` |  |
-| alertmanager.ingress.path | string | `"/"` |  |
-| alertmanager.ingress.pathType | string | `"Prefix"` |  |
-| alertmanager.ingress.tls | list | `[]` |  |
-| alertmanager.monzoTemplate.enabled | bool | `true` |  |
-| alertmanager.spec.externalURL | string | `""` |  |
-| alertmanager.spec.image.tag | string | `"v0.25.0"` |  |
-| alertmanager.spec.port | string | `"9093"` |  |
-| alertmanager.spec.routePrefix | string | `"/"` |  |
-| alertmanager.spec.selectAllByDefault | bool | `true` |  |
-| alertmanager.templateFiles | object | `{}` |  |
-| argocdReleaseOverride | string | `""` | For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME' |
-| coreDns.enabled | bool | `true` |  |
-| coreDns.service.enabled | bool | `true` |  |
-| coreDns.service.port | int | `9153` |  |
-| coreDns.service.selector.k8s-app | string | `"kube-dns"` |  |
-| coreDns.service.targetPort | int | `9153` |  |
-| coreDns.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics"}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
-| crds.enabled | bool | `true` |  |
-| dashboards | object | `{"node-exporter-full":true,"operator":false,"vmalert":false}` | Enable dashboards despite it's dependency is not installed |
-| dashboards.node-exporter-full | bool | `true` | in ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply See [this issue](https://github.com/VictoriaMetrics/helm-charts/tree/disable-node-exporter-dashboard-by-default/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards) |
-| defaultDashboardsEnabled | bool | `true` | Create default dashboards |
-| defaultRules | object | `{"alerting":{"spec":{"annotations":{},"labels":{}}},"annotations":{},"create":true,"group":{"spec":{"params":{}}},"groups":{"alertmanager":{"create":true,"rules":{}},"etcd":{"create":true,"rules":{}},"general":{"create":true,"rules":{}},"k8sContainerCpuUsageSecondsTotal":{"create":true,"rules":{}},"k8sContainerMemoryCache":{"create":true,"rules":{}},"k8sContainerMemoryRss":{"create":true,"rules":{}},"k8sContainerMemorySwap":{"create":true,"rules":{}},"k8sContainerMemoryWorkingSetBytes":{"create":true,"rules":{}},"k8sContainerResource":{"create":true,"rules":{}},"k8sPodOwner":{"create":true,"rules":{}},"kubeApiserver":{"create":true,"rules":{}},"kubeApiserverAvailability":{"create":true,"rules":{}},"kubeApiserverBurnrate":{"create":true,"rules":{}},"kubeApiserverHistogram":{"create":true,"rules":{}},"kubeApiserverSlos":{"create":true,"rules":{}},"kubePrometheusGeneral":{"create":true,"rules":{}},"kubePrometheusNodeRecording":{"create":true,"rules":{}},"kubeScheduler":{"create":true,"rules":{}},"kubeStateMetrics":{"create":true,"rules":{}},"kubelet":{"create":true,"rules":{}},"kubernetesApps":{"create":true,"rules":{},"targetNamespace":".*"},"kubernetesResources":{"create":true,"rules":{}},"kubernetesStorage":{"create":true,"rules":{},"targetNamespace":".*"},"kubernetesSystem":{"create":true,"rules":{}},"kubernetesSystemApiserver":{"create":true,"rules":{}},"kubernetesSystemControllerManager":{"create":true,"rules":{}},"kubernetesSystemKubelet":{"create":true,"rules":{}},"kubernetesSystemScheduler":{"create":true,"rules":{}},"node":{"create":true,"rules":{}},"nodeNetwork":{"create":true,"rules":{}},"vmHealth":{"create":true,"rules":{}},"vmagent":{"create":true,"rules":{}},"vmcluster":{"create":true,"rules":{}},"vmoperator":{"create":true,"rules":{}},"vmsingle":{"create":true,"rules":{}}},"labels":{},"recording":{"spec":{"annotations":{},"labels":{}}},"rule":{"spec":{"annotations":{},"labels":{}}},"rules":{},"runbookUrl":"https://runbooks.prometheus-operator.dev/runbooks"}` | Create default rules for monitoring the cluster |
-| defaultRules.alerting | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for VMRules alerts |
-| defaultRules.alerting.spec.annotations | object | `{}` | Additional annotations for VMRule alerts |
-| defaultRules.alerting.spec.labels | object | `{}` | Additional labels for VMRule alerts |
-| defaultRules.annotations | object | `{}` | Annotations for default rules |
-| defaultRules.group | object | `{"spec":{"params":{}}}` | Common properties for VMRule groups |
-| defaultRules.group.spec.params | object | `{}` | Optional HTTP URL parameters added to each rule request |
-| defaultRules.groups.etcd.rules | object | `{}` | Common properties for all rules in a group |
-| defaultRules.labels | object | `{}` | Labels for default rules |
-| defaultRules.recording | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for VMRules recording rules |
-| defaultRules.recording.spec.annotations | object | `{}` | Additional annotations for VMRule recording rules |
-| defaultRules.recording.spec.labels | object | `{}` | Additional labels for VMRule recording rules |
-| defaultRules.rule | object | `{"spec":{"annotations":{},"labels":{}}}` | Common properties for all VMRules |
-| defaultRules.rule.spec.annotations | object | `{}` | Additional annotations for all VMRules |
-| defaultRules.rule.spec.labels | object | `{}` | Additional labels for all VMRules |
-| defaultRules.rules | object | `{}` | Per rule properties |
-| defaultRules.runbookUrl | string | `"https://runbooks.prometheus-operator.dev/runbooks"` | Runbook url prefix for default rules |
-| experimentalDashboardsEnabled | bool | `true` | Create experimental dashboards |
-| externalVM.read.url | string | `""` |  |
-| externalVM.write.url | string | `""` |  |
-| extraObjects | list | `[]` | Add extra objects dynamically to this chart |
-| fullnameOverride | string | `""` |  |
-| global.clusterLabel | string | `"cluster"` |  |
-| global.license.key | string | `""` |  |
-| global.license.keyRef | object | `{}` |  |
-| grafana.additionalDataSources | list | `[]` |  |
-| grafana.defaultDashboardsTimezone | string | `"utc"` |  |
-| grafana.defaultDatasourceType | string | `"prometheus"` |  |
-| grafana.enabled | bool | `true` |  |
-| grafana.forceDeployDatasource | bool | `false` |  |
-| grafana.ingress.annotations | object | `{}` |  |
-| grafana.ingress.enabled | bool | `false` |  |
-| grafana.ingress.extraPaths | list | `[]` |  |
-| grafana.ingress.hosts[0] | string | `"grafana.domain.com"` |  |
-| grafana.ingress.labels | object | `{}` |  |
-| grafana.ingress.path | string | `"/"` |  |
-| grafana.ingress.pathType | string | `"Prefix"` |  |
-| grafana.ingress.tls | list | `[]` |  |
-| grafana.sidecar.dashboards.additionalDashboardAnnotations | object | `{}` |  |
-| grafana.sidecar.dashboards.additionalDashboardLabels | object | `{}` |  |
-| grafana.sidecar.dashboards.defaultFolderName | string | `"default"` |  |
-| grafana.sidecar.dashboards.enabled | bool | `true` |  |
-| grafana.sidecar.dashboards.folder | string | `"/var/lib/grafana/dashboards"` |  |
-| grafana.sidecar.dashboards.multicluster | bool | `false` |  |
-| grafana.sidecar.dashboards.provider.name | string | `"default"` |  |
-| grafana.sidecar.dashboards.provider.orgid | int | `1` |  |
-| grafana.sidecar.datasources.createVMReplicasDatasources | bool | `false` |  |
-| grafana.sidecar.datasources.default | list | `[{"isDefault":true,"name":"VictoriaMetrics"},{"isDefault":false,"name":"VictoriaMetrics (DS)","type":"victoriametrics-datasource"}]` | list of default prometheus compatible datasource configurations. VM `url` will be added to each of them in templates and `type` will be set to defaultDatasourceType if not defined |
-| grafana.sidecar.datasources.enabled | bool | `true` |  |
-| grafana.sidecar.datasources.initDatasources | bool | `true` |  |
-| grafana.vmScrape | object | `{"enabled":true,"spec":{"endpoints":[{"port":"{{ .Values.grafana.service.portName }}"}],"selector":{"matchLabels":{"app.kubernetes.io/name":"{{ include \"grafana.name\" .Subcharts.grafana }}"}}}}` | grafana VM scrape config |
-| grafanaOperatorDashboardsFormat | object | `{"allowCrossNamespaceImport":false,"enabled":false,"instanceSelector":{"matchLabels":{"dashboards":"grafana"}}}` | Create dashboards as CRDs (reuqires grafana-operator to be installed) |
-| kube-state-metrics.enabled | bool | `true` |  |
-| kube-state-metrics.vmScrape | object | `{"enabled":true,"spec":{"endpoints":[{"honorLabels":true,"metricRelabelConfigs":[{"action":"labeldrop","regex":"(uid|container_id|image_id)"}],"port":"http"}],"jobLabel":"app.kubernetes.io/name","selector":{"matchLabels":{"app.kubernetes.io/instance":"{{ include \"vm.release\" . }}","app.kubernetes.io/name":"{{ include \"kube-state-metrics.name\" (index .Subcharts \"kube-state-metrics\") }}"}}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
-| kubeApiServer.enabled | bool | `true` |  |
-| kubeApiServer.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"https","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"component","namespaceSelector":{"matchNames":["default"]},"selector":{"matchLabels":{"component":"apiserver","provider":"kubernetes"}}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
-| kubeControllerManager.enabled | bool | `true` |  |
-| kubeControllerManager.endpoints | list | `[]` |  |
-| kubeControllerManager.service.enabled | bool | `true` |  |
-| kubeControllerManager.service.port | int | `10257` |  |
-| kubeControllerManager.service.selector.component | string | `"kube-controller-manager"` |  |
-| kubeControllerManager.service.targetPort | int | `10257` |  |
-| kubeControllerManager.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","serverName":"kubernetes"}}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
-| kubeDns.enabled | bool | `false` |  |
-| kubeDns.service.enabled | bool | `false` |  |
-| kubeDns.service.ports.dnsmasq.port | int | `10054` |  |
-| kubeDns.service.ports.dnsmasq.targetPort | int | `10054` |  |
-| kubeDns.service.ports.skydns.port | int | `10055` |  |
-| kubeDns.service.ports.skydns.targetPort | int | `10055` |  |
-| kubeDns.service.selector.k8s-app | string | `"kube-dns"` |  |
-| kubeDns.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics-dnsmasq"},{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics-skydns"}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
-| kubeEtcd.enabled | bool | `true` |  |
-| kubeEtcd.endpoints | list | `[]` |  |
-| kubeEtcd.service.enabled | bool | `true` |  |
-| kubeEtcd.service.port | int | `2379` |  |
-| kubeEtcd.service.selector.component | string | `"etcd"` |  |
-| kubeEtcd.service.targetPort | int | `2379` |  |
-| kubeEtcd.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"}}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
-| kubeProxy.enabled | bool | `false` |  |
-| kubeProxy.endpoints | list | `[]` |  |
-| kubeProxy.service.enabled | bool | `true` |  |
-| kubeProxy.service.port | int | `10249` |  |
-| kubeProxy.service.selector.k8s-app | string | `"kube-proxy"` |  |
-| kubeProxy.service.targetPort | int | `10249` |  |
-| kubeProxy.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"}}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
-| kubeScheduler.enabled | bool | `true` |  |
-| kubeScheduler.endpoints | list | `[]` |  |
-| kubeScheduler.service.enabled | bool | `true` |  |
-| kubeScheduler.service.port | int | `10259` |  |
-| kubeScheduler.service.selector.component | string | `"kube-scheduler"` |  |
-| kubeScheduler.service.targetPort | int | `10259` |  |
-| kubeScheduler.vmScrape | object | `{"spec":{"endpoints":[{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","port":"http-metrics","scheme":"https","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"}}],"jobLabel":"jobLabel","namespaceSelector":{"matchNames":["kube-system"]}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
-| kubelet.enabled | bool | `true` |  |
-| kubelet.vmScrape | object | `{"kind":"VMNodeScrape","spec":{"bearerTokenFile":"/var/run/secrets/kubernetes.io/serviceaccount/token","honorLabels":true,"honorTimestamps":false,"interval":"30s","metricRelabelConfigs":[{"action":"labeldrop","regex":"(uid)"},{"action":"labeldrop","regex":"(id|name)"},{"action":"drop","regex":"(rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)","source_labels":["__name__"]}],"relabelConfigs":[{"action":"labelmap","regex":"__meta_kubernetes_node_label_(.+)"},{"sourceLabels":["__metrics_path__"],"targetLabel":"metrics_path"},{"replacement":"kubelet","targetLabel":"job"}],"scheme":"https","scrapeTimeout":"5s","tlsConfig":{"caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","insecureSkipVerify":true}}}` | spec for VMNodeScrape crd https://docs.victoriametrics.com/operator/api.html#vmnodescrapespec |
-| kubelet.vmScrapes.cadvisor | object | `{"enabled":true,"spec":{"path":"/metrics/cadvisor"}}` | Enable scraping /metrics/cadvisor from kubelet's service |
-| kubelet.vmScrapes.kubelet.spec | object | `{}` |  |
-| kubelet.vmScrapes.probes | object | `{"enabled":true,"spec":{"path":"/metrics/probes"}}` | Enable scraping /metrics/probes from kubelet's service |
-| nameOverride | string | `""` |  |
-| prometheus-node-exporter.enabled | bool | `true` |  |
-| prometheus-node-exporter.extraArgs[0] | string | `"--collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"` |  |
-| prometheus-node-exporter.extraArgs[1] | string | `"--collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"` |  |
-| prometheus-node-exporter.podLabels.jobLabel | string | `"node-exporter"` |  |
-| prometheus-node-exporter.vmScrape | object | `{"enabled":true,"spec":{"endpoints":[{"metricRelabelConfigs":[{"action":"drop","regex":"/var/lib/kubelet/pods.+","source_labels":["mountpoint"]}],"port":"metrics"}],"jobLabel":"jobLabel","selector":{"matchLabels":{"app.kubernetes.io/name":"{{ include \"prometheus-node-exporter.name\" (index .Subcharts \"prometheus-node-exporter\") }}"}}}}` | node exporter VM scrape config |
-| prometheus-node-exporter.vmScrape.spec | object | `{"endpoints":[{"metricRelabelConfigs":[{"action":"drop","regex":"/var/lib/kubelet/pods.+","source_labels":["mountpoint"]}],"port":"metrics"}],"jobLabel":"jobLabel","selector":{"matchLabels":{"app.kubernetes.io/name":"{{ include \"prometheus-node-exporter.name\" (index .Subcharts \"prometheus-node-exporter\") }}"}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
-| prometheus-operator-crds.enabled | bool | `false` |  |
-| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
-| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| serviceAccount.name | string | `""` | If not set and create is true, a name is generated using the fullname template |
-| tenant | string | `"0"` |  |
-| victoria-metrics-operator | object | `{"crd":{"cleanup":{"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl"}},"create":false},"enabled":true,"operator":{"disable_prometheus_converter":false},"vmScrape":{"spec":{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ include \"vm.namespace\" . }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}}}` | also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars |
-| victoria-metrics-operator.crd.cleanup | object | `{"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl"}}` | tells helm to clean up vm cr resources when uninstalling |
-| victoria-metrics-operator.crd.create | bool | `false` | we disable crd creation by operator chart as we create them in this chart |
-| victoria-metrics-operator.operator.disable_prometheus_converter | bool | `false` | By default, operator converts prometheus-operator objects. |
-| victoria-metrics-operator.vmScrape.spec | object | `{"endpoints":[{"port":"http"}],"namespaceSelector":{"matchNames":["{{ include \"vm.namespace\" . }}"]},"selector":{"matchLabels":{"app.kubernetes.io/name":"victoria-metrics-operator"}}}` | spec for VMServiceScrape crd https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec |
-| vmagent.additionalRemoteWrites | list | `[]` |  |
-| vmagent.annotations | object | `{}` |  |
-| vmagent.enabled | bool | `true` |  |
-| vmagent.ingress.annotations | object | `{}` |  |
-| vmagent.ingress.enabled | bool | `false` |  |
-| vmagent.ingress.extraPaths | list | `[]` |  |
-| vmagent.ingress.hosts[0] | string | `"vmagent.domain.com"` |  |
-| vmagent.ingress.labels | object | `{}` |  |
-| vmagent.ingress.path | string | `"/"` |  |
-| vmagent.ingress.pathType | string | `"Prefix"` |  |
-| vmagent.ingress.tls | list | `[]` |  |
-| vmagent.spec.externalLabels | object | `{}` |  |
-| vmagent.spec.extraArgs."promscrape.dropOriginalLabels" | string | `"true"` |  |
-| vmagent.spec.extraArgs."promscrape.streamParse" | string | `"true"` |  |
-| vmagent.spec.image.tag | string | `"v1.103.0"` |  |
-| vmagent.spec.port | string | `"8429"` |  |
-| vmagent.spec.scrapeInterval | string | `"20s"` |  |
-| vmagent.spec.selectAllByDefault | bool | `true` |  |
-| vmalert.additionalNotifierConfigs | object | `{}` |  |
-| vmalert.annotations | object | `{}` |  |
-| vmalert.enabled | bool | `true` |  |
-| vmalert.ingress.annotations | object | `{}` |  |
-| vmalert.ingress.enabled | bool | `false` |  |
-| vmalert.ingress.extraPaths | list | `[]` |  |
-| vmalert.ingress.hosts[0] | string | `"vmalert.domain.com"` |  |
-| vmalert.ingress.labels | object | `{}` |  |
-| vmalert.ingress.path | string | `"/"` |  |
-| vmalert.ingress.pathType | string | `"Prefix"` |  |
-| vmalert.ingress.tls | list | `[]` |  |
-| vmalert.remoteWriteVMAgent | bool | `false` |  |
-| vmalert.spec.evaluationInterval | string | `"15s"` |  |
-| vmalert.spec.externalLabels | object | `{}` |  |
-| vmalert.spec.image.tag | string | `"v1.103.0"` |  |
-| vmalert.spec.port | string | `"8080"` |  |
-| vmalert.spec.selectAllByDefault | bool | `true` |  |
-| vmalert.templateFiles | object | `{}` |  |
-| vmcluster.annotations | object | `{}` |  |
-| vmcluster.enabled | bool | `false` |  |
-| vmcluster.ingress.insert.annotations | object | `{}` |  |
-| vmcluster.ingress.insert.enabled | bool | `false` |  |
-| vmcluster.ingress.insert.extraPaths | list | `[]` |  |
-| vmcluster.ingress.insert.hosts[0] | string | `"vminsert.domain.com"` |  |
-| vmcluster.ingress.insert.labels | object | `{}` |  |
-| vmcluster.ingress.insert.path | string | `"/"` |  |
-| vmcluster.ingress.insert.pathType | string | `"Prefix"` |  |
-| vmcluster.ingress.insert.tls | list | `[]` |  |
-| vmcluster.ingress.select.annotations | object | `{}` |  |
-| vmcluster.ingress.select.enabled | bool | `false` |  |
-| vmcluster.ingress.select.extraPaths | list | `[]` |  |
-| vmcluster.ingress.select.hosts[0] | string | `"vmselect.domain.com"` |  |
-| vmcluster.ingress.select.labels | object | `{}` |  |
-| vmcluster.ingress.select.path | string | `"/"` |  |
-| vmcluster.ingress.select.pathType | string | `"Prefix"` |  |
-| vmcluster.ingress.select.tls | list | `[]` |  |
-| vmcluster.ingress.storage.annotations | object | `{}` |  |
-| vmcluster.ingress.storage.enabled | bool | `false` |  |
-| vmcluster.ingress.storage.extraPaths | list | `[]` |  |
-| vmcluster.ingress.storage.hosts[0] | string | `"vmstorage.domain.com"` |  |
-| vmcluster.ingress.storage.labels | object | `{}` |  |
-| vmcluster.ingress.storage.path | string | `"/"` |  |
-| vmcluster.ingress.storage.pathType | string | `"Prefix"` |  |
-| vmcluster.ingress.storage.tls | list | `[]` |  |
-| vmcluster.spec.replicationFactor | int | `2` |  |
-| vmcluster.spec.retentionPeriod | string | `"1"` | Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention) |
-| vmcluster.spec.vminsert.extraArgs | object | `{}` |  |
-| vmcluster.spec.vminsert.image.tag | string | `"v1.103.0-cluster"` |  |
-| vmcluster.spec.vminsert.port | string | `"8480"` |  |
-| vmcluster.spec.vminsert.replicaCount | int | `2` |  |
-| vmcluster.spec.vminsert.resources | object | `{}` |  |
-| vmcluster.spec.vmselect.cacheMountPath | string | `"/select-cache"` |  |
-| vmcluster.spec.vmselect.extraArgs | object | `{}` |  |
-| vmcluster.spec.vmselect.image.tag | string | `"v1.103.0-cluster"` |  |
-| vmcluster.spec.vmselect.port | string | `"8481"` |  |
-| vmcluster.spec.vmselect.replicaCount | int | `2` |  |
-| vmcluster.spec.vmselect.resources | object | `{}` |  |
-| vmcluster.spec.vmselect.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"2Gi"` |  |
-| vmcluster.spec.vmstorage.image.tag | string | `"v1.103.0-cluster"` |  |
-| vmcluster.spec.vmstorage.replicaCount | int | `2` |  |
-| vmcluster.spec.vmstorage.resources | object | `{}` |  |
-| vmcluster.spec.vmstorage.storage.volumeClaimTemplate.spec.resources.requests.storage | string | `"10Gi"` |  |
-| vmcluster.spec.vmstorage.storageDataPath | string | `"/vm-data"` |  |
-| vmsingle | object | `{"annotations":{},"enabled":true,"ingress":{"annotations":{},"enabled":false,"extraPaths":[],"hosts":["vmsingle.domain.com"],"labels":{},"path":"/","pathType":"Prefix","tls":[]},"spec":{"extraArgs":{},"image":{"tag":"v1.103.0"},"port":"8429","replicaCount":1,"retentionPeriod":"1","storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}}` | Configures vmsingle params |
-| vmsingle.spec.retentionPeriod | string | `"1"` | Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention) |
+<table>
+  <thead>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>additionalVictoriaMetricsMap</td>
+      <td>string</td>
+      <td><pre lang="">
+null
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>alertmanager.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>alertmanager.config</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+receivers:
+    - name: blackhole
+route:
+    receiver: blackhole
+templates:
+    - /etc/vm/configs/**/*.tmpl
+</pre>
+</td>
+      <td><p>alertmanager configuration</p>
+</td>
+    </tr>
+    <tr>
+      <td>alertmanager.configSecret</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>if this one defined, it will be used for alertmanager configuration and config parameter will be ignored</p>
+</td>
+    </tr>
+    <tr>
+      <td>alertmanager.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>alertmanager.ingress</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+annotations: {}
+enabled: false
+extraPaths: []
+hosts:
+    - alertmanager.domain.com
+labels: {}
+path: /
+pathType: Prefix
+tls: []
+</pre>
+</td>
+      <td><p>alertmanager ingress configuration</p>
+</td>
+    </tr>
+    <tr>
+      <td>alertmanager.monzoTemplate.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>alertmanager.spec</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+externalURL: ""
+image:
+    tag: v0.25.0
+port: "9093"
+routePrefix: /
+selectAllByDefault: true
+</pre>
+</td>
+      <td><p>full spec for VMAlertmanager CRD. Allowed values described <a href="https://docs.victoriametrics.com/operator/api#vmalertmanagerspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>alertmanager.templateFiles</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>extra alert templates</p>
+</td>
+    </tr>
+    <tr>
+      <td>argocdReleaseOverride</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>For correct working need set value &lsquo;argocdReleaseOverride=$ARGOCD_APP_NAME&rsquo;</p>
+</td>
+    </tr>
+    <tr>
+      <td>coreDns.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>coreDns.service.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>coreDns.service.port</td>
+      <td>int</td>
+      <td><pre lang="">
+9153
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>coreDns.service.selector.k8s-app</td>
+      <td>string</td>
+      <td><pre lang="">
+kube-dns
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>coreDns.service.targetPort</td>
+      <td>int</td>
+      <td><pre lang="">
+9153
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>coreDns.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics
+    jobLabel: jobLabel
+    namespaceSelector:
+        matchNames:
+            - kube-system
+</pre>
+</td>
+      <td><p>spec for VMServiceScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>crds.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>dashboards</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+node-exporter-full: true
+operator: false
+vmalert: false
+</pre>
+</td>
+      <td><p>Enable dashboards despite it&rsquo;s dependency is not installed</p>
+</td>
+    </tr>
+    <tr>
+      <td>dashboards.node-exporter-full</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td><p>in ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply See <a href="https://github.com/VictoriaMetrics/helm-charts/tree/disable-node-exporter-dashboard-by-default/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards" target="_blank">this issue</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultDashboardsEnabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td><p>Create default dashboards</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+alerting:
+    spec:
+        annotations: {}
+        labels: {}
+annotations: {}
+create: true
+group:
+    spec:
+        params: {}
+groups:
+    alertmanager:
+        create: true
+        rules: {}
+    etcd:
+        create: true
+        rules: {}
+    general:
+        create: true
+        rules: {}
+    k8sContainerCpuUsageSecondsTotal:
+        create: true
+        rules: {}
+    k8sContainerMemoryCache:
+        create: true
+        rules: {}
+    k8sContainerMemoryRss:
+        create: true
+        rules: {}
+    k8sContainerMemorySwap:
+        create: true
+        rules: {}
+    k8sContainerMemoryWorkingSetBytes:
+        create: true
+        rules: {}
+    k8sContainerResource:
+        create: true
+        rules: {}
+    k8sPodOwner:
+        create: true
+        rules: {}
+    kubeApiserver:
+        create: true
+        rules: {}
+    kubeApiserverAvailability:
+        create: true
+        rules: {}
+    kubeApiserverBurnrate:
+        create: true
+        rules: {}
+    kubeApiserverHistogram:
+        create: true
+        rules: {}
+    kubeApiserverSlos:
+        create: true
+        rules: {}
+    kubePrometheusGeneral:
+        create: true
+        rules: {}
+    kubePrometheusNodeRecording:
+        create: true
+        rules: {}
+    kubeScheduler:
+        create: true
+        rules: {}
+    kubeStateMetrics:
+        create: true
+        rules: {}
+    kubelet:
+        create: true
+        rules: {}
+    kubernetesApps:
+        create: true
+        rules: {}
+        targetNamespace: .*
+    kubernetesResources:
+        create: true
+        rules: {}
+    kubernetesStorage:
+        create: true
+        rules: {}
+        targetNamespace: .*
+    kubernetesSystem:
+        create: true
+        rules: {}
+    kubernetesSystemApiserver:
+        create: true
+        rules: {}
+    kubernetesSystemControllerManager:
+        create: true
+        rules: {}
+    kubernetesSystemKubelet:
+        create: true
+        rules: {}
+    kubernetesSystemScheduler:
+        create: true
+        rules: {}
+    node:
+        create: true
+        rules: {}
+    nodeNetwork:
+        create: true
+        rules: {}
+    vmHealth:
+        create: true
+        rules: {}
+    vmagent:
+        create: true
+        rules: {}
+    vmcluster:
+        create: true
+        rules: {}
+    vmoperator:
+        create: true
+        rules: {}
+    vmsingle:
+        create: true
+        rules: {}
+labels: {}
+recording:
+    spec:
+        annotations: {}
+        labels: {}
+rule:
+    spec:
+        annotations: {}
+        labels: {}
+rules: {}
+runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
+</pre>
+</td>
+      <td><p>Create default rules for monitoring the cluster</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.alerting</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    annotations: {}
+    labels: {}
+</pre>
+</td>
+      <td><p>Common properties for VMRules alerts</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.alerting.spec.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Additional annotations for VMRule alerts</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.alerting.spec.labels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Additional labels for VMRule alerts</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Annotations for default rules</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.group</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    params: {}
+</pre>
+</td>
+      <td><p>Common properties for VMRule groups</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.group.spec.params</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Optional HTTP URL parameters added to each rule request</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.groups.etcd.rules</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Common properties for all rules in a group</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.labels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Labels for default rules</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.recording</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    annotations: {}
+    labels: {}
+</pre>
+</td>
+      <td><p>Common properties for VMRules recording rules</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.recording.spec.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Additional annotations for VMRule recording rules</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.recording.spec.labels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Additional labels for VMRule recording rules</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.rule</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    annotations: {}
+    labels: {}
+</pre>
+</td>
+      <td><p>Common properties for all VMRules</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.rule.spec.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Additional annotations for all VMRules</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.rule.spec.labels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Additional labels for all VMRules</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.rules</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Per rule properties</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.runbookUrl</td>
+      <td>string</td>
+      <td><pre lang="">
+https://runbooks.prometheus-operator.dev/runbooks
+</pre>
+</td>
+      <td><p>Runbook url prefix for default rules</p>
+</td>
+    </tr>
+    <tr>
+      <td>experimentalDashboardsEnabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td><p>Create experimental dashboards</p>
+</td>
+    </tr>
+    <tr>
+      <td>externalVM.read.url</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>externalVM.write.url</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>extraObjects</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>Add extra objects dynamically to this chart</p>
+</td>
+    </tr>
+    <tr>
+      <td>fullnameOverride</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>global.clusterLabel</td>
+      <td>string</td>
+      <td><pre lang="">
+cluster
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>global.license.key</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>global.license.keyRef</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.additionalDataSources</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.defaultDashboardsTimezone</td>
+      <td>string</td>
+      <td><pre lang="">
+utc
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.defaultDatasourceType</td>
+      <td>string</td>
+      <td><pre lang="">
+prometheus
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.forceDeployDatasource</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.ingress.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.ingress.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.ingress.extraPaths</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.ingress.hosts[0]</td>
+      <td>string</td>
+      <td><pre lang="">
+grafana.domain.com
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.ingress.labels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.ingress.path</td>
+      <td>string</td>
+      <td><pre lang="">
+/
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.ingress.pathType</td>
+      <td>string</td>
+      <td><pre lang="">
+Prefix
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.ingress.tls</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.dashboards.additionalDashboardAnnotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.dashboards.additionalDashboardLabels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.dashboards.defaultFolderName</td>
+      <td>string</td>
+      <td><pre lang="">
+default
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.dashboards.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.dashboards.folder</td>
+      <td>string</td>
+      <td><pre lang="">
+/var/lib/grafana/dashboards
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.dashboards.multicluster</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.dashboards.provider.name</td>
+      <td>string</td>
+      <td><pre lang="">
+default
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.dashboards.provider.orgid</td>
+      <td>int</td>
+      <td><pre lang="">
+1
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.datasources.createVMReplicasDatasources</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.datasources.default</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+- isDefault: true
+  name: VictoriaMetrics
+- isDefault: false
+  name: VictoriaMetrics (DS)
+  type: victoriametrics-datasource
+</pre>
+</td>
+      <td><p>list of default prometheus compatible datasource configurations. VM <code>url</code> will be added to each of them in templates and <code>type</code> will be set to defaultDatasourceType if not defined</p>
+</td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.datasources.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.sidecar.datasources.initDatasources</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>grafana.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: true
+spec:
+    endpoints:
+        - port: '{{ .Values.grafana.service.portName }}'
+    selector:
+        matchLabels:
+            app.kubernetes.io/name: '{{ include "grafana.name" .Subcharts.grafana }}'
+</pre>
+</td>
+      <td><p>grafana VM scrape config</p>
+</td>
+    </tr>
+    <tr>
+      <td>grafana.vmScrape.spec</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+endpoints:
+    - port: '{{ .Values.grafana.service.portName }}'
+selector:
+    matchLabels:
+        app.kubernetes.io/name: '{{ include "grafana.name" .Subcharts.grafana }}'
+</pre>
+</td>
+      <td><p><a href="https://docs.victoriametrics.com/operator/api#vmservicescrapespec" target="_blank">Scrape configuration</a> for Grafana</p>
+</td>
+    </tr>
+    <tr>
+      <td>grafanaOperatorDashboardsFormat</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+allowCrossNamespaceImport: false
+enabled: false
+instanceSelector:
+    matchLabels:
+        dashboards: grafana
+</pre>
+</td>
+      <td><p>Create dashboards as CRDs (reuqires grafana-operator to be installed)</p>
+</td>
+    </tr>
+    <tr>
+      <td>kube-state-metrics.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kube-state-metrics.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: true
+spec:
+    endpoints:
+        - honorLabels: true
+          metricRelabelConfigs:
+            - action: labeldrop
+              regex: (uid|container_id|image_id)
+          port: http
+    jobLabel: app.kubernetes.io/name
+    selector:
+        matchLabels:
+            app.kubernetes.io/instance: '{{ include "vm.release" . }}'
+            app.kubernetes.io/name: '{{ include "kube-state-metrics.name" (index .Subcharts "kube-state-metrics") }}'
+</pre>
+</td>
+      <td><p><a href="https://docs.victoriametrics.com/operator/api#vmservicescrapespec" target="_blank">Scrape configuration</a> for Kube State Metrics</p>
+</td>
+    </tr>
+    <tr>
+      <td>kubeApiServer.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeApiServer.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: https
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            serverName: kubernetes
+    jobLabel: component
+    namespaceSelector:
+        matchNames:
+            - default
+    selector:
+        matchLabels:
+            component: apiserver
+            provider: kubernetes
+</pre>
+</td>
+      <td><p>spec for VMServiceScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>kubeControllerManager.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeControllerManager.endpoints</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeControllerManager.service.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeControllerManager.service.port</td>
+      <td>int</td>
+      <td><pre lang="">
+10257
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeControllerManager.service.selector.component</td>
+      <td>string</td>
+      <td><pre lang="">
+kube-controller-manager
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeControllerManager.service.targetPort</td>
+      <td>int</td>
+      <td><pre lang="">
+10257
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeControllerManager.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            serverName: kubernetes
+    jobLabel: jobLabel
+    namespaceSelector:
+        matchNames:
+            - kube-system
+</pre>
+</td>
+      <td><p>spec for VMServiceScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>kubeDns.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeDns.service.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeDns.service.ports.dnsmasq.port</td>
+      <td>int</td>
+      <td><pre lang="">
+10054
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeDns.service.ports.dnsmasq.targetPort</td>
+      <td>int</td>
+      <td><pre lang="">
+10054
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeDns.service.ports.skydns.port</td>
+      <td>int</td>
+      <td><pre lang="">
+10055
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeDns.service.ports.skydns.targetPort</td>
+      <td>int</td>
+      <td><pre lang="">
+10055
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeDns.service.selector.k8s-app</td>
+      <td>string</td>
+      <td><pre lang="">
+kube-dns
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeDns.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics-dnsmasq
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics-skydns
+    jobLabel: jobLabel
+    namespaceSelector:
+        matchNames:
+            - kube-system
+</pre>
+</td>
+      <td><p>spec for VMServiceScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>kubeEtcd.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeEtcd.endpoints</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeEtcd.service.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeEtcd.service.port</td>
+      <td>int</td>
+      <td><pre lang="">
+2379
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeEtcd.service.selector.component</td>
+      <td>string</td>
+      <td><pre lang="">
+etcd
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeEtcd.service.targetPort</td>
+      <td>int</td>
+      <td><pre lang="">
+2379
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeEtcd.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    jobLabel: jobLabel
+    namespaceSelector:
+        matchNames:
+            - kube-system
+</pre>
+</td>
+      <td><p>spec for VMServiceScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>kubeProxy.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeProxy.endpoints</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeProxy.service.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeProxy.service.port</td>
+      <td>int</td>
+      <td><pre lang="">
+10249
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeProxy.service.selector.k8s-app</td>
+      <td>string</td>
+      <td><pre lang="">
+kube-proxy
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeProxy.service.targetPort</td>
+      <td>int</td>
+      <td><pre lang="">
+10249
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeProxy.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    jobLabel: jobLabel
+    namespaceSelector:
+        matchNames:
+            - kube-system
+</pre>
+</td>
+      <td><p>spec for VMServiceScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>kubeScheduler.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeScheduler.endpoints</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeScheduler.service.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeScheduler.service.port</td>
+      <td>int</td>
+      <td><pre lang="">
+10259
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeScheduler.service.selector.component</td>
+      <td>string</td>
+      <td><pre lang="">
+kube-scheduler
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeScheduler.service.targetPort</td>
+      <td>int</td>
+      <td><pre lang="">
+10259
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubeScheduler.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+spec:
+    endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    jobLabel: jobLabel
+    namespaceSelector:
+        matchNames:
+            - kube-system
+</pre>
+</td>
+      <td><p>spec for VMServiceScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>kubelet.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubelet.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+kind: VMNodeScrape
+spec:
+    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    honorLabels: true
+    honorTimestamps: false
+    interval: 30s
+    metricRelabelConfigs:
+        - action: labeldrop
+          regex: (uid)
+        - action: labeldrop
+          regex: (id|name)
+        - action: drop
+          regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
+          source_labels:
+            - __name__
+    relabelConfigs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - sourceLabels:
+            - __metrics_path__
+          targetLabel: metrics_path
+        - replacement: kubelet
+          targetLabel: job
+    scheme: https
+    scrapeTimeout: 5s
+    tlsConfig:
+        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecureSkipVerify: true
+</pre>
+</td>
+      <td><p>spec for VMNodeScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmnodescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmnodescrapespec</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>kubelet.vmScrapes.cadvisor</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: true
+spec:
+    path: /metrics/cadvisor
+</pre>
+</td>
+      <td><p>Enable scraping /metrics/cadvisor from kubelet&rsquo;s service</p>
+</td>
+    </tr>
+    <tr>
+      <td>kubelet.vmScrapes.kubelet.spec</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>kubelet.vmScrapes.probes</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: true
+spec:
+    path: /metrics/probes
+</pre>
+</td>
+      <td><p>Enable scraping /metrics/probes from kubelet&rsquo;s service</p>
+</td>
+    </tr>
+    <tr>
+      <td>nameOverride</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>prometheus-node-exporter.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>prometheus-node-exporter.extraArgs[0]</td>
+      <td>string</td>
+      <td><pre lang="">
+--collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>prometheus-node-exporter.extraArgs[1]</td>
+      <td>string</td>
+      <td><pre lang="">
+--collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>prometheus-node-exporter.podLabels.jobLabel</td>
+      <td>string</td>
+      <td><pre lang="">
+node-exporter
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>prometheus-node-exporter.vmScrape</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: true
+spec:
+    endpoints:
+        - metricRelabelConfigs:
+            - action: drop
+              regex: /var/lib/kubelet/pods.+
+              source_labels:
+                - mountpoint
+          port: metrics
+    jobLabel: jobLabel
+    selector:
+        matchLabels:
+            app.kubernetes.io/name: '{{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}'
+</pre>
+</td>
+      <td><p>node exporter VM scrape config</p>
+</td>
+    </tr>
+    <tr>
+      <td>prometheus-node-exporter.vmScrape.spec</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+endpoints:
+    - metricRelabelConfigs:
+        - action: drop
+          regex: /var/lib/kubelet/pods.+
+          source_labels:
+            - mountpoint
+      port: metrics
+jobLabel: jobLabel
+selector:
+    matchLabels:
+        app.kubernetes.io/name: '{{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}'
+</pre>
+</td>
+      <td><p><a href="https://docs.victoriametrics.com/operator/api#vmservicescrapespec" target="_blank">Scrape configuration</a> for Node Exporter</p>
+</td>
+    </tr>
+    <tr>
+      <td>prometheus-operator-crds.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>serviceAccount.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Annotations to add to the service account</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.create</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td><p>Specifies whether a service account should be created</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.name</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>If not set and create is true, a name is generated using the fullname template</p>
+</td>
+    </tr>
+    <tr>
+      <td>tenant</td>
+      <td>string</td>
+      <td><pre lang="">
+"0"
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>victoria-metrics-operator</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+crd:
+    cleanup:
+        enabled: true
+        image:
+            pullPolicy: IfNotPresent
+            repository: bitnami/kubectl
+    create: false
+enabled: true
+operator:
+    disable_prometheus_converter: false
+vmScrape:
+    spec:
+        endpoints:
+            - port: http
+        namespaceSelector:
+            matchNames:
+                - '{{ include "vm.namespace" . }}'
+        selector:
+            matchLabels:
+                app.kubernetes.io/name: victoria-metrics-operator
+</pre>
+</td>
+      <td><p>also checkout here possible ENV variables to configure operator behaviour <a href="https://docs.victoriametrics.com/operator/vars" target="_blank">https://docs.victoriametrics.com/operator/vars</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>victoria-metrics-operator.crd.cleanup</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: true
+image:
+    pullPolicy: IfNotPresent
+    repository: bitnami/kubectl
+</pre>
+</td>
+      <td><p>tells helm to clean up vm cr resources when uninstalling</p>
+</td>
+    </tr>
+    <tr>
+      <td>victoria-metrics-operator.crd.create</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td><p>we disable crd creation by operator chart as we create them in this chart</p>
+</td>
+    </tr>
+    <tr>
+      <td>victoria-metrics-operator.operator.disable_prometheus_converter</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td><p>By default, operator converts prometheus-operator objects.</p>
+</td>
+    </tr>
+    <tr>
+      <td>victoria-metrics-operator.vmScrape.spec</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+endpoints:
+    - port: http
+namespaceSelector:
+    matchNames:
+        - '{{ include "vm.namespace" . }}'
+selector:
+    matchLabels:
+        app.kubernetes.io/name: victoria-metrics-operator
+</pre>
+</td>
+      <td><p>spec for VMServiceScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>vmagent.additionalRemoteWrites</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>remoteWrite configuration of VMAgent, allowed parameters defined in a <a href="https://docs.victoriametrics.com/operator/api#vmagentremotewritespec" target="_blank">spec</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>vmagent.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmagent.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmagent.ingress</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+annotations: {}
+enabled: false
+extraPaths: []
+hosts:
+    - vmagent.domain.com
+labels: {}
+path: /
+pathType: Prefix
+tls: []
+</pre>
+</td>
+      <td><p>vmagent ingress configuration</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmagent.ingress.extraPaths</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmagent.spec</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+externalLabels: {}
+extraArgs:
+    promscrape.dropOriginalLabels: "true"
+    promscrape.streamParse: "true"
+image:
+    tag: v1.103.0
+port: "8429"
+scrapeInterval: 20s
+selectAllByDefault: true
+</pre>
+</td>
+      <td><p>full spec for VMAgent CRD. Allowed values described <a href="https://docs.victoriametrics.com/operator/api#vmagentspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>vmalert.additionalNotifierConfigs</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmalert.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmalert.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmalert.ingress</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+annotations: {}
+enabled: false
+extraPaths: []
+hosts:
+    - vmalert.domain.com
+labels: {}
+path: /
+pathType: Prefix
+tls: []
+</pre>
+</td>
+      <td><p>vmalert ingress config</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmalert.remoteWriteVMAgent</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmalert.spec</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+evaluationInterval: 15s
+externalLabels: {}
+image:
+    tag: v1.103.0
+port: "8080"
+selectAllByDefault: true
+</pre>
+</td>
+      <td><p>full spec for VMAlert CRD. Allowed values described <a href="https://docs.victoriametrics.com/operator/api#vmalertspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>vmalert.templateFiles</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>extra vmalert annotation templates</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmcluster.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.insert.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.insert.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.insert.extraPaths</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.insert.hosts[0]</td>
+      <td>string</td>
+      <td><pre lang="">
+vminsert.domain.com
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.insert.labels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.insert.path</td>
+      <td>string</td>
+      <td><pre lang="">
+/
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.insert.pathType</td>
+      <td>string</td>
+      <td><pre lang="">
+Prefix
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.insert.tls</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.select.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.select.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.select.extraPaths</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.select.hosts[0]</td>
+      <td>string</td>
+      <td><pre lang="">
+vmselect.domain.com
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.select.labels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.select.path</td>
+      <td>string</td>
+      <td><pre lang="">
+/
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.select.pathType</td>
+      <td>string</td>
+      <td><pre lang="">
+Prefix
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.select.tls</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.storage.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.storage.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.storage.extraPaths</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.storage.hosts[0]</td>
+      <td>string</td>
+      <td><pre lang="">
+vmstorage.domain.com
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.storage.labels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.storage.path</td>
+      <td>string</td>
+      <td><pre lang="">
+/
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.storage.pathType</td>
+      <td>string</td>
+      <td><pre lang="">
+Prefix
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.storage.tls</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmcluster.spec</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+replicationFactor: 2
+retentionPeriod: "1"
+vminsert:
+    extraArgs: {}
+    image:
+        tag: v1.103.0-cluster
+    port: "8480"
+    replicaCount: 2
+    resources: {}
+vmselect:
+    cacheMountPath: /select-cache
+    extraArgs: {}
+    image:
+        tag: v1.103.0-cluster
+    port: "8481"
+    replicaCount: 2
+    resources: {}
+    storage:
+        volumeClaimTemplate:
+            spec:
+                resources:
+                    requests:
+                        storage: 2Gi
+vmstorage:
+    image:
+        tag: v1.103.0-cluster
+    replicaCount: 2
+    resources: {}
+    storage:
+        volumeClaimTemplate:
+            spec:
+                resources:
+                    requests:
+                        storage: 10Gi
+    storageDataPath: /vm-data
+</pre>
+</td>
+      <td><p>full spec for VMCluster CRD. Allowed values described <a href="https://docs.victoriametrics.com/operator/api#vmclusterspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>vmcluster.spec.retentionPeriod</td>
+      <td>string</td>
+      <td><pre lang="">
+"1"
+</pre>
+</td>
+      <td><p>Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these <a href="https://docs.victoriametrics.com/single-server-victoriametrics/#retention" target="_blank">docs</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>vmsingle.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmsingle.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmsingle.ingress.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmsingle.ingress.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmsingle.ingress.extraPaths</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmsingle.ingress.hosts[0]</td>
+      <td>string</td>
+      <td><pre lang="">
+vmsingle.domain.com
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmsingle.ingress.labels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmsingle.ingress.path</td>
+      <td>string</td>
+      <td><pre lang="">
+/
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmsingle.ingress.pathType</td>
+      <td>string</td>
+      <td><pre lang="">
+Prefix
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmsingle.ingress.tls</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmsingle.spec</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+extraArgs: {}
+image:
+    tag: v1.103.0
+port: "8429"
+replicaCount: 1
+retentionPeriod: "1"
+storage:
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 20Gi
+</pre>
+</td>
+      <td><p>full spec for VMSingle CRD. Allowed values describe <a href="https://docs.victoriametrics.com/operator/api#vmsinglespec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>vmsingle.spec.retentionPeriod</td>
+      <td>string</td>
+      <td><pre lang="">
+"1"
+</pre>
+</td>
+      <td><p>Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these <a href="https://docs.victoriametrics.com/single-server-victoriametrics/#retention" target="_blank">docs</a></p>
+</td>
+    </tr>
+  </tbody>
+</table>
+
