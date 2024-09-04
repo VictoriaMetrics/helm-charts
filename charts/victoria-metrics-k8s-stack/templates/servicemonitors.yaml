@@ -96,7 +96,14 @@ metadata:
   name: {{ $fullname }}
   namespace: {{ $namespace }}
   labels: {{ $scrapeLabels | nindent 4 }}
-spec: {{ (tpl (toYaml (mergeOverwrite (deepCopy $spec) (deepCopy $sc.spec))) $) | nindent 2 }}
+{{- $emptyParamsToDrop := list "endpoints" }}
+{{- $scrapeSpec := mergeOverwrite (deepCopy $spec) (deepCopy $sc.spec) }}
+{{- range $paramToDrop := $emptyParamsToDrop }}
+  {{- if and (hasKey $scrapeSpec $paramToDrop) (empty (index $scrapeSpec $paramToDrop)) }}
+    {{- $_ := unset $scrapeSpec $paramToDrop }}
+  {{- end }}
+{{- end }}
+spec: {{ (tpl (toYaml $scrapeSpec) $) | nindent 2 }}
 
 
         {{- end }}
