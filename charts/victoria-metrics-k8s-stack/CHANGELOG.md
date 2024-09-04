@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed alertmanager templates
 
 ## 0.25.13
 
