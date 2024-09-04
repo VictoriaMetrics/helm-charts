@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Removed deprecated autoscaling v2beta2 API support
 
 ## 0.13.3
 

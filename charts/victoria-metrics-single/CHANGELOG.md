@@ -3,6 +3,7 @@
 ## Next release
 
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
+- Removed deprecated API from RBAC. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1438)
 
 ## 0.11.1
 
