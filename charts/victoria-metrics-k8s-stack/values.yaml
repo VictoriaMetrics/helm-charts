@@ -548,10 +548,10 @@ alertmanager:
       #   slack_configs:
       #     - channel: "#channel"
       #       send_resolved: true
-      #       title: '{{ include "slack.monzo.title" . }}'
-      #       icon_emoji: '{{ include "slack.monzo.icon_emoji" . }}'
-      #       color: '{{ include "slack.monzo.color" . }}'
-      #       text: '{{ include "slack.monzo.text" . }}'
+      #       title: '{{ template "slack.monzo.title" . }}'
+      #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
+      #       color: '{{ template "slack.monzo.color" . }}'
+      #       text: '{{ template "slack.monzo.text" . }}'
       #       actions:
       #         - type: button
       #           text: "Runbook :green_book:"
@@ -564,18 +564,18 @@ alertmanager:
       #           url: "{{ (index .Alerts 0).Annotations.dashboard }}"
       #         - type: button
       #           text: "Silence :no_bell:"
-      #           url: '{{ include "__alert_silence_link" . }}'
+      #           url: '{{ template "__alert_silence_link" . }}'
       #         - type: button
-      #           text: '{{ include "slack.monzo.link_button_text" . }}'
+      #           text: '{{ template "slack.monzo.link_button_text" . }}'
       #           url: "{{ .CommonAnnotations.link_url }}"
       # - name: slack-code-owners
       #   slack_configs:
       #     - channel: "#{{ .CommonLabels.code_owner_channel }}"
       #       send_resolved: true
-      #       title: '{{ include "slack.monzo.title" . }}'
-      #       icon_emoji: '{{ include "slack.monzo.icon_emoji" . }}'
-      #       color: '{{ include "slack.monzo.color" . }}'
-      #       text: '{{ include "slack.monzo.text" . }}'
+      #       title: '{{ template "slack.monzo.title" . }}'
+      #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
+      #       color: '{{ template "slack.monzo.color" . }}'
+      #       text: '{{ template "slack.monzo.text" . }}'
       #       actions:
       #         - type: button
       #           text: "Runbook :green_book:"
@@ -588,9 +588,9 @@ alertmanager:
       #           url: "{{ (index .Alerts 0).Annotations.dashboard }}"
       #         - type: button
       #           text: "Silence :no_bell:"
-      #           url: '{{ include "__alert_silence_link" . }}'
+      #           url: '{{ template "__alert_silence_link" . }}'
       #         - type: button
-      #           text: '{{ include "slack.monzo.link_button_text" . }}'
+      #           text: '{{ template "slack.monzo.link_button_text" . }}'
       #           url: "{{ .CommonAnnotations.link_url }}"
       #
   # better alert templates for slack
