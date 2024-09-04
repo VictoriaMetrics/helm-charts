@@ -1093,6 +1093,16 @@ Prefix
       <td></td>
     </tr>
     <tr>
+      <td>server.initContainers</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>Additional initContainers to initialize the pod</p>
+</td>
+    </tr>
+    <tr>
       <td>server.labels</td>
       <td>object</td>
       <td><pre lang="plaintext">
