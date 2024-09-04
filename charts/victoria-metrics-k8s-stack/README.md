@@ -1,7 +1,7 @@
 
 # Helm Chart For Victoria Metrics kubernetes monitoring stack.
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.25.12](https://img.shields.io/badge/Version-0.25.12-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.25.13](https://img.shields.io/badge/Version-0.25.13-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -1905,16 +1905,8 @@ crd:
 enabled: true
 operator:
     disable_prometheus_converter: false
-vmScrape:
-    spec:
-        endpoints:
-            - port: http
-        namespaceSelector:
-            matchNames:
-                - '{{ include "vm.namespace" . }}'
-        selector:
-            matchLabels:
-                app.kubernetes.io/name: victoria-metrics-operator
+serviceMonitor:
+    enabled: true
 </pre>
 </td>
       <td><p>also checkout here possible ENV variables to configure operator behaviour <a href="https://docs.victoriametrics.com/operator/vars" target="_blank">https://docs.victoriametrics.com/operator/vars</a></p>
@@ -1951,23 +1943,6 @@ false
 </pre>
 </td>
       <td><p>By default, operator converts prometheus-operator objects.</p>
-</td>
-    </tr>
-    <tr>
-      <td>victoria-metrics-operator.vmScrape.spec</td>
-      <td>object</td>
-      <td><pre lang="plaintext">
-endpoints:
-    - port: http
-namespaceSelector:
-    matchNames:
-        - '{{ include "vm.namespace" . }}'
-selector:
-    matchLabels:
-        app.kubernetes.io/name: victoria-metrics-operator
-</pre>
-</td>
-      <td><p>spec for VMServiceScrape crd <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec</a></p>
 </td>
     </tr>
     <tr>
