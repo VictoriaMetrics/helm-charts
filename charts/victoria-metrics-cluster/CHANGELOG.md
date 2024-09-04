@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed vmstorage resources templating
 
 ## 0.13.2
 

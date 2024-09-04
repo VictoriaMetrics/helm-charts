@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Drop empty endpoints param from scrape configuration
 
 ## 0.25.14
 
