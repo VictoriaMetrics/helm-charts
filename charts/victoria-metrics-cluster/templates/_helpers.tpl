@@ -258,7 +258,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "vmbackupmanager.restore.args" -}}
-  {{- $app := .Values.server -}}
+  {{- $app := .Values.vmstorage -}}
   {{- $manager := $app.vmbackupmanager -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}

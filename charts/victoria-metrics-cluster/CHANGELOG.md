@@ -3,6 +3,7 @@
 ## Next release
 
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
+- Fixed vmstorage restore cmd args template
 
 ## 0.13.1
 
