@@ -26,14 +26,14 @@ fullnameOverride: ""
 containerWorkingDir: "/vmanomaly"
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name:
 
-# -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+# -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
 podDisruptionBudget:
   enabled: false
   minAvailable: 1
@@ -77,7 +77,7 @@ podSecurityContext:
   enabled: true
   # fsGroup: 2000
 
-## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+# -- Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 securityContext:
   enabled: true
   runAsNonRoot: true
@@ -102,10 +102,10 @@ annotations: {}
 # -- Annotations to be added to pod
 podAnnotations: {}
 
-# -- NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+# -- NodeSelector configurations. Details are [here](https://kubernetes.io/docs/user-guide/node-selection/)
 nodeSelector: {}
 
-# -- Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+# -- Tolerations configurations. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
 tolerations: []
   # - key: "key"
   #   operator: "Equal|Exists"
@@ -134,7 +134,7 @@ config:
   reader:
     # -- Name of the class needed to enable reading from VictoriaMetrics or Prometheus. VmReader is the default option, if not specified.
     class: "vm"
-    # -- Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480
+    # -- Datasource URL address. Required for example `http://single-victoria-metrics-single-server.default.svc.cluster.local:8428` or `http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480`
     datasource_url: ""
     # -- For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs
     tenant_id: ""
@@ -151,14 +151,14 @@ config:
     #    expr: 'sum(rate(vm_http_requests_total{path=~"/api/v1/write|.*insert.*"}[5m])) by (path) > 0'
     #  slow_inserts:
     #    expr: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
-    # -- Frequency of the points returned. Will be converted to "/query_range?step=%s" param (in seconds). **Required** since 1.9.0.
+    # -- Frequency of the points returned. Will be converted to `/query_range?step=%s` param (in seconds). **Required** since 1.9.0.
     sampling_period: '1m'
 
   # -- [Writer section](https://docs.victoriametrics.com/anomaly-detection/components/writer/)
   writer:
     # -- Name of the class needed to enable writing to VictoriaMetrics or Prometheus. VmWriter is the default option, if not specified.
     class: "vm"
-    # -- Datasource URL address. Required for example "http://single-victoria-metrics-single-server.default.svc.cluster.local:8428" or "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480"
+    # -- Datasource URL address. Required for example `http://single-victoria-metrics-single-server.default.svc.cluster.local:8428` or `http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480`
     datasource_url: ""
     # -- For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs
     tenant_id: ""
@@ -170,7 +170,7 @@ persistentVolume:
   # -- Create/use Persistent Volume Claim for models dump.
   enabled: false
 
-  # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/)
+  # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](http://kubernetes.io/docs/user-guide/persistent-volumes/)
   accessModes:
     - ReadWriteOnce
   # -- Persistant volume annotations

@@ -1,6 +1,7 @@
+
 # Victoria Metrics Helm Chart for vmgateway
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)  ![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-gateway)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -161,87 +162,740 @@ The following tables lists the configurable parameters of the chart and their de
 
 Change the values according to the need of the environment in ``victoria-metrics-gateway/values.yaml`` file.
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| affinity | object | `{}` | Affinity configurations |
-| annotations | object | `{}` | Annotations to be added to the deployment |
-| auth | object | `{"enabled":false}` | Access Control configuration. https://docs.victoriametrics.com/vmgateway#access-control |
-| auth.enabled | bool | `false` | Enable/Disable access-control |
-| clusterMode | bool | `false` | Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting |
-| configMap | string | `""` | Use existing configmap if specified otherwise .config values will be used. Ref: https://docs.victoriametrics.com/vmgateway |
-| containerWorkingDir | string | `"/"` |  |
-| env | list | `[]` | Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables |
-| envFrom | list | `[]` |  |
-| extraArgs."envflag.enable" | string | `"true"` |  |
-| extraArgs."envflag.prefix" | string | `"VM_"` |  |
-| extraArgs.loggerFormat | string | `"json"` |  |
-| extraContainers | list | `[]` |  |
-| extraHostPathMounts | list | `[]` | Additional hostPath mounts |
-| extraVolumeMounts | list | `[]` | Extra Volume Mounts for the container |
-| extraVolumes | list | `[]` | Extra Volumes for the pod |
-| fullnameOverride | string | `""` |  |
-| global.compatibility.openshift.adaptSecurityContext | string | `"auto"` |  |
-| global.image.registry | string | `""` |  |
-| global.imagePullSecrets | list | `[]` |  |
-| image.pullPolicy | string | `"IfNotPresent"` | Pull policy of Docker image |
-| image.registry | string | `""` | Victoria Metrics gateway Docker registry |
-| image.repository | string | `"victoriametrics/vmgateway"` | Victoria Metrics gateway Docker repository and image name |
-| image.tag | string | `""` | Tag of Docker image override Chart.AppVersion |
-| image.variant | string | `""` |  |
-| imagePullSecrets | list | `[]` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.extraLabels | object | `{}` |  |
-| ingress.hosts | list | `[]` |  |
-| ingress.pathType | string | `"Prefix"` | pathType is only for k8s >= 1.1= |
-| ingress.tls | list | `[]` |  |
-| license | object | `{"key":"","secret":{"key":"","name":""}}` | Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - https://docs.victoriametrics.com/enterprise, for more information, visit https://victoriametrics.com/products/enterprise/ . To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/ Supported starting from VictoriaMetrics v1.94.0 |
-| license.key | string | `""` | License key |
-| license.secret | object | `{"key":"","name":""}` | Use existing secret with license key |
-| license.secret.key | string | `""` | Key in secret with license key |
-| license.secret.name | string | `""` | Existing secret name |
-| nameOverride | string | `""` |  |
-| nodeSelector | object | `{}` | NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
-| podAnnotations | object | `{}` | Annotations to be added to pod |
-| podDisruptionBudget | object | `{"enabled":false,"labels":{}}` | See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
-| podSecurityContext.enabled | bool | `true` |  |
-| probe.liveness.initialDelaySeconds | int | `5` |  |
-| probe.liveness.periodSeconds | int | `15` |  |
-| probe.liveness.tcpSocket | object | `{}` |  |
-| probe.liveness.timeoutSeconds | int | `5` |  |
-| probe.readiness.httpGet | object | `{}` |  |
-| probe.readiness.initialDelaySeconds | int | `5` |  |
-| probe.readiness.periodSeconds | int | `15` |  |
-| probe.startup | object | `{}` |  |
-| rateLimiter | object | `{"config":{},"datasource":{"url":""},"enabled":false}` | Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway#rate-limiter |
-| rateLimiter.datasource.url | string | `""` | Datasource VictoriaMetrics or vmselects. Required. Example http://victoroametrics:8428 or http://vmselect:8481/select/0/prometheus |
-| rateLimiter.enabled | bool | `false` | Enable/Disable rate-limiting |
-| read.url | string | `""` | Read endpoint without suffixes, victoriametrics or vmselect. Example http://victoroametrics:8428 or http://vmselect:8481 |
-| replicaCount | int | `1` | Number of replicas of vmgateway |
-| resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
-| securityContext.enabled | bool | `true` |  |
-| securityContext.runAsGroup | int | `1000` |  |
-| securityContext.runAsNonRoot | bool | `true` |  |
-| securityContext.runAsUser | int | `1000` |  |
-| service.annotations | object | `{}` |  |
-| service.clusterIP | string | `""` |  |
-| service.enabled | bool | `true` |  |
-| service.externalIPs | list | `[]` |  |
-| service.extraLabels | object | `{}` |  |
-| service.ipFamilies | list | `[]` |  |
-| service.ipFamilyPolicy | string | `""` |  |
-| service.loadBalancerIP | string | `""` |  |
-| service.loadBalancerSourceRanges | list | `[]` |  |
-| service.servicePort | int | `8431` |  |
-| service.type | string | `"ClusterIP"` |  |
-| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
-| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| serviceAccount.name | string | `nil` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| serviceMonitor.annotations | object | `{}` | Service Monitor annotations |
-| serviceMonitor.basicAuth | object | `{}` | Basic auth params for Service Monitor |
-| serviceMonitor.enabled | bool | `false` | Enable deployment of Service Monitor for server component. This is Prometheus operator object |
-| serviceMonitor.extraLabels | object | `{}` | Service Monitor labels |
-| serviceMonitor.metricRelabelings | list | `[]` | Service Monitor metricRelabelings |
-| serviceMonitor.relabelings | list | `[]` | Service Monitor relabelings |
-| tolerations | list | `[]` | Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
-| write.url | string | `""` | Write endpoint without suffixes, victoriametrics or vminsert. Example http://victoroametrics:8428 or http://vminsert:8480 |
+<table>
+  <thead>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>affinity</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Affinity configurations</p>
+</td>
+    </tr>
+    <tr>
+      <td>annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Annotations to be added to the deployment</p>
+</td>
+    </tr>
+    <tr>
+      <td>auth</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: false
+</pre>
+</td>
+      <td><p>Access Control configuration. <a href="https://docs.victoriametrics.com/vmgateway#access-control" target="_blank">https://docs.victoriametrics.com/vmgateway#access-control</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>auth.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td><p>Enable/Disable access-control</p>
+</td>
+    </tr>
+    <tr>
+      <td>clusterMode</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td><p>Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting</p>
+</td>
+    </tr>
+    <tr>
+      <td>configMap</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>Use existing configmap if specified otherwise .config values will be used. Ref: <a href="https://docs.victoriametrics.com/vmgateway" target="_blank">https://docs.victoriametrics.com/vmgateway</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>containerWorkingDir</td>
+      <td>string</td>
+      <td><pre lang="">
+/
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>env</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>Additional environment variables (ex.: secret tokens, flags) <a href="https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables" target="_blank">https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>envFrom</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>extraArgs."envflag.enable"</td>
+      <td>string</td>
+      <td><pre lang="">
+"true"
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>extraArgs."envflag.prefix"</td>
+      <td>string</td>
+      <td><pre lang="">
+VM_
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>extraArgs.loggerFormat</td>
+      <td>string</td>
+      <td><pre lang="">
+json
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>extraContainers</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>extraHostPathMounts</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>Additional hostPath mounts</p>
+</td>
+    </tr>
+    <tr>
+      <td>extraVolumeMounts</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>Extra Volume Mounts for the container</p>
+</td>
+    </tr>
+    <tr>
+      <td>extraVolumes</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>Extra Volumes for the pod</p>
+</td>
+    </tr>
+    <tr>
+      <td>fullnameOverride</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>global.compatibility.openshift.adaptSecurityContext</td>
+      <td>string</td>
+      <td><pre lang="">
+auto
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>global.image.registry</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>global.imagePullSecrets</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>image.pullPolicy</td>
+      <td>string</td>
+      <td><pre lang="">
+IfNotPresent
+</pre>
+</td>
+      <td><p>Pull policy of Docker image</p>
+</td>
+    </tr>
+    <tr>
+      <td>image.registry</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>Victoria Metrics gateway Docker registry</p>
+</td>
+    </tr>
+    <tr>
+      <td>image.repository</td>
+      <td>string</td>
+      <td><pre lang="">
+victoriametrics/vmgateway
+</pre>
+</td>
+      <td><p>Victoria Metrics gateway Docker repository and image name</p>
+</td>
+    </tr>
+    <tr>
+      <td>image.tag</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>Tag of Docker image override Chart.AppVersion</p>
+</td>
+    </tr>
+    <tr>
+      <td>image.variant</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>imagePullSecrets</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ingress.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ingress.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ingress.extraLabels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ingress.hosts</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ingress.pathType</td>
+      <td>string</td>
+      <td><pre lang="">
+Prefix
+</pre>
+</td>
+      <td><p>pathType is only for k8s &gt;= 1.1=</p>
+</td>
+    </tr>
+    <tr>
+      <td>ingress.tls</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>license</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+key: ""
+secret:
+    key: ""
+    name: ""
+</pre>
+</td>
+      <td><p>Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - <a href="https://docs.victoriametrics.com/enterprise" target="_blank">https://docs.victoriametrics.com/enterprise</a>, for more information, visit <a href="https://victoriametrics.com/products/enterprise/" target="_blank">https://victoriametrics.com/products/enterprise/</a> . To request a trial license, go to <a href="https://victoriametrics.com/products/enterprise/trial/" target="_blank">https://victoriametrics.com/products/enterprise/trial/</a> Supported starting from VictoriaMetrics v1.94.0</p>
+</td>
+    </tr>
+    <tr>
+      <td>license.key</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>License key</p>
+</td>
+    </tr>
+    <tr>
+      <td>license.secret</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+key: ""
+name: ""
+</pre>
+</td>
+      <td><p>Use existing secret with license key</p>
+</td>
+    </tr>
+    <tr>
+      <td>license.secret.key</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>Key in secret with license key</p>
+</td>
+    </tr>
+    <tr>
+      <td>license.secret.name</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>Existing secret name</p>
+</td>
+    </tr>
+    <tr>
+      <td>nameOverride</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>nodeSelector</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>NodeSelector configurations. Ref: <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">https://kubernetes.io/docs/user-guide/node-selection/</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>podAnnotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Annotations to be added to pod</p>
+</td>
+    </tr>
+    <tr>
+      <td>podDisruptionBudget</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: false
+labels: {}
+</pre>
+</td>
+      <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more. Ref: <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">https://kubernetes.io/docs/tasks/run-application/configure-pdb/</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>podSecurityContext.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>probe.liveness</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+initialDelaySeconds: 5
+periodSeconds: 15
+tcpSocket: {}
+timeoutSeconds: 5
+</pre>
+</td>
+      <td><p>liveness probe</p>
+</td>
+    </tr>
+    <tr>
+      <td>probe.readiness</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+httpGet: {}
+initialDelaySeconds: 5
+periodSeconds: 15
+</pre>
+</td>
+      <td><p>readiness probe</p>
+</td>
+    </tr>
+    <tr>
+      <td>probe.startup</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>startup probe</p>
+</td>
+    </tr>
+    <tr>
+      <td>rateLimiter</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+config: {}
+datasource:
+    url: ""
+enabled: false
+</pre>
+</td>
+      <td><p>Rate limiter configuration. Docs <a href="https://docs.victoriametrics.com/vmgateway#rate-limiter" target="_blank">https://docs.victoriametrics.com/vmgateway#rate-limiter</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>rateLimiter.datasource.url</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>Datasource VictoriaMetrics or vmselects. Required. Example <a href="http://victoroametrics:8428" target="_blank">http://victoroametrics:8428</a> or <a href="http://vmselect:8481/select/0/prometheus" target="_blank">http://vmselect:8481/select/0/prometheus</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>rateLimiter.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td><p>Enable/Disable rate-limiting</p>
+</td>
+    </tr>
+    <tr>
+      <td>read.url</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>Read endpoint without suffixes, victoriametrics or vmselect. Example <a href="http://victoroametrics:8428" target="_blank">http://victoroametrics:8428</a> or <a href="http://vmselect:8481" target="_blank">http://vmselect:8481</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>replicaCount</td>
+      <td>int</td>
+      <td><pre lang="">
+1
+</pre>
+</td>
+      <td><p>Number of replicas of vmgateway</p>
+</td>
+    </tr>
+    <tr>
+      <td>resources</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after &lsquo;resources:&rsquo;.</p>
+</td>
+    </tr>
+    <tr>
+      <td>securityContext</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+enabled: true
+runAsGroup: 1000
+runAsNonRoot: true
+runAsUser: 1000
+</pre>
+</td>
+      <td><p>Ref: <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">https://kubernetes.io/docs/tasks/configure-pod-container/security-context/</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>service.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.clusterIP</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.externalIPs</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.extraLabels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.ipFamilies</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.ipFamilyPolicy</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.loadBalancerIP</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.loadBalancerSourceRanges</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.servicePort</td>
+      <td>int</td>
+      <td><pre lang="">
+8431
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.type</td>
+      <td>string</td>
+      <td><pre lang="">
+ClusterIP
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>serviceAccount.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Annotations to add to the service account</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.create</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td><p>Specifies whether a service account should be created</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.name</td>
+      <td>string</td>
+      <td><pre lang="">
+null
+</pre>
+</td>
+      <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceMonitor.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Service Monitor annotations</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceMonitor.basicAuth</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Basic auth params for Service Monitor</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceMonitor.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td><p>Enable deployment of Service Monitor for server component. This is Prometheus operator object</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceMonitor.extraLabels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Service Monitor labels</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceMonitor.metricRelabelings</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>Service Monitor metricRelabelings</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceMonitor.relabelings</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>Service Monitor relabelings</p>
+</td>
+    </tr>
+    <tr>
+      <td>tolerations</td>
+      <td>list</td>
+      <td><pre lang="plaintext">
+[]
+</pre>
+</td>
+      <td><p>Tolerations configurations. Ref: <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/" target="_blank">https://kubernetes.io/docs/concepts/configuration/assign-pod-node/</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>write.url</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>Write endpoint without suffixes, victoriametrics or vminsert. Example <a href="http://victoroametrics:8428" target="_blank">http://victoroametrics:8428</a> or <a href="http://vminsert:8480" target="_blank">http://vminsert:8480</a></p>
+</td>
+    </tr>
+  </tbody>
+</table>
+

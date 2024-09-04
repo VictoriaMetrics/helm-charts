@@ -21,7 +21,7 @@ global:
 printNotes: true
 
 podDisruptionBudget:
-  # -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: [https://kubernetes.io/docs/tasks/run-application/configure-pdb/](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   enabled: false
   #  minAvailable: 1
   #  maxUnavailable: 1
@@ -46,13 +46,13 @@ server:
   priorityClassName: ""
   # -- Data retention period in month
   retentionPeriod: 1
-  # Extra command line arguments for container of component
+  # -- Extra command line arguments for container of component
   extraArgs:
     envflag.enable: "true"
     envflag.prefix: VM_
     loggerFormat: json
 
-  # Additional hostPath mounts
+  # -- Additional hostPath mounts
   extraHostPathMounts:
     []
      #- name: certs-dir
@@ -61,28 +61,30 @@ server:
      #  hostPath: /etc/kubernetes/certs
      #  readOnly: true
 
-  # Extra Volumes for the pod
+  # -- Extra Volumes for the pod
   extraVolumes:
     []
     #- name: example
     #  configMap:
     #   name: example
 
-  # Extra Volume Mounts for the container
+  # -- Extra Volume Mounts for the container
   extraVolumeMounts:
     []
     # - name: example
     #   mountPath: /example
 
+  # -- Extra containers to run in a pod with Victoria Logs container
   extraContainers:
     []
     #- name: config-reloader
     #  image: reloader-image
 
+  # -- Init containers for Victoria Logs Pod
   initContainers:
     []
 
-  # -- Node tolerations for server scheduling to nodes with taints. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+  # -- Node tolerations for server scheduling to nodes with taints. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
   tolerations:
     []
     # - key: "key"
@@ -90,7 +92,7 @@ server:
     #   value: "value"
     #   effect: "NoSchedule|PreferNoSchedule"
 
-  # -- Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/)
+  # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
   # -- Pod affinity
@@ -108,9 +110,9 @@ server:
   # -- Container workdir
   containerWorkingDir: ""
 
-  ## Use an alternate scheduler, e.g. "stork".
-  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
-  ##
+  # -- Use an alternate scheduler, e.g. "stork".
+  # ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  #
   # schedulerName:
 
   emptyDir: {}
@@ -118,7 +120,7 @@ server:
     # -- Create/use Persistent Volume Claim for server component. Empty dir if false
     enabled: false
 
-    # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Ref: [http://kubernetes.io/docs/user-guide/persistent-volumes/](http://kubernetes.io/docs/user-guide/persistent-volumes/)
+    # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](http://kubernetes.io/docs/user-guide/persistent-volumes/)
     accessModes:
       - ReadWriteOnce
     # -- Persistant volume annotations
@@ -149,7 +151,7 @@ server:
   # -- Pod's management policy
   podManagementPolicy: OrderedReady
 
-  # -- Resource object. Ref: [http://kubernetes.io/docs/user-guide/compute-resources/](http://kubernetes.io/docs/user-guide/compute-resources/
+  # -- Resource object. Details are [here](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
     {}
     # limits:
@@ -160,7 +162,7 @@ server:
     #   memory: 512Mi
 
   probe:
-    # Indicates whether the Container is ready to service requests. If the readiness probe fails, the endpoints controller removes the Pod's IP address from the endpoints of all Services that match the Pod. The default state of readiness before the initial delay is Failure. If a Container does not provide a readiness probe, the default state is Success.
+    # -- Indicates whether the Container is ready to service requests. If the readiness probe fails, the endpoints controller removes the Pod's IP address from the endpoints of all Services that match the Pod. The default state of readiness before the initial delay is Failure. If a Container does not provide a readiness probe, the default state is Success.
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
@@ -168,7 +170,7 @@ server:
       timeoutSeconds: 5
       failureThreshold: 3
 
-    # Indicates whether the Container is running. If the liveness probe fails, the kubelet kills the Container, and the Container is subjected to its restart policy. If a Container does not provide a liveness probe, the default state is Success.
+    # -- Indicates whether the Container is running. If the liveness probe fails, the kubelet kills the Container, and the Container is subjected to its restart policy. If a Container does not provide a liveness probe, the default state is Success.
     liveness:
       tcpSocket: {}
       initialDelaySeconds: 30
@@ -176,7 +178,7 @@ server:
       timeoutSeconds: 5
       failureThreshold: 10
 
-    # Indicates whether the Container is done with potentially costly initialization. If set it is executed first. If it fails Container is restarted. If it succeeds liveness and readiness probes takes over.
+    # -- Indicates whether the Container is done with potentially costly initialization. If set it is executed first. If it fails Container is restarted. If it succeeds liveness and readiness probes takes over.
     startup: {}
      # tcpSocket: {}
      # failureThreshold: 30
@@ -193,7 +195,7 @@ server:
         - ALL
     readOnlyRootFilesystem: true
 
-  # -- Pod's security context. Ref: [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext:
     enabled: true
     fsGroup: 2000
@@ -235,7 +237,7 @@ server:
     labels: {}
     # -- Service ClusterIP
     clusterIP: ""
-    # -- Service External IPs. Ref: [https://kubernetes.io/docs/user-guide/services/#external-ips]( https://kubernetes.io/docs/user-guide/services/#external-ips)
+    # -- Service External IPs. Details are [here]( https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
     # -- Service load balacner IP
     loadBalancerIP: ""
@@ -307,11 +309,12 @@ fluent-bit:
   config:
     # -- Note that Host must be replaced to match your VictoriaLogs service name
     # Default format points to VictoriaLogs service.
+    # @notationType -- tpl
     outputs: |
       [OUTPUT]
           Name http
           Match kube.*
-          Host {{ include "victoria-logs.server.fullname" . }}
+          Host '{{ include "victoria-logs.server.fullname" . }}'
           port 9428
           compress gzip
           uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name,kubernetes_container_name,kubernetes_namespace_name&_msg_field=log&_time_field=date
@@ -319,6 +322,8 @@ fluent-bit:
           json_date_format iso8601
           header AccountID 0
           header ProjectID 0
+    # -- FluentBit configuration filters
+    # @notationType -- tpl
     filters: |
       [FILTER]
           Name kubernetes
@@ -335,5 +340,5 @@ fluent-bit:
           Nested_under kubernetes
           Add_prefix   kubernetes_
 
-# Add extra specs dynamically to this chart
+# -- Add extra specs dynamically to this chart
 extraObjects: []

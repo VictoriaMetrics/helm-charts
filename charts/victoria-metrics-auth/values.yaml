@@ -161,7 +161,7 @@ ingressInternal:
   # -- pathType is only for k8s >= 1.1=
   pathType: Prefix
 
-# -- We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# -- We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after `resources:`.
 resources: {}
   # limits:
   #   cpu: 100m
@@ -252,15 +252,18 @@ config:
 extraObjects: []
 
 probe:
+  # -- readiness probe
   readiness:
     tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
+  # -- liveness probe
   liveness:
     tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
     timeoutSeconds: 5
+  # -- startup probe
   startup: {}
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.

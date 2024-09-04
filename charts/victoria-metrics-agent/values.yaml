@@ -11,17 +11,17 @@ global:
       
 replicaCount: 1
 
-# ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+# -- ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 deployment:
   enabled: true
-  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  # ref: -- https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   strategy: {}
    # rollingUpdate:
    #  maxSurge: 25%
    #  maxUnavailable: 25%
    # type: RollingUpdate
 
-# ref:  https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+# -- ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
 statefulset:
   enabled: false
   # -- create cluster of vmagents. See https://docs.victoriametrics.com/vmagent#scraping-big-number-of-targets
@@ -34,10 +34,13 @@ statefulset:
     # type: RollingUpdate
 
 image:
+  # -- Image registry
   registry: ""
+  # -- Image repository
   repository: victoriametrics/vmagent
+  # -- Image tag, set to `Chart.AppVersion` by default
   tag: "" # rewrites Chart.AppVersion
-  # Variant of the image to use.
+  # -- Variant of the image to use.
   # e.g. enterprise, scratch
   variant: ""
   pullPolicy: IfNotPresent
@@ -57,23 +60,23 @@ rbac:
   namespaced: false
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
+  # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
 
-## See `kubectl explain poddisruptionbudget.spec` for more
-## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+# -- See `kubectl explain poddisruptionbudget.spec` for more
+# ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
 podDisruptionBudget:
   enabled: false
   # minAvailable: 1
   # maxUnavailable: 1
   labels: {}
 
-# WARN: need to specify at least one remote write url or one multi tenant url
+# -- WARN: need to specify at least one remote write url or one multi tenant url
 remoteWriteUrls: []
 # remoteWriteUrls:
 #   - http://vm-insert:8480/insert/0/prometheus
@@ -84,6 +87,7 @@ multiTenantUrls: []
 #   - http://vm-insert-az1:8480
 #   - http://vm-insert-az2:8480
 
+# -- vmagent extra command line arguments
 extraArgs:
   envflag.enable: "true"
   envflag.prefix: VM_
@@ -111,13 +115,13 @@ envFrom:
   #- configMapRef:
   #    name: special-config
 
-# extra Labels for Pods, Deployment and Statefulset
+# -- extra Labels for Pods, Deployment and Statefulset
 extraLabels: {}
 
-# extra Labels for Pods only
+# -- extra Labels for Pods only
 podLabels: {}
 
-# Additional hostPath mounts
+# -- Additional hostPath mounts
 extraHostPathMounts:
   []
   # - name: certs-dir
@@ -126,14 +130,14 @@ extraHostPathMounts:
   #   hostPath: /etc/kubernetes/certs
   #   readOnly: true
 
-# Extra Volumes for the pod
+# -- Extra Volumes for the pod
 extraVolumes:
   []
   # - name: example
   #   configMap:
   #     name: example
 
-# Extra Volume Mounts for the container
+# -- Extra Volume Mounts for the container
 extraVolumeMounts:
   []
   # - name: example
@@ -212,10 +216,10 @@ resources:
   #   cpu: 100m
   #   memory: 128Mi
 
-# Annotations to be added to the deployment
+# -- Annotations to be added to the deployment
 annotations: {}
 
-# Annotations to be added to pod
+# -- Annotations to be added to pod
 podAnnotations: {}
 
 nodeSelector: {}
@@ -229,9 +233,8 @@ topologySpreadConstraints: []
 
 affinity: {}
 
-# vmagent scraping configuration:
+# -- vmagent scraping configuration:
 # https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/docs/vmagent.md#how-to-collect-metrics-in-prometheus-format
-
 # use existing configmap if specified
 # otherwise .config values will be used
 configMap: ""
@@ -290,7 +293,7 @@ config:
   global:
     scrape_interval: 10s
 
-  # scrape self by default
+  # -- scrape configuration. scrape self by default
   scrape_configs:
     - job_name: vmagent
       static_configs:
@@ -420,6 +423,7 @@ config:
     # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
     # * `prometheus.io/port`: If the metrics are exposed on a different port to the
     # service then set this appropriately.
+    # 
     - job_name: "kubernetes-service-endpoints"
       kubernetes_sd_configs:
         - role: endpointslices
@@ -480,6 +484,7 @@ config:
     # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
     # * `prometheus.io/port`: If the metrics are exposed on a different port to the
     # service then set this appropriately.
+    #
     - job_name: "kubernetes-service-endpoints-slow"
       scrape_interval: 5m
       scrape_timeout: 30s
@@ -536,6 +541,7 @@ config:
     # via the following annotations:
     #
     # * `prometheus.io/probe`: Only probe services that have a value of `true`
+    #
     - job_name: "kubernetes-services"
       metrics_path: /probe
       params:
@@ -567,6 +573,7 @@ config:
     # * `prometheus.io/scrape`: Only scrape pods that have a value of `true`
     # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
     # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the default of `9102`.
+    #
     - job_name: "kubernetes-pods"
       kubernetes_sd_configs:
         - role: pod
@@ -606,18 +613,21 @@ config:
 extraScrapeConfigs: []
 
 probe:
+  # -- readiness probe
   readiness:
     httpGet: {}
     initialDelaySeconds: 5
     periodSeconds: 15
+  # -- liveness probe
   liveness:
     tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
     timeoutSeconds: 5
+  # -- startup probe
   startup: {}
 
-# Add extra specs dynamically to this chart
+# -- Add extra specs dynamically to this chart
 extraObjects: []
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
