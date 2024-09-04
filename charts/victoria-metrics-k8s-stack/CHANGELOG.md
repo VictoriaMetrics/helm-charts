@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Use operator's own service monitor
 
 ## 0.25.12
 
