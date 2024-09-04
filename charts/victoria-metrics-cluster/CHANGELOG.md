@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.13.3
+
+**Release date:** 2024-09-04
+
+![AppVersion: v1.103.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.103.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - fixed vmstorage resources templating
 
 ## 0.13.2
