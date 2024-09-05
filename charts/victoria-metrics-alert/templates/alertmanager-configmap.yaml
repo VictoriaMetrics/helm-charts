@@ -4,13 +4,10 @@ kind: ConfigMap
 metadata:
   name: {{ include "vmalert.alertmanager.configname" .}}
   namespace: {{include "vm.namespace" .}}
-  labels: {{- include "vmalert.alertmanager.labels" . | nindent 4}}
+  labels: {{ include "vmalert.alertmanager.labels" . | nindent 4 }}
 data:
-  alertmanager.yaml: |
-    {{ toYaml .Values.alertmanager.config | nindent 4 }}
-
-{{- range $key, $value := .Values.alertmanager.templates }}
-  {{ $key }}: |-
-    {{- $value | nindent 4 }}
+  alertmanager.yaml: |{{ toYaml .Values.alertmanager.config | nindent 4 }}
+  {{- range $key, $value := .Values.alertmanager.templates }}
+  {{ $key }}: |{{ $value | nindent 4 }}
   {{- end }}
 {{- end }}
