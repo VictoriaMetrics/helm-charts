@@ -237,7 +237,7 @@ http://{{- include "vmalert.alertmanager.fullname" . -}}:9093{{ .Values.alertman
   {{- $_ := set $args "storage.path" (ternary $app.persistentVolume.mountPath "/data" $app.persistentVolume.enabled) -}}
   {{- $_ := set $args "data.retention" $app.retention -}}
   {{- $_ := set $args "web.listen-address" $app.listenAddress -}}
-  {{- $_ := set $args "cluster.advertise-address" "$(POD_IP):6783" -}}
+  {{- $_ := set $args "cluster.advertise-address" "[$(POD_IP)]:6783" -}}
   {{- with $app.baseURL -}}
     {{- $_ := set $args "web.external-url" $app.baseURL -}}
   {{- end -}}
