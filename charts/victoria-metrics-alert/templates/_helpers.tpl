@@ -244,7 +244,6 @@ http://{{- include "vmalert.alertmanager.fullname" . -}}:9093{{ .Values.alertman
   {{ with $app.baseURLPrefix }}
     {{- $_ := set $args "web.route-prefix" $app.baseURLPrefix -}}
   {{- end -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
