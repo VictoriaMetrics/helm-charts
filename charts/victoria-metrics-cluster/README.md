@@ -1,7 +1,7 @@
 
 # Victoria Metrics Helm Chart for Cluster Version
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.13.3](https://img.shields.io/badge/Version-0.13.3-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.13.4](https://img.shields.io/badge/Version-0.13.4-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-cluster)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -631,6 +631,15 @@ false
     </tr>
     <tr>
       <td>vminsert.podDisruptionBudget.labels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vminsert.podLabels</td>
       <td>object</td>
       <td><pre lang="plaintext">
 {}
@@ -1447,6 +1456,15 @@ false
       <td></td>
     </tr>
     <tr>
+      <td>vmselect.podLabels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
       <td>vmselect.podSecurityContext.enabled</td>
       <td>bool</td>
       <td><pre lang="">
@@ -2175,6 +2193,15 @@ labels: {}
 </td>
       <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more. Details are <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">here</a></p>
 </td>
+    </tr>
+    <tr>
+      <td>vmstorage.podLabels</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
     </tr>
     <tr>
       <td>vmstorage.podManagementPolicy</td>
