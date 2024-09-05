@@ -5,22 +5,17 @@ metadata:
   name: {{ include "vmalert.server.fullname" . }}
   namespace: {{ include "vm.namespace" . }}
 spec:
-  {{- if .Values.server.verticalPodAutoscaler.recommenders }}
-  recommenders:
-    {{- range .Values.server.verticalPodAutoscaler.recommenders }}
-    - name: {{ .name }}
-    {{- end }}
+  {{- with .Values.server.verticalPodAutoscaler.recommenders }}
+  recommenders: {{ toYaml . | nindent 4 }}
   {{- end }}
   targetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "vmalert.server.fullname" . }}
-  {{- if .Values.server.verticalPodAutoscaler.updatePolicy }}
-  updatePolicy:
-    {{- toYaml .Values.server.verticalPodAutoscaler.updatePolicy | nindent 4 }}
+  {{- with .Values.server.verticalPodAutoscaler.updatePolicy }}
+  updatePolicy: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- if .Values.server.verticalPodAutoscaler.resourcePolicy }}
-  resourcePolicy:
-    {{- toYaml .Values.server.verticalPodAutoscaler.resourcePolicy | nindent 4 }}
+  {{- with .Values.server.verticalPodAutoscaler.resourcePolicy }}
+  resourcePolicy: {{ toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}

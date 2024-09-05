@@ -33,6 +33,9 @@ spec:
       {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $app.initContainers }}
+      initContainers: {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: alertmanager
           {{- if $app.securityContext.enabled }}

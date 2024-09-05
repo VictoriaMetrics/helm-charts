@@ -5,8 +5,7 @@ kind: Service
 metadata:
   namespace: {{ include "vm.namespace" . }}
   {{- with $app.service.annotations }}
-  annotations:
-  {{- toYaml . | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
   {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
   labels: {{ include "vmalert.alertmanager.labels" $ctx | nindent 4 }}
