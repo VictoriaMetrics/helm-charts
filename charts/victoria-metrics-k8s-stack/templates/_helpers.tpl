@@ -130,7 +130,7 @@ If release name contains chart name it will be used as a full name.
         {{- $spec = $spec.spec -}}
       {{- end -}}
     {{- end -}}
-    {{- $isSecure = ($spec.extraArgs).tls | default $isSecure -}}
+    {{- $isSecure = (eq ($spec.extraArgs).tls "true") | default $isSecure -}}
     {{- $proto = (ternary "https" "http" $isSecure) -}}
     {{- $port = (ternary 443 80 $isSecure) -}}
     {{- $port = $spec.port | default $port -}}

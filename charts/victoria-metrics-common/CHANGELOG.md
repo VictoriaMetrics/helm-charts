@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fixed protocol extraction with TLS enabled
 
 ## 0.0.9
 

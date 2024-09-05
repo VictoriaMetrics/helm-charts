@@ -3,6 +3,7 @@
 ## Next release
 
 - Drop empty endpoints param from scrape configuration
+- Fixed proto when TLS is enabled. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1449)
 
 ## 0.25.14
 
