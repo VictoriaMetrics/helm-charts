@@ -3,6 +3,7 @@
 ## Next release
 
 - Removed deprecated autoscaling v2beta2 API support
+- Added podLabels support
 
 ## 0.13.3
 

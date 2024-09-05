@@ -60,6 +60,9 @@ app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 
 {{- define "victoria-metrics.common.podLabels" -}}
 app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
+{{- with .extraLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmstorage.labels" -}}
