@@ -29,7 +29,7 @@ spec:
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
       labels: {{ include "victoria-metrics.vmselect.podLabels" $ctx | nindent 8 }}
     spec:
-      {{- with $ctx.priorityClassName }}
+      {{- with $app.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}

@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed priority class name templating for vmselect deployment
 
 ## 0.13.4
 
