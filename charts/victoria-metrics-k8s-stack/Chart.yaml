@@ -2,7 +2,7 @@ apiVersion: v2
 name: victoria-metrics-k8s-stack
 description: Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
 type: application
-version: 0.25.15
+version: 0.25.16
 appVersion: v1.102.1
 sources:
   - https://github.com/VictoriaMetrics/helm-charts
@@ -32,6 +32,9 @@ annotations:
       url: https://docs.victoriametrics.com
 
 dependencies:
+  - name: victoria-metrics-common
+    version: "0.0.*"
+    repository: https://victoriametrics.github.io/helm-charts
   - name: victoria-metrics-operator
     version: "0.34.*"
     repository: https://victoriametrics.github.io/helm-charts

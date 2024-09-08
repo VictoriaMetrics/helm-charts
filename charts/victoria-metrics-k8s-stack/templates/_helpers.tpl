@@ -193,7 +193,7 @@ If release name contains chart name it will be used as a full name.
   {{- $_ := set $remotes "remoteRead" $remoteRead -}}
   {{- $_ := set $remotes "datasource" $remoteRead -}}
   {{- if $Values.vmalert.additionalNotifierConfigs }}
-    {{- $configName := ((printf "%s-vmalert-additional-notifier" $fullname) | trunc 63 | trimSuffix "-") -}}
+    {{- $configName := printf "%s-vmalert-additional-notifier" $fullname -}}
     {{- $notifierConfigRef := dict "name" $configName "key" "notifier-configs.yaml" -}}
     {{- $_ := set $remotes "notifierConfigRef" $notifierConfigRef -}}
   {{- else if $Values.alertmanager.enabled -}}
@@ -216,7 +216,7 @@ If release name contains chart name it will be used as a full name.
   {{- $cms :=  ($Values.vmalert.spec.configMaps | default list) -}}
   {{- if $Values.vmalert.templateFiles -}}
     {{- $fullname := (include "victoria-metrics-k8s-stack.fullname" .) -}}
-    {{- $cms = append $cms ((printf "%s-vmalert-extra-tpl" $fullname) | trunc 63 | trimSuffix "-") -}}
+    {{- $cms = append $cms (printf "%s-vmalert-extra-tpl" $fullname) -}}
   {{- end -}}
   {{- $output := dict "configMaps" (compact $cms) -}}
   {{- toYaml $output -}}
@@ -243,7 +243,7 @@ If release name contains chart name it will be used as a full name.
   {{- $Values := (.helm).Values | default .Values }}
   {{- $extraArgs := dict "remoteWrite.disablePathAppend" "true" -}}
   {{- if $Values.vmalert.templateFiles -}}
-    {{- $ruleTmpl := (printf "/etc/vm/configs/%s-vmalert-extra-tpl/*.tmpl" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") -}}
+    {{- $ruleTmpl := (printf "/etc/vm/configs/%s-vmalert-extra-tpl/*.tmpl" (include "victoria-metrics-k8s-stack.fullname" .)) -}}
     {{- $_ := set $extraArgs "rule.templates" $ruleTmpl -}}
   {{- end -}}
   {{- $vmAlertRemotes := (include "vm.alert.remotes" . | fromYaml) -}}
@@ -293,10 +293,10 @@ If release name contains chart name it will be used as a full name.
   {{- end -}}
   {{- $templates := default list -}}
   {{- if $Values.alertmanager.monzoTemplate.enabled -}}
-    {{- $configMap := ((printf "%s-alertmanager-monzo-tpl" $fullname) | trunc 63 | trimSuffix "-") -}}
+    {{- $configMap := (printf "%s-alertmanager-monzo-tpl" $fullname) -}}
     {{- $templates = append $templates (dict "name" $configMap "key" "monzo.tmpl") -}}
   {{- end -}}
-  {{- $configMap := ((printf "%s-alertmanager-extra-tpl" $fullname) | trunc 63 | trimSuffix "-") -}}
+  {{- $configMap := (printf "%s-alertmanager-extra-tpl" $fullname) -}}
   {{- range $key, $value := (.Values.alertmanager.templateFiles | default dict) -}}
     {{- $templates = append $templates (dict "name" $configMap "key" $key) -}}
   {{- end -}}
@@ -397,8 +397,7 @@ If release name contains chart name it will be used as a full name.
 
 {{- /* VMRule name */ -}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.name" -}}
-  {{- $id := include "victoria-metrics-k8s-stack.rulegroup.id" . -}}
-  {{- printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) $id | trunc 63 | trimSuffix "-" | trimSuffix "." -}}
+  {{- printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) (.name | replace "_" "") -}}
 {{- end -}}
 
 {{- /* VMRule labels */ -}}
@@ -413,11 +412,6 @@ If release name contains chart name it will be used as a full name.
 {{- /* VMRule key */ -}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.key" -}}
   {{- without (regexSplit "[-_.]" .name -1) "exporter" "rules" | join "-" | camelcase | untitle -}}
-{{- end -}}
-
-{{- /* VMRule ID */ -}}
-{{- define "victoria-metrics-k8s-stack.rulegroup.id" -}}
-  {{- .name | replace "_" "" | trunc 63 | trimSuffix "-" | trimSuffix "." -}}
 {{- end -}}
 
 {{- /* VMAlertmanager name */ -}}

@@ -2,7 +2,9 @@
 
 ## Next release
 
-- TODO
+- Do not truncate servicemonitor, datasources, rules, dashboard, alertmanager & vmalert templates names
+- Use service label for node-exporter instead of podLabel. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1458)
+- Added common chart to a k8s-stack. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1456)
 
 ## 0.25.15
 

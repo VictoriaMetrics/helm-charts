@@ -3,6 +3,9 @@
 ## Next release
 
 - Fixed protocol extraction with TLS enabled
+- Typo fixes
+- use appkey as `app` label by default
+- support multiple service naming styles for `vm.service`
 
 ## 0.0.9
 

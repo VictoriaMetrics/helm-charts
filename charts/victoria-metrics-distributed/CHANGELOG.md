@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Do not truncate datasource name
 
 ## 0.3.0
 

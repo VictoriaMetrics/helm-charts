@@ -1,17 +1,16 @@
 {{- $app := (include "victoria-metrics-k8s-stack.name" .) }}
-{{- $fullname := ((printf "%s-additional-victoria-metrics-rules" (include "victoria-metrics-k8s-stack.fullname" .)) | trunc 63 | trimSuffix "-") }}
 {{- if .Values.additionalVictoriaMetricsMap }}
 apiVersion: v1
 kind: List
 metadata:
-  name: {{ $fullname }}
+  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-additional-victoria-metrics-rules
   namespace: {{ include "vm.namespace" . }}
 items:
 {{- range $VMRuleName, $VMRule := .Values.additionalVictoriaMetricsMap }}
   - apiVersion: operator.victoriametrics.com/v1beta1
     kind: VMRule
     metadata:
-      {{- $name := ((printf "%s-%s" $app $VMRuleName) | trunc 63 | trimSuffix "-") }}
+      {{- $name := (printf "%s-%s" $app $VMRuleName) }}
       name: {{ $name }}
       namespace: {{ include "vm.namespace" $ }}
       {{- $extraLabels := (deepCopy ($VMRule.additionalLabels | default dict)) -}}

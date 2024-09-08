@@ -3,7 +3,8 @@
 ## Next release
 
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
-- updated alertmanager args for IPv6 compatibility. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/856)
+- Updated alertmanager args for IPv6 compatibility. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/856)
+- Added ability to set init containers for alertmanager and vmalert pods
 
 ## 0.11.0
 

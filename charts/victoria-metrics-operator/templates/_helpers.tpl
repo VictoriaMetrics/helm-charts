@@ -91,7 +91,7 @@ meta.helm.sh/release-name: {{ $Release.Name }}
 Create the name of service account and clusterRole for cleanup-hook
 */}}
 {{- define "vm-operator.cleanupHookName" -}}
-  {{- printf "%s-%s" (include "vm-operator.fullname" .) "cleanup-hook" | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+  {{- include "vm-operator.fullname" . }}-cleanup-hook
 {{- end }}
 
 {{/*

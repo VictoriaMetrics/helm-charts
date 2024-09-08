@@ -3,6 +3,8 @@
 ## Next release
 
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
+- Fixed template for cert-manager certificates
+- Removed cluster role disabling, when operator watches self namespace
 
 ## 0.34.7
 
