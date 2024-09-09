@@ -3,6 +3,7 @@
 ## Next release
 
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
+- Changed webhook service port from 443 to 9443
 
 ## 0.34.7
 
