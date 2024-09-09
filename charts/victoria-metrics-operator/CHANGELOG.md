@@ -5,6 +5,7 @@
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
 - Fixed template for cert-manager certificates
 - Removed cluster role disabling, when operator watches self namespace
+- Changed webhook service port from 443 to 9443
 
 ## 0.34.7
 
