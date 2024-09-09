@@ -1,0 +1,110 @@
+{{- if .Values.cleanup.enabled }}
+{{- $app := .Values.cleanup }}
+{{- if empty ($app.image).tag }}
+  {{- $tag := (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor) | replace "+" "" -}}
+  {{- $_ := set $app.image "tag" $tag }}
+{{- end }}
+
+{{- $files := .Files }}
+{{- $fileContentsList := $files.Get "crds/crd.yaml" | splitList "---" }}
+{{- $groups := dict }}
+{{- $crds := list }}
+{{- range $fileContentsList }}
+  {{- $fileContents := . | fromYaml }}
+  {{- $group := $fileContents.spec.group }}
+  {{- $plural:= $fileContents.spec.names.plural }}
+  {{- $crds = append $crds $fileContents.spec.names.singular }}
+  {{- $resources := get $groups $group | default (list) }}
+  {{- $resources = concat $resources (list $plural (printf "%s/finalizers" $plural) (printf "%s/status" $plural)) }}
+  {{- $groups = set $groups $group $resources }}
+{{- end }}
+
+{{- $rules := default dict }}
+{{- $verbs := dict "admin" (list "*") "view" (list "get" "list" "watch") }}
+{{- range $group, $resources := $groups }}
+  {{- range $name, $v := $verbs }}
+    {{- $r := index $rules $name | default list -}}
+    {{- $r = append $r (dict "apiGroups" (list $group) "resources" $resources "verbs" $v) -}}
+    {{- $_ := set $rules $name $r }}
+  {{- end }}
+{{- end -}}
+
+{{- $ctx := dict "helm" . }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "vm.fullname" $ctx }}-cleanup-hook
+  namespace: {{ include "vm.namespace" . }}
+  labels: {{ include "vm.labels" . | nindent 4 }}
+  annotations: {{ include "crds.cleanup.annotations" (dict "hookWeight" "-3") | nindent 4 }}
+spec:
+  template:
+    metadata:
+      name: {{ .Release.Name }}
+      labels: {{ include "vm.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "vm.fullname" . }}-cleanup-hook
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: kubectl
+          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
+          imagePullPolicy: {{ $app.image.pullPolicy }}
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "100m"
+              memory: "56Mi"
+          args:
+            - delete
+            - {{ join "," $crds }}
+            - --all
+            - --ignore-not-found=true
+      restartPolicy: OnFailure
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "vm.fullname" $ctx }}-cleanup-hook
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  annotations: {{ include "crds.cleanup.annotations" (dict "hookWeight" "-5") | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "vm.fullname" $ctx }}-cleanup-hook
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  annotations: {{ include "crds.cleanup.annotations" (dict "hookWeight" "-4") | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "vm.fullname" $ctx }}-cleanup-hook
+subjects:
+- kind: ServiceAccount
+  name: {{ include "vm.fullname" $ctx }}-cleanup-hook
+  namespace: {{ include "vm.namespace" $ctx }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "vm.fullname" . }}-cleanup-hook
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" . | nindent 4 }}
+  annotations: {{ include "crds.cleanup.annotations" (dict "hookWeight" "-5") | nindent 4 }}
+rules: {{ toYaml $rules.admin | nindent 2 }}
+{{- end }}

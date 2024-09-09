@@ -1,26 +1,30 @@
-{{- $files := .Files }}
-{{- $fileContentsList := $files.Get "crd.yaml" | splitList "---" }}
-{{- $groups := dict }}
-{{- range $fileContentsList }}
-  {{- $fileContents := . | fromYaml }}
-  {{- $group := $fileContents.spec.group }}
-  {{- $plural:= $fileContents.spec.names.plural }}
-  {{- $resources := get $groups $group | default (list) }}
-  {{- $resources = concat $resources (list $plural (printf "%s/finalizers" $plural) (printf "%s/status" $plural)) }}
-  {{- $groups = set $groups $group $resources }}
+{{- $rules := default dict }}
+{{- if hasKey .Subcharts "crd" }}
+  {{- $files := .Subcharts.crd.Files }}
+  {{- $fileContentsList := $files.Get "crds/crd.yaml" | splitList "---" }}
+  {{- $groups := dict }}
+  {{- range $fileContentsList }}
+    {{- $fileContents := . | fromYaml }}
+    {{- $group := $fileContents.spec.group }}
+    {{- $plural:= $fileContents.spec.names.plural }}
+    {{- $resources := get $groups $group | default (list) }}
+    {{- $resources = concat $resources (list $plural (printf "%s/finalizers" $plural) (printf "%s/status" $plural)) }}
+    {{- $groups = set $groups $group $resources }}
+  {{- end }}
+  {{- $verbs := dict "admin" (list "*") "view" (list "get" "list" "watch") }}
+  {{- range $group, $resources := $groups }}
+    {{- range $name, $v := $verbs }}
+      {{- $r := index $rules $name | default list -}}
+      {{- $r = append $r (dict "apiGroups" (list $group) "resources" $resources "verbs" $v) -}}
+      {{- $_ := set $rules $name $r }}
+    {{- end }}
+  {{- end -}}
 {{- end }}
 
-{{- $rules := default dict }}
-{{- $verbs := dict "admin" (list "*") "view" (list "get" "list" "watch") }}
-{{- range $group, $resources := $groups }}
-  {{- range $name, $v := $verbs }}
-    {{- $r := index $rules $name | default list -}}
-    {{- $r = append $r (dict "apiGroups" (list $group) "resources" $resources "verbs" $v) -}}
-    {{- $_ := set $rules $name $r }}
-  {{- end }}
-{{- end -}}
+{{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
 
 {{- if .Values.rbac.create }}
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -173,21 +177,11 @@ rules:
   - list
   - watch
   - get
-{{ toYaml $rules.admin }}
-{{- end }}
-{{- if .Values.crd.cleanup.enabled }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: {{ include "vm-operator.cleanupHookName" . }}
-  namespace: {{ include "vm.namespace" . }}
-  labels: {{ include "vm-operator.labels" . | nindent 4 }}
-  annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-5") | nindent 4 }}
-rules: {{ toYaml $rules.admin | nindent 2 }}
+{{- with $rules.admin }}
+{{ toYaml . }}
 {{- end }}
 
-{{- if and .Values.crd.create .Values.rbac.aggregatedClusterRoles.enabled }}
+{{- if and (index .Values "victoria-metrics-crds" "enabled") .Values.rbac.aggregatedClusterRoles.enabled }}
 {{- /* This template generates readonly and admin cluster roles for */ -}}
 {{- /* each CRD present in the helm chart.  The clusterroles use the */ -}}
 {{- /* kubernetes clusterrole aggregation feature to include these */ -}}

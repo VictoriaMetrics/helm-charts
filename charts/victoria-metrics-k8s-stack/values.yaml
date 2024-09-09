@@ -21,9 +21,9 @@ victoria-metrics-operator:
   enabled: true
   serviceMonitor:
     enabled: true
-  crd:
+  victoria-metrics-crds:
     # -- we disable crd creation by operator chart as we create them in this chart
-    create: false
+    enabled: true
 
     # -- tells helm to clean up vm cr resources when uninstalling
     cleanup:
@@ -1210,10 +1210,6 @@ kubeProxy:
           scheme: https
           tlsConfig:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-
-## install vm operator crds
-crds:
-  enabled: true
 
 ## install prometheus operator crds
 prometheus-operator-crds:
