@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.11.1
+
+**Release date:** 2024-09-10
+
+![AppVersion: v1.103.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.103.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
 - Updated alertmanager args for IPv6 compatibility. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/856)
 - Added ability to set init containers for alertmanager and vmalert pods
