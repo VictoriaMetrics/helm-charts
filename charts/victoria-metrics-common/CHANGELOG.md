@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added ability to pass extra prefix for `vm.managed.fullname`
 
 ## 0.0.10
 
