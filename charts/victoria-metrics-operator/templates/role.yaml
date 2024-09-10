@@ -33,33 +33,6 @@ metadata:
   namespace: {{ include "vm.namespace" . }}
 rules:
 - apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - ""
-  resources:
-  - configmaps/status
-  verbs:
-  - get
-  - update
-  - patch
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
-- apiGroups:
   - coordination.k8s.io
   verbs:
   - create
@@ -67,6 +40,11 @@ rules:
   - update
   resources:
   - leases
+
+{{- $watchNamespaces := (fromYaml (tpl (toYaml (dict "ns" .Values.watchNamespaces)) .)).ns }}
+{{- $selfNamespace := (include "vm.namespace" .) }}
+{{- $watchSelfNamespace := (and (eq (len $watchNamespaces) 1) (eq (first $watchNamespaces) $selfNamespace)) }}
+{{- if not $watchSelfNamespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -78,6 +56,14 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 rules:
+- nonResourceURLs:
+  - /metrics
+  - /metrics/resources
+  verbs:
+  - get
+  - watch
+  - list
+{{- end }}
 - apiGroups:
   - ""
   resources:
@@ -125,13 +111,6 @@ rules:
   - "*"
   verbs:
   - "*"
-- nonResourceURLs:
-  - /metrics
-  - /metrics/resources
-  verbs:
-  - get
-  - watch
-  - list
 - apiGroups:
   - rbac.authorization.k8s.io
   resources:
