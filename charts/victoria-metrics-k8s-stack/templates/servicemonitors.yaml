@@ -5,7 +5,8 @@
 {{- range $name, $config := .Values }}
   {{- if and (kindIs "map" $config) $config.enabled (hasKey $config "vmScrape") }}
     {{- $svc := kebabcase $name }}
-    {{- $fullname := (printf "%s-%s" $prefix $svc) | trunc 63 | trimSuffix "-" }}
+    {{- $fullname := (printf "%s-%s" $prefix $svc) }}
+    {{- $fullnameLabel := $fullname | trunc 63 | trimSuffix "-" }}
     {{- $ctx := deepCopy $global }}
     {{- $ports := ($config.service).ports | default dict }}
     {{- if ($config.service).port }}
@@ -18,7 +19,7 @@ kind: Endpoints
 metadata:
   name: {{ $fullname }}
   namespace: kube-system
-  {{- $extraLabels := dict "app" $fullname "k8s-app" $svc }}
+  {{- $extraLabels := dict "app" $fullnameLabel "k8s-app" $svc }}
   {{- $_ := set $ctx "extraLabels" $extraLabels }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 subsets:
@@ -43,7 +44,7 @@ subsets:
     {{- end }}
     {{- $selector := default dict }}
     {{- if and ($config.service).enabled (empty (index $.Subcharts $name)) }}
-      {{- $extraLabels := dict "app" $fullname "jobLabel" $svc }}
+      {{- $extraLabels := dict "app" $fullnameLabel "jobLabel" $svc }}
       {{- $_ := set $ctx "extraLabels" $extraLabels }}
       {{- $selector = dict "matchLabels" (fromYaml (include "victoria-metrics-k8s-stack.selectorLabels" $ctx)) }}
 ---
@@ -88,7 +89,7 @@ spec:
       {{- range $scrapeName, $scrapeConfig := $scrapes }}
         {{- $sc := mergeOverwrite (deepCopy $defaultScrape) (deepCopy $scrapeConfig) }}
         {{- if or (not (hasKey $sc "enabled")) $sc.enabled }}
-          {{- $fullname = (printf "%s-%s" $prefix $scrapeName) | trunc 63 | trimSuffix "-" }}
+          {{- $fullname = (printf "%s-%s" $prefix $scrapeName) }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: {{ ternary "VMServiceScrape" $sc.kind (empty $sc.kind) }}

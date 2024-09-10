@@ -33,33 +33,6 @@ metadata:
   namespace: {{ include "vm.namespace" . }}
 rules:
 - apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - ""
-  resources:
-  - configmaps/status
-  verbs:
-  - get
-  - update
-  - patch
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
-- apiGroups:
   - coordination.k8s.io
   verbs:
   - create
@@ -83,6 +56,13 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 rules:
+- nonResourceURLs:
+  - /metrics
+  - /metrics/resources
+  verbs:
+  - get
+  - watch
+  - list
 {{- end }}
 - apiGroups:
   - ""
@@ -131,13 +111,6 @@ rules:
   - "*"
   verbs:
   - "*"
-- nonResourceURLs:
-  - /metrics
-  - /metrics/resources
-  verbs:
-  - get
-  - watch
-  - list
 - apiGroups:
   - rbac.authorization.k8s.io
   resources:

@@ -488,8 +488,8 @@ alertmanager:
     externalURL: ""
     routePrefix: /
 
-  # -- (string) if this one defined, it will be used for alertmanager configuration and config parameter will be ignored
-  configSecret: ""
+    # -- (string) if this one defined, it will be used for alertmanager configuration and config parameter will be ignored
+    configSecret: ""
   # -- (object) alertmanager configuration
   config:
     templates:
@@ -896,10 +896,11 @@ prometheus-node-exporter:
   enabled: true
 
   # all values for prometheus-node-exporter helm chart can be specified here
-  podLabels:
+  service:
     ## Add the 'node-exporter' label to be used by serviceMonitor to match standard common usage in rules and grafana dashboards
     ##
-    jobLabel: node-exporter
+    labels:
+      jobLabel: node-exporter
   extraArgs:
     - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
     - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$

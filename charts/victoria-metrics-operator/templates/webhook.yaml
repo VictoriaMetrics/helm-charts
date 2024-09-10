@@ -7,8 +7,8 @@ metadata:
   name:  {{ include "vm-operator.fullname" . }}-admission
   {{- if .Values.admissionWebhooks.certManager.enabled }}
   annotations:
-    certmanager.k8s.io/inject-ca-from: {{ printf "%s/%s-validation" include "vm.namespace" . ( include "vm-operator.fullname" .) | quote }}
-    cert-manager.io/inject-ca-from: {{ printf "%s/%s-validation" include "vm.namespace" . (include "vm-operator.fullname" .) | quote }}
+    certmanager.k8s.io/inject-ca-from: {{ printf "%s/%s-validation" (include "vm.namespace" .) ( include "vm-operator.fullname" .) | quote }}
+    cert-manager.io/inject-ca-from: {{ printf "%s/%s-validation" (include "vm.namespace" .) (include "vm-operator.fullname" .) | quote }}
   {{- end }}
   {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}

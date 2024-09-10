@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) "vmalert-additional-notifier" | trunc 63 | trimSuffix "-" }}
+  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-vmalert-additional-notifier
   namespace: {{ include "vm.namespace" . }}
   labels:
     app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" . }}-vmalert
