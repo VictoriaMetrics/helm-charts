@@ -3470,6 +3470,51 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
+        - Updated alertmanager args for IPv6 compatibility. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/856)
+        - Added ability to set init containers for alertmanager and vmalert pods
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/vmalert
+    apiVersion: v2
+    appVersion: v1.103.0
+    created: "2024-09-10T06:07:52.672173214Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Metrics Alert - executes a list of given MetricsQL expressions
+      (rules) and sends alerts to Alert Manager.
+    digest: 7dde59881c2209b8137e6c62355da3bbeba201928d78794cb64a763c44e9b6b8
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmalert
+    - alerting
+    - alerts
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    - rules
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-alert
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-alert-0.11.1/victoria-metrics-alert-0.11.1.tgz
+    version: 0.11.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - bump version of VM components to [v1.103.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.103.0)
         - Added ability to configure container port
         - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
@@ -11665,6 +11710,41 @@ entries:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-cluster-0.1.0.tgz
     version: 0.1.0
   victoria-metrics-common:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - Fixed protocol extraction with TLS enabled
+        - Typo fixes
+        - use appkey as `app` label by default
+        - support multiple service naming styles for `vm.service`
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+    apiVersion: v2
+    created: "2024-09-10T06:07:52.770660816Z"
+    description: Victoria Metrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: 480526f406175e46128667ea4ebe5042c979975cf062820385e3eb4b948f7ea8
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.0.10/victoria-metrics-common-0.0.10.tgz
+    version: 0.0.10
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
@@ -20717,6 +20797,52 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
+        - Fixed template for cert-manager certificates
+        - Fixed operator Role creation when only watching own namespace using `watchNamespaces`
+        - Changed webhook service port from 443 to 9443
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/operator
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: v0.47.3
+    created: "2024-09-10T06:07:53.130844017Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Metrics Operator
+    digest: 3ff63b06fb65b9e209811e2c69f73e1529f5fcaf87e1512e38fb79f64d1a785f
+    home: https://github.com/VictoriaMetrics/operator
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-operator
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    - https://github.com/VictoriaMetrics/operator
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-operator-0.34.8/victoria-metrics-operator-0.34.8.tgz
+    version: 0.34.8
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - Do not create ClusterRole if `watchNamespaces` contains only namespace, where operator is deployed
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -26120,4 +26246,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-09-05T10:40:44.660084621Z"
+generated: "2024-09-10T06:07:53.132590856Z"
