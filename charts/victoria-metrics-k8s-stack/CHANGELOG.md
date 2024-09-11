@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Moved crds to a shared chart and import them as a dependency
 
 ## 0.25.16
 

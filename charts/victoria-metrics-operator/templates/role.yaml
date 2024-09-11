@@ -1,6 +1,6 @@
 {{- $rules := default dict }}
-{{- if hasKey .Subcharts "crd" }}
-  {{- $files := .Subcharts.crd.Files }}
+{{- if .Subcharts.crds }}
+  {{- $files := .Subcharts.crds.Files }}
   {{- $fileContentsList := $files.Get "crds/crd.yaml" | splitList "---" }}
   {{- $groups := dict }}
   {{- range $fileContentsList }}
@@ -180,8 +180,9 @@ rules:
 {{- with $rules.admin }}
 {{ toYaml . }}
 {{- end }}
+{{- end }}
 
-{{- if and (index .Values "victoria-metrics-crds" "enabled") .Values.rbac.aggregatedClusterRoles.enabled }}
+{{- if and .Values.crds.enabled .Values.rbac.aggregatedClusterRoles.enabled }}
 {{- /* This template generates readonly and admin cluster roles for */ -}}
 {{- /* each CRD present in the helm chart.  The clusterroles use the */ -}}
 {{- /* kubernetes clusterrole aggregation feature to include these */ -}}
