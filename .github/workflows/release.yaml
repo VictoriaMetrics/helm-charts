@@ -127,6 +127,16 @@ jobs:
         with:
           config: .github/ci/cr.yaml
 
+      - name: Release OCI
+        run: |
+          helm registry login \
+            -u ${{ github.actor }} \
+            -p ${{ github.token }} \
+            ghcr.io
+          for package in $(find **/.cr-release-packages -name "*.tgz"); do
+            helm push $package oci://ghcr.io/${{ github.repository_owner }}/charts/;
+          done
+
       - name: Automatic update changelogs and readme
         run: |
           rm charts/*/RELEASE_NOTES.md
