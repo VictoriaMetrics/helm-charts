@@ -58,7 +58,7 @@ spec:
             {{- if $app.extraArgs.clusternativeListenAddr }}
             - name: cluster-tcp
               protocol: TCP
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.clusternativeListenAddr "default" "8401") }}
             {{- end }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
