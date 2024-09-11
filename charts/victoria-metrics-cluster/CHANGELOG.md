@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed cluster native address port rendering on vmselect statefulset. Thanks to @Red-M
 
 ## 0.13.5
 
