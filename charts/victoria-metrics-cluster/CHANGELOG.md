@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fixed security context for vmstorage statefulset
 
 ## 0.13.6
 
