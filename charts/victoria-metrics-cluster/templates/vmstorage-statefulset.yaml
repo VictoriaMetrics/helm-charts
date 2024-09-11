@@ -35,43 +35,43 @@ spec:
       {{- $manager := $app.vmbackupmanager }}
       {{- if or $app.initContainers $manager.restore.onStart.enabled }}
       initContainers:
-      {{- with $app.initContainers -}}
-      {{- toYaml . | nindent 6 }}
-      {{- end -}}
-      {{- if $manager.restore.onStart.enabled }}
-      {{- include "vm.enterprise.only" . }}
-      - name: vmbackupmanager-restore
-        image: {{ include "vm.image" (merge (deepCopy .) (dict "app" $manager)) }}
-        imagePullPolicy: {{ $app.image.pullPolicy }}
-        {{- with $app.podSecurityContext }}
-        securityContext:  {{ toYaml . | nindent 10 }}
-        {{- end }}
-        args: {{ include "vmbackupmanager.restore.args" . | nindent 12 }}
-        {{- with $manager.resources }}
-        resources: {{ toYaml . | nindent 10 }}
-        {{- end }}
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        {{- with $manager.env }}
+        {{- with $app.initContainers -}}
         {{- toYaml . | nindent 8 }}
+        {{- end -}}
+        {{- if $manager.restore.onStart.enabled }}
+        {{- include "vm.enterprise.only" . }}
+        - name: vmbackupmanager-restore
+          image: {{ include "vm.image" (merge (deepCopy .) (dict "app" $manager)) }}
+          imagePullPolicy: {{ $app.image.pullPolicy }}
+          {{- if $app.securityContext.enabled }}
+          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
+          {{- end }}
+          args: {{ include "vmbackupmanager.restore.args" . | nindent 12 }}
+          {{- with $manager.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            {{- with $manager.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: manager-http
+              containerPort: 8300
+          volumeMounts:
+            - name: vmstorage-volume
+              mountPath: {{ $app.persistentVolume.mountPath }}
+              subPath: {{ $app.persistentVolume.subPath }}
+            {{- range $manager.extraSecretMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+            {{- end }}
         {{- end }}
-        ports:
-        - name: manager-http
-          containerPort: 8300
-        volumeMounts:
-        - name: vmstorage-volume
-          mountPath: {{ $app.persistentVolume.mountPath }}
-          subPath: {{ $app.persistentVolume.subPath }}
-        {{- range $manager.extraSecretMounts }}
-        - name: {{ .name }}
-          mountPath: {{ .mountPath }}
-          subPath: {{ .subPath }}
         {{- end }}
-      {{- end }}
-      {{- end }}
       {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -182,9 +182,9 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          {{- with $manager.env }}
-          {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- with $manager.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
             - name: manager-http
               containerPort: 8300
