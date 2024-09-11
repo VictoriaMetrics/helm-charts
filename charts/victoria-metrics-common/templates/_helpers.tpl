@@ -74,28 +74,35 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{- define "vm.managed.fullname" -}}
-  {{- with .appKey -}}
-    {{- $prefix := . -}}
-    {{- if kindIs "list" $prefix -}}
-      {{- $prefix = last $prefix -}}
-    {{- end -}}
+  {{- $prefix := .appKey -}}
+  {{- $oldPrefix := .prefix -}}
+  {{- if kindIs "slice" $prefix -}}
+    {{- $prefix = last $prefix -}}
+  {{- end -}}
+  {{- if $prefix -}}
+    {{- with $oldPrefix -}}
+      {{- $prefix = printf "%s-%s" $prefix . -}}
+    {{- end }}
     {{- $_ := set $ "prefix" $prefix -}}
   {{- end -}}
   {{- include "vm.fullname" . -}}
+  {{- $_ := set . "prefix" $oldPrefix -}}
 {{- end -}}
 
 {{- define "vm.plain.fullname" -}}
   {{- $suffix := .appKey -}}
-  {{- if kindIs "list" $suffix -}}
+  {{- $oldSuffix := .suffix -}}
+  {{- if kindIs "slice" $suffix -}}
     {{- $suffix = last $suffix }}
   {{- end -}}
   {{- if $suffix -}}
-    {{- with .suffix -}}
+    {{- with $oldSuffix -}}
       {{- $suffix = printf "%s-%s" $suffix . -}}
     {{- end -}}
     {{- $_ := set . "suffix" $suffix -}}
   {{- end -}}
   {{- include "vm.fullname" . -}}
+  {{- $_ := set . "suffix" $oldSuffix -}}
 {{- end -}}
 
 {{- /* Create chart name and version as used by the chart label. */ -}}
