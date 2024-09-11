@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.11
+
+**Release date:** 2024-09-11
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Added ability to pass extra prefix for `vm.managed.fullname`
 
 ## 0.0.10
