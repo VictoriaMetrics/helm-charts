@@ -13,11 +13,20 @@ Access a Kubernetes cluster.
 
 Add a chart helm repository with follow commands:
 
-```console
-helm repo add vm https://victoriametrics.github.io/helm-charts/
+ - From HTTPS repository
 
-helm repo update
-```
+   ```console
+   helm repo add vm https://victoriametrics.github.io/helm-charts/
+
+   helm repo update
+   ```
+ - From OCI repository
+   
+   ```console
+   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
+
+   helm repo update
+   ```
 
 List [all charts](#list-of-charts) and versions of `vm` repository available to installation:
 
