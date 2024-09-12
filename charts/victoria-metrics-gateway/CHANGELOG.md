@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 0.4.0
+
+**Release date:** 2024-09-12
+
+![AppVersion: v1.103.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.103.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Deprecated `rateLimiter.enable` in a favour of `rateLimiter.enabled`
 - Deprecated `auth.enable` in a favour of `auth.enabled`
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
