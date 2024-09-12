@@ -3,6 +3,8 @@
 ## Next release
 
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
+- Made replicas configurable
+- Allow override default for statefulset headless service
 
 ## 0.6.1
 

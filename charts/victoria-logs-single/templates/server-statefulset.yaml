@@ -16,7 +16,7 @@ spec:
   serviceName: {{ $fullname }}
   selector:
     matchLabels: {{ include "victoria-logs.server.matchLabels" . | nindent 6 }}
-  replicas: 1
+  replicas: {{ $app.replicaCount }}
   podManagementPolicy: {{ $app.podManagementPolicy }}
   template:
     metadata:

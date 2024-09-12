@@ -15,7 +15,7 @@ metadata:
 spec:
   selector:
     matchLabels: {{ include "victoria-metrics.server.matchLabels" . | nindent 6 }}
-  replicas: 1
+  replicas: {{ $app.replicaCount }}
   {{- if $app.persistentVolume.enabled }}
   strategy:
     # Must be "Recreate" when we have a persistent volume
