@@ -75,7 +75,7 @@ Install chart with command:
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'agent'
+kubectl get pods -A | grep 'vma'
 ```
 
 Get the application by running this command:
