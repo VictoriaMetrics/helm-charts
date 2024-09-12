@@ -11,23 +11,27 @@ metadata:
   labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
   name: {{ include "victoria-logs.server.fullname" . }}
 spec:
-  {{- $clusterIP := ternary "None" $app.service.clusterIP $app.statefulSet.enabled }}
+  {{- $clusterIP := $app.service.clusterIP }}
+  {{- if and (not $clusterIP) $app.statefulSet.enabled }}
+    {{- $clusterIP = "None" }}
+  {{- end }}
   {{- with $clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
-  {{- $externalIPs := ternary (default list) $app.service.externalIPs $app.statefulSet.enabled }}
-  {{- with $externalIPs }}
+  {{- with $app.service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $loadBalancerIP := ternary "" $app.service.loadBalancerIP $app.statefulSet.enabled }}
-  {{- with $loadBalancerIP }}
+  {{- with $app.service.loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
-  {{- $loadBalancerSourceRanges := ternary (default list) $app.service.loadBalancerSourceRanges $app.statefulSet.enabled }}
-  {{- with $loadBalancerSourceRanges }}
+  {{- with $app.service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
   {{- end }}
-  type: {{ ternary "ClusterIP" $app.service.type $app.statefulSet.enabled }}
+  {{- $type := $app.service.type }}
+  {{- if and (not $type) $app.statefulSet.enabled }}
+    {{- $type = "ClusterIP" }}
+  {{- end }}
+  type: {{ $type }}
   {{- with $app.service.healthCheckNodePort }}
   healthCheckNodePort: {{ . }}
   {{- end }}
