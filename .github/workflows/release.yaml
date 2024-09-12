@@ -133,7 +133,7 @@ jobs:
             -u ${{ github.actor }} \
             -p ${{ github.token }} \
             ghcr.io
-          for package in $(find **/.cr-release-packages -name "*.tgz"); do
+          for package in $(find .cr-release-packages -name "*.tgz"); do
             helm push $package oci://ghcr.io/${{ github.repository_owner }}/charts/;
           done
 
