@@ -133,9 +133,8 @@ jobs:
             -u ${{ github.actor }} \
             -p ${{ github.token }} \
             ghcr.io
-          for package in $(find .cr-release-packages -name "*.tgz"); do
-            helm push $package oci://ghcr.io/${{ github.repository_owner }}/charts/;
-          done
+          mkdir -p .cr-release-packages
+          find .cr-release-packages -name "*.tgz" -exec helm push {} oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts \;
 
       - name: Automatic update changelogs and readme
         run: |
