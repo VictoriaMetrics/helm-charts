@@ -4,6 +4,50 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
+        - Made replicas configurable
+        - Allow override default for statefulset headless service
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/VictoriaLogs/
+    apiVersion: v2
+    appVersion: v0.28.0
+    created: "2024-09-12T14:28:57.132024017Z"
+    dependencies:
+    - condition: fluent-bit.enabled
+      name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.46.7
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Logs Single version - high-performance, cost-effective and
+      scalable logs storage
+    digest: a700596f3dd1943280003514ad417a53364ec1bcc7f7679f30b42a0a68011be7
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - victorialogs
+    - logs
+    - kubernetes
+    - observability
+    - logsql
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-logs-single
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-single-0.6.2/victoria-logs-single-0.6.2.tgz
+    version: 0.6.2
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - Added ability to configure container port
         - Fixed image pull secrets. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1285)
         - Renamed `.Values.server.persistentVolume.storageClass` to `.Values.server.persistentVolume.storageClassName`
@@ -8558,6 +8602,51 @@ entries:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-auth-0.1.0.tgz
     version: 0.1.0
   victoria-metrics-cluster:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - Fixed security context for vmstorage statefulset
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/cluster-victoriametrics
+    apiVersion: v2
+    appVersion: v1.103.0
+    created: "2024-09-12T14:28:57.644192185Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Metrics Cluster version - high-performance, cost-effective
+      and scalable TSDB, long-term remote storage for Prometheus
+    digest: 4fc5bbc92c8d3a1fe5cdcffff907a3813e63890d2d494ad3acd9f24a12d6b529
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmcluster
+    - vmselect
+    - vminsert
+    - vmstorage
+    - tsdb
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-cluster
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-cluster-0.13.7/victoria-metrics-cluster-0.13.7.tgz
+    version: 0.13.7
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
@@ -23965,6 +24054,50 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
+        - Removed deprecated API from RBAC. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1438)
+        - Made replicas configurable
+        - Allow override default for statefulset headless service
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/
+    apiVersion: v2
+    appVersion: v1.103.0
+    created: "2024-09-12T14:28:57.963077702Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Metrics Single version - high-performance, cost-effective
+      and scalable TSDB, long-term remote storage for Prometheus
+    digest: 7f0df66308890e503ccdff127424489b5a22f192d3f0d9cb47a064f51bd0de9a
+    keywords:
+    - victoriametrics
+    - vmsingle
+    - single
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-single
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-single-0.11.2/victoria-metrics-single-0.11.2.tgz
+    version: 0.11.2
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - Deprecated `server.vmbackupmanager.enable` in a favour of `server.vmbackupmanager.enabled`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/940).
         - Fixed PVC in StatefulSet
       artifacthub.io/license: Apache-2.0
@@ -26437,4 +26570,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-09-12T04:39:00.806962349Z"
+generated: "2024-09-12T14:28:57.966478188Z"
