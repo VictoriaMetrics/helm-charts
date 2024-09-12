@@ -1,7 +1,7 @@
 
 # Victoria Metrics Helm Chart for vmanomaly
 
-![Version: 1.4.4](https://img.shields.io/badge/Version-1.4.4-informational?style=flat-square)
+![Version: 1.4.5](https://img.shields.io/badge/Version-1.4.5-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-anomaly)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 [![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/helm-charts/blob/master/LICENSE)
@@ -332,10 +332,10 @@ vm
       <td></td>
     </tr>
     <tr>
-      <td>extraArgs.loggerFormat</td>
-      <td>string</td>
-      <td><pre lang="">
-json
+      <td>extraArgs</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
 </pre>
 </td>
       <td></td>
@@ -449,7 +449,7 @@ victoriametrics/vmanomaly
       <td>image.tag</td>
       <td>string</td>
       <td><pre lang="">
-v1.15.4
+v1.15.9
 </pre>
 </td>
       <td><p>Tag of Docker image</p>
