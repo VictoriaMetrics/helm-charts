@@ -1,7 +1,7 @@
 
 # Victoria Metrics Helm Chart for Single Version
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.11.1](https://img.shields.io/badge/Version-0.11.1-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.11.2](https://img.shields.io/badge/Version-0.11.2-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single)
 
 Victoria Metrics Single version - high-performance, cost-effective and scalable TSDB, long-term remote storage for Prometheus
@@ -812,6 +812,16 @@ enabled: false
 </pre>
 </td>
       <td><p>Use existing configmap if specified otherwise .config values will be used. Relabel config <strong>should</strong> reside under <code>relabel.yml</code> key</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.replicaCount</td>
+      <td>int</td>
+      <td><pre lang="">
+1
+</pre>
+</td>
+      <td><p>Replica count</p>
 </td>
     </tr>
     <tr>

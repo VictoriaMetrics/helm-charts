@@ -1,7 +1,7 @@
 
 # Victoria Logs Helm Chart for Single Version
 
- ![Version: 0.6.1](https://img.shields.io/badge/Version-0.6.1-informational?style=flat-square)
+ ![Version: 0.6.2](https://img.shields.io/badge/Version-0.6.2-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-single)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -800,6 +800,16 @@ timeoutSeconds: 5
 </pre>
 </td>
       <td><p>Indicates whether the Container is done with potentially costly initialization. If set it is executed first. If it fails Container is restarted. If it succeeds liveness and readiness probes takes over.</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.replicaCount</td>
+      <td>int</td>
+      <td><pre lang="">
+1
+</pre>
+</td>
+      <td><p>Replica count</p>
 </td>
     </tr>
     <tr>
