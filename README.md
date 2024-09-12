@@ -68,7 +68,7 @@ Test the installation with command:
   - For OCI repository
 
     ```console
-    helm install oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install victoria-metrics oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
     ```
 
 Install chart with command:
@@ -82,7 +82,7 @@ Install chart with command:
   - For OCI repository
 
     ```console
-    helm install oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster -f values.yaml -n NAMESPACE
+    helm install victoria-metrics oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster -f values.yaml -n NAMESPACE
     ```
 
 ## Validate installation
