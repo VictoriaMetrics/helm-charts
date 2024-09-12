@@ -2,6 +2,15 @@
 
 ## Next release
 
+- TODO
+
+## 1.4.5
+
+**Release date:** 2024-09-12
+
+![AppVersion: v1.15.9](https://img.shields.io/static/v1?label=AppVersion&message=v1.15.9&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
 - Removed vmanomaly not existing `loggerFormat` extra arg. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1476)
 
