@@ -1,4 +1,3 @@
-
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-distributed)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
@@ -115,53 +114,82 @@ Example command using vmagent:
 
 Access a Kubernetes cluster.
 
+### Setup chart repository (can be omitted for OCI repositories)
+
 Add a chart helm repository with follow commands:
 
- - From HTTPS repository
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
 
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-  
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-distributed``` chart available to installation:
+helm repo update
+```
+List versions of `vm/victoria-metrics-distributed` chart available to installation:
 
 ```console
-helm search repo vm/victoria-metrics-distributed` -l
+helm search repo vm/victoria-metrics-distributed -l
 ```
 
-Export default values of ``victoria-metrics-distributed``` chart to file ``values.yaml``:
+### Install `victoria-metrics-distributed` chart
 
-```console
-helm show values vm/victoria-metrics-distributed` > values.yaml
-```
+Export default values of `victoria-metrics-distributed` chart to file `values.yaml`:
+
+  - For HTTPS repository
+
+    ```console
+    helm show values vm/victoria-metrics-distributed > values.yaml
+    ```
+  - For OCI repository
+
+    ```console
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-distributed > values.yaml
+    ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
 
 Test the installation with command:
 
-```console
-helm install vm-dis vm/victoria-metrics-distributed` -f values.yaml -n NAMESPACE --debug --dry-run
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vmd vm/victoria-metrics-distributed -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vmd oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-distributed -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
 
 Install chart with command:
 
-```console
-helm install vm-dis vm/victoria-metrics-distributed` -f values.yaml -n NAMESPACE
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vmd vm/victoria-metrics-distributed -f values.yaml -n NAMESPACE
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vmd oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-distributed -f values.yaml -n NAMESPACE
+    ```
 
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -n NAMESPACE'
+kubectl get pods -A | grep 'agent'
+```
+
+Get the application by running this command:
+
+```console
+helm list -f vmd -n NAMESPACE
+```
+
+See the history of versions of `vmd` application with command.
+
+```console
+helm history vmd -n NAMESPACE
 ```
 
 ## How to upgrade
@@ -180,7 +208,7 @@ Then, perform update on availability zone `zone-us-1` with the same steps1~4.
 Remove application with command.
 
 ```console
-helm uninstall vm-dis -n NAMESPACE
+helm uninstall vmd -n NAMESPACE
 ```
 
 ## Documentation of Helm Chart
@@ -190,7 +218,7 @@ Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIR
 Generate docs with ``helm-docs`` command.
 
 ```bash
-cd charts/victoria-metrics-distributed`
+cd charts/victoria-metrics-distributed
 
 helm-docs
 ```

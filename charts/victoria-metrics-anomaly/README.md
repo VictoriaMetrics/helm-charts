@@ -1,4 +1,3 @@
-
 ![Version: 1.4.6](https://img.shields.io/badge/Version-1.4.6-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-anomaly)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
@@ -24,65 +23,82 @@ This chart will do the following:
 
 Access a Kubernetes cluster.
 
+### Setup chart repository (can be omitted for OCI repositories)
+
 Add a chart helm repository with follow commands:
 
- - From HTTPS repository
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
 
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-  
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-anomaly`` chart available to installation:
+helm repo update
+```
+List versions of `vm/victoria-metrics-anomaly` chart available to installation:
 
 ```console
 helm search repo vm/victoria-metrics-anomaly -l
 ```
 
-Export default values of ``victoria-metrics-anomaly`` chart to file ``values.yaml``:
+### Install `victoria-metrics-anomaly` chart
 
-```console
-helm show values vm/victoria-metrics-anomaly > values.yaml
-```
+Export default values of `victoria-metrics-anomaly` chart to file `values.yaml`:
+
+  - For HTTPS repository
+
+    ```console
+    helm show values vm/victoria-metrics-anomaly > values.yaml
+    ```
+  - For OCI repository
+
+    ```console
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-anomaly > values.yaml
+    ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
 
 Test the installation with command:
 
-```console
-helm install vmanomaly vm/victoria-metrics-anomaly -f values.yaml -n NAMESPACE --debug --dry-run
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vma vm/victoria-metrics-anomaly -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vma oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-anomaly -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
 
 Install chart with command:
 
-```console
-helm install vmanomaly vm/victoria-metrics-anomaly -f values.yaml -n NAMESPACE
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vma vm/victoria-metrics-anomaly -f values.yaml -n NAMESPACE
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vma oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-anomaly -f values.yaml -n NAMESPACE
+    ```
 
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'vmanomaly'
+kubectl get pods -A | grep 'agent'
 ```
 
 Get the application by running this command:
 
 ```console
-helm list -f vmanomaly -n NAMESPACE
+helm list -f vma -n NAMESPACE
 ```
 
-See the history of versions of ``vmanomaly`` application with command.
+See the history of versions of `vma` application with command.
 
 ```console
-helm history vmanomaly -n NAMESPACE
+helm history vma -n NAMESPACE
 ```
 
 ## How to uninstall
@@ -90,7 +106,7 @@ helm history vmanomaly -n NAMESPACE
 Remove application with command.
 
 ```console
-helm uninstall vmanomaly -n NAMESPACE
+helm uninstall vma -n NAMESPACE
 ```
 
 ## Documentation of Helm Chart

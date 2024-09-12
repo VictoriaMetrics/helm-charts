@@ -172,59 +172,7 @@ helm repo update
 
 * PV support on underlying infrastructure.
 
-
-## How to install
-
-Access a Kubernetes cluster.
-
-Add a chart helm repository with follow commands:
-
- - From HTTPS repository
-
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-   
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-k8s-stack`` chart available to installation:
-
-```console
-helm search repo vm/victoria-metrics-k8s-stack -l
-```
-
-Export default values of ``victoria-metrics-k8s-stack`` chart to file ``values.yaml``:
-
-```console
-helm show values vm/victoria-metrics-k8s-stack > values.yaml
-```
-
-Change the values according to the need of the environment in ``values.yaml`` file.
-
-Test the installation with command:
-
-```console
-helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE --debug --dry-run
-```
-
-Install chart with command:
-
-```console
-helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE
-```
-
-Get the pods lists by running this commands:
-
-```console
-kubectl get pods -A | grep 'victoria-metrics'
-```
+{{ include "chart.installSection" . }}
 
 ### Install locally (Minikube)
 
@@ -242,16 +190,7 @@ Install helm chart
 helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -f values.minikube.yaml -n NAMESPACE --debug --dry-run
 ```
 
-## How to uninstall
-
-Remove application with command.
-
-```console
-helm uninstall [RELEASE_NAME] -n NAMESPACE
-```
-This removes all the Kubernetes components associated with the chart and deletes the release.
-
-_See [helm uninstall](https://helm.sh/docs/helm/helm_uninstall/) for command documentation._
+{{ include "chart.uninstallSection" . }}
 
 CRDs created by this chart are not removed by default and should be manually cleaned up:
 
@@ -350,20 +289,7 @@ kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.1
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.15.0/config/crd/bases/operator.victoriametrics.com_vmclusters.yaml
 ```
 
-
-## Documentation of Helm Chart
-
-Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
-
-Generate docs with ``helm-docs`` command.
-
-```bash
-cd charts/victoria-metrics-k8s-stack
-
-helm-docs
-```
-
-The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+{{ include "chart.helmDocs" . }}
 
 ## Parameters
 

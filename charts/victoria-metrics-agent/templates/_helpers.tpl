@@ -78,6 +78,9 @@ Defines the name of configuration map
 
 {{- define "vmagent.args" -}}
   {{- $args := default dict -}}
+  {{- if empty .Values.remoteWriteUrls -}}
+    {{- fail "Please define at least one remoteWriteUrl" -}}
+  {{- end -}}
   {{- $_ := set $args "promscrape.config" "/config/scrape.yml" -}}
   {{- $_ := set $args "remoteWrite.tmpDataPath" "/tmpData" -}}
   {{- $_ := set $args "remoteWrite.url" .Values.remoteWriteUrls -}}

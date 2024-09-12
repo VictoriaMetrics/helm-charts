@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fail if no remoteWriteUrls set
 
 ## 0.12.2
 

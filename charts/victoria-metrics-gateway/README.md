@@ -1,4 +1,3 @@
-
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-gateway)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
@@ -29,73 +28,82 @@ This chart will do the following:
 
 Access a Kubernetes cluster.
 
+### Setup chart repository (can be omitted for OCI repositories)
+
 Add a chart helm repository with follow commands:
 
- - From HTTPS repository
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
 
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-  
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
+helm repo update
+```
 List versions of `vm/victoria-metrics-gateway` chart available to installation:
 
 ```console
 helm search repo vm/victoria-metrics-gateway -l
 ```
 
-Export default values of ``victoria-metrics-gateway`` chart to file ``values.yaml``:
+### Install `victoria-metrics-gateway` chart
 
-```console
-helm show values vm/victoria-metrics-gateway > values.yaml
-```
+Export default values of `victoria-metrics-gateway` chart to file `values.yaml`:
+
+  - For HTTPS repository
+
+    ```console
+    helm show values vm/victoria-metrics-gateway > values.yaml
+    ```
+  - For OCI repository
+
+    ```console
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-gateway > values.yaml
+    ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
 
 Test the installation with command:
 
-```console
-helm install vmgateway vm/victoria-metrics-gateway -f values.yaml -n NAMESPACE --debug --dry-run
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vmg vm/victoria-metrics-gateway -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vmg oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-gateway -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
 
 Install chart with command:
 
-```console
-helm install vmgateway vm/victoria-metrics-gateway -f values.yaml -n NAMESPACE
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vmg vm/victoria-metrics-gateway -f values.yaml -n NAMESPACE
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vmg oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-gateway -f values.yaml -n NAMESPACE
+    ```
 
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'vmgateway'
+kubectl get pods -A | grep 'agent'
 ```
 
 Get the application by running this command:
 
 ```console
-helm list -f vmgateway -n NAMESPACE
+helm list -f vmg -n NAMESPACE
 ```
 
-See the history of versions of ``vmgateway`` application with command.
+See the history of versions of `vmg` application with command.
 
 ```console
-helm history vmgateway -n NAMESPACE
-```
-
-## How to uninstall
-
-Remove application with command.
-
-```console
-helm uninstall vmgateway -n NAMESPACE
+helm history vmg -n NAMESPACE
 ```
 
 # How to use [JWT signature verification](https://docs.victoriametrics.com/vmgateway#jwt-signature-verification)
@@ -148,6 +156,14 @@ extraArgs:
 ```
 Note that in this configuration all secret keys will be mounted and accessible to pod.
 Please, refer to [this](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#secretvolumesource-v1-core) doc to see all available secret source options.
+
+## How to uninstall
+
+Remove application with command.
+
+```console
+helm uninstall vmg -n NAMESPACE
+```
 
 ## Documentation of Helm Chart
 

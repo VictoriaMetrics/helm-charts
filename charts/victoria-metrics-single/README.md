@@ -1,4 +1,3 @@
-
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.11.2](https://img.shields.io/badge/Version-0.11.2-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single)
 
@@ -19,65 +18,82 @@ This chart will do the following:
 
 Access a Kubernetes cluster.
 
+### Setup chart repository (can be omitted for OCI repositories)
+
 Add a chart helm repository with follow commands:
 
- - From HTTPS repository
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
 
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-  
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-single`` chart available to installation:
+helm repo update
+```
+List versions of `vm/victoria-metrics-single` chart available to installation:
 
 ```console
 helm search repo vm/victoria-metrics-single -l
 ```
 
-Export default values of ``victoria-metrics-single`` chart to file ``values.yaml``:
+### Install `victoria-metrics-single` chart
 
-```console
-helm show values vm/victoria-metrics-single > values.yaml
-```
+Export default values of `victoria-metrics-single` chart to file `values.yaml`:
+
+  - For HTTPS repository
+
+    ```console
+    helm show values vm/victoria-metrics-single > values.yaml
+    ```
+  - For OCI repository
+
+    ```console
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-single > values.yaml
+    ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
 
 Test the installation with command:
 
-```console
-helm install vmsingle vm/victoria-metrics-single -f values.yaml -n NAMESPACE --debug --dry-run
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vms vm/victoria-metrics-single -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vms oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-single -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
 
 Install chart with command:
 
-```console
-helm install vmsingle vm/victoria-metrics-single -f values.yaml -n NAMESPACE
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vms vm/victoria-metrics-single -f values.yaml -n NAMESPACE
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vms oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-single -f values.yaml -n NAMESPACE
+    ```
 
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'single'
+kubectl get pods -A | grep 'agent'
 ```
 
 Get the application by running this command:
 
 ```console
-helm list -f vmsingle -n NAMESPACE
+helm list -f vms -n NAMESPACE
 ```
 
-See the history of versions of ``vmsingle`` application with command.
+See the history of versions of `vms` application with command.
 
 ```console
-helm history vmsingle -n NAMESPACE
+helm history vms -n NAMESPACE
 ```
 
 ## How to uninstall
@@ -85,7 +101,7 @@ helm history vmsingle -n NAMESPACE
 Remove application with command.
 
 ```console
-helm uninstall vmsingle -n NAMESPACE
+helm uninstall vms -n NAMESPACE
 ```
 
 ## Documentation of Helm Chart

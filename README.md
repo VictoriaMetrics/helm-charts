@@ -5,29 +5,20 @@
 
 This repository contains helm charts for VictoriaMetrics and VictoriaLogs.
 
-## Add a chart helm repository
+## Add a chart helm repository (can be skipped for OCI repository)
 
 Access a Kubernetes cluster.
 
 Add a chart helm repository with follow commands:
 
- - From HTTPS repository
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
 
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-   
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
+helm repo update
+```
 
 List [all charts](#list-of-charts) and versions of `vm` repository available to installation:
-
+    
 ```console
 helm search repo vm/
 ```
@@ -51,25 +42,50 @@ vm/victoria-metrics-single      0.9.22          v1.101.0                Victoria
 
 ## Installing the chart
 
-Export default values of ``victoria-metrics-cluster`` chart to file ``values.yaml``:
+Export default values of `victoria-metrics-cluster` chart to file `values.yaml`:
 
-```console
-helm show values vm/victoria-metrics-cluster > values.yaml
-```
+  - For HTTPS repository
+
+    ```console
+    helm show values vm/victoria-metrics-cluster > values.yaml
+    ```
+  - For OCI repository
+
+    ```console
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-agent > values.yaml
+    ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
 
 Test the installation with command:
 
-```console
-helm install victoria-metrics vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
-```
+  - For HTTPS repository
+
+    ```console
+    helm install victoria-metrics vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
 
 Install chart with command:
 
-```console
-helm install victoria-metrics vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE
-```
+  - For HTTPS repository
+    
+    ```console
+    helm install victoria-metrics vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster -f values.yaml -n NAMESPACE
+    ```
+
+## Validate installation
 
 Get the pods lists by running these commands:
 

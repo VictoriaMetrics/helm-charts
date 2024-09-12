@@ -14,92 +14,11 @@
 
 Note: this chart installs VictoriaMetrics cluster components such as vminsert, vmselect and vmstorage. It doesn't create or configure metrics scraping. If you are looking for a chart to configure monitoring stack in cluster check out [victoria-metrics-k8s-stack chart](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack#helm-chart-for-victoria-metrics-kubernetes-monitoring-stack).
 
-## How to install
+{{ include "chart.installSection" . }}
 
-Access a Kubernetes cluster.
+{{ include "chart.uninstallSection" . }}
 
-Add a chart helm repository with follow commands:
-
- - From HTTPS repository
-
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-   
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-cluster`` chart available to installation:
-
-```console
-helm search repo vm/victoria-metrics-cluster -l
-```
-
-Export default values of ``victoria-metrics-cluster`` chart to file ``values.yaml``:
-
-```console
-helm show values vm/victoria-metrics-cluster > values.yaml
-```
-
-Change the values according to the need of the environment in ``values.yaml`` file.
-
-Test the installation with command:
-
-```console
-helm install vmcluster vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
-```
-
-Install chart with command:
-
-```console
-helm install vmcluster vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE
-```
-
-Get the pods lists by running this commands:
-
-```console
-kubectl get pods -A | grep 'vminsert\|vmselect\|vmstorage'
-```
-
-Get the application by running this command:
-
-```console
-helm list -f vmcluster -n NAMESPACE
-```
-
-See the history of versions of ``vmcluster`` application with command.
-
-```console
-helm history vmcluster -n NAMESPACE
-```
-
-## How to uninstall
-
-Remove application with command.
-
-```console
-helm uninstall vmcluster -n NAMESPACE
-```
-
-## Documentation of Helm Chart
-
-Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
-
-Generate docs with ``helm-docs`` command.
-
-```bash
-cd charts/victoria-metrics-cluster
-
-helm-docs
-```
-
-The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+{{ include "chart.helmDocs" . }}
 
 ## Parameters
 
