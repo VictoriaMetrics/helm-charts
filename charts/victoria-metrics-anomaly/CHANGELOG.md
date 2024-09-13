@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added the ability to add annotations to the configMap using `values.configMapAnnotations`
 
 ## 1.4.5
 
