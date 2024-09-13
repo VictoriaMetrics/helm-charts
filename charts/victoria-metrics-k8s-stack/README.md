@@ -2133,7 +2133,7 @@ false
 annotations: {}
 enabled: false
 hosts:
-    - vmagent.domain.com
+    - vmauth.domain.com
 labels: {}
 path: /
 pathType: Prefix
