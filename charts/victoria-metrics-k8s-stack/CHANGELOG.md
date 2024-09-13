@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added VMAuth to k8s stack. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/829)
 
 ## 0.25.16
 

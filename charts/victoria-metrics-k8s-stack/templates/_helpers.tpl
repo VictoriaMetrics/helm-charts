@@ -283,6 +283,43 @@ If release name contains chart name it will be used as a full name.
   {{- tpl (deepCopy $Values.vmagent.spec | mergeOverwrite $spec | toYaml) . -}}
 {{- end }}
 
+{{- /* VMAuth spec */ -}}
+{{- define "vm.auth.spec" -}}
+  {{- $ctx := . -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $unauthorizedAccessConfig := default list }}
+  {{- if $Values.vmsingle.enabled -}}
+    {{- $_ := set $ctx "appKey" (list "vmsingle") -}}
+    {{- $url := (include "vm.url" $ctx) }}
+    {{- $srcPath := clean (printf "%s/.*" (urlParse $url).path) }}
+    {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $srcPath) "url_prefix" (list $url)) }}
+  {{- else if $Values.vmcluster.enabled -}}
+    {{- $_ := set $ctx "appKey" (list "vmcluster" "vminsert") -}}
+    {{- $writeUrl := (include "vm.url" $ctx) }}
+    {{- $writeSrcPath := clean (printf "%s/insert/.*" (urlParse $writeUrl).path) }}
+    {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $writeSrcPath) "url_prefix" (list $writeUrl)) }}
+    {{- $_ := set $ctx "appKey" (list "vmcluster" "vmselect") -}}
+    {{- $readUrl := (include "vm.url" $ctx) }}
+    {{- $readSrcPath := clean (printf "%s/select/.*" (urlParse $readUrl).path) }}
+    {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $readSrcPath) "url_prefix" (list $readUrl)) }}
+  {{- else if or $Values.externalVM.read.url $Values.externalVM.write.url }}
+    {{- with $Values.externalVM.read.url }}
+      {{- $srcPath := regexReplaceAll "(.*)/api/.*" (clean (printf "%s/.*" (urlParse .).path)) "${1}" }}
+      {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $srcPath) "url_prefix" (list .)) }}
+    {{- end -}}
+    {{- with $Values.externalVM.write.url }}
+      {{- $srcPath := regexReplaceAll "(.*)/api/.*" (clean (printf "%s/.*" (urlParse .).path)) "${1}" }}
+      {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $srcPath) "url_prefix" (list .)) }}
+    {{- end -}}
+  {{- end -}}
+  {{- $spec := $Values.vmauth.spec }}
+  {{- $_ := set $spec "unauthorizedAccessConfig" (concat $unauthorizedAccessConfig ($spec.unauthorizedAccessConfig | default list)) }}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $spec "license" (fromYaml .) -}}
+  {{- end -}}
+  {{- tpl (toYaml $spec) . -}}
+{{- end -}}
+
 {{- /* Alermanager spec */ -}}
 {{- define "vm.alertmanager.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
