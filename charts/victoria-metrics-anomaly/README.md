@@ -149,6 +149,7 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>config</td>
       <td>object</td>
       <td><pre lang="plaintext">
+annotations: {}
 models: {}
 preset: ""
 reader:
