@@ -149,7 +149,6 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>config</td>
       <td>object</td>
       <td><pre lang="plaintext">
-annotations: {}
 models: {}
 preset: ""
 reader:
@@ -302,6 +301,16 @@ vm
 </pre>
 </td>
       <td><p>For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs</p>
+</td>
+    </tr>
+    <tr>
+      <td>configMapAnnotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Annotations to be added to configMap</p>
 </td>
     </tr>
     <tr>
