@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fixed ETCD dashboard
 
 ## 0.25.16
 
