@@ -52,15 +52,12 @@ jobs:
 
       - name: Synchronize docs
         run: |
-          export VM_GIT_BRANCH_NAME="docs-update-$(date +%s)"
-          git checkout -b "${VM_GIT_BRANCH_NAME}"
           cp -f ${{ runner.temp }}/README.md .
           cp -fr ${{ runner.temp }}/charts ./
           git add README.md
           git add charts/*/README.md
           git commit -S -m "Synchronize docs"
-          git push origin ${VM_GIT_BRANCH_NAME}
-          gh pr create -f --base gh-pages
+          git push origin gh-pages
         env:
           GH_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
           GITHUB_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
