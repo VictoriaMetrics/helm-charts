@@ -43,7 +43,7 @@
     {{- end -}}
     {{- $isSecure = (eq ($spec.extraArgs).tls "true") | default $isSecure -}}
     {{- $port = (ternary 443 80 $isSecure) -}}
-    {{- $port = $spec.port | default $port -}}
+    {{- $port = $spec.port | default ($spec.service).servicePort | default $port -}}
   {{- end }}
   {{- $fqdn }}:{{ $port }}
 {{- end -}}
