@@ -1,5 +1,3 @@
-# CHANGELOG for `victoria-metrics-anomaly` helm-chart
-
 ## Next release
 
 - Added the ability to add annotations to the configMap using `values.configMapAnnotations`

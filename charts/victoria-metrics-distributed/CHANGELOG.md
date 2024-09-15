@@ -1,5 +1,3 @@
-# CHANGELOG for `victoria-metrics-distributed` helm-chart
-
 ## Next release
 
 - Do not truncate datasource name

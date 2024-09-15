@@ -1,5 +1,3 @@
-# CHANGELOG for `victoria-metrics-operator` helm-chart
-
 ## Next release
 
 - TODO

@@ -1,5 +1,3 @@
-# CHANGELOG for `victoria-metrics-auth` helm-chart
-
 ## Next release
 
 - Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
