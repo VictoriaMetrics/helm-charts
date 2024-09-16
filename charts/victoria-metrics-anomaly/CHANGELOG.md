@@ -5,7 +5,7 @@
 - Added the ability to add annotations to the configMap using `values.configMapAnnotations`
 - Fixed license file flag name
 
-## 1.4.6
+## 1.4.5
 
 **Release date:** 2024-09-12
 
