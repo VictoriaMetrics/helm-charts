@@ -13,11 +13,15 @@
   {{- ($Values.license).key | default (($Values.global).license).key | default "" -}}
 {{- end -}}
 
-{{- define "vm.enterprise.only" -}}
+{{- define "vm.enterprise.disabled" -}}
   {{- $licenseKey := (include "vm.license.key" .) -}}
   {{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
   {{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
-  {{- if and (empty $licenseKey) (and (empty $licenseSecretName) (empty $licenseSecretKey)) -}}
+  {{- and (empty $licenseKey) (and (empty $licenseSecretName) (empty $licenseSecretKey)) -}}
+{{- end -}}
+
+{{- define "vm.enterprise.only" -}}
+  {{- if eq (include "vm.enterprise.disabled" .) "true" }}
     {{ fail `Pass valid license at .Values.license or .Values.global.license if you have an enterprise license for running this software.
        See https://victoriametrics.com/legal/esa/ for details.
        Documentation - https://docs.victoriametrics.com/enterprise

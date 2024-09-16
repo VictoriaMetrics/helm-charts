@@ -4,5 +4,8 @@ metadata:
   name: {{ include "chart.fullname" . }}
   namespace: {{ include "vm.namespace" . }}
   labels: {{- include "chart.labels" . | nindent 4 }}
+  {{- with .Values.configMapAnnotations }}
+  annotations: {{ toYaml . | nindent 10 }}
+  {{- end }}
 data:
   config.yml: |{{ toYaml (.Values.config | default dict) | nindent 4 }}

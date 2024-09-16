@@ -304,6 +304,16 @@ vm
 </td>
     </tr>
     <tr>
+      <td>configMapAnnotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td><p>Annotations to be added to configMap</p>
+</td>
+    </tr>
+    <tr>
       <td>containerWorkingDir</td>
       <td>string</td>
       <td><pre lang="">
