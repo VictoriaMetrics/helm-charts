@@ -2,7 +2,9 @@
 
 ## Next release
 
-- TODO
+- Add enterprise to existing variant if enterprise enabled
+- Added `vm.enterprise.disabled` template to check if enterprise license is disabled
+- Use `service.servicePort` as a port source if flag is not set in `vm.url`
 
 ## 0.0.11
 
