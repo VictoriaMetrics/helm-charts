@@ -53,6 +53,7 @@ app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
 
 {{- define "vmanomaly.args" -}}
   {{- $args := default dict -}}
+  {{- $_ := set . "flagStyle" "kebab" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args .Values.extraArgs -}}
   {{- $output := (fromYaml (include "vm.args" $args)).args -}}

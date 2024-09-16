@@ -4,6 +4,25 @@
 
 - TODO
 
+## 0.0.13
+
+**Release date:** 2024-09-16
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Do not use image variant if custom image tag is set in `vm.image` template
+- Support multiple license flag styles, which are different for vmanomaly and other services
+
+## 0.0.12
+
+**Release date:** 2024-09-16
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Add enterprise to existing variant if enterprise enabled
+- Added `vm.enterprise.disabled` template to check if enterprise license is disabled
+- Use `service.servicePort` as a port source if flag is not set in `vm.url`
+
 ## 0.0.11
 
 **Release date:** 2024-09-11
