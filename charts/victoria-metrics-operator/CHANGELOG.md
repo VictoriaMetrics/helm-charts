@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Made webhook port configurable. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1506)
 
 ## 0.34.8
 
