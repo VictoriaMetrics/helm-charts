@@ -66,6 +66,10 @@ Return license flag if necessary.
   {{- if $licenseKey -}}
     license: {{ $licenseKey }}
   {{- else if and $licenseSecretName $licenseSecretKey -}}
-    licenseFile: /etc/vm-license-key/{{ $licenseSecretKey }}
+    {{- $flagName := "licenseFile" -}}
+    {{- if eq .flagStyle "kebab" }}
+      {{- $flagName = "license-file" -}}
+    {{- end -}}
+    {{- $flagName }}: /etc/vm-license-key/{{ $licenseSecretKey }}
   {{- end -}}
 {{- end -}}
