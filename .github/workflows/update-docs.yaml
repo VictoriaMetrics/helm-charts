@@ -31,14 +31,6 @@ jobs:
           token: ${{ secrets.VM_BOT_GH_TOKEN }}
           path: __vm-repo
 
-      - name: Import GPG key for charts repo
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.VM_BOT_GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.VM_BOT_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-
       - name: Import GPG key for VM repo
         id: import-gpg
         uses: crazy-max/ghaction-import-gpg@v6
@@ -47,7 +39,7 @@ jobs:
           passphrase: ${{ secrets.VM_BOT_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
-          workdir: __vm-repo
+          git_config_global: true
 
       - name: Generate docs
         run:
