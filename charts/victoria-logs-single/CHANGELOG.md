@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Avoid variant if tag is set explicitly
 
 ## 0.6.2
 
