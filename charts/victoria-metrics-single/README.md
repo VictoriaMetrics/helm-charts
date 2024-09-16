@@ -633,7 +633,7 @@ true
 </td>
     </tr>
     <tr>
-      <td>server.persistentVolume.storageClass</td>
+      <td>server.persistentVolume.storageClassName</td>
       <td>string</td>
       <td><pre lang="">
 ""
