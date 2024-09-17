@@ -3,6 +3,7 @@
 ## Next release
 
 - Made webhook port configurable. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1506)
+- Changed crd cleanup hook delete policy to prevent `resource already exists` error.
 
 ## 0.34.8
 
