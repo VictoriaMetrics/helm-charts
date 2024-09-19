@@ -149,7 +149,8 @@ Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstrai
 {{- $newvmclusterSpec := dict "vminsert" $newvminsert "vmstorage" $newvmstorage "vmselect" $newvmselect }}
 {{- $vmclusterSpec = mergeOverwrite (deepCopy $vmclusterSpec) $newvmclusterSpec }}
 
-{{- $_ := set $zonesMap $rolloutZone.name $vmclusterSpec -}}
+{{- $vmclusterName := default (printf "vmcluster-%s" $rolloutZone.name) $rolloutZone.vmcluster.name }}
+{{- $_ := set $zonesMap $vmclusterName $vmclusterSpec -}}
 {{- end -}}
 {{- $zonesMap | toYaml }}
 {{- end }}

@@ -803,10 +803,28 @@ true
       <td></td>
     </tr>
     <tr>
+      <td>service.servicePort</td>
+      <td>int</td>
+      <td><pre lang="">
+8080
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
       <td>service.type</td>
       <td>string</td>
       <td><pre lang="">
 ClusterIP
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>service.webhookPort</td>
+      <td>int</td>
+      <td><pre lang="">
+9443
 </pre>
 </td>
       <td></td>

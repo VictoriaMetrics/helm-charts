@@ -1,6 +1,8 @@
 ## Next release
 
 - Do not truncate datasource name
+- Support customizing vmauthQueryGlobal spec. Thanks to @olivierbouffet for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1511).
+- Support overriding the default name for extra vmagent and vmcluster per zone.
 
 ## 0.3.0
 
