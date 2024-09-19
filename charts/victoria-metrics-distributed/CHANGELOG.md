@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 0.3.1
+
+**Release date:** 2024-09-19
+
+![AppVersion: v1.103.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.103.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Do not truncate datasource name
 - Support customizing vmauthQueryGlobal spec. Thanks to @olivierbouffet for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1511).
 - Support overriding the default name for extra vmagent and vmcluster per zone.
