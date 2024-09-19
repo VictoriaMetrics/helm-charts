@@ -4,8 +4,9 @@ title: Helm Charts
 menu:
   docs:
     weight: 0
+    identifier: helm
 aliases:
-  - /helm/
+  - /helm
   - /helm/index.html
 ---
 {{% content "README.md" %}}

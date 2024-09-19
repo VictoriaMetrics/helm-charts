@@ -6,8 +6,8 @@ menu:
     parent: helm
     weight: 7
     identifier: helm-victoriametrics-distributed
+url: /helm/victoriametrics-distributed
 aliases:
-  - /helm/victoriametrics-distributed/
   - /helm/victoriametrics-distrinuted/index.html
 ---
 {{% content "README.md" %}}

@@ -6,8 +6,8 @@ menu:
     parent: helm
     weight: 5
     identifier: helm-victoriametrics-auth
+url: /helm/victoriametrics-auth
 aliases:
-  - /helm/victoriametrics-auth/
   - /helm/victoriametrics-auth/index.html
 ---
 {{% content "README.md" %}}
