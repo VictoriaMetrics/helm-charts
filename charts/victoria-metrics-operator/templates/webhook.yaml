@@ -20,7 +20,7 @@ webhooks:
         namespace: {{ include "vm.namespace" $ }}
         name: {{ include "vm-operator.fullname" $ }}
         path: /validate-operator-victoriametrics-com-v1beta1-{{ $name }}
-        port: {{ .Values.service.webhookPort }}
+        port: {{ $.Values.service.webhookPort }}
       {{- if not $.Values.admissionWebhooks.certManager.enabled }}
       caBundle: {{ $tls.caCert }}
       {{- end }}
