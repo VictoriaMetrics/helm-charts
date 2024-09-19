@@ -1,4 +1,3 @@
-
  ![Version: 0.6.3](https://img.shields.io/badge/Version-0.6.3-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-single)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
@@ -30,65 +29,82 @@ By default, fluentbit will forward logs to VictoriaLogs installation deployed by
 
 Access a Kubernetes cluster.
 
+### Setup chart repository (can be omitted for OCI repositories)
+
 Add a chart helm repository with follow commands:
 
- - From HTTPS repository
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
 
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-  
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-logs-single`` chart available to installation:
+helm repo update
+```
+List versions of `vm/victoria-logs-single` chart available to installation:
 
 ```console
 helm search repo vm/victoria-logs-single -l
 ```
 
-Export default values of ``victoria-logs-single`` chart to file ``values.yaml``:
+### Install `victoria-logs-single` chart
 
-```console
-helm show values vm/victoria-logs-single > values.yaml
-```
+Export default values of `victoria-logs-single` chart to file `values.yaml`:
+
+  - For HTTPS repository
+
+    ```console
+    helm show values vm/victoria-logs-single > values.yaml
+    ```
+  - For OCI repository
+
+    ```console
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/victoria-logs-single > values.yaml
+    ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
 
 Test the installation with command:
 
-```console
-helm install vlsingle vm/victoria-logs-single -f values.yaml -n NAMESPACE --debug --dry-run
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vls vm/victoria-logs-single -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vls oci://ghcr.io/victoriametrics/helm-charts/victoria-logs-single -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
 
 Install chart with command:
 
-```console
-helm install vlsingle vm/victoria-logs-single -f values.yaml -n NAMESPACE
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vls vm/victoria-logs-single -f values.yaml -n NAMESPACE
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vls oci://ghcr.io/victoriametrics/helm-charts/victoria-logs-single -f values.yaml -n NAMESPACE
+    ```
 
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'single'
+kubectl get pods -A | grep 'vls'
 ```
 
 Get the application by running this command:
 
 ```console
-helm list -f vlsingle -n NAMESPACE
+helm list -f vls -n NAMESPACE
 ```
 
-See the history of versions of ``vlsingle`` application with command.
+See the history of versions of `vls` application with command.
 
 ```console
-helm history vlsingle -n NAMESPACE
+helm history vls -n NAMESPACE
 ```
 
 ## How to uninstall
@@ -96,7 +112,7 @@ helm history vlsingle -n NAMESPACE
 Remove application with command.
 
 ```console
-helm uninstall vlsingle -n NAMESPACE
+helm uninstall vls -n NAMESPACE
 ```
 
 ## Documentation of Helm Chart

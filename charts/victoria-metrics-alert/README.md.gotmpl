@@ -8,70 +8,7 @@
 
 * Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
 
-## How to install
-
-Access a Kubernetes cluster.
-
-Add a chart helm repository with follow commands:
-
- - From HTTPS repository
-
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-   
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-alert`` chart available to installation:
-
-```console
-helm search repo vm/victoria-metrics-alert -l
-```
-
-Export default values of ``victoria-metrics-alert`` chart to file ``values.yaml``:
-
-```console
-helm show values vm/victoria-metrics-alert > values.yaml
-```
-
-Change the values according to the need of the environment in ``values.yaml`` file.
-
-Test the installation with command:
-
-```console
-helm install vmalert vm/victoria-metrics-alert -f values.yaml -n NAMESPACE --debug --dry-run
-```
-
-Install chart with command:
-
-```console
-helm install vmalert vm/victoria-metrics-alert -f values.yaml -n NAMESPACE
-```
-
-Get the pods lists by running this commands:
-
-```console
-kubectl get pods -A | grep 'alert'
-```
-
-Get the application by running this command:
-
-```console
-helm list -f vmalert -n NAMESPACE
-```
-
-See the history of versions of ``vmalert`` application with command.
-
-```console
-helm history vmalert -n NAMESPACE
-```
+{{ include "chart.installSection" . }}
 
 ## HA configuration for Alertmanager
 
@@ -80,27 +17,9 @@ To enable the HA configuration, you can use:
 - [VictoriaMetrics Operator](https://docs.victoriametrics.com/operator/)
 - official [Alertmanager Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager)
 
-## How to uninstall
+{{ include "chart.uninstallSection" . }}
 
-Remove application with command.
-
-```console
-helm uninstall vmalert -n NAMESPACE
-```
-
-## Documentation of Helm Chart
-
-Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
-
-Generate docs with ``helm-docs`` command.
-
-```bash
-cd charts/victoria-metrics-alert
-
-helm-docs
-```
-
-The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+{{ include "chart.helmDocs" . }}
 
 ## Parameters
 

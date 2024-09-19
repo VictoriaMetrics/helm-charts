@@ -1,4 +1,3 @@
-
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.13.7](https://img.shields.io/badge/Version-0.13.7-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-cluster)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
@@ -19,65 +18,82 @@ Note: this chart installs VictoriaMetrics cluster components such as vminsert, v
 
 Access a Kubernetes cluster.
 
+### Setup chart repository (can be omitted for OCI repositories)
+
 Add a chart helm repository with follow commands:
 
- - From HTTPS repository
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
 
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-  
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-cluster`` chart available to installation:
+helm repo update
+```
+List versions of `vm/victoria-metrics-cluster` chart available to installation:
 
 ```console
 helm search repo vm/victoria-metrics-cluster -l
 ```
 
-Export default values of ``victoria-metrics-cluster`` chart to file ``values.yaml``:
+### Install `victoria-metrics-cluster` chart
 
-```console
-helm show values vm/victoria-metrics-cluster > values.yaml
-```
+Export default values of `victoria-metrics-cluster` chart to file `values.yaml`:
+
+  - For HTTPS repository
+
+    ```console
+    helm show values vm/victoria-metrics-cluster > values.yaml
+    ```
+  - For OCI repository
+
+    ```console
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster > values.yaml
+    ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
 
 Test the installation with command:
 
-```console
-helm install vmcluster vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vmc vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vmc oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
 
 Install chart with command:
 
-```console
-helm install vmcluster vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vmc vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vmc oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster -f values.yaml -n NAMESPACE
+    ```
 
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'vminsert\|vmselect\|vmstorage'
+kubectl get pods -A | grep 'vmc'
 ```
 
 Get the application by running this command:
 
 ```console
-helm list -f vmcluster -n NAMESPACE
+helm list -f vmc -n NAMESPACE
 ```
 
-See the history of versions of ``vmcluster`` application with command.
+See the history of versions of `vmc` application with command.
 
 ```console
-helm history vmcluster -n NAMESPACE
+helm history vmc -n NAMESPACE
 ```
 
 ## How to uninstall
@@ -85,7 +101,7 @@ helm history vmcluster -n NAMESPACE
 Remove application with command.
 
 ```console
-helm uninstall vmcluster -n NAMESPACE
+helm uninstall vmc -n NAMESPACE
 ```
 
 ## Documentation of Helm Chart

@@ -1,4 +1,3 @@
-
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.11.1](https://img.shields.io/badge/Version-0.11.1-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
@@ -13,65 +12,82 @@ Victoria Metrics Alert - executes a list of given MetricsQL expressions (rules) 
 
 Access a Kubernetes cluster.
 
+### Setup chart repository (can be omitted for OCI repositories)
+
 Add a chart helm repository with follow commands:
 
- - From HTTPS repository
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
 
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-  
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-alert`` chart available to installation:
+helm repo update
+```
+List versions of `vm/victoria-metrics-alert` chart available to installation:
 
 ```console
 helm search repo vm/victoria-metrics-alert -l
 ```
 
-Export default values of ``victoria-metrics-alert`` chart to file ``values.yaml``:
+### Install `victoria-metrics-alert` chart
 
-```console
-helm show values vm/victoria-metrics-alert > values.yaml
-```
+Export default values of `victoria-metrics-alert` chart to file `values.yaml`:
+
+  - For HTTPS repository
+
+    ```console
+    helm show values vm/victoria-metrics-alert > values.yaml
+    ```
+  - For OCI repository
+
+    ```console
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-alert > values.yaml
+    ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
 
 Test the installation with command:
 
-```console
-helm install vmalert vm/victoria-metrics-alert -f values.yaml -n NAMESPACE --debug --dry-run
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vma vm/victoria-metrics-alert -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vma oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-alert -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
 
 Install chart with command:
 
-```console
-helm install vmalert vm/victoria-metrics-alert -f values.yaml -n NAMESPACE
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vma vm/victoria-metrics-alert -f values.yaml -n NAMESPACE
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vma oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-alert -f values.yaml -n NAMESPACE
+    ```
 
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'alert'
+kubectl get pods -A | grep 'vma'
 ```
 
 Get the application by running this command:
 
 ```console
-helm list -f vmalert -n NAMESPACE
+helm list -f vma -n NAMESPACE
 ```
 
-See the history of versions of ``vmalert`` application with command.
+See the history of versions of `vma` application with command.
 
 ```console
-helm history vmalert -n NAMESPACE
+helm history vma -n NAMESPACE
 ```
 
 ## HA configuration for Alertmanager
@@ -86,7 +102,7 @@ To enable the HA configuration, you can use:
 Remove application with command.
 
 ```console
-helm uninstall vmalert -n NAMESPACE
+helm uninstall vma -n NAMESPACE
 ```
 
 ## Documentation of Helm Chart

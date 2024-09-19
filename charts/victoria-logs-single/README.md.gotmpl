@@ -25,92 +25,11 @@ fluent-bit:
 ```
 By default, fluentbit will forward logs to VictoriaLogs installation deployed by this chart.
 
-## How to install
+{{ include "chart.installSection" . }}
 
-Access a Kubernetes cluster.
+{{ include "chart.uninstallSection" . }}
 
-Add a chart helm repository with follow commands:
-
- - From HTTPS repository
-
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-   
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-logs-single`` chart available to installation:
-
-```console
-helm search repo vm/victoria-logs-single -l
-```
-
-Export default values of ``victoria-logs-single`` chart to file ``values.yaml``:
-
-```console
-helm show values vm/victoria-logs-single > values.yaml
-```
-
-Change the values according to the need of the environment in ``values.yaml`` file.
-
-Test the installation with command:
-
-```console
-helm install vlsingle vm/victoria-logs-single -f values.yaml -n NAMESPACE --debug --dry-run
-```
-
-Install chart with command:
-
-```console
-helm install vlsingle vm/victoria-logs-single -f values.yaml -n NAMESPACE
-```
-
-Get the pods lists by running this commands:
-
-```console
-kubectl get pods -A | grep 'single'
-```
-
-Get the application by running this command:
-
-```console
-helm list -f vlsingle -n NAMESPACE
-```
-
-See the history of versions of ``vlsingle`` application with command.
-
-```console
-helm history vlsingle -n NAMESPACE
-```
-
-## How to uninstall
-
-Remove application with command.
-
-```console
-helm uninstall vlsingle -n NAMESPACE
-```
-
-## Documentation of Helm Chart
-
-Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
-
-Generate docs with ``helm-docs`` command.
-
-```bash
-cd charts/victoria-logs-single
-
-helm-docs
-```
-
-The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+{{ include "chart.helmDocs" . }}
 
 ## Parameters
 

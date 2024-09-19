@@ -110,58 +110,7 @@ Example command using vmagent:
 /path/to/vmagent -remoteWrite.url=http://vmauth-vmauth-global-write-$ReleaseName-vm-distributed:8427/prometheus/api/v1/write -remoteWrite.basicAuth.username=tenant-1088 -remoteWrite.basicAuth.password=secret
 ```
 
-## How to install
-
-Access a Kubernetes cluster.
-
-Add a chart helm repository with follow commands:
-
- - From HTTPS repository
-
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-   
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-distributed``` chart available to installation:
-
-```console
-helm search repo vm/victoria-metrics-distributed` -l
-```
-
-Export default values of ``victoria-metrics-distributed``` chart to file ``values.yaml``:
-
-```console
-helm show values vm/victoria-metrics-distributed` > values.yaml
-```
-
-Change the values according to the need of the environment in ``values.yaml`` file.
-
-Test the installation with command:
-
-```console
-helm install vm-dis vm/victoria-metrics-distributed` -f values.yaml -n NAMESPACE --debug --dry-run
-```
-
-Install chart with command:
-
-```console
-helm install vm-dis vm/victoria-metrics-distributed` -f values.yaml -n NAMESPACE
-```
-
-Get the pods lists by running this commands:
-
-```console
-kubectl get pods -n NAMESPACE'
-```
+{{ include "chart.installSection" . }}
 
 ## How to upgrade
 
@@ -174,27 +123,9 @@ First, performing update on availability zone `zone-eu-1`:
 
 Then, perform update on availability zone `zone-us-1` with the same steps1~4.
 
-## How to uninstall
+{{ include "chart.uninstallSection" . }}
 
-Remove application with command.
-
-```console
-helm uninstall vm-dis -n NAMESPACE
-```
-
-## Documentation of Helm Chart
-
-Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
-
-Generate docs with ``helm-docs`` command.
-
-```bash
-cd charts/victoria-metrics-distributed`
-
-helm-docs
-```
-
-The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+{{ include "chart.helmDocs" . }}
 
 ## Parameters
 
