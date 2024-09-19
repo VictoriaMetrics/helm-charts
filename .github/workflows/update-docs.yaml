@@ -53,11 +53,10 @@ jobs:
             --include="*.webp" \
             --include="*.md" \
             --exclude="*" \
-            charts/ ../__vm-repo/docs/helm/
-          cp *.md ../_vm-repo/docs/helm/
+            charts/ __vm-repo/docs/helm/
+          cp *.md __vm-repo/docs/helm/
           echo "BUILDTIME=$(date +%s)" >> $GITHUB_OUTPUT
           echo "SHORT_SHA=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
-
           cp -f README.md ${{ runner.temp }}/README.md
           for readme in $(find charts/*/README.md)
           do
