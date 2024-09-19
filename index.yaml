@@ -12459,6 +12459,51 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - Do not truncate datasource name
+        - Support customizing vmauthQueryGlobal spec. Thanks to @olivierbouffet for [the pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1511).
+        - Support overriding the default name for extra vmagent and vmcluster per zone.
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: v1.103.0
+    created: "2024-09-19T05:47:37.690088499Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    - condition: victoria-metrics-k8s-stack.enabled
+      name: victoria-metrics-k8s-stack
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.25.*
+    description: A Helm chart for Running VMCluster on Multiple Availability Zones
+    digest: 47b1188a21b4ffc24e588ce90abf74adc9b2409bd6493a2710bb8745d5067627
+    home: https://github.com/VictoriaMetrics/helm-charts
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-distributed
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-distributed-0.3.1/victoria-metrics-distributed-0.3.1.tgz
+    version: 0.3.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - bump version of VM components to [v1.103.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.103.0)
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -26814,4 +26859,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-09-16T15:07:33.822568374Z"
+generated: "2024-09-19T05:47:38.308537967Z"
