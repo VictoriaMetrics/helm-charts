@@ -1,4 +1,3 @@
-
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.25.16](https://img.shields.io/badge/Version-0.25.16-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
@@ -175,53 +174,82 @@ helm repo update
 
 Access a Kubernetes cluster.
 
+### Setup chart repository (can be omitted for OCI repositories)
+
 Add a chart helm repository with follow commands:
 
- - From HTTPS repository
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
 
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-  
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-k8s-stack`` chart available to installation:
+helm repo update
+```
+List versions of `vm/victoria-metrics-k8s-stack` chart available to installation:
 
 ```console
 helm search repo vm/victoria-metrics-k8s-stack -l
 ```
 
-Export default values of ``victoria-metrics-k8s-stack`` chart to file ``values.yaml``:
+### Install `victoria-metrics-k8s-stack` chart
 
-```console
-helm show values vm/victoria-metrics-k8s-stack > values.yaml
-```
+Export default values of `victoria-metrics-k8s-stack` chart to file `values.yaml`:
+
+  - For HTTPS repository
+
+    ```console
+    helm show values vm/victoria-metrics-k8s-stack > values.yaml
+    ```
+  - For OCI repository
+
+    ```console
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack > values.yaml
+    ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
 
 Test the installation with command:
 
-```console
-helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE --debug --dry-run
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vmks vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vmks oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
 
 Install chart with command:
 
-```console
-helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vmks vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vmks oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE
+    ```
 
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'victoria-metrics'
+kubectl get pods -A | grep 'vmks'
+```
+
+Get the application by running this command:
+
+```console
+helm list -f vmks -n NAMESPACE
+```
+
+See the history of versions of `vmks` application with command.
+
+```console
+helm history vmks -n NAMESPACE
 ```
 
 ### Install locally (Minikube)
@@ -245,11 +273,8 @@ helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -f valu
 Remove application with command.
 
 ```console
-helm uninstall [RELEASE_NAME] -n NAMESPACE
+helm uninstall vmks -n NAMESPACE
 ```
-This removes all the Kubernetes components associated with the chart and deletes the release.
-
-_See [helm uninstall](https://helm.sh/docs/helm/helm_uninstall/) for command documentation._
 
 CRDs created by this chart are not removed by default and should be manually cleaned up:
 

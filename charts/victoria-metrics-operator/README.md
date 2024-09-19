@@ -1,4 +1,3 @@
-
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.34.8](https://img.shields.io/badge/Version-0.34.8-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-operator)
 
@@ -75,73 +74,82 @@ This chart will do the following:
 
 Access a Kubernetes cluster.
 
+### Setup chart repository (can be omitted for OCI repositories)
+
 Add a chart helm repository with follow commands:
 
- - From HTTPS repository
+```console
+helm repo add vm https://victoriametrics.github.io/helm-charts/
 
-   ```console
-   helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-   helm repo update
-   ```
- - From OCI repository
-  
-   ```console
-   helm repo add vm oci://ghcr.io/victoriametrics/helm-charts/
-
-   helm repo update
-   ```
-
-List versions of ``vm/victoria-metrics-operator`` chart available to installation:
+helm repo update
+```
+List versions of `vm/victoria-metrics-operator` chart available to installation:
 
 ```console
 helm search repo vm/victoria-metrics-operator -l
 ```
 
-Export default values of ``victoria-metrics-operator`` chart to file ``values.yaml``:
+### Install `victoria-metrics-operator` chart
 
-```console
-helm show values vm/victoria-metrics-operator > values.yaml
-```
+Export default values of `victoria-metrics-operator` chart to file `values.yaml`:
+
+  - For HTTPS repository
+
+    ```console
+    helm show values vm/victoria-metrics-operator > values.yaml
+    ```
+  - For OCI repository
+
+    ```console
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-operator > values.yaml
+    ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
 
 Test the installation with command:
 
-```console
-helm install vmoperator vm/victoria-metrics-operator -f values.yaml -n NAMESPACE --debug --dry-run
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vmo vm/victoria-metrics-operator -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vmo oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-operator -f values.yaml -n NAMESPACE --debug --dry-run
+    ```
 
 Install chart with command:
 
-```console
-helm install vmoperator vm/victoria-metrics-operator -f values.yaml -n NAMESPACE
-```
+  - For HTTPS repository
+
+    ```console
+    helm install vmo vm/victoria-metrics-operator -f values.yaml -n NAMESPACE
+    ```
+
+  - For OCI repository
+
+    ```console
+    helm install vmo oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-operator -f values.yaml -n NAMESPACE
+    ```
 
 Get the pods lists by running this commands:
 
 ```console
-kubectl get pods -A | grep 'operator'
+kubectl get pods -A | grep 'vmo'
 ```
 
 Get the application by running this command:
 
 ```console
-helm list -f vmoperator -n NAMESPACE
+helm list -f vmo -n NAMESPACE
 ```
 
-See the history of versions of ``vmoperator`` application with command.
+See the history of versions of `vmo` application with command.
 
 ```console
-helm history vmoperator -n NAMESPACE
-```
-
-## How to uninstall
-
-Remove application with command.
-
-```console
-helm uninstall vmoperator -n NAMESPACE
+helm history vmo -n NAMESPACE
 ```
 
 ## Validation webhook
@@ -155,6 +163,14 @@ admissionWebhooks:
   certManager:
     # enables cert creation and injection by cert-manager
     enabled: true
+```
+
+## How to uninstall
+
+Remove application with command.
+
+```console
+helm uninstall vmo -n NAMESPACE
 ```
 
 ## Documentation of Helm Chart
