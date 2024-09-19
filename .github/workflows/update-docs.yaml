@@ -64,6 +64,19 @@ jobs:
             cp -f $readme ${{ runner.temp }}/$readme
           done
 
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: docs/helm
+          commit-message: Automatic update helm docs from ${{ github.repository }}@${{ steps.update.outputs.SHORT_SHA }}
+          signoff: true
+          committer: "Github Actions <${{ steps.import-gpg.outputs.email }}>"
+          path: __vm-repo
+          branch: helm-docs-update-${{ steps.update.outputs.BUILDTIME }}
+          token: ${{ secrets.VM_BOT_GH_TOKEN }}
+          delete-branch: true
+          title: Automatic update helm docs from ${{ github.repository }}@${{ steps.update.outputs.SHORT_SHA }}
+
       - name: Checkout to pages
         uses: actions/checkout@v4
         with:
@@ -80,16 +93,3 @@ jobs:
         env:
           GH_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
           GITHUB_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          add-paths: docs/helm
-          commit-message: Automatic update helm docs from ${{ github.repository }}@${{ steps.update.outputs.SHORT_SHA }}
-          signoff: true
-          committer: "Github Actions <${{ steps.import-gpg.outputs.email }}>"
-          path: __vm-repo
-          branch: helm-docs-update-${{ steps.update.outputs.BUILDTIME }}
-          token: ${{ secrets.VM_BOT_GH_TOKEN }}
-          delete-branch: true
-          title: Automatic update helm docs from ${{ github.repository }}@${{ steps.update.outputs.SHORT_SHA }}
