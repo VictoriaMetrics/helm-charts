@@ -1,13 +1,13 @@
 ---
 weight: 4
-title: Victoria Metrics Anomaly
+title: VictoriaMetrics Anomaly
 menu:
   docs:
     parent: helm
     weight: 4
-    identifier: helm-victoria-metrics-anomaly
+    identifier: helm-victoriametrics-anomaly
 aliases:
-  - /helm/victoria-metrics-anomaly/
-  - /helm/victoria-metrics-anomaly/index.html
+  - /helm/victoriametrics-anomaly/
+  - /helm/victoriametrics-anomaly/index.html
 ---
 {{% content "README.md" %}}

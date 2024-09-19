@@ -1,6 +1,6 @@
 ---
 weight: 9
-title: Victoria Metrics K8s Stack
+title: VictoriaMetrics K8s Stack
 menu:
   docs:
     parent: helm

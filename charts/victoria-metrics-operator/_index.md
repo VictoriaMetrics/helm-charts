@@ -1,13 +1,13 @@
 ---
-weight: 9
-title: Victoria Metrics Operator
+weight: 10
+title: VictoriaMetrics Operator
 menu:
   docs:
     parent: helm
-    weight: 9
-    identifier: helm-victoria-metrics-operator
+    weight: 10
+    identifier: helm-victoriametrics-operator
 aliases:
-  - /helm/victoria-metrics-operator/
-  - /helm/victoria-metrics-operator/index.html
+  - /helm/victoriametrics-operator/
+  - /helm/victoriametrics-operator/index.html
 ---
 {{% content "README.md" %}}

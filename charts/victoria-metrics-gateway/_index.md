@@ -1,13 +1,13 @@
 ---
 weight: 8
-title: Victoria Metrics Gateway
+title: VictoriaMetrics Gateway
 menu:
   docs:
     parent: helm
     weight: 8
-    identifier: helm-victoria-metrics-gateway
+    identifier: helm-victoriametrics-gateway
 aliases:
-  - /helm/victoria-metrics-gateway/
-  - /helm/victoria-metrics-gateway/index.html
+  - /helm/victoriametrics-gateway/
+  - /helm/victoriametrics-gateway/index.html
 ---
 {{% content "README.md" %}}

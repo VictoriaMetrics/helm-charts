@@ -1,13 +1,13 @@
 ---
 weight: 2
-title: Victoria Metrics Agent
+title: VictoriaMetrics Agent
 menu:
   docs:
     parent: helm
     weight: 2
-    identifier: helm-victoria-metrics-agent
+    identifier: helm-victoriametrics-agent
 aliases:
-  - /helm/victoria-metrics-agent/
-  - /helm/victoria-metrics-agent/index.html
+  - /helm/victoriametrics-agent/
+  - /helm/victoriametrics-agent/index.html
 ---
 {{% content "README.md" %}}

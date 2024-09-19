@@ -1,13 +1,13 @@
 ---
 weight: 3
-title: Victoria Metrics Alert
+title: VictoriaMetrics Alert
 menu:
   docs:
     parent: helm
     weight: 3
-    identifier: helm-victoria-metrics-alert
+    identifier: helm-victoriametrics-alert
 aliases:
-  - /helm/victoria-metrics-alert/
-  - /helm/victoria-metrics-alert/index.html
+  - /helm/victoriametrics-alert/
+  - /helm/victoriametrics-alert/index.html
 ---
 {{% content "README.md" %}}

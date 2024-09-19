@@ -1,13 +1,13 @@
 ---
 weight: 6
-title: Victoria Metrics Cluster
+title: VictoriaMetrics Cluster
 menu:
   docs:
     parent: helm
     weight: 6
-    identifier: helm-victoria-metrics-cluster
+    identifier: helm-victoriametrics-cluster
 aliases:
-  - /helm/victoria-metrics-cluster/
-  - /helm/victoria-metrics-cluster/index.html
+  - /helm/victoriametrics-cluster/
+  - /helm/victoriametrics-cluster/index.html
 ---
 {{% content "README.md" %}}

@@ -1,13 +1,13 @@
 ---
 weight: 7
-title: Victoria Metrics Distributed
+title: VictoriaMetrics Distributed
 menu:
   docs:
     parent: helm
     weight: 7
-    identifier: helm-victoria-metrics-distributed
+    identifier: helm-victoriametrics-distributed
 aliases:
-  - /helm/victoria-metrics-distributed/
-  - /helm/victoria-metrics-distrinuted/index.html
+  - /helm/victoriametrics-distributed/
+  - /helm/victoriametrics-distrinuted/index.html
 ---
 {{% content "README.md" %}}
