@@ -86,7 +86,7 @@ jobs:
         run: |
           cp -f ${{ runner.temp }}/README.md .
           cp -fr ${{ runner.temp }}/charts ./
-          if git status --porcelain; then
+          if [[ -n $(git status --porcelain --untracked-files=no) ]]; then
             git add README.md
             git add charts/*/README.md
             git commit -S -m "Synchronize docs"
