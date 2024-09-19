@@ -39,6 +39,7 @@ spec:
       port: {{ .Values.service.servicePort }}
       targetPort: http
       protocol: TCP
-    - name: {{ .Values.service.webhookPort }}
+    - name: webhook
+      port: {{ .Values.service.webhookPort }}
       targetPort: webhook
   selector: {{ include "vm-operator.selectorLabels" . | nindent 4 }}
