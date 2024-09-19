@@ -1,6 +1,4 @@
 
-# Victoria Metrics Helm Chart for vmanomaly
-
 ![Version: 1.4.6](https://img.shields.io/badge/Version-1.4.6-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-anomaly)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)

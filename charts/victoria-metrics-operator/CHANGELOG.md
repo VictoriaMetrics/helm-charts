@@ -1,5 +1,3 @@
-# CHANGELOG for `victoria-metrics-operator` helm-chart
-
 ## Next release
 
 - Made webhook port configurable. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1506)

@@ -1,5 +1,3 @@
-# CHANGELOG for `victoria-metrics-cluster` helm-chart
-
 ## Next release
 
 - TODO

@@ -1,5 +1,3 @@
-# CHANGELOG for `victoria-metrics-k8s-stack` helm-chart
-
 ## Next release
 
 - Fixed ETCD dashboard

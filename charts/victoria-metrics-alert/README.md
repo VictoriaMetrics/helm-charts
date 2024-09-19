@@ -1,6 +1,4 @@
 
-# Helm Chart For Victoria Metrics Alert.
-
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.11.1](https://img.shields.io/badge/Version-0.11.1-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-alert)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)

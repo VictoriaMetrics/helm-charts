@@ -1,5 +1,3 @@
-# CHANGELOG for `victoria-metrics-single` helm-chart
-
 ## Next release
 
 - TODO
