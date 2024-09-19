@@ -2,6 +2,7 @@
 
 - Added VMAuth to k8s stack. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/829)
 - Fixed ETCD dashboard
+- Use path prefix from args as a default path prefix for ingress. Related [issue](https://github.com/VictoriaMetrics/helm-charts/issues/1260)
 
 ## 0.25.16
 

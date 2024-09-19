@@ -39,8 +39,8 @@ spec:
                 name: {{ $serviceName }}
                 port:
                   name: {{ $ingress.serviceName | default "http" }}
-            {{- with $ingress.path }}
-            path: {{ . }}
+            {{- with ($ingress.path | default (dig "spec" "extraArgs" "http.pathPrefix" "/" $config)) }}
+            path: {{ tpl . $ }}
             {{- end }}
             {{- with $ingress.pathType }}
             pathType: {{ . }}

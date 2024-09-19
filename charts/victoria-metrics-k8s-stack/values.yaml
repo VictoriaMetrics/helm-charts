@@ -284,7 +284,7 @@ vmsingle:
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     labels: {}
-    path: /
+    path: ""
     # pathType is only for k8s > 1.19
     pathType: Prefix
 
@@ -381,7 +381,7 @@ vmcluster:
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       labels: {}
-      path: /
+      path: ""
       # pathType is only for k8s > 1.19
       pathType: Prefix
 
@@ -416,7 +416,7 @@ vmcluster:
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       labels: {}
-      path: /
+      path: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vmselect }}'
       # pathType is only for k8s > 1.19
       pathType: Prefix
 
@@ -451,7 +451,7 @@ vmcluster:
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       labels: {}
-      path: /
+      path: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vminsert }}'
       # pathType is only for k8s > 1.19
       pathType: Prefix
 
@@ -619,7 +619,7 @@ alertmanager:
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     labels: {}
-    path: /
+    path: '{{ .Values.alertmanager.spec.routePrefix | default "/" }}'
     # pathType is only for k8s > 1.19
     pathType: Prefix
 
@@ -657,6 +657,8 @@ vmalert:
     image:
       tag: v1.103.0
     evaluationInterval: 15s
+    extraArgs:
+      http.pathPrefix: "/"
 
     # External labels to add to all generated recording rules and alerts
     externalLabels: {}
@@ -691,7 +693,7 @@ vmalert:
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     labels: {}
-    path: /
+    path: ""
     # pathType is only for k8s > 1.19
     pathType: Prefix
 
@@ -759,7 +761,7 @@ vmagent:
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     labels: {}
-    path: /
+    path: ""
     # pathType is only for k8s > 1.19
     pathType: Prefix
 
