@@ -1,5 +1,5 @@
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-distributed)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -406,6 +406,16 @@ spec: {}
 </td>
     </tr>
     <tr>
+      <td>availabilityZones[0].vmcluster.name</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>override the name of the vmcluster, by default is vmcluster-<zoneName></p>
+</td>
+    </tr>
+    <tr>
       <td>availabilityZones[0].vmcluster.spec</td>
       <td>object</td>
       <td><pre lang="plaintext">
@@ -494,6 +504,16 @@ spec: {}
 </td>
     </tr>
     <tr>
+      <td>availabilityZones[1].vmcluster.name</td>
+      <td>string</td>
+      <td><pre lang="">
+""
+</pre>
+</td>
+      <td><p>override the name of the vmcluster, by default is vmcluster-<zoneName></p>
+</td>
+    </tr>
+    <tr>
       <td>availabilityZones[1].vmcluster.spec</td>
       <td>object</td>
       <td><pre lang="plaintext">
@@ -531,6 +551,7 @@ false
       <td>object</td>
       <td><pre lang="plaintext">
 enabled: true
+name: test-vmagent
 spec:
     selectAllByDefault: true
 </pre>
