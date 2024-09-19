@@ -2132,6 +2132,35 @@ selectAllByDefault: true
 </td>
     </tr>
     <tr>
+      <td>vmauth.annotations</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmauth.enabled</td>
+      <td>bool</td>
+      <td><pre lang="">
+false
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmauth.spec</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+discover_backend_ips: true
+port: "8427"
+</pre>
+</td>
+      <td><p>full spec for VMAuth CRD. Allowed values described <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
       <td>vmcluster.annotations</td>
       <td>object</td>
       <td><pre lang="plaintext">
