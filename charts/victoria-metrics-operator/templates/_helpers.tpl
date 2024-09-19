@@ -11,7 +11,7 @@ Expand the name of the chart.
 {{- define "vm-operator.cleanup.annotations" -}}
 "helm.sh/hook": pre-delete
 "helm.sh/hook-weight": "{{ .hookWeight }}"
-"helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+"helm.sh/hook-delete-policy": before-hook-creation
 {{- end }}
 
 {{/*
