@@ -6,6 +6,10 @@ metadata:
   name: {{ include "victoria-metrics-distributed.vmauthQueryGlobalName" . }}
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
+  {{- with .Values.vmauthQueryGlobal.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end  }}
 spec:
   unauthorizedAccessConfig:
     - src_paths:
@@ -14,6 +18,11 @@ spec:
 {{- range $zone := $.Values.availabilityZones }}
 {{ printf "- http://vmauth-%s:8427/" ( $zone.vmauthCrossAZQuery.name | default ( printf "vmauth-read-proxy-%s" $zone.name )) | indent 8 }}
 {{- end }}
+{{- $spec := deepCopy .Values.vmauthQueryGlobal.spec }}
+{{- $spec := unset $spec "unauthorizedAccessConfig" }}
       load_balancing_policy: first_available
+{{- if $spec }}
+{{- toYaml $spec | nindent 2 }}
+{{- end }}
 {{- end }}
 
