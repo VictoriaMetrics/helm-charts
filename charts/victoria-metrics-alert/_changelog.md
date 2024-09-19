@@ -4,10 +4,10 @@ title: CHANGELOG
 menu:
   docs:
     weight: 1
-    identifier: helm-victoria-metrics-alert-changelog
-    parent: helm-victoria-metrics-alert
-url: /helm/victoria-metrics-alert/changelog
+    identifier: helm-victoriametrics-alert-changelog
+    parent: helm-victoriametrics-alert
+url: /helm/victoriametrics-alert/changelog
 aliases:
-  - /helm/victoria-metrics-alert/changelog/index.html
+  - /helm/victoriametrics-alert/changelog/index.html
 ---
 {{% content "CHANGELOG.md" %}}

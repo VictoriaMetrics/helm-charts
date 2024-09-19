@@ -86,10 +86,12 @@ jobs:
         run: |
           cp -f ${{ runner.temp }}/README.md .
           cp -fr ${{ runner.temp }}/charts ./
-          git add README.md
-          git add charts/*/README.md
-          git commit -S -m "Synchronize docs"
-          git push origin gh-pages
+          if [[ -n $(git status --porcelain --untracked-files=no) ]]; then
+            git add README.md
+            git add charts/*/README.md
+            git commit -S -m "Synchronize docs"
+            git push origin gh-pages
+          fi
         env:
           GH_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
           GITHUB_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
