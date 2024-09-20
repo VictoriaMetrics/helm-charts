@@ -5,7 +5,7 @@ menu:
   docs:
     weight: 35
     identifier: helm
-pageRef: /helm/
+    pageRef: /helm/
 aliases:
   - /helm
   - /helm/index.html
