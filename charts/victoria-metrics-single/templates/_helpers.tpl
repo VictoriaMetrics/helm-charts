@@ -1,5 +1,6 @@
 {{- define "vmsingle.args" -}}
-  {{- $app := .Values.server -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $app := $Values.server -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "retentionPeriod" $app.retentionPeriod -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
@@ -15,7 +16,8 @@
 {{- end -}}
 
 {{- define "vmbackupmanager.args" -}}
-  {{- $app := .Values.server -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $app := $Values.server -}}
   {{- $manager := $app.vmbackupmanager -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "disableHourly" $manager.disableHourly -}}
@@ -36,7 +38,8 @@
 {{- end -}}
 
 {{- define "vmbackupmanager.restore.args" -}}
-  {{- $app := .Values.server -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $app := $Values.server -}}
   {{- $manager := $app.vmbackupmanager -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}

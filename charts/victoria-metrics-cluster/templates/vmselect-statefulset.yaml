@@ -2,15 +2,18 @@
 {{- if and $app.enabled $app.statefulSet.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "vmselect" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
+  {{- $_ := set $ctx "extraLabels" $app.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" $ctx }}
+  namespace: {{ $ns }}
 spec:
   serviceName: {{ $fullname }}
   selector:
@@ -99,7 +102,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "vm.sa.name" . }}
+      serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

@@ -1,12 +1,14 @@
 {{- $app := .Values.server }}
+{{- $service := $app.service }}
 {{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ include "vm.namespace" . }}
-  {{- with $app.service.annotations }}
+  namespace: {{ $ns }}
+  {{- with $service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
   {{- $_ := set $ctx "extraLabels" $app.service.labels }}
@@ -14,45 +16,45 @@ metadata:
   {{- $_ := unset $ctx "extraLabels" }}
   name: {{ $fullname }}
 spec:
-  {{- $clusterIP := $app.service.clusterIP }}
+  {{- $clusterIP := $service.clusterIP }}
   {{- if and (not $clusterIP) $app.statefulSet.enabled }}
     {{- $clusterIP = "None" }}
   {{- end }}
   {{- with $clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
-  {{- with $app.service.externalIPs }}
+  {{- with $service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- with $app.service.loadBalancerIP }}
+  {{- with $service.loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
-  {{- with $app.service.loadBalancerSourceRanges }}
+  {{- with $service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $type := $app.service.type }}
+  {{- $type := $service.type }}
   {{- if and (not $type) $app.statefulSet.enabled }}
     {{- $type = "ClusterIP" }}
   {{- end }}
   type: {{ $type }}
-  {{- with $app.service.healthCheckNodePort }}
+  {{- with $service.healthCheckNodePort }}
   healthCheckNodePort: {{ . }}
   {{- end }}
-  {{- with $app.service.externalTrafficPolicy }}
+  {{- with $service.externalTrafficPolicy }}
   externalTrafficPolicy: {{ . }}
   {{- end }}
-  {{- with $app.service.ipFamilyPolicy }}
+  {{- with $service.ipFamilyPolicy }}
   ipFamilyPolicy: {{ . }}
   {{- end }}
-  {{- with $app.service.ipFamilies }}
+  {{- with $service.ipFamilies }}
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
     - name: http
-      port: {{ $app.service.servicePort }}
+      port: {{ $service.servicePort }}
       protocol: TCP
       targetPort: http
-      {{- with $app.service.nodePort }}
+      {{- with $service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
     {{- with $app.extraArgs.graphiteListenAddr }}

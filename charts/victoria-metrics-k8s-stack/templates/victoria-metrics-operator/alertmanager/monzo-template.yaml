@@ -1,12 +1,13 @@
 {{- if and .Values.alertmanager.enabled .Values.alertmanager.monzoTemplate.enabled }}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" "style" "managed" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 ---
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: {{ $fullname }}-monzo-tpl
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
   monzo.tmpl: |-

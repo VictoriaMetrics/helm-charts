@@ -1,17 +1,19 @@
 {{- $app := .Values.vmstorage }}
 {{- if $app.enabled -}}
-{{- $ctx := dict "helm" . "extraLabels" $app.extraLabels "appKey" "vmstorage" }}
+{{- $ctx := dict "helm" . "appKey" "vmstorage" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
+  {{- $_ := set $ctx "extraLabels" $app.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
 spec:
   serviceName: {{ $fullname }}
   selector:

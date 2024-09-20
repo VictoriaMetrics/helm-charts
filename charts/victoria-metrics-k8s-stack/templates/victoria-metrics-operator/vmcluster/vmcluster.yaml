@@ -1,15 +1,17 @@
-{{- if .Values.vmcluster.enabled }}
+{{- $app := .Values.vmcluster }}
+{{- if $app.enabled }}
 {{- $ctx := dict "helm" . "appKey" "vmcluster" }}
 {{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMCluster
 metadata:
-  {{- with .Values.vmcluster.annotations }}
+  {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   {{- $_ := set $ctx "style" "managed" }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec: {{ include "vm.cluster.spec" $ctx | nindent 2 }}

@@ -1,11 +1,12 @@
 {{- if and .Values.vmalert.enabled .Values.vmalert.additionalNotifierConfigs }}
 {{- $ctx := dict "helm" . "appKey" "vmalert" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $fullname }}-additional-notifier
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 stringData:
   {{- $configs := .Values.vmalert.additionalNotifierConfigs.static_configs | default list -}}

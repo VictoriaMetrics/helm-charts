@@ -25,12 +25,13 @@
 
 {{- $ctx := dict "helm" . -}}
 {{- $fullname := include "vm.plain.fullname" $ctx -}}
+{{- $ns := include "vm.namespace" $ctx }}
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}

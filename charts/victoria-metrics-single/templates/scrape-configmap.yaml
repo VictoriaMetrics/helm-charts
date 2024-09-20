@@ -1,19 +1,19 @@
 {{- if and .Values.server.scrape.enabled (empty .Values.server.scrape.configMap) }}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ $fullname }}-scrapeconfig
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
-  scrape.yml: |
-    {{- range $k, $v := .Values.server.scrape.config }}
-    {{- if and (eq $k "scrape_configs") ($.Values.server.scrape.extraScrapeConfigs) }}
-    {{ dict $k (concat $v $.Values.server.scrape.extraScrapeConfigs) | toYaml | nindent 4 }}
-    {{- else }}
-    {{ dict $k $v | toYaml | nindent 4 }}
+  {{- $config := .Values.server.scrape.config }}
+  {{- with .Values.server.scrape.extraScrapeConfigs }}
+    {{- if hasKey "scrape_configs" $config }}
+      {{- $_ := set $config (concat $config.scrape_configs .) }}
     {{- end }}
-    {{- end }}
+  {{- end }}
+  scrape.yml: |{{ toYaml $config }}
 {{- end }}

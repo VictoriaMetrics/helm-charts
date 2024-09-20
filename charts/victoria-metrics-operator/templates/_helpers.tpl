@@ -22,8 +22,8 @@ Generate certificates for webhook
 {{- $Release := (.helm).Release | default .Release }}
 {{- $webhook := $Values.admissionWebhooks -}}
 {{- $tls := $webhook.tls -}}
-{{- $serviceName := (include "vm.plain.fullname" .) -}}
-{{- $secretName := (printf "%s-validation" $serviceName) -}}
+{{- $fullname := (include "vm.plain.fullname" .) -}}
+{{- $secretName := (printf "%s-validation" $fullname) -}}
 {{- $secret := lookup "v1" "Secret" (include "vm.namespace" .) $secretName -}}
 {{- if (and $tls.caCert $tls.cert $tls.key) -}}
 caCert: {{ $tls.caCert | b64enc }}
@@ -35,12 +35,12 @@ clientCert: {{ index $secret.data "tls.crt" }}
 clientKey: {{ index $secret.data "tls.key" }}
 {{- else -}}
 {{- $altNames := default list -}}
-{{- $namePrefix := (printf "%s.%s" $serviceName (include "vm.namespace" .)) -}}
+{{- $namePrefix := (printf "%s.%s" $fullname (include "vm.namespace" .)) -}}
 {{- $altNames = append $altNames $namePrefix -}}
 {{- $altNames = append $altNames (printf "%s.svc" $namePrefix) -}}
 {{- $altNames = append $altNames (printf "%s.svc.%s" $namePrefix $Values.global.cluster.dnsDomain) -}}
 {{- $ca := genCA "vm-operator-ca" 3650 -}}
-{{- $cert := genSignedCert $serviceName nil $altNames 3650 $ca -}}
+{{- $cert := genSignedCert $fullname nil $altNames 3650 $ca -}}
 caCert: {{ $ca.Cert | b64enc }}
 clientCert: {{ $cert.Cert | b64enc }}
 clientKey: {{ $cert.Key | b64enc }}

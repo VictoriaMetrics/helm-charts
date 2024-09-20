@@ -1,35 +1,34 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- include "vm.enterprise.only" . -}}
 
 {{- if not .Values.config.reader.datasource_url -}}
-{{ fail "Please provide url for reading data from VictoriaMetrics. You need to specify url in `config.reader.datasource_url` parameter in values.yaml"}}
+  {{ fail "Please provide url for reading data from VictoriaMetrics. You need to specify url in `config.reader.datasource_url` parameter in values.yaml"}}
 {{- end -}}
 
 {{- if not .Values.config.writer.datasource_url -}}
-{{ fail "Please provide url for writing data to VictoriaMetrics. You need to specify url in `config.writer.datasource_url` parameter  in values.yaml"}}
+  {{ fail "Please provide url for writing data to VictoriaMetrics. You need to specify url in `config.writer.datasource_url` parameter  in values.yaml"}}
 {{- end -}}
 
 {{- if and (not .Values.config.reader.queries) (not .Values.config.preset) -}}
-{{ fail "At least one query must be specified. You nee to add queries in `config.reader.queries` parameter in values.yaml"}}
+  {{ fail "At least one query must be specified. You nee to add queries in `config.reader.queries` parameter in values.yaml"}}
 {{- end -}}
 
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+---
 apiVersion: apps/v1
-{{- if .Values.persistentVolume.enabled }}
-kind: StatefulSet
-{{- else }}
-kind: Deployment
-{{- end }}
+kind: {{ ternary "StatefulSet" "Deployment" .Values.persistentVolume.enabled }}
 metadata:
-  namespace: {{ include "vm.namespace" . }}
-  name: {{ include "chart.fullname" . }}
+  namespace: {{ $ns }}
+  name: {{ $fullname }}
 spec:
   selector:
-    matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
       annotations:
         checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum }}
-      labels: {{ include "chart.selectorLabels" . | nindent 8 }}
+      labels: {{ include "vm.selectorLabels" $ctx | nindent 8 }}
     spec:
       {{- if .Values.podSecurityContext}}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.podSecurityContext "helm" .) | nindent 8 }}
@@ -39,7 +38,7 @@ spec:
       {{- end }}
       containers:
         - name: model
-          image: {{ include "vm.image" (merge $global (dict "app" .Values)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" .Values) }}
           workingDir: {{ .Values.containerWorkingDir }}
           {{- if (((.Values.config).monitoring).pull).enabled }}
           {{- with (((.Values.config).monitoring).pull).port }}
@@ -94,7 +93,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "chart.fullname" . }}
+            name: {{ $fullname }}
         {{- include "vm.license.volume" . | nindent 8 }}
         {{- if or (not .Values.persistentVolume.enabled) .Values.persistentVolume.existingClaim }}
         - name: models-dump
