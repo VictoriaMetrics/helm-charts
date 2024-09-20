@@ -193,18 +193,19 @@ The following tables lists the configurable parameters of the chart and their de
 
 Change the values according to the need of the environment in ``victoria-metrics-operator/values.yaml`` file.
 
-<table>
+<table class="helm-vars">
   <thead>
-    <th>Key</th>
-    <th>Type</th>
-    <th>Default</th>
-    <th>Description</th>
+    <th class="helm-vars-key">Key</th>
+    <th class="helm-vars-type">Type</th>
+    <th class="helm-vars-default">Default</th>
+    <th class="helm-vars-description">Description</th>
   </thead>
   <tbody>
     <tr>
       <td>admissionWebhooks</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 certManager:
     enabled: false
     issuer: {}
@@ -226,6 +227,7 @@ tls:
     caCert: null
     cert: null
     key: null
+</code>
 </pre>
 </td>
       <td><p>Configures resource validation</p>
@@ -234,9 +236,11 @@ tls:
     <tr>
       <td>admissionWebhooks.certManager</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 enabled: false
 issuer: {}
+</code>
 </pre>
 </td>
       <td><p>with keys: tls.key, tls.crt, ca.crt</p>
@@ -245,8 +249,10 @@ issuer: {}
     <tr>
       <td>admissionWebhooks.certManager.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td><p>Enables cert creation and injection by cert-manager.</p>
@@ -255,8 +261,10 @@ false
     <tr>
       <td>admissionWebhooks.certManager.issuer</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>If needed, provide own issuer. Operator will create self-signed if empty.</p>
@@ -265,8 +273,10 @@ false
     <tr>
       <td>admissionWebhooks.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td><p>Enables validation webhook.</p>
@@ -275,8 +285,10 @@ true
     <tr>
       <td>admissionWebhooks.policy</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 Fail
+</code>
 </pre>
 </td>
       <td><p>What to do in case, when operator not available to validate request.</p>
@@ -285,8 +297,10 @@ Fail
     <tr>
       <td>affinity</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Pod affinity</p>
@@ -295,8 +309,10 @@ Fail
     <tr>
       <td>annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Annotations to be added to the all resources</p>
@@ -305,8 +321,10 @@ Fail
     <tr>
       <td>crd.cleanup.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td><p>Tells helm to clean up all the vm resources under this release&rsquo;s namespace when uninstalling</p>
@@ -315,10 +333,12 @@ false
     <tr>
       <td>crd.cleanup.image</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 pullPolicy: IfNotPresent
 repository: bitnami/kubectl
 tag: ""
+</code>
 </pre>
 </td>
       <td><p>Image configuration for CRD cleanup Job</p>
@@ -327,8 +347,10 @@ tag: ""
     <tr>
       <td>crd.create</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td><p>with this option, if you remove this chart, all crd resources will be deleted with it.</p>
@@ -337,8 +359,10 @@ true
     <tr>
       <td>env</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>extra settings for the operator deployment. Full list <a href="https://docs.victoriametrics.com/operator/vars" target="_blank">here</a></p>
@@ -347,8 +371,10 @@ true
     <tr>
       <td>envFrom</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -356,8 +382,10 @@ true
     <tr>
       <td>extraArgs</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>operator container additional commandline arguments</p>
@@ -366,8 +394,10 @@ true
     <tr>
       <td>extraContainers</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -375,8 +405,10 @@ true
     <tr>
       <td>extraHostPathMounts</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Additional hostPath mounts</p>
@@ -385,8 +417,10 @@ true
     <tr>
       <td>extraLabels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Labels to be added to the all resources</p>
@@ -395,8 +429,10 @@ true
     <tr>
       <td>extraObjects</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Add extra specs dynamically to this chart</p>
@@ -405,8 +441,10 @@ true
     <tr>
       <td>extraVolumeMounts</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Extra Volume Mounts for the container</p>
@@ -415,8 +453,10 @@ true
     <tr>
       <td>extraVolumes</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Extra Volumes for the pod</p>
@@ -425,8 +465,10 @@ true
     <tr>
       <td>fullnameOverride</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Overrides the full name of server component</p>
@@ -435,8 +477,10 @@ true
     <tr>
       <td>global.cluster.dnsDomain</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 cluster.local
+</code>
 </pre>
 </td>
       <td></td>
@@ -444,8 +488,10 @@ cluster.local
     <tr>
       <td>global.image.registry</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -453,8 +499,10 @@ cluster.local
     <tr>
       <td>global.imagePullSecrets</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -462,12 +510,14 @@ cluster.local
     <tr>
       <td>image</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 pullPolicy: IfNotPresent
 registry: ""
 repository: victoriametrics/operator
 tag: ""
 variant: ""
+</code>
 </pre>
 </td>
       <td><p>operator image configuration</p>
@@ -476,8 +526,10 @@ variant: ""
     <tr>
       <td>image.pullPolicy</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 IfNotPresent
+</code>
 </pre>
 </td>
       <td><p>Image pull policy</p>
@@ -486,8 +538,10 @@ IfNotPresent
     <tr>
       <td>image.registry</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Image registry</p>
@@ -496,8 +550,10 @@ IfNotPresent
     <tr>
       <td>image.repository</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 victoriametrics/operator
+</code>
 </pre>
 </td>
       <td><p>Image repository</p>
@@ -506,8 +562,10 @@ victoriametrics/operator
     <tr>
       <td>image.tag</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Image tag override Chart.AppVersion</p>
@@ -516,8 +574,10 @@ victoriametrics/operator
     <tr>
       <td>imagePullSecrets</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Secret to pull images</p>
@@ -526,8 +586,10 @@ victoriametrics/operator
     <tr>
       <td>logLevel</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 info
+</code>
 </pre>
 </td>
       <td><p>possible values: info and error.</p>
@@ -536,8 +598,10 @@ info
     <tr>
       <td>nameOverride</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>VM operatror deployment name override</p>
@@ -546,8 +610,10 @@ info
     <tr>
       <td>nodeSelector</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
@@ -556,8 +622,10 @@ info
     <tr>
       <td>operator.disable_prometheus_converter</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td><p>By default, operator converts prometheus-operator objects.</p>
@@ -566,8 +634,10 @@ false
     <tr>
       <td>operator.enable_converter_ownership</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td><p>Enables ownership reference for converted prometheus-operator objects, it will remove corresponding victoria-metrics objects in case of deletion prometheus one.</p>
@@ -576,8 +646,10 @@ false
     <tr>
       <td>operator.prometheus_converter_add_argocd_ignore_annotations</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td><p>Compare-options and sync-options for prometheus objects converted by operator for properly use with ArgoCD</p>
@@ -586,8 +658,10 @@ false
     <tr>
       <td>operator.useCustomConfigReloader</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td><p>Enables custom config-reloader, bundled with operator. It should reduce  vmagent and vmauth config sync-time and make it predictable.</p>
@@ -596,9 +670,11 @@ false
     <tr>
       <td>podDisruptionBudget</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 enabled: false
 labels: {}
+</code>
 </pre>
 </td>
       <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more or check <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">these docs</a></p>
@@ -607,8 +683,10 @@ labels: {}
     <tr>
       <td>podLabels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -616,8 +694,10 @@ labels: {}
     <tr>
       <td>podSecurityContext</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -625,13 +705,15 @@ labels: {}
     <tr>
       <td>probe.liveness</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 failureThreshold: 3
 initialDelaySeconds: 5
 periodSeconds: 15
 tcpSocket:
     port: probe
 timeoutSeconds: 5
+</code>
 </pre>
 </td>
       <td><p>Liveness probe</p>
@@ -640,13 +722,15 @@ timeoutSeconds: 5
     <tr>
       <td>probe.readiness</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 failureThreshold: 3
 httpGet:
     port: probe
 initialDelaySeconds: 5
 periodSeconds: 15
 timeoutSeconds: 5
+</code>
 </pre>
 </td>
       <td><p>Readiness probe</p>
@@ -655,8 +739,10 @@ timeoutSeconds: 5
     <tr>
       <td>probe.startup</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Startup probe</p>
@@ -665,13 +751,15 @@ timeoutSeconds: 5
     <tr>
       <td>rbac.aggregatedClusterRoles</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 enabled: true
 labels:
     admin:
         rbac.authorization.k8s.io/aggregate-to-admin: "true"
     view:
         rbac.authorization.k8s.io/aggregate-to-view: "true"
+</code>
 </pre>
 </td>
       <td><p>create aggregated clusterRoles for CRD readonly and admin permissions</p>
@@ -680,11 +768,13 @@ labels:
     <tr>
       <td>rbac.aggregatedClusterRoles.labels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 admin:
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
 view:
     rbac.authorization.k8s.io/aggregate-to-view: "true"
+</code>
 </pre>
 </td>
       <td><p>labels attached to according clusterRole</p>
@@ -693,8 +783,10 @@ view:
     <tr>
       <td>rbac.create</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td><p>Specifies whether the RBAC resources should be created</p>
@@ -703,8 +795,10 @@ true
     <tr>
       <td>replicaCount</td>
       <td>int</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 1
+</code>
 </pre>
 </td>
       <td></td>
@@ -712,8 +806,10 @@ true
     <tr>
       <td>resources</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Resource object</p>
@@ -722,8 +818,10 @@ true
     <tr>
       <td>securityContext</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -731,8 +829,10 @@ true
     <tr>
       <td>service.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -740,8 +840,10 @@ true
     <tr>
       <td>service.clusterIP</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -749,8 +851,10 @@ true
     <tr>
       <td>service.externalIPs</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -758,8 +862,10 @@ true
     <tr>
       <td>service.externalTrafficPolicy</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -767,8 +873,10 @@ true
     <tr>
       <td>service.healthCheckNodePort</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -776,8 +884,10 @@ true
     <tr>
       <td>service.ipFamilies</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -785,8 +895,10 @@ true
     <tr>
       <td>service.ipFamilyPolicy</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -794,8 +906,10 @@ true
     <tr>
       <td>service.labels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -803,8 +917,10 @@ true
     <tr>
       <td>service.loadBalancerIP</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -812,8 +928,10 @@ true
     <tr>
       <td>service.loadBalancerSourceRanges</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -821,8 +939,10 @@ true
     <tr>
       <td>service.servicePort</td>
       <td>int</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 8080
+</code>
 </pre>
 </td>
       <td></td>
@@ -830,8 +950,10 @@ true
     <tr>
       <td>service.type</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ClusterIP
+</code>
 </pre>
 </td>
       <td></td>
@@ -839,8 +961,10 @@ ClusterIP
     <tr>
       <td>service.webhookPort</td>
       <td>int</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 9443
+</code>
 </pre>
 </td>
       <td></td>
@@ -848,8 +972,10 @@ ClusterIP
     <tr>
       <td>serviceAccount.create</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td><p>Specifies whether a service account should be created</p>
@@ -858,8 +984,10 @@ true
     <tr>
       <td>serviceAccount.name</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
@@ -868,7 +996,8 @@ true
     <tr>
       <td>serviceMonitor</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 annotations: {}
 basicAuth: {}
 enabled: false
@@ -878,6 +1007,7 @@ relabelings: []
 scheme: ""
 scrapeTimeout: ""
 tlsConfig: {}
+</code>
 </pre>
 </td>
       <td><p>configures monitoring with serviceScrape. VMServiceScrape must be pre-installed</p>
@@ -886,8 +1016,10 @@ tlsConfig: {}
     <tr>
       <td>tolerations</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Array of tolerations object. Spec is <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/" target="_blank">here</a></p>
@@ -896,8 +1028,10 @@ tlsConfig: {}
     <tr>
       <td>topologySpreadConstraints</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Pod Topology Spread Constraints. Spec is <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/" target="_blank">here</a></p>
@@ -906,8 +1040,10 @@ tlsConfig: {}
     <tr>
       <td>watchNamespaces</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>By default, the operator will watch all the namespaces If you want to override this behavior, specify the namespace. Operator supports multiple namespaces for watching.</p>

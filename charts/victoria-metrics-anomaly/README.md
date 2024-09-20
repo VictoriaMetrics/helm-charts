@@ -131,19 +131,21 @@ For more `vmanomaly` config parameters see https://docs.victoriametrics.com/anom
 
 Change the values according to the need of the environment in ``victoria-metrics-anomaly/values.yaml`` file.
 
-<table>
+<table class="helm-vars">
   <thead>
-    <th>Key</th>
-    <th>Type</th>
-    <th>Default</th>
-    <th>Description</th>
+    <th class="helm-vars-key">Key</th>
+    <th class="helm-vars-type">Type</th>
+    <th class="helm-vars-default">Default</th>
+    <th class="helm-vars-description">Description</th>
   </thead>
   <tbody>
     <tr>
       <td>affinity</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Affinity configurations</p>
@@ -152,8 +154,10 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr>
       <td>annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Annotations to be added to the deployment</p>
@@ -162,7 +166,8 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr>
       <td>config</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 models: {}
 preset: ""
 reader:
@@ -176,6 +181,7 @@ writer:
     class: vm
     datasource_url: ""
     tenant_id: ""
+</code>
 </pre>
 </td>
       <td><p>Full <a href="https://docs.victoriametrics.com/anomaly-detection/components/" target="_blank">vmanomaly config section</a></p>
@@ -184,8 +190,10 @@ writer:
     <tr>
       <td>config.models</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p><a href="https://docs.victoriametrics.com/anomaly-detection/components/models/" target="_blank">Models section</a></p>
@@ -194,8 +202,10 @@ writer:
     <tr>
       <td>config.preset</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Whether to use preset configuration. If not empty, preset name should be specified.</p>
@@ -204,12 +214,14 @@ writer:
     <tr>
       <td>config.reader</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 class: vm
 datasource_url: ""
 queries: {}
 sampling_period: 1m
 tenant_id: ""
+</code>
 </pre>
 </td>
       <td><p><a href="https://docs.victoriametrics.com/anomaly-detection/components/reader/" target="_blank">Reader section</a></p>
@@ -218,8 +230,10 @@ tenant_id: ""
     <tr>
       <td>config.reader.class</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 vm
+</code>
 </pre>
 </td>
       <td><p>Name of the class needed to enable reading from VictoriaMetrics or Prometheus. VmReader is the default option, if not specified.</p>
@@ -228,8 +242,10 @@ vm
     <tr>
       <td>config.reader.datasource_url</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Datasource URL address. Required for example <code>http://single-victoria-metrics-single-server.default.svc.cluster.local:8428</code> or <code>http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480</code></p>
@@ -238,8 +254,10 @@ vm
     <tr>
       <td>config.reader.queries</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Required. PromQL/MetricsQL query to select data in format: QUERY_ALIAS: &ldquo;QUERY&rdquo;. As accepted by &ldquo;/query_range?query=%s&rdquo;. See <a href="https://docs.victoriametrics.com/anomaly-detection/components/reader/#per-query-parameters" target="_blank">https://docs.victoriametrics.com/anomaly-detection/components/reader/#per-query-parameters</a> for more details.</p>
@@ -248,8 +266,10 @@ vm
     <tr>
       <td>config.reader.sampling_period</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 1m
+</code>
 </pre>
 </td>
       <td><p>Frequency of the points returned. Will be converted to <code>/query_range?step=%s</code> param (in seconds). <strong>Required</strong> since 1.9.0.</p>
@@ -258,8 +278,10 @@ vm
     <tr>
       <td>config.reader.tenant_id</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs</p>
@@ -268,8 +290,10 @@ vm
     <tr>
       <td>config.schedulers</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p><a href="https://docs.victoriametrics.com/anomaly-detection/components/scheduler/" target="_blank">Scheduler section</a></p>
@@ -278,10 +302,12 @@ vm
     <tr>
       <td>config.writer</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 class: vm
 datasource_url: ""
 tenant_id: ""
+</code>
 </pre>
 </td>
       <td><p><a href="https://docs.victoriametrics.com/anomaly-detection/components/writer/" target="_blank">Writer section</a></p>
@@ -290,8 +316,10 @@ tenant_id: ""
     <tr>
       <td>config.writer.class</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 vm
+</code>
 </pre>
 </td>
       <td><p>Name of the class needed to enable writing to VictoriaMetrics or Prometheus. VmWriter is the default option, if not specified.</p>
@@ -300,8 +328,10 @@ vm
     <tr>
       <td>config.writer.datasource_url</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Datasource URL address. Required for example <code>http://single-victoria-metrics-single-server.default.svc.cluster.local:8428</code> or <code>http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480</code></p>
@@ -310,8 +340,10 @@ vm
     <tr>
       <td>config.writer.tenant_id</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs</p>
@@ -320,8 +352,10 @@ vm
     <tr>
       <td>configMapAnnotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Annotations to be added to configMap</p>
@@ -330,8 +364,10 @@ vm
     <tr>
       <td>containerWorkingDir</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 /vmanomaly
+</code>
 </pre>
 </td>
       <td></td>
@@ -339,8 +375,10 @@ vm
     <tr>
       <td>emptyDir</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -348,8 +386,10 @@ vm
     <tr>
       <td>env</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Additional environment variables (ex.: secret tokens, flags)</p>
@@ -358,8 +398,10 @@ vm
     <tr>
       <td>envFrom</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -367,8 +409,10 @@ vm
     <tr>
       <td>extraArgs</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -376,8 +420,10 @@ vm
     <tr>
       <td>extraContainers</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -385,8 +431,10 @@ vm
     <tr>
       <td>extraHostPathMounts</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Additional hostPath mounts</p>
@@ -395,8 +443,10 @@ vm
     <tr>
       <td>extraVolumeMounts</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Extra Volume Mounts for the container</p>
@@ -405,8 +455,10 @@ vm
     <tr>
       <td>extraVolumes</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Extra Volumes for the pod</p>
@@ -415,8 +467,10 @@ vm
     <tr>
       <td>fullnameOverride</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -424,8 +478,10 @@ vm
     <tr>
       <td>global.compatibility.openshift.adaptSecurityContext</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 auto
+</code>
 </pre>
 </td>
       <td></td>
@@ -433,8 +489,10 @@ auto
     <tr>
       <td>global.image.registry</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -442,8 +500,10 @@ auto
     <tr>
       <td>global.imagePullSecrets</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -451,8 +511,10 @@ auto
     <tr>
       <td>image.pullPolicy</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 IfNotPresent
+</code>
 </pre>
 </td>
       <td><p>Pull policy of Docker image</p>
@@ -461,8 +523,10 @@ IfNotPresent
     <tr>
       <td>image.registry</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Victoria Metrics anomaly Docker registry</p>
@@ -471,8 +535,10 @@ IfNotPresent
     <tr>
       <td>image.repository</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 victoriametrics/vmanomaly
+</code>
 </pre>
 </td>
       <td><p>Victoria Metrics anomaly Docker repository and image name</p>
@@ -481,8 +547,10 @@ victoriametrics/vmanomaly
     <tr>
       <td>image.tag</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 v1.15.9
+</code>
 </pre>
 </td>
       <td><p>Tag of Docker image</p>
@@ -491,8 +559,10 @@ v1.15.9
     <tr>
       <td>imagePullSecrets</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -500,11 +570,13 @@ v1.15.9
     <tr>
       <td>license</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 key: ""
 secret:
     key: ""
     name: ""
+</code>
 </pre>
 </td>
       <td><p>License key configuration for vmanomaly. See <a href="https://docs.victoriametrics.com/vmanomaly#licensing" target="_blank">docs</a> Required starting from v1.5.0.</p>
@@ -513,8 +585,10 @@ secret:
     <tr>
       <td>license.key</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>License key for vmanomaly</p>
@@ -523,9 +597,11 @@ secret:
     <tr>
       <td>license.secret</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 key: ""
 name: ""
+</code>
 </pre>
 </td>
       <td><p>Use existing secret with license key for vmanomaly</p>
@@ -534,8 +610,10 @@ name: ""
     <tr>
       <td>license.secret.key</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Key in secret with license key</p>
@@ -544,8 +622,10 @@ name: ""
     <tr>
       <td>license.secret.name</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Existing secret name</p>
@@ -554,8 +634,10 @@ name: ""
     <tr>
       <td>nameOverride</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -563,8 +645,10 @@ name: ""
     <tr>
       <td>nodeSelector</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>NodeSelector configurations. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
@@ -573,7 +657,8 @@ name: ""
     <tr>
       <td>persistentVolume</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 accessModes:
     - ReadWriteOnce
 annotations: {}
@@ -582,6 +667,7 @@ existingClaim: ""
 matchLabels: {}
 size: 1Gi
 storageClassName: ""
+</code>
 </pre>
 </td>
       <td><p>Persistence to store models on disk. Available starting from v1.13.0</p>
@@ -590,8 +676,10 @@ storageClassName: ""
     <tr>
       <td>persistentVolume.accessModes</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 - ReadWriteOnce
+</code>
 </pre>
 </td>
       <td><p>Array of access modes. Must match those of existing PV or dynamic provisioner. Details are <a href="http://kubernetes.io/docs/user-guide/persistent-volumes/" target="_blank">here</a></p>
@@ -600,8 +688,10 @@ storageClassName: ""
     <tr>
       <td>persistentVolume.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Persistant volume annotations</p>
@@ -610,8 +700,10 @@ storageClassName: ""
     <tr>
       <td>persistentVolume.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td><p>Create/use Persistent Volume Claim for models dump.</p>
@@ -620,8 +712,10 @@ false
     <tr>
       <td>persistentVolume.existingClaim</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Existing Claim name. If defined, PVC must be created manually before volume will be bound</p>
@@ -630,8 +724,10 @@ false
     <tr>
       <td>persistentVolume.matchLabels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Bind Persistent Volume by labels. Must match all labels of targeted PV.</p>
@@ -640,8 +736,10 @@ false
     <tr>
       <td>persistentVolume.size</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 1Gi
+</code>
 </pre>
 </td>
       <td><p>Size of the volume. Should be calculated based on the metrics you send and retention policy you set.</p>
@@ -650,8 +748,10 @@ false
     <tr>
       <td>persistentVolume.storageClassName</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically</p>
@@ -660,8 +760,10 @@ false
     <tr>
       <td>podAnnotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Annotations to be added to pod</p>
@@ -670,10 +772,12 @@ false
     <tr>
       <td>podDisruptionBudget</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 enabled: false
 labels: {}
 minAvailable: 1
+</code>
 </pre>
 </td>
       <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more. Details are <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">here</a></p>
@@ -682,8 +786,10 @@ minAvailable: 1
     <tr>
       <td>podMonitor.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -691,8 +797,10 @@ minAvailable: 1
     <tr>
       <td>podMonitor.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td></td>
@@ -700,8 +808,10 @@ false
     <tr>
       <td>podMonitor.extraLabels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -709,8 +819,10 @@ false
     <tr>
       <td>podSecurityContext.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td></td>
@@ -718,8 +830,10 @@ true
     <tr>
       <td>resources</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -727,11 +841,13 @@ true
     <tr>
       <td>securityContext</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 enabled: true
 runAsGroup: 1000
 runAsNonRoot: true
 runAsUser: 1000
+</code>
 </pre>
 </td>
       <td><p>Ref: <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">https://kubernetes.io/docs/tasks/configure-pod-container/security-context/</a></p>
@@ -740,8 +856,10 @@ runAsUser: 1000
     <tr>
       <td>serviceAccount.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Annotations to add to the service account</p>
@@ -750,8 +868,10 @@ runAsUser: 1000
     <tr>
       <td>serviceAccount.create</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td><p>Specifies whether a service account should be created</p>
@@ -760,8 +880,10 @@ true
     <tr>
       <td>serviceAccount.name</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 null
+</code>
 </pre>
 </td>
       <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
@@ -770,8 +892,10 @@ null
     <tr>
       <td>tolerations</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Tolerations configurations. Details are <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/" target="_blank">here</a></p>

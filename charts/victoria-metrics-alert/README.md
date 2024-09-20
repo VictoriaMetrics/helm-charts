@@ -125,19 +125,21 @@ The following tables lists the configurable parameters of the chart and their de
 
 Change the values according to the need of the environment in ``victoria-metrics-alert/values.yaml`` file.
 
-<table>
+<table class="helm-vars">
   <thead>
-    <th>Key</th>
-    <th>Type</th>
-    <th>Default</th>
-    <th>Description</th>
+    <th class="helm-vars-key">Key</th>
+    <th class="helm-vars-type">Type</th>
+    <th class="helm-vars-default">Default</th>
+    <th class="helm-vars-description">Description</th>
   </thead>
   <tbody>
     <tr>
       <td>alertmanager.baseURL</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>external URL, that alertmanager will expose to receivers</p>
@@ -146,8 +148,10 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr>
       <td>alertmanager.baseURLPrefix</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>external URL Prefix, Prefix for the internal routes of web endpoints</p>
@@ -156,8 +160,10 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr>
       <td>alertmanager.config.global.resolve_timeout</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 5m
+</code>
 </pre>
 </td>
       <td></td>
@@ -165,8 +171,10 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr>
       <td>alertmanager.config.receivers[0].name</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 devnull
+</code>
 </pre>
 </td>
       <td></td>
@@ -174,8 +182,10 @@ devnull
     <tr>
       <td>alertmanager.config.route.group_by[0]</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 alertname
+</code>
 </pre>
 </td>
       <td></td>
@@ -183,8 +193,10 @@ alertname
     <tr>
       <td>alertmanager.config.route.group_interval</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 10s
+</code>
 </pre>
 </td>
       <td></td>
@@ -192,8 +204,10 @@ alertname
     <tr>
       <td>alertmanager.config.route.group_wait</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 30s
+</code>
 </pre>
 </td>
       <td></td>
@@ -201,8 +215,10 @@ alertname
     <tr>
       <td>alertmanager.config.route.receiver</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 devnull
+</code>
 </pre>
 </td>
       <td></td>
@@ -210,8 +226,10 @@ devnull
     <tr>
       <td>alertmanager.config.route.repeat_interval</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 24h
+</code>
 </pre>
 </td>
       <td></td>
@@ -219,8 +237,10 @@ devnull
     <tr>
       <td>alertmanager.configMap</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>use existing configmap if specified otherwise .config values will be used</p>
@@ -229,8 +249,10 @@ devnull
     <tr>
       <td>alertmanager.emptyDir</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -238,8 +260,10 @@ devnull
     <tr>
       <td>alertmanager.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td></td>
@@ -247,8 +271,10 @@ false
     <tr>
       <td>alertmanager.envFrom</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -256,8 +282,10 @@ false
     <tr>
       <td>alertmanager.extraArgs</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -265,8 +293,10 @@ false
     <tr>
       <td>alertmanager.extraContainers</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -274,8 +304,10 @@ false
     <tr>
       <td>alertmanager.extraHostPathMounts</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Additional hostPath mounts</p>
@@ -284,8 +316,10 @@ false
     <tr>
       <td>alertmanager.extraVolumeMounts</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Extra Volume Mounts for the container</p>
@@ -294,8 +328,10 @@ false
     <tr>
       <td>alertmanager.extraVolumes</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Extra Volumes for the pod</p>
@@ -304,10 +340,12 @@ false
     <tr>
       <td>alertmanager.image</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 registry: ""
 repository: prom/alertmanager
 tag: v0.25.0
+</code>
 </pre>
 </td>
       <td><p>alertmanager image configuration</p>
@@ -316,8 +354,10 @@ tag: v0.25.0
     <tr>
       <td>alertmanager.imagePullSecrets</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -325,8 +365,10 @@ tag: v0.25.0
     <tr>
       <td>alertmanager.ingress.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -334,8 +376,10 @@ tag: v0.25.0
     <tr>
       <td>alertmanager.ingress.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td></td>
@@ -343,8 +387,10 @@ false
     <tr>
       <td>alertmanager.ingress.extraLabels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -352,8 +398,10 @@ false
     <tr>
       <td>alertmanager.ingress.hosts</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -361,8 +409,10 @@ false
     <tr>
       <td>alertmanager.ingress.pathType</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 Prefix
+</code>
 </pre>
 </td>
       <td><p>pathType is only for k8s &gt;= 1.1=</p>
@@ -371,8 +421,10 @@ Prefix
     <tr>
       <td>alertmanager.ingress.tls</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -380,8 +432,10 @@ Prefix
     <tr>
       <td>alertmanager.initContainers</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Additional initContainers to initialize the pod</p>
@@ -390,8 +444,10 @@ Prefix
     <tr>
       <td>alertmanager.listenAddress</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 0.0.0.0:9093
+</code>
 </pre>
 </td>
       <td></td>
@@ -399,8 +455,10 @@ Prefix
     <tr>
       <td>alertmanager.nodeSelector</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -408,8 +466,10 @@ Prefix
     <tr>
       <td>alertmanager.persistentVolume.accessModes</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 - ReadWriteOnce
+</code>
 </pre>
 </td>
       <td><p>Array of access modes. Must match those of existing PV or dynamic provisioner. Details are <a href="http://kubernetes.io/docs/user-guide/persistent-volumes/" target="_blank">here</a></p>
@@ -418,8 +478,10 @@ Prefix
     <tr>
       <td>alertmanager.persistentVolume.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Persistant volume annotations</p>
@@ -428,8 +490,10 @@ Prefix
     <tr>
       <td>alertmanager.persistentVolume.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td><p>Create/use Persistent Volume Claim for alertmanager component. Empty dir if false</p>
@@ -438,8 +502,10 @@ false
     <tr>
       <td>alertmanager.persistentVolume.existingClaim</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Existing Claim name. If defined, PVC must be created manually before volume will be bound</p>
@@ -448,8 +514,10 @@ false
     <tr>
       <td>alertmanager.persistentVolume.mountPath</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 /data
+</code>
 </pre>
 </td>
       <td><p>Mount path. Alertmanager data Persistent Volume mount root path.</p>
@@ -458,8 +526,10 @@ false
     <tr>
       <td>alertmanager.persistentVolume.size</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 50Mi
+</code>
 </pre>
 </td>
       <td><p>Size of the volume. Better to set the same as resource limit memory property.</p>
@@ -468,8 +538,10 @@ false
     <tr>
       <td>alertmanager.persistentVolume.storageClassName</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>StorageClass to use for persistent volume. Requires alertmanager.persistentVolume.enabled: true. If defined, PVC created automatically</p>
@@ -478,8 +550,10 @@ false
     <tr>
       <td>alertmanager.persistentVolume.subPath</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Mount subpath</p>
@@ -488,8 +562,10 @@ false
     <tr>
       <td>alertmanager.podMetadata.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -497,8 +573,10 @@ false
     <tr>
       <td>alertmanager.podMetadata.labels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -506,8 +584,10 @@ false
     <tr>
       <td>alertmanager.podSecurityContext.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td></td>
@@ -515,8 +595,10 @@ false
     <tr>
       <td>alertmanager.priorityClassName</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -524,10 +606,12 @@ false
     <tr>
       <td>alertmanager.probe.liveness</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 httpGet:
     path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/healthy'
     port: web
+</code>
 </pre>
 </td>
       <td><p>liveness probe</p>
@@ -536,10 +620,12 @@ httpGet:
     <tr>
       <td>alertmanager.probe.readiness</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 httpGet:
     path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready'
     port: web
+</code>
 </pre>
 </td>
       <td><p>readiness probe</p>
@@ -548,10 +634,12 @@ httpGet:
     <tr>
       <td>alertmanager.probe.startup</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 httpGet:
     path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready'
     port: web
+</code>
 </pre>
 </td>
       <td><p>startup probe</p>
@@ -560,8 +648,10 @@ httpGet:
     <tr>
       <td>alertmanager.resources</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -569,8 +659,10 @@ httpGet:
     <tr>
       <td>alertmanager.retention</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 120h
+</code>
 </pre>
 </td>
       <td></td>
@@ -578,8 +670,10 @@ httpGet:
     <tr>
       <td>alertmanager.securityContext.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td></td>
@@ -587,8 +681,10 @@ false
     <tr>
       <td>alertmanager.service.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -596,8 +692,10 @@ false
     <tr>
       <td>alertmanager.service.clusterIP</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -605,8 +703,10 @@ false
     <tr>
       <td>alertmanager.service.externalIPs</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Ref: <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">https://kubernetes.io/docs/user-guide/services/#external-ips</a></p>
@@ -615,8 +715,10 @@ false
     <tr>
       <td>alertmanager.service.externalTrafficPolicy</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Ref: <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip</a></p>
@@ -625,8 +727,10 @@ false
     <tr>
       <td>alertmanager.service.healthCheckNodePort</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -634,8 +738,10 @@ false
     <tr>
       <td>alertmanager.service.ipFamilies</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -643,8 +749,10 @@ false
     <tr>
       <td>alertmanager.service.ipFamilyPolicy</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -652,8 +760,10 @@ false
     <tr>
       <td>alertmanager.service.labels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -661,8 +771,10 @@ false
     <tr>
       <td>alertmanager.service.loadBalancerIP</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -670,8 +782,10 @@ false
     <tr>
       <td>alertmanager.service.loadBalancerSourceRanges</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -679,8 +793,10 @@ false
     <tr>
       <td>alertmanager.service.nodePort</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>if you want to force a specific nodePort. Must be use with service.type=NodePort</p>
@@ -689,8 +805,10 @@ false
     <tr>
       <td>alertmanager.service.port</td>
       <td>int</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 9093
+</code>
 </pre>
 </td>
       <td></td>
@@ -698,8 +816,10 @@ false
     <tr>
       <td>alertmanager.service.servicePort</td>
       <td>int</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 8880
+</code>
 </pre>
 </td>
       <td></td>
@@ -707,8 +827,10 @@ false
     <tr>
       <td>alertmanager.service.type</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ClusterIP
+</code>
 </pre>
 </td>
       <td></td>
@@ -716,8 +838,10 @@ ClusterIP
     <tr>
       <td>alertmanager.templates</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -725,8 +849,10 @@ ClusterIP
     <tr>
       <td>alertmanager.tolerations</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -734,8 +860,10 @@ ClusterIP
     <tr>
       <td>extraObjects</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Add extra specs dynamically to this chart</p>
@@ -744,8 +872,10 @@ ClusterIP
     <tr>
       <td>global.compatibility.openshift.adaptSecurityContext</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 auto
+</code>
 </pre>
 </td>
       <td></td>
@@ -753,8 +883,10 @@ auto
     <tr>
       <td>global.image.registry</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -762,8 +894,10 @@ auto
     <tr>
       <td>global.imagePullSecrets</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -771,11 +905,13 @@ auto
     <tr>
       <td>license</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 key: ""
 secret:
     key: ""
     name: ""
+</code>
 </pre>
 </td>
       <td><p>Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - <a href="https://docs.victoriametrics.com/enterprise" target="_blank">https://docs.victoriametrics.com/enterprise</a>, for more information, visit <a href="https://victoriametrics.com/products/enterprise/" target="_blank">https://victoriametrics.com/products/enterprise/</a> . To request a trial license, go to <a href="https://victoriametrics.com/products/enterprise/trial/" target="_blank">https://victoriametrics.com/products/enterprise/trial/</a> Supported starting from VictoriaMetrics v1.94.0</p>
@@ -784,8 +920,10 @@ secret:
     <tr>
       <td>license.key</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>License key</p>
@@ -794,9 +932,11 @@ secret:
     <tr>
       <td>license.secret</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 key: ""
 name: ""
+</code>
 </pre>
 </td>
       <td><p>Use existing secret with license key</p>
@@ -805,8 +945,10 @@ name: ""
     <tr>
       <td>license.secret.key</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Key in secret with license key</p>
@@ -815,8 +957,10 @@ name: ""
     <tr>
       <td>license.secret.name</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Existing secret name</p>
@@ -825,8 +969,10 @@ name: ""
     <tr>
       <td>rbac.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -834,8 +980,10 @@ name: ""
     <tr>
       <td>rbac.create</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td></td>
@@ -843,8 +991,10 @@ true
     <tr>
       <td>rbac.extraLabels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -852,8 +1002,10 @@ true
     <tr>
       <td>rbac.namespaced</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td></td>
@@ -861,8 +1013,10 @@ false
     <tr>
       <td>server.affinity</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -870,8 +1024,10 @@ false
     <tr>
       <td>server.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Annotations to be added to the deployment</p>
@@ -880,8 +1036,10 @@ false
     <tr>
       <td>server.config.alerts.groups</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -889,8 +1047,10 @@ false
     <tr>
       <td>server.configMap</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>vmalert alert rules configuration configuration: use existing configmap if specified otherwise .config values will be used</p>
@@ -899,7 +1059,8 @@ false
     <tr>
       <td>server.datasource</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 basicAuth:
     password: ""
     username: ""
@@ -907,6 +1068,7 @@ bearer:
     token: ""
     tokenFile: ""
 url: ""
+</code>
 </pre>
 </td>
       <td><p>vmalert reads metrics from source, next section represents its configuration. It can be any service which supports MetricsQL or PromQL.</p>
@@ -915,9 +1077,11 @@ url: ""
     <tr>
       <td>server.datasource.basicAuth</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 password: ""
 username: ""
+</code>
 </pre>
 </td>
       <td><p>Basic auth for datasource</p>
@@ -926,8 +1090,10 @@ username: ""
     <tr>
       <td>server.datasource.bearer.token</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Token with Bearer token. You can use one of token or tokenFile. You don&rsquo;t need to add &ldquo;Bearer&rdquo; prefix string</p>
@@ -936,8 +1102,10 @@ username: ""
     <tr>
       <td>server.datasource.bearer.tokenFile</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Token Auth file with Bearer token. You can use one of token or tokenFile</p>
@@ -946,8 +1114,10 @@ username: ""
     <tr>
       <td>server.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td></td>
@@ -955,8 +1125,10 @@ true
     <tr>
       <td>server.env</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Additional environment variables (ex.: secret tokens, flags) <a href="https://docs.victoriametrics.com/#environment-variables" target="_blank">https://docs.victoriametrics.com/#environment-variables</a></p>
@@ -965,8 +1137,10 @@ true
     <tr>
       <td>server.envFrom</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -974,8 +1148,10 @@ true
     <tr>
       <td>server.extraArgs."envflag.enable"</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 "true"
+</code>
 </pre>
 </td>
       <td></td>
@@ -983,8 +1159,10 @@ true
     <tr>
       <td>server.extraArgs."envflag.prefix"</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 VM_
+</code>
 </pre>
 </td>
       <td></td>
@@ -992,8 +1170,10 @@ VM_
     <tr>
       <td>server.extraArgs.loggerFormat</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 json
+</code>
 </pre>
 </td>
       <td></td>
@@ -1001,8 +1181,10 @@ json
     <tr>
       <td>server.extraContainers</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Additional containers to run in the same pod</p>
@@ -1011,8 +1193,10 @@ json
     <tr>
       <td>server.extraHostPathMounts</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Additional hostPath mounts</p>
@@ -1021,8 +1205,10 @@ json
     <tr>
       <td>server.extraVolumeMounts</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Extra Volume Mounts for the container</p>
@@ -1031,8 +1217,10 @@ json
     <tr>
       <td>server.extraVolumes</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Extra Volumes for the pod</p>
@@ -1041,8 +1229,10 @@ json
     <tr>
       <td>server.fullnameOverride</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -1050,12 +1240,14 @@ json
     <tr>
       <td>server.image</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 pullPolicy: IfNotPresent
 registry: ""
 repository: victoriametrics/vmalert
 tag: ""
 variant: ""
+</code>
 </pre>
 </td>
       <td><p>vmalert image configuration</p>
@@ -1064,8 +1256,10 @@ variant: ""
     <tr>
       <td>server.imagePullSecrets</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -1073,8 +1267,10 @@ variant: ""
     <tr>
       <td>server.ingress.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -1082,8 +1278,10 @@ variant: ""
     <tr>
       <td>server.ingress.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td></td>
@@ -1091,8 +1289,10 @@ false
     <tr>
       <td>server.ingress.extraLabels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -1100,8 +1300,10 @@ false
     <tr>
       <td>server.ingress.hosts</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -1109,8 +1311,10 @@ false
     <tr>
       <td>server.ingress.pathType</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 Prefix
+</code>
 </pre>
 </td>
       <td><p>pathType is only for k8s &gt;= 1.1=</p>
@@ -1119,8 +1323,10 @@ Prefix
     <tr>
       <td>server.ingress.tls</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -1128,8 +1334,10 @@ Prefix
     <tr>
       <td>server.initContainers</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Additional initContainers to initialize the pod</p>
@@ -1138,8 +1346,10 @@ Prefix
     <tr>
       <td>server.labels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>labels to be added to the deployment</p>
@@ -1148,8 +1358,10 @@ Prefix
     <tr>
       <td>server.minReadySeconds</td>
       <td>int</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 0
+</code>
 </pre>
 </td>
       <td><p>specifies the minimum number of seconds for which a newly created Pod should be ready without any of its containers crashing/terminating 0 is the standard k8s default</p>
@@ -1158,8 +1370,10 @@ Prefix
     <tr>
       <td>server.name</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 server
+</code>
 </pre>
 </td>
       <td></td>
@@ -1167,8 +1381,10 @@ server
     <tr>
       <td>server.nameOverride</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -1176,8 +1392,10 @@ server
     <tr>
       <td>server.nodeSelector</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -1185,7 +1403,8 @@ server
     <tr>
       <td>server.notifier</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 alertmanager:
     basicAuth:
         password: ""
@@ -1194,6 +1413,7 @@ alertmanager:
         token: ""
         tokenFile: ""
     url: ""
+</code>
 </pre>
 </td>
       <td><p>Notifier to use for alerts. Multiple notifiers can be enabled by using <code>notifiers</code> section</p>
@@ -1202,9 +1422,11 @@ alertmanager:
     <tr>
       <td>server.notifier.alertmanager.basicAuth</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 password: ""
 username: ""
+</code>
 </pre>
 </td>
       <td><p>Basic auth for alertmanager</p>
@@ -1213,8 +1435,10 @@ username: ""
     <tr>
       <td>server.notifier.alertmanager.bearer.token</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Token with Bearer token. You can use one of token or tokenFile. You don&rsquo;t need to add &ldquo;Bearer&rdquo; prefix string</p>
@@ -1223,8 +1447,10 @@ username: ""
     <tr>
       <td>server.notifier.alertmanager.bearer.tokenFile</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Token Auth file with Bearer token. You can use one of token or tokenFile</p>
@@ -1233,8 +1459,10 @@ username: ""
     <tr>
       <td>server.notifiers</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Additional notifiers to use for alerts</p>
@@ -1243,8 +1471,10 @@ username: ""
     <tr>
       <td>server.podAnnotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Annotations to be added to pod</p>
@@ -1253,9 +1483,11 @@ username: ""
     <tr>
       <td>server.podDisruptionBudget</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 enabled: false
 labels: {}
+</code>
 </pre>
 </td>
       <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more. Or check <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">docs</a></p>
@@ -1264,8 +1496,10 @@ labels: {}
     <tr>
       <td>server.podLabels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -1273,8 +1507,10 @@ labels: {}
     <tr>
       <td>server.podSecurityContext.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td></td>
@@ -1282,8 +1518,10 @@ true
     <tr>
       <td>server.priorityClassName</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -1291,12 +1529,14 @@ true
     <tr>
       <td>server.probe.liveness</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 failureThreshold: 3
 initialDelaySeconds: 5
 periodSeconds: 15
 tcpSocket: {}
 timeoutSeconds: 5
+</code>
 </pre>
 </td>
       <td><p>liveness probe</p>
@@ -1305,12 +1545,14 @@ timeoutSeconds: 5
     <tr>
       <td>server.probe.readiness</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 failureThreshold: 3
 httpGet: {}
 initialDelaySeconds: 5
 periodSeconds: 15
 timeoutSeconds: 5
+</code>
 </pre>
 </td>
       <td><p>readiness probe</p>
@@ -1319,8 +1561,10 @@ timeoutSeconds: 5
     <tr>
       <td>server.probe.startup</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>startup probe</p>
@@ -1329,9 +1573,11 @@ timeoutSeconds: 5
     <tr>
       <td>server.remote.read.basicAuth</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 password: ""
 username: ""
+</code>
 </pre>
 </td>
       <td><p>Basic auth for remote read</p>
@@ -1340,8 +1586,10 @@ username: ""
     <tr>
       <td>server.remote.read.bearer.token</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Token with Bearer token. You can use one of token or tokenFile. You don&rsquo;t need to add &ldquo;Bearer&rdquo; prefix string</p>
@@ -1350,8 +1598,10 @@ username: ""
     <tr>
       <td>server.remote.read.bearer.tokenFile</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Token Auth file with Bearer token. You can use one of token or tokenFile</p>
@@ -1360,8 +1610,10 @@ username: ""
     <tr>
       <td>server.remote.read.url</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -1369,9 +1621,11 @@ username: ""
     <tr>
       <td>server.remote.write.basicAuth</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 password: ""
 username: ""
+</code>
 </pre>
 </td>
       <td><p>Basic auth for remote write</p>
@@ -1380,9 +1634,11 @@ username: ""
     <tr>
       <td>server.remote.write.bearer</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 token: ""
 tokenFile: ""
+</code>
 </pre>
 </td>
       <td><p>Auth based on Bearer token for remote write</p>
@@ -1391,8 +1647,10 @@ tokenFile: ""
     <tr>
       <td>server.remote.write.bearer.token</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Token with Bearer token. You can use one of token or tokenFile. You don&rsquo;t need to add &ldquo;Bearer&rdquo; prefix string</p>
@@ -1401,8 +1659,10 @@ tokenFile: ""
     <tr>
       <td>server.remote.write.bearer.tokenFile</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td><p>Token Auth file with Bearer token. You can use one of token or tokenFile</p>
@@ -1411,8 +1671,10 @@ tokenFile: ""
     <tr>
       <td>server.remote.write.url</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -1420,8 +1682,10 @@ tokenFile: ""
     <tr>
       <td>server.replicaCount</td>
       <td>int</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 1
+</code>
 </pre>
 </td>
       <td></td>
@@ -1429,8 +1693,10 @@ tokenFile: ""
     <tr>
       <td>server.resources</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -1438,8 +1704,10 @@ tokenFile: ""
     <tr>
       <td>server.securityContext.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td></td>
@@ -1447,8 +1715,10 @@ true
     <tr>
       <td>server.service.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -1456,8 +1726,10 @@ true
     <tr>
       <td>server.service.clusterIP</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -1465,8 +1737,10 @@ true
     <tr>
       <td>server.service.externalIPs</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -1474,8 +1748,10 @@ true
     <tr>
       <td>server.service.externalTrafficPolicy</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -1483,8 +1759,10 @@ true
     <tr>
       <td>server.service.healthCheckNodePort</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -1492,8 +1770,10 @@ true
     <tr>
       <td>server.service.ipFamilies</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -1501,8 +1781,10 @@ true
     <tr>
       <td>server.service.ipFamilyPolicy</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -1510,8 +1792,10 @@ true
     <tr>
       <td>server.service.labels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td></td>
@@ -1519,8 +1803,10 @@ true
     <tr>
       <td>server.service.loadBalancerIP</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ""
+</code>
 </pre>
 </td>
       <td></td>
@@ -1528,8 +1814,10 @@ true
     <tr>
       <td>server.service.loadBalancerSourceRanges</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -1537,8 +1825,10 @@ true
     <tr>
       <td>server.service.servicePort</td>
       <td>int</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 8880
+</code>
 </pre>
 </td>
       <td></td>
@@ -1546,8 +1836,10 @@ true
     <tr>
       <td>server.service.type</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 ClusterIP
+</code>
 </pre>
 </td>
       <td></td>
@@ -1555,11 +1847,13 @@ ClusterIP
     <tr>
       <td>server.strategy</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 rollingUpdate:
     maxSurge: 25%
     maxUnavailable: 25%
 type: RollingUpdate
+</code>
 </pre>
 </td>
       <td><p>deployment strategy, set to standard k8s default</p>
@@ -1568,8 +1862,10 @@ type: RollingUpdate
     <tr>
       <td>server.tolerations</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td></td>
@@ -1577,8 +1873,10 @@ type: RollingUpdate
     <tr>
       <td>server.verticalPodAutoscaler</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 enabled: false
+</code>
 </pre>
 </td>
       <td><p>Vertical Pod Autoscaler</p>
@@ -1587,8 +1885,10 @@ enabled: false
     <tr>
       <td>server.verticalPodAutoscaler.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td><p>Use VPA for vmalert</p>
@@ -1597,8 +1897,10 @@ false
     <tr>
       <td>serviceAccount.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Annotations to add to the service account</p>
@@ -1607,8 +1909,10 @@ false
     <tr>
       <td>serviceAccount.automountToken</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td><p>mount API token to pod directly</p>
@@ -1617,8 +1921,10 @@ true
     <tr>
       <td>serviceAccount.create</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 true
+</code>
 </pre>
 </td>
       <td><p>Specifies whether a service account should be created</p>
@@ -1627,8 +1933,10 @@ true
     <tr>
       <td>serviceAccount.name</td>
       <td>string</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 null
+</code>
 </pre>
 </td>
       <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
@@ -1637,8 +1945,10 @@ null
     <tr>
       <td>serviceMonitor.annotations</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Service Monitor annotations</p>
@@ -1647,8 +1957,10 @@ null
     <tr>
       <td>serviceMonitor.basicAuth</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Basic auth params for Service Monitor</p>
@@ -1657,8 +1969,10 @@ null
     <tr>
       <td>serviceMonitor.enabled</td>
       <td>bool</td>
-      <td><pre lang="">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">
 false
+</code>
 </pre>
 </td>
       <td><p>Enable deployment of Service Monitor for server component. This is Prometheus operator object</p>
@@ -1667,8 +1981,10 @@ false
     <tr>
       <td>serviceMonitor.extraLabels</td>
       <td>object</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 {}
+</code>
 </pre>
 </td>
       <td><p>Service Monitor labels</p>
@@ -1677,8 +1993,10 @@ false
     <tr>
       <td>serviceMonitor.metricRelabelings</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Service Monitor metricRelabelings</p>
@@ -1687,8 +2005,10 @@ false
     <tr>
       <td>serviceMonitor.relabelings</td>
       <td>list</td>
-      <td><pre lang="plaintext">
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">
 []
+</code>
 </pre>
 </td>
       <td><p>Service Monitor relabelings</p>

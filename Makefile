@@ -1,5 +1,5 @@
 HELM_IMAGE = alpine/helm:3.15.3
-HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.15-fork
+HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.14.144
 CT_IMAGE = quay.io/helmpack/chart-testing:v3.11.0
 HELM?=helm-docker
 CT?=ct-docker
@@ -116,7 +116,7 @@ docs-image:
 		-t vmdocs \
 		$(WORKDIR)/vmdocs
 
-docs-debug: docs-image gen-docs
+docs-debug: gen-docs docs-image
 	$(CONTAINER_TOOL) run \
 		--rm \
 		--name vmdocs \
@@ -124,3 +124,15 @@ docs-debug: docs-image gen-docs
 		-v ./:/opt/docs/content/helm \
 		$(foreach chart,$(wildcard charts/*), -v ./$(chart):/opt/docs/content/helm/$(basename $(chart))) \
 		vmdocs
+
+docs-images-to-webp: docs-image
+	$(CONTAINER_TOOL) run \
+		--rm \
+		--entrypoint /usr/bin/find \
+		--name vmdocs \
+		-v ./:/opt/docs/content/helm \
+                $(foreach chart,$(wildcard charts/*), -v ./$(chart):/opt/docs/content/helm/$(basename $(chart))) \
+		vmdocs \
+			content/helm \
+				-regex ".*\.\(png\|jpg\|jpeg\)" \
+				-exec sh -c 'cwebp -preset drawing -m 6 -o $$(echo {} | cut -f-1 -d.).webp {} && rm -rf {}' {} \;
