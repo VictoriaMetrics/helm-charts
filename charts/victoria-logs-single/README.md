@@ -268,6 +268,18 @@ resources: {}
 </td>
     </tr>
     <tr>
+      <td>global.compatibility</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">openshift:
+    adaptSecurityContext: auto
+</code>
+</pre>
+</td>
+      <td><p>Openshift security context compatibility configuration</p>
+</td>
+    </tr>
+    <tr>
       <td>global.image.registry</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -323,10 +335,11 @@ resources: {}
 </td>
     </tr>
     <tr>
-      <td>podDisruptionBudget.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
+      <td>podDisruptionBudget</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: false
+extraLabels: {}
 </code>
 </pre>
 </td>
@@ -464,7 +477,7 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td><p>Sts/Deploy additional labels</p>
+      <td><p>StatefulSet/Deployment additional labels</p>
 </td>
     </tr>
     <tr>
@@ -596,7 +609,19 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of host objects</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.ingress.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
     </tr>
     <tr>
       <td>server.ingress.pathType</td>
@@ -606,7 +631,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>server.ingress.tls</td>
