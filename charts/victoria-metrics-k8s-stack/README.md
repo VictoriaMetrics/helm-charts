@@ -1,4 +1,4 @@
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.25.16](https://img.shields.io/badge/Version-0.25.16-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.25.17](https://img.shields.io/badge/Version-0.25.17-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -448,7 +448,7 @@ extraPaths: []
 hosts:
     - alertmanager.domain.com
 labels: {}
-path: /
+path: '{{ .Values.alertmanager.spec.routePrefix | default "/" }}'
 pathType: Prefix
 tls: []
 </pre>
@@ -2016,7 +2016,7 @@ extraPaths: []
 hosts:
     - vmagent.domain.com
 labels: {}
-path: /
+path: ""
 pathType: Prefix
 tls: []
 </pre>
@@ -2089,7 +2089,7 @@ extraPaths: []
 hosts:
     - vmalert.domain.com
 labels: {}
-path: /
+path: ""
 pathType: Prefix
 tls: []
 </pre>
@@ -2112,6 +2112,8 @@ false
       <td><pre lang="plaintext">
 evaluationInterval: 15s
 externalLabels: {}
+extraArgs:
+    http.pathPrefix: /
 image:
     tag: v1.103.0
 port: "8080"
@@ -2148,22 +2150,6 @@ false
 </pre>
 </td>
       <td></td>
-    </tr>
-    <tr>
-      <td>vmauth.ingress</td>
-      <td>object</td>
-      <td><pre lang="plaintext">
-annotations: {}
-enabled: false
-hosts:
-    - vmauth.domain.com
-labels: {}
-path: /
-pathType: Prefix
-</pre>
-</td>
-      <td><p>vmagent ingress configuration</p>
-</td>
     </tr>
     <tr>
       <td>vmauth.spec</td>
@@ -2243,7 +2229,7 @@ vminsert.domain.com
       <td>vmcluster.ingress.insert.path</td>
       <td>string</td>
       <td><pre lang="">
-/
+'{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vminsert }}'
 </pre>
 </td>
       <td></td>
@@ -2315,7 +2301,7 @@ vmselect.domain.com
       <td>vmcluster.ingress.select.path</td>
       <td>string</td>
       <td><pre lang="">
-/
+'{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vmselect }}'
 </pre>
 </td>
       <td></td>
@@ -2387,7 +2373,7 @@ vmstorage.domain.com
       <td>vmcluster.ingress.storage.path</td>
       <td>string</td>
       <td><pre lang="">
-/
+""
 </pre>
 </td>
       <td></td>
@@ -2531,7 +2517,7 @@ vmsingle.domain.com
       <td>vmsingle.ingress.path</td>
       <td>string</td>
       <td><pre lang="">
-/
+""
 </pre>
 </td>
       <td></td>
