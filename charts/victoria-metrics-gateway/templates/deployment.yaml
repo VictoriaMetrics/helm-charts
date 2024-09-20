@@ -1,4 +1,3 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- include "vm.enterprise.only" . -}}
 {{- if hasKey .Values.rateLimiter "enable" }}
   {{- fail "`rateLimiter.enable` is deprecated. Use `rateLimiter.enabled` instead" }}
@@ -33,7 +32,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ include "vm.fullname" . }}
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "chart.labels" . | nindent 4 }}
   {{- with .Values.annotations }}
@@ -49,7 +48,7 @@ spec:
       {{- $annotations := merge (dict "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum)) .Values.podAnnotations }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+      serviceAccountName: {{ include "vm.sa.name" . }}
       {{- if .Values.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
@@ -61,7 +60,7 @@ spec:
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" .Values) }}
           workingDir: {{ .Values.containerWorkingDir }}
           args: {{ include "vmgateway.args" . | nindent 12 }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -124,7 +123,7 @@ spec:
         {{- if .Values.rateLimiter.enabled }}
         - name: config
           configMap:
-            name: {{ include "chart.fullname" .}}
+            name: {{ include "vm.fullname" .}}
         {{- end }}
         {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}

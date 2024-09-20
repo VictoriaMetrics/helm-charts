@@ -4,65 +4,90 @@ nameOverride: "vm-distributed"
 # -- overrides the chart's computed fullname.
 fullnameOverride: ""
 
+global: {}
+
+common:
+  vmagent:
+    spec:
+      remoteWriteSettings:
+        useMultiTenantMode: true
+  vmcluster:
+    spec:
+      vminsert:
+        serviceSpec:
+          spec:
+            clusterIP: None
+            type: ClusterIP
+
 # -- set up a vmauth as the global write entrypoint
-vmauthIngestGlobal:
-  enabled: true
-  name: ""
-  spec: {}
+write:
+  global:
+    vmauth:
+      enabled: true
+      name: ""
+      spec: {}
 
 # -- set up a vmauth as the global read entrypoint
-vmauthQueryGlobal:
-  enabled: true
-  name: ""
-  spec: {}
+read:
+  global:
+    vmauth:
+      enabled: true
+      name: ""
+      spec: {}
 
 # -- config per availability zone components, including vmagent, vmcluster, vmauth etc
 availabilityZones:
   - name: zone-eu-1
-    # -- allow data ingestion to this zone
-    allowIngest: true
-    # -- allow data query from this zone through global query endpoint
-    allowQuery: true
-    # -- nodeselector to restrict where pods of this zone can be placed.
-    # usually provided by cloud providers.
-    nodeSelector:
-      topology.kubernetes.io/zone: zone-eu-1
-    # -- extraAffinity adds user defined custom affinity rules
-    extraAffinity: {}
-      # preferredDuringSchedulingIgnoredDuringExecution:
-      # - weight: 1
-      #   preference:
-      #     matchExpressions:
-      #     - key: topology.kubernetes.io/zone
-      #       operator: In
-      #       values:
-      #       - us-central1-b
-    # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
-    topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-    vmauthIngest:
-      enabled: true
-      # -- override the name of the vmauth object
-      name: ""
+    common:
       spec:
-        extraArgs:
-          # vmauth discovers backend IPs via periodic DNS queries,
-          # and performs load balancing between vminsert instances
-          # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
-          discoverBackendIPs: "true"
-    vmauthQueryPerZone:
-      enabled: true
-      name: ""
-      spec:
-        extraArgs:
-          discoverBackendIPs: "true"
-    # -- set up a vmauth with all the zone with `allowQuery: true` as query backends
-    vmauthCrossAZQuery:
-      enabled: true
-      name: ""
-      spec: {}
+        # -- nodeselector to restrict where pods of this zone can be placed.
+        # usually provided by cloud providers.
+        nodeSelector:
+          topology.kubernetes.io/zone: zone-eu-1
+        # -- extraAffinity adds user defined custom affinity rules
+        affinity: {}
+          # preferredDuringSchedulingIgnoredDuringExecution:
+          # - weight: 1
+          #   preference:
+          #     matchExpressions:
+          #     - key: topology.kubernetes.io/zone
+          #       operator: In
+          #       values:
+          #       - us-central1-b
+        # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+    write:
+      # -- allow data ingestion to this zone
+      allow: true
+      vmauth:
+        enabled: true
+        # -- override the name of the vmauth object
+        name: ""
+        spec:
+          extraArgs:
+            # vmauth discovers backend IPs via periodic DNS queries,
+            # and performs load balancing between vminsert instances
+            # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
+            discoverBackendIPs: "true"
+    read:
+      # -- allow data query from this zone through global query endpoint
+      allow: true
+      perZone:
+        vmauth:
+          enabled: true
+          name: ""
+          spec:
+            extraArgs:
+              discoverBackendIPs: "true"
+      # -- set up a vmauth with all the zone with `allow: true` as query backends
+      crossZone:
+        vmauth:
+          enabled: true
+          name: ""
+          spec: {}
     # -- vmagent here only meant to proxy write requests to each az,
     # doesn't support customized other remote write address.
     vmagent:
@@ -94,48 +119,54 @@ availabilityZones:
             {}
     
   - name: zone-us-1
-    # -- allow data ingestion to this zone
-    allowIngest: true
-    # -- allow data query from this zone through global query endpoint
-    allowQuery: true
-    # -- nodeselector to restrict where pods of this zone can be placed.
-    # usually provided by cloud providers.
-    nodeSelector:
-      topology.kubernetes.io/zone: zone-us-1
-    # -- extraAffinity adds user defined custom affinity rules
-    extraAffinity: {}
-      # preferredDuringSchedulingIgnoredDuringExecution:
-      # - weight: 1
-      #   preference:
-      #     matchExpressions:
-      #     - key: topology.kubernetes.io/zone
-      #       operator: In
-      #       values:
-      #       - us-central1-c
-    # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
-    topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-    vmauthIngest:
-      enabled: true
-      name: ""
+    common:
       spec:
-        extraArgs:
-          # vmauth discovers backend IPs via periodic DNS queries,
-          # and performs load balancing between vminsert instances
-          # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
-          discoverBackendIPs: "true"
-    vmauthQueryPerZone:
-      enabled: true
-      name: ""
-      spec:
-        extraArgs:
-          discoverBackendIPs: "true"
-    vmauthCrossAZQuery:
-      enabled: true
-      name: ""
-      spec: {}
+        # -- nodeselector to restrict where pods of this zone can be placed.
+        # usually provided by cloud providers.
+        nodeSelector:
+          topology.kubernetes.io/zone: zone-us-1
+        # -- extraAffinity adds user defined custom affinity rules
+        affinity: {}
+          # preferredDuringSchedulingIgnoredDuringExecution:
+          # - weight: 1
+          #   preference:
+          #     matchExpressions:
+          #     - key: topology.kubernetes.io/zone
+          #       operator: In
+          #       values:
+          #       - us-central1-c
+        # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+    write:
+      # -- allow data ingestion to this zone
+      allow: true
+      vmauth:
+        enabled: true
+        name: ""
+        spec:
+          extraArgs:
+            # vmauth discovers backend IPs via periodic DNS queries,
+            # and performs load balancing between vminsert instances
+            # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
+            discoverBackendIPs: "true"
+    read:
+      # -- allow data query from this zone through global query endpoint
+      allow: true
+      perZone:
+        vmauth:
+          enabled: true
+          name: ""
+          spec:
+            extraArgs:
+              discoverBackendIPs: "true"
+      crossZone:
+        vmauth:
+          enabled: true
+          name: ""
+          spec: {}
     # -- vmagent only meant to proxy write requests to each az,
     # doesn't support customized remote write address
     vmagent:
@@ -168,42 +199,46 @@ availabilityZones:
 
   ## add more zones if needed
   # - name: zone-na-1
-  #   # -- allow data ingestion to this zone
-  #   allowIngest: true
-  #   # -- allow data query from this zone through global query endpoint
-  #   allowQuery: true
-  #   # -- nodeselector to restrict where pods of this zone can be placed.
-  #   # usually provided by cloud providers.
-  #   nodeSelector:
-  #     topology.kubernetes.io/zone: zone-na-1
-  #   # -- extraAffinity adds user defined custom affinity rules
-  #   extraAffinity: {}
-  #   # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
-  #   topologySpreadConstraints:
-  #     - maxSkew: 1
-  #       topologyKey: kubernetes.io/hostname
-  #       whenUnsatisfiable: ScheduleAnyway
-  #   vmauthIngest:
-  #     enabled: true
-  #     # -- override the name of the vmauth object
-  #     name: ""
+  #   common:
   #     spec:
-  #       extraArgs:
-            # vmauth discovers backend IPs via periodic DNS queries,
-            # and performs load balancing between vminsert instances
-            # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
-  #         discoverBackendIPs: "true"
-  #   vmauthQueryPerZone:
-  #     enabled: true
-  #     name: ""
-  #     spec:
-  #       extraArgs:
-  #         discoverBackendIPs: "true"
-  #   # -- set up a vmauth with all the zone with `allowQuery: true` as query backends
-  #   vmauthCrossAZQuery:
-  #     enabled: true
-  #     name: ""
-  #     spec: {}
+  #       # -- nodeselector to restrict where pods of this zone can be placed.
+  #       # usually provided by cloud providers.
+  #       nodeSelector:
+  #         topology.kubernetes.io/zone: zone-na-1
+  #       # -- extraAffinity adds user defined custom affinity rules
+  #       affinity: {}
+  #       # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
+  #       topologySpreadConstraints:
+  #         - maxSkew: 1
+  #           topologyKey: kubernetes.io/hostname
+  #           whenUnsatisfiable: ScheduleAnyway
+  #   write:
+  #     allow: true
+  #     vmauth:
+  #       enabled: true
+  #       # -- override the name of the vmauth object
+  #       name: ""
+  #       spec:
+  #         extraArgs:
+              # vmauth discovers backend IPs via periodic DNS queries,
+              # and performs load balancing between vminsert instances
+              # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
+  #           discoverBackendIPs: "true"
+  #   read:
+  #     allow:
+  #       perZone:
+  #         vmauth:
+  #           enabled: true
+  #           name: ""
+  #           spec:
+  #             extraArgs:
+  #               discoverBackendIPs: "true"
+  #     # -- set up a vmauth with all the zone with `allow: true` as query backends
+  #     crossZone:
+  #       vmauth:
+  #         enabled: true
+  #         name: ""
+  #         spec: {}
   #   # -- vmagent here only meant to proxy write requests to each az,
   #   # doesn't support customized remote write address
   #   vmagent:

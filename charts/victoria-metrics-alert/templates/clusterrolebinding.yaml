@@ -1,22 +1,20 @@
 {{- if and .Values.rbac.create (not .Values.rbac.namespaced) }}
+{{- $ctx := dict "helm" . "extraLabels" .Values.rbac.extraLabels "appKey" "server" }}
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ include "vmalert.server.fullname" . }}-clusterrolebinding
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
-  labels: {{ include "vmalert.server.labels" . | nindent 4 }}
-    {{- with .Values.rbac.extraLabels }}
-    {{- toYaml . | nindent 4}}
-    {{- end }}
+  labels: {{ include "vmalert.server.labels" $ctx | nindent 4 }}
   {{- with .Values.rbac.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "vmalert.serviceAccountName" . }}
+    name: {{ include "vm.sa.name" . }}
     namespace: {{ include "vm.namespace" . }}
 roleRef:
   kind: ClusterRole
-  name: {{ include "vmalert.server.fullname" . }}-clusterrole
+  name: {{ include "vm.plain.fullname" $ctx }}
   apiGroup: rbac.authorization.k8s.io
 {{- end -}}

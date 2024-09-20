@@ -1,11 +1,14 @@
 {{- if hasKey .Values "cleanupCRD" }}
-  {{- fail "`cleanupCRD` is deprecated. Use `crd.cleanup.enabled` instead" -}}
+  {{- fail "`cleanupCRD` is deprecated. Use `crds.cleanup.enabled` instead" -}}
 {{- end }}
 {{- if hasKey .Values "cleanupImage" }}
-  {{- fail "`cleanupImage` is deprecated. Use `crd.cleanup.image` instead" -}}
+  {{- fail "`cleanupImage` is deprecated. Use `crds.cleanup.image` instead" -}}
 {{- end }}
-{{- if .Values.crd.cleanup.enabled }}
-{{- $app := .Values.crd.cleanup }}
+{{- if hasKey .Values "crd" }}
+  {{- fail "`crd` is deprecated. Use `crds.cleanup.image` instead" -}}
+{{- end }}
+{{- if .Values.crds.cleanup.enabled }}
+{{- $app := .Values.crds.cleanup }}
 {{- if empty ($app.image).tag }}
   {{- $tag := (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor) | replace "+" "" -}}
   {{- $_ := set $app.image "tag" $tag }}
@@ -14,7 +17,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "vm-operator.cleanupHookName" . }}
+  name: {{ include "vm.fullname" . }}-cleanup-hook
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
   annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-3") | nindent 4 }}
@@ -24,7 +27,7 @@ spec:
       name: {{ .Release.Name }}
       labels: {{ include "vm-operator.labels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "vm-operator.cleanupHookName" . }}
+      serviceAccountName: {{ include "vm.fullname" . }}-cleanup-hook
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}

@@ -1,13 +1,13 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.alertmanager }}
-{{- $fullname := (include "vmalert.alertmanager.fullname" .) }}
+{{- $ctx := dict "helm" . "appKey" "alertmanager" }}
+{{- $fullname := (include "vm.plain.fullname" $ctx) }}
 {{- if $app.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
-  labels: {{ include "vmalert.alertmanager.labels" . | nindent 4 }}
+  labels: {{ include "vmalert.alertmanager.labels" $ctx | nindent 4 }}
 spec:
   replicas: 1
   selector:
@@ -19,13 +19,13 @@ spec:
   {{- end }}
   template:
     metadata:
-      {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.podMetadata.labels) }}
+      {{- $_ := set $ctx "extraLabels" $app.podMetadata.labels }}
       labels: {{ include "vmalert.alertmanager.labels" $ctx | nindent 8 }}
       {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/alertmanager-configmap.yaml") . | sha256sum) }}
       {{- $annotations = merge $annotations (deepCopy $app.podMetadata.annotations) }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "vmalert.serviceAccountName" . }}
+      serviceAccountName: {{ include "vm.sa.name" . }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
@@ -41,7 +41,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
           args: {{ include "alertmanager.args" . | nindent 12 }}
           ports:
             - name: web

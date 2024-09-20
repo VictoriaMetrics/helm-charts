@@ -2,12 +2,12 @@
 {{- if hasKey .Values "watchNamespace" }}
   {{- fail "`watchNamespace` is deprecated Please use `watchNamespaces` slice instead" -}}
 {{- end }}
+{{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "vm-operator.fullname" . }}
-  namespace: {{ include "vm.namespace" . }}
-  {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
+  name: {{ include "vm.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
@@ -15,7 +15,7 @@ metadata:
 spec:
   replicas: {{.Values.replicaCount}}
   selector:
-    matchLabels: {{ include "vm-operator.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm-operator.selectorLabels" (omit $ctx "extraLabels") | nindent 6 }}
   template:
     metadata:
       {{- with .Values.annotations }}
@@ -27,7 +27,7 @@ spec:
       {{- with .Values.podSecurityContext }}
       securityContext: {{ toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "vm-operator.serviceAccountName" . }}
+      serviceAccountName: {{ include "vm.sa.name" . }}
       {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -137,7 +137,7 @@ spec:
         - {{ toYaml $constraint | nindent 10 | trim }}
           {{- if not $constraint.labelSelector }}
           labelSelector:
-            matchLabels: {{ include "vm-operator.selectorLabels" $ | nindent 14 }}
+            matchLabels: {{ include "vm-operator.selectorLabels" (omit $ctx "extraLabels") | nindent 14 }}
           {{- end }}
         {{- end }}
       {{- end }}
@@ -149,7 +149,7 @@ spec:
         - name: cert
           secret:
             defaultMode: 420
-            secretName: {{ include "vm-operator.fullname" . }}-validation
+            secretName: {{ include "vm.fullname" $ctx }}-validation
         {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml .| nindent 8 }}

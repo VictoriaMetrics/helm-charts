@@ -1,56 +1,57 @@
 {{- $app := .Values.server }}
+{{- $service := $app.service }}
 {{- if $app.enabled -}}
+{{- $ctx := dict "helm" . "extraLabels" $service.labels "appKey" "server" }}
 apiVersion: v1
 kind: Service
 metadata:
   namespace: {{ include "vm.namespace" . }}
-  {{- with $app.service.annotations }}
+  {{- with $service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
   labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-logs.server.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
 spec:
-  {{- $clusterIP := $app.service.clusterIP }}
+  {{- $clusterIP := $service.clusterIP }}
   {{- if and (not $clusterIP) $app.statefulSet.enabled }}
     {{- $clusterIP = "None" }}
   {{- end }}
   {{- with $clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
-  {{- with $app.service.externalIPs }}
+  {{- with $service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- with $app.service.loadBalancerIP }}
+  {{- with $service.loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
-  {{- with $app.service.loadBalancerSourceRanges }}
+  {{- with $service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $type := $app.service.type }}
+  {{- $type := $service.type }}
   {{- if and (not $type) $app.statefulSet.enabled }}
     {{- $type = "ClusterIP" }}
   {{- end }}
   type: {{ $type }}
-  {{- with $app.service.healthCheckNodePort }}
+  {{- with $service.healthCheckNodePort }}
   healthCheckNodePort: {{ . }}
   {{- end }}
-  {{- with $app.service.externalTrafficPolicy }}
+  {{- with $service.externalTrafficPolicy }}
   externalTrafficPolicy: {{ . }}
   {{- end }}
-  {{- with $app.service.ipFamilyPolicy }}
+  {{- with $service.ipFamilyPolicy }}
   ipFamilyPolicy: {{ . }}
   {{- end }}
-  {{- with $app.service.ipFamilies }}
+  {{- with $service.ipFamilies }}
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
     - name: http
-      port: {{ $app.service.servicePort }}
+      port: {{ $service.servicePort }}
       protocol: TCP
       targetPort: http
-      {{- with $app.service.nodePort }}
+      {{- with $service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
-  selector: {{ include "victoria-logs.server.matchLabels" . | nindent 4 }}
+  selector: {{ include "victoria-logs.server.matchLabels" (omit $ctx "extraLabels") | nindent 4 }}
 {{- end }}

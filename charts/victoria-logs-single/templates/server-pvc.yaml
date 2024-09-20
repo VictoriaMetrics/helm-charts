@@ -1,26 +1,28 @@
-{{- if .Values.server.persistentVolume.enabled -}}
-{{- if not .Values.server.statefulSet.enabled -}}
-{{- if not .Values.server.persistentVolume.existingClaim -}}
+{{- $app := .Values.server }}
+{{- if $app.persistentVolume.enabled -}}
+{{- if not $app.statefulSet.enabled -}}
+{{- if not $app.persistentVolume.existingClaim -}}
+{{- $ctx := dict "helm" . "appKey" "server" }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ include "victoria-logs.server.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
-  {{- with .Values.server.persistentVolume.annotations  }}
+  {{- with $app.persistentVolume.annotations  }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
   labels: {{ include "victoria-logs.server.labels" . | nindent 4 }}
 spec:
- {{- with .Values.server.persistentVolume.accessModes }}
+  {{- with $app.persistentVolume.accessModes }}
   accessModes: {{ toYaml . | nindent 4 }}
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.server.persistentVolume.size }}
-  {{- with .Values.server.persistentVolume.storageClassName }}
+      storage: {{ $app.persistentVolume.size }}
+  {{- with $app.persistentVolume.storageClassName }}
   storageClassName: {{ . }}
   {{- end }}
-  {{- with .Values.server.persistentVolume.matchLabels }}
+  {{- with $app.persistentVolume.matchLabels }}
   selector:
     matchLabels: {{ toYaml . | nindent 6 }}
   {{- end }}

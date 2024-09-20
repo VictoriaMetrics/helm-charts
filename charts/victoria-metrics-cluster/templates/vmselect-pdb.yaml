@@ -1,18 +1,19 @@
-{{- if .Values.vmselect.podDisruptionBudget.enabled }}
+{{- $pdb := .Values.vmselect.podDisruptionBudget }}
+{{- if $pdb.enabled }}
+{{- $ctx := dict "helm" . "extraLabels" $pdb.labels "appKey" "vmselect" }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "victoria-metrics.vmselect.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.vmselect.podDisruptionBudget.labels) }}
   labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
 spec:
-  {{- with .Values.vmselect.podDisruptionBudget.minAvailable }}
+  {{- with $pdb.minAvailable }}
   minAvailable: {{ . }}
   {{- end }}
-  {{- with .Values.vmselect.podDisruptionBudget.maxUnavailable }}
+  {{- with $pdb.maxUnavailable }}
   maxUnavailable: {{ . }}
   {{- end }}
   selector:
-    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" (omit $ctx "extraLabels") | nindent 6 }}
 {{- end }}

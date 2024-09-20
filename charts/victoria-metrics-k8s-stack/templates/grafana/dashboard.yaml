@@ -1,11 +1,6 @@
 {{- if .Values.defaultDashboardsEnabled }}
 
 {{- /*
-Create custom template context
-*/}}
-{{- $ctx := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
-
-{{- /*
 Loop through all dashboard files, that were crafted with hack/sync_grafana_dashboards.py
 */}}
 {{- range $dashboardFile, $_ := .Files.Glob  "files/dashboards/**.yaml" -}}
@@ -19,7 +14,7 @@ Get dashboard name
 {{- /*
 Get dashboard data from file
 */}}
-{{- $dashboardData := fromYaml (tpl ($.Files.Get $dashboardFile) $ctx) -}}
+{{- $dashboardData := fromYaml (tpl ($.Files.Get $dashboardFile) $) -}}
 
 {{- /*
 Save condition for a dashboard from file
@@ -37,14 +32,14 @@ Check if dashboard is enabled
 {{- if $dashboardCondition }}
 
 {{- $dashboardResult := toRawJson $dashboardData -}}
-{{- $app := ((printf "%s-grafana" (include "victoria-metrics-k8s-stack.name" $)) | trunc 63 | trimSuffix "-") }}
+{{- $app := ((printf "%s-grafana" (include "vm.name" $)) | trunc 63 | trimSuffix "-") }}
 {{- if $.Values.grafanaOperatorDashboardsFormat.enabled }}
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
   namespace: {{ include "vm.namespace" $ }}
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) $dashboardName | replace "_" "" }}
+  name: {{ printf "%s-%s" (include "vm.fullname" $) $dashboardName | replace "_" "" }}
   labels:
     app: {{ $app }}
     {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
@@ -62,7 +57,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: {{ include "vm.namespace" $ }}
-  name: {{ printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" $) $dashboardName }}
+  name: {{ printf "%s-%s" (include "vm.fullname" $) $dashboardName }}
   labels:
     {{- if $.Values.grafana.sidecar.dashboards.label }}
     {{ $.Values.grafana.sidecar.dashboards.label }}: "1"

@@ -1,5 +1,5 @@
-{{- $files := .Files }}
-{{- $fileContentsList := $files.Get "crd.yaml" | splitList "---" }}
+{{- $rules := default dict }}
+{{- $fileContentsList := .Files.Get "crd.yaml" | splitList "---" }}
 {{- $groups := dict }}
 {{- range $fileContentsList }}
   {{- $fileContents := . | fromYaml }}
@@ -9,8 +9,6 @@
   {{- $resources = concat $resources (list $plural (printf "%s/finalizers" $plural) (printf "%s/status" $plural)) }}
   {{- $groups = set $groups $group $resources }}
 {{- end }}
-
-{{- $rules := default dict }}
 {{- $verbs := dict "admin" (list "*") "view" (list "get" "list" "watch") }}
 {{- range $group, $resources := $groups }}
   {{- range $name, $v := $verbs }}
@@ -20,17 +18,19 @@
   {{- end }}
 {{- end -}}
 
+{{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
+
 {{- if .Values.rbac.create }}
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "vm-operator.fullname" . }}
-  {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
+  name: {{ include "vm.fullname" $ctx }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ include "vm.namespace" $ctx }}
 rules:
 - apiGroups:
   - coordination.k8s.io
@@ -49,8 +49,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ template "vm-operator.fullname" . }}
-  {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
+  name: {{ template "vm.fullname" $ctx }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
@@ -173,27 +172,29 @@ rules:
   - list
   - watch
   - get
-{{ toYaml $rules.admin }}
+{{- with $rules.admin }}
+{{ toYaml . }}
 {{- end }}
-{{- if .Values.crd.cleanup.enabled }}
+{{- end }}
+{{- if .Values.crds.cleanup.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "vm-operator.cleanupHookName" . }}
+  name: {{ include "vm.fullname" . }}-cleanup-hook
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
   annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-5") | nindent 4 }}
 rules: {{ toYaml $rules.admin | nindent 2 }}
 {{- end }}
 
-{{- if and .Values.crd.create .Values.rbac.aggregatedClusterRoles.enabled }}
+{{- if .Values.rbac.aggregatedClusterRoles.enabled }}
 {{- /* This template generates readonly and admin cluster roles for */ -}}
 {{- /* each CRD present in the helm chart.  The clusterroles use the */ -}}
 {{- /* kubernetes clusterrole aggregation feature to include these */ -}}
 {{- /* cluster roles into the default view and admin roles */ -}}
 {{- /* See https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles */}}
----
+--- 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -201,7 +202,7 @@ metadata:
   labels:
     {{- include "vm-operator.labels" . | nindent 4 }}
     {{- .Values.rbac.aggregatedClusterRoles.labels.admin | toYaml | nindent 4 }}
-rules: {{ toYaml $rules.admin | nindent 2 }}
+rules: {{ toYaml ($rules.admin | default list) | nindent 2 }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -210,5 +211,5 @@ metadata:
   labels:
     {{- include "vm-operator.labels" . | nindent 4 }}
     {{- .Values.rbac.aggregatedClusterRoles.labels.view | toYaml | nindent 4 }}
-rules: {{ toYaml $rules.view | nindent 2 }}
+rules: {{ toYaml ($rules.view | default list) | nindent 2 }}
 {{- end }}

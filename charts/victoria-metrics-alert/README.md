@@ -732,6 +732,15 @@ ClusterIP
       <td></td>
     </tr>
     <tr>
+      <td>alertmanager.webConfig</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
       <td>extraObjects</td>
       <td>list</td>
       <td><pre lang="plaintext">
@@ -1159,7 +1168,7 @@ Prefix
       <td>server.name</td>
       <td>string</td>
       <td><pre lang="">
-server
+null
 </pre>
 </td>
       <td></td>

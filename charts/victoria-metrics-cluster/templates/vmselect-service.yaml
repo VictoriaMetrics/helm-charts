@@ -1,51 +1,52 @@
 {{- $app := .Values.vmselect }}
+{{- $service := $app.service }}
 {{- if $app.enabled -}}
+{{- $ctx := dict "helm" . "extraLabels" $service.labels "appKey" "vmselect" }}
 apiVersion: v1
 kind: Service
 metadata:
-  {{- with $app.service.annotations }}
+  {{- with $service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
   labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-metrics.vmselect.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
 spec:
-  {{- $clusterIP := ternary "None" $app.service.clusterIP $app.statefulSet.enabled }}
+  {{- $clusterIP := ternary "None" $service.clusterIP $app.statefulSet.enabled }}
   {{- with $clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
-  {{- $externalIPs := ternary (default list) $app.service.externalIPs $app.statefulSet.enabled }}
+  {{- $externalIPs := ternary (default list) $service.externalIPs $app.statefulSet.enabled }}
   {{- with $externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $loadBalancerIP := ternary "" $app.service.loadBalancerIP $app.statefulSet.enabled }}
+  {{- $loadBalancerIP := ternary "" $service.loadBalancerIP $app.statefulSet.enabled }}
   {{- with $loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
-  {{- $loadBalancerSourceRanges := ternary (default list) $app.service.loadBalancerSourceRanges $app.statefulSet.enabled }}
+  {{- $loadBalancerSourceRanges := ternary (default list) $service.loadBalancerSourceRanges $app.statefulSet.enabled }}
   {{- with $loadBalancerSourceRanges }}
   loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
   {{- end }}
-  type: {{ ternary "ClusterIP" $app.service.type $app.statefulSet.enabled }}
-  {{- with $app.service.healthCheckNodePort }}
+  type: {{ ternary "ClusterIP" $service.type $app.statefulSet.enabled }}
+  {{- with $service.healthCheckNodePort }}
   healthCheckNodePort: {{ . }}
   {{- end }}
-  {{- with $app.service.externalTrafficPolicy }}
+  {{- with $service.externalTrafficPolicy }}
   externalTrafficPolicy: {{ . }}
   {{- end }}
-  {{- with $app.service.ipFamilyPolicy }}
+  {{- with $service.ipFamilyPolicy }}
   ipFamilyPolicy: {{ . }}
   {{- end }}
-  {{- with $app.service.ipFamilies }}
+  {{- with $service.ipFamilies }}
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
     - name: http
-      port: {{ $app.service.servicePort }}
+      port: {{ $service.servicePort }}
       protocol: TCP
-      targetPort: {{ $app.service.targetPort }}
-    {{- range $app.service.extraPorts }}
+      targetPort: {{ $service.targetPort }}
+    {{- range $service.extraPorts }}
     - name: {{ .name }}
       port: {{ .port }}
       protocol: TCP
@@ -57,5 +58,5 @@ spec:
       port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: cluster-tcp
     {{- end }}
-  selector: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 4 }}
+  selector: {{ include "victoria-metrics.vmselect.matchLabels" (omit $ctx "extraLabels") | nindent 4 }}
 {{- end }}

@@ -1,16 +1,17 @@
-{{- if .Values.server.podDisruptionBudget.enabled }}
+{{- $pdb := .Values.server.podDisruptionBudget }}
+{{- if $pdb.enabled }}
+{{- $ctx := dict "helm" . "extraLabels" $pdb.labels "appKey" "server" }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "vmalert.server.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.server.podDisruptionBudget.labels) }}
   labels: {{ include "vmalert.server.labels" $ctx | nindent 4 }}
 spec:
-  {{- with .Values.server.podDisruptionBudget.minAvailable }}
+  {{- with $pdb.minAvailable }}
   minAvailable: {{ . }}
   {{- end }}
-  {{- with .Values.server.podDisruptionBudget.maxUnavailable }}
+  {{- with $pdb.maxUnavailable }}
   maxUnavailable: {{ . }}
   {{- end }}
   selector:

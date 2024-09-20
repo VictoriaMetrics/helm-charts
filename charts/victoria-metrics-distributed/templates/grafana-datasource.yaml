@@ -1,9 +1,10 @@
-{{ if and .Values.vmauthQueryGlobal.enabled (index .Values "victoria-metrics-k8s-stack" "grafana" "enabled") }}
+{{ if and .Values.read.global.vmauth.enabled (index .Values "victoria-metrics-k8s-stack" "grafana" "enabled") }}
+{{- $url := (printf "%s/select/0/prometheus/" (include "vm.url" .)) }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "victoria-metrics-distributed.fullname" . }}-grafana-ds
+  name: {{ include "vm.fullname" . }}-grafana-ds
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
     {{ index .Values "victoria-metrics-k8s-stack" "grafana" "sidecar" "datasources" "label" }}: "1"
@@ -13,8 +14,7 @@ data:
     datasources:
     - name: VictoriaMetrics
       type: prometheus
-      {{- $readEndpoint:= (include "victoria-metrics-distributed.globalQueryAddr" . | fromYaml) }}
-      url: {{ $readEndpoint.url }}
+      url: {{ $url }}
       access: proxy
       isDefault: true
       jsonData: {}

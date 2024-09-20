@@ -41,6 +41,7 @@
 - Typo fixes
 - use appkey as `app` label by default
 - support multiple service naming styles for `vm.service`
+- Allow overriding fullname from `global.fullnameOverride`
 
 ## 0.0.9
 

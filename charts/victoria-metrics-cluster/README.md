@@ -133,16 +133,6 @@ Change the values according to the need of the environment in ``victoria-metrics
   </thead>
   <tbody>
     <tr>
-      <td>clusterDomainSuffix</td>
-      <td>string</td>
-      <td><pre lang="">
-cluster.local
-</pre>
-</td>
-      <td><p>k8s cluster domain suffix, uses for building storage pods&rsquo; FQDN. Details are <a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
       <td>extraObjects</td>
       <td>list</td>
       <td><pre lang="plaintext">
@@ -1121,6 +1111,15 @@ true
       <td>string</td>
       <td><pre lang="">
 VM_
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>vmselect.extraArgs.httpListenAddr</td>
+      <td>string</td>
+      <td><pre lang="">
+0.0.0.0:8481
 </pre>
 </td>
       <td></td>

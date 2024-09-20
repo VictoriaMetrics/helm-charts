@@ -1,12 +1,12 @@
 {{- if and .Values.alertmanager.enabled .Values.alertmanager.monzoTemplate.enabled }}
+{{- $ctx := dict "helm" . "extraLabels" (default dict) }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-alertmanager-monzo-tpl
+  name: {{ include "vm.fullname" $ctx }}-alertmanager-monzo-tpl
   namespace: {{ include "vm.namespace" . }}
-  labels: 
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-alertmanager
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+  {{- $_ := set $ctx.extraLabels "app.kubernetes.io/component" (printf "%s-alertmanager" (include "vm.name" $)) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 data:
   monzo.tmpl: |-
     {{`# This builds the silence URL.  We exclude the alertname in the range

@@ -1,48 +1,49 @@
 {{- $app := .Values.vmstorage }}
+{{- $service := $app.service }}
 {{- if $app.enabled -}}
+{{- $ctx := dict "helm" . "extraLabels" $service.labels "appKey" "vmstorage" }}
 apiVersion: v1
 kind: Service
 metadata:
-  {{- with $app.service.annotations }}
+  {{- with $service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
   labels: {{ include "victoria-metrics.vmstorage.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-metrics.vmstorage.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
 spec:
   clusterIP: None
   type: ClusterIP
-  {{- with $app.service.healthCheckNodePort }}
+  {{- with $service.healthCheckNodePort }}
   healthCheckNodePort: {{ . }}
   {{- end }}
-  {{- with $app.service.externalTrafficPolicy }}
+  {{- with $service.externalTrafficPolicy }}
   externalTrafficPolicy: {{ . }}
   {{- end }}
-  {{- with $app.service.ipFamilyPolicy }}
+  {{- with $service.ipFamilyPolicy }}
   ipFamilyPolicy: {{ . }}
   {{- end }}
-  {{- with $app.service.ipFamilies }}
+  {{- with $service.ipFamilies }}
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
-    - port: {{ $app.service.servicePort }}
+    - port: {{ $service.servicePort }}
       targetPort: http
       protocol: TCP
       name: http
-    - port: {{ $app.service.vmselectPort }}
+    - port: {{ $service.vmselectPort }}
       targetPort: vmselect
       protocol: TCP
       name: vmselect
-    - port: {{ $app.service.vminsertPort }}
+    - port: {{ $service.vminsertPort }}
       targetPort: vminsert
       protocol: TCP
       name: vminsert
-    {{- range $app.service.extraPorts }}
+    {{- range $service.extraPorts }}
     - name: {{ .name }}
       port: {{ .port }}
       protocol: TCP
       targetPort: {{ .targetPort }}
     {{- end }}
-  selector: {{ include "victoria-metrics.vmstorage.matchLabels" . | nindent 4 }}
+  selector: {{ include "victoria-metrics.vmstorage.matchLabels" (omit $ctx "extraLabels") | nindent 4 }}
 {{- end -}}

@@ -1,14 +1,15 @@
-{{- if and .Values.vmselect.enabled .Values.vmselect.serviceMonitor.enabled -}}
-{{- $serviceMonitor := .Values.vmselect.serviceMonitor -}}
+{{- $app := .Values.vmselect }}
+{{- $serviceMonitor := $app.serviceMonitor }}
+{{- if and $app.enabled $serviceMonitor.enabled -}}
+{{- $ctx := dict "helm" . "extraLabels" $serviceMonitor.extraLabels "appKey" "vmselect" }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   {{- with $serviceMonitor.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $serviceMonitor.extraLabels) }}
   labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-metrics.vmselect.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   {{- with $serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
@@ -17,7 +18,7 @@ spec:
     matchNames:
       - {{ include "vm.namespace" . }}
   selector:
-    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }} 
+    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" (omit $ctx "extraLabels") | nindent 6 }} 
   endpoints:
     - port: http
       {{- with $serviceMonitor.basicAuth }}

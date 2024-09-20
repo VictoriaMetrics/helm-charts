@@ -5,7 +5,7 @@ metadata:
   {{- with .Values.vmsingle.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-  name: {{ .Values.vmsingle.name | default (include "victoria-metrics-k8s-stack.fullname" .) }}
+  name: {{ .Values.vmsingle.name | default (include "vm.fullname" .) }}
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 spec: {{ include "vm.single.spec" . | nindent 2 }}

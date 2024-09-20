@@ -1,47 +1,48 @@
-{{- if and .Values.service.enabled -}}
+{{- $service := .Values.service }}
+{{- if $service.enabled -}}
+{{- $ctx := dict "helm" . "extraLabels" $service.extraLabels }}
 apiVersion: v1
 kind: Service
 metadata:
-  {{- with .Values.service.annotations }}
+  {{- with $service.annotations }}
   annotations: {{ toYaml . | nindent 4}}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.service.extraLabels) }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}
-  name: {{ include "chart.fullname" . }}
-  namespace: {{ include "vm.namespace" . }}
+  name: {{ include "vm.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
 spec:
-  {{- with .Values.service.clusterIP }}
+  {{- with $service.clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
-  {{- with .Values.service.externalIPs }}
+  {{- with $service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- with .Values.service.loadBalancerIP }}
+  {{- with $service.loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
-  {{- with .Values.service.loadBalancerSourceRanges }}
+  {{- with $service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
   {{- end }}
-  type: {{ .Values.service.type }}
-  {{- with .Values.service.healthCheckNodePort }}
+  type: {{ $service.type }}
+  {{- with $service.healthCheckNodePort }}
   healthCheckNodePort: {{ . }}
   {{- end }}
-  {{- with .Values.service.externalTrafficPolicy }}
+  {{- with $service.externalTrafficPolicy }}
   externalTrafficPolicy: {{ . }}
   {{- end }}
-  {{- with .Values.service.ipFamilyPolicy }}
+  {{- with $service.ipFamilyPolicy }}
   ipFamilyPolicy: {{ . }}
   {{- end }}
-  {{- with .Values.service.ipFamilies }}
+  {{- with $service.ipFamilies }}
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
     - name: http
-      port: {{ .Values.service.servicePort }}
+      port: {{ $service.servicePort }}
       protocol: TCP
       targetPort: http
-      {{- with .Values.service.nodePort }}
+      {{- with $service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
-  selector: {{ include "chart.selectorLabels" . | nindent 4 }}
+  selector: {{ include "chart.selectorLabels" (omit $ctx "extraLabels") | nindent 4 }}
 {{- end }}

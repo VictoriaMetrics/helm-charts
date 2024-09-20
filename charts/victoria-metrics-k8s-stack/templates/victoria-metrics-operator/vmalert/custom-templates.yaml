@@ -2,10 +2,10 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-vmalert-extra-tpl
+  name: {{ include "vm.fullname" . }}-vmalert-extra-tpl
   namespace: {{ include "vm.namespace" . }}
   labels: 
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" . }}-vmalert
+    app.kubernetes.io/component: {{ include "vm.name" . }}-vmalert
     {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 data:
   {{- range $file, $template := .Values.vmalert.templateFiles }}

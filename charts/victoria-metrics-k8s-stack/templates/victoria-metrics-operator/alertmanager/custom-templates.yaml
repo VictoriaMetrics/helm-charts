@@ -1,14 +1,14 @@
-{{- if and .Values.alertmanager.enabled .Values.alertmanager.templateFiles }}
+{{- $app := .Values.alertmanager }}
+{{- if and $app.enabled $app.templateFiles }}
+{{- $ctx := dict "helm" . "extraLabels" (dict "app.kubernetes.io/component" (printf "%s-alertmanager" (include "vm.name" .))) }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-alertmanager-extra-tpl
+  name: {{ include "vm.fullname" . }}-alertmanager-extra-tpl
   namespace: {{ include "vm.namespace" . }}
-  labels: 
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-alertmanager
-{{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 data:
-{{- range $file, $template := .Values.alertmanager.templateFiles }}
+{{- range $file, $template := $app.templateFiles }}
   {{ $file }}: |-
      {{- $template | nindent 4 }}
 {{- end }}

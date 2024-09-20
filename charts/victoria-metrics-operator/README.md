@@ -1,4 +1,4 @@
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.34.8](https://img.shields.io/badge/Version-0.34.8-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.34.9](https://img.shields.io/badge/Version-0.34.9-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-operator)
 
 Victoria Metrics Operator
@@ -303,7 +303,7 @@ Fail
 </td>
     </tr>
     <tr>
-      <td>crd.cleanup.enabled</td>
+      <td>crds.cleanup.enabled</td>
       <td>bool</td>
       <td><pre lang="">
 false
@@ -313,7 +313,7 @@ false
 </td>
     </tr>
     <tr>
-      <td>crd.cleanup.image</td>
+      <td>crds.cleanup.image</td>
       <td>object</td>
       <td><pre lang="plaintext">
 pullPolicy: IfNotPresent
@@ -325,13 +325,13 @@ tag: ""
 </td>
     </tr>
     <tr>
-      <td>crd.create</td>
+      <td>crds.plain</td>
       <td>bool</td>
       <td><pre lang="">
-true
+false
 </pre>
 </td>
-      <td><p>with this option, if you remove this chart, all crd resources will be deleted with it.</p>
+      <td><p>check if plain or templated CRDs should be created. with this option set to <code>false</code>, all CRDs will be rendered from templates. with this option set to <code>true</code>, all CRDs are immutable and require manual upgrade.</p>
 </td>
     </tr>
     <tr>

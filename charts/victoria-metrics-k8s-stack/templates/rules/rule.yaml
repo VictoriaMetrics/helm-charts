@@ -13,7 +13,7 @@ Exact rules overrides
 {{- /*
 Create custom template context
 */}}
-{{- $ctx := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $ctx := . -}}
 
 {{- /*
 Loop through all rules files, that were crafted with hack/sync_rules.py
@@ -45,7 +45,7 @@ Merge common group with a group data of a current iteration
 {{- /*
 Get group data from file
 */}}
-{{- $groupCtx := mergeOverwrite (deepCopy $ctx) $group }}
+{{- $groupCtx := mergeOverwrite $ctx $group }}
 {{- $groupData := fromYaml (tpl ($.Files.Get $groupFile) $groupCtx) -}}
 
 {{- /*
@@ -98,12 +98,13 @@ Filter out ignore rules
 Check if group is enabled
 */}}
 {{- if (and $rulesSpec (dig "create" true $group) $groupCondition) }}
+{{- $ruleName := (include "victoria-metrics-k8s-stack.rulegroup.name" $ctx) }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
   namespace: {{ include "vm.namespace" $ }}
-  name: {{ include "victoria-metrics-k8s-stack.rulegroup.name" $ctx }}
+  name: {{ $ruleName }}
   {{- with (include "victoria-metrics-k8s-stack.rulegroup.labels" $ctx) }}
   labels: {{ . | nindent 4 }}
   {{- end }}

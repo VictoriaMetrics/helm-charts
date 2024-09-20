@@ -1,52 +1,42 @@
+{{- $ns := include "vm.namespace" . }}
+{{- $ctx := dict "helm" . }}
 {{- range $i, $zone := .Values.availabilityZones }}
-{{- if and $zone.vmauthCrossAZQuery.enabled $zone.vmauthQueryPerZone.enabled}}
+{{- if and $zone.read.crossZone.vmauth.enabled $zone.read.perZone.vmauth.enabled }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
-  name: {{ $zone.vmauthCrossAZQuery.name | default (printf "vmauth-read-proxy-%s" $zone.name ) }}
-  namespace: {{ include "vm.namespace" $ }}
+  {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "read" "crossZone" "vmauth") }}
+  name: read-proxy-{{ include "vm.fullname" $ctx }}
+  namespace: {{ $ns }}
   labels: {{ include "victoria-metrics-distributed.labels" $ | nindent 4 }}
-  {{- with $zone.vmauthCrossAZQuery.annotations }}
+  {{- with $zone.read.crossZone.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
-  {{- end  }}
-spec:
-{{- $nodeSelector := deepCopy $zone.nodeSelector }}
-{{- if $zone.vmauthCrossAZQuery.spec.nodeSelector }}
-{{- $nodeSelector = mergeOverwrite (deepCopy $zone.nodeSelector) $zone.vmauthCrossAZQuery.spec.nodeSelector }}
-{{- end }}
-  nodeSelector: {{ toYaml $nodeSelector | nindent 4 }}
-{{- if or $zone.extraAffinity ( and $zone.vmauthCrossAZQuery.spec $zone.vmauthCrossAZQuery.spec.affinity ) }}
-{{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmauthCrossAZQuery.spec.affinity | default (dict)) }}
-  affinity: {{ toYaml $affinity | nindent 4 }}
-{{- end }}
-{{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
-{{- if $zone.vmauthCrossAZQuery.spec.topologySpreadConstraints }}
-{{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmauthCrossAZQuery.spec.topologySpreadConstraints }}
-{{- end }}
-  topologySpreadConstraints: {{ toYaml $topologySpreadConstraints | nindent 4 }}
+  {{- end }}
+{{- $spec := mergeOverwrite (deepCopy (($zone.common).spec)) (deepCopy (((($zone.read).crossZone).vmauth).spec)) }}
+spec: {{ toYaml (omit $spec "unauthorizedAccessConfig") | nindent 2 }}
   unauthorizedAccessConfig:
-    - src_paths:
-        - "/select/.+"
-      url_prefix:
-{{- if $zone.allowQuery }}
-{{ printf "- http://vmauth-%s:8427/" ($zone.vmauthQueryPerZone.name | default ( printf "vmauth-read-balancer-%s" $zone.name ))| indent 8 }}
-{{- end }}
-{{- range $j, $tmpzone := $.Values.availabilityZones }}
-{{- if and (ne $j $i) $tmpzone.allowQuery }}
-{{ printf "- http://vmauth-%s:8427/" ($tmpzone.vmauthQueryPerZone.name | default ( printf "vmauth-read-balancer-%s" $tmpzone.name )) | indent 8 }}
-{{- end }}
-{{- end }}
-      load_balancing_policy: first_available
-      retry_status_codes:
-        - 503
-{{- $spec := deepCopy $zone.vmauthCrossAZQuery.spec }}
-{{- $spec := unset $spec "nodeSelector" }}
-{{- $spec := unset $spec "affinity" }}
-{{- $spec := unset $spec "topologySpreadConstraints" }}
-{{- $spec := unset $spec "unauthorizedAccessConfig" }}
-{{- if $spec }}
-{{- toYaml $spec | nindent 2 }}
-{{- end }}
+  - src_paths:
+    - "/select/.+"
+    load_balancing_policy: first_available
+    retry_status_codes:
+    - 503
+    {{- $_ := set $ctx "style" "managed" }}
+    {{- $urls := default list }}
+    {{- if $zone.read.allow }}
+      {{- $_ := set $ctx "prefix" "read-balancer" }}
+      {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "read" "perZone" "vmauth") }}
+      {{- $urls = append $urls (include "vm.url" $ctx) }}
+    {{- end }}
+    {{- $_ := set $ctx "prefix" "read-proxy" }}
+    {{- range $j, $cross := $.Values.availabilityZones }}
+      {{- if and (ne $j $i) $cross.read.allow }}
+        {{- $_ := set $ctx "appKey" (list "availabilityZones" $j "read" "perZone" "vmauth") }}
+        {{- $urls = append $urls (include "vm.url" $ctx)}}
+      {{- end }}
+    {{- end }}
+    url_prefix: {{ toYaml $urls | nindent 4 }}
+    {{- $_ := unset $ctx "style" }}
+    {{- $_ := unset $ctx "prefix" }}
 {{- end }}
 {{- end }}

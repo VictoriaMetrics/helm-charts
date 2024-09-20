@@ -1,10 +1,11 @@
 {{- if eq .Values.configMap "" }}
 {{- if .Values.rateLimiter.enabled }}
+{{- $ctx := dict "helm" . }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "chart.fullname" .}}
-  namespace: {{ include "vm.namespace" . }}
+  name: {{ include "vm.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "chart.labels" . | nindent 4 }}
 data:
   rate-limiter.yml: |{{ toYaml .Values.rateLimiter.config | nindent 4 }}

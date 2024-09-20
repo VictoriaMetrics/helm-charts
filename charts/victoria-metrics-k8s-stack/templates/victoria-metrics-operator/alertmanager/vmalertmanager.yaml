@@ -1,17 +1,18 @@
-{{- if .Values.alertmanager.enabled }}
-{{- if and .Values.alertmanager.spec.configRawYaml .Values.alertmanager.config }}
+{{- $app := .Values.alertmanager }}
+{{- $ctx := dict "helm" . "appKey" "alertmanager" }}
+{{- if $app.enabled }}
+{{- if and $app.spec.configRawYaml $app.config }}
 {{- fail "ERROR: Both .Values.alertmanager.spec.configRawYaml and .Values.alertmanager.config are set, but only one is allowed." }}
 {{- end }}
-{{- if and (not .Values.alertmanager.spec.configSecret) (not .Values.alertmanager.spec.configRawYaml) }}
+{{- if and (not $app.spec.configSecret) (not $app.spec.configRawYaml) }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-alertmanager
+  name: {{ include "vm.fullname" . }}-alertmanager
   namespace: {{ include "vm.namespace" . }}
-  labels: 
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" . }}-alertmanager
-    {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+  {{- $_ := set $ctx "extraLabels" (dict "app.kubernetes.io/component" (printf "%s-alertmanager" (include "vm.name" .))) }}
+  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
 stringData:
   alertmanager.yaml: |{{ toYaml .Values.alertmanager.config | nindent 4 }}
 {{- end }}
@@ -22,11 +23,8 @@ metadata:
   {{- with .Values.alertmanager.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-  {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
-  name: {{ include "victoria-metrics-k8s-stack.fullname" $ctx }}
+  name: {{ include "vm.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
-  labels: 
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" . }}-alertmanager
-    {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
-spec: {{ include "vm.alertmanager.spec" . | nindent 2}}
+  labels: {{- include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
+spec: {{ include "vm.alertmanager.spec" . | nindent 2 }}
 {{- end }}

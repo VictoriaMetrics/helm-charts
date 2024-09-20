@@ -2,12 +2,12 @@
 {{- if $serviceMonitor.enabled -}}
 {{- $mergedVMServiceScrapeAnnotations := mustMerge $serviceMonitor.annotations .Values.annotations -}}
 {{- $mergedVMServiceScrapeLabels := mustMerge $serviceMonitor.extraLabels .Values.extraLabels -}}
+{{- $ctx := dict "helm" . "extraLabels" $mergedVMServiceScrapeLabels }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ include "vm-operator.fullname" . }}
+  name: {{ include "vm.fullname" . }}
   namespace: {{ include "vm.namespace" . }}
-  {{- $ctx := dict "helm" . "extraLabels" $mergedVMServiceScrapeLabels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
   {{- with $mergedVMServiceScrapeAnnotations }}
   annotations: {{ toYaml . | nindent 4 }}

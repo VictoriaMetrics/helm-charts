@@ -1,13 +1,14 @@
 {{- $app := .Values.vminsert }}
-{{- if and $app.enabled $app.ingress.enabled }}
-{{- $serviceName := include "victoria-metrics.vminsert.fullname" . }}
+{{- $ingress := $app.ingress }}
+{{- if and $app.enabled $ingress.enabled }}
+{{- $ctx := dict "helm" . "extraLabels" $ingress.extraLabels "appKey" "vminsert" }}
+{{- $serviceName := include "vm.plain.fullname" $ctx }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   {{- with $app.ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.ingress.extraLabels) }}
   labels: {{ include "victoria-metrics.vminsert.labels" $ctx | nindent 4 }}
   name: {{ $serviceName }}
   namespace: {{ include "vm.namespace" . }}

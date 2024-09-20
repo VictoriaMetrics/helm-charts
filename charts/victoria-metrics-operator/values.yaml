@@ -22,10 +22,11 @@ image:
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
-crd:
-  # -- enables CRD creation and management.
-  # -- with this option, if you remove this chart, all crd resources will be deleted with it.
-  create: true
+crds:
+  # -- check if plain or templated CRDs should be created.
+  # with this option set to `false`, all CRDs will be rendered from templates.
+  # with this option set to `true`, all CRDs are immutable and require manual upgrade.
+  plain: false
   cleanup:
     # -- Tells helm to clean up all the vm resources under this release's namespace when uninstalling
     enabled: false

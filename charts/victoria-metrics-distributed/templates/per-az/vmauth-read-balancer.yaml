@@ -1,48 +1,28 @@
-{{- $top := . -}}
-{{- range $zone := .Values.availabilityZones }}
-{{- if $zone.vmauthQueryPerZone.enabled }}
+{{- $ns := include "vm.namespace" . }}
+{{- $ctx := dict "helm" . }}
+{{- range $i, $zone := .Values.availabilityZones }}
+{{- if $zone.read.perZone.vmauth.enabled }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
-  name: {{ $zone.vmauthQueryPerZone.name | default (printf "vmauth-read-balancer-%s" $zone.name ) }}
-  namespace: {{ include "vm.namespace" $ }}
-  labels: {{ include "victoria-metrics-distributed.labels" $top | nindent 4 }}
-  {{- with $zone.vmauthQueryPerZone.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "read" "perZone" "vmauth") }}
+  name: read-balancer-{{ include "vm.fullname" $ctx }}
+  namespace: {{ $ns }}
+  labels: {{ include "victoria-metrics-distributed.labels" $ | nindent 4 }}
+  {{- with $zone.read.perZone.vmauth.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-spec:
-{{- $nodeSelector := deepCopy $zone.nodeSelector }}
-{{- if $zone.vmauthQueryPerZone.spec.nodeSelector }}
-{{- $nodeSelector = mergeOverwrite (deepCopy $zone.nodeSelector) $zone.vmauthQueryPerZone.spec.nodeSelector }}
-{{- end }}
-  nodeSelector:
-{{- toYaml $nodeSelector | nindent 4 }}
-{{- if or $zone.extraAffinity ( and $zone.vmauthQueryPerZone.spec $zone.vmauthQueryPerZone.spec.affinity ) }}
-{{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmauthQueryPerZone.spec.affinity | default (dict)) }}
-  affinity:
-{{- toYaml $affinity | nindent 4 }}
-{{- end }}
-{{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
-{{- if $zone.vmauthQueryPerZone.spec.topologySpreadConstraints }}
-{{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmauthQueryPerZone.spec.topologySpreadConstraints }}
-{{- end }}
-  topologySpreadConstraints:
-{{- toYaml $topologySpreadConstraints | nindent 4 }}
+{{- $spec := mergeOverwrite (deepCopy (($zone.common).spec)) (deepCopy (((($zone.read).perZone).vmauth).spec)) }}
+spec: {{ toYaml (omit $spec "unauthorizedAccessConfig") | nindent 2 }}
   unauthorizedAccessConfig:
-    - src_paths:
-        - "/select/.+"
-      url_prefix:
-{{ printf "- http://vmselect-vmcluster-%s:8481/" $zone.name | indent 8 }}
-{{- $spec := deepCopy $zone.vmauthQueryPerZone.spec }}
-{{- $spec := unset $spec "nodeSelector" }}
-{{- $spec := unset $spec "affinity" }}
-{{- $spec := unset $spec "topologySpreadConstraints" }}
-{{- $spec := unset $spec "unauthorizedAccessConfig" }}
-{{- if $spec }}
-{{- toYaml $spec | nindent 2 }}
-{{- end }}
+  - src_paths:
+    - "/select/.+"
+    {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "vmcluster" "spec" "vmselect") }}
+    {{- $_ := set $ctx "style" "managed" }}
+    url_prefix: 
+    - {{ include "vm.url" $ctx }}
+    {{- $_ := unset $ctx "style" }}
 {{- end }}
 {{- end }}
 

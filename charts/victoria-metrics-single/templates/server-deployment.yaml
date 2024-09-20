@@ -1,6 +1,6 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.server }}
-{{- $fullname := (include "victoria-metrics.server.fullname" .) }}
+{{- $ctx := dict "helm" . "extraLabels" $app.extraLabels }}
+{{- $fullname := (include "vm.server.fullname" $ctx) }}
 {{- if and $app.enabled (not $app.statefulSet.enabled) -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -8,13 +8,12 @@ metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-metrics.server.labels" $ctx | nindent 4 }}
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ include "vm.namespace" $ctx }}
 spec:
   selector:
-    matchLabels: {{ include "victoria-metrics.server.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "victoria-metrics.server.matchLabels" (omit $ctx "extraLabels") | nindent 6 }}
   replicas: {{ $app.replicaCount }}
   {{- if $app.persistentVolume.enabled }}
   strategy:
@@ -26,7 +25,7 @@ spec:
       {{- with $app.podAnnotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.podLabels) }}
+      {{- $_ := set $ctx "extraLabels" $app.podLabels }}
       labels: {{ include "victoria-metrics.server.labels" $ctx | nindent 8 }}
     spec:
       {{- with $app.priorityClassName }}
@@ -45,7 +44,7 @@ spec:
       {{- if $manager.restore.onStart.enabled }}
       {{- include "vm.enterprise.only" . }}
       - name: vmbackupmanager-restore
-        image: {{ include "vm.image" (merge (deepCopy .) (dict "app" $manager)) }}
+        image: {{ include "vm.image" (dict "helm" . "app" $manager) }}
         imagePullPolicy: {{ $app.image.pullPolicy }}
         {{- with $app.podSecurityContext }}
         securityContext:  {{ toYaml . | nindent 10 }}
@@ -84,7 +83,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.containerWorkingDir }}
           workingDir: {{ $app.containerWorkingDir }}
@@ -196,7 +195,7 @@ spec:
         {{- if $manager.enabled }}
         {{- include "vm.enterprise.only" . }}
         - name: vmbackupmanager
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $manager)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" $manager) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           args: {{ include "vmbackupmanager.args" . | nindent 12 }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $manager "type" "readiness"))) }}
@@ -239,7 +238,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "victoria-metrics.serviceAccountName" . }}
+      serviceAccountName: {{ include "vm.sa.name" . }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

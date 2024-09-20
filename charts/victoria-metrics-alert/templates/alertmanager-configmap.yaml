@@ -10,4 +10,7 @@ data:
   {{- range $key, $value := .Values.alertmanager.templates }}
   {{ $key }}: |{{ $value | nindent 4 }}
   {{- end }}
+  {{- with .Values.alertmanager.webconfig }}
+  webconfig.yaml: |{{ toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}

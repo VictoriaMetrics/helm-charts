@@ -1,25 +1,22 @@
-{{- if .Values.vmselect.horizontalPodAutoscaler.enabled }}
+{{- $app := .Values.vmselect }}
+{{- $hpa := $app.horizontalPodAutoscaler }}
+{{- if $hpa.enabled }}
+{{- $ctx := dict "helm" . "extraLabels" $app.extraLabels "appKey" "vmselect" }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  labels:
-    {{- include "victoria-metrics.vmselect.labels" . | nindent 4 }}
-{{- with .Values.vmselect.extraLabels }}
-{{ toYaml . | indent 4 }}
-{{- end }}
-  name: {{ include "victoria-metrics.vmselect.fullname" . }}
+  labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
 spec:
-  maxReplicas: {{ .Values.vmselect.horizontalPodAutoscaler.maxReplicas }}
-  minReplicas: {{ .Values.vmselect.horizontalPodAutoscaler.minReplicas }}
+  maxReplicas: {{ $hpa.maxReplicas }}
+  minReplicas: {{ $hpa.minReplicas }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "victoria-metrics.vmselect.fullname" . }}
-  metrics:
-{{ toYaml .Values.vmselect.horizontalPodAutoscaler.metrics | indent 4 }}
-{{- if .Values.vmselect.horizontalPodAutoscaler.behavior }}
-  behavior:
-{{ toYaml .Values.vmselect.horizontalPodAutoscaler.behavior | indent 4 }}
-{{- end -}}
+    name: {{ include "vm.plain.fullname" $ctx }}
+  metrics: {{ toYaml $hpa.metrics | nindent 4 }}
+  {{- with $hpa.behavior }}
+  behavior: {{ toYaml . | nindent 4 }}
+  {{- end -}}
 {{- end -}}

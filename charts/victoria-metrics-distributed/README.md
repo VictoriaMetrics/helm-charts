@@ -243,37 +243,35 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>availabilityZones</td>
       <td>list</td>
       <td><pre lang="plaintext">
-- allowIngest: true
-  allowQuery: true
-  extraAffinity: {}
+- common:
+    spec:
+        affinity: {}
+        nodeSelector:
+            topology.kubernetes.io/zone: zone-eu-1
+        topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
   name: zone-eu-1
-  nodeSelector:
-    topology.kubernetes.io/zone: zone-eu-1
-  topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: kubernetes.io/hostname
-      whenUnsatisfiable: ScheduleAnyway
+  read:
+    allow: true
+    crossZone:
+        vmauth:
+            enabled: true
+            name: ""
+            spec: {}
+    perZone:
+        vmauth:
+            enabled: true
+            name: ""
+            spec:
+                extraArgs:
+                    discoverBackendIPs: "true"
   vmagent:
     annotations: {}
     enabled: true
     name: ""
     spec: {}
-  vmauthCrossAZQuery:
-    enabled: true
-    name: ""
-    spec: {}
-  vmauthIngest:
-    enabled: true
-    name: ""
-    spec:
-        extraArgs:
-            discoverBackendIPs: "true"
-  vmauthQueryPerZone:
-    enabled: true
-    name: ""
-    spec:
-        extraArgs:
-            discoverBackendIPs: "true"
   vmcluster:
     enabled: true
     name: ""
@@ -292,37 +290,43 @@ Change the values according to the need of the environment in ``victoria-metrics
             replicaCount: 2
             resources: {}
             storageDataPath: /vm-data
-- allowIngest: true
-  allowQuery: true
-  extraAffinity: {}
+  write:
+    allow: true
+    vmauth:
+        enabled: true
+        name: ""
+        spec:
+            extraArgs:
+                discoverBackendIPs: "true"
+- common:
+    spec:
+        affinity: {}
+        nodeSelector:
+            topology.kubernetes.io/zone: zone-us-1
+        topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
   name: zone-us-1
-  nodeSelector:
-    topology.kubernetes.io/zone: zone-us-1
-  topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: kubernetes.io/hostname
-      whenUnsatisfiable: ScheduleAnyway
+  read:
+    allow: true
+    crossZone:
+        vmauth:
+            enabled: true
+            name: ""
+            spec: {}
+    perZone:
+        vmauth:
+            enabled: true
+            name: ""
+            spec:
+                extraArgs:
+                    discoverBackendIPs: "true"
   vmagent:
     annotations: {}
     enabled: true
     name: ""
     spec: {}
-  vmauthCrossAZQuery:
-    enabled: true
-    name: ""
-    spec: {}
-  vmauthIngest:
-    enabled: true
-    name: ""
-    spec:
-        extraArgs:
-            discoverBackendIPs: "true"
-  vmauthQueryPerZone:
-    enabled: true
-    name: ""
-    spec:
-        extraArgs:
-            discoverBackendIPs: "true"
   vmcluster:
     enabled: true
     name: ""
@@ -341,33 +345,21 @@ Change the values according to the need of the environment in ``victoria-metrics
             replicaCount: 2
             resources: {}
             storageDataPath: /vm-data
+  write:
+    allow: true
+    vmauth:
+        enabled: true
+        name: ""
+        spec:
+            extraArgs:
+                discoverBackendIPs: "true"
 </pre>
 </td>
       <td><p>config per availability zone components, including vmagent, vmcluster, vmauth etc</p>
 </td>
     </tr>
     <tr>
-      <td>availabilityZones[0].allowIngest</td>
-      <td>bool</td>
-      <td><pre lang="">
-true
-</pre>
-</td>
-      <td><p>allow data ingestion to this zone</p>
-</td>
-    </tr>
-    <tr>
-      <td>availabilityZones[0].allowQuery</td>
-      <td>bool</td>
-      <td><pre lang="">
-true
-</pre>
-</td>
-      <td><p>allow data query from this zone through global query endpoint</p>
-</td>
-    </tr>
-    <tr>
-      <td>availabilityZones[0].extraAffinity</td>
+      <td>availabilityZones[0].common.spec.affinity</td>
       <td>object</td>
       <td><pre lang="plaintext">
 {}
@@ -377,7 +369,7 @@ true
 </td>
     </tr>
     <tr>
-      <td>availabilityZones[0].nodeSelector</td>
+      <td>availabilityZones[0].common.spec.nodeSelector</td>
       <td>object</td>
       <td><pre lang="plaintext">
 topology.kubernetes.io/zone: zone-eu-1
@@ -387,7 +379,7 @@ topology.kubernetes.io/zone: zone-eu-1
 </td>
     </tr>
     <tr>
-      <td>availabilityZones[0].topologySpreadConstraints</td>
+      <td>availabilityZones[0].common.spec.topologySpreadConstraints</td>
       <td>list</td>
       <td><pre lang="plaintext">
 - maxSkew: 1
@@ -396,6 +388,29 @@ topology.kubernetes.io/zone: zone-eu-1
 </pre>
 </td>
       <td><p>topologySpreadConstraints allows to customize the default topologySpreadConstraints.</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].read.allow</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td><p>allow data query from this zone through global query endpoint</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].read.crossZone</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+vmauth:
+    enabled: true
+    name: ""
+    spec: {}
+</pre>
+</td>
+      <td><p>set up a vmauth with all the zone with <code>allow: true</code> as query backends</p>
 </td>
     </tr>
     <tr>
@@ -409,28 +424,6 @@ spec: {}
 </pre>
 </td>
       <td><p>vmagent here only meant to proxy write requests to each az, doesn&rsquo;t support customized other remote write address.</p>
-</td>
-    </tr>
-    <tr>
-      <td>availabilityZones[0].vmauthCrossAZQuery</td>
-      <td>object</td>
-      <td><pre lang="plaintext">
-enabled: true
-name: ""
-spec: {}
-</pre>
-</td>
-      <td><p>set up a vmauth with all the zone with <code>allowQuery: true</code> as query backends</p>
-</td>
-    </tr>
-    <tr>
-      <td>availabilityZones[0].vmauthIngest.name</td>
-      <td>string</td>
-      <td><pre lang="">
-""
-</pre>
-</td>
-      <td><p>override the name of the vmauth object</p>
 </td>
     </tr>
     <tr>
@@ -467,7 +460,7 @@ vmstorage:
 </td>
     </tr>
     <tr>
-      <td>availabilityZones[1].allowIngest</td>
+      <td>availabilityZones[0].write.allow</td>
       <td>bool</td>
       <td><pre lang="">
 true
@@ -477,17 +470,17 @@ true
 </td>
     </tr>
     <tr>
-      <td>availabilityZones[1].allowQuery</td>
-      <td>bool</td>
+      <td>availabilityZones[0].write.vmauth.name</td>
+      <td>string</td>
       <td><pre lang="">
-true
+""
 </pre>
 </td>
-      <td><p>allow data query from this zone through global query endpoint</p>
+      <td><p>override the name of the vmauth object</p>
 </td>
     </tr>
     <tr>
-      <td>availabilityZones[1].extraAffinity</td>
+      <td>availabilityZones[1].common.spec.affinity</td>
       <td>object</td>
       <td><pre lang="plaintext">
 {}
@@ -497,7 +490,7 @@ true
 </td>
     </tr>
     <tr>
-      <td>availabilityZones[1].nodeSelector</td>
+      <td>availabilityZones[1].common.spec.nodeSelector</td>
       <td>object</td>
       <td><pre lang="plaintext">
 topology.kubernetes.io/zone: zone-us-1
@@ -507,7 +500,7 @@ topology.kubernetes.io/zone: zone-us-1
 </td>
     </tr>
     <tr>
-      <td>availabilityZones[1].topologySpreadConstraints</td>
+      <td>availabilityZones[1].common.spec.topologySpreadConstraints</td>
       <td>list</td>
       <td><pre lang="plaintext">
 - maxSkew: 1
@@ -516,6 +509,16 @@ topology.kubernetes.io/zone: zone-us-1
 </pre>
 </td>
       <td><p>topologySpreadConstraints allows to customize the default topologySpreadConstraints.</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].read.allow</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td><p>allow data query from this zone through global query endpoint</p>
 </td>
     </tr>
     <tr>
@@ -565,6 +568,43 @@ vmstorage:
 </td>
     </tr>
     <tr>
+      <td>availabilityZones[1].write.allow</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td><p>allow data ingestion to this zone</p>
+</td>
+    </tr>
+    <tr>
+      <td>common.vmagent.spec.remoteWriteSettings.useMultiTenantMode</td>
+      <td>bool</td>
+      <td><pre lang="">
+true
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>common.vmcluster.spec.vminsert.serviceSpec.spec.clusterIP</td>
+      <td>string</td>
+      <td><pre lang="">
+None
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>common.vmcluster.spec.vminsert.serviceSpec.spec.type</td>
+      <td>string</td>
+      <td><pre lang="">
+ClusterIP
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
       <td>enableMultitenancy</td>
       <td>bool</td>
       <td><pre lang="">
@@ -598,6 +638,15 @@ spec:
 </td>
     </tr>
     <tr>
+      <td>global</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+{}
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
       <td>nameOverride</td>
       <td>string</td>
       <td><pre lang="">
@@ -605,6 +654,20 @@ vm-distributed
 </pre>
 </td>
       <td><p>overrides the chart&rsquo;s name</p>
+</td>
+    </tr>
+    <tr>
+      <td>read</td>
+      <td>object</td>
+      <td><pre lang="plaintext">
+global:
+    vmauth:
+        enabled: true
+        name: ""
+        spec: {}
+</pre>
+</td>
+      <td><p>set up a vmauth as the global read entrypoint</p>
 </td>
     </tr>
     <tr>
@@ -637,27 +700,17 @@ vmsingle:
 </td>
     </tr>
     <tr>
-      <td>vmauthIngestGlobal</td>
+      <td>write</td>
       <td>object</td>
       <td><pre lang="plaintext">
-enabled: true
-name: ""
-spec: {}
+global:
+    vmauth:
+        enabled: true
+        name: ""
+        spec: {}
 </pre>
 </td>
       <td><p>set up a vmauth as the global write entrypoint</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmauthQueryGlobal</td>
-      <td>object</td>
-      <td><pre lang="plaintext">
-enabled: true
-name: ""
-spec: {}
-</pre>
-</td>
-      <td><p>set up a vmauth as the global read entrypoint</p>
 </td>
     </tr>
   </tbody>

@@ -1,20 +1,20 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vmselect }}
 {{- if and $app.enabled $app.statefulSet.enabled -}}
+{{- $ctx := dict "helm" . "appKey" "vmselect" "extraLabels" $app.extraLabels }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-metrics.vmselect.fullname" . }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
 spec:
-  serviceName: {{ include "victoria-metrics.vmselect.fullname" . }}
+  serviceName: {{ $fullname }}
   selector:
-    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" (omit $ctx "extraLabels") | nindent 6 }}
   replicas: {{ $app.replicaCount }}
   podManagementPolicy: {{ $app.statefulSet.podManagementPolicy }}
   template:
@@ -37,7 +37,7 @@ spec:
       {{- end }}
       containers:
         - name: vmselect
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
@@ -98,7 +98,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "victoria-metrics.serviceAccountName" . }}
+      serviceAccountName: {{ include "vm.sa.name" . }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

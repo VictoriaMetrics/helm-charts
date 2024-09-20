@@ -19,20 +19,11 @@ argocdReleaseOverride: ""
 # -- also checkout here possible ENV variables to configure operator behaviour https://docs.victoriametrics.com/operator/vars
 victoria-metrics-operator:
   enabled: true
+  crd:
+    # -- added temporary, till new operator version released
+    create: false
   serviceMonitor:
     enabled: true
-  crd:
-    # -- we disable crd creation by operator chart as we create them in this chart
-    create: false
-
-    # -- tells helm to clean up vm cr resources when uninstalling
-    cleanup:
-      enabled: true
-      image:
-        repository: bitnami/kubectl
-        # use image tag that matches k8s API version by default
-        # tag: 1.29.6
-        pullPolicy: IfNotPresent
   operator:
     # -- By default, operator converts prometheus-operator objects.
     disable_prometheus_converter: false

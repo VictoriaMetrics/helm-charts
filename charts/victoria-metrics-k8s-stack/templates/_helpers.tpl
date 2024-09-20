@@ -1,73 +1,9 @@
-{{- /* Expand the name of the chart. */ -}}
-{{- define "victoria-metrics-k8s-stack.name" -}}
-  {{- $Chart := (.helm).Chart | default .Chart -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- default $Chart.Name $Values.nameOverride | trunc 63 | trimSuffix "-" -}}
-{{- end }}
-
-{{- /*
-Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
-*/ -}}
-{{- define "victoria-metrics-k8s-stack.fullname" -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- $Chart := (.helm).Chart | default .Chart -}}
-  {{- $Release := (.helm).Release | default .Release -}}
-  {{- $fullname := "" -}}
-  {{- if .appKey -}}
-    {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
-    {{- $values := $Values -}}
-    {{- $global := (index $Values.global $Chart.Name) | default dict -}}
-    {{- range $ak := $appKey }}
-      {{- $values = (index $values $ak) | default dict -}}
-      {{- $global = (index $global $ak) | default dict -}}
-      {{- if $values.name -}}
-        {{- $fullname = $values.name -}}
-      {{- else if $global.name -}}
-        {{- $fullname = $global.name -}}
-      {{- end -}}
-    {{- end }}
-  {{- end -}}
-  {{- if empty $fullname -}}
-    {{- if $Values.fullnameOverride -}}
-      {{- $fullname = $Values.fullnameOverride -}}
-    {{- else if (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
-      {{- $fullname = (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
-    {{- else -}}
-      {{- $name := default $Chart.Name $Values.nameOverride -}}
-      {{- if contains $name $Release.Name -}}
-        {{- $fullname = $Release.Name -}}
-      {{- else -}}
-        {{- $fullname = (printf "%s-%s" $Release.Name $name) }}
-      {{- end -}}
-    {{- end }}
-  {{- end -}}
-  {{- $fullname | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- /* Create chart name and version as used by the chart label. */ -}}
-{{- define "victoria-metrics-k8s-stack.chart" -}}
-  {{- $Chart := (.helm).Chart | default .Chart -}}
-  {{- printf "%s-%s" $Chart.Name $Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
-{{- end }}
-
-{{- /* Create the name of the service account to use */ -}}
-{{- define "victoria-metrics-k8s-stack.serviceAccountName" -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- if $Values.serviceAccount.create -}}
-    {{- default (include "victoria-metrics-k8s-stack.fullname" .) $Values.serviceAccount.name -}}
-  {{- else -}}
-    {{- default "default" $Values.serviceAccount.name -}}
-  {{- end }}
-{{- end }}
-
 {{- /* Common labels */ -}}
 {{- define "victoria-metrics-k8s-stack.labels" -}}
   {{- $Release := (.helm).Release | default .Release -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $labels := (fromYaml (include "victoria-metrics-k8s-stack.selectorLabels" .)) -}}
-  {{- $_ := set $labels "helm.sh/chart" (include "victoria-metrics-k8s-stack.chart" .) -}}
+  {{- $_ := set $labels "helm.sh/chart" (include "vm.chart" .) -}}
   {{- $_ := set $labels "app.kubernetes.io/managed-by" $Release.Service -}}
   {{- with $Chart.AppVersion }}
     {{- $_ := set $labels "app.kubernetes.io/version" . -}}
@@ -75,24 +11,18 @@ If release name contains chart name it will be used as a full name.
   {{- toYaml $labels -}}
 {{- end }}
 
-{{- define "vm.release" -}}
-  {{- $Release := (.helm).Release | default .Release -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- default $Release.Name $Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
 {{- /* Selector labels */ -}}
 {{- define "victoria-metrics-k8s-stack.selectorLabels" -}}
   {{- $labels := .extraLabels | default dict -}}
-  {{- $_ := set $labels "app.kubernetes.io/name" (include "victoria-metrics-k8s-stack.name" .) -}}
   {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
+  {{- $_ := set $labels "app.kubernetes.io/name" (include "vm.name" .) -}}
   {{- toYaml $labels -}}
 {{- end }}
 
 {{- /* Create the name for VM service */ -}}
 {{- define "vm.service" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $name := (include "victoria-metrics-k8s-stack.fullname" .) -}}
+  {{- $name := (include "vm.fullname" .) -}}
   {{- with .appKey -}}
     {{- $prefix := . -}}
     {{- if kindIs "slice" $prefix }}
@@ -180,7 +110,7 @@ If release name contains chart name it will be used as a full name.
 {{- define "vm.alert.remotes" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $remotes := default dict -}}
-  {{- $fullname := (include "victoria-metrics-k8s-stack.fullname" .) -}}
+  {{- $fullname := (include "vm.fullname" .) -}}
   {{- $ctx := dict "helm" . -}}
   {{- $remoteWrite := (include "vm.write.endpoint" $ctx | fromYaml) -}}
   {{- if $Values.vmalert.remoteWriteVMAgent -}}
@@ -215,7 +145,7 @@ If release name contains chart name it will be used as a full name.
   {{- $Values := (.helm).Values | default .Values}}
   {{- $cms :=  ($Values.vmalert.spec.configMaps | default list) -}}
   {{- if $Values.vmalert.templateFiles -}}
-    {{- $fullname := (include "victoria-metrics-k8s-stack.fullname" .) -}}
+    {{- $fullname := (include "vm.fullname" .) -}}
     {{- $cms = append $cms (printf "%s-vmalert-extra-tpl" $fullname) -}}
   {{- end -}}
   {{- $output := dict "configMaps" (compact $cms) -}}
@@ -243,7 +173,7 @@ If release name contains chart name it will be used as a full name.
   {{- $Values := (.helm).Values | default .Values }}
   {{- $extraArgs := dict "remoteWrite.disablePathAppend" "true" -}}
   {{- if $Values.vmalert.templateFiles -}}
-    {{- $ruleTmpl := (printf "/etc/vm/configs/%s-vmalert-extra-tpl/*.tmpl" (include "victoria-metrics-k8s-stack.fullname" .)) -}}
+    {{- $ruleTmpl := (printf "/etc/vm/configs/%s-vmalert-extra-tpl/*.tmpl" (include "vm.fullname" .)) -}}
     {{- $_ := set $extraArgs "rule.templates" $ruleTmpl -}}
   {{- end -}}
   {{- $vmAlertRemotes := (include "vm.alert.remotes" . | fromYaml) -}}
@@ -323,7 +253,7 @@ If release name contains chart name it will be used as a full name.
 {{- /* Alermanager spec */ -}}
 {{- define "vm.alertmanager.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $fullname := (include "victoria-metrics-k8s-stack.fullname" .) -}}
+  {{- $fullname := (include "vm.fullname" .) -}}
   {{- $spec := $Values.alertmanager.spec -}}
   {{- if and (not $Values.alertmanager.spec.configRawYaml) (not $Values.alertmanager.spec.configSecret) -}}
     {{- $_ := set $spec "configSecret" (printf "%s-alertmanager" $fullname) -}}
@@ -434,14 +364,15 @@ If release name contains chart name it will be used as a full name.
 
 {{- /* VMRule name */ -}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.name" -}}
-  {{- printf "%s-%s" (include "victoria-metrics-k8s-stack.fullname" .) (.name | replace "_" "") -}}
+  {{- $id := (.name | replace "_" "") -}}
+  {{- printf "%s-%s" (include "vm.fullname" .) $id -}}
 {{- end -}}
 
 {{- /* VMRule labels */ -}}
 {{- define "victoria-metrics-k8s-stack.rulegroup.labels" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $labels := (fromYaml (include "victoria-metrics-k8s-stack.labels" .)) -}}
-  {{- $_ := set $labels "app" (include "victoria-metrics-k8s-stack.name" .) -}}
+  {{- $_ := set $labels "app" (include "vm.name" .) -}}
   {{- $labels = mergeOverwrite $labels (deepCopy $Values.defaultRules.labels) -}}
   {{- toYaml $labels -}}
 {{- end }}
@@ -454,5 +385,5 @@ If release name contains chart name it will be used as a full name.
 {{- /* VMAlertmanager name */ -}}
 {{- define "victoria-metrics-k8s-stack.alertmanager.name" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "victoria-metrics-k8s-stack.fullname" .) | trunc 63 | trimSuffix "-") -}}
+  {{- $Values.alertmanager.name | default (printf "%s-%s" "vmalertmanager" (include "vm.fullname" .)) -}}
 {{- end -}}

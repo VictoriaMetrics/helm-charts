@@ -1,37 +1,38 @@
+{{- $service := .Values.service }}
+{{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
 apiVersion: v1
 kind: Service
 metadata:
   namespace: {{ include "vm.namespace" . }}
-  {{- with .Values.service.annotations }}
+  {{- with $service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
-  name: {{ include "vm-operator.fullname" . }}
+  name: {{ include "vm.fullname" . }}
 spec:
-  {{- with .Values.service.clusterIP }}
+  {{- with $service.clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
-  {{- with .Values.service.externalIPs }}
+  {{- with $service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- with .Values.service.loadBalancerIP }}
+  {{- with $service.loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
-  {{- with .Values.service.loadBalancerSourceRanges }}
+  {{- with $service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
   {{- end }}
-  type: {{ .Values.service.type }}
-  {{- with .Values.service.healthCheckNodePort }}
+  type: {{ $service.type }}
+  {{- with $service.healthCheckNodePort }}
   healthCheckNodePort: {{ . }}
   {{- end }}
-  {{- with .Values.service.externalTrafficPolicy }}
+  {{- with $service.externalTrafficPolicy }}
   externalTrafficPolicy: {{ . }}
   {{- end }}
-  {{- with .Values.service.ipFamilyPolicy }}
+  {{- with $service.ipFamilyPolicy }}
   ipFamilyPolicy: {{ . }}
   {{- end }}
-  {{- with .Values.service.ipFamilies }}
+  {{- with $service.ipFamilies }}
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:

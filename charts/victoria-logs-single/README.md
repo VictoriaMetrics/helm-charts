@@ -186,7 +186,7 @@ fluent-bit.config.outputs: |
   [OUTPUT]
       Name http
       Match kube.*
-      Host '{{ include "victoria-logs.server.fullname" . }}'
+      Host '{{ include "vm.plain.fullname" (dict "helm" . "appKey" "server") }}'
       port 9428
       compress gzip
       uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name,kubernetes_container_name,kubernetes_namespace_name&_msg_field=log&_time_field=date
@@ -337,7 +337,7 @@ auto
       <td></td>
     </tr>
     <tr>
-      <td>global.victoriaLogs.server.fullnameOverride</td>
+      <td>global.victoria-logs-single.server.fullnameOverride</td>
       <td>string</td>
       <td><pre lang="">
 null
@@ -347,14 +347,13 @@ null
 </td>
     </tr>
     <tr>
-      <td>global.victoriaLogs.server.name</td>
+      <td>global.victoria-logs-single.server.name</td>
       <td>string</td>
       <td><pre lang="">
-server
+""
 </pre>
 </td>
-      <td><p>Server container name</p>
-</td>
+      <td></td>
     </tr>
     <tr>
       <td>podDisruptionBudget.enabled</td>

@@ -1,14 +1,14 @@
 {{- if and .Values.server.enabled .Values.server.serviceMonitor.enabled -}}
 {{- $serviceMonitor := .Values.server.serviceMonitor -}}
+{{- $ctx := dict "helm" . "extraLabels" $serviceMonitor.extraLabels "appKey" "server" }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   {{- with $serviceMonitor.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $serviceMonitor.extraLabels) }}
   labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-logs.server.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   {{- with $serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
@@ -17,7 +17,7 @@ spec:
     matchNames:
       - {{ include "vm.namespace" . }}
   selector:
-    matchLabels: {{ include "victoria-logs.server.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "victoria-logs.server.matchLabels" (omit $ctx "extraLabels") | nindent 6 }}
   endpoints:
     - port: http
       {{- with $serviceMonitor.basicAuth }}

@@ -1,14 +1,14 @@
 {{- if .Values.serviceMonitor.enabled -}}
 {{- $serviceMonitor := .Values.serviceMonitor -}}
+{{- $ctx := dict "helm" . "extraLabels" $serviceMonitor.extraLabels "appKey" "server" }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   {{- with $serviceMonitor.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $serviceMonitor.extraLabels) }}
   labels: {{ include "vmalert.server.labels" $ctx | nindent 4 }}
-  name: {{ include "vmalert.server.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   {{- with $serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}

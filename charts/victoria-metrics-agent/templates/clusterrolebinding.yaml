@@ -1,13 +1,13 @@
 {{- if .Values.rbac.create -}}
 {{- $namespaced := .Values.rbac.namespaced }}
+{{- $ctx := dict "helm" . "extraLabels" .Values.rbac.extraLabels }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ ternary "RoleBinding" "ClusterRoleBinding" $namespaced }}
 metadata:
-  name: {{ include "chart.fullname" . }}{{- ternary "" "-clusterrolebinding" $namespaced }}
+  name: {{ include "vm.fullname" $ctx }}
   {{- if $namespaced }}
   namespace: {{ include "vm.namespace" . }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.rbac.extraLabels) }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}
   {{- with .Values.rbac.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
@@ -15,9 +15,9 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: {{ ternary "Role" "ClusterRole" $namespaced }}
-  name: {{ include "chart.fullname" . }}{{- ternary "" "-clusterrole" $namespaced }}
+  name: {{ include "vm.fullname" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "chart.serviceAccountName" . }}
+    name: {{ include "vm.sa.name" . }}
     namespace: {{ include "vm.namespace" . }}
 {{- end -}}

@@ -1,6 +1,6 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vmselect -}}
-{{- $fullname := (include "victoria-metrics.vmselect.fullname" .) }}
+{{- $ctx := dict "helm" . "extraLabels" $app.extraLabels "appKey" "vmselect" }}
+{{- $fullname := (include "vm.plain.fullname" $ctx) }}
 {{- if and $app.enabled (not $app.statefulSet.enabled) -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -8,13 +8,12 @@ metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := mergeOverwrite (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
   name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
 spec:
   selector:
-    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" (omit $ctx "extraLabels") | nindent 6 }}
   {{- if not $app.horizontalPodAutoscaler.enabled }}
   replicas: {{ $app.replicaCount }}
   {{- end }}
@@ -41,7 +40,7 @@ spec:
       {{- end }}
       containers:
         - name: vmselect
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
@@ -102,7 +101,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "victoria-metrics.serviceAccountName" . }}
+      serviceAccountName: {{ include "vm.sa.name" . }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

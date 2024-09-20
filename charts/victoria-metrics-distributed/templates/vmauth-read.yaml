@@ -1,28 +1,33 @@
-{{- if .Values.vmauthQueryGlobal.enabled }}
+{{- if .Values.read.global.vmauth.enabled }}
+{{- $ctx := dict "helm" . "appKey" (list "write" "global" "vmauth") }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
-  name: {{ include "victoria-metrics-distributed.vmauthQueryGlobalName" . }}
+  name: read-global-{{ include "vm.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
-  {{- with .Values.vmauthQueryGlobal.annotations }}
+  {{- with .Values.read.global.vmauth.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end  }}
+{{- $spec := .Values.read.global.vmauth.spec }}
 spec:
+  {{- with (omit $spec "unauthorizedAccessConfig") }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   unauthorizedAccessConfig:
-    - src_paths:
-        - "/select/.+"
-      url_prefix:
-{{- range $zone := $.Values.availabilityZones }}
-{{ printf "- http://vmauth-%s:8427/" ( $zone.vmauthCrossAZQuery.name | default ( printf "vmauth-read-proxy-%s" $zone.name )) | indent 8 }}
-{{- end }}
-{{- $spec := deepCopy .Values.vmauthQueryGlobal.spec }}
-{{- $spec := unset $spec "unauthorizedAccessConfig" }}
-      load_balancing_policy: first_available
-{{- if $spec }}
-{{- toYaml $spec | nindent 2 }}
-{{- end }}
+  - src_paths:
+    - "/select/.+"
+    load_balancing_policy: first_available
+    {{- $_ := set $ctx "style" "managed" }}
+    {{- $_ := set $ctx "prefix" "read-proxy" }}
+    {{- $urls := default list }}
+    {{- range $i, $zone := $.Values.availabilityZones }}
+      {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "read" "crossZone" "vmauth") }}
+      {{- $urls = append $urls (include "vm.url" $ctx) }}
+    {{- end }}
+    {{- $_ := unset $ctx "style" }}
+    url_prefix: {{ toYaml $urls | nindent 4 }}
 {{- end }}
 

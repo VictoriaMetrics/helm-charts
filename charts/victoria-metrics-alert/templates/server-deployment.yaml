@@ -1,18 +1,18 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.server }}
 {{- if and $app.enabled -}}
 {{- if not $app.extraArgs.rule }}
-{{- if and (eq $app.configMap "") (eq (len $app.config.alerts.groups) 0) -}}
-{{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
+{{- if and (empty $app.configMap) (empty $app.config.alerts.groups) -}}
+  {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
 {{- end -}}
 {{- end -}}
 {{- if eq $app.datasource.url "" -}}
-{{- fail "server.datasource.url datasource URL must be specified" -}}
+  {{- fail "server.datasource.url datasource URL must be specified" -}}
 {{- end -}}
+{{- $ctx := dict "helm" . "appKey" "server" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "vmalert.server.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vmalert.server.labels" . | nindent 4 }}
   {{- with $app.annotations }}
@@ -28,13 +28,13 @@ spec:
   {{- end }}
   template:
     metadata:
-      {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.podLabels) }}
+      {{- $_ := set $ctx "extraLabels" $app.podLabels }}
       labels: {{ include "vmalert.server.labels" $ctx | nindent 8 }}
       {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/server-alerts-configmap.yaml") . | sha256sum) }}
       {{- $annotations = merge $annotations $app.podAnnotations }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "vmalert.serviceAccountName" . }}
+      serviceAccountName: {{ include "vm.sa.name" . }}
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
@@ -50,7 +50,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
           args: {{ include "vmalert.args" . | nindent 12 }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.envFrom }}

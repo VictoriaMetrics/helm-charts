@@ -1,4 +1,5 @@
 {{- if .Values.extraVMAgent.enabled }}
+{{- $ctx := dict "helm" . }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAgent
@@ -6,5 +7,8 @@ metadata:
   labels: {{ include "victoria-metrics-distributed.labels" . | nindent 4 }}
   name: {{ .Values.extraVMAgent.name }}
   namespace: {{ include "vm.namespace" . }}
-spec: {{ include "victoria-metrics-distributed.extravmagentSpec" . | nindent 2 }}
+{{- $spec := (deepCopy .Values.extraVMAgent.spec) }}
+{{- $remoteWrites := list (dict "url" (printf "%s/prometheus/api/v1/write" (include "vm.url" $ctx))) }}
+{{- $_ := set $spec "remoteWrite" (concat $remoteWrites ($spec.remoteWrite | default list)) }}
+spec: {{ tpl (toYaml $spec) . | nindent 2 }}
 {{- end }}

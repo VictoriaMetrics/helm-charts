@@ -1929,11 +1929,6 @@ true
       <td>object</td>
       <td><pre lang="plaintext">
 crd:
-    cleanup:
-        enabled: true
-        image:
-            pullPolicy: IfNotPresent
-            repository: bitnami/kubectl
     create: false
 enabled: true
 operator:
@@ -1946,26 +1941,13 @@ serviceMonitor:
 </td>
     </tr>
     <tr>
-      <td>victoria-metrics-operator.crd.cleanup</td>
-      <td>object</td>
-      <td><pre lang="plaintext">
-enabled: true
-image:
-    pullPolicy: IfNotPresent
-    repository: bitnami/kubectl
-</pre>
-</td>
-      <td><p>tells helm to clean up vm cr resources when uninstalling</p>
-</td>
-    </tr>
-    <tr>
       <td>victoria-metrics-operator.crd.create</td>
       <td>bool</td>
       <td><pre lang="">
 false
 </pre>
 </td>
-      <td><p>we disable crd creation by operator chart as we create them in this chart</p>
+      <td><p>added temporary, till new operator version released</p>
 </td>
     </tr>
     <tr>

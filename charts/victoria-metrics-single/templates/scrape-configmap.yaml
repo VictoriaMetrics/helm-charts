@@ -2,16 +2,15 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "victoria-metrics.server.fullname" . }}-scrapeconfig
+  name: {{ include "victoria-metrics.server.scrape.configname" . }}
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "victoria-metrics.server.labels" . | nindent 4 }}
 data:
-  scrape.yml: |
-    {{- range $k, $v := .Values.server.scrape.config }}
-    {{- if and (eq $k "scrape_configs") ($.Values.server.scrape.extraScrapeConfigs) }}
-    {{ dict $k (concat $v $.Values.server.scrape.extraScrapeConfigs) | toYaml | nindent 4 }}
-    {{- else }}
-    {{ dict $k $v | toYaml | nindent 4 }}
+  {{- $config := .Values.server.scrape.config }}
+  {{- with .Values.server.scrape.extraScrapeConfigs }}
+    {{- if hasKey "scrape_configs" $config }}
+      {{- $_ := set $config (concat $config.scrape_configs .) }}
     {{- end }}
-    {{- end }}
+  {{- end }}
+  scrape.yml: |{{ toYaml $config }}
 {{- end }}

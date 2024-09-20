@@ -1,10 +1,9 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}
-  namespace: {{ include "vm.namespace" . }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" .Values.extraLabels) }}
+  name: {{ include "vm.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
@@ -12,14 +11,14 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "chart.selectorLabels" (omit $ctx "extraLabels") | nindent 6 }}
   template:
     metadata:
       labels: {{ include "chart.selectorLabels" $ctx | nindent 8 }}
       {{- $annotations := merge (dict "checksum/config" (include (print .Template.BasePath "/secret.yaml") . | sha256sum)) .Values.podAnnotations }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+      serviceAccountName: {{ include "vm.sa.name" . }}
       {{- if .Values.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
@@ -31,7 +30,7 @@ spec:
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" .Values) }}
           workingDir: {{ .Values.containerWorkingDir }}
           args: {{ include "vmauth.args" . | nindent 12 }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -88,7 +87,7 @@ spec:
       volumes:
         - name: config
           secret:
-            secretName: {{ ternary (include "chart.fullname" .) .Values.secretName (empty .Values.secretName) }}
+            secretName: {{ ternary (include "vm.fullname" $ctx) .Values.secretName (empty .Values.secretName) }}
         {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:

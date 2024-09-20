@@ -13,7 +13,7 @@ kind: Ingress
 metadata:
   name: {{ $serviceName }}
   namespace: {{ $ns }}
-  {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-%s" (include "victoria-metrics-k8s-stack.name" $) $name) }}
+  {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-%s" (include "vm.name" $) $name) }}
   {{- $_ := set $ctx "extraLabels" (merge $extraLabels $ingress.labels) }}
   labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
   {{- with $ingress.annotations }}

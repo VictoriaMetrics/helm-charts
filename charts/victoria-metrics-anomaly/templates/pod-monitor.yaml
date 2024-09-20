@@ -3,15 +3,15 @@
   {{- fail "`config.monitoring.pull.port` is required and `config.monitoring.pull.enabled` should be `true`, when PodMonitor is enabled" -}}
 {{- end -}}
 {{- $podMonitor := .Values.podMonitor -}}
+{{- $ctx := dict "helm" . "extraLabels" $podMonitor.extraLabels }}
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   {{- with $podMonitor.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $podMonitor.extraLabels) }}
   labels: {{ include "chart.labels" $ctx | nindent 4 }}
-  name: {{ include "chart.fullname" . }}
+  name: {{ include "vm.fullname" . }}
   {{- with $podMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}

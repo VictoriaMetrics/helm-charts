@@ -1,7 +1,7 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.server }}
-{{- $fullname := (include "victoria-logs.server.fullname" .) }}
 {{- if and $app.enabled $app.statefulSet.enabled -}}
+{{- $ctx := dict "helm" . "extraLabels" $app.extraLabels "appKey" "server" }}
+{{- $fullname := (include "vm.plain.fullname" $ctx) }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -10,12 +10,11 @@ metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
 spec:
   serviceName: {{ $fullname }}
   selector:
-    matchLabels: {{ include "victoria-logs.server.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "victoria-logs.server.matchLabels" (omit $ctx "extraLabels") | nindent 6 }}
   replicas: {{ $app.replicaCount }}
   podManagementPolicy: {{ $app.podManagementPolicy }}
   template:
@@ -23,7 +22,7 @@ spec:
       {{- with $app.podAnnotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.podLabels) }}
+      {{- $_ := set $ctx "extraLabels" $app.podLabels }}
       labels: {{ include "victoria-logs.server.labels" $ctx | nindent 8 }}
     spec:
       {{- with $app.priorityClassName }}
@@ -43,7 +42,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
@@ -123,7 +122,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
-      {{ with $app.tolerations }}
+      {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with $app.affinity }}
