@@ -334,7 +334,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Use an alternate scheduler, e.g. &ldquo;stork&rdquo;. Check <a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/" target="_blank">here</a> for more details schedulerName:</p>
+</td>
     </tr>
     <tr>
       <td>server.enabled</td>
@@ -355,7 +356,7 @@ name: ""
 </code>
 </pre>
 </td>
-      <td><p>Additional environment variables (ex.: secret tokens, flags) <a href="https://docs.victoriametrics.com/#environment-variables" target="_blank">https://docs.victoriametrics.com/#environment-variables</a></p>
+      <td><p>Additional environment variables (ex.: secret tokens, flags). Check <a href="https://docs.victoriametrics.com/#environment-variables" target="_blank">here</a> for more details</p>
 </td>
     </tr>
     <tr>
@@ -1805,7 +1806,7 @@ relabel_configs:
 </code>
 </pre>
 </td>
-      <td><p>Service External IPs. Details are <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a></p>
+      <td><p>Service external IPs. Details are <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
@@ -1816,7 +1817,8 @@ relabel_configs:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external traffic policy. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>server.service.healthCheckNodePort</td>

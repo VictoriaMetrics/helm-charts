@@ -714,14 +714,15 @@ tcpSocket: {}
 </td>
     </tr>
     <tr>
-      <td>securityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>securityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Container security context. Check <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>service.annotations</td>
@@ -761,7 +762,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external IPs. Check <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>service.externalTrafficPolicy</td>
@@ -771,7 +773,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external traffic policy. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>service.extraLabels</td>

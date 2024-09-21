@@ -14,7 +14,7 @@ replicaCount: 1
 # -- [K8s Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) specific variables
 deployment:
   enabled: true
-  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  # -- Deployment stragegy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) for details
   strategy: {}
    # rollingUpdate:
    #  maxSurge: 25%
@@ -29,7 +29,7 @@ statefulset:
   clusterMode: false
   # -- replication factor for vmagent in cluster mode
   replicationFactor: 1
-  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  # -- StatefulSet update strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies) for details.
   updateStrategy: {}
     # type: RollingUpdate
 
@@ -169,8 +169,7 @@ service:
   annotations: {}
   extraLabels: {}
   clusterIP: ""
-  ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
-  ##
+  # -- Service external IPs. Check [here](https://kubernetes.io/docs/user-guide/services/#external-ips) for details
   externalIPs: []
   loadBalancerIP: ""
   loadBalancerSourceRanges: []
@@ -179,7 +178,7 @@ service:
   type: ClusterIP
   ipFamilyPolicy: ""
   ipFamilies: []
-  # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
   externalTrafficPolicy: ""
   healthCheckNodePort: ""
 ingress:

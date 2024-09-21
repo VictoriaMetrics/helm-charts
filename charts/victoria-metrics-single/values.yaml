@@ -125,7 +125,7 @@ server:
   affinity: {}
 
   # -- Env variables
-  # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for more details
   env: []
 
   envFrom: []
@@ -135,9 +135,7 @@ server:
   # -- Container workdir
   containerWorkingDir: ""
 
-  ## Use an alternate scheduler, e.g. "stork".
-  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
-  ##
+  # -- Use an alternate scheduler, e.g. "stork". Check [here](https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/) for more details
   # schedulerName:
 
   emptyDir: {}
@@ -318,7 +316,7 @@ server:
     labels: {}
     # -- Service ClusterIP
     clusterIP: ""
-    # -- Service External IPs. Details are [here](https://kubernetes.io/docs/user-guide/services/#external-ips)
+    # -- Service external IPs. Details are [here](https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
     # -- Service load balacner IP
     loadBalancerIP: ""
@@ -330,7 +328,7 @@ server:
     # nodePort: 30000
     # -- Service type
     type: ClusterIP
-    # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
     externalTrafficPolicy: ""
     healthCheckNodePort: ""
     ipFamilyPolicy: ""
@@ -393,7 +391,7 @@ server:
           static_configs:
             - targets: [ "localhost:8428" ]
 
-          ## COPY from Prometheus helm chart https://github.com/helm/charts/blob/master/stable/prometheus/values.yaml
+          # COPY from Prometheus helm chart https://github.com/helm/charts/blob/master/stable/prometheus/values.yaml
 
           # Scrape config for API servers.
           #
@@ -691,7 +689,7 @@ server:
             - source_labels: [ __meta_kubernetes_pod_name ]
               action: replace
               target_label: pod
-          ## End of COPY
+          # End of COPY
 
     # -- Extra scrape configs that will be appended to `server.scrape.config`
     extraScrapeConfigs: []

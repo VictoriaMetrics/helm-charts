@@ -658,7 +658,7 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td><p>Check <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a> for details.</p>
+      <td><p>Service external IPs. Check <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a> for details</p>
 </td>
     </tr>
     <tr>
@@ -669,7 +669,7 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td><p>Chech <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details.</p>
+      <td><p>Service external traffic policy. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
 </td>
     </tr>
     <tr>
@@ -1604,7 +1604,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external IPs. Check <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>server.service.externalTrafficPolicy</td>
@@ -1614,7 +1615,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external traffic policy. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>server.service.healthCheckNodePort</td>

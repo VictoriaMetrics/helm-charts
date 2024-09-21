@@ -860,7 +860,7 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td><p>Service External IPs. Details are <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a></p>
+      <td><p>Service external IPs. Details are <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
@@ -1759,7 +1759,7 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td><p>Service External IPs. Details are <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a></p>
+      <td><p>Service external IPs. Details are <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
@@ -2767,7 +2767,7 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td><p>Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Details are <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/" target="_blank">here</a> #</p>
+      <td><p>Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Details are <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>

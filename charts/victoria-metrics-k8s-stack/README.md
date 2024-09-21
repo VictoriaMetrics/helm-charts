@@ -404,7 +404,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Provide custom recording or alerting rules to be deployed into the cluster.</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.annotations</td>
@@ -459,6 +460,17 @@ tls: []
 </pre>
 </td>
       <td><p>Alertmanager ingress configuration</p>
+</td>
+    </tr>
+    <tr>
+      <td>alertmanager.ingress.extraPaths</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
 </td>
     </tr>
     <tr>
@@ -1039,6 +1051,60 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
       <td></td>
     </tr>
     <tr>
+      <td>grafana</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">additionalDataSources: []
+defaultDashboardsTimezone: utc
+defaultDatasourceType: prometheus
+enabled: true
+forceDeployDatasource: false
+ingress:
+    annotations: {}
+    enabled: false
+    extraPaths: []
+    hosts:
+        - grafana.domain.com
+    labels: {}
+    path: /
+    pathType: Prefix
+    tls: []
+sidecar:
+    dashboards:
+        additionalDashboardAnnotations: {}
+        additionalDashboardLabels: {}
+        defaultFolderName: default
+        enabled: true
+        folder: /var/lib/grafana/dashboards
+        multicluster: false
+        provider:
+            name: default
+            orgid: 1
+    datasources:
+        createVMReplicasDatasources: false
+        default:
+            - isDefault: true
+              name: VictoriaMetrics
+            - isDefault: false
+              name: VictoriaMetrics (DS)
+              type: victoriametrics-datasource
+        enabled: true
+        initDatasources: true
+vmScrape:
+    enabled: true
+    spec:
+        endpoints:
+            - port: '{{ .Values.grafana.service.portName }}'
+        selector:
+            matchLabels:
+                app.kubernetes.io/name: '{{ include "grafana.name" .Subcharts.grafana }}'
+</code>
+</pre>
+</td>
+      <td><p>Grafana dependency chart configuration. For possible values refer <a href="https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
       <td>grafana.additionalDataSources</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -1046,37 +1112,8 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.defaultDashboardsTimezone</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">utc
-</code>
-</pre>
+      <td><p>Configure additional grafana datasources (passed through tpl). Check <a href="http://docs.grafana.org/administration/provisioning/#datasources" target="_blank">here</a> for details</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.defaultDatasourceType</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">prometheus
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>grafana.forceDeployDatasource</td>
@@ -1086,27 +1123,8 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.ingress.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
+      <td><p>Create datasource configmap even if grafana deployment has been disabled</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.ingress.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>grafana.ingress.extraPaths</td>
@@ -1116,147 +1134,8 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.ingress.hosts[0]</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">grafana.domain.com
-</code>
-</pre>
+      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.ingress.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.ingress.path</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">/
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.ingress.pathType</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">Prefix
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.ingress.tls</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.dashboards.additionalDashboardAnnotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.dashboards.additionalDashboardLabels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.dashboards.defaultFolderName</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">default
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.dashboards.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.dashboards.folder</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">/var/lib/grafana/dashboards
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.dashboards.multicluster</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.dashboards.provider.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">default
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.dashboards.provider.orgid</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">1
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.datasources.createVMReplicasDatasources</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>grafana.sidecar.datasources.default</td>
@@ -1272,26 +1151,6 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
 </td>
       <td><p>List of default prometheus compatible datasource configurations. VM <code>url</code> will be added to each of them in templates and <code>type</code> will be set to defaultDatasourceType if not defined</p>
 </td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.datasources.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.datasources.initDatasources</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>grafana.vmScrape</td>
@@ -1825,14 +1684,55 @@ spec:
 </td>
     </tr>
     <tr>
-      <td>kubelet.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>kubelet</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
+vmScrape:
+    kind: VMNodeScrape
+    spec:
+        bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+        honorLabels: true
+        honorTimestamps: false
+        interval: 30s
+        metricRelabelConfigs:
+            - action: labeldrop
+              regex: (uid)
+            - action: labeldrop
+              regex: (id|name)
+            - action: drop
+              regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
+              source_labels:
+                - __name__
+        relabelConfigs:
+            - action: labelmap
+              regex: __meta_kubernetes_node_label_(.+)
+            - sourceLabels:
+                - __metrics_path__
+              targetLabel: metrics_path
+            - replacement: kubelet
+              targetLabel: job
+        scheme: https
+        scrapeTimeout: 5s
+        tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            insecureSkipVerify: true
+vmScrapes:
+    cadvisor:
+        enabled: true
+        spec:
+            path: /metrics/cadvisor
+    kubelet:
+        spec: {}
+    probes:
+        enabled: true
+        spec:
+            path: /metrics/probes
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Component scraping the kubelets</p>
+</td>
     </tr>
     <tr>
       <td>kubelet.vmScrape</td>
@@ -1884,16 +1784,6 @@ spec:
 </td>
       <td><p>Enable scraping /metrics/cadvisor from kubelet&rsquo;s service</p>
 </td>
-    </tr>
-    <tr>
-      <td>kubelet.vmScrapes.kubelet.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>kubelet.vmScrapes.probes</td>
@@ -2165,17 +2055,6 @@ tls: []
 </td>
     </tr>
     <tr>
-      <td>vmagent.ingress.extraPaths</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
-</td>
-    </tr>
-    <tr>
       <td>vmagent.spec</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -2202,7 +2081,8 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>allows to configure static notifiers, discover notifiers via Consul and DNS, see specification <a href="https://docs.victoriametrics.com/vmalert/#notifier-configuration-file" target="_blank">here</a>. This configuration will be created as separate secret and mounted to VMAlert pod.</p>
+</td>
     </tr>
     <tr>
       <td>vmalert.annotations</td>
@@ -2241,6 +2121,17 @@ tls: []
 </pre>
 </td>
       <td><p>VMAlert ingress config</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmalert.ingress.extraPaths</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
 </td>
     </tr>
     <tr>
@@ -2362,7 +2253,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.insert.hosts[0]</td>
@@ -2442,7 +2334,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.select.hosts[0]</td>
@@ -2522,7 +2415,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.storage.hosts[0]</td>
@@ -2678,7 +2572,8 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
+</td>
     </tr>
     <tr>
       <td>vmsingle.ingress.hosts[0]</td>

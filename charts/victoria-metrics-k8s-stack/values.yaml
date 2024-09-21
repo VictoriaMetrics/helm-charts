@@ -229,7 +229,7 @@ grafanaOperatorDashboardsFormat:
       dashboards: "grafana"
   allowCrossNamespaceImport: false
 
-## -- Provide custom recording or alerting rules to be deployed into the cluster.
+# -- Provide custom recording or alerting rules to be deployed into the cluster.
 additionalVictoriaMetricsMap:
 #    rule-name:
 #     groups:
@@ -249,8 +249,6 @@ externalVM:
     # bearerTokenSecret:
     #   name: dbaas-read-access-token
     #   key: bearerToken
-
-##############
 
 # Configures vmsingle params
 vmsingle:
@@ -283,18 +281,12 @@ vmsingle:
       # kubernetes.io/tls-acme: "true"
     labels: {}
     path: ""
-    # pathType is only for k8s > 1.19
     pathType: Prefix
 
     hosts:
       - vmsingle.domain.com
-    ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+    # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
-    # - path: /*
-    #   backend:
-    #     serviceName: ssl-redirect
-    #     servicePort: use-annotation
-    ## Or for k8s > 1.19
     # - path: /*
     #   pathType: Prefix
     #   backend:
@@ -380,18 +372,12 @@ vmcluster:
         # kubernetes.io/tls-acme: "true"
       labels: {}
       path: ""
-      # pathType is only for k8s > 1.19
       pathType: Prefix
 
       hosts:
         - vmstorage.domain.com
-      ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+      # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
       extraPaths: []
-      # - path: /*
-      #   backend:
-      #     serviceName: ssl-redirect
-      #     servicePort: use-annotation
-      ## Or for k8s > 1.19
       # - path: /*
       #   pathType: Prefix
       #   backend:
@@ -415,18 +401,12 @@ vmcluster:
         # kubernetes.io/tls-acme: "true"
       labels: {}
       path: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vmselect }}'
-      # pathType is only for k8s > 1.19
       pathType: Prefix
 
       hosts:
         - vmselect.domain.com
-      ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+      # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
       extraPaths: []
-      # - path: /*
-      #   backend:
-      #     serviceName: ssl-redirect
-      #     servicePort: use-annotation
-      ## Or for k8s > 1.19
       # - path: /*
       #   pathType: Prefix
       #   backend:
@@ -450,18 +430,12 @@ vmcluster:
         # kubernetes.io/tls-acme: "true"
       labels: {}
       path: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vminsert }}'
-      # pathType is only for k8s > 1.19
       pathType: Prefix
 
       hosts:
         - vminsert.domain.com
-      ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+      # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
       extraPaths: []
-      # - path: /*
-      #   backend:
-      #     serviceName: ssl-redirect
-      #     servicePort: use-annotation
-      ## Or for k8s > 1.19
       # - path: /*
       #   pathType: Prefix
       #   backend:
@@ -618,18 +592,12 @@ alertmanager:
       # kubernetes.io/tls-acme: "true"
     labels: {}
     path: '{{ .Values.alertmanager.spec.routePrefix | default "/" }}'
-    # pathType is only for k8s > 1.19
     pathType: Prefix
 
     hosts:
       - alertmanager.domain.com
-    ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+    # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
-    # - path: /*
-    #   backend:
-    #     serviceName: ssl-redirect
-    #     servicePort: use-annotation
-    ## Or for k8s > 1.19
     # - path: /*
     #   pathType: Prefix
     #   backend:
@@ -670,9 +638,9 @@ vmalert:
     #   {{- end }}
     # template_2.tmpl: ""
 
-  ## additionalNotifierConfigs allows to configure static notifiers, discover notifiers via Consul and DNS,
-  ## see specification in https://docs.victoriametrics.com/vmalert/#notifier-configuration-file.
-  ## This configuration will be created as separate secret and mounted to VMAlert pod.
+  # -- allows to configure static notifiers, discover notifiers via Consul and DNS,
+  # see specification [here](https://docs.victoriametrics.com/vmalert/#notifier-configuration-file).
+  # This configuration will be created as separate secret and mounted to VMAlert pod.
   additionalNotifierConfigs: {}
     # dns_sd_configs:
     #   - names:
@@ -692,18 +660,12 @@ vmalert:
       # kubernetes.io/tls-acme: "true"
     labels: {}
     path: ""
-    # pathType is only for k8s > 1.19
     pathType: Prefix
 
     hosts:
       - vmalert.domain.com
-    ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+    # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
-    # - path: /*
-    #   backend:
-    #     serviceName: ssl-redirect
-    #     servicePort: use-annotation
-    ## Or for k8s > 1.19
     # - path: /*
     #   pathType: Prefix
     #   backend:
@@ -760,18 +722,11 @@ vmagent:
       # kubernetes.io/tls-acme: "true"
     labels: {}
     path: ""
-    # pathType is only for k8s > 1.19
     pathType: Prefix
 
     hosts:
       - vmagent.domain.com
-    # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
-    # - path: /*
-    #   backend:
-    #     serviceName: ssl-redirect
-    #     servicePort: use-annotation
-    ## Or for k8s > 1.19
     # - path: /*
     #   pathType: Prefix
     #   backend:
@@ -784,13 +739,10 @@ vmagent:
     #    hosts:
     #      - vmagent.domain.com
 
-#################################################
-###              dependencies               #####
-#################################################
-# Grafana dependency chart configuration. For possible values refer to https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration
+# -- Grafana dependency chart configuration. For possible values refer [here](https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration)
 grafana:
   enabled: true
-  ## all values for grafana helm chart can be specified here
+  # all values for grafana helm chart can be specified here
   sidecar:
     datasources:
       enabled: true
@@ -815,11 +767,10 @@ grafana:
       enabled: true
       multicluster: false
 
-  ## ForceDeployDatasource Create datasource configmap even if grafana deployment has been disabled
+  # -- Create datasource configmap even if grafana deployment has been disabled
   forceDeployDatasource: false
 
-  ## Configure additional grafana datasources (passed through tpl)
-  ## ref: http://docs.grafana.org/administration/provisioning/#datasources
+  # -- Configure additional grafana datasources (passed through tpl). Check [here](http://docs.grafana.org/administration/provisioning/#datasources) for details
   additionalDataSources: []
   # - name: prometheus-sample
   #   access: proxy
@@ -862,18 +813,12 @@ grafana:
       # kubernetes.io/tls-acme: "true"
     labels: {}
     path: /
-    # pathType is only for k8s > 1.19
     pathType: Prefix
 
     hosts:
       - grafana.domain.com
-    ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+    # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
-    # - path: /*
-    #   backend:
-    #     serviceName: ssl-redirect
-    #     servicePort: use-annotation
-    ## Or for k8s > 1.19
     # - path: /*
     #   pathType: Prefix
     #   backend:
@@ -905,8 +850,8 @@ prometheus-node-exporter:
 
   # all values for prometheus-node-exporter helm chart can be specified here
   service:
-    ## Add the 'node-exporter' label to be used by serviceMonitor to match standard common usage in rules and grafana dashboards
-    ##
+    # Add the 'node-exporter' label to be used by serviceMonitor to match standard common usage in rules and grafana dashboards
+    #
     labels:
       jobLabel: node-exporter
   extraArgs:
@@ -932,8 +877,6 @@ prometheus-node-exporter:
 # kube-state-metrics dependency chart configuration. For possible values refer to https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-state-metrics/values.yaml
 kube-state-metrics:
   enabled: true
-  ## all values for kube-state-metrics helm chart can be specified here
-
   # -- [Scrape configuration](https://docs.victoriametrics.com/operator/api#vmservicescrapespec) for Kube State Metrics
   vmScrape:
     enabled: true
@@ -950,10 +893,7 @@ kube-state-metrics:
               regex: (uid|container_id|image_id)
       jobLabel: app.kubernetes.io/name
 
-#################################################
-###              Service Monitors           #####
-#################################################
-# Component scraping the kubelets
+# -- Component scraping the kubelets
 kubelet:
   enabled: true
   vmScrapes:
@@ -1028,15 +968,13 @@ kubeApiServer:
 kubeControllerManager:
   enabled: true
 
-  ## If your kube controller manager is not deployed as a pod, specify IPs it can be found on
-  ##
+  # If your kube controller manager is not deployed as a pod, specify IPs it can be found on
   endpoints: []
   # - 10.141.4.22
   # - 10.141.4.23
   # - 10.141.4.24
 
-  ## If using kubeControllerManager.endpoints only the port and targetPort are used
-  ##
+  # If using kubeControllerManager.endpoints only the port and targetPort are used
   service:
     enabled: true
     port: 10257
@@ -1112,15 +1050,13 @@ coreDns:
 kubeEtcd:
   enabled: true
 
-  ## If your etcd is not deployed as a pod, specify IPs it can be found on
-  ##
+  # If your etcd is not deployed as a pod, specify IPs it can be found on
   endpoints: []
   # - 10.141.4.22
   # - 10.141.4.23
   # - 10.141.4.24
 
-  ## Etcd service. If using kubeEtcd.endpoints only the port and targetPort are used
-  ##
+  # Etcd service. If using kubeEtcd.endpoints only the port and targetPort are used
   service:
     enabled: true
     port: 2379
@@ -1147,15 +1083,13 @@ kubeEtcd:
 kubeScheduler:
   enabled: true
 
-  ## If your kube scheduler is not deployed as a pod, specify IPs it can be found on
-  ##
+  # If your kube scheduler is not deployed as a pod, specify IPs it can be found on
   endpoints: []
   # - 10.141.4.22
   # - 10.141.4.23
   # - 10.141.4.24
 
-  ## If using kubeScheduler.endpoints only the port and targetPort are used
-  ##
+  # If using kubeScheduler.endpoints only the port and targetPort are used
   service:
     enabled: true
     port: 10259
@@ -1182,8 +1116,7 @@ kubeScheduler:
 kubeProxy:
   enabled: false
 
-  ## If your kube proxy is not deployed as a pod, specify IPs it can be found on
-  ##
+  # If your kube proxy is not deployed as a pod, specify IPs it can be found on
   endpoints: []
   # - 10.141.4.22
   # - 10.141.4.23

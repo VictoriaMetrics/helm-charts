@@ -440,6 +440,17 @@ strategy: {}
 </td>
     </tr>
     <tr>
+      <td>deployment.strategy</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Deployment stragegy. Check <a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy" target="_blank">here</a> for details</p>
+</td>
+    </tr>
+    <tr>
       <td>emptyDir</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -1164,7 +1175,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external IPs. Check <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>service.externalTrafficPolicy</td>
@@ -1174,7 +1186,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external traffic policy. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>service.extraLabels</td>
@@ -1389,6 +1402,17 @@ updateStrategy: {}
 </pre>
 </td>
       <td><p>replication factor for vmagent in cluster mode</p>
+</td>
+    </tr>
+    <tr>
+      <td>statefulset.updateStrategy</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>StatefulSet update strategy. Check <a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies" target="_blank">here</a> for details.</p>
 </td>
     </tr>
     <tr>
