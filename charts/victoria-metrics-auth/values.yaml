@@ -43,7 +43,7 @@ serviceAccount:
   # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name:
 
-# -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+# -- See `kubectl explain poddisruptionbudget.spec` for more. Official guide is [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
 podDisruptionBudget:
   enabled: false
   # minAvailable: 1
@@ -55,7 +55,7 @@ extraArgs:
   envflag.prefix: VM_
   loggerFormat: json
 
-# -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+# -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details
 env: []
 
 envFrom: []
@@ -137,7 +137,6 @@ ingress:
   # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
   # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
   # ingressClassName: nginx
-  # -- pathType is only for k8s >= 1.1=
   pathType: Prefix
 
 ingressInternal:
@@ -158,7 +157,6 @@ ingressInternal:
   # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
   # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
   # ingressClassName: nginx
-  # -- pathType is only for k8s >= 1.1=
   pathType: Prefix
 
 # -- We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after `resources:`.
@@ -179,10 +177,10 @@ podAnnotations: {}
 # -- Labels to be added to the deployment and pods
 extraLabels: {}
 
-# -- NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+# -- NodeSelector configurations. Check [here](https://kubernetes.io/docs/user-guide/node-selection/) for details
 nodeSelector: {}
 
-# -- Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+# -- Tolerations configurations. Check [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) for details
 tolerations: []
   # - key: "key"
   #   operator: "Equal|Exists"
@@ -213,7 +211,7 @@ serviceMonitor:
 #    tlsConfig:
 #      insecureSkipVerify: true
 
-# -- Use existing secret if specified otherwise .config values will be used. Ref: https://docs.victoriametrics.com/vmauth.
+# -- Use existing secret if specified otherwise .config values will be used. Check [here](https://docs.victoriametrics.com/vmauth) for details.
 # Configuration in the given secret must be stored under `auth.yml` key.
 secretName: ""
 
@@ -252,25 +250,24 @@ config:
 extraObjects: []
 
 probe:
-  # -- readiness probe
+  # -- Readiness probe
   readiness:
     tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
-  # -- liveness probe
+  # -- Liveness probe
   liveness:
     tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
     timeoutSeconds: 5
-  # -- startup probe
+  # -- Startup probe
   startup: {}
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
-# Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise,
-# for more information, visit https://victoriametrics.com/products/enterprise/ .
-# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Required only for VictoriaMetrics enterprise. Check docs [here](https://docs.victoriametrics.com/enterprise),
+# for more information, visit [site](https://victoriametrics.com/products/enterprise/).
+# Request a trial license [here](https://victoriametrics.com/products/enterprise/trial/)
 # Supported starting from VictoriaMetrics v1.94.0
 license:
   # -- License key

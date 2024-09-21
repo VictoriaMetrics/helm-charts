@@ -130,8 +130,7 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>affinity</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -141,8 +140,7 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -153,8 +151,7 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>config.global.scrape_interval</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-10s
+<code class="language-yaml">10s
 </code>
 </pre>
 </td>
@@ -164,8 +161,7 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>config.scrape_configs</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-- job_name: vmagent
+<code class="language-yaml">- job_name: vmagent
   static_configs:
     - targets:
         - localhost:8429
@@ -407,27 +403,25 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td><p>scrape configuration. scrape self by default</p>
+      <td><p>Scrape configuration. scrape self by default</p>
 </td>
     </tr>
     <tr>
       <td>configMap</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
-      <td><p>vmagent scraping configuration: <a href="https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/docs/vmagent.md#how-to-collect-metrics-in-prometheus-format" target="_blank">https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/docs/vmagent.md#how-to-collect-metrics-in-prometheus-format</a> use existing configmap if specified otherwise .config values will be used</p>
+      <td><p>VMAgent <a href="https://docs.victoriametrics.com/vmagent#how-to-collect-metrics-in-prometheus-format" target="_blank">scraping configuration</a> use existing configmap if specified otherwise .config values will be used</p>
 </td>
     </tr>
     <tr>
       <td>containerWorkingDir</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-/
+<code class="language-yaml">/
 </code>
 </pre>
 </td>
@@ -437,21 +431,19 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>deployment</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-enabled: true
+<code class="language-yaml">enabled: true
 strategy: {}
 </code>
 </pre>
 </td>
-      <td><p>ref: <a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">https://kubernetes.io/docs/concepts/workloads/controllers/deployment/</a></p>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">K8s Deployment</a> specific variables</p>
 </td>
     </tr>
     <tr>
       <td>emptyDir</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -461,20 +453,18 @@ strategy: {}
       <td>env</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
-      <td><p>Additional environment variables (ex.: secret tokens, flags) <a href="https://docs.victoriametrics.com/#environment-variables" target="_blank">https://docs.victoriametrics.com/#environment-variables</a></p>
+      <td><p>Additional environment variables (ex.: secret tokens, flags). Check <a href="https://docs.victoriametrics.com/#environment-variables" target="_blank">here</a> for more details.</p>
 </td>
     </tr>
     <tr>
       <td>envFrom</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -484,22 +474,20 @@ strategy: {}
       <td>extraArgs</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-envflag.enable: "true"
+<code class="language-yaml">envflag.enable: "true"
 envflag.prefix: VM_
 loggerFormat: json
 </code>
 </pre>
 </td>
-      <td><p>vmagent extra command line arguments</p>
+      <td><p>VMAgent extra command line arguments</p>
 </td>
     </tr>
     <tr>
       <td>extraContainers</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -509,8 +497,7 @@ loggerFormat: json
       <td>extraHostPathMounts</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -521,20 +508,18 @@ loggerFormat: json
       <td>extraLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
-      <td><p>extra Labels for Pods, Deployment and Statefulset</p>
+      <td><p>Extra labels for Pods, Deployment and Statefulset</p>
 </td>
     </tr>
     <tr>
       <td>extraObjects</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -545,8 +530,7 @@ loggerFormat: json
       <td>extraScrapeConfigs</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -557,8 +541,7 @@ loggerFormat: json
       <td>extraVolumeMounts</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -569,8 +552,7 @@ loggerFormat: json
       <td>extraVolumes</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -581,8 +563,7 @@ loggerFormat: json
       <td>fullnameOverride</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -592,8 +573,7 @@ loggerFormat: json
       <td>global.compatibility.openshift.adaptSecurityContext</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-auto
+<code class="language-yaml">auto
 </code>
 </pre>
 </td>
@@ -603,8 +583,7 @@ auto
       <td>global.image.registry</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -614,8 +593,7 @@ auto
       <td>global.imagePullSecrets</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -625,23 +603,21 @@ auto
       <td>horizontalPodAutoscaling</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-enabled: false
+<code class="language-yaml">enabled: false
 maxReplicas: 10
 metrics: []
 minReplicas: 1
 </code>
 </pre>
 </td>
-      <td><p>Horizontal Pod Autoscaling. Note that it is not intended to be used for vmagents which perform scraping. In order to scale scraping vmagents see: <a href="https://docs.victoriametrics.com/vmagent/#scraping-big-number-of-targets" target="_blank">https://docs.victoriametrics.com/vmagent/#scraping-big-number-of-targets</a></p>
+      <td><p>Horizontal Pod Autoscaling. Note that it is not intended to be used for vmagents which perform scraping. In order to scale scraping vmagents check <a href="https://docs.victoriametrics.com/vmagent/#scraping-big-number-of-targets" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
       <td>horizontalPodAutoscaling.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-false
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
@@ -652,8 +628,7 @@ false
       <td>horizontalPodAutoscaling.maxReplicas</td>
       <td>int</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-10
+<code class="language-yaml">10
 </code>
 </pre>
 </td>
@@ -664,8 +639,7 @@ false
       <td>horizontalPodAutoscaling.metrics</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -676,8 +650,7 @@ false
       <td>horizontalPodAutoscaling.minReplicas</td>
       <td>int</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-1
+<code class="language-yaml">1
 </code>
 </pre>
 </td>
@@ -688,8 +661,7 @@ false
       <td>image.pullPolicy</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-IfNotPresent
+<code class="language-yaml">IfNotPresent
 </code>
 </pre>
 </td>
@@ -699,8 +671,7 @@ IfNotPresent
       <td>image.registry</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -711,8 +682,7 @@ IfNotPresent
       <td>image.repository</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-victoriametrics/vmagent
+<code class="language-yaml">victoriametrics/vmagent
 </code>
 </pre>
 </td>
@@ -723,8 +693,7 @@ victoriametrics/vmagent
       <td>image.tag</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -735,8 +704,7 @@ victoriametrics/vmagent
       <td>image.variant</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -747,8 +715,7 @@ victoriametrics/vmagent
       <td>imagePullSecrets</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -758,8 +725,7 @@ victoriametrics/vmagent
       <td>ingress.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -769,8 +735,7 @@ victoriametrics/vmagent
       <td>ingress.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-false
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
@@ -780,8 +745,7 @@ false
       <td>ingress.extraLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -791,8 +755,7 @@ false
       <td>ingress.hosts</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -802,20 +765,17 @@ false
       <td>ingress.pathType</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-Prefix
+<code class="language-yaml">Prefix
 </code>
 </pre>
 </td>
-      <td><p>pathType is only for k8s &gt;= 1.1=</p>
-</td>
+      <td></td>
     </tr>
     <tr>
       <td>ingress.tls</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -825,8 +785,7 @@ Prefix
       <td>initContainers</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -836,23 +795,21 @@ Prefix
       <td>license</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-key: ""
+<code class="language-yaml">key: ""
 secret:
     key: ""
     name: ""
 </code>
 </pre>
 </td>
-      <td><p>Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Documentation - <a href="https://docs.victoriametrics.com/enterprise" target="_blank">https://docs.victoriametrics.com/enterprise</a>, for more information, visit <a href="https://victoriametrics.com/products/enterprise/" target="_blank">https://victoriametrics.com/products/enterprise/</a> . To request a trial license, go to <a href="https://victoriametrics.com/products/enterprise/trial/" target="_blank">https://victoriametrics.com/products/enterprise/trial/</a> Supported starting from VictoriaMetrics v1.94.0</p>
+      <td><p>Enterprise license key configuration for VictoriaMetrics enterprise. Required only for VictoriaMetrics enterprise. Check docs <a href="https://docs.victoriametrics.com/enterprise" target="_blank">here</a>, for more information, visit <a href="https://victoriametrics.com/products/enterprise/" target="_blank">site</a>. Request a trial license <a href="https://victoriametrics.com/products/enterprise/trial/" target="_blank">here</a> Supported starting from VictoriaMetrics v1.94.0</p>
 </td>
     </tr>
     <tr>
       <td>license.key</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -863,8 +820,7 @@ secret:
       <td>license.secret</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-key: ""
+<code class="language-yaml">key: ""
 name: ""
 </code>
 </pre>
@@ -876,8 +832,7 @@ name: ""
       <td>license.secret.key</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -888,8 +843,7 @@ name: ""
       <td>license.secret.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -900,8 +854,7 @@ name: ""
       <td>multiTenantUrls</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -911,8 +864,7 @@ name: ""
       <td>nameOverride</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -922,8 +874,7 @@ name: ""
       <td>nodeSelector</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -933,8 +884,7 @@ name: ""
       <td>persistence.accessModes[0]</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-ReadWriteOnce
+<code class="language-yaml">ReadWriteOnce
 </code>
 </pre>
 </td>
@@ -944,8 +894,7 @@ ReadWriteOnce
       <td>persistence.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -955,8 +904,7 @@ ReadWriteOnce
       <td>persistence.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-false
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
@@ -966,8 +914,7 @@ false
       <td>persistence.existingClaim</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -977,8 +924,7 @@ false
       <td>persistence.extraLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -988,8 +934,7 @@ false
       <td>persistence.matchLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1000,8 +945,7 @@ false
       <td>persistence.size</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-10Gi
+<code class="language-yaml">10Gi
 </code>
 </pre>
 </td>
@@ -1011,8 +955,7 @@ false
       <td>podAnnotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1023,33 +966,30 @@ false
       <td>podDisruptionBudget</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-enabled: false
+<code class="language-yaml">enabled: false
 labels: {}
 </code>
 </pre>
 </td>
-      <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more ref: <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">https://kubernetes.io/docs/tasks/run-application/configure-pdb/</a></p>
+      <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more or check <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">official documentation</a></p>
 </td>
     </tr>
     <tr>
       <td>podLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
-      <td><p>extra Labels for Pods only</p>
+      <td><p>Extra labels for Pods only</p>
 </td>
     </tr>
     <tr>
       <td>podSecurityContext.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-true
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
@@ -1059,61 +999,56 @@ true
       <td>priorityClassName</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
-      <td><p>priority class to be assigned to the pod(s)</p>
+      <td><p>Priority class to be assigned to the pod(s)</p>
 </td>
     </tr>
     <tr>
       <td>probe.liveness</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-initialDelaySeconds: 5
+<code class="language-yaml">initialDelaySeconds: 5
 periodSeconds: 15
 tcpSocket: {}
 timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td><p>liveness probe</p>
+      <td><p>Liveness probe</p>
 </td>
     </tr>
     <tr>
       <td>probe.readiness</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-httpGet: {}
+<code class="language-yaml">httpGet: {}
 initialDelaySeconds: 5
 periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td><p>readiness probe</p>
+      <td><p>Readiness probe</p>
 </td>
     </tr>
     <tr>
       <td>probe.startup</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
-      <td><p>startup probe</p>
+      <td><p>Startup probe</p>
 </td>
     </tr>
     <tr>
       <td>rbac.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1123,8 +1058,7 @@ periodSeconds: 15
       <td>rbac.create</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-true
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
@@ -1134,8 +1068,7 @@ true
       <td>rbac.extraLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1145,8 +1078,7 @@ true
       <td>rbac.namespaced</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-false
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
@@ -1157,8 +1089,7 @@ false
       <td>remoteWriteUrls</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -1169,8 +1100,7 @@ false
       <td>replicaCount</td>
       <td>int</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-1
+<code class="language-yaml">1
 </code>
 </pre>
 </td>
@@ -1180,8 +1110,7 @@ false
       <td>resources</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1191,8 +1120,7 @@ false
       <td>securityContext.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-true
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
@@ -1202,8 +1130,7 @@ true
       <td>service.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1213,8 +1140,7 @@ true
       <td>service.clusterIP</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -1224,8 +1150,7 @@ true
       <td>service.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-false
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
@@ -1235,8 +1160,7 @@ false
       <td>service.externalIPs</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -1246,8 +1170,7 @@ false
       <td>service.externalTrafficPolicy</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -1257,8 +1180,7 @@ false
       <td>service.extraLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1268,8 +1190,7 @@ false
       <td>service.healthCheckNodePort</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -1279,8 +1200,7 @@ false
       <td>service.ipFamilies</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -1290,8 +1210,7 @@ false
       <td>service.ipFamilyPolicy</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -1301,8 +1220,7 @@ false
       <td>service.loadBalancerIP</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -1312,8 +1230,7 @@ false
       <td>service.loadBalancerSourceRanges</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -1323,8 +1240,7 @@ false
       <td>service.servicePort</td>
       <td>int</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-8429
+<code class="language-yaml">8429
 </code>
 </pre>
 </td>
@@ -1334,8 +1250,7 @@ false
       <td>service.type</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-ClusterIP
+<code class="language-yaml">ClusterIP
 </code>
 </pre>
 </td>
@@ -1345,8 +1260,7 @@ ClusterIP
       <td>serviceAccount.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1357,8 +1271,7 @@ ClusterIP
       <td>serviceAccount.create</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-true
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
@@ -1369,8 +1282,7 @@ true
       <td>serviceAccount.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-null
+<code class="language-yaml">null
 </code>
 </pre>
 </td>
@@ -1381,8 +1293,7 @@ null
       <td>serviceMonitor.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1393,8 +1304,7 @@ null
       <td>serviceMonitor.basicAuth</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1405,8 +1315,7 @@ null
       <td>serviceMonitor.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-false
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
@@ -1417,8 +1326,7 @@ false
       <td>serviceMonitor.extraLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1429,8 +1337,7 @@ false
       <td>serviceMonitor.metricRelabelings</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -1441,8 +1348,7 @@ false
       <td>serviceMonitor.relabelings</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -1453,35 +1359,32 @@ false
       <td>statefulset</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-clusterMode: false
+<code class="language-yaml">clusterMode: false
 enabled: false
 replicationFactor: 1
 updateStrategy: {}
 </code>
 </pre>
 </td>
-      <td><p>ref: <a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/" target="_blank">https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/</a></p>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/" target="_blank">K8s StatefulSet</a> specific variables</p>
 </td>
     </tr>
     <tr>
       <td>statefulset.clusterMode</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-false
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
-      <td><p>create cluster of vmagents. See <a href="https://docs.victoriametrics.com/vmagent#scraping-big-number-of-targets" target="_blank">https://docs.victoriametrics.com/vmagent#scraping-big-number-of-targets</a> available since 1.77.2 version <a href="https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.2" target="_blank">https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.2</a></p>
+      <td><p>create cluster of vmagents. Check <a href="https://docs.victoriametrics.com/vmagent#scraping-big-number-of-targets" target="_blank">here</a> available since <a href="https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.2" target="_blank">v1.77.2</a></p>
 </td>
     </tr>
     <tr>
       <td>statefulset.replicationFactor</td>
       <td>int</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-1
+<code class="language-yaml">1
 </code>
 </pre>
 </td>
@@ -1492,8 +1395,7 @@ false
       <td>tolerations</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -1503,8 +1405,7 @@ false
       <td>topologySpreadConstraints</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>

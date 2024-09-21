@@ -40,7 +40,7 @@ serviceAccount:
   # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name:
 
-# -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+# -- See `kubectl explain poddisruptionbudget.spec` for more. Check [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) for details
 podDisruptionBudget:
   enabled: false
   # minAvailable: 1
@@ -52,7 +52,7 @@ extraArgs:
   envflag.prefix: VM_
   loggerFormat: json
 
-# -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
+# -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables) for details.
 env: []
 
 envFrom: []
@@ -88,7 +88,7 @@ podSecurityContext:
   enabled: true
 # fsGroup: 2000
 
-# -- Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+# -- Pod security context. Check [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for details
 securityContext:
   enabled: true
   runAsNonRoot: true
@@ -132,7 +132,6 @@ ingress:
   # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
   # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
   # ingressClassName: nginx
-  # -- pathType is only for k8s >= 1.1=
   pathType: Prefix
 
 # -- We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'.
@@ -150,10 +149,10 @@ annotations: {}
 # -- Annotations to be added to pod
 podAnnotations: {}
 
-# -- NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+# -- NodeSelector configurations. Check [here](https://kubernetes.io/docs/user-guide/node-selection/) for details
 nodeSelector: {}
 
-# -- Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+# -- Tolerations configurations. Check [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) for details
 tolerations: []
   # - key: "key"
   #   operator: "Equal|Exists"
@@ -184,19 +183,19 @@ serviceMonitor:
   #    tlsConfig:
   #      insecureSkipVerify: true
 
-# -- Use existing configmap if specified otherwise .config values will be used. Ref: https://docs.victoriametrics.com/vmgateway
+# -- Use existing configmap if specified otherwise .config values will be used. Check [here](https://docs.victoriametrics.com/vmgateway) for details
 configMap: ""
 
 # -- Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting
 clusterMode: false
 
-# -- Access Control configuration. https://docs.victoriametrics.com/vmgateway#access-control
+# -- Access Control configuration. Check [here](https://docs.victoriametrics.com/vmgateway#access-control) for details
 auth:
   # -- Enable/Disable access-control
   enabled: false
   
 
-# -- Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway#rate-limiter
+# -- Rate limiter configuration. Docs are [here](https://docs.victoriametrics.com/vmgateway#rate-limiter)
 rateLimiter:
   # -- Enable/Disable rate-limiting
   enabled: false
@@ -227,25 +226,24 @@ write:
   url: ""
 
 probe:
-  # -- readiness probe
+  # -- Readiness probe
   readiness:
     httpGet: {}
     initialDelaySeconds: 5
     periodSeconds: 15
-  # -- liveness probe
+  # -- Liveness probe
   liveness:
     tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
     timeoutSeconds: 5
-  # -- startup probe
+  # -- Startup probe
   startup: {}
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
-# Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise,
-# for more information, visit https://victoriametrics.com/products/enterprise/ .
-# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Required only for VictoriaMetrics enterprise. Check docs [here](https://docs.victoriametrics.com/enterprise),
+# for more information, visit [site](https://victoriametrics.com/products/enterprise/).
+# Request a trial license [here](https://victoriametrics.com/products/enterprise/trial/)
 # Supported starting from VictoriaMetrics v1.94.0
 license:
   # -- License key

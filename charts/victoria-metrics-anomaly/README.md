@@ -143,8 +143,7 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>affinity</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -155,8 +154,7 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -167,8 +165,7 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>config</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-models: {}
+<code class="language-yaml">models: {}
 preset: ""
 reader:
     class: vm
@@ -191,8 +188,7 @@ writer:
       <td>config.models</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -203,8 +199,7 @@ writer:
       <td>config.preset</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -215,8 +210,7 @@ writer:
       <td>config.reader</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-class: vm
+<code class="language-yaml">class: vm
 datasource_url: ""
 queries: {}
 sampling_period: 1m
@@ -231,8 +225,7 @@ tenant_id: ""
       <td>config.reader.class</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-vm
+<code class="language-yaml">vm
 </code>
 </pre>
 </td>
@@ -243,8 +236,7 @@ vm
       <td>config.reader.datasource_url</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -255,20 +247,18 @@ vm
       <td>config.reader.queries</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
-      <td><p>Required. PromQL/MetricsQL query to select data in format: QUERY_ALIAS: &ldquo;QUERY&rdquo;. As accepted by &ldquo;/query_range?query=%s&rdquo;. See <a href="https://docs.victoriametrics.com/anomaly-detection/components/reader/#per-query-parameters" target="_blank">https://docs.victoriametrics.com/anomaly-detection/components/reader/#per-query-parameters</a> for more details.</p>
+      <td><p>Required. PromQL/MetricsQL query to select data in format: QUERY_ALIAS: &ldquo;QUERY&rdquo;. As accepted by &ldquo;/query_range?query=%s&rdquo;. See <a href="https://docs.victoriametrics.com/anomaly-detection/components/reader/#per-query-parameters" target="_blank">here</a> for more details.</p>
 </td>
     </tr>
     <tr>
       <td>config.reader.sampling_period</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-1m
+<code class="language-yaml">1m
 </code>
 </pre>
 </td>
@@ -279,8 +269,7 @@ vm
       <td>config.reader.tenant_id</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -291,8 +280,7 @@ vm
       <td>config.schedulers</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -303,8 +291,7 @@ vm
       <td>config.writer</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-class: vm
+<code class="language-yaml">class: vm
 datasource_url: ""
 tenant_id: ""
 </code>
@@ -317,8 +304,7 @@ tenant_id: ""
       <td>config.writer.class</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-vm
+<code class="language-yaml">vm
 </code>
 </pre>
 </td>
@@ -329,8 +315,7 @@ vm
       <td>config.writer.datasource_url</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -341,8 +326,7 @@ vm
       <td>config.writer.tenant_id</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -353,8 +337,7 @@ vm
       <td>configMapAnnotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -365,8 +348,7 @@ vm
       <td>containerWorkingDir</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-/vmanomaly
+<code class="language-yaml">/vmanomaly
 </code>
 </pre>
 </td>
@@ -376,8 +358,7 @@ vm
       <td>emptyDir</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -387,8 +368,7 @@ vm
       <td>env</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -399,8 +379,7 @@ vm
       <td>envFrom</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -410,8 +389,7 @@ vm
       <td>extraArgs</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -421,8 +399,7 @@ vm
       <td>extraContainers</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -432,8 +409,7 @@ vm
       <td>extraHostPathMounts</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -444,8 +420,7 @@ vm
       <td>extraVolumeMounts</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -456,8 +431,7 @@ vm
       <td>extraVolumes</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -468,8 +442,7 @@ vm
       <td>fullnameOverride</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -479,8 +452,7 @@ vm
       <td>global.compatibility.openshift.adaptSecurityContext</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-auto
+<code class="language-yaml">auto
 </code>
 </pre>
 </td>
@@ -490,8 +462,7 @@ auto
       <td>global.image.registry</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -501,8 +472,7 @@ auto
       <td>global.imagePullSecrets</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -512,8 +482,7 @@ auto
       <td>image.pullPolicy</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-IfNotPresent
+<code class="language-yaml">IfNotPresent
 </code>
 </pre>
 </td>
@@ -524,8 +493,7 @@ IfNotPresent
       <td>image.registry</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -536,8 +504,7 @@ IfNotPresent
       <td>image.repository</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-victoriametrics/vmanomaly
+<code class="language-yaml">victoriametrics/vmanomaly
 </code>
 </pre>
 </td>
@@ -548,8 +515,7 @@ victoriametrics/vmanomaly
       <td>image.tag</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-v1.15.9
+<code class="language-yaml">v1.15.9
 </code>
 </pre>
 </td>
@@ -560,8 +526,7 @@ v1.15.9
       <td>imagePullSecrets</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
@@ -571,8 +536,7 @@ v1.15.9
       <td>license</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-key: ""
+<code class="language-yaml">key: ""
 secret:
     key: ""
     name: ""
@@ -586,8 +550,7 @@ secret:
       <td>license.key</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -598,8 +561,7 @@ secret:
       <td>license.secret</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-key: ""
+<code class="language-yaml">key: ""
 name: ""
 </code>
 </pre>
@@ -611,8 +573,7 @@ name: ""
       <td>license.secret.key</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -623,8 +584,7 @@ name: ""
       <td>license.secret.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -635,8 +595,7 @@ name: ""
       <td>nameOverride</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -646,8 +605,7 @@ name: ""
       <td>nodeSelector</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -658,8 +616,7 @@ name: ""
       <td>persistentVolume</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-accessModes:
+<code class="language-yaml">accessModes:
     - ReadWriteOnce
 annotations: {}
 enabled: false
@@ -677,8 +634,7 @@ storageClassName: ""
       <td>persistentVolume.accessModes</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-- ReadWriteOnce
+<code class="language-yaml">- ReadWriteOnce
 </code>
 </pre>
 </td>
@@ -689,8 +645,7 @@ storageClassName: ""
       <td>persistentVolume.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -701,8 +656,7 @@ storageClassName: ""
       <td>persistentVolume.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-false
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
@@ -713,8 +667,7 @@ false
       <td>persistentVolume.existingClaim</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -725,8 +678,7 @@ false
       <td>persistentVolume.matchLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -737,8 +689,7 @@ false
       <td>persistentVolume.size</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-1Gi
+<code class="language-yaml">1Gi
 </code>
 </pre>
 </td>
@@ -749,8 +700,7 @@ false
       <td>persistentVolume.storageClassName</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -761,8 +711,7 @@ false
       <td>podAnnotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -773,8 +722,7 @@ false
       <td>podDisruptionBudget</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-enabled: false
+<code class="language-yaml">enabled: false
 labels: {}
 minAvailable: 1
 </code>
@@ -787,8 +735,7 @@ minAvailable: 1
       <td>podMonitor.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -798,8 +745,7 @@ minAvailable: 1
       <td>podMonitor.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-false
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
@@ -809,8 +755,7 @@ false
       <td>podMonitor.extraLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -820,8 +765,7 @@ false
       <td>podSecurityContext.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-true
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
@@ -831,8 +775,7 @@ true
       <td>resources</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -842,23 +785,21 @@ true
       <td>securityContext</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-enabled: true
+<code class="language-yaml">enabled: true
 runAsGroup: 1000
 runAsNonRoot: true
 runAsUser: 1000
 </code>
 </pre>
 </td>
-      <td><p>Ref: <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">https://kubernetes.io/docs/tasks/configure-pod-container/security-context/</a></p>
+      <td><p>Check <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a> for details.</p>
 </td>
     </tr>
     <tr>
       <td>serviceAccount.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -869,8 +810,7 @@ runAsUser: 1000
       <td>serviceAccount.create</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-true
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
@@ -881,8 +821,7 @@ true
       <td>serviceAccount.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-null
+<code class="language-yaml">null
 </code>
 </pre>
 </td>
@@ -893,8 +832,7 @@ null
       <td>tolerations</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-[]
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>

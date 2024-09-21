@@ -243,8 +243,7 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>availabilityZones</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-- allowIngest: true
+<code class="language-yaml">- allowIngest: true
   allowQuery: true
   extraAffinity: {}
   name: zone-eu-1
@@ -345,130 +344,120 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td><p>config per availability zone components, including vmagent, vmcluster, vmauth etc</p>
+      <td><p>Config per availability zone components, including vmagent, vmcluster, vmauth etc</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[0].allowIngest</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-true
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
-      <td><p>allow data ingestion to this zone</p>
+      <td><p>Allow data ingestion to this zone</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[0].allowQuery</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-true
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
-      <td><p>allow data query from this zone through global query endpoint</p>
+      <td><p>Allow data query from this zone through global query endpoint</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[0].extraAffinity</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
-      <td><p>extraAffinity adds user defined custom affinity rules</p>
+      <td><p>Extra affinity adds user defined custom affinity rules</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[0].nodeSelector</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-topology.kubernetes.io/zone: zone-eu-1
+<code class="language-yaml">topology.kubernetes.io/zone: zone-eu-1
 </code>
 </pre>
 </td>
-      <td><p>nodeselector to restrict where pods of this zone can be placed. usually provided by cloud providers.</p>
+      <td><p>Node selector to restrict where pods of this zone can be placed. usually provided by cloud providers.</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[0].topologySpreadConstraints</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-- maxSkew: 1
+<code class="language-yaml">- maxSkew: 1
   topologyKey: kubernetes.io/hostname
   whenUnsatisfiable: ScheduleAnyway
 </code>
 </pre>
 </td>
-      <td><p>topologySpreadConstraints allows to customize the default topologySpreadConstraints.</p>
+      <td><p>Topology spread constraints allows to customize the default topologySpreadConstraints.</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[0].vmagent</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-annotations: {}
+<code class="language-yaml">annotations: {}
 enabled: true
 name: ""
 spec: {}
 </code>
 </pre>
 </td>
-      <td><p>vmagent here only meant to proxy write requests to each az, doesn&rsquo;t support customized other remote write address.</p>
+      <td><p>VMAgent here only meant to proxy write requests to each az, doesn&rsquo;t support customized other remote write address.</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[0].vmauthCrossAZQuery</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-enabled: true
+<code class="language-yaml">enabled: true
 name: ""
 spec: {}
 </code>
 </pre>
 </td>
-      <td><p>set up a vmauth with all the zone with <code>allowQuery: true</code> as query backends</p>
+      <td><p>Set up a vmauth with all the zone with <code>allowQuery: true</code> as query backends</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[0].vmauthIngest.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
-      <td><p>override the name of the vmauth object</p>
+      <td><p>Override the name of the vmauth object</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[0].vmcluster.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
-      <td><p>override the name of the vmcluster, by default is vmcluster-<zoneName></p>
+      <td><p>Override the name of the vmcluster, by default is vmcluster-<zoneName></p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[0].vmcluster.spec</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-replicationFactor: 2
+<code class="language-yaml">replicationFactor: 2
 retentionPeriod: "14"
 vminsert:
     extraArgs: {}
@@ -485,104 +474,96 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td><p>spec for VMCluster crd, see <a href="https://docs.victoriametrics.com/operator/api#vmclusterspec" target="_blank">https://docs.victoriametrics.com/operator/api#vmclusterspec</a></p>
+      <td><p>Spec for VMCluster CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmclusterspec" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[1].allowIngest</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-true
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
-      <td><p>allow data ingestion to this zone</p>
+      <td><p>Allow data ingestion to this zone</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[1].allowQuery</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-true
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
-      <td><p>allow data query from this zone through global query endpoint</p>
+      <td><p>Allow data query from this zone through global query endpoint</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[1].extraAffinity</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-{}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
-      <td><p>extraAffinity adds user defined custom affinity rules</p>
+      <td><p>Extra affinity adds user defined custom affinity rules</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[1].nodeSelector</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-topology.kubernetes.io/zone: zone-us-1
+<code class="language-yaml">topology.kubernetes.io/zone: zone-us-1
 </code>
 </pre>
 </td>
-      <td><p>nodeselector to restrict where pods of this zone can be placed. usually provided by cloud providers.</p>
+      <td><p>Node selector to restrict where pods of this zone can be placed. usually provided by cloud providers.</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[1].topologySpreadConstraints</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-- maxSkew: 1
+<code class="language-yaml">- maxSkew: 1
   topologyKey: kubernetes.io/hostname
   whenUnsatisfiable: ScheduleAnyway
 </code>
 </pre>
 </td>
-      <td><p>topologySpreadConstraints allows to customize the default topologySpreadConstraints.</p>
+      <td><p>Topology spread constraints allows to customize the default topologySpreadConstraints.</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[1].vmagent</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-annotations: {}
+<code class="language-yaml">annotations: {}
 enabled: true
 name: ""
 spec: {}
 </code>
 </pre>
 </td>
-      <td><p>vmagent only meant to proxy write requests to each az, doesn&rsquo;t support customized remote write address</p>
+      <td><p>VMAgent only meant to proxy write requests to each az, doesn&rsquo;t support customized remote write address</p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[1].vmcluster.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
-      <td><p>override the name of the vmcluster, by default is vmcluster-<zoneName></p>
+      <td><p>Override the name of the vmcluster, by default is vmcluster-<zoneName></p>
 </td>
     </tr>
     <tr>
       <td>availabilityZones[1].vmcluster.spec</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-replicationFactor: 2
+<code class="language-yaml">replicationFactor: 2
 retentionPeriod: "14"
 vminsert:
     extraArgs: {}
@@ -599,66 +580,61 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td><p>spec for VMCluster crd, see <a href="https://docs.victoriametrics.com/operator/api#vmclusterspec" target="_blank">https://docs.victoriametrics.com/operator/api#vmclusterspec</a></p>
+      <td><p>Spec for VMCluster CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmclusterspec" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
       <td>enableMultitenancy</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-false
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
-      <td><p>enable multitenancy mode see <a href="https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy" target="_blank">https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy</a></p>
+      <td><p>Enable multitenancy mode see <a href="https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
       <td>extraVMAgent</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-enabled: true
+<code class="language-yaml">enabled: true
 name: test-vmagent
 spec:
     selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td><p>set up an extra vmagent to scrape all the scrape objects by default, and write data to above vmauth-global-ingest endpoint.</p>
+      <td><p>Set up an extra vmagent to scrape all the scrape objects by default, and write data to above vmauth-global-ingest endpoint.</p>
 </td>
     </tr>
     <tr>
       <td>fullnameOverride</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-""
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
-      <td><p>overrides the chart&rsquo;s computed fullname.</p>
+      <td><p>Overrides the chart&rsquo;s computed fullname.</p>
 </td>
     </tr>
     <tr>
       <td>nameOverride</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">
-vm-distributed
+<code class="language-yaml">vm-distributed
 </code>
 </pre>
 </td>
-      <td><p>overrides the chart&rsquo;s name</p>
+      <td><p>Overrides the chart&rsquo;s name</p>
 </td>
     </tr>
     <tr>
       <td>victoria-metrics-k8s-stack</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-alertmanager:
+<code class="language-yaml">alertmanager:
     enabled: false
 crds:
     enabled: true
@@ -681,35 +657,33 @@ vmsingle:
 </code>
 </pre>
 </td>
-      <td><p>set up vm operator and other resources like vmalert, grafana if needed</p>
+      <td><p>Set up vm operator and other resources like vmalert, grafana if needed</p>
 </td>
     </tr>
     <tr>
       <td>vmauthIngestGlobal</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-enabled: true
+<code class="language-yaml">enabled: true
 name: ""
 spec: {}
 </code>
 </pre>
 </td>
-      <td><p>set up a vmauth as the global write entrypoint</p>
+      <td><p>Set up a vmauth as the global write entrypoint</p>
 </td>
     </tr>
     <tr>
       <td>vmauthQueryGlobal</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">
-enabled: true
+<code class="language-yaml">enabled: true
 name: ""
 spec: {}
 </code>
 </pre>
 </td>
-      <td><p>set up a vmauth as the global read entrypoint</p>
+      <td><p>Set up a vmauth as the global read entrypoint</p>
 </td>
     </tr>
   </tbody>

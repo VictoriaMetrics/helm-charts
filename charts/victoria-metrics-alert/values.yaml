@@ -17,7 +17,7 @@ serviceAccount:
   # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
-  # -- mount API token to pod directly
+  # -- Mount API token to pod directly
   automountToken: true
 
 rbac:
@@ -29,7 +29,7 @@ rbac:
 server:
   name: server
   enabled: true
-  # -- vmalert image configuration
+  # -- VMAlert image configuration
   image:
     registry: ""
     repository: victoriametrics/vmalert
@@ -49,7 +49,7 @@ server:
     # maxUnavailable: 1
     labels: {}
 
-  # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details.
   env:
     []
     # - name: VM_remoteWrite_basicAuth_password
@@ -64,37 +64,37 @@ server:
     #    name: special-config
 
   probe:
-    # -- readiness probe
+    # -- Readiness probe
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- liveness probe
+    # -- Liveness probe
     liveness:
       tcpSocket: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- startup probe
+    # -- Startup probe
     startup: {}
 
   replicaCount: 1
 
-  # -- deployment strategy, set to standard k8s default
+  # -- Deployment strategy, set to standard k8s default
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 25%
       maxUnavailable: 25%
 
-  # -- specifies the minimum number of seconds for which a newly created Pod should be ready without any of its containers crashing/terminating
+  # -- Specifies the minimum number of seconds for which a newly created Pod should be ready without any of its containers crashing/terminating
   # 0 is the standard k8s default
   minReadySeconds: 0
 
-  # -- vmalert reads metrics from source, next section represents its configuration. It can be any service which supports
+  # -- VMAlert reads metrics from source, next section represents its configuration. It can be any service which supports
   # MetricsQL or PromQL.
   datasource:
     url: ""
@@ -234,7 +234,6 @@ server:
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     # ingressClassName: nginx
-    # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
 
   podSecurityContext:
@@ -265,7 +264,7 @@ server:
 
   # -- Annotations to be added to the deployment
   annotations: {}
-  # -- labels to be added to the deployment
+  # -- Labels to be added to the deployment
   labels: {}
 
   # -- Annotations to be added to pod
@@ -281,7 +280,7 @@ server:
 
   affinity: {}
 
-  # -- vmalert alert rules configuration configuration:
+  # -- VMAlert alert rules configuration configuration:
   # use existing configmap if specified
   # otherwise .config values will be used
   configMap: ""
@@ -338,7 +337,7 @@ alertmanager:
   podMetadata:
     labels: {}
     annotations: {}
-  # -- alertmanager image configuration
+  # -- Alertmanager image configuration
   image:
     registry: ""
     repository: prom/alertmanager
@@ -350,17 +349,17 @@ alertmanager:
   tolerations: []
   imagePullSecrets: []
   probe:
-    # -- readiness probe
+    # -- Readiness probe
     readiness:
       httpGet:
         path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready'
         port: web
-    # -- liveness probe
+    # -- Liveness probe
     liveness:
       httpGet:
         path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/healthy'
         port: web
-    # -- startup probe
+    # -- Startup probe
     startup:
       httpGet:
         path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready'
@@ -373,11 +372,11 @@ alertmanager:
   extraArgs: {}
   # key: value
   envFrom: []
-  # -- external URL, that alertmanager will expose to receivers
+  # -- External URL, that alertmanager will expose to receivers
   baseURL: ""
-  # -- external URL Prefix, Prefix for the internal routes of web endpoints
+  # -- External URL Prefix, Prefix for the internal routes of web endpoints
   baseURLPrefix: ""
-  # -- use existing configmap if specified
+  # -- Use existing configmap if specified
   # otherwise .config values will be used
   configMap: ""
   config:
@@ -404,14 +403,14 @@ alertmanager:
     clusterIP: ""
     type: ClusterIP
     port: 9093
-    # -- if you want to force a specific nodePort. Must be use with service.type=NodePort
+    # -- If you want to force a specific nodePort. Must be use with service.type=NodePort
     nodePort: ""
-    # -- Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+    # -- Check [here](https://kubernetes.io/docs/user-guide/services/#external-ips) for details.
     externalIPs: []
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
     servicePort: 8880
-    # -- Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    # -- Chech [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details.
     externalTrafficPolicy: ""
     healthCheckNodePort: ""
     ipFamilyPolicy: ""
@@ -435,7 +434,6 @@ alertmanager:
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     # ingressClassName: nginx
-    # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
   emptyDir: {}
   persistentVolume:
@@ -491,10 +489,9 @@ alertmanager:
 extraObjects: []
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
-# Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise,
-# for more information, visit https://victoriametrics.com/products/enterprise/ .
-# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Required only for VictoriaMetrics enterprise. Check docs [here](https://docs.victoriametrics.com/enterprise),
+# for more information, visit [site](https://victoriametrics.com/products/enterprise/).
+# Request a trial license [here](https://victoriametrics.com/products/enterprise/trial/)
 # Supported starting from VictoriaMetrics v1.94.0
 license:
   # -- License key

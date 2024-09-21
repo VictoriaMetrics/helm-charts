@@ -9,7 +9,7 @@ global:
     openshift:
       adaptSecurityContext: "auto"
 
-# -- k8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
+# -- K8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
 clusterDomainSuffix: cluster.local
 printNotes: true
 
@@ -41,7 +41,7 @@ extraObjects: []
 vmselect:
   # -- Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet
   enabled: true
-  # -- Vmselect container name
+  # -- VMSelect container name
   name: vmselect
   strategy: {}
    # rollingUpdate:
@@ -78,28 +78,28 @@ vmselect:
   annotations: {}
   extraLabels: {}
   podLabels: {}
-  # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details.
   env: []
   envFrom: []
     #- configMapRef:
     #    name: special-config
 
   probe:
-    # -- vmselect readiness probe
+    # -- VMSelect readiness probe
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- vmselect liveness probe
+    # -- VMSelect liveness probe
     liveness:
       tcpSocket: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- vmselect startup probe
+    # -- VMSelect startup probe
     startup: {}
 
   horizontalPodAutoscaler:
@@ -235,7 +235,6 @@ vmselect:
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     # ingressClassName: nginx
-    # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
   statefulSet:
     # -- Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data.
@@ -293,7 +292,7 @@ vmselect:
 vminsert:
   # -- Enable deployment of vminsert component. Deployment is used
   enabled: true
-  # -- vminsert container name
+  # -- VMInsert container name
   name: vminsert
   strategy: {}
    # rollingUpdate:
@@ -327,7 +326,7 @@ vminsert:
   annotations: {}
   extraLabels: {}
   podLabels: {}
-  # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details.
   env: []
   envFrom: []
     #- configMapRef:
@@ -339,21 +338,21 @@ vminsert:
 
   # Readiness & Liveness probes
   probe:
-    # -- vminsert readiness probe
+    # -- VMInsert readiness probe
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- vminsert liveness probe
+    # -- VMInsert liveness probe
     liveness:
       tcpSocket: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- vminsert startup probe
+    # -- VMInsert startup probe
     startup: {}
 
 # Horizontal Pod Autoscaling
@@ -453,7 +452,7 @@ vminsert:
     # -- Service type
     type: ClusterIP
     # -- Enable UDP port. used if you have "spec.opentsdbListenAddr" specified
-    # -- Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
+    # -- Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. Check [here](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/) for details
     udp: false
     healthCheckNodePort: ""
     externalTrafficPolicy: ""
@@ -480,7 +479,6 @@ vminsert:
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     # ingressClassName: nginx
-    # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
   serviceMonitor:
     # -- Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object
@@ -510,7 +508,7 @@ vminsert:
 vmstorage:
   # -- Enable deployment of vmstorage component. StatefulSet is used
   enabled: true
-  # -- vmstorage container name
+  # -- VMStorage container name
   name: vmstorage
   image:
     # -- Image registry
@@ -532,7 +530,7 @@ vmstorage:
   # -- Overrides the full name of vmstorage component
   fullnameOverride:
   automountServiceAccountToken: true
-  # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details
   env: []
   envFrom: []
     #- configMapRef:
@@ -620,8 +618,7 @@ vmstorage:
   topologySpreadConstraints: []
 
 
-  # -- Use an alternate scheduler, e.g. "stork".
-  # ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  # -- Use an alternate scheduler, e.g. "stork". Check [here](https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/) for details
   #
   # schedulerName:
 
@@ -696,70 +693,69 @@ vmstorage:
   # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60
   probe:
-    # -- vmstorage readiness probe
+    # -- VMStorage readiness probe
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- vmstorage liveness probe
+    # -- VMStorage liveness probe
     liveness:
       tcpSocket: {}
       initialDelaySeconds: 30
       periodSeconds: 30
       timeoutSeconds: 5
       failureThreshold: 10
-    # -- vmstorage startup probe
+    # -- VMStorage startup probe
     startup: {}
   vmbackupmanager:
-    # -- enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages
+    # -- Enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages
     enabled: false
     image:
-      # -- vmbackupmanager image registry
+      # -- VMBackupManager image registry
       registry: ""
-      # -- vmbackupmanager image repository
+      # -- VMBackupManager image repository
       repository: victoriametrics/vmbackupmanager
-      # -- vmbackupmanager image tag
+      # -- VMBackupManager image tag
       # override Chart.AppVersion
       tag: ""
       # Variant of the image tag to use.
       # e.g. enterprise.
       variant: cluster
-    # -- disable hourly backups
+    # -- Disable hourly backups
     disableHourly: false
-    # -- disable daily backups
+    # -- Disable daily backups
     disableDaily: false
-    # -- disable weekly backups
+    # -- Disable weekly backups
     disableWeekly: false
-    # -- disable monthly backups
+    # -- Disable monthly backups
     disableMonthly: false
-    # -- backup destination at S3, GCS or local filesystem. Pod name will be included to path!
+    # -- Backup destination at S3, GCS or local filesystem. Pod name will be included to path!
     destination: ""
-    # -- backups' retention settings
+    # -- Backups' retention settings
     retention:
-      # -- keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off
+      # -- Keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off
       keepLastHourly: 2
-      # -- keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off
+      # -- Keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off
       keepLastDaily: 2
-      # -- keep last N weekly backups. 0 means delete all existing weekly backups. Specify -1 to turn off
+      # -- Keep last N weekly backups. 0 means delete all existing weekly backups. Specify -1 to turn off
       keepLastWeekly: 2
-      # -- keep last N monthly backups. 0 means delete all existing monthly backups. Specify -1 to turn off
+      # -- Keep last N monthly backups. 0 means delete all existing monthly backups. Specify -1 to turn off
       keepLastMonthly: 2
     extraArgs:
       envflag.enable: "true"
       envflag.prefix: VM_
       loggerFormat: json
-    # -- Allows to enable restore options for pod.
-    # Read more: https://docs.victoriametrics.com/vmbackupmanager#restore-commands
+    # -- Allows to enable restore options for pod. Check [here](https://docs.victoriametrics.com/vmbackupmanager#restore-commands) for details
     restore:
       onStart:
         enabled: false
     resources: {}
-    # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+    # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details
     env: []
     probe:
-      # -- vmbackupmanager readiness probe
+      # -- VMBackupManager readiness probe
       readiness:
         httpGet:
           port: manager-http
@@ -767,7 +763,7 @@ vmstorage:
         periodSeconds: 15
         timeoutSeconds: 5
         failureThreshold: 3
-      # -- vmbackupmanager liveness probe
+      # -- VMBackupManager liveness probe
       liveness:
         tcpSocket:
           port: manager-http
@@ -775,7 +771,7 @@ vmstorage:
         periodSeconds: 30
         timeoutSeconds: 5
         failureThreshold: 10
-      # -- vmbackupmanager startup probe
+      # -- VMBackupManager startup probe
       startup: {}
     extraSecretMounts:
       []
@@ -809,10 +805,9 @@ vmstorage:
     metricRelabelings: []
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
-# Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise,
-# for more information, visit https://victoriametrics.com/products/enterprise/ .
-# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Required only for VictoriaMetrics enterprise. Check docs [here](https://docs.victoriametrics.com/enterprise),
+# for more information, visit [site](https://victoriametrics.com/products/enterprise/).
+# Request a trial license [here](https://victoriametrics.com/products/enterprise/trial/)
 # Supported starting from VictoriaMetrics v1.94.0
 license:
   # -- License key
