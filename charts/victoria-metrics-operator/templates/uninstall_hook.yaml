@@ -41,7 +41,7 @@ spec:
               memory: "56Mi"
           args:
             - delete
-            - {{ (keys .Values.admissionWebhooks.enabledCRDValidation) | join "," }}
+            - {{ (keys .Values.admissionWebhooks.enabledCRDValidation) | sortAlpha | join "," }}
             - --all
             - --ignore-not-found=true
       restartPolicy: OnFailure
