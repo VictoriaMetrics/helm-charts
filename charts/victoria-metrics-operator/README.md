@@ -364,7 +364,8 @@ tag: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
       <td>extraArgs</td>
@@ -385,7 +386,8 @@ tag: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra containers to run in a pod with operator</p>
+</td>
     </tr>
     <tr>
       <td>extraHostPathMounts</td>
@@ -464,6 +466,18 @@ tag: ""
       <td></td>
     </tr>
     <tr>
+      <td>global.compatibility</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">openshift:
+    adaptSecurityContext: auto
+</code>
+</pre>
+</td>
+      <td><p>Openshift security context compatibility configuration</p>
+</td>
+    </tr>
+    <tr>
       <td>global.image.registry</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -471,7 +485,8 @@ tag: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image registry, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>global.imagePullSecrets</td>
@@ -481,7 +496,8 @@ tag: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>image</td>
@@ -650,7 +666,8 @@ labels: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>extra Labels for Pods only</p>
+</td>
     </tr>
     <tr>
       <td>podSecurityContext</td>
@@ -660,7 +677,8 @@ labels: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s security context. Details are <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>probe.liveness</td>
@@ -754,7 +772,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Number of operator replicas</p>
+</td>
     </tr>
     <tr>
       <td>resources</td>
@@ -775,7 +794,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Security context to be added to server pods</p>
+</td>
     </tr>
     <tr>
       <td>service.annotations</td>
@@ -785,7 +805,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service annotations</p>
+</td>
     </tr>
     <tr>
       <td>service.clusterIP</td>
@@ -795,7 +816,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service ClusterIP</p>
+</td>
     </tr>
     <tr>
       <td>service.externalIPs</td>
@@ -805,7 +827,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external IPs. Check <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>service.externalTrafficPolicy</td>
@@ -815,7 +838,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external traffic policy. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>service.healthCheckNodePort</td>
@@ -825,7 +849,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Health check node port for a service. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>service.ipFamilies</td>
@@ -835,7 +860,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>List of service IP families. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>service.ipFamilyPolicy</td>
@@ -845,7 +871,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service IP family policy. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>service.labels</td>
@@ -855,7 +882,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service labels</p>
+</td>
     </tr>
     <tr>
       <td>service.loadBalancerIP</td>
@@ -865,7 +893,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service load balacner IP</p>
+</td>
     </tr>
     <tr>
       <td>service.loadBalancerSourceRanges</td>
@@ -875,7 +904,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Load balancer source range</p>
+</td>
     </tr>
     <tr>
       <td>service.servicePort</td>
@@ -885,7 +915,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service port</p>
+</td>
     </tr>
     <tr>
       <td>service.type</td>
@@ -895,7 +926,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service type</p>
+</td>
     </tr>
     <tr>
       <td>service.webhookPort</td>
@@ -905,7 +937,8 @@ view:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service webhook port</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.create</td>

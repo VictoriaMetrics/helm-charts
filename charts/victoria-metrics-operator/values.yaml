@@ -1,7 +1,13 @@
 global:
-  image:
-    registry: ""
+  # -- Image pull secrets, that can be shared across multiple helm charts
   imagePullSecrets: []
+  image:
+    # -- Image registry, that can be shared across multiple helm charts
+    registry: ""
+  # -- Openshift security context compatibility configuration
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
   cluster:
     dnsDomain: cluster.local
 # Default values for victoria-metrics.
@@ -34,7 +40,8 @@ crd:
       # use image tag that matches k8s API version by default
       tag: ""
       pullPolicy: IfNotPresent
-    
+
+# -- Number of operator replicas
 replicaCount: 1
 
 # -- Secret to pull images
@@ -64,12 +71,15 @@ rbac:
 
 # -- Labels to be added to the all resources
 extraLabels: {}
-# extra Labels for Pods only
+# -- extra Labels for Pods only
 podLabels: {}
 # -- Annotations to be added to the all resources
 annotations: {}
 
+# -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
 podSecurityContext: {}
+
+# -- Security context to be added to server pods
 securityContext: {}
 
 operator:
@@ -96,18 +106,31 @@ serviceAccount:
   name: ""
 
 service:
+  # -- Service annotations
   annotations: {}
+  # -- Service labels
   labels: {}
+  # -- Service ClusterIP
   clusterIP: ""
+  # -- Service external IPs. Check [here](https://kubernetes.io/docs/user-guide/services/#external-ips) for details
   externalIPs: ""
+  # -- Service load balacner IP
   loadBalancerIP: ""
+  # -- Load balancer source range
   loadBalancerSourceRanges: []
+  # -- Service type
   type: ClusterIP
+  # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
   healthCheckNodePort: ""
+  # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
   externalTrafficPolicy: ""
+  # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
   ipFamilyPolicy: ""
+  # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
   ipFamilies: []
+  # -- Service port
   servicePort: 8080
+  # -- Service webhook port
   webhookPort: 9443
 
 # -- See `kubectl explain poddisruptionbudget.spec` for more or check [these docs](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
@@ -148,6 +171,7 @@ env:
   # - name: VM_VMSINGLEDEFAULT_VERSION
   #   value: v1.43.0
 
+# -- Specify alternative source for env variables
 envFrom:
   []
   #- configMapRef:
@@ -175,6 +199,7 @@ extraVolumeMounts:
   # - name: example
   #   mountPath: /example
 
+# -- Extra containers to run in a pod with operator
 extraContainers:
   []
   # - name: config-reloader

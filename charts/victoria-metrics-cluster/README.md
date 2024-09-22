@@ -165,14 +165,16 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td></td>
     </tr>
     <tr>
-      <td>global.compatibility.openshift.adaptSecurityContext</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">auto
+      <td>global.compatibility</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">openshift:
+    adaptSecurityContext: auto
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Openshift security context compatibility configuration</p>
+</td>
     </tr>
     <tr>
       <td>global.image.registry</td>
@@ -182,7 +184,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image registry, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>global.imagePullSecrets</td>
@@ -192,7 +195,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>license</td>
@@ -264,6 +268,17 @@ name: ""
       <td></td>
     </tr>
     <tr>
+      <td>rbac.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Role/RoleBinding annotations</p>
+</td>
+    </tr>
+    <tr>
       <td>rbac.create</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -271,7 +286,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enables Role/RoleBinding creation</p>
+</td>
     </tr>
     <tr>
       <td>rbac.extraLabels</td>
@@ -281,7 +297,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Role/RoleBinding labels</p>
+</td>
     </tr>
     <tr>
       <td>rbac.namespaced</td>
@@ -291,7 +308,19 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>If true and <code>rbac.enabled</code>, will deploy a Role/RoleBinding instead of a ClusterRole/ClusterRoleBinding</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Service account annotations</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.automountToken</td>
@@ -301,7 +330,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>mount API token to pod directly</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.create</td>
@@ -311,7 +341,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specifies whether a service account should be created</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.extraLabels</td>
@@ -321,7 +352,19 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service account labels</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">null
+</code>
+</pre>
+</td>
+      <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.affinity</td>
@@ -339,16 +382,6 @@ name: ""
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
 <code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>vminsert.automountServiceAccountToken</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
 </code>
 </pre>
 </td>
@@ -395,37 +428,21 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
-      <td>vminsert.extraArgs."envflag.enable"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">"true"
+      <td>vminsert.extraArgs</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">envflag.enable: "true"
+envflag.prefix: VM_
+loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>vminsert.extraArgs."envflag.prefix"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">VM_
-</code>
-</pre>
+      <td><p>Extra command line arguments for vminsert component</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>vminsert.extraArgs.loggerFormat</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">json
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>vminsert.extraContainers</td>
@@ -435,7 +452,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra containers to run in a pod with vminsert</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.extraLabels</td>
@@ -445,7 +463,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>StatefulSet/Deployment additional labels</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.extraVolumeMounts</td>
@@ -617,7 +636,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.ingress.hosts</td>
@@ -631,6 +651,17 @@ name: ""
 </td>
     </tr>
     <tr>
+      <td>vminsert.ingress.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
+    </tr>
+    <tr>
       <td>vminsert.ingress.pathType</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -638,7 +669,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.ingress.tls</td>
@@ -659,7 +691,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Init containers for vminsert</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.name</td>
@@ -695,25 +728,16 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>vminsert.podDisruptionBudget.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
+      <td>vminsert.podDisruptionBudget</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: false
+labels: {}
 </code>
 </pre>
 </td>
       <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more. Details are <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">here</a></p>
 </td>
-    </tr>
-    <tr>
-      <td>vminsert.podDisruptionBudget.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>vminsert.podLabels</td>
@@ -723,17 +747,19 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod’s additional labels</p>
+</td>
     </tr>
     <tr>
-      <td>vminsert.podSecurityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
+      <td>vminsert.podSecurityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: false
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s security context. Details are <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>vminsert.ports.name</td>
@@ -754,6 +780,29 @@ name: ""
 </pre>
 </td>
       <td><p>Name of Priority Class</p>
+</td>
+    </tr>
+    <tr>
+      <td>vminsert.probe</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">liveness:
+    failureThreshold: 3
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    tcpSocket: {}
+    timeoutSeconds: 5
+readiness:
+    failureThreshold: 3
+    httpGet: {}
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+startup: {}
+</code>
+</pre>
+</td>
+      <td><p>Readiness &amp; Liveness probes</p>
 </td>
     </tr>
     <tr>
@@ -816,7 +865,7 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td><p>Resource object</p>
+      <td><p>Resource object. Details are <a href="https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
@@ -871,7 +920,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external traffic policy. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.service.extraPorts</td>
@@ -892,7 +942,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Health check node port for a service. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.service.ipFamilies</td>
@@ -902,7 +953,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>List of service IP families. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.service.ipFamilyPolicy</td>
@@ -912,7 +964,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service IP family policy. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.service.labels</td>
@@ -988,7 +1041,7 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td><p>Make sure that service is not type &ldquo;LoadBalancer&rdquo;, as it requires &ldquo;MixedProtocolLBService&rdquo; feature gate. Check <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/" target="_blank">here</a> for details</p>
+      <td><p>Enable UDP port. used if you have &ldquo;spec.opentsdbListenAddr&rdquo; specified Make sure that service is not type &ldquo;LoadBalancer&rdquo;, as it requires &ldquo;MixedProtocolLBService&rdquo; feature gate. Check <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/" target="_blank">here</a> for details</p>
 </td>
     </tr>
     <tr>
@@ -1133,16 +1186,6 @@ timeoutSeconds: 5
       <td></td>
     </tr>
     <tr>
-      <td>vmselect.automountServiceAccountToken</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
       <td>vmselect.cacheMountPath</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -1204,37 +1247,21 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
-      <td>vmselect.extraArgs."envflag.enable"</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>vmselect.extraArgs</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">envflag.enable: true
+envflag.prefix: VM_
+loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>vmselect.extraArgs."envflag.prefix"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">VM_
-</code>
-</pre>
+      <td><p>Extra command line arguments for vmselect component</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>vmselect.extraArgs.loggerFormat</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">json
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>vmselect.extraContainers</td>
@@ -1244,7 +1271,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra containers to run in a pod with vmselect</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.extraHostPathMounts</td>
@@ -1265,7 +1293,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>StatefulSet/Deployment additional labels</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.extraVolumeMounts</td>
@@ -1439,7 +1468,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.ingress.hosts</td>
@@ -1453,6 +1483,17 @@ timeoutSeconds: 5
 </td>
     </tr>
     <tr>
+      <td>vmselect.ingress.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
+    </tr>
+    <tr>
       <td>vmselect.ingress.pathType</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -1460,7 +1501,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.ingress.tls</td>
@@ -1481,7 +1523,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Init containers for vmselect</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.name</td>
@@ -1594,6 +1637,18 @@ timeoutSeconds: 5
 </td>
     </tr>
     <tr>
+      <td>vmselect.podDisruptionBudget</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: false
+labels: {}
+</code>
+</pre>
+</td>
+      <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more. Details are <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
       <td>vmselect.podDisruptionBudget.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -1605,16 +1660,6 @@ timeoutSeconds: 5
 </td>
     </tr>
     <tr>
-      <td>vmselect.podDisruptionBudget.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
       <td>vmselect.podLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -1622,17 +1667,19 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod’s additional labels</p>
+</td>
     </tr>
     <tr>
-      <td>vmselect.podSecurityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>vmselect.podSecurityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s security context. Details are <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>vmselect.ports.name</td>
@@ -1653,6 +1700,29 @@ timeoutSeconds: 5
 </pre>
 </td>
       <td><p>Name of Priority Class</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmselect.probe</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">liveness:
+    failureThreshold: 3
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    tcpSocket: {}
+    timeoutSeconds: 5
+readiness:
+    failureThreshold: 3
+    httpGet: {}
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+startup: {}
+</code>
+</pre>
+</td>
+      <td><p>Readiness &amp; Liveness probes</p>
 </td>
     </tr>
     <tr>
@@ -1715,7 +1785,7 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td><p>Resource object</p>
+      <td><p>Resource object. Details are <a href="https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
@@ -1770,7 +1840,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external traffic policy. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.service.extraPorts</td>
@@ -1791,7 +1862,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Health check node port for a service. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.service.ipFamilies</td>
@@ -1801,7 +1873,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>List of service IP families. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.service.ipFamilyPolicy</td>
@@ -1811,7 +1884,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service IP family policy. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.service.labels</td>
@@ -2040,17 +2114,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>vmstorage.automountServiceAccountToken</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
+      <td><p>StatefulSet/Deployment annotations</p>
 </td>
-      <td></td>
     </tr>
     <tr>
       <td>vmstorage.containerWorkingDir</td>
@@ -2104,37 +2169,21 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
-      <td>vmstorage.extraArgs."envflag.enable"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">"true"
+      <td>vmstorage.extraArgs</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">envflag.enable: "true"
+envflag.prefix: VM_
+loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>vmstorage.extraArgs."envflag.prefix"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">VM_
-</code>
-</pre>
+      <td><p>Additional vmstorage container arguments. Extra command line arguments for vmstorage component</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>vmstorage.extraArgs.loggerFormat</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">json
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>vmstorage.extraContainers</td>
@@ -2144,7 +2193,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra containers to run in a pod with vmstorage</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.extraHostPathMounts</td>
@@ -2165,7 +2215,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>StatefulSet/Deployment additional labels</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.extraSecretMounts</td>
@@ -2272,7 +2323,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Init containers for vmstorage</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.name</td>
@@ -2436,7 +2488,8 @@ labels: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod’s additional labels</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.podManagementPolicy</td>
@@ -2450,14 +2503,15 @@ labels: {}
 </td>
     </tr>
     <tr>
-      <td>vmstorage.podSecurityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
+      <td>vmstorage.podSecurityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: false
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s security context. Details are <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.ports.name</td>
@@ -2478,6 +2532,29 @@ labels: {}
 </pre>
 </td>
       <td><p>Name of Priority Class</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmstorage.probe</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">liveness:
+    failureThreshold: 10
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    tcpSocket: {}
+    timeoutSeconds: 5
+readiness:
+    failureThreshold: 3
+    httpGet: {}
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+startup: {}
+</code>
+</pre>
+</td>
+      <td><p>Readiness &amp; Liveness probes</p>
 </td>
     </tr>
     <tr>
@@ -2584,7 +2661,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service external traffic policy. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.service.extraPorts</td>
@@ -2605,7 +2683,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Health check node port for a service. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.service.ipFamilies</td>
@@ -2615,7 +2694,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>List of service IP families. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.service.ipFamilyPolicy</td>
@@ -2625,7 +2705,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service IP family policy. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.service.labels</td>
@@ -2859,34 +2940,17 @@ timeoutSeconds: 5
 </td>
     </tr>
     <tr>
-      <td>vmstorage.vmbackupmanager.extraArgs."envflag.enable"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">"true"
+      <td>vmstorage.vmbackupmanager.extraArgs</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">envflag.enable: "true"
+envflag.prefix: VM_
+loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>vmstorage.vmbackupmanager.extraArgs."envflag.prefix"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">VM_
-</code>
-</pre>
+      <td><p>Extra command line arguments for container of component</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>vmstorage.vmbackupmanager.extraArgs.loggerFormat</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">json
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>vmstorage.vmbackupmanager.extraSecretMounts</td>
@@ -2942,6 +3006,31 @@ timeoutSeconds: 5
       <td></td>
     </tr>
     <tr>
+      <td>vmstorage.vmbackupmanager.probe</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">liveness:
+    failureThreshold: 10
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    tcpSocket:
+        port: manager-http
+    timeoutSeconds: 5
+readiness:
+    failureThreshold: 3
+    httpGet:
+        port: manager-http
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+startup: {}
+</code>
+</pre>
+</td>
+      <td><p>Readiness &amp; Liveness probes</p>
+</td>
+    </tr>
+    <tr>
       <td>vmstorage.vmbackupmanager.probe.liveness</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -2992,7 +3081,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Resource object. Details are <a href="https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.vmbackupmanager.restore</td>

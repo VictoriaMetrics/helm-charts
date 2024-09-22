@@ -1200,14 +1200,29 @@ instanceSelector:
 </td>
     </tr>
     <tr>
-      <td>kube-state-metrics.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>kube-state-metrics</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
+vmScrape:
+    enabled: true
+    spec:
+        endpoints:
+            - honorLabels: true
+              metricRelabelConfigs:
+                - action: labeldrop
+                  regex: (uid|container_id|image_id)
+              port: http
+        jobLabel: app.kubernetes.io/name
+        selector:
+            matchLabels:
+                app.kubernetes.io/instance: '{{ include "vm.release" . }}'
+                app.kubernetes.io/name: '{{ include "kube-state-metrics.name" (index .Subcharts "kube-state-metrics") }}'
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>kube-state-metrics dependency chart configuration. For possible values check <a href="https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-state-metrics/values.yaml" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>kube-state-metrics.vmScrape</td>
@@ -1809,44 +1824,35 @@ spec:
       <td></td>
     </tr>
     <tr>
-      <td>prometheus-node-exporter.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>prometheus-node-exporter</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
+extraArgs:
+    - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+    - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+service:
+    labels:
+        jobLabel: node-exporter
+vmScrape:
+    enabled: true
+    spec:
+        endpoints:
+            - metricRelabelConfigs:
+                - action: drop
+                  regex: /var/lib/kubelet/pods.+
+                  source_labels:
+                    - mountpoint
+              port: metrics
+        jobLabel: jobLabel
+        selector:
+            matchLabels:
+                app.kubernetes.io/name: '{{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}'
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>prometheus-node-exporter.extraArgs[0]</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">--collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
-</code>
-</pre>
+      <td><p>prometheus-node-exporter dependency chart configuration. For possible values check <a href="https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/values.yaml" target="_blank">here</a></p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>prometheus-node-exporter.extraArgs[1]</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">--collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>prometheus-node-exporter.service.labels.jobLabel</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">node-exporter
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>prometheus-node-exporter.vmScrape</td>

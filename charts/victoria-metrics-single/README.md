@@ -133,16 +133,6 @@ Change the values according to the need of the environment in ``victoria-metrics
   </thead>
   <tbody>
     <tr>
-      <td>automountServiceAccountToken</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
       <td>extraObjects</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -154,14 +144,16 @@ Change the values according to the need of the environment in ``victoria-metrics
 </td>
     </tr>
     <tr>
-      <td>global.compatibility.openshift.adaptSecurityContext</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">auto
+      <td>global.compatibility</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">openshift:
+    adaptSecurityContext: auto
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Openshift security context compatibility configuration</p>
+</td>
     </tr>
     <tr>
       <td>global.image.registry</td>
@@ -171,7 +163,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image registry, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>global.imagePullSecrets</td>
@@ -181,7 +174,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>license</td>
@@ -243,25 +237,16 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>podDisruptionBudget.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
+      <td>podDisruptionBudget</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: false
+extraLabels: {}
 </code>
 </pre>
 </td>
       <td><p>See <code>kubectl explain poddisruptionbudget.spec</code> for more. Details are <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/" target="_blank">here</a></p>
 </td>
-    </tr>
-    <tr>
-      <td>podDisruptionBudget.extraLabels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>printNotes</td>
@@ -275,6 +260,17 @@ name: ""
 </td>
     </tr>
     <tr>
+      <td>rbac.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Role/RoleBinding annotations</p>
+</td>
+    </tr>
+    <tr>
       <td>rbac.create</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -282,7 +278,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enables Role/RoleBinding creation</p>
+</td>
     </tr>
     <tr>
       <td>rbac.extraLabels</td>
@@ -292,7 +289,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Role/RoleBinding labels</p>
+</td>
     </tr>
     <tr>
       <td>rbac.namespaced</td>
@@ -302,7 +300,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>If true and <code>rbac.enabled</code>, will deploy a Role/RoleBinding instead of a ClusterRole/ClusterRoleBinding</p>
+</td>
     </tr>
     <tr>
       <td>server.affinity</td>
@@ -367,37 +366,21 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
-      <td>server.extraArgs."envflag.enable"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">"true"
+      <td>server.extraArgs</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">envflag.enable: "true"
+envflag.prefix: VM_
+loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.extraArgs."envflag.prefix"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">VM_
-</code>
-</pre>
+      <td><p>Extra command line arguments for container of component</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.extraArgs.loggerFormat</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">json
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>server.extraContainers</td>
@@ -407,7 +390,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra containers to run in a pod with VM single</p>
+</td>
     </tr>
     <tr>
       <td>server.extraHostPathMounts</td>
@@ -438,7 +422,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volume Mounts for the container</p>
+</td>
     </tr>
     <tr>
       <td>server.extraVolumes</td>
@@ -523,7 +508,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets</p>
+</td>
     </tr>
     <tr>
       <td>server.ingress.annotations</td>
@@ -598,7 +584,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Init containers for VM single pod</p>
+</td>
     </tr>
     <tr>
       <td>server.name</td>
@@ -777,104 +764,57 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>server.probe.liveness.failureThreshold</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">10
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.probe.liveness.initialDelaySeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">30
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.probe.liveness.periodSeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">30
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.probe.liveness.tcpSocket</td>
+      <td>server.probe</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
+<code class="language-yaml">liveness:
+    failureThreshold: 10
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    tcpSocket: {}
+    timeoutSeconds: 5
+readiness:
+    failureThreshold: 3
+    httpGet: {}
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+startup: {}
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.probe.liveness.timeoutSeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">5
-</code>
-</pre>
+      <td><p>Readiness &amp; Liveness probes</p>
 </td>
-      <td></td>
     </tr>
     <tr>
-      <td>server.probe.readiness.failureThreshold</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">3
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.probe.readiness.httpGet</td>
+      <td>server.probe.liveness</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
+<code class="language-yaml">failureThreshold: 10
+initialDelaySeconds: 30
+periodSeconds: 30
+tcpSocket: {}
+timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Indicates whether the Container is running. If the liveness probe fails, the kubelet kills the Container, and the Container is subjected to its restart policy. If a Container does not provide a liveness probe, the default state is Success.</p>
+</td>
     </tr>
     <tr>
-      <td>server.probe.readiness.initialDelaySeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">5
+      <td>server.probe.readiness</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">failureThreshold: 3
+httpGet: {}
+initialDelaySeconds: 5
+periodSeconds: 15
+timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.probe.readiness.periodSeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">15
-</code>
-</pre>
+      <td><p>Indicates whether the Container is ready to service requests. If the readiness probe fails, the endpoints controller removes the Pod&rsquo;s IP address from the endpoints of all Services that match the Pod. The default state of readiness before the initial delay is Failure. If a Container does not provide a readiness probe, the default state is Success.</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.probe.readiness.timeoutSeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">5
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>server.probe.startup</td>
@@ -884,7 +824,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Indicates whether the Container is done with potentially costly initialization. If set it is executed first. If it fails Container is restarted. If it succeeds liveness and readiness probes takes over.</p>
+</td>
     </tr>
     <tr>
       <td>server.relabel</td>
@@ -918,7 +859,7 @@ enabled: false
 </code>
 </pre>
 </td>
-      <td><p>Replica count</p>
+      <td><p>Number of victoriametrics single replicas</p>
 </td>
     </tr>
     <tr>
@@ -941,241 +882,6 @@ enabled: false
 </pre>
 </td>
       <td><p>Data retention period in month</p>
-</td>
-    </tr>
-    <tr>
-      <td>server.scrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">config:
-    global:
-        scrape_interval: 15s
-    scrape_configs:
-        - job_name: victoriametrics
-          static_configs:
-            - targets:
-                - localhost:8428
-        - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-          job_name: kubernetes-apiservers
-          kubernetes_sd_configs:
-            - role: endpoints
-          relabel_configs:
-            - action: keep
-              regex: default;kubernetes;https
-              source_labels:
-                - __meta_kubernetes_namespace
-                - __meta_kubernetes_service_name
-                - __meta_kubernetes_endpoint_port_name
-          scheme: https
-          tls_config:
-            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            insecure_skip_verify: true
-        - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-          job_name: kubernetes-nodes
-          kubernetes_sd_configs:
-            - role: node
-          relabel_configs:
-            - action: labelmap
-              regex: __meta_kubernetes_node_label_(.+)
-            - replacement: kubernetes.default.svc:443
-              target_label: __address__
-            - regex: (.+)
-              replacement: /api/v1/nodes/$1/proxy/metrics
-              source_labels:
-                - __meta_kubernetes_node_name
-              target_label: __metrics_path__
-          scheme: https
-          tls_config:
-            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            insecure_skip_verify: true
-        - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-          honor_timestamps: false
-          job_name: kubernetes-nodes-cadvisor
-          kubernetes_sd_configs:
-            - role: node
-          relabel_configs:
-            - action: labelmap
-              regex: __meta_kubernetes_node_label_(.+)
-            - replacement: kubernetes.default.svc:443
-              target_label: __address__
-            - regex: (.+)
-              replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
-              source_labels:
-                - __meta_kubernetes_node_name
-              target_label: __metrics_path__
-          scheme: https
-          tls_config:
-            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            insecure_skip_verify: true
-        - job_name: kubernetes-service-endpoints
-          kubernetes_sd_configs:
-            - role: endpoints
-          relabel_configs:
-            - action: drop
-              regex: true
-              source_labels:
-                - __meta_kubernetes_pod_container_init
-            - action: keep_if_equal
-              source_labels:
-                - __meta_kubernetes_service_annotation_prometheus_io_port
-                - __meta_kubernetes_pod_container_port_number
-            - action: keep
-              regex: true
-              source_labels:
-                - __meta_kubernetes_service_annotation_prometheus_io_scrape
-            - action: replace
-              regex: (https?)
-              source_labels:
-                - __meta_kubernetes_service_annotation_prometheus_io_scheme
-              target_label: __scheme__
-            - action: replace
-              regex: (.+)
-              source_labels:
-                - __meta_kubernetes_service_annotation_prometheus_io_path
-              target_label: __metrics_path__
-            - action: replace
-              regex: ([^:]+)(?::\d+)?;(\d+)
-              replacement: $1:$2
-              source_labels:
-                - __address__
-                - __meta_kubernetes_service_annotation_prometheus_io_port
-              target_label: __address__
-            - action: labelmap
-              regex: __meta_kubernetes_service_label_(.+)
-            - action: replace
-              source_labels:
-                - __meta_kubernetes_namespace
-              target_label: namespace
-            - action: replace
-              source_labels:
-                - __meta_kubernetes_service_name
-              target_label: service
-            - action: replace
-              source_labels:
-                - __meta_kubernetes_pod_node_name
-              target_label: node
-        - job_name: kubernetes-service-endpoints-slow
-          kubernetes_sd_configs:
-            - role: endpoints
-          relabel_configs:
-            - action: drop
-              regex: true
-              source_labels:
-                - __meta_kubernetes_pod_container_init
-            - action: keep_if_equal
-              source_labels:
-                - __meta_kubernetes_service_annotation_prometheus_io_port
-                - __meta_kubernetes_pod_container_port_number
-            - action: keep
-              regex: true
-              source_labels:
-                - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow
-            - action: replace
-              regex: (https?)
-              source_labels:
-                - __meta_kubernetes_service_annotation_prometheus_io_scheme
-              target_label: __scheme__
-            - action: replace
-              regex: (.+)
-              source_labels:
-                - __meta_kubernetes_service_annotation_prometheus_io_path
-              target_label: __metrics_path__
-            - action: replace
-              regex: ([^:]+)(?::\d+)?;(\d+)
-              replacement: $1:$2
-              source_labels:
-                - __address__
-                - __meta_kubernetes_service_annotation_prometheus_io_port
-              target_label: __address__
-            - action: labelmap
-              regex: __meta_kubernetes_service_label_(.+)
-            - action: replace
-              source_labels:
-                - __meta_kubernetes_namespace
-              target_label: namespace
-            - action: replace
-              source_labels:
-                - __meta_kubernetes_service_name
-              target_label: service
-            - action: replace
-              source_labels:
-                - __meta_kubernetes_pod_node_name
-              target_label: node
-          scrape_interval: 5m
-          scrape_timeout: 30s
-        - job_name: kubernetes-services
-          kubernetes_sd_configs:
-            - role: service
-          metrics_path: /probe
-          params:
-            module:
-                - http_2xx
-          relabel_configs:
-            - action: keep
-              regex: true
-              source_labels:
-                - __meta_kubernetes_service_annotation_prometheus_io_probe
-            - source_labels:
-                - __address__
-              target_label: __param_target
-            - replacement: blackbox
-              target_label: __address__
-            - source_labels:
-                - __param_target
-              target_label: instance
-            - action: labelmap
-              regex: __meta_kubernetes_service_label_(.+)
-            - source_labels:
-                - __meta_kubernetes_namespace
-              target_label: namespace
-            - source_labels:
-                - __meta_kubernetes_service_name
-              target_label: service
-        - job_name: kubernetes-pods
-          kubernetes_sd_configs:
-            - role: pod
-          relabel_configs:
-            - action: drop
-              regex: true
-              source_labels:
-                - __meta_kubernetes_pod_container_init
-            - action: keep_if_equal
-              source_labels:
-                - __meta_kubernetes_pod_annotation_prometheus_io_port
-                - __meta_kubernetes_pod_container_port_number
-            - action: keep
-              regex: true
-              source_labels:
-                - __meta_kubernetes_pod_annotation_prometheus_io_scrape
-            - action: replace
-              regex: (.+)
-              source_labels:
-                - __meta_kubernetes_pod_annotation_prometheus_io_path
-              target_label: __metrics_path__
-            - action: replace
-              regex: ([^:]+)(?::\d+)?;(\d+)
-              replacement: $1:$2
-              source_labels:
-                - __address__
-                - __meta_kubernetes_pod_annotation_prometheus_io_port
-              target_label: __address__
-            - action: labelmap
-              regex: __meta_kubernetes_pod_label_(.+)
-            - action: replace
-              source_labels:
-                - __meta_kubernetes_namespace
-              target_label: namespace
-            - action: replace
-              source_labels:
-                - __meta_kubernetes_pod_name
-              target_label: pod
-configMap: ""
-enabled: false
-extraScrapeConfigs: []
-</code>
-</pre>
-</td>
-      <td><p>Scrape configuration for victoriametrics</p>
 </td>
     </tr>
     <tr>
@@ -1410,329 +1116,6 @@ scrape_configs:
 </td>
     </tr>
     <tr>
-      <td>server.scrape.config.scrape_configs</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">- job_name: victoriametrics
-  static_configs:
-    - targets:
-        - localhost:8428
-- bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  job_name: kubernetes-apiservers
-  kubernetes_sd_configs:
-    - role: endpoints
-  relabel_configs:
-    - action: keep
-      regex: default;kubernetes;https
-      source_labels:
-        - __meta_kubernetes_namespace
-        - __meta_kubernetes_service_name
-        - __meta_kubernetes_endpoint_port_name
-  scheme: https
-  tls_config:
-    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    insecure_skip_verify: true
-- bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  job_name: kubernetes-nodes
-  kubernetes_sd_configs:
-    - role: node
-  relabel_configs:
-    - action: labelmap
-      regex: __meta_kubernetes_node_label_(.+)
-    - replacement: kubernetes.default.svc:443
-      target_label: __address__
-    - regex: (.+)
-      replacement: /api/v1/nodes/$1/proxy/metrics
-      source_labels:
-        - __meta_kubernetes_node_name
-      target_label: __metrics_path__
-  scheme: https
-  tls_config:
-    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    insecure_skip_verify: true
-- bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  honor_timestamps: false
-  job_name: kubernetes-nodes-cadvisor
-  kubernetes_sd_configs:
-    - role: node
-  relabel_configs:
-    - action: labelmap
-      regex: __meta_kubernetes_node_label_(.+)
-    - replacement: kubernetes.default.svc:443
-      target_label: __address__
-    - regex: (.+)
-      replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
-      source_labels:
-        - __meta_kubernetes_node_name
-      target_label: __metrics_path__
-  scheme: https
-  tls_config:
-    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    insecure_skip_verify: true
-- job_name: kubernetes-service-endpoints
-  kubernetes_sd_configs:
-    - role: endpoints
-  relabel_configs:
-    - action: drop
-      regex: true
-      source_labels:
-        - __meta_kubernetes_pod_container_init
-    - action: keep_if_equal
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_port
-        - __meta_kubernetes_pod_container_port_number
-    - action: keep
-      regex: true
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_scrape
-    - action: replace
-      regex: (https?)
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_scheme
-      target_label: __scheme__
-    - action: replace
-      regex: (.+)
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_path
-      target_label: __metrics_path__
-    - action: replace
-      regex: ([^:]+)(?::\d+)?;(\d+)
-      replacement: $1:$2
-      source_labels:
-        - __address__
-        - __meta_kubernetes_service_annotation_prometheus_io_port
-      target_label: __address__
-    - action: labelmap
-      regex: __meta_kubernetes_service_label_(.+)
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_namespace
-      target_label: namespace
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_service_name
-      target_label: service
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_pod_node_name
-      target_label: node
-- job_name: kubernetes-service-endpoints-slow
-  kubernetes_sd_configs:
-    - role: endpoints
-  relabel_configs:
-    - action: drop
-      regex: true
-      source_labels:
-        - __meta_kubernetes_pod_container_init
-    - action: keep_if_equal
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_port
-        - __meta_kubernetes_pod_container_port_number
-    - action: keep
-      regex: true
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow
-    - action: replace
-      regex: (https?)
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_scheme
-      target_label: __scheme__
-    - action: replace
-      regex: (.+)
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_path
-      target_label: __metrics_path__
-    - action: replace
-      regex: ([^:]+)(?::\d+)?;(\d+)
-      replacement: $1:$2
-      source_labels:
-        - __address__
-        - __meta_kubernetes_service_annotation_prometheus_io_port
-      target_label: __address__
-    - action: labelmap
-      regex: __meta_kubernetes_service_label_(.+)
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_namespace
-      target_label: namespace
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_service_name
-      target_label: service
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_pod_node_name
-      target_label: node
-  scrape_interval: 5m
-  scrape_timeout: 30s
-- job_name: kubernetes-services
-  kubernetes_sd_configs:
-    - role: service
-  metrics_path: /probe
-  params:
-    module:
-        - http_2xx
-  relabel_configs:
-    - action: keep
-      regex: true
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_probe
-    - source_labels:
-        - __address__
-      target_label: __param_target
-    - replacement: blackbox
-      target_label: __address__
-    - source_labels:
-        - __param_target
-      target_label: instance
-    - action: labelmap
-      regex: __meta_kubernetes_service_label_(.+)
-    - source_labels:
-        - __meta_kubernetes_namespace
-      target_label: namespace
-    - source_labels:
-        - __meta_kubernetes_service_name
-      target_label: service
-- job_name: kubernetes-pods
-  kubernetes_sd_configs:
-    - role: pod
-  relabel_configs:
-    - action: drop
-      regex: true
-      source_labels:
-        - __meta_kubernetes_pod_container_init
-    - action: keep_if_equal
-      source_labels:
-        - __meta_kubernetes_pod_annotation_prometheus_io_port
-        - __meta_kubernetes_pod_container_port_number
-    - action: keep
-      regex: true
-      source_labels:
-        - __meta_kubernetes_pod_annotation_prometheus_io_scrape
-    - action: replace
-      regex: (.+)
-      source_labels:
-        - __meta_kubernetes_pod_annotation_prometheus_io_path
-      target_label: __metrics_path__
-    - action: replace
-      regex: ([^:]+)(?::\d+)?;(\d+)
-      replacement: $1:$2
-      source_labels:
-        - __address__
-        - __meta_kubernetes_pod_annotation_prometheus_io_port
-      target_label: __address__
-    - action: labelmap
-      regex: __meta_kubernetes_pod_label_(.+)
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_namespace
-      target_label: namespace
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_pod_name
-      target_label: pod
-</code>
-</pre>
-</td>
-      <td><p>Scrape targets</p>
-</td>
-    </tr>
-    <tr>
-      <td>server.scrape.config.scrape_configs[4]</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">job_name: kubernetes-service-endpoints
-kubernetes_sd_configs:
-    - role: endpoints
-relabel_configs:
-    - action: drop
-      regex: true
-      source_labels:
-        - __meta_kubernetes_pod_container_init
-    - action: keep_if_equal
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_port
-        - __meta_kubernetes_pod_container_port_number
-    - action: keep
-      regex: true
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_scrape
-    - action: replace
-      regex: (https?)
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_scheme
-      target_label: __scheme__
-    - action: replace
-      regex: (.+)
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_path
-      target_label: __metrics_path__
-    - action: replace
-      regex: ([^:]+)(?::\d+)?;(\d+)
-      replacement: $1:$2
-      source_labels:
-        - __address__
-        - __meta_kubernetes_service_annotation_prometheus_io_port
-      target_label: __address__
-    - action: labelmap
-      regex: __meta_kubernetes_service_label_(.+)
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_namespace
-      target_label: namespace
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_service_name
-      target_label: service
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_pod_node_name
-      target_label: node
-</code>
-</pre>
-</td>
-      <td><p>Scrape rule using kubernetes service discovery for endpoints</p>
-</td>
-    </tr>
-    <tr>
-      <td>server.scrape.config.scrape_configs[6]</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">job_name: kubernetes-services
-kubernetes_sd_configs:
-    - role: service
-metrics_path: /probe
-params:
-    module:
-        - http_2xx
-relabel_configs:
-    - action: keep
-      regex: true
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_probe
-    - source_labels:
-        - __address__
-      target_label: __param_target
-    - replacement: blackbox
-      target_label: __address__
-    - source_labels:
-        - __param_target
-      target_label: instance
-    - action: labelmap
-      regex: __meta_kubernetes_service_label_(.+)
-    - source_labels:
-        - __meta_kubernetes_namespace
-      target_label: namespace
-    - source_labels:
-        - __meta_kubernetes_service_name
-      target_label: service
-</code>
-</pre>
-</td>
-      <td><p>Example scrape config for probing services via the Blackbox Exporter.  The relabeling allows the actual service scrape endpoint to be configured via the following annotations:  * <code>prometheus.io/probe</code>: Only probe services that have a value of <code>true</code></p>
-</td>
-    </tr>
-    <tr>
       <td>server.scrape.configMap</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -1828,7 +1211,8 @@ relabel_configs:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Health check node port for a service. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>server.service.ipFamilies</td>
@@ -1838,7 +1222,8 @@ relabel_configs:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>List of service IP families. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>server.service.ipFamilyPolicy</td>
@@ -1848,7 +1233,8 @@ relabel_configs:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service IP family policy. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>server.service.labels</td>
@@ -2093,34 +1479,17 @@ relabel_configs:
 </td>
     </tr>
     <tr>
-      <td>server.vmbackupmanager.extraArgs."envflag.enable"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">"true"
+      <td>server.vmbackupmanager.extraArgs</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">envflag.enable: "true"
+envflag.prefix: VM_
+loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.vmbackupmanager.extraArgs."envflag.prefix"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">VM_
-</code>
-</pre>
+      <td><p>Extra command line arguments for container of component</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.vmbackupmanager.extraArgs.loggerFormat</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">json
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>server.vmbackupmanager.extraVolumeMounts</td>
@@ -2176,114 +1545,75 @@ relabel_configs:
       <td></td>
     </tr>
     <tr>
-      <td>server.vmbackupmanager.probe.liveness.failureThreshold</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">10
+      <td>server.vmbackupmanager.probe</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">liveness:
+    failureThreshold: 10
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    tcpSocket:
+        port: manager-http
+    timeoutSeconds: 5
+readiness:
+    failureThreshold: 3
+    httpGet:
+        port: manager-http
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+startup:
+    httpGet:
+        port: manager-http
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Readiness &amp; Liveness probes</p>
+</td>
     </tr>
     <tr>
-      <td>server.vmbackupmanager.probe.liveness.initialDelaySeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">30
+      <td>server.vmbackupmanager.probe.liveness</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">failureThreshold: 10
+initialDelaySeconds: 30
+periodSeconds: 30
+tcpSocket:
+    port: manager-http
+timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMBackupManager liveness probe</p>
+</td>
     </tr>
     <tr>
-      <td>server.vmbackupmanager.probe.liveness.periodSeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">30
+      <td>server.vmbackupmanager.probe.readiness</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">failureThreshold: 3
+httpGet:
+    port: manager-http
+initialDelaySeconds: 5
+periodSeconds: 15
+timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMBackupManager readiness probe</p>
+</td>
     </tr>
     <tr>
-      <td>server.vmbackupmanager.probe.liveness.tcpSocket.port</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">manager-http
+      <td>server.vmbackupmanager.probe.startup</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">httpGet:
+    port: manager-http
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.vmbackupmanager.probe.liveness.timeoutSeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">5
-</code>
-</pre>
+      <td><p>VMBackupManager startup probe</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.vmbackupmanager.probe.readiness.failureThreshold</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">3
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.vmbackupmanager.probe.readiness.httpGet.port</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">manager-http
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.vmbackupmanager.probe.readiness.initialDelaySeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">5
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.vmbackupmanager.probe.readiness.periodSeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">15
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.vmbackupmanager.probe.readiness.timeoutSeconds</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">5
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.vmbackupmanager.probe.startup.httpGet.port</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">manager-http
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>server.vmbackupmanager.resources</td>
@@ -2293,7 +1623,8 @@ relabel_configs:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Resource object. Details are <a href="http://kubernetes.io/docs/user-guide/compute-resources/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>server.vmbackupmanager.restore</td>
@@ -2366,6 +1697,17 @@ keepLastWeekly: 2
 </td>
     </tr>
     <tr>
+      <td>serviceAccount.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>ServiceAccount annotations</p>
+</td>
+    </tr>
+    <tr>
       <td>serviceAccount.automountToken</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -2395,7 +1737,19 @@ keepLastWeekly: 2
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>ServiceAccount labels</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">null
+</code>
+</pre>
+</td>
+      <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
+</td>
     </tr>
   </tbody>
 </table>

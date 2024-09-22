@@ -134,7 +134,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod affinity</p>
+</td>
     </tr>
     <tr>
       <td>annotations</td>
@@ -148,262 +149,255 @@ Change the values according to the need of the environment in ``victoria-metrics
 </td>
     </tr>
     <tr>
-      <td>config.global.scrape_interval</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">10s
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>config.scrape_configs</td>
-      <td>list</td>
+      <td>config</td>
+      <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">- job_name: vmagent
-  static_configs:
-    - targets:
-        - localhost:8429
-- bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  job_name: kubernetes-apiservers
-  kubernetes_sd_configs:
-    - role: endpoints
-  relabel_configs:
-    - action: keep
-      regex: default;kubernetes;https
-      source_labels:
-        - __meta_kubernetes_namespace
-        - __meta_kubernetes_service_name
-        - __meta_kubernetes_endpoint_port_name
-  scheme: https
-  tls_config:
-    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    insecure_skip_verify: true
-- bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  job_name: kubernetes-nodes
-  kubernetes_sd_configs:
-    - role: node
-  relabel_configs:
-    - action: labelmap
-      regex: __meta_kubernetes_node_label_(.+)
-    - replacement: kubernetes.default.svc:443
-      target_label: __address__
-    - regex: (.+)
-      replacement: /api/v1/nodes/$1/proxy/metrics
-      source_labels:
-        - __meta_kubernetes_node_name
-      target_label: __metrics_path__
-  scheme: https
-  tls_config:
-    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    insecure_skip_verify: true
-- bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  honor_timestamps: false
-  job_name: kubernetes-nodes-cadvisor
-  kubernetes_sd_configs:
-    - role: node
-  relabel_configs:
-    - action: labelmap
-      regex: __meta_kubernetes_node_label_(.+)
-    - replacement: kubernetes.default.svc:443
-      target_label: __address__
-    - regex: (.+)
-      replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
-      source_labels:
-        - __meta_kubernetes_node_name
-      target_label: __metrics_path__
-  scheme: https
-  tls_config:
-    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    insecure_skip_verify: true
-- job_name: kubernetes-service-endpoints
-  kubernetes_sd_configs:
-    - role: endpointslices
-  relabel_configs:
-    - action: drop
-      regex: true
-      source_labels:
-        - __meta_kubernetes_pod_container_init
-    - action: keep_if_equal
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_port
-        - __meta_kubernetes_pod_container_port_number
-    - action: keep
-      regex: true
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_scrape
-    - action: replace
-      regex: (https?)
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_scheme
-      target_label: __scheme__
-    - action: replace
-      regex: (.+)
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_path
-      target_label: __metrics_path__
-    - action: replace
-      regex: ([^:]+)(?::\d+)?;(\d+)
-      replacement: $1:$2
-      source_labels:
-        - __address__
-        - __meta_kubernetes_service_annotation_prometheus_io_port
-      target_label: __address__
-    - action: labelmap
-      regex: __meta_kubernetes_service_label_(.+)
-    - source_labels:
-        - __meta_kubernetes_pod_name
-      target_label: pod
-    - source_labels:
-        - __meta_kubernetes_pod_container_name
-      target_label: container
-    - source_labels:
-        - __meta_kubernetes_namespace
-      target_label: namespace
-    - source_labels:
-        - __meta_kubernetes_service_name
-      target_label: service
-    - replacement: ${1}
-      source_labels:
-        - __meta_kubernetes_service_name
-      target_label: job
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_pod_node_name
-      target_label: node
-- job_name: kubernetes-service-endpoints-slow
-  kubernetes_sd_configs:
-    - role: endpointslices
-  relabel_configs:
-    - action: drop
-      regex: true
-      source_labels:
-        - __meta_kubernetes_pod_container_init
-    - action: keep_if_equal
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_port
-        - __meta_kubernetes_pod_container_port_number
-    - action: keep
-      regex: true
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow
-    - action: replace
-      regex: (https?)
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_scheme
-      target_label: __scheme__
-    - action: replace
-      regex: (.+)
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_path
-      target_label: __metrics_path__
-    - action: replace
-      regex: ([^:]+)(?::\d+)?;(\d+)
-      replacement: $1:$2
-      source_labels:
-        - __address__
-        - __meta_kubernetes_service_annotation_prometheus_io_port
-      target_label: __address__
-    - action: labelmap
-      regex: __meta_kubernetes_service_label_(.+)
-    - source_labels:
-        - __meta_kubernetes_pod_name
-      target_label: pod
-    - source_labels:
-        - __meta_kubernetes_pod_container_name
-      target_label: container
-    - source_labels:
-        - __meta_kubernetes_namespace
-      target_label: namespace
-    - source_labels:
-        - __meta_kubernetes_service_name
-      target_label: service
-    - replacement: ${1}
-      source_labels:
-        - __meta_kubernetes_service_name
-      target_label: job
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_pod_node_name
-      target_label: node
-  scrape_interval: 5m
-  scrape_timeout: 30s
-- job_name: kubernetes-services
-  kubernetes_sd_configs:
-    - role: service
-  metrics_path: /probe
-  params:
-    module:
-        - http_2xx
-  relabel_configs:
-    - action: keep
-      regex: true
-      source_labels:
-        - __meta_kubernetes_service_annotation_prometheus_io_probe
-    - source_labels:
-        - __address__
-      target_label: __param_target
-    - replacement: blackbox
-      target_label: __address__
-    - source_labels:
-        - __param_target
-      target_label: instance
-    - action: labelmap
-      regex: __meta_kubernetes_service_label_(.+)
-    - source_labels:
-        - __meta_kubernetes_namespace
-      target_label: namespace
-    - source_labels:
-        - __meta_kubernetes_service_name
-      target_label: service
-- job_name: kubernetes-pods
-  kubernetes_sd_configs:
-    - role: pod
-  relabel_configs:
-    - action: drop
-      regex: true
-      source_labels:
-        - __meta_kubernetes_pod_container_init
-    - action: keep_if_equal
-      source_labels:
-        - __meta_kubernetes_pod_annotation_prometheus_io_port
-        - __meta_kubernetes_pod_container_port_number
-    - action: keep
-      regex: true
-      source_labels:
-        - __meta_kubernetes_pod_annotation_prometheus_io_scrape
-    - action: replace
-      regex: (.+)
-      source_labels:
-        - __meta_kubernetes_pod_annotation_prometheus_io_path
-      target_label: __metrics_path__
-    - action: replace
-      regex: ([^:]+)(?::\d+)?;(\d+)
-      replacement: $1:$2
-      source_labels:
-        - __address__
-        - __meta_kubernetes_pod_annotation_prometheus_io_port
-      target_label: __address__
-    - action: labelmap
-      regex: __meta_kubernetes_pod_label_(.+)
-    - source_labels:
-        - __meta_kubernetes_pod_name
-      target_label: pod
-    - source_labels:
-        - __meta_kubernetes_pod_container_name
-      target_label: container
-    - source_labels:
-        - __meta_kubernetes_namespace
-      target_label: namespace
-    - action: replace
-      source_labels:
-        - __meta_kubernetes_pod_node_name
-      target_label: node
+<code class="language-yaml">global:
+    scrape_interval: 10s
+scrape_configs:
+    - job_name: vmagent
+      static_configs:
+        - targets:
+            - localhost:8429
+    - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      job_name: kubernetes-apiservers
+      kubernetes_sd_configs:
+        - role: endpoints
+      relabel_configs:
+        - action: keep
+          regex: default;kubernetes;https
+          source_labels:
+            - __meta_kubernetes_namespace
+            - __meta_kubernetes_service_name
+            - __meta_kubernetes_endpoint_port_name
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+    - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      job_name: kubernetes-nodes
+      kubernetes_sd_configs:
+        - role: node
+      relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - replacement: kubernetes.default.svc:443
+          target_label: __address__
+        - regex: (.+)
+          replacement: /api/v1/nodes/$1/proxy/metrics
+          source_labels:
+            - __meta_kubernetes_node_name
+          target_label: __metrics_path__
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+    - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      honor_timestamps: false
+      job_name: kubernetes-nodes-cadvisor
+      kubernetes_sd_configs:
+        - role: node
+      relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - replacement: kubernetes.default.svc:443
+          target_label: __address__
+        - regex: (.+)
+          replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
+          source_labels:
+            - __meta_kubernetes_node_name
+          target_label: __metrics_path__
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+    - job_name: kubernetes-service-endpoints
+      kubernetes_sd_configs:
+        - role: endpointslices
+      relabel_configs:
+        - action: drop
+          regex: true
+          source_labels:
+            - __meta_kubernetes_pod_container_init
+        - action: keep_if_equal
+          source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_port
+            - __meta_kubernetes_pod_container_port_number
+        - action: keep
+          regex: true
+          source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_scrape
+        - action: replace
+          regex: (https?)
+          source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_scheme
+          target_label: __scheme__
+        - action: replace
+          regex: (.+)
+          source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          source_labels:
+            - __address__
+            - __meta_kubernetes_service_annotation_prometheus_io_port
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - source_labels:
+            - __meta_kubernetes_pod_name
+          target_label: pod
+        - source_labels:
+            - __meta_kubernetes_pod_container_name
+          target_label: container
+        - source_labels:
+            - __meta_kubernetes_namespace
+          target_label: namespace
+        - source_labels:
+            - __meta_kubernetes_service_name
+          target_label: service
+        - replacement: ${1}
+          source_labels:
+            - __meta_kubernetes_service_name
+          target_label: job
+        - action: replace
+          source_labels:
+            - __meta_kubernetes_pod_node_name
+          target_label: node
+    - job_name: kubernetes-service-endpoints-slow
+      kubernetes_sd_configs:
+        - role: endpointslices
+      relabel_configs:
+        - action: drop
+          regex: true
+          source_labels:
+            - __meta_kubernetes_pod_container_init
+        - action: keep_if_equal
+          source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_port
+            - __meta_kubernetes_pod_container_port_number
+        - action: keep
+          regex: true
+          source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow
+        - action: replace
+          regex: (https?)
+          source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_scheme
+          target_label: __scheme__
+        - action: replace
+          regex: (.+)
+          source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          source_labels:
+            - __address__
+            - __meta_kubernetes_service_annotation_prometheus_io_port
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - source_labels:
+            - __meta_kubernetes_pod_name
+          target_label: pod
+        - source_labels:
+            - __meta_kubernetes_pod_container_name
+          target_label: container
+        - source_labels:
+            - __meta_kubernetes_namespace
+          target_label: namespace
+        - source_labels:
+            - __meta_kubernetes_service_name
+          target_label: service
+        - replacement: ${1}
+          source_labels:
+            - __meta_kubernetes_service_name
+          target_label: job
+        - action: replace
+          source_labels:
+            - __meta_kubernetes_pod_node_name
+          target_label: node
+      scrape_interval: 5m
+      scrape_timeout: 30s
+    - job_name: kubernetes-services
+      kubernetes_sd_configs:
+        - role: service
+      metrics_path: /probe
+      params:
+        module:
+            - http_2xx
+      relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_probe
+        - source_labels:
+            - __address__
+          target_label: __param_target
+        - replacement: blackbox
+          target_label: __address__
+        - source_labels:
+            - __param_target
+          target_label: instance
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - source_labels:
+            - __meta_kubernetes_namespace
+          target_label: namespace
+        - source_labels:
+            - __meta_kubernetes_service_name
+          target_label: service
+    - job_name: kubernetes-pods
+      kubernetes_sd_configs:
+        - role: pod
+      relabel_configs:
+        - action: drop
+          regex: true
+          source_labels:
+            - __meta_kubernetes_pod_container_init
+        - action: keep_if_equal
+          source_labels:
+            - __meta_kubernetes_pod_annotation_prometheus_io_port
+            - __meta_kubernetes_pod_container_port_number
+        - action: keep
+          regex: true
+          source_labels:
+            - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        - action: replace
+          regex: (.+)
+          source_labels:
+            - __meta_kubernetes_pod_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          source_labels:
+            - __address__
+            - __meta_kubernetes_pod_annotation_prometheus_io_port
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - source_labels:
+            - __meta_kubernetes_pod_name
+          target_label: pod
+        - source_labels:
+            - __meta_kubernetes_pod_container_name
+          target_label: container
+        - source_labels:
+            - __meta_kubernetes_namespace
+          target_label: namespace
+        - action: replace
+          source_labels:
+            - __meta_kubernetes_pod_node_name
+          target_label: node
 </code>
 </pre>
 </td>
-      <td><p>Scrape configuration. scrape self by default</p>
+      <td><p>VMAgent scrape configuration</p>
 </td>
     </tr>
     <tr>
@@ -425,7 +419,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Container working directory</p>
+</td>
     </tr>
     <tr>
       <td>deployment</td>
@@ -458,7 +453,8 @@ strategy: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Empty dir configuration for a case, when persistence is disabled</p>
+</td>
     </tr>
     <tr>
       <td>env</td>
@@ -479,7 +475,8 @@ strategy: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
       <td>extraArgs</td>
@@ -502,7 +499,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra containers to run in a pod with vmagent</p>
+</td>
     </tr>
     <tr>
       <td>extraHostPathMounts</td>
@@ -581,14 +579,16 @@ loggerFormat: json
       <td></td>
     </tr>
     <tr>
-      <td>global.compatibility.openshift.adaptSecurityContext</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">auto
+      <td>global.compatibility</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">openshift:
+    adaptSecurityContext: auto
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Openshift security context compatibility configuration</p>
+</td>
     </tr>
     <tr>
       <td>global.image.registry</td>
@@ -598,7 +598,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image registry, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>global.imagePullSecrets</td>
@@ -608,7 +609,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>horizontalPodAutoscaling</td>
@@ -676,7 +678,8 @@ minReplicas: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull policy</p>
+</td>
     </tr>
     <tr>
       <td>image.registry</td>
@@ -730,7 +733,8 @@ minReplicas: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets</p>
+</td>
     </tr>
     <tr>
       <td>ingress.annotations</td>
@@ -740,7 +744,8 @@ minReplicas: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress annotations</p>
+</td>
     </tr>
     <tr>
       <td>ingress.enabled</td>
@@ -750,7 +755,8 @@ minReplicas: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable deployment of ingress for agent</p>
+</td>
     </tr>
     <tr>
       <td>ingress.extraLabels</td>
@@ -760,7 +766,8 @@ minReplicas: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>ingress.hosts</td>
@@ -770,7 +777,19 @@ minReplicas: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of host objects</p>
+</td>
+    </tr>
+    <tr>
+      <td>ingress.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
     </tr>
     <tr>
       <td>ingress.pathType</td>
@@ -780,7 +799,8 @@ minReplicas: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>ingress.tls</td>
@@ -790,7 +810,8 @@ minReplicas: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of TLS objects</p>
+</td>
     </tr>
     <tr>
       <td>initContainers</td>
@@ -800,7 +821,8 @@ minReplicas: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Init containers for vmagent</p>
+</td>
     </tr>
     <tr>
       <td>license</td>
@@ -889,17 +911,19 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
-      <td>persistence.accessModes[0]</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">ReadWriteOnce
+      <td>persistence.accessModes</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">- ReadWriteOnce
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of access modes. Must match those of existing PV or dynamic provisioner. Details are <a href="http://kubernetes.io/docs/user-guide/persistent-volumes/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>persistence.annotations</td>
@@ -909,7 +933,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Persistant volume annotations</p>
+</td>
     </tr>
     <tr>
       <td>persistence.enabled</td>
@@ -919,7 +944,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create/use Persistent Volume Claim for server component. Empty dir if false</p>
+</td>
     </tr>
     <tr>
       <td>persistence.existingClaim</td>
@@ -929,7 +955,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Existing Claim name. If defined, PVC must be created manually before volume will be bound</p>
+</td>
     </tr>
     <tr>
       <td>persistence.extraLabels</td>
@@ -939,7 +966,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Persistant volume additional labels</p>
+</td>
     </tr>
     <tr>
       <td>persistence.matchLabels</td>
@@ -960,7 +988,19 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Size of the volume. Should be calculated based on the logs you send and retention policy you set.</p>
+</td>
+    </tr>
+    <tr>
+      <td>persistence.storageClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically</p>
+</td>
     </tr>
     <tr>
       <td>podAnnotations</td>
@@ -997,14 +1037,15 @@ labels: {}
 </td>
     </tr>
     <tr>
-      <td>podSecurityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>podSecurityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Security context to be added to pod</p>
+</td>
     </tr>
     <tr>
       <td>priorityClassName</td>
@@ -1063,7 +1104,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Role/RoleBinding annotations</p>
+</td>
     </tr>
     <tr>
       <td>rbac.create</td>
@@ -1073,7 +1115,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enables Role/RoleBinding creation</p>
+</td>
     </tr>
     <tr>
       <td>rbac.extraLabels</td>
@@ -1083,7 +1126,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Role/RoleBinding labels</p>
+</td>
     </tr>
     <tr>
       <td>rbac.namespaced</td>
@@ -1093,7 +1137,7 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td><p>if true and <code>rbac.enabled</code>, will deploy a Role/Rolebinding instead of a ClusterRole/ClusterRoleBinding</p>
+      <td><p>If true and <code>rbac.enabled</code>, will deploy a Role/RoleBinding instead of a ClusterRole/ClusterRoleBinding</p>
 </td>
     </tr>
     <tr>
@@ -1115,7 +1159,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Replica count</p>
+</td>
     </tr>
     <tr>
       <td>resources</td>
@@ -1125,17 +1170,19 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Resource object. Details are <a href="http://kubernetes.io/docs/user-guide/compute-resources/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
-      <td>securityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>securityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Security context to be added to pod&rsquo;s containers</p>
+</td>
     </tr>
     <tr>
       <td>service.annotations</td>
@@ -1145,7 +1192,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service annotations</p>
+</td>
     </tr>
     <tr>
       <td>service.clusterIP</td>
@@ -1155,7 +1203,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service ClusterIP</p>
+</td>
     </tr>
     <tr>
       <td>service.enabled</td>
@@ -1165,7 +1214,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable agent service</p>
+</td>
     </tr>
     <tr>
       <td>service.externalIPs</td>
@@ -1197,7 +1247,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service labels</p>
+</td>
     </tr>
     <tr>
       <td>service.healthCheckNodePort</td>
@@ -1207,7 +1258,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Health check node port for a service. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>service.ipFamilies</td>
@@ -1217,7 +1269,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>List of service IP families. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>service.ipFamilyPolicy</td>
@@ -1227,7 +1280,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service IP family policy. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>service.loadBalancerIP</td>
@@ -1237,7 +1291,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service load balacner IP</p>
+</td>
     </tr>
     <tr>
       <td>service.loadBalancerSourceRanges</td>
@@ -1247,7 +1302,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Load balancer source range</p>
+</td>
     </tr>
     <tr>
       <td>service.servicePort</td>
@@ -1257,7 +1313,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service port</p>
+</td>
     </tr>
     <tr>
       <td>service.type</td>
@@ -1267,7 +1324,8 @@ periodSeconds: 15
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service type</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.annotations</td>
@@ -1423,7 +1481,8 @@ updateStrategy: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Node tolerations for server scheduling to nodes with taints. Details are <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>topologySpreadConstraints</td>
@@ -1433,7 +1492,8 @@ updateStrategy: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod topologySpreadConstraints</p>
+</td>
     </tr>
   </tbody>
 </table>

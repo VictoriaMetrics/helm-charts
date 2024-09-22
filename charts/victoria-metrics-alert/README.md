@@ -156,74 +156,25 @@ Change the values according to the need of the environment in ``victoria-metrics
 </td>
     </tr>
     <tr>
-      <td>alertmanager.config.global.resolve_timeout</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">5m
+      <td>alertmanager.config</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">global:
+    resolve_timeout: 5m
+receivers:
+    - name: devnull
+route:
+    group_by:
+        - alertname
+    group_interval: 10s
+    group_wait: 30s
+    receiver: devnull
+    repeat_interval: 24h
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>alertmanager.config.receivers[0].name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">devnull
-</code>
-</pre>
+      <td><p>Alertmanager configuration</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>alertmanager.config.route.group_by[0]</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">alertname
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>alertmanager.config.route.group_interval</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">10s
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>alertmanager.config.route.group_wait</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">30s
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>alertmanager.config.route.receiver</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">devnull
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>alertmanager.config.route.repeat_interval</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">24h
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>alertmanager.configMap</td>
@@ -264,7 +215,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.extraArgs</td>
@@ -284,7 +236,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra containers to run in a pod with alertmanager</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.extraHostPathMounts</td>
@@ -340,7 +293,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.ingress.annotations</td>
@@ -350,7 +304,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress annotations</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.ingress.enabled</td>
@@ -360,7 +315,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable deployment of ingress for alertmanager component</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.ingress.extraLabels</td>
@@ -370,7 +326,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.ingress.hosts</td>
@@ -380,7 +337,19 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of host objects</p>
+</td>
+    </tr>
+    <tr>
+      <td>alertmanager.ingress.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.ingress.pathType</td>
@@ -390,7 +359,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.ingress.tls</td>
@@ -400,7 +370,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of TLS objects</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.initContainers</td>
@@ -542,14 +513,15 @@ tag: v0.25.0
       <td></td>
     </tr>
     <tr>
-      <td>alertmanager.podSecurityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
+      <td>alertmanager.podSecurityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: false
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s security context. Details are <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.priorityClassName</td>
@@ -608,7 +580,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Resource object. Details are <a href="http://kubernetes.io/docs/user-guide/compute-resources/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.retention</td>
@@ -621,14 +594,15 @@ tag: v0.25.0
       <td></td>
     </tr>
     <tr>
-      <td>alertmanager.securityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
+      <td>alertmanager.securityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: false
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Security context to be added to server pods</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.service.annotations</td>
@@ -638,7 +612,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service annotations</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.service.clusterIP</td>
@@ -648,7 +623,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service ClusterIP</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.service.externalIPs</td>
@@ -680,7 +656,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Health check node port for a service. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.service.ipFamilies</td>
@@ -690,7 +667,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>List of service IP families. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.service.ipFamilyPolicy</td>
@@ -700,7 +678,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service IP family policy. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.service.labels</td>
@@ -710,7 +689,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service labels</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.service.loadBalancerIP</td>
@@ -720,7 +700,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service load balacner IP</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.service.loadBalancerSourceRanges</td>
@@ -730,28 +711,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>alertmanager.service.nodePort</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
+      <td><p>Load balancer source range</p>
 </td>
-      <td><p>If you want to force a specific nodePort. Must be use with service.type=NodePort</p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.service.port</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">9093
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>alertmanager.service.servicePort</td>
@@ -761,7 +722,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service port</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.service.type</td>
@@ -771,7 +733,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service type</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.templates</td>
@@ -791,7 +754,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Node tolerations for server scheduling to nodes with taints. Details are <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>extraObjects</td>
@@ -805,14 +769,16 @@ tag: v0.25.0
 </td>
     </tr>
     <tr>
-      <td>global.compatibility.openshift.adaptSecurityContext</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">auto
+      <td>global.compatibility</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">openshift:
+    adaptSecurityContext: auto
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Openshift security context compatibility configuration</p>
+</td>
     </tr>
     <tr>
       <td>global.image.registry</td>
@@ -822,7 +788,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image registry, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>global.imagePullSecrets</td>
@@ -832,7 +799,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>license</td>
@@ -901,7 +869,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Role/RoleBinding annotations</p>
+</td>
     </tr>
     <tr>
       <td>rbac.create</td>
@@ -911,7 +880,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enables Role/RoleBinding creation</p>
+</td>
     </tr>
     <tr>
       <td>rbac.extraLabels</td>
@@ -921,7 +891,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Role/RoleBinding labels</p>
+</td>
     </tr>
     <tr>
       <td>rbac.namespaced</td>
@@ -931,7 +902,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>If true and <code>rbac.enabled</code>, will deploy a Role/RoleBinding instead of a ClusterRole/ClusterRoleBinding</p>
+</td>
     </tr>
     <tr>
       <td>server.affinity</td>
@@ -1055,37 +1027,21 @@ username: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
-      <td>server.extraArgs."envflag.enable"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">"true"
+      <td>server.extraArgs</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">envflag.enable: "true"
+envflag.prefix: VM_
+loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.extraArgs."envflag.prefix"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">VM_
-</code>
-</pre>
+      <td><p>Extra command line arguments for container of component</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>server.extraArgs.loggerFormat</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">json
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>server.extraContainers</td>
@@ -1164,7 +1120,8 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets</p>
+</td>
     </tr>
     <tr>
       <td>server.ingress.annotations</td>
@@ -1174,7 +1131,8 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress annotations</p>
+</td>
     </tr>
     <tr>
       <td>server.ingress.enabled</td>
@@ -1184,7 +1142,8 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable deployment of ingress for vmalert component</p>
+</td>
     </tr>
     <tr>
       <td>server.ingress.extraLabels</td>
@@ -1194,7 +1153,8 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>server.ingress.hosts</td>
@@ -1204,7 +1164,19 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of host objects</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.ingress.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
     </tr>
     <tr>
       <td>server.ingress.pathType</td>
@@ -1214,7 +1186,8 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>server.ingress.tls</td>
@@ -1224,7 +1197,8 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of TLS objects</p>
+</td>
     </tr>
     <tr>
       <td>server.initContainers</td>
@@ -1386,14 +1360,15 @@ labels: {}
       <td></td>
     </tr>
     <tr>
-      <td>server.podSecurityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>server.podSecurityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s security context. Details are <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>server.priorityClassName</td>
@@ -1554,7 +1529,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Replica count</p>
+</td>
     </tr>
     <tr>
       <td>server.resources</td>
@@ -1564,17 +1540,19 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Resource object. Details are <a href="http://kubernetes.io/docs/user-guide/compute-resources/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
-      <td>server.securityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>server.securityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Security context to be added to server pods</p>
+</td>
     </tr>
     <tr>
       <td>server.service.annotations</td>
@@ -1584,7 +1562,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service annotations</p>
+</td>
     </tr>
     <tr>
       <td>server.service.clusterIP</td>
@@ -1594,7 +1573,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service ClusterIP</p>
+</td>
     </tr>
     <tr>
       <td>server.service.externalIPs</td>
@@ -1626,7 +1606,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Health check node port for a service. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>server.service.ipFamilies</td>
@@ -1636,7 +1617,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>List of service IP families. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>server.service.ipFamilyPolicy</td>
@@ -1646,7 +1628,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service IP family policy. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>server.service.labels</td>
@@ -1656,7 +1639,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service labels</p>
+</td>
     </tr>
     <tr>
       <td>server.service.loadBalancerIP</td>
@@ -1666,7 +1650,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service load balacner IP</p>
+</td>
     </tr>
     <tr>
       <td>server.service.loadBalancerSourceRanges</td>
@@ -1676,7 +1661,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Load balancer source range</p>
+</td>
     </tr>
     <tr>
       <td>server.service.servicePort</td>
@@ -1686,7 +1672,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service port</p>
+</td>
     </tr>
     <tr>
       <td>server.service.type</td>
@@ -1696,7 +1683,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service type</p>
+</td>
     </tr>
     <tr>
       <td>server.strategy</td>
@@ -1720,7 +1708,8 @@ type: RollingUpdate
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Node tolerations for server scheduling to nodes with taints. Details are <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>server.verticalPodAutoscaler</td>

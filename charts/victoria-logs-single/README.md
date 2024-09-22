@@ -155,6 +155,59 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </td>
     </tr>
     <tr>
+      <td>fluent-bit</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">config:
+    filters: |
+        [FILTER]
+            Name kubernetes
+            Match kube.*
+            Merge_Log On
+            Keep_Log On
+            K8S-Logging.Parser On
+            K8S-Logging.Exclude On
+        [FILTER]
+            Name                nest
+            Match               *
+            Wildcard            pod_name
+            Operation lift
+            Nested_under kubernetes
+            Add_prefix   kubernetes_
+    outputs: |
+        [OUTPUT]
+            Name http
+            Match kube.*
+            Host '{{ include "victoria-logs.server.fullname" . }}'
+            port 9428
+            compress gzip
+            uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name,kubernetes_container_name,kubernetes_namespace_name&_msg_field=log&_time_field=date
+            format json_lines
+            json_date_format iso8601
+            header AccountID 0
+            header ProjectID 0
+daemonSetVolumeMounts:
+    - mountPath: /var/log
+      name: varlog
+    - mountPath: /var/lib/docker/containers
+      name: varlibdockercontainers
+      readOnly: true
+daemonSetVolumes:
+    - hostPath:
+        path: /var/log
+      name: varlog
+    - hostPath:
+        path: /var/lib/docker/containers
+      name: varlibdockercontainers
+enabled: false
+resources: {}
+</code>
+</pre>
+</td>
+      <td><p>Values for <a href="https://fluent.github.io/helm-charts/" target="_blank">fluent-bit helm chart</a></p>
+</td>
+    </tr>
+    <tr>
       <td>fluent-bit.config.filters</td>
       <td>tpl</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="tpl">
@@ -204,96 +257,6 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </td>
     </tr>
     <tr>
-      <td>fluent-bit.daemonSetVolumeMounts[0].mountPath</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">/var/log
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>fluent-bit.daemonSetVolumeMounts[0].name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">varlog
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>fluent-bit.daemonSetVolumeMounts[1].mountPath</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">/var/lib/docker/containers
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>fluent-bit.daemonSetVolumeMounts[1].name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">varlibdockercontainers
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>fluent-bit.daemonSetVolumeMounts[1].readOnly</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>fluent-bit.daemonSetVolumes[0].hostPath.path</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">/var/log
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>fluent-bit.daemonSetVolumes[0].name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">varlog
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>fluent-bit.daemonSetVolumes[1].hostPath.path</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">/var/lib/docker/containers
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>fluent-bit.daemonSetVolumes[1].name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">varlibdockercontainers
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
       <td>fluent-bit.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -305,26 +268,6 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </td>
     </tr>
     <tr>
-      <td>fluent-bit.resources</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>global.compatibility.openshift.adaptSecurityContext</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">auto
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
       <td>global.image.registry</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -332,7 +275,8 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image registry, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>global.imagePullSecrets</td>
@@ -342,7 +286,8 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>global.nameOverride</td>
@@ -352,7 +297,8 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Global name override</p>
+</td>
     </tr>
     <tr>
       <td>global.victoriaLogs.server.fullnameOverride</td>
@@ -395,7 +341,8 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>PodDisruptionBudget extra labels</p>
+</td>
     </tr>
     <tr>
       <td>printNotes</td>
@@ -471,7 +418,8 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
       <td>server.extraArgs</td>
@@ -593,7 +541,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image tag suffix, which is appended to <code>Chart.AppVersion</code> if no <code>server.image.tag</code> is defined</p>
+</td>
     </tr>
     <tr>
       <td>server.imagePullSecrets</td>
@@ -991,7 +940,8 @@ readOnlyRootFilesystem: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Health check node port for a service. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>server.service.ipFamilies</td>
@@ -1001,7 +951,8 @@ readOnlyRootFilesystem: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>List of service IP families. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>server.service.ipFamilyPolicy</td>
@@ -1011,7 +962,8 @@ readOnlyRootFilesystem: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service IP family policy. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>server.service.labels</td>
@@ -1176,6 +1128,17 @@ readOnlyRootFilesystem: true
 </pre>
 </td>
       <td><p>Node tolerations for server scheduling to nodes with taints. Details are <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>server.topologySpreadConstraints</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td><p>Pod topologySpreadConstraints</p>
 </td>
     </tr>
   </tbody>

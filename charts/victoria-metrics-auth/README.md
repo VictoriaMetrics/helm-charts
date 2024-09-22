@@ -188,37 +188,21 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
-      <td>extraArgs."envflag.enable"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">"true"
+      <td>extraArgs</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">envflag.enable: "true"
+envflag.prefix: VM_
+loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>extraArgs."envflag.prefix"</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">VM_
-</code>
-</pre>
+      <td><p>Extra command line arguments for container of component</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>extraArgs.loggerFormat</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">json
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>extraContainers</td>
@@ -228,7 +212,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra containers to run in a pod with vmauth</p>
+</td>
     </tr>
     <tr>
       <td>extraHostPathMounts</td>
@@ -296,14 +281,16 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td></td>
     </tr>
     <tr>
-      <td>global.compatibility.openshift.adaptSecurityContext</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">auto
+      <td>global.compatibility</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">openshift:
+    adaptSecurityContext: auto
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Openshift security context compatibility configuration</p>
+</td>
     </tr>
     <tr>
       <td>global.image.registry</td>
@@ -313,7 +300,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image registry, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>global.imagePullSecrets</td>
@@ -323,7 +311,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>image.pullPolicy</td>
@@ -387,7 +376,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets</p>
+</td>
     </tr>
     <tr>
       <td>ingress.annotations</td>
@@ -397,7 +387,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress annotations</p>
+</td>
     </tr>
     <tr>
       <td>ingress.enabled</td>
@@ -407,7 +398,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable deployment of ingress for vmauth component</p>
+</td>
     </tr>
     <tr>
       <td>ingress.extraLabels</td>
@@ -417,7 +409,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>ingress.hosts</td>
@@ -427,7 +420,19 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of host objects</p>
+</td>
+    </tr>
+    <tr>
+      <td>ingress.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
     </tr>
     <tr>
       <td>ingress.pathType</td>
@@ -437,7 +442,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>ingress.tls</td>
@@ -447,7 +453,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of TLS objects</p>
+</td>
     </tr>
     <tr>
       <td>ingressInternal.annotations</td>
@@ -457,7 +464,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress annotations</p>
+</td>
     </tr>
     <tr>
       <td>ingressInternal.enabled</td>
@@ -467,7 +475,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable deployment of internal ingress for vmauth component</p>
+</td>
     </tr>
     <tr>
       <td>ingressInternal.extraLabels</td>
@@ -477,7 +486,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>ingressInternal.hosts</td>
@@ -487,7 +497,19 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of host objects</p>
+</td>
+    </tr>
+    <tr>
+      <td>ingressInternal.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
     </tr>
     <tr>
       <td>ingressInternal.pathType</td>
@@ -497,7 +519,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>ingressInternal.tls</td>
@@ -507,7 +530,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of TLS objects</p>
+</td>
     </tr>
     <tr>
       <td>license</td>
@@ -613,14 +637,15 @@ labels: {}
 </td>
     </tr>
     <tr>
-      <td>podSecurityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>podSecurityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s security context. Details are <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>probe.liveness</td>
@@ -659,26 +684,6 @@ tcpSocket: {}
 </td>
       <td><p>Startup probe</p>
 </td>
-    </tr>
-    <tr>
-      <td>rbac.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>rbac.extraLabels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>replicaCount</td>
@@ -732,7 +737,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service annotations</p>
+</td>
     </tr>
     <tr>
       <td>service.clusterIP</td>
@@ -742,7 +748,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service ClusterIP</p>
+</td>
     </tr>
     <tr>
       <td>service.enabled</td>
@@ -752,7 +759,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable vmauth service</p>
+</td>
     </tr>
     <tr>
       <td>service.externalIPs</td>
@@ -784,7 +792,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service labels</p>
+</td>
     </tr>
     <tr>
       <td>service.healthCheckNodePort</td>
@@ -794,7 +803,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Health check node port for a service. Check <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip" target="_blank">here</a> for details</p>
+</td>
     </tr>
     <tr>
       <td>service.ipFamilies</td>
@@ -804,7 +814,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>List of service IP families. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>service.ipFamilyPolicy</td>
@@ -814,7 +825,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service IP family policy. Check <a href="https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services" target="_blank">here</a> for details.</p>
+</td>
     </tr>
     <tr>
       <td>service.loadBalancerIP</td>
@@ -824,7 +836,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service load balacner IP</p>
+</td>
     </tr>
     <tr>
       <td>service.loadBalancerSourceRanges</td>
@@ -834,7 +847,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Load balancer source range</p>
+</td>
     </tr>
     <tr>
       <td>service.servicePort</td>
@@ -844,7 +858,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service port</p>
+</td>
     </tr>
     <tr>
       <td>service.type</td>
@@ -854,7 +869,8 @@ tcpSocket: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Service type</p>
+</td>
     </tr>
     <tr>
       <td>serviceAccount.annotations</td>

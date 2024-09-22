@@ -383,7 +383,8 @@ tenant_id: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Specify alternative source for env variables</p>
+</td>
     </tr>
     <tr>
       <td>extraArgs</td>
@@ -449,14 +450,16 @@ tenant_id: ""
       <td></td>
     </tr>
     <tr>
-      <td>global.compatibility.openshift.adaptSecurityContext</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">auto
+      <td>global.compatibility</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">openshift:
+    adaptSecurityContext: auto
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Openshift security context compatibility configuration</p>
+</td>
     </tr>
     <tr>
       <td>global.image.registry</td>
@@ -466,7 +469,8 @@ tenant_id: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image registry, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>global.imagePullSecrets</td>
@@ -476,7 +480,8 @@ tenant_id: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets, that can be shared across multiple helm charts</p>
+</td>
     </tr>
     <tr>
       <td>image.pullPolicy</td>
@@ -530,7 +535,8 @@ tenant_id: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Image pull secrets</p>
+</td>
     </tr>
     <tr>
       <td>license</td>
@@ -762,14 +768,15 @@ minAvailable: 1
       <td></td>
     </tr>
     <tr>
-      <td>podSecurityContext.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>podSecurityContext</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s security context. Details are <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>resources</td>
@@ -779,7 +786,8 @@ minAvailable: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Resource object. Details are <a href="http://kubernetes.io/docs/user-guide/compute-resources/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>securityContext</td>
