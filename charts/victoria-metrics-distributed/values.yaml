@@ -1,33 +1,33 @@
-# -- overrides the chart's name
+# -- Overrides the chart's name
 nameOverride: "vm-distributed"
 
-# -- overrides the chart's computed fullname.
+# -- Overrides the chart's computed fullname.
 fullnameOverride: ""
 
-# -- set up a vmauth as the global write entrypoint
+# -- Set up a vmauth as the global write entrypoint
 vmauthIngestGlobal:
   enabled: true
   name: ""
   spec: {}
 
-# -- set up a vmauth as the global read entrypoint
+# -- Set up a vmauth as the global read entrypoint
 vmauthQueryGlobal:
   enabled: true
   name: ""
   spec: {}
 
-# -- config per availability zone components, including vmagent, vmcluster, vmauth etc
+# -- Config per availability zone components, including vmagent, vmcluster, vmauth etc
 availabilityZones:
   - name: zone-eu-1
-    # -- allow data ingestion to this zone
+    # -- Allow data ingestion to this zone
     allowIngest: true
-    # -- allow data query from this zone through global query endpoint
+    # -- Allow data query from this zone through global query endpoint
     allowQuery: true
-    # -- nodeselector to restrict where pods of this zone can be placed.
+    # -- Node selector to restrict where pods of this zone can be placed.
     # usually provided by cloud providers.
     nodeSelector:
       topology.kubernetes.io/zone: zone-eu-1
-    # -- extraAffinity adds user defined custom affinity rules
+    # -- Extra affinity adds user defined custom affinity rules
     extraAffinity: {}
       # preferredDuringSchedulingIgnoredDuringExecution:
       # - weight: 1
@@ -37,14 +37,14 @@ availabilityZones:
       #       operator: In
       #       values:
       #       - us-central1-b
-    # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
+    # -- Topology spread constraints allows to customize the default topologySpreadConstraints.
     topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: ScheduleAnyway
     vmauthIngest:
       enabled: true
-      # -- override the name of the vmauth object
+      # -- Override the name of the vmauth object
       name: ""
       spec:
         extraArgs:
@@ -58,12 +58,12 @@ availabilityZones:
       spec:
         extraArgs:
           discoverBackendIPs: "true"
-    # -- set up a vmauth with all the zone with `allowQuery: true` as query backends
+    # -- Set up a vmauth with all the zone with `allowQuery: true` as query backends
     vmauthCrossAZQuery:
       enabled: true
       name: ""
       spec: {}
-    # -- vmagent here only meant to proxy write requests to each az,
+    # -- VMAgent here only meant to proxy write requests to each az,
     # doesn't support customized other remote write address.
     vmagent:
       enabled: true
@@ -72,9 +72,9 @@ availabilityZones:
       spec: {}
     vmcluster:
       enabled: true
-      # -- override the name of the vmcluster, by default is vmcluster-<zoneName>
+      # -- Override the name of the vmcluster, by default is vmcluster-<zoneName>
       name: ""
-      # -- spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api#vmclusterspec
+      # -- Spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
       spec:
         retentionPeriod: "14"
         replicationFactor: 2
@@ -94,15 +94,15 @@ availabilityZones:
             {}
     
   - name: zone-us-1
-    # -- allow data ingestion to this zone
+    # -- Allow data ingestion to this zone
     allowIngest: true
-    # -- allow data query from this zone through global query endpoint
+    # -- Allow data query from this zone through global query endpoint
     allowQuery: true
-    # -- nodeselector to restrict where pods of this zone can be placed.
+    # -- Node selector to restrict where pods of this zone can be placed.
     # usually provided by cloud providers.
     nodeSelector:
       topology.kubernetes.io/zone: zone-us-1
-    # -- extraAffinity adds user defined custom affinity rules
+    # -- Extra affinity adds user defined custom affinity rules
     extraAffinity: {}
       # preferredDuringSchedulingIgnoredDuringExecution:
       # - weight: 1
@@ -112,7 +112,7 @@ availabilityZones:
       #       operator: In
       #       values:
       #       - us-central1-c
-    # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
+    # -- Topology spread constraints allows to customize the default topologySpreadConstraints.
     topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -136,7 +136,7 @@ availabilityZones:
       enabled: true
       name: ""
       spec: {}
-    # -- vmagent only meant to proxy write requests to each az,
+    # -- VMAgent only meant to proxy write requests to each az,
     # doesn't support customized remote write address
     vmagent:
       enabled: true
@@ -145,9 +145,9 @@ availabilityZones:
       spec: {}
     vmcluster:
       enabled: true
-      # -- override the name of the vmcluster, by default is vmcluster-<zoneName>
+      # -- Override the name of the vmcluster, by default is vmcluster-<zoneName>
       name: ""
-      # -- spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api#vmclusterspec
+      # -- Spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
       spec:
         retentionPeriod: "14"
         replicationFactor: 2
@@ -166,7 +166,7 @@ availabilityZones:
           resources:
             {}
 
-  ## add more zones if needed
+  # add more zones if needed
   # - name: zone-na-1
   #   # -- allow data ingestion to this zone
   #   allowIngest: true
@@ -214,11 +214,11 @@ availabilityZones:
   #   vmcluster:
   #     enabled: true
   #     name: ""
-  #     # -- spec for VMCluster crd, see https://docs.victoriametrics.com/operator/api#vmclusterspec
+  #     # -- spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
   #     spec: {}
 
 
-# -- set up an extra vmagent to scrape all the scrape objects by default,
+# -- Set up an extra vmagent to scrape all the scrape objects by default,
 # and write data to above vmauth-global-ingest endpoint.
 extraVMAgent:
   enabled: true
@@ -227,11 +227,11 @@ extraVMAgent:
     selectAllByDefault: true
 
 
-# -- enable multitenancy mode
-# see https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy
+# -- Enable multitenancy mode
+# see [here](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy)
 enableMultitenancy: false
 
-# -- set up vm operator and other resources like vmalert, grafana if needed
+# -- Set up vm operator and other resources like vmalert, grafana if needed
 victoria-metrics-k8s-stack:
   enabled: true
   victoria-metrics-operator:

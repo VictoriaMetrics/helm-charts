@@ -2,9 +2,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
-  image:
-    registry: ""
+  # -- Image pull secrets, that can be shared across multiple helm charts
   imagePullSecrets: []
+  image:
+    # -- Image registry, that can be shared across multiple helm charts
+    registry: ""
+  # -- Openshift security context compatibility configuration
   compatibility:
     openshift:
       adaptSecurityContext: "auto"
@@ -26,6 +29,7 @@ image:
   # -- Pull policy of Docker image
   pullPolicy: IfNotPresent
 
+# -- Image pull secrets
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -40,26 +44,26 @@ serviceAccount:
   # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name:
 
-# -- See `kubectl explain poddisruptionbudget.spec` for more. Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+# -- See `kubectl explain poddisruptionbudget.spec` for more. Check [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) for details
 podDisruptionBudget:
   enabled: false
   # minAvailable: 1
   # maxUnavailable: 1
   labels: {}
 
+# -- Extra command line arguments for container of component
 extraArgs:
   envflag.enable: "true"
   envflag.prefix: VM_
   loggerFormat: json
 
-# -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
+# -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables) for details.
 env: []
 
+# -- Specify alternative source for env variables
 envFrom: []
   #- configMapRef:
   #    name: special-config
-
-
 
 # -- Additional hostPath mounts
 extraHostPathMounts: []
@@ -80,15 +84,17 @@ extraVolumeMounts: []
   # - name: example
   #   mountPath: /example
 
+# -- Extra containers to run in a pod with vmgateway
 extraContainers: []
   # - name: config-reloader
   #   image: reloader-image
 
+# -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
 podSecurityContext:
   enabled: true
 # fsGroup: 2000
 
-# -- Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+# -- Pod security context. Check [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for details
 securityContext:
   enabled: true
   runAsNonRoot: true
@@ -96,43 +102,62 @@ securityContext:
   runAsGroup: 1000
 
 service:
+  # -- Enabled vmgateway service
   enabled: true
+  # -- Service annotations
   annotations: {}
+  # -- Service labels
   extraLabels: {}
+  # -- Service ClusterIP
   clusterIP: ""
-  ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
-  ##
+  # -- Service external IPs. Check [here](https://kubernetes.io/docs/user-guide/services/#external-ips) for details
   externalIPs: []
+  # -- Service load balacner IP
   loadBalancerIP: ""
+  # -- Load balancer source range
   loadBalancerSourceRanges: []
+  # -- Service port
   servicePort: 8431
   # nodePort: 30000
+  # -- Service type
   type: ClusterIP
-  # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
-  # externalTrafficPolicy: "local"
-  # healthCheckNodePort: 0
+  # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  externalTrafficPolicy: ""
+  # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  healthCheckNodePort: ""
+  # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
   ipFamilyPolicy: ""
+  # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
   ipFamilies: []
 
 ingress:
+  # -- Enable deployment of ingress for server component
   enabled: false
+
+  # -- Ingress annotations
   annotations: {}
   #   kubernetes.io/ingress.class: nginx
   #   kubernetes.io/tls-acme: 'true'
 
+  # -- Ingress extra labels
   extraLabels: {}
+
+  # -- Array of host objects
   hosts: []
   #   - name: vmgateway.local
   #     path: /
   #     port: http
+
+  # -- Array of TLS objects
   tls: []
   #   - secretName: vmgateway-ingress-tls
   #     hosts:
   #       - vmgateway.local
-  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-  # ingressClassName: nginx
-  # -- pathType is only for k8s >= 1.1=
+
+  # -- Ingress controller class name
+  ingressClassName: ""
+
+  # -- Ingress path type
   pathType: Prefix
 
 # -- We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'.
@@ -150,10 +175,10 @@ annotations: {}
 # -- Annotations to be added to pod
 podAnnotations: {}
 
-# -- NodeSelector configurations. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+# -- NodeSelector configurations. Check [here](https://kubernetes.io/docs/user-guide/node-selection/) for details
 nodeSelector: {}
 
-# -- Tolerations configurations. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+# -- Tolerations configurations. Check [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) for details
 tolerations: []
   # - key: "key"
   #   operator: "Equal|Exists"
@@ -184,19 +209,19 @@ serviceMonitor:
   #    tlsConfig:
   #      insecureSkipVerify: true
 
-# -- Use existing configmap if specified otherwise .config values will be used. Ref: https://docs.victoriametrics.com/vmgateway
+# -- Use existing configmap if specified otherwise .config values will be used. Check [here](https://docs.victoriametrics.com/vmgateway) for details
 configMap: ""
 
 # -- Specify to True if the source for rate-limiting, reading and writing as a VictoriaMetrics Cluster. Must be true for rate limiting
 clusterMode: false
 
-# -- Access Control configuration. https://docs.victoriametrics.com/vmgateway#access-control
+# -- Access Control configuration. Check [here](https://docs.victoriametrics.com/vmgateway#access-control) for details
 auth:
   # -- Enable/Disable access-control
   enabled: false
   
 
-# -- Rate limiter configuration. Docs https://docs.victoriametrics.com/vmgateway#rate-limiter
+# -- Rate limiter configuration. Docs are [here](https://docs.victoriametrics.com/vmgateway#rate-limiter)
 rateLimiter:
   # -- Enable/Disable rate-limiting
   enabled: false
@@ -227,25 +252,24 @@ write:
   url: ""
 
 probe:
-  # -- readiness probe
+  # -- Readiness probe
   readiness:
     httpGet: {}
     initialDelaySeconds: 5
     periodSeconds: 15
-  # -- liveness probe
+  # -- Liveness probe
   liveness:
     tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
     timeoutSeconds: 5
-  # -- startup probe
+  # -- Startup probe
   startup: {}
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
-# Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise,
-# for more information, visit https://victoriametrics.com/products/enterprise/ .
-# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Required only for VictoriaMetrics enterprise. Check docs [here](https://docs.victoriametrics.com/enterprise),
+# for more information, visit [site](https://victoriametrics.com/products/enterprise/).
+# Request a trial license [here](https://victoriametrics.com/products/enterprise/trial/)
 # Supported starting from VictoriaMetrics v1.94.0
 license:
   # -- License key

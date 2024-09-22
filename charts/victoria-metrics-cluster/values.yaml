@@ -2,29 +2,48 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
+  # -- Image pull secrets, that can be shared across multiple helm charts
   imagePullSecrets: []
   image:
+    # -- Image registry, that can be shared across multiple helm charts
     registry: ""
+  # -- Openshift security context compatibility configuration
   compatibility:
     openshift:
       adaptSecurityContext: "auto"
 
-# -- k8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
+# -- K8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
 clusterDomainSuffix: cluster.local
 printNotes: true
 
 rbac:
+  # -- Enables Role/RoleBinding creation
   create: true
+
+  # -- If true and `rbac.enabled`, will deploy a Role/RoleBinding instead of a ClusterRole/ClusterRoleBinding
   namespaced: false
+
+  # -- Role/RoleBinding labels
   extraLabels: {}
-  # annotations: {}
+  
+  # -- Role/RoleBinding annotations
+  annotations: {}
 
 serviceAccount:
+  # -- Specifies whether a service account should be created
   create: true
-  # name:
+
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+  # -- Service account labels
   extraLabels: {}
-  # annotations: {}
-  # mount API token to pod directly
+
+  # -- Service account annotations
+  annotations: {}
+
+  # -- mount API token to pod directly
   automountToken: true
 
 extraSecrets:
@@ -41,7 +60,7 @@ extraObjects: []
 vmselect:
   # -- Enable deployment of vmselect component. Can be deployed as Deployment(default) or StatefulSet
   enabled: true
-  # -- Vmselect container name
+  # -- VMSelect container name
   name: vmselect
   strategy: {}
    # rollingUpdate:
@@ -69,37 +88,42 @@ vmselect:
   fullnameOverride: ""
   # -- Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs
   suppressStorageFQDNsRender: false
-  automountServiceAccountToken: true
-  # Extra command line arguments for vmselect component
+  # -- Extra command line arguments for vmselect component
   extraArgs:
     envflag.enable: true
     envflag.prefix: VM_
     loggerFormat: json
   annotations: {}
+  # -- StatefulSet/Deployment additional labels
   extraLabels: {}
+  # -- Pod’s additional labels
   podLabels: {}
-  # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details.
   env: []
+
+  # -- Specify alternative source for env variables
   envFrom: []
     #- configMapRef:
     #    name: special-config
 
+  # -- Readiness & Liveness probes
   probe:
-    # -- vmselect readiness probe
+    # -- VMSelect readiness probe
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- vmselect liveness probe
+    # -- VMSelect liveness probe
     liveness:
       tcpSocket: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- vmselect startup probe
+    # -- VMSelect startup probe
     startup: {}
 
   horizontalPodAutoscaler:
@@ -136,16 +160,19 @@ vmselect:
     # - name: example
     #   mountPath: /example
 
+  # -- Extra containers to run in a pod with vmselect
   extraContainers:
     []
     # - name: config-reloader
     #   image: reloader-image
 
+  # -- Init containers for vmselect
   initContainers:
     []
     # - name: example
     #   image: example-image
 
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   podDisruptionBudget:
     # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
     enabled: false
@@ -172,7 +199,7 @@ vmselect:
   replicaCount: 2
   # -- Container workdir
   containerWorkingDir: ""
-  # -- Resource object
+  # -- Resource object. Details are [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources: {}
     # limits:
     #   cpu: 50m
@@ -184,6 +211,7 @@ vmselect:
   # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   securityContext:
     enabled: true
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext:
     enabled: true
   # -- Cache root folder
@@ -195,7 +223,7 @@ vmselect:
     labels: {}
     # -- Service ClusterIP
     clusterIP: ""
-    # -- Service External IPs. Details are [here](https://kubernetes.io/docs/user-guide/services/#external-ips)
+    # -- Service external IPs. Details are [here](https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
     # -- Extra service ports
     extraPorts: []
@@ -209,33 +237,42 @@ vmselect:
     targetPort: http
     # -- Service type
     type: ClusterIP
+    # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
     healthCheckNodePort: ""
+    # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
     externalTrafficPolicy: ""
+    # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilyPolicy: ""
+    # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilies: []
   ingress:
     # -- Enable deployment of ingress for vmselect component
     enabled: false
+
     # -- Ingress annotations
     annotations: {}
     #   kubernetes.io/ingress.class: nginx
     #   kubernetes.io/tls-acme: 'true'
 
+    # -- Ingress extra labels
     extraLabels: {}
+
     # -- Array of host objects
     hosts: []
     #   - name: vmselect.local
     #     path: /select
     #    port: http
+
     # -- Array of TLS objects
     tls: []
     #   - secretName: vmselect-ingress-tls
     #     hosts:
     #       - vmselect.local
-    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    # ingressClassName: nginx
-    # -- pathType is only for k8s >= 1.1=
+
+    # -- Ingress controller class name
+    ingressClassName: ""
+
+    # -- Ingress path type
     pathType: Prefix
   statefulSet:
     # -- Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data.
@@ -259,8 +296,6 @@ vmselect:
     # -- Existing Claim name. Requires vmselect.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
 
-    ## Vmselect data Persistent Volume mount root path
-    ##
     # -- Size of the volume. Better to set the same as resource limit memory property
     size: 2Gi
     # -- Mount subpath
@@ -293,7 +328,7 @@ vmselect:
 vminsert:
   # -- Enable deployment of vminsert component. Deployment is used
   enabled: true
-  # -- vminsert container name
+  # -- VMInsert container name
   name: vminsert
   strategy: {}
    # rollingUpdate:
@@ -319,41 +354,45 @@ vminsert:
   priorityClassName: ""
   # -- Overrides the full name of vminsert component
   fullnameOverride: ""
-  # Extra command line arguments for vminsert component
+  # -- Extra command line arguments for vminsert component
   extraArgs:
     envflag.enable: "true"
     envflag.prefix: VM_
     loggerFormat: json
   annotations: {}
+  # -- StatefulSet/Deployment additional labels
   extraLabels: {}
+  # -- Pod’s additional labels
   podLabels: {}
-  # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details.
   env: []
+
+  # -- Specify alternative source for env variables
   envFrom: []
     #- configMapRef:
     #    name: special-config
 
   # -- Suppress rendering `--storageNode` FQDNs based on `vmstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs
   suppressStorageFQDNsRender: false
-  automountServiceAccountToken: true
 
-  # Readiness & Liveness probes
+  # -- Readiness & Liveness probes
   probe:
-    # -- vminsert readiness probe
+    # -- VMInsert readiness probe
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- vminsert liveness probe
+    # -- VMInsert liveness probe
     liveness:
       tcpSocket: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- vminsert startup probe
+    # -- VMInsert startup probe
     startup: {}
 
 # Horizontal Pod Autoscaling
@@ -382,18 +421,20 @@ vminsert:
     # - name: example
     #   mountPath: /example
 
+  # -- Extra containers to run in a pod with vminsert
   extraContainers:
     []
     # - name: config-reloader
     #   image: reloader-image
 
+  # -- Init containers for vminsert
   initContainers:
     []
     # - name: example
     #   image: example-image
 
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   podDisruptionBudget:
-    # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
     enabled: false
     # minAvailable: 1
     # maxUnavailable: 1
@@ -418,7 +459,7 @@ vminsert:
   replicaCount: 2
   # -- Container workdir
   containerWorkingDir: ""
-  # -- Resource object
+  # -- Resource object. Details are [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources: {}
     # limits:
     #   cpu: 50m
@@ -429,6 +470,7 @@ vminsert:
   # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   securityContext:
     enabled: false
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext:
     enabled: false
   service:
@@ -438,7 +480,7 @@ vminsert:
     labels: {}
     # -- Service ClusterIP
     clusterIP: ""
-    # -- Service External IPs. Details are [here]( https://kubernetes.io/docs/user-guide/services/#external-ips)
+    # -- Service external IPs. Details are [here]( https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
     # -- Extra service ports
     extraPorts: []
@@ -453,34 +495,48 @@ vminsert:
     # -- Service type
     type: ClusterIP
     # -- Enable UDP port. used if you have "spec.opentsdbListenAddr" specified
-    # -- Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
+    # Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. Check [here](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/) for details
     udp: false
+    # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
     healthCheckNodePort: ""
+    # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
     externalTrafficPolicy: ""
+    # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilyPolicy: ""
+    # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilies: []
+
+
+
+
   ingress:
     # -- Enable deployment of ingress for vminsert component
     enabled: false
+
     # -- Ingress annotations
     annotations: {}
     #   kubernetes.io/ingress.class: nginx
     #   kubernetes.io/tls-acme: 'true'
+
+    # -- Ingress extra labels
     extraLabels: {}
+
     # -- Array of host objects
     hosts: []
     # - name: vminsert.local
     #   path: /insert
     #   port: http
+
     # -- Array of TLS objects
     tls: []
     #   - secretName: vminsert-ingress-tls
     #     hosts:
     #       - vminsert.local
-    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    # ingressClassName: nginx
-    # -- pathType is only for k8s >= 1.1=
+
+    # -- Ingress controller class name
+    ingressClassName: ""
+
+    # -- Ingress path type
     pathType: Prefix
   serviceMonitor:
     # -- Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object
@@ -510,7 +566,7 @@ vminsert:
 vmstorage:
   # -- Enable deployment of vmstorage component. StatefulSet is used
   enabled: true
-  # -- vmstorage container name
+  # -- VMStorage container name
   name: vmstorage
   image:
     # -- Image registry
@@ -531,16 +587,18 @@ vmstorage:
   priorityClassName: ""
   # -- Overrides the full name of vmstorage component
   fullnameOverride:
-  automountServiceAccountToken: true
-  # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details
   env: []
+
+  # -- Specify alternative source for env variables
   envFrom: []
     #- configMapRef:
     #    name: special-config
 
   # -- Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month
   retentionPeriod: 1
-  # Additional vmstorage container arguments. Extra command line arguments for vmstorage component
+  # -- Additional vmstorage container arguments. Extra command line arguments for vmstorage component
   extraArgs:
     envflag.enable: "true"
     envflag.prefix: VM_
@@ -568,6 +626,7 @@ vmstorage:
     # - name: example
     #   mountPath: /example
 
+  # -- Extra containers to run in a pod with vmstorage
   extraContainers:
     []
     # - name: config-reloader
@@ -580,6 +639,7 @@ vmstorage:
     #  subPath: ""
     #  readOnly: true
 
+  # -- Init containers for vmstorage
   initContainers:
     []
     # - name: vmrestore
@@ -603,7 +663,6 @@ vmstorage:
     labels: {}
 
   # -- Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
-  ##
   tolerations:
     []
     # - key: "key"
@@ -620,8 +679,7 @@ vmstorage:
   topologySpreadConstraints: []
 
 
-  # -- Use an alternate scheduler, e.g. "stork".
-  # ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  # -- Use an alternate scheduler, e.g. "stork". Check [here](https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/) for details
   #
   # schedulerName:
 
@@ -652,8 +710,11 @@ vmstorage:
 
   # -- Pod's annotations
   podAnnotations: {}
+  # -- StatefulSet/Deployment annotations
   annotations: {}
+  # -- StatefulSet/Deployment additional labels
   extraLabels: {}
+  # -- Pod’s additional labels
   podLabels: {}
   # -- Count of vmstorage pods
   replicaCount: 2
@@ -661,7 +722,6 @@ vmstorage:
   containerWorkingDir: ""
   # -- Deploy order policy for StatefulSet pods
   podManagementPolicy: OrderedReady
-
   # -- Resource object. Details are [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources: {}
     # limits:
@@ -674,6 +734,7 @@ vmstorage:
   # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   securityContext:
     enabled: false
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext:
     enabled: false
   service:
@@ -689,77 +750,84 @@ vmstorage:
     vmselectPort: 8401
     # -- Extra service ports
     extraPorts: []
+    # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
     healthCheckNodePort: ""
+    # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
     externalTrafficPolicy: ""
+    # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilyPolicy: ""
+    # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilies: []
   # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60
+  # -- Readiness & Liveness probes
   probe:
-    # -- vmstorage readiness probe
+    # -- VMStorage readiness probe
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    # -- vmstorage liveness probe
+    # -- VMStorage liveness probe
     liveness:
       tcpSocket: {}
       initialDelaySeconds: 30
       periodSeconds: 30
       timeoutSeconds: 5
       failureThreshold: 10
-    # -- vmstorage startup probe
+    # -- VMStorage startup probe
     startup: {}
   vmbackupmanager:
-    # -- enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages
+    # -- Enable automatic creation of backup via vmbackupmanager. vmbackupmanager is part of Enterprise packages
     enabled: false
     image:
-      # -- vmbackupmanager image registry
+      # -- VMBackupManager image registry
       registry: ""
-      # -- vmbackupmanager image repository
+      # -- VMBackupManager image repository
       repository: victoriametrics/vmbackupmanager
-      # -- vmbackupmanager image tag
+      # -- VMBackupManager image tag
       # override Chart.AppVersion
       tag: ""
       # Variant of the image tag to use.
       # e.g. enterprise.
       variant: cluster
-    # -- disable hourly backups
+    # -- Disable hourly backups
     disableHourly: false
-    # -- disable daily backups
+    # -- Disable daily backups
     disableDaily: false
-    # -- disable weekly backups
+    # -- Disable weekly backups
     disableWeekly: false
-    # -- disable monthly backups
+    # -- Disable monthly backups
     disableMonthly: false
-    # -- backup destination at S3, GCS or local filesystem. Pod name will be included to path!
+    # -- Backup destination at S3, GCS or local filesystem. Pod name will be included to path!
     destination: ""
-    # -- backups' retention settings
+    # -- Backups' retention settings
     retention:
-      # -- keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off
+      # -- Keep last N hourly backups. 0 means delete all existing hourly backups. Specify -1 to turn off
       keepLastHourly: 2
-      # -- keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off
+      # -- Keep last N daily backups. 0 means delete all existing daily backups. Specify -1 to turn off
       keepLastDaily: 2
-      # -- keep last N weekly backups. 0 means delete all existing weekly backups. Specify -1 to turn off
+      # -- Keep last N weekly backups. 0 means delete all existing weekly backups. Specify -1 to turn off
       keepLastWeekly: 2
-      # -- keep last N monthly backups. 0 means delete all existing monthly backups. Specify -1 to turn off
+      # -- Keep last N monthly backups. 0 means delete all existing monthly backups. Specify -1 to turn off
       keepLastMonthly: 2
+    # -- Extra command line arguments for container of component
     extraArgs:
       envflag.enable: "true"
       envflag.prefix: VM_
       loggerFormat: json
-    # -- Allows to enable restore options for pod.
-    # Read more: https://docs.victoriametrics.com/vmbackupmanager#restore-commands
+    # -- Allows to enable restore options for pod. Check [here](https://docs.victoriametrics.com/vmbackupmanager#restore-commands) for details
     restore:
       onStart:
         enabled: false
+    # -- Resource object. Details are [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     resources: {}
-    # -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+    # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details
     env: []
+    # -- Readiness & Liveness probes
     probe:
-      # -- vmbackupmanager readiness probe
+      # -- VMBackupManager readiness probe
       readiness:
         httpGet:
           port: manager-http
@@ -767,7 +835,7 @@ vmstorage:
         periodSeconds: 15
         timeoutSeconds: 5
         failureThreshold: 3
-      # -- vmbackupmanager liveness probe
+      # -- VMBackupManager liveness probe
       liveness:
         tcpSocket:
           port: manager-http
@@ -775,7 +843,7 @@ vmstorage:
         periodSeconds: 30
         timeoutSeconds: 5
         failureThreshold: 10
-      # -- vmbackupmanager startup probe
+      # -- VMBackupManager startup probe
       startup: {}
     extraSecretMounts:
       []
@@ -809,10 +877,9 @@ vmstorage:
     metricRelabelings: []
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
-# Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise,
-# for more information, visit https://victoriametrics.com/products/enterprise/ .
-# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Required only for VictoriaMetrics enterprise. Check docs [here](https://docs.victoriametrics.com/enterprise),
+# for more information, visit [site](https://victoriametrics.com/products/enterprise/).
+# Request a trial license [here](https://victoriametrics.com/products/enterprise/trial/)
 # Supported starting from VictoriaMetrics v1.94.0
 license:
   # -- License key

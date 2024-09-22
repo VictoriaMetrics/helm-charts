@@ -7,5 +7,5 @@ RUN \
       --branch tohtml-func \
       https://github.com/AndrewChubatiuk/helm-docs && \
    cd helm-docs && \
-   go build -o helm-docs ./cmd/helm-docs/... && \
-   mv helm-docs /bin/helm-docs
+   go build -o docs ./cmd/helm-docs/... && \
+   mv docs /bin/helm-docs

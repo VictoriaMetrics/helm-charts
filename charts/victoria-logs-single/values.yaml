@@ -2,29 +2,32 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
+  # -- Image pull secrets, that can be shared across multiple helm charts
   imagePullSecrets: []
   image:
+    # -- Image registry, that can be shared across multiple helm charts
     registry: ""
+  # -- Openshift security context compatibility configuration
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+  # -- Global name override
   nameOverride: ""
   victoriaLogs:
     server:
       # -- Overrides the full name of server component
       fullnameOverride:
-
       # -- Server container name
       name: server
-
-  compatibility:
-    openshift:
-      adaptSecurityContext: "auto"
 # -- Print chart notes
 printNotes: true
 
+# -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
 podDisruptionBudget:
-  # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   enabled: false
   #  minAvailable: 1
   #  maxUnavailable: 1
+  # -- PodDisruptionBudget extra labels
   extraLabels: {}
 
 server:
@@ -37,6 +40,7 @@ server:
     repository: victoriametrics/victoria-logs
     # -- Image tag
     tag: ""
+    # -- Image tag suffix, which is appended to `Chart.AppVersion` if no `server.image.tag` is defined
     variant: victorialogs
     # -- Image pull policy
     pullPolicy: IfNotPresent
@@ -97,13 +101,16 @@ server:
   # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
+  # -- Pod topologySpreadConstraints
+  topologySpreadConstraints: []
+
   # -- Pod affinity
   affinity: {}
 
-  # -- Env variables
-  # -- Additional environment variables (ex.: secret tokens, flags) https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables
+  # -- Additional environment variables (ex.: secret tokens, flags). Details are [here](https://github.com/VictoriaMetrics/VictoriaMetrics#environment-variables)
   env: []
 
+  # -- Specify alternative source for env variables
   envFrom:
     []
     #- configMapRef:
@@ -112,8 +119,7 @@ server:
   # -- Container workdir
   containerWorkingDir: ""
 
-  # -- Use an alternate scheduler, e.g. "stork".
-  # ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  # -- Use an alternate scheduler, e.g. "stork". Check details [here](https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/)
   #
   # schedulerName:
 
@@ -144,7 +150,7 @@ server:
     # -- Size of the volume. Should be calculated based on the logs you send and retention policy you set.
     size: 3Gi
 
-  # -- Sts/Deploy additional labels
+  # -- StatefulSet/Deployment additional labels
   extraLabels: {}
   # -- Pod's additional labels
   podLabels: {}
@@ -207,6 +213,7 @@ server:
   ingress:
     # -- Enable deployment of ingress for server component
     enabled: false
+
     # -- Ingress annotations
     annotations:
     #   kubernetes.io/ingress.class: nginx
@@ -214,8 +221,8 @@ server:
 
     # -- Ingress extra labels
     extraLabels: {}
-    # -- Array of host objects
 
+    # -- Array of host objects
     hosts: []
     #   - name: vmselect.local
     #     path: /select
@@ -226,10 +233,11 @@ server:
     #   - secretName: vmselect-ingress-tls
     #     hosts:
     #       - vmselect.local
-    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    # ingressClassName: nginx
-    # -- pathType is only for k8s >= 1.1=
+
+    # -- Ingress controller class name
+    ingressClassName: ""
+
+    # -- Ingress path type
     pathType: Prefix
 
   service:
@@ -239,7 +247,7 @@ server:
     labels: {}
     # -- Service ClusterIP
     clusterIP: ""
-    # -- Service External IPs. Details are [here]( https://kubernetes.io/docs/user-guide/services/#external-ips)
+    # -- Service external IPs. Details are [here]( https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
     # -- Service load balacner IP
     loadBalancerIP: ""
@@ -251,10 +259,13 @@ server:
     # nodePort: 30000
     # -- Service type
     type: ClusterIP
-    # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
     externalTrafficPolicy: ""
+    # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
     healthCheckNodePort: ""
+    # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilyPolicy: ""
+    # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilies: []
 
   statefulSet:
@@ -287,6 +298,7 @@ server:
     # -- Service Monitor metricRelabelings
     metricRelabelings: []
 
+# -- Values for [fluent-bit helm chart](https://fluent.github.io/helm-charts/)
 fluent-bit:
   # -- Enable deployment of fluent-bit
   enabled: false

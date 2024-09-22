@@ -2,34 +2,38 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
-  image:
-    registry: ""
+  # -- Image pull secrets, that can be shared across multiple helm charts
   imagePullSecrets: []
+  image:
+    # -- Image registry, that can be shared across multiple helm charts
+    registry: ""
+  # -- Openshift security context compatibility configuration
   compatibility:
     openshift:
       adaptSecurityContext: "auto"
-      
+
+# -- Replica count     
 replicaCount: 1
 
-# -- ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+# -- [K8s Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) specific variables
 deployment:
   enabled: true
-  # ref: -- https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  # -- Deployment stragegy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) for details
   strategy: {}
    # rollingUpdate:
    #  maxSurge: 25%
    #  maxUnavailable: 25%
    # type: RollingUpdate
 
-# -- ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+# -- [K8s StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) specific variables
 statefulset:
   enabled: false
-  # -- create cluster of vmagents. See https://docs.victoriametrics.com/vmagent#scraping-big-number-of-targets
-  # available since 1.77.2 version https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.2
+  # -- create cluster of vmagents. Check [here](https://docs.victoriametrics.com/vmagent#scraping-big-number-of-targets)
+  # available since [v1.77.2](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.2)
   clusterMode: false
   # -- replication factor for vmagent in cluster mode
   replicationFactor: 1
-  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  # -- StatefulSet update strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies) for details.
   updateStrategy: {}
     # type: RollingUpdate
 
@@ -43,20 +47,29 @@ image:
   # -- Variant of the image to use.
   # e.g. enterprise, scratch
   variant: ""
+  # -- Image pull policy
   pullPolicy: IfNotPresent
 
+# -- Image pull secrets
 imagePullSecrets: []
 
 nameOverride: ""
 fullnameOverride: ""
 
+# -- Container working directory
 containerWorkingDir: "/"
 
 rbac:
+  # -- Enables Role/RoleBinding creation
   create: true
+
+  # -- Role/RoleBinding annotations
   annotations: {}
+
+  # -- Role/RoleBinding labels
   extraLabels: {}
-  # -- if true and `rbac.enabled`, will deploy a Role/Rolebinding instead of a ClusterRole/ClusterRoleBinding
+
+  # -- If true and `rbac.enabled`, will deploy a Role/RoleBinding instead of a ClusterRole/ClusterRoleBinding
   namespaced: false
 
 serviceAccount:
@@ -68,8 +81,7 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name:
 
-# -- See `kubectl explain poddisruptionbudget.spec` for more
-# ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+# -- See `kubectl explain poddisruptionbudget.spec` for more or check [official documentation](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
 podDisruptionBudget:
   enabled: false
   # minAvailable: 1
@@ -87,7 +99,7 @@ multiTenantUrls: []
 #   - http://vm-insert-az1:8480
 #   - http://vm-insert-az2:8480
 
-# -- vmagent extra command line arguments
+# -- VMAgent extra command line arguments
 extraArgs:
   envflag.enable: "true"
   envflag.prefix: VM_
@@ -101,7 +113,7 @@ extraArgs:
   # opentsdbHTTPListenAddr: ":4242"
   # opentsdbListenAddr: ":4242"
 
-# -- Additional environment variables (ex.: secret tokens, flags) https://docs.victoriametrics.com/#environment-variables
+# -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for more details.
 env:
   []
   # - name: VM_remoteWrite_basicAuth_password
@@ -110,15 +122,16 @@ env:
   #       name: auth_secret
   #       key: password
 
+# -- Specify alternative source for env variables
 envFrom:
   []
   #- configMapRef:
   #    name: special-config
 
-# -- extra Labels for Pods, Deployment and Statefulset
+# -- Extra labels for Pods, Deployment and Statefulset
 extraLabels: {}
 
-# -- extra Labels for Pods only
+# -- Extra labels for Pods only
 podLabels: {}
 
 # -- Additional hostPath mounts
@@ -143,19 +156,23 @@ extraVolumeMounts:
   # - name: example
   #   mountPath: /example
 
+# -- Extra containers to run in a pod with vmagent
 extraContainers: []
 #   - name: config-reloader
 #     image: reloader-image
 
+ # -- Init containers for vmagent
 initContainers:
   []
   # - name: example
   #   image: example-image
 
+# -- Security context to be added to pod
 podSecurityContext:
   enabled: true
   # fsGroup: 2000
 
+# -- Security context to be added to pod's containers
 securityContext:
   enabled: true
   # capabilities:
@@ -166,43 +183,65 @@ securityContext:
   # runAsUser: 1000
 
 service:
+  # -- Enable agent service
   enabled: false
+  # -- Service annotations
   annotations: {}
+  # -- Service labels
   extraLabels: {}
+  # -- Service ClusterIP
   clusterIP: ""
-  ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
-  ##
+  # -- Service external IPs. Check [here](https://kubernetes.io/docs/user-guide/services/#external-ips) for details
   externalIPs: []
+  # -- Service load balacner IP
   loadBalancerIP: ""
+  # -- Load balancer source range
   loadBalancerSourceRanges: []
+  # -- Service port
   servicePort: 8429
   # nodePort: 30000
+  # -- Service type
   type: ClusterIP
+  # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
   ipFamilyPolicy: ""
+  # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
   ipFamilies: []
-  # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
   externalTrafficPolicy: ""
+  # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
   healthCheckNodePort: ""
+
 ingress:
+  # -- Enable deployment of ingress for agent
   enabled: false
+  
+  # -- Ingress annotations
   annotations: {}
   #   kubernetes.io/ingress.class: nginx
   #   kubernetes.io/tls-acme: 'true'
 
+  # -- Ingress extra labels
   extraLabels: {}
+  
+  # -- Array of host objects
   hosts: []
   #   - name: vmagent.local
   #     path: /
   #     port: http
+  
+  # -- Array of TLS objects
   tls: []
   #   - secretName: vmagent-ingress-tls
   #     hosts:
   #       - vmagent.local
-  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-  # ingressClassName: nginx
-  # -- pathType is only for k8s >= 1.1=
+
+  # -- Ingress controller class name
+  ingressClassName: ""
+
+  # -- Ingress path type
   pathType: Prefix
+
+# -- Resource object. Details are [here](http://kubernetes.io/docs/user-guide/compute-resources/)
 resources:
   {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -222,24 +261,27 @@ annotations: {}
 # -- Annotations to be added to pod
 podAnnotations: {}
 
+# -- Pod's node selector. Details are [here](https://kubernetes.io/docs/user-guide/node-selection/)
 nodeSelector: {}
 
+# -- Node tolerations for server scheduling to nodes with taints. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
 tolerations: []
 
+# -- Pod topologySpreadConstraints
 topologySpreadConstraints: []
   # - maxSkew: 1
   #   topologyKey: topology.kubernetes.io/zone
   #   whenUnsatisfiable: DoNotSchedule
 
+# -- Pod affinity
 affinity: {}
 
-# -- vmagent scraping configuration:
-# https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/docs/vmagent.md#how-to-collect-metrics-in-prometheus-format
+# -- VMAgent [scraping configuration](https://docs.victoriametrics.com/vmagent#how-to-collect-metrics-in-prometheus-format)
 # use existing configmap if specified
 # otherwise .config values will be used
 configMap: ""
 
-# -- priority class to be assigned to the pod(s)
+# -- Priority class to be assigned to the pod(s)
 priorityClassName: ""
 
 serviceMonitor:
@@ -263,22 +305,38 @@ serviceMonitor:
 #    tlsConfig:
 #      insecureSkipVerify: true
 
+# -- Empty dir configuration for a case, when persistence is disabled
 emptyDir: {}
+
 persistence:
+  # -- Create/use Persistent Volume Claim for server component. Empty dir if false
   enabled: false
-  # storageClassName: default
+
+  # -- StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically
+  storageClassName: ""
+
+  # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](http://kubernetes.io/docs/user-guide/persistent-volumes/)
   accessModes:
     - ReadWriteOnce
+
+  # -- Size of the volume. Should be calculated based on the logs you send and retention policy you set.
   size: 10Gi
+
+  # -- Persistant volume annotations
   annotations: {}
+
+  # -- Persistant volume additional labels
   extraLabels: {}
+
+  # -- Existing Claim name. If defined, PVC must be created manually before volume will be bound
   existingClaim: ""
+
   # -- Bind Persistent Volume by labels. Must match all labels of targeted PV.
   matchLabels: {}
 
 # -- Horizontal Pod Autoscaling.
 # Note that it is not intended to be used for vmagents which perform scraping.
-# In order to scale scraping vmagents see: https://docs.victoriametrics.com/vmagent/#scraping-big-number-of-targets
+# In order to scale scraping vmagents check [here](https://docs.victoriametrics.com/vmagent/#scraping-big-number-of-targets)
 horizontalPodAutoscaling:
   # -- Use HPA for vmagent
   enabled: false
@@ -289,11 +347,11 @@ horizontalPodAutoscaling:
   # -- Metric for HPA to use to scale vmagent
   metrics: []
 
+# -- VMAgent scrape configuration
 config:
   global:
     scrape_interval: 10s
 
-  # -- scrape configuration. scrape self by default
   scrape_configs:
     - job_name: vmagent
       static_configs:
@@ -613,28 +671,27 @@ config:
 extraScrapeConfigs: []
 
 probe:
-  # -- readiness probe
+  # -- Readiness probe
   readiness:
     httpGet: {}
     initialDelaySeconds: 5
     periodSeconds: 15
-  # -- liveness probe
+  # -- Liveness probe
   liveness:
     tcpSocket: {}
     initialDelaySeconds: 5
     periodSeconds: 15
     timeoutSeconds: 5
-  # -- startup probe
+  # -- Startup probe
   startup: {}
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 
 # -- Enterprise license key configuration for VictoriaMetrics enterprise.
-# Required only for VictoriaMetrics enterprise.
-# Documentation - https://docs.victoriametrics.com/enterprise,
-# for more information, visit https://victoriametrics.com/products/enterprise/ .
-# To request a trial license, go to https://victoriametrics.com/products/enterprise/trial/
+# Required only for VictoriaMetrics enterprise. Check docs [here](https://docs.victoriametrics.com/enterprise),
+# for more information, visit [site](https://victoriametrics.com/products/enterprise/).
+# Request a trial license [here](https://victoriametrics.com/products/enterprise/trial/)
 # Supported starting from VictoriaMetrics v1.94.0
 license:
   # -- License key
