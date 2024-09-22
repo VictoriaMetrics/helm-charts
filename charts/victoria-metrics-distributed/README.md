@@ -240,114 +240,6 @@ Change the values according to the need of the environment in ``victoria-metrics
   </thead>
   <tbody>
     <tr>
-      <td>availabilityZones</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">- allowIngest: true
-  allowQuery: true
-  extraAffinity: {}
-  name: zone-eu-1
-  nodeSelector:
-    topology.kubernetes.io/zone: zone-eu-1
-  topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: kubernetes.io/hostname
-      whenUnsatisfiable: ScheduleAnyway
-  vmagent:
-    annotations: {}
-    enabled: true
-    name: ""
-    spec: {}
-  vmauthCrossAZQuery:
-    enabled: true
-    name: ""
-    spec: {}
-  vmauthIngest:
-    enabled: true
-    name: ""
-    spec:
-        extraArgs:
-            discoverBackendIPs: "true"
-  vmauthQueryPerZone:
-    enabled: true
-    name: ""
-    spec:
-        extraArgs:
-            discoverBackendIPs: "true"
-  vmcluster:
-    enabled: true
-    name: ""
-    spec:
-        replicationFactor: 2
-        retentionPeriod: "14"
-        vminsert:
-            extraArgs: {}
-            replicaCount: 2
-            resources: {}
-        vmselect:
-            extraArgs: {}
-            replicaCount: 2
-            resources: {}
-        vmstorage:
-            replicaCount: 2
-            resources: {}
-            storageDataPath: /vm-data
-- allowIngest: true
-  allowQuery: true
-  extraAffinity: {}
-  name: zone-us-1
-  nodeSelector:
-    topology.kubernetes.io/zone: zone-us-1
-  topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: kubernetes.io/hostname
-      whenUnsatisfiable: ScheduleAnyway
-  vmagent:
-    annotations: {}
-    enabled: true
-    name: ""
-    spec: {}
-  vmauthCrossAZQuery:
-    enabled: true
-    name: ""
-    spec: {}
-  vmauthIngest:
-    enabled: true
-    name: ""
-    spec:
-        extraArgs:
-            discoverBackendIPs: "true"
-  vmauthQueryPerZone:
-    enabled: true
-    name: ""
-    spec:
-        extraArgs:
-            discoverBackendIPs: "true"
-  vmcluster:
-    enabled: true
-    name: ""
-    spec:
-        replicationFactor: 2
-        retentionPeriod: "14"
-        vminsert:
-            extraArgs: {}
-            replicaCount: 2
-            resources: {}
-        vmselect:
-            extraArgs: {}
-            replicaCount: 2
-            resources: {}
-        vmstorage:
-            replicaCount: 2
-            resources: {}
-            storageDataPath: /vm-data
-</code>
-</pre>
-</td>
-      <td><p>Config per availability zone components, including vmagent, vmcluster, vmauth etc</p>
-</td>
-    </tr>
-    <tr>
       <td>availabilityZones[0].allowIngest</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -378,6 +270,17 @@ Change the values according to the need of the environment in ``victoria-metrics
 </pre>
 </td>
       <td><p>Extra affinity adds user defined custom affinity rules</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">zone-eu-1
+</code>
+</pre>
+</td>
+      <td><p>Availability zone name</p>
 </td>
     </tr>
     <tr>
@@ -419,16 +322,80 @@ spec: {}
 </td>
     </tr>
     <tr>
-      <td>availabilityZones[0].vmauthCrossAZQuery</td>
+      <td>availabilityZones[0].vmagent.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-name: ""
-spec: {}
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
-      <td><p>Set up a vmauth with all the zone with <code>allowQuery: true</code> as query backends</p>
+      <td><p>VMAgent annotations</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmagent.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override the name of the vmagent object</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmagent.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>VMAgent spec. More options can be found <a href="https://docs.victoriametrics.com/operator/api/#vmagentspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmauthCrossAZQuery.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Create a vmauth with all the zone with <code>allowQuery: true</code> as query backends</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmauthCrossAZQuery.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override the name of the vmauth object</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmauthCrossAZQuery.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>VMAuth spec. More options can be found <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmauthIngest.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Create vmauth as a local write endpoint</p>
 </td>
     </tr>
     <tr>
@@ -441,6 +408,62 @@ spec: {}
 </td>
       <td><p>Override the name of the vmauth object</p>
 </td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmauthIngest.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">extraArgs:
+    discoverBackendIPs: "true"
+</code>
+</pre>
+</td>
+      <td><p>VMAuth spec. More options can be found <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmauthQueryPerZone.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Create vmauth as a local read endpoint</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmauthQueryPerZone.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override the name of the vmauth object</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmauthQueryPerZone.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">extraArgs:
+    discoverBackendIPs: "true"
+</code>
+</pre>
+</td>
+      <td><p>VMAuth spec. More options can be found <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[0].vmcluster.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td></td>
     </tr>
     <tr>
       <td>availabilityZones[0].vmcluster.name</td>
@@ -511,6 +534,17 @@ vmstorage:
 </td>
     </tr>
     <tr>
+      <td>availabilityZones[1].name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">zone-us-1
+</code>
+</pre>
+</td>
+      <td><p>Availability zone name</p>
+</td>
+    </tr>
+    <tr>
       <td>availabilityZones[1].nodeSelector</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -547,6 +581,150 @@ spec: {}
 </td>
       <td><p>VMAgent only meant to proxy write requests to each az, doesn&rsquo;t support customized remote write address</p>
 </td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmagent.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>VMAgent annotations</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmagent.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override the name of the vmagent object</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmagent.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>VMAgent spec. More options can be found <a href="https://docs.victoriametrics.com/operator/api/#vmagentspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmauthCrossAZQuery.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Create a vmauth with all the zone with <code>allowQuery: true</code> as query backends</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmauthCrossAZQuery.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override the name of the vmauth object</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmauthCrossAZQuery.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>VMAuth spec. More options can be found <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmauthIngest.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Create vmauth as a local write endpoint</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmauthIngest.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override the name of the vmauth object</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmauthIngest.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">extraArgs:
+    discoverBackendIPs: "true"
+</code>
+</pre>
+</td>
+      <td><p>VMAuth spec. More options can be found <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmauthQueryPerZone.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Create vmauth as a local read endpoint</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmauthQueryPerZone.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override the name of the vmauth object</p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmauthQueryPerZone.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">extraArgs:
+    discoverBackendIPs: "true"
+</code>
+</pre>
+</td>
+      <td><p>VMAuth spec. More options can be found <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>availabilityZones[1].vmcluster.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td></td>
     </tr>
     <tr>
       <td>availabilityZones[1].vmcluster.name</td>
@@ -661,29 +839,69 @@ vmsingle:
 </td>
     </tr>
     <tr>
-      <td>vmauthIngestGlobal</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-name: ""
-spec: {}
+      <td>vmauthIngestGlobal.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
-      <td><p>Set up a vmauth as the global write entrypoint</p>
+      <td><p>Create a vmauth as the global write entrypoint</p>
 </td>
     </tr>
     <tr>
-      <td>vmauthQueryGlobal</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-name: ""
-spec: {}
+      <td>vmauthIngestGlobal.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
-      <td><p>Set up a vmauth as the global read entrypoint</p>
+      <td><p>Override the name of the vmauth object</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmauthIngestGlobal.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>VMAuth spec. More options can be found <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>vmauthQueryGlobal.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Create vmauth as the global read entrypoint</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmauthQueryGlobal.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override the name of the vmauth object</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmauthQueryGlobal.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>VMAuth spec. More options can be found <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">here</a></p>
 </td>
     </tr>
   </tbody>

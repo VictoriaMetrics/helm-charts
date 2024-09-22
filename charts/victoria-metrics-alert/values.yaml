@@ -37,7 +37,9 @@ rbac:
   annotations: {}
 
 server:
+  # -- Override fullname suffix
   name: server
+  # -- Create vmalert component
   enabled: true
   # -- VMAlert image configuration
   image:
@@ -48,7 +50,9 @@ server:
     # e.g. enterprise, scratch
     variant: ""
     pullPolicy: IfNotPresent
+  # -- Full name suffix override
   nameOverride: ""
+  # -- Full name prefix override
   fullnameOverride: ""
   # -- Image pull secrets
   imagePullSecrets: []
@@ -124,6 +128,7 @@ server:
 
   remote:
     write:
+      # -- VMAlert remote write URL
       url: ""
       # -- Basic auth for remote write
       basicAuth:
@@ -136,12 +141,13 @@ server:
         # -- Token Auth file with Bearer token. You can use one of token or tokenFile
         tokenFile: ""
     read:
+      # -- VMAlert remote read URL
       url: ""
       # -- Basic auth for remote read
       basicAuth:
         username: ""
         password: ""
-        # -- Auth based on Bearer token for remote read
+      # -- Auth based on Bearer token for remote read
       bearer:
         # -- Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string
         token: ""
@@ -304,21 +310,25 @@ server:
   # -- Annotations to be added to pod
   podAnnotations: {}
 
+  # -- Pod's additional labels
   podLabels: {}
 
+  # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
+  # -- Name of Priority Class
   priorityClassName: ""
 
   # -- Node tolerations for server scheduling to nodes with taints. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
   tolerations: []
 
+  # -- Pod affinity
   affinity: {}
 
-  # -- VMAlert alert rules configuration configuration:
-  # use existing configmap if specified
-  # otherwise .config values will be used
+  # -- VMAlert alert rules configuration configuration.
+  # Use existing configmap if specified
   configMap: ""
+  # -- VMAlert configuration
   config:
     alerts:
       groups: []
@@ -368,7 +378,9 @@ serviceMonitor:
 #      insecureSkipVerify: true
 
 alertmanager:
+  # -- Create alertmanager resources
   enabled: false
+  # -- Alertmanager Pod metadata
   podMetadata:
     labels: {}
     annotations: {}
@@ -377,8 +389,11 @@ alertmanager:
     registry: ""
     repository: prom/alertmanager
     tag: v0.25.0
+  # -- Alertmanager retention
   retention: 120h
+  # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
+  # -- Name of Priority Class
   priorityClassName: ""
   # -- Resource object. Details are [here](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources: {}
@@ -410,7 +425,9 @@ alertmanager:
   # -- Security context to be added to server pods
   securityContext:
     enabled: false
+  # -- Alertmanager listen address
   listenAddress: "0.0.0.0:9093"
+  # -- Extra command line arguments for container of component
   extraArgs: {}
   # -- Specify alternative source for env variables
   envFrom: []
@@ -438,6 +455,7 @@ alertmanager:
       repeat_interval: 24h
     receivers:
       - name: devnull
+  # -- Alertmanager extra templates
   templates: {}
   #  alertmanager.tmpl: |-
   service:
@@ -497,6 +515,7 @@ alertmanager:
     # -- Ingress path type
     pathType: Prefix
 
+  # -- Empty dir configuration if persistence is disabled for Alertmanager
   emptyDir: {}
   persistentVolume:
     # -- Create/use Persistent Volume Claim for alertmanager component. Empty dir if false

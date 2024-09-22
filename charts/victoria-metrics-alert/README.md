@@ -195,7 +195,8 @@ route:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Empty dir configuration if persistence is disabled for Alertmanager</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.enabled</td>
@@ -205,7 +206,8 @@ route:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create alertmanager resources</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.envFrom</td>
@@ -226,7 +228,8 @@ route:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra command line arguments for container of component</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.extraContainers</td>
@@ -392,7 +395,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Alertmanager listen address</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.nodeSelector</td>
@@ -402,7 +406,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.persistentVolume.accessModes</td>
@@ -493,24 +498,16 @@ tag: v0.25.0
 </td>
     </tr>
     <tr>
-      <td>alertmanager.podMetadata.annotations</td>
+      <td>alertmanager.podMetadata</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
+<code class="language-yaml">annotations: {}
+labels: {}
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>alertmanager.podMetadata.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
+      <td><p>Alertmanager Pod metadata</p>
 </td>
-      <td></td>
     </tr>
     <tr>
       <td>alertmanager.podSecurityContext</td>
@@ -531,7 +528,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Name of Priority Class</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.probe.liveness</td>
@@ -591,7 +589,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Alertmanager retention</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.securityContext</td>
@@ -744,7 +743,8 @@ tag: v0.25.0
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Alertmanager extra templates</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.tolerations</td>
@@ -913,7 +913,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod affinity</p>
+</td>
     </tr>
     <tr>
       <td>server.annotations</td>
@@ -927,14 +928,16 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>server.config.alerts.groups</td>
-      <td>list</td>
+      <td>server.config</td>
+      <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">[]
+<code class="language-yaml">alerts:
+    groups: []
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMAlert configuration</p>
+</td>
     </tr>
     <tr>
       <td>server.configMap</td>
@@ -944,7 +947,7 @@ name: ""
 </code>
 </pre>
 </td>
-      <td><p>VMAlert alert rules configuration configuration: use existing configmap if specified otherwise .config values will be used</p>
+      <td><p>VMAlert alert rules configuration configuration. Use existing configmap if specified</p>
 </td>
     </tr>
     <tr>
@@ -1006,7 +1009,8 @@ username: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create vmalert component</p>
+</td>
     </tr>
     <tr>
       <td>server.env</td>
@@ -1095,7 +1099,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Full name prefix override</p>
+</td>
     </tr>
     <tr>
       <td>server.image</td>
@@ -1241,7 +1246,8 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Override fullname suffix</p>
+</td>
     </tr>
     <tr>
       <td>server.nameOverride</td>
@@ -1251,7 +1257,8 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Full name suffix override</p>
+</td>
     </tr>
     <tr>
       <td>server.nodeSelector</td>
@@ -1261,7 +1268,8 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
+</td>
     </tr>
     <tr>
       <td>server.notifier</td>
@@ -1357,7 +1365,8 @@ labels: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Pod&rsquo;s additional labels</p>
+</td>
     </tr>
     <tr>
       <td>server.podSecurityContext</td>
@@ -1378,7 +1387,8 @@ labels: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Name of Priority Class</p>
+</td>
     </tr>
     <tr>
       <td>server.probe.liveness</td>
@@ -1434,6 +1444,18 @@ username: ""
 </td>
     </tr>
     <tr>
+      <td>server.remote.read.bearer</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">token: ""
+tokenFile: ""
+</code>
+</pre>
+</td>
+      <td><p>Auth based on Bearer token for remote read</p>
+</td>
+    </tr>
+    <tr>
       <td>server.remote.read.bearer.token</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -1463,7 +1485,8 @@ username: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMAlert remote read URL</p>
+</td>
     </tr>
     <tr>
       <td>server.remote.write.basicAuth</td>
@@ -1519,7 +1542,8 @@ tokenFile: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMAlert remote write URL</p>
+</td>
     </tr>
     <tr>
       <td>server.replicaCount</td>

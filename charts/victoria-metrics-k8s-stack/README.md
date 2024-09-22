@@ -415,7 +415,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Alertmanager annotations</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.config</td>
@@ -441,7 +442,8 @@ templates:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create VMAlertmanager CR</p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.ingress</td>
@@ -474,14 +476,15 @@ tls: []
 </td>
     </tr>
     <tr>
-      <td>alertmanager.monzoTemplate.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+      <td>alertmanager.monzoTemplate</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Better alert templates for <a href="https://gist.github.com/milesbxf/e2744fc90e9c41b47aa47925f8ff6512" target="_blank">slack source</a></p>
+</td>
     </tr>
     <tr>
       <td>alertmanager.spec</td>
@@ -530,7 +533,7 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td><p>For correct working need set value &lsquo;argocdReleaseOverride=$ARGOCD_APP_NAME&rsquo;</p>
+      <td><p>If this chart is used in &ldquo;Argocd&rdquo; with &ldquo;releaseName&rdquo; field then VMServiceScrapes couldn&rsquo;t select the proper services. For correct working need set value &lsquo;argocdReleaseOverride=$ARGOCD_APP_NAME&rsquo;</p>
 </td>
     </tr>
     <tr>
@@ -541,7 +544,8 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enabled CoreDNS metrics scraping</p>
+</td>
     </tr>
     <tr>
       <td>coreDns.service.enabled</td>
@@ -551,7 +555,8 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create service for CoreDNS metrics</p>
+</td>
     </tr>
     <tr>
       <td>coreDns.service.port</td>
@@ -561,17 +566,19 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>CoreDNS service port</p>
+</td>
     </tr>
     <tr>
-      <td>coreDns.service.selector.k8s-app</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">kube-dns
+      <td>coreDns.service.selector</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">k8s-app: kube-dns
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>CoreDNS service pod selector</p>
+</td>
     </tr>
     <tr>
       <td>coreDns.service.targetPort</td>
@@ -581,7 +588,8 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>CoreDNS service target port</p>
+</td>
     </tr>
     <tr>
       <td>coreDns.vmScrape</td>
@@ -855,6 +863,123 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
 </td>
     </tr>
     <tr>
+      <td>defaultRules.groups</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">alertmanager:
+    create: true
+    rules: {}
+etcd:
+    create: true
+    rules: {}
+general:
+    create: true
+    rules: {}
+k8sContainerCpuUsageSecondsTotal:
+    create: true
+    rules: {}
+k8sContainerMemoryCache:
+    create: true
+    rules: {}
+k8sContainerMemoryRss:
+    create: true
+    rules: {}
+k8sContainerMemorySwap:
+    create: true
+    rules: {}
+k8sContainerMemoryWorkingSetBytes:
+    create: true
+    rules: {}
+k8sContainerResource:
+    create: true
+    rules: {}
+k8sPodOwner:
+    create: true
+    rules: {}
+kubeApiserver:
+    create: true
+    rules: {}
+kubeApiserverAvailability:
+    create: true
+    rules: {}
+kubeApiserverBurnrate:
+    create: true
+    rules: {}
+kubeApiserverHistogram:
+    create: true
+    rules: {}
+kubeApiserverSlos:
+    create: true
+    rules: {}
+kubePrometheusGeneral:
+    create: true
+    rules: {}
+kubePrometheusNodeRecording:
+    create: true
+    rules: {}
+kubeScheduler:
+    create: true
+    rules: {}
+kubeStateMetrics:
+    create: true
+    rules: {}
+kubelet:
+    create: true
+    rules: {}
+kubernetesApps:
+    create: true
+    rules: {}
+    targetNamespace: .*
+kubernetesResources:
+    create: true
+    rules: {}
+kubernetesStorage:
+    create: true
+    rules: {}
+    targetNamespace: .*
+kubernetesSystem:
+    create: true
+    rules: {}
+kubernetesSystemApiserver:
+    create: true
+    rules: {}
+kubernetesSystemControllerManager:
+    create: true
+    rules: {}
+kubernetesSystemKubelet:
+    create: true
+    rules: {}
+kubernetesSystemScheduler:
+    create: true
+    rules: {}
+node:
+    create: true
+    rules: {}
+nodeNetwork:
+    create: true
+    rules: {}
+vmHealth:
+    create: true
+    rules: {}
+vmagent:
+    create: true
+    rules: {}
+vmcluster:
+    create: true
+    rules: {}
+vmoperator:
+    create: true
+    rules: {}
+vmsingle:
+    create: true
+    rules: {}
+</code>
+</pre>
+</td>
+      <td><p>Rule group properties</p>
+</td>
+    </tr>
+    <tr>
       <td>defaultRules.groups.etcd.rules</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -980,24 +1105,18 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
 </td>
     </tr>
     <tr>
-      <td>externalVM.read.url</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
+      <td>externalVM</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">read:
+    url: ""
+write:
+    url: ""
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>externalVM.write.url</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
+      <td><p>External VM read and write URLs</p>
 </td>
-      <td></td>
     </tr>
     <tr>
       <td>extraObjects</td>
@@ -1018,7 +1137,8 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Resource full name prefix override</p>
+</td>
     </tr>
     <tr>
       <td>global.clusterLabel</td>
@@ -1028,27 +1148,20 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>global.license.key</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
+      <td><p>Cluster label to use for dashboards and rules</p>
 </td>
-      <td></td>
     </tr>
     <tr>
-      <td>global.license.keyRef</td>
+      <td>global.license</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
+<code class="language-yaml">key: ""
+keyRef: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Global license configuration</p>
+</td>
     </tr>
     <tr>
       <td>grafana</td>
@@ -1255,7 +1368,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable Kube Api Server metrics scraping</p>
+</td>
     </tr>
     <tr>
       <td>kubeApiServer.vmScrape</td>
@@ -1291,7 +1405,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable kube controller manager metrics scraping</p>
+</td>
     </tr>
     <tr>
       <td>kubeControllerManager.endpoints</td>
@@ -1301,7 +1416,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>If your kube controller manager is not deployed as a pod, specify IPs it can be found on</p>
+</td>
     </tr>
     <tr>
       <td>kubeControllerManager.service.enabled</td>
@@ -1311,7 +1427,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create service for kube controller manager metrics scraping</p>
+</td>
     </tr>
     <tr>
       <td>kubeControllerManager.service.port</td>
@@ -1321,17 +1438,19 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Kube controller manager service port</p>
+</td>
     </tr>
     <tr>
-      <td>kubeControllerManager.service.selector.component</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">kube-controller-manager
+      <td>kubeControllerManager.service.selector</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">component: kube-controller-manager
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Kube controller manager service pod selector</p>
+</td>
     </tr>
     <tr>
       <td>kubeControllerManager.service.targetPort</td>
@@ -1341,7 +1460,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Kube controller manager service target port</p>
+</td>
     </tr>
     <tr>
       <td>kubeControllerManager.vmScrape</td>
@@ -1373,7 +1493,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enabled KubeDNS metrics scraping</p>
+</td>
     </tr>
     <tr>
       <td>kubeDns.service.enabled</td>
@@ -1383,57 +1504,35 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create Service for KubeDNS metrics</p>
+</td>
     </tr>
     <tr>
-      <td>kubeDns.service.ports.dnsmasq.port</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">10054
+      <td>kubeDns.service.ports</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">dnsmasq:
+    port: 10054
+    targetPort: 10054
+skydns:
+    port: 10055
+    targetPort: 10055
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>KubeDNS service ports</p>
+</td>
     </tr>
     <tr>
-      <td>kubeDns.service.ports.dnsmasq.targetPort</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">10054
+      <td>kubeDns.service.selector</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">k8s-app: kube-dns
 </code>
 </pre>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>kubeDns.service.ports.skydns.port</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">10055
-</code>
-</pre>
+      <td><p>KubeDNS service pods selector</p>
 </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>kubeDns.service.ports.skydns.targetPort</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">10055
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>kubeDns.service.selector.k8s-app</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">kube-dns
-</code>
-</pre>
-</td>
-      <td></td>
     </tr>
     <tr>
       <td>kubeDns.vmScrape</td>
@@ -1463,7 +1562,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enabled KubeETCD metrics scraping</p>
+</td>
     </tr>
     <tr>
       <td>kubeEtcd.endpoints</td>
@@ -1473,7 +1573,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>If your etcd is not deployed as a pod, specify IPs it can be found on</p>
+</td>
     </tr>
     <tr>
       <td>kubeEtcd.service.enabled</td>
@@ -1483,7 +1584,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable service for ETCD metrics scraping</p>
+</td>
     </tr>
     <tr>
       <td>kubeEtcd.service.port</td>
@@ -1493,17 +1595,19 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>ETCD service port</p>
+</td>
     </tr>
     <tr>
-      <td>kubeEtcd.service.selector.component</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">etcd
+      <td>kubeEtcd.service.selector</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">component: etcd
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>ETCD service pods selector</p>
+</td>
     </tr>
     <tr>
       <td>kubeEtcd.service.targetPort</td>
@@ -1513,7 +1617,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>ETCD service target port</p>
+</td>
     </tr>
     <tr>
       <td>kubeEtcd.vmScrape</td>
@@ -1544,7 +1649,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable kube proxy metrics scraping</p>
+</td>
     </tr>
     <tr>
       <td>kubeProxy.endpoints</td>
@@ -1554,7 +1660,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>If your kube proxy is not deployed as a pod, specify IPs it can be found on</p>
+</td>
     </tr>
     <tr>
       <td>kubeProxy.service.enabled</td>
@@ -1564,7 +1671,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable service for kube proxy metrics scraping</p>
+</td>
     </tr>
     <tr>
       <td>kubeProxy.service.port</td>
@@ -1574,17 +1682,19 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Kube proxy service port</p>
+</td>
     </tr>
     <tr>
-      <td>kubeProxy.service.selector.k8s-app</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">kube-proxy
+      <td>kubeProxy.service.selector</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">k8s-app: kube-proxy
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Kube proxy service pod selector</p>
+</td>
     </tr>
     <tr>
       <td>kubeProxy.service.targetPort</td>
@@ -1594,7 +1704,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Kube proxy service target port</p>
+</td>
     </tr>
     <tr>
       <td>kubeProxy.vmScrape</td>
@@ -1625,7 +1736,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable KubeScheduler metrics scraping</p>
+</td>
     </tr>
     <tr>
       <td>kubeScheduler.endpoints</td>
@@ -1635,7 +1747,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>If your kube scheduler is not deployed as a pod, specify IPs it can be found on</p>
+</td>
     </tr>
     <tr>
       <td>kubeScheduler.service.enabled</td>
@@ -1645,7 +1758,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable service for KubeScheduler metrics scrape</p>
+</td>
     </tr>
     <tr>
       <td>kubeScheduler.service.port</td>
@@ -1655,17 +1769,19 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>KubeScheduler service port</p>
+</td>
     </tr>
     <tr>
-      <td>kubeScheduler.service.selector.component</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">kube-scheduler
+      <td>kubeScheduler.service.selector</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">component: kube-scheduler
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>KubeScheduler service pod selector</p>
+</td>
     </tr>
     <tr>
       <td>kubeScheduler.service.targetPort</td>
@@ -1675,7 +1791,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>KubeScheduler service target port</p>
+</td>
     </tr>
     <tr>
       <td>kubeScheduler.vmScrape</td>
@@ -1821,7 +1938,8 @@ spec:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Resource full name suffix override</p>
+</td>
     </tr>
     <tr>
       <td>prometheus-node-exporter</td>
@@ -1939,7 +2057,7 @@ selector:
 </code>
 </pre>
 </td>
-      <td><p>If not set and create is true, a name is generated using the fullname template</p>
+      <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
 </td>
     </tr>
     <tr>
@@ -1950,7 +2068,8 @@ selector:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Tenant to use for Grafana datasources and remote write</p>
+</td>
     </tr>
     <tr>
       <td>victoria-metrics-operator</td>
@@ -1972,31 +2091,6 @@ serviceMonitor:
 </pre>
 </td>
       <td><p>VictoriaMetrics Operator dependency chart configuration. More values can be found <a href="https://docs.victoriametrics.com/helm/victoriametrics-operator#parameters" target="_blank">here</a>. Also checkout <a href="https://docs.victoriametrics.com/operator/vars" target="_blank">here</a> possible ENV variables to configure operator behaviour</p>
-</td>
-    </tr>
-    <tr>
-      <td>victoria-metrics-operator.crd.cleanup</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-image:
-    pullPolicy: IfNotPresent
-    repository: bitnami/kubectl
-</code>
-</pre>
-</td>
-      <td><p>Helm delete hook for VM CR cleanup</p>
-</td>
-    </tr>
-    <tr>
-      <td>victoria-metrics-operator.crd.create</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Disable CRD creation by operator chart as it&rsquo;s being created in this chart</p>
 </td>
     </tr>
     <tr>
@@ -2029,7 +2123,8 @@ image:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMAgent annotations</p>
+</td>
     </tr>
     <tr>
       <td>vmagent.enabled</td>
@@ -2039,7 +2134,8 @@ image:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create VMAgent CR</p>
+</td>
     </tr>
     <tr>
       <td>vmagent.ingress</td>
@@ -2087,7 +2183,7 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td><p>allows to configure static notifiers, discover notifiers via Consul and DNS, see specification <a href="https://docs.victoriametrics.com/vmalert/#notifier-configuration-file" target="_blank">here</a>. This configuration will be created as separate secret and mounted to VMAlert pod.</p>
+      <td><p>Allows to configure static notifiers, discover notifiers via Consul and DNS, see specification <a href="https://docs.victoriametrics.com/vmalert/#notifier-configuration-file" target="_blank">here</a>. This configuration will be created as separate secret and mounted to VMAlert pod.</p>
 </td>
     </tr>
     <tr>
@@ -2098,7 +2194,8 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMAlert annotations</p>
+</td>
     </tr>
     <tr>
       <td>vmalert.enabled</td>
@@ -2108,7 +2205,8 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create VMAlert CR</p>
+</td>
     </tr>
     <tr>
       <td>vmalert.ingress</td>
@@ -2148,7 +2246,8 @@ tls: []
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Controls whether VMAlert should use VMAgent or VMInsert as a target for remotewrite</p>
+</td>
     </tr>
     <tr>
       <td>vmalert.spec</td>
@@ -2187,7 +2286,8 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMAuth annotations</p>
+</td>
     </tr>
     <tr>
       <td>vmauth.enabled</td>
@@ -2197,7 +2297,8 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable VMAuth CR</p>
+</td>
     </tr>
     <tr>
       <td>vmauth.spec</td>
@@ -2219,7 +2320,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMCluster annotations</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.enabled</td>
@@ -2229,7 +2331,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create VMCluster CR</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.insert.annotations</td>
@@ -2239,7 +2342,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress annotations</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.insert.enabled</td>
@@ -2249,7 +2353,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable deployment of ingress for server component</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.insert.extraPaths</td>
@@ -2263,14 +2368,26 @@ port: "8427"
 </td>
     </tr>
     <tr>
-      <td>vmcluster.ingress.insert.hosts[0]</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">vminsert.domain.com
+      <td>vmcluster.ingress.insert.hosts</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of host objects</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.insert.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.insert.labels</td>
@@ -2280,7 +2397,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.insert.path</td>
@@ -2290,7 +2408,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress default path</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.insert.pathType</td>
@@ -2300,7 +2419,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.insert.tls</td>
@@ -2310,7 +2430,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of TLS objects</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.select.annotations</td>
@@ -2320,7 +2441,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress annotations</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.select.enabled</td>
@@ -2330,7 +2452,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable deployment of ingress for server component</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.select.extraPaths</td>
@@ -2344,14 +2467,26 @@ port: "8427"
 </td>
     </tr>
     <tr>
-      <td>vmcluster.ingress.select.hosts[0]</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">vmselect.domain.com
+      <td>vmcluster.ingress.select.hosts</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of host objects</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.select.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.select.labels</td>
@@ -2361,7 +2496,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.select.path</td>
@@ -2371,7 +2507,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress default path</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.select.pathType</td>
@@ -2381,7 +2518,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.select.tls</td>
@@ -2391,7 +2529,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of TLS objects</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.storage.annotations</td>
@@ -2401,7 +2540,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress annotations</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.storage.enabled</td>
@@ -2411,7 +2551,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable deployment of ingress for server component</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.storage.extraPaths</td>
@@ -2425,14 +2566,26 @@ port: "8427"
 </td>
     </tr>
     <tr>
-      <td>vmcluster.ingress.storage.hosts[0]</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">vmstorage.domain.com
+      <td>vmcluster.ingress.storage.hosts</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of host objects</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmcluster.ingress.storage.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.storage.labels</td>
@@ -2442,7 +2595,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.storage.path</td>
@@ -2452,7 +2606,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress default path</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.storage.pathType</td>
@@ -2462,7 +2617,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.ingress.storage.tls</td>
@@ -2472,7 +2628,8 @@ port: "8427"
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of TLS objects</p>
+</td>
     </tr>
     <tr>
       <td>vmcluster.spec</td>
@@ -2538,7 +2695,8 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMSingle annotations</p>
+</td>
     </tr>
     <tr>
       <td>vmsingle.enabled</td>
@@ -2548,7 +2706,8 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Create VMSingle CR</p>
+</td>
     </tr>
     <tr>
       <td>vmsingle.ingress.annotations</td>
@@ -2558,7 +2717,8 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress annotations</p>
+</td>
     </tr>
     <tr>
       <td>vmsingle.ingress.enabled</td>
@@ -2568,7 +2728,8 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable deployment of ingress for server component</p>
+</td>
     </tr>
     <tr>
       <td>vmsingle.ingress.extraPaths</td>
@@ -2582,14 +2743,26 @@ vmstorage:
 </td>
     </tr>
     <tr>
-      <td>vmsingle.ingress.hosts[0]</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">vmsingle.domain.com
+      <td>vmsingle.ingress.hosts</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">[]
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of host objects</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmsingle.ingress.ingressClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Ingress controller class name</p>
+</td>
     </tr>
     <tr>
       <td>vmsingle.ingress.labels</td>
@@ -2599,7 +2772,8 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress extra labels</p>
+</td>
     </tr>
     <tr>
       <td>vmsingle.ingress.path</td>
@@ -2609,7 +2783,8 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress default path</p>
+</td>
     </tr>
     <tr>
       <td>vmsingle.ingress.pathType</td>
@@ -2619,7 +2794,8 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Ingress path type</p>
+</td>
     </tr>
     <tr>
       <td>vmsingle.ingress.tls</td>
@@ -2629,7 +2805,8 @@ vmstorage:
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Array of TLS objects</p>
+</td>
     </tr>
     <tr>
       <td>vmsingle.spec</td>
