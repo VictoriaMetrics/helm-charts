@@ -14,6 +14,7 @@ global:
 
 # -- K8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
 clusterDomainSuffix: cluster.local
+# -- Print information after deployment
 printNotes: true
 
 rbac:
@@ -62,6 +63,7 @@ vmselect:
   enabled: true
   # -- VMSelect container name
   name: vmselect
+  # -- VMSelect strategy
   strategy: {}
    # rollingUpdate:
    #  maxSurge: 25%
@@ -77,10 +79,11 @@ vmselect:
     tag: ""
     # -- Image pull policy
     pullPolicy: IfNotPresent
-    # Variant of the image to use.
+    # -- Variant of the image to use.
     # e.g. cluster, enterprise-cluster
     variant: cluster
   ports: 
+    # -- VMSelect http port name
     name: "http"
   # -- Name of Priority Class
   priorityClassName: ""
@@ -93,6 +96,7 @@ vmselect:
     envflag.enable: true
     envflag.prefix: VM_
     loggerFormat: json
+  # -- StatefulSet/Deployment annotations
   annotations: {}
   # -- StatefulSet/Deployment additional labels
   extraLabels: {}
@@ -279,6 +283,8 @@ vmselect:
     enabled: false
     # -- Deploy order policy for StatefulSet pods
     podManagementPolicy: OrderedReady
+  
+  # -- Empty dir configuration if persistence is disabled
   emptyDir: {}
   persistentVolume:
     # -- Create/use Persistent Volume Claim for vmselect component. Empty dir if false. If true, vmselect will create/use a Persistent Volume Claim
@@ -330,6 +336,7 @@ vminsert:
   enabled: true
   # -- VMInsert container name
   name: vminsert
+  # -- VMInsert strategy
   strategy: {}
    # rollingUpdate:
    #  maxSurge: 25%
@@ -343,12 +350,13 @@ vminsert:
     # -- Image tag
     # override Chart.AppVersion    
     tag: ""
-    # Variant of the image to use.
+    # -- Variant of the image to use.
     # e.g. cluster, enterprise-cluster
     variant: cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
-  ports: 
+  ports:
+    # -- VMInsert http port name
     name: "http"
   # -- Name of Priority Class
   priorityClassName: ""
@@ -359,6 +367,7 @@ vminsert:
     envflag.enable: "true"
     envflag.prefix: VM_
     loggerFormat: json
+  # -- StatefulSet/Deployment annotations
   annotations: {}
   # -- StatefulSet/Deployment additional labels
   extraLabels: {}
@@ -408,14 +417,14 @@ vminsert:
     # -- Behavior settings for scaling by the HPA
     behavior: {}
 
-  # Extra Volumes for the pod
+  # -- Extra Volumes for the pod
   extraVolumes:
     []
     # - name: example
     #   configMap:
     #     name: example
 
-  # Extra Volume Mounts for the container
+  # -- Extra Volume Mounts for the container
   extraVolumeMounts:
     []
     # - name: example
@@ -494,8 +503,8 @@ vminsert:
     targetPort: http
     # -- Service type
     type: ClusterIP
-    # -- Enable UDP port. used if you have "spec.opentsdbListenAddr" specified
-    # Make sure that service is not type "LoadBalancer", as it requires "MixedProtocolLBService" feature gate. Check [here](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/) for details
+    # -- Enable UDP port. used if you have `spec.opentsdbListenAddr` specified
+    # Make sure that service is not type `LoadBalancer`, as it requires `MixedProtocolLBService` feature gate. Check [here](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/) for details
     udp: false
     # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
     healthCheckNodePort: ""
@@ -576,12 +585,13 @@ vmstorage:
     # -- Image tag
     # override Chart.AppVersion
     tag: ""
-    # Variant of the image to use.
+    # -- Variant of the image to use.
     # e.g. cluster, enterprise-cluster
     variant: cluster
     # -- Image pull policy
     pullPolicy: IfNotPresent
   ports: 
+    # -- VMStorage http port name
     name: "http"
   # -- Name of Priority Class
   priorityClassName: ""
@@ -631,7 +641,8 @@ vmstorage:
     []
     # - name: config-reloader
     #   image: reloader-image
-
+  
+  # -- Extra secret mounts for vmstorage
   extraSecretMounts:
     []
     # - name: secret
@@ -681,8 +692,9 @@ vmstorage:
 
   # -- Use an alternate scheduler, e.g. "stork". Check [here](https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/) for details
   #
-  # schedulerName:
+  schedulerName: ""
 
+  # -- Empty dir configuration if persistence is disabled
   emptyDir: {}
   persistentVolume:
     # -- Create/use Persistent Volume Claim for vmstorage component. Empty dir if false. If true,  vmstorage will create/use a Persistent Volume Claim
@@ -789,7 +801,7 @@ vmstorage:
       # -- VMBackupManager image tag
       # override Chart.AppVersion
       tag: ""
-      # Variant of the image tag to use.
+      # -- Variant of the image tag to use.
       # e.g. enterprise.
       variant: cluster
     # -- Disable hourly backups
@@ -845,6 +857,7 @@ vmstorage:
         failureThreshold: 10
       # -- VMBackupManager startup probe
       startup: {}
+    # -- Extra secret mounts for vmbackupmanager
     extraSecretMounts:
       []
       # - name: secret

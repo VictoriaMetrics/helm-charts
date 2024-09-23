@@ -1,17 +1,22 @@
 global:
+  # -- Cluster label to use for dashboards and rules
   clusterLabel: cluster
+  # -- Global license configuration
   license:
     key: ""
     keyRef: {}
       # name: secret-license
       # key: license
 
+# -- Resource full name suffix override
 nameOverride: ""
+# -- Resource full name prefix override
 fullnameOverride: ""
+# -- Tenant to use for Grafana datasources and remote write
 tenant: "0"
 # -- If this chart is used in "Argocd" with "releaseName" field then
-# -- VMServiceScrapes couldn't select the proper services.
-# -- For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME'
+# VMServiceScrapes couldn't select the proper services.
+# For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME'
 argocdReleaseOverride: ""
 
 # -- VictoriaMetrics Operator dependency chart configuration. More values can be found [here](https://docs.victoriametrics.com/helm/victoriametrics-operator#parameters). Also checkout [here](https://docs.victoriametrics.com/operator/vars) possible ENV variables to configure operator behaviour
@@ -20,16 +25,11 @@ victoria-metrics-operator:
   serviceMonitor:
     enabled: true
   crd:
-    # -- Disable CRD creation by operator chart as it's being created in this chart
     create: false
-
-    # -- Helm delete hook for VM CR cleanup
     cleanup:
       enabled: true
       image:
         repository: bitnami/kubectl
-        # use image tag that matches k8s API version by default
-        # tag: 1.29.6
         pullPolicy: IfNotPresent
   operator:
     # -- By default, operator converts prometheus-operator objects.
@@ -41,7 +41,7 @@ serviceAccount:
   # -- Annotations to add to the service account
   annotations: {}
   # -- The name of the service account to use.
-  # -- If not set and create is true, a name is generated using the fullname template
+  # If not set and create is true, a name is generated using the fullname template
   name: ""
 
 # -- Enable dashboards despite it's dependency is not installed
@@ -94,6 +94,7 @@ defaultRules:
     #     for: 15m
     #     labels:
     #       severity: critical
+  # -- Rule group properties
   groups:
     etcd:
       create: true
@@ -238,6 +239,7 @@ additionalVictoriaMetricsMap:
 #       - record: my_record
 #         expr: 100 * my_record
 
+# -- External VM read and write URLs
 externalVM:
   read:
     url: ""
@@ -252,7 +254,9 @@ externalVM:
 
 # Configures vmsingle params
 vmsingle:
+  # -- VMSingle annotations
   annotations: {}
+  # -- Create VMSingle CR
   enabled: true
   # -- Full spec for VMSingle CRD. Allowed values describe [here](https://docs.victoriametrics.com/operator/api#vmsinglespec)
   spec:
@@ -270,21 +274,25 @@ vmsingle:
         requests:
           storage: 20Gi
   ingress:
+    # -- Enable deployment of ingress for server component
     enabled: false
-    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    # ingressClassName: nginx
-    # Values can be templated
+    # -- Ingress annotations
     annotations:
       {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
+    # -- Ingress extra labels
     labels: {}
+    # -- Ingress default path
     path: ""
+    # -- Ingress path type
     pathType: Prefix
+    # -- Ingress controller class name
+    ingressClassName: ""
 
-    hosts:
-      - vmsingle.domain.com
+    # -- Array of host objects
+    hosts: []
+    #  - vmsingle.domain.com
     # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
     # - path: /*
@@ -294,13 +302,17 @@ vmsingle:
     #       name: ssl-redirect
     #       port:
     #         name: service
+
+    # -- Array of TLS objects
     tls: []
     #  - secretName: vmsingle-ingress-tls
     #    hosts:
     #      - vmsingle.domain.com
 
 vmcluster:
+  # -- Create VMCluster CR
   enabled: false
+  # -- VMCluster annotations
   annotations: {}
   # -- Full spec for VMCluster CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
   spec:
@@ -361,21 +373,30 @@ vmcluster:
 
   ingress:
     storage:
+      # -- Enable deployment of ingress for server component
       enabled: false
-      # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-      # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-      # ingressClassName: nginx
-      # Values can be templated
-      annotations:
-        {}
+
+      # -- Ingress annotations
+      annotations: {}
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
+
+      # -- Ingress extra labels
       labels: {}
-      path: ""
+
+      # -- Ingress controller class name
+      ingressClassName: ""
+
+      # -- Ingress path type
       pathType: Prefix
 
-      hosts:
-        - vmstorage.domain.com
+      # -- Ingress default path
+      path: ""
+
+      # -- Array of host objects
+      hosts: []
+      #  - vmstorage.domain.com
+
       # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
       extraPaths: []
       # - path: /*
@@ -385,26 +406,36 @@ vmcluster:
       #       name: ssl-redirect
       #       port:
       #         name: service
+
+      # -- Array of TLS objects
       tls: []
       #  - secretName: vmstorage-ingress-tls
       #    hosts:
       #      - vmstorage.domain.com
     select:
+      # -- Enable deployment of ingress for server component
       enabled: false
-      # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-      # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-      # ingressClassName: nginx
-      # Values can be templated
-      annotations:
-        {}
+
+      # -- Ingress annotations
+      annotations: {}
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
+
+      # -- Ingress extra labels
       labels: {}
-      path: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vmselect }}'
+
+      # -- Ingress controller class name
+      ingressClassName: ""
+
+      # -- Ingress path type
       pathType: Prefix
 
-      hosts:
-        - vmselect.domain.com
+      # -- Ingress default path
+      path: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vmselect }}'
+
+      # -- Array of host objects
+      hosts: []
+      #  - vmselect.domain.com
       # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
       extraPaths: []
       # - path: /*
@@ -414,26 +445,37 @@ vmcluster:
       #       name: ssl-redirect
       #       port:
       #         name: service
+
+      # -- Array of TLS objects
       tls: []
       #  - secretName: vmselect-ingress-tls
       #    hosts:
       #      - vmselect.domain.com
     insert:
+      # -- Enable deployment of ingress for server component
       enabled: false
-      # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-      # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-      # ingressClassName: nginx
-      # Values can be templated
+
+      # -- Ingress annotations
       annotations:
         {}
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
+
+      # -- Ingress extra labels
       labels: {}
-      path: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vminsert }}'
+
+      # -- Ingress controller class name
+      ingressClassName: ""
+
+      # -- Ingress path type
       pathType: Prefix
 
-      hosts:
-        - vminsert.domain.com
+      # -- Ingress default path
+      path: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vminsert }}'
+
+      # -- Array of host objects
+      hosts: []
+      #  - vminsert.domain.com
       # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
       extraPaths: []
       # - path: /*
@@ -443,13 +485,17 @@ vmcluster:
       #       name: ssl-redirect
       #       port:
       #         name: service
+
+      # -- Array of TLS objects
       tls: []
       #  - secretName: vminsert-ingress-tls
       #    hosts:
       #      - vminsert.domain.com
 
 alertmanager:
+  # -- Create VMAlertmanager CR
   enabled: true
+  # -- Alertmanager annotations
   annotations: {}
   # -- (object) Full spec for VMAlertmanager CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmalertmanagerspec)
   spec:
@@ -565,8 +611,7 @@ alertmanager:
       #           text: '{{ template "slack.monzo.link_button_text" . }}'
       #           url: "{{ .CommonAnnotations.link_url }}"
       #
-  # better alert templates for slack
-  # source https://gist.github.com/milesbxf/e2744fc90e9c41b47aa47925f8ff6512
+  # -- Better alert templates for [slack source](https://gist.github.com/milesbxf/e2744fc90e9c41b47aa47925f8ff6512)
   monzoTemplate:
     enabled: true
 
@@ -611,10 +656,12 @@ alertmanager:
     #      - alertmanager.domain.com
 
 vmalert:
+  # -- VMAlert annotations
   annotations: {}
+  # -- Create VMAlert CR
   enabled: true
 
-  # Controls whether VMAlert should use VMAgent or VMInsert as a target for remotewrite
+  # -- Controls whether VMAlert should use VMAgent or VMInsert as a target for remotewrite
   remoteWriteVMAgent: false
   # -- (object) Full spec for VMAlert CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmalertspec)
   spec:
@@ -638,7 +685,7 @@ vmalert:
     #   {{- end }}
     # template_2.tmpl: ""
 
-  # -- allows to configure static notifiers, discover notifiers via Consul and DNS,
+  # -- Allows to configure static notifiers, discover notifiers via Consul and DNS,
   # see specification [here](https://docs.victoriametrics.com/vmalert/#notifier-configuration-file).
   # This configuration will be created as separate secret and mounted to VMAlert pod.
   additionalNotifierConfigs: {}
@@ -679,7 +726,9 @@ vmalert:
     #      - vmalert.domain.com
 
 vmauth:
+  # -- Enable VMAuth CR
   enabled: false
+  # -- VMAuth annotations
   annotations: {}
   # -- (object) Full spec for VMAuth CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
   spec:
@@ -687,7 +736,9 @@ vmauth:
     port: "8427"
 
 vmagent:
+  # -- Create VMAgent CR
   enabled: true
+  # -- VMAgent annotations
   annotations: {}
   # -- Remote write configuration of VMAgent, allowed parameters defined in a [spec](https://docs.victoriametrics.com/operator/api#vmagentremotewritespec)
   additionalRemoteWrites:
@@ -942,6 +993,7 @@ kubelet:
       honorTimestamps: false
 # Component scraping the kube api server
 kubeApiServer:
+  # -- Enable Kube Api Server metrics scraping
   enabled: true
   # -- Spec for VMServiceScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec)
   vmScrape:
@@ -966,9 +1018,10 @@ kubeApiServer:
 
 # Component scraping the kube controller manager
 kubeControllerManager:
+  # -- Enable kube controller manager metrics scraping
   enabled: true
 
-  # If your kube controller manager is not deployed as a pod, specify IPs it can be found on
+  # -- If your kube controller manager is not deployed as a pod, specify IPs it can be found on
   endpoints: []
   # - 10.141.4.22
   # - 10.141.4.23
@@ -976,9 +1029,13 @@ kubeControllerManager:
 
   # If using kubeControllerManager.endpoints only the port and targetPort are used
   service:
+    # -- Create service for kube controller manager metrics scraping
     enabled: true
+    # -- Kube controller manager service port
     port: 10257
+    # -- Kube controller manager service target port
     targetPort: 10257
+    # -- Kube controller manager service pod selector
     selector:
       component: kube-controller-manager
 
@@ -1001,10 +1058,12 @@ kubeControllerManager:
 
 # Component scraping kubeDns. Use either this or coreDns
 kubeDns:
+  # -- Enabled KubeDNS metrics scraping
   enabled: false
-  # -- 
   service:
+    # -- Create Service for KubeDNS metrics
     enabled: false
+    # -- KubeDNS service ports
     ports:
       dnsmasq:
         port: 10054
@@ -1012,6 +1071,7 @@ kubeDns:
       skydns:
         port: 10055
         targetPort: 10055
+    # -- KubeDNS service pods selector
     selector:
       k8s-app: kube-dns
   # -- Spec for VMServiceScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec)
@@ -1028,11 +1088,16 @@ kubeDns:
 
 # Component scraping coreDns. Use either this or kubeDns
 coreDns:
+  # -- Enabled CoreDNS metrics scraping
   enabled: true
   service:
+    # -- Create service for CoreDNS metrics
     enabled: true
+    # -- CoreDNS service port
     port: 9153
+    # -- CoreDNS service target port
     targetPort: 9153
+    # -- CoreDNS service pod selector
     selector:
       k8s-app: kube-dns
 
@@ -1048,9 +1113,10 @@ coreDns:
 
 # Component scraping etcd
 kubeEtcd:
+  # -- Enabled KubeETCD metrics scraping
   enabled: true
 
-  # If your etcd is not deployed as a pod, specify IPs it can be found on
+  # -- If your etcd is not deployed as a pod, specify IPs it can be found on
   endpoints: []
   # - 10.141.4.22
   # - 10.141.4.23
@@ -1058,9 +1124,13 @@ kubeEtcd:
 
   # Etcd service. If using kubeEtcd.endpoints only the port and targetPort are used
   service:
+    # -- Enable service for ETCD metrics scraping
     enabled: true
+    # -- ETCD service port
     port: 2379
+    # -- ETCD service target port
     targetPort: 2379
+    # -- ETCD service pods selector
     selector:
       component: etcd
 
@@ -1081,9 +1151,10 @@ kubeEtcd:
 
 # Component scraping kube scheduler
 kubeScheduler:
+  # -- Enable KubeScheduler metrics scraping
   enabled: true
 
-  # If your kube scheduler is not deployed as a pod, specify IPs it can be found on
+  # -- If your kube scheduler is not deployed as a pod, specify IPs it can be found on
   endpoints: []
   # - 10.141.4.22
   # - 10.141.4.23
@@ -1091,9 +1162,13 @@ kubeScheduler:
 
   # If using kubeScheduler.endpoints only the port and targetPort are used
   service:
+    # -- Enable service for KubeScheduler metrics scrape
     enabled: true
+    # -- KubeScheduler service port
     port: 10259
+    # -- KubeScheduler service target port
     targetPort: 10259
+    # -- KubeScheduler service pod selector
     selector:
       component: kube-scheduler
 
@@ -1114,18 +1189,23 @@ kubeScheduler:
 
 # Component scraping kube proxy
 kubeProxy:
+  # -- Enable kube proxy metrics scraping
   enabled: false
 
-  # If your kube proxy is not deployed as a pod, specify IPs it can be found on
+  # -- If your kube proxy is not deployed as a pod, specify IPs it can be found on
   endpoints: []
   # - 10.141.4.22
   # - 10.141.4.23
   # - 10.141.4.24
 
   service:
+    # -- Enable service for kube proxy metrics scraping
     enabled: true
+    # -- Kube proxy service port
     port: 10249
+    # -- Kube proxy service target port
     targetPort: 10249
+    # -- Kube proxy service pod selector
     selector:
       k8s-app: kube-proxy
 

@@ -267,7 +267,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Container working directory</p>
+</td>
     </tr>
     <tr>
       <td>env</td>
@@ -356,7 +357,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Full name prefix</p>
+</td>
     </tr>
     <tr>
       <td>global.compatibility</td>
@@ -444,7 +446,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Variant of the image to use. e.g. enterprise, enterprise-scratch</p>
+</td>
     </tr>
     <tr>
       <td>imagePullSecrets</td>
@@ -601,7 +604,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Full name suffix</p>
+</td>
     </tr>
     <tr>
       <td>nodeSelector</td>

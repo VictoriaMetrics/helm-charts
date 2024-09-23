@@ -265,7 +265,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Print information after deployment</p>
+</td>
     </tr>
     <tr>
       <td>rbac.annotations</td>
@@ -385,7 +386,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>StatefulSet/Deployment annotations</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.containerWorkingDir</td>
@@ -474,7 +476,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volume Mounts for the container</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.extraVolumes</td>
@@ -484,7 +487,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra Volumes for the pod</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.fullnameOverride</td>
@@ -604,7 +608,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Variant of the image to use. e.g. cluster, enterprise-cluster</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.ingress.annotations</td>
@@ -769,7 +774,8 @@ labels: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMInsert http port name</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.priorityClassName</td>
@@ -1041,7 +1047,7 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td><p>Enable UDP port. used if you have &ldquo;spec.opentsdbListenAddr&rdquo; specified Make sure that service is not type &ldquo;LoadBalancer&rdquo;, as it requires &ldquo;MixedProtocolLBService&rdquo; feature gate. Check <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/" target="_blank">here</a> for details</p>
+      <td><p>Enable UDP port. used if you have <code>spec.opentsdbListenAddr</code> specified Make sure that service is not type <code>LoadBalancer</code>, as it requires <code>MixedProtocolLBService</code> feature gate. Check <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/" target="_blank">here</a> for details</p>
 </td>
     </tr>
     <tr>
@@ -1129,7 +1135,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMInsert strategy</p>
+</td>
     </tr>
     <tr>
       <td>vminsert.suppressStorageFQDNsRender</td>
@@ -1183,7 +1190,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>StatefulSet/Deployment annotations</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.cacheMountPath</td>
@@ -1215,7 +1223,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Empty dir configuration if persistence is disabled</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.enabled</td>
@@ -1436,7 +1445,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Variant of the image to use. e.g. cluster, enterprise-cluster</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.ingress.annotations</td>
@@ -1689,7 +1699,8 @@ labels: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMSelect http port name</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.priorityClassName</td>
@@ -2060,7 +2071,8 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMSelect strategy</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.suppressStorageFQDNsRender</td>
@@ -2136,7 +2148,7 @@ timeoutSeconds: 5
 </code>
 </pre>
 </td>
-      <td><p>Use an alternate scheduler, e.g. &ldquo;stork&rdquo;. Check <a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/" target="_blank">here</a> for details  schedulerName:</p>
+      <td><p>Empty dir configuration if persistence is disabled</p>
 </td>
     </tr>
     <tr>
@@ -2226,7 +2238,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra secret mounts for vmstorage</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.extraVolumeMounts</td>
@@ -2313,7 +2326,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Variant of the image to use. e.g. cluster, enterprise-cluster</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.initContainers</td>
@@ -2521,7 +2535,8 @@ labels: {}
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>VMStorage http port name</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.priorityClassName</td>
@@ -2629,6 +2644,17 @@ timeoutSeconds: 5
 </pre>
 </td>
       <td><p>Data retention period. Supported values 1w, 1d, number without measurement means month, e.g. 2 = 2month</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmstorage.schedulerName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Use an alternate scheduler, e.g. &ldquo;stork&rdquo;. Check <a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/" target="_blank">here</a> for details</p>
 </td>
     </tr>
     <tr>
@@ -2960,7 +2986,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra secret mounts for vmbackupmanager</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.vmbackupmanager.image.registry</td>
@@ -3003,7 +3030,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Variant of the image tag to use. e.g. enterprise.</p>
+</td>
     </tr>
     <tr>
       <td>vmstorage.vmbackupmanager.probe</td>

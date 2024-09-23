@@ -4,21 +4,27 @@ nameOverride: "vm-distributed"
 # -- Overrides the chart's computed fullname.
 fullnameOverride: ""
 
-# -- Set up a vmauth as the global write entrypoint
 vmauthIngestGlobal:
+  # -- Create a vmauth as the global write entrypoint
   enabled: true
+  # -- Override the name of the vmauth object
   name: ""
+  # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
   spec: {}
 
-# -- Set up a vmauth as the global read entrypoint
 vmauthQueryGlobal:
+  # -- Create vmauth as the global read entrypoint
   enabled: true
+  # -- Override the name of the vmauth object
   name: ""
+  # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
   spec: {}
 
-# -- Config per availability zone components, including vmagent, vmcluster, vmauth etc
+# Config per availability zone components, including vmagent, vmcluster, vmauth etc
 availabilityZones:
-  - name: zone-eu-1
+  - 
+    # -- Availability zone name
+    name: zone-eu-1
     # -- Allow data ingestion to this zone
     allowIngest: true
     # -- Allow data query from this zone through global query endpoint
@@ -43,9 +49,11 @@ availabilityZones:
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: ScheduleAnyway
     vmauthIngest:
+      # -- Create vmauth as a local write endpoint
       enabled: true
       # -- Override the name of the vmauth object
       name: ""
+      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
       spec:
         extraArgs:
           # vmauth discovers backend IPs via periodic DNS queries,
@@ -53,22 +61,30 @@ availabilityZones:
           # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
           discoverBackendIPs: "true"
     vmauthQueryPerZone:
+      # -- Create vmauth as a local read endpoint
       enabled: true
+      # -- Override the name of the vmauth object
       name: ""
+      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
       spec:
         extraArgs:
           discoverBackendIPs: "true"
-    # -- Set up a vmauth with all the zone with `allowQuery: true` as query backends
     vmauthCrossAZQuery:
+      # -- Create a vmauth with all the zone with `allowQuery: true` as query backends
       enabled: true
+      # -- Override the name of the vmauth object
       name: ""
+      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
       spec: {}
     # -- VMAgent here only meant to proxy write requests to each az,
     # doesn't support customized other remote write address.
     vmagent:
       enabled: true
+      # -- Override the name of the vmagent object
       name: ""
+      # -- VMAgent annotations
       annotations: {}
+      # -- VMAgent spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmagentspec)
       spec: {}
     vmcluster:
       enabled: true
@@ -93,7 +109,9 @@ availabilityZones:
           resources:
             {}
     
-  - name: zone-us-1
+  - 
+    # -- Availability zone name
+    name: zone-us-1
     # -- Allow data ingestion to this zone
     allowIngest: true
     # -- Allow data query from this zone through global query endpoint
@@ -118,8 +136,11 @@ availabilityZones:
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: ScheduleAnyway
     vmauthIngest:
+      # -- Create vmauth as a local write endpoint
       enabled: true
+      # -- Override the name of the vmauth object
       name: ""
+      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
       spec:
         extraArgs:
           # vmauth discovers backend IPs via periodic DNS queries,
@@ -127,21 +148,30 @@ availabilityZones:
           # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
           discoverBackendIPs: "true"
     vmauthQueryPerZone:
+      # -- Create vmauth as a local read endpoint
       enabled: true
+      # -- Override the name of the vmauth object
       name: ""
+      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
       spec:
         extraArgs:
           discoverBackendIPs: "true"
     vmauthCrossAZQuery:
+      # -- Create a vmauth with all the zone with `allowQuery: true` as query backends
       enabled: true
+      # -- Override the name of the vmauth object
       name: ""
+      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
       spec: {}
     # -- VMAgent only meant to proxy write requests to each az,
     # doesn't support customized remote write address
     vmagent:
       enabled: true
+      # -- Override the name of the vmagent object
       name: ""
+      # -- VMAgent annotations
       annotations: {}
+      # -- VMAgent spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmagentspec)
       spec: {}
     vmcluster:
       enabled: true

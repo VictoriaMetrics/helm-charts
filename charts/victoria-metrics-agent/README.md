@@ -576,7 +576,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Overrides the fullname prefix</p>
+</td>
     </tr>
     <tr>
       <td>global.compatibility</td>
@@ -891,7 +892,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Destination multitenant endpoint for scraped/received metrics</p>
+</td>
     </tr>
     <tr>
       <td>nameOverride</td>
@@ -901,7 +903,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Overrides fullname suffix</p>
+</td>
     </tr>
     <tr>
       <td>nodeSelector</td>
