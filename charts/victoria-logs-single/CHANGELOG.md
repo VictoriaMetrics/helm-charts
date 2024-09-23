@@ -9,7 +9,8 @@
 ![AppVersion: v0.29.0](https://img.shields.io/static/v1?label=AppVersion&message=v0.29.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-- TODO
+- VictoriaLogs 0.29.0
+- Fixed host template in default fluent-bit output configuration
 
 ## 0.6.3
 
