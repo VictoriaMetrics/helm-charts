@@ -352,7 +352,8 @@ tenant_id: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Container working directory</p>
+</td>
     </tr>
     <tr>
       <td>emptyDir</td>
@@ -362,7 +363,8 @@ tenant_id: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Empty dir configuration when persistence is disabled</p>
+</td>
     </tr>
     <tr>
       <td>env</td>
@@ -394,7 +396,8 @@ tenant_id: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra command line arguments for container of component</p>
+</td>
     </tr>
     <tr>
       <td>extraContainers</td>
@@ -404,7 +407,8 @@ tenant_id: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Extra containers to run in a pod with anomaly container</p>
+</td>
     </tr>
     <tr>
       <td>extraHostPathMounts</td>
@@ -447,7 +451,8 @@ tenant_id: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Full name prefix override</p>
+</td>
     </tr>
     <tr>
       <td>global.compatibility</td>
@@ -605,7 +610,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Full name suffix override</p>
+</td>
     </tr>
     <tr>
       <td>nodeSelector</td>
@@ -745,7 +751,8 @@ minAvailable: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>PodMonitor annotations</p>
+</td>
     </tr>
     <tr>
       <td>podMonitor.enabled</td>
@@ -755,7 +762,8 @@ minAvailable: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Enable PodMonitor</p>
+</td>
     </tr>
     <tr>
       <td>podMonitor.extraLabels</td>
@@ -765,7 +773,8 @@ minAvailable: 1
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>PodMonitor labels</p>
+</td>
     </tr>
     <tr>
       <td>podSecurityContext</td>

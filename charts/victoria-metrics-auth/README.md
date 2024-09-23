@@ -278,7 +278,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Full name prefix override</p>
+</td>
     </tr>
     <tr>
       <td>global.compatibility</td>
@@ -366,7 +367,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Variant of the image to use. e.g. enterprise, scratch</p>
+</td>
     </tr>
     <tr>
       <td>imagePullSecrets</td>
@@ -600,7 +602,8 @@ name: ""
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>Full name suffix override</p>
+</td>
     </tr>
     <tr>
       <td>nodeSelector</td>
