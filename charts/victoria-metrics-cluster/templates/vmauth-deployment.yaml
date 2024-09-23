@@ -1,28 +1,31 @@
-{{- $app := .Values.vmselect }}
-{{- $ctx := dict "helm" . "appKey" "vmselect" }}
-{{- if and $app.enabled $app.statefulSet.enabled -}}
+{{- $app := .Values.vmauth -}}
+{{- $ctx := dict "helm" . "extraLabels" $app.extraLabels "appKey" "vmauth" }}
+{{- if $app.enabled -}}
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
+  labels: {{ include "victoria-metrics.vmauth.labels" $ctx | nindent 4 }}
   name: {{ include "vm.plain.fullname" $ctx }}
-  namespace: {{ include "vm.namespace" $ctx }}
+  namespace: {{ include "vm.namespace" . }}
 spec:
-  serviceName: {{ include "vm.plain.fullname" $ctx }}
   selector:
-    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "victoria-metrics.vmauth.matchLabels" . | nindent 6 }}
+  {{- if not $app.horizontalPodAutoscaler.enabled }}
   replicas: {{ $app.replicaCount }}
-  podManagementPolicy: {{ $app.statefulSet.podManagementPolicy }}
+  {{- end }}
+  {{- with $app.strategy }}
+  strategy: {{ toYaml . | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       {{- with $app.podAnnotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
-      labels: {{ include "victoria-metrics.vmselect.podLabels" $ctx | nindent 8 }}
+      labels: {{ include "victoria-metrics.vmauth.podLabels" $ctx | nindent 8 }}
     spec:
       {{- with $app.priorityClassName }}
       priorityClassName: {{ . }}
@@ -35,7 +38,7 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: vmselect
+        - name: vmauth
           image: {{ include "vm.image" (dict "helm" . "app" $app) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
@@ -44,7 +47,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
           {{- end }}
-          args: {{ include "vmselect.args" . | nindent 12 }}
+          args: {{ include "vmauth.args" . | nindent 12 }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -52,13 +55,8 @@ spec:
           env: {{ toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - name: http
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8481") }}
-            {{- with $app.extraArgs.clusternativeListenAddr }}
-            - name: cluster-tcp
-              protocol: TCP
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
-            {{- end }}
+            - name: {{ $app.ports.name  | default "http" }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8427") }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -69,18 +67,8 @@ spec:
           startupProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - mountPath: {{ $app.cacheMountPath }}
-              name: cache-volume
-            {{- range .Values.vmstorage.extraHostPathMounts }}
-            - name: {{ .name }}
-              mountPath: {{ .mountPath }}
-              {{- with .subPath }}
-              subPath: {{ . }}
-              {{- end }}
-              {{- with .readOnly }}
-              readOnly: {{ . }}
-              {{- end }}
-            {{- end }}
+            - name: config
+              mountPath: /config
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -108,40 +96,11 @@ spec:
       topologySpreadConstraints: {{ toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        - name: config
+          secret:
+            secretName: {{ ternary (include "vm.plain.fullname" $ctx) .Values.configSecretName (empty .Values.configSecretName) }}
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- if or (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
-        - name: cache-volume
-          {{- if $app.persistentVolume.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ $app.persistentVolume.existingClaim }}
-          {{- else }}
-          emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
-          {{- end }}
-        {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
-  {{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
-  volumeClaimTemplates:
-    - apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata:
-        name: cache-volume
-        {{- with $app.persistentVolume.annotations }}
-        annotations: {{ toYaml . | nindent 10 }}
-        {{- end }}
-        {{- with .Values.vmstorage.persistentVolume.labels }}
-        labels: {{ toYaml . | nindent 10 }}
-        {{- end }}
-      spec:
-        {{- with $app.persistentVolume.accessModes }}
-        accessModes: {{ toYaml . | nindent 10 }}
-        {{- end }}
-        resources:
-          requests:
-            storage: {{ $app.persistentVolume.size }}
-        {{- with $app.persistentVolume.storageClassName }}
-        storageClassName: {{ ternary "" . (eq "-" .) }}
-        {{- end }}
-  {{- end }}
 {{- end }}

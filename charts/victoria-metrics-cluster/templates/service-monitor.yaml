@@ -1,23 +1,29 @@
-{{- if and .Values.vminsert.enabled .Values.vminsert.serviceMonitor.enabled -}}
-{{- $serviceMonitor := .Values.vminsert.serviceMonitor -}}
+{{- $ctx := dict "helm" . }}
+{{- range $name, $app := .Values }}
+{{- if and (kindIs "map" $app) $app.enabled ($app.serviceMonitor).enabled }}
+{{- $serviceMonitor := $app.serviceMonitor }}
+{{- $_ := set $ctx "extraLabels" $serviceMonitor.extraLabels }}
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   {{- with $serviceMonitor.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $serviceMonitor.extraLabels) }}
-  labels: {{ include "victoria-metrics.vminsert.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-metrics.vminsert.fullname" . }}
+  {{- $labelsTpl := printf "victoria-metrics.%s.labels" $name }}
+  labels: {{ include $labelsTpl $ctx | nindent 4 }}
+  {{- $_ := set $ctx "appKey" $name }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   {{- with $serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
 spec:
   namespaceSelector:
     matchNames:
-      - {{ include "vm.namespace" . }}
+      - {{ include "vm.namespace" $ }}
   selector:
-    matchLabels: {{ include "victoria-metrics.vminsert.matchLabels" . | nindent 6 }} 
+    {{- $selectorTpl := printf "victoria-metrics.%s.matchLabels" $name }}
+    matchLabels: {{ include $selectorTpl $ | nindent 6 }} 
   endpoints:
     - port: http
       {{- with $serviceMonitor.basicAuth }}
@@ -41,4 +47,5 @@ spec:
       {{- with $serviceMonitor.metricRelabelings }}
       metricRelabelings: {{ toYaml . | nindent 8 }}
       {{- end }}
-  {{- end }}
+{{- end }}
+{{- end }}

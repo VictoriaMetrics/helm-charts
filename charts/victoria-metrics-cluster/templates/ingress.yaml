@@ -1,0 +1,41 @@
+{{- $ctx := dict "helm" . }}
+{{- range $name, $app := .Values }}
+{{- if and (kindIs "map" $app) $app.enabled ($app.ingress).enabled }}
+{{- $ingress := $app.ingress }}
+{{- $_ := set $ctx "extraLabels" $ingress.extraLabels }}
+{{- $_ := set $ctx "appKey" $name }}
+{{- $serviceName := include "vm.plain.fullname" $ctx }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  {{- with $ingress.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $labelsTpl := printf "victoria-metrics.%s.labels" $name }}
+  labels: {{ include $labelsTpl $ctx | nindent 4 }}
+  name: {{ $serviceName }}
+  namespace: {{ include "vm.namespace" $ }}
+spec:
+  {{- with $ingress.ingressClassName }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with $ingress.tls }}
+  tls: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range $ingress.hosts }}
+    - host: {{ tpl .name $ }}
+      http:
+        paths:
+          - path: {{ .path }}
+            {{- with $ingress.pathType }}
+            pathType: {{ . }}
+            {{- end }}
+            backend:
+              service:
+                name: {{ $serviceName }}
+                port: {{ include "vm.ingress.port" . | nindent 18 }}
+    {{- end }}
+{{- end }}
+{{- end }}

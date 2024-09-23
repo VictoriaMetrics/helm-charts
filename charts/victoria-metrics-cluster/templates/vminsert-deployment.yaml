@@ -1,5 +1,5 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.vminsert -}}
+{{- $ctx := dict "helm" . "appKey" "vminsert" "extraLabels" $app.extraLabels }}
 {{- if $app.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -7,9 +7,8 @@ metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := mergeOverwrite (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
   labels: {{ include "victoria-metrics.vminsert.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-metrics.vminsert.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
 spec:
   selector:
@@ -40,7 +39,7 @@ spec:
       {{- end }}
       containers:
         - name: vminsert
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
@@ -120,7 +119,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "victoria-metrics.serviceAccountName" . }}
+      serviceAccountName: {{ include "vm.sa.name" . }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -130,7 +129,7 @@ spec:
       {{- with $app.topologySpreadConstraints }}
       topologySpreadConstraints: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or (and .Values.license.secret.name .Values.license.secret.key) $app.extraVolumes }}
+      {{- if or (and (include "vm.license.secret.key" .) (include "vm.license.secret.name" .)) $app.extraVolumes }}
       volumes:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}

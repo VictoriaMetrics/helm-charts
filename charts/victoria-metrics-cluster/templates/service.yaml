@@ -1,0 +1,59 @@
+{{- $ctx := dict "helm" . }}
+{{- range $name, $app := .Values }}
+{{- if and (kindIs "map" $app) $app.enabled ($app.service).enabled }}
+{{- $service := $app.service }}
+{{- $_ := set $ctx "extraLabels" $service.labels }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  {{- with $service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $labelsTpl := printf "victoria-metrics.%s.labels" $name }}
+  labels: {{ include $labelsTpl $ctx | nindent 4 }}
+  {{- $_ := set $ctx "appKey" $name }}
+  name: {{ include "vm.plain.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ }}
+spec:
+  {{- $clusterIP := $service.clusterIP }}
+  {{- if and (not $clusterIP) ($app.statefulSet).enabled }}
+    {{- $clusterIP = "None" }}
+  {{- end }}
+  {{- with $clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
+  {{- with $service.externalIPs }}
+  externalIPs: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- with $service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $type := $service.type }}
+  {{- if and (not $type) ($app.statefulSet).enabled }}
+    {{- $type = "ClusterIP" }}
+  {{- end }}
+  type: {{ $type }}
+  {{- with $service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with $service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
+  {{- with $service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ . }}
+  {{- end }}
+  {{- with $service.ipFamilies }}
+  ipFamilies: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $portsTpl := printf "%s.ports" $name }}
+  {{- with include $portsTpl $app }}
+  ports: {{ . | nindent 4 }}
+  {{- end }}
+  {{- $selectorTpl := printf "victoria-metrics.%s.matchLabels" $name }}
+  selector: {{ include $selectorTpl $ | nindent 4 }}
+{{- end }}
+{{- end }}

@@ -1,65 +1,24 @@
-{{/* vim: set filetype=mustache: */}}
-{{/*
-Expand the name of the chart.
-*/}}
-{{- define "victoria-metrics.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{/*
-Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
-*/}}
-{{- define "victoria-metrics.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Create chart name and version as used by the chart label.
-*/}}
-{{- define "victoria-metrics.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{/*
-Create the name of the service account
-*/}}
-{{- define "victoria-metrics.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "victoria-metrics.fullname" .) .Values.serviceAccount.name }}
-{{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
-{{- end -}}
-{{- end -}}
-
 {{/*
 Create unified labels for victoria-metrics components
 */}}
 {{- define "victoria-metrics.common.matchLabels" -}}
-app.kubernetes.io/name: {{ include "victoria-metrics.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- $Release := (.helm).Release | default .Release -}}
+app.kubernetes.io/name: {{ include "vm.name" . }}
+app.kubernetes.io/instance: {{ $Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.common.metaLabels" -}}
-helm.sh/chart: {{ include "victoria-metrics.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
+{{- $Release := (.helm).Release | default .Release -}}
+helm.sh/chart: {{ include "vm.chart" . }}
+app.kubernetes.io/managed-by: {{ $Release.Service | trunc 63 | trimSuffix "-" }}
 {{- with .extraLabels }}
 {{ toYaml . }}
 {{- end }}
 {{- end -}}
 
 {{- define "victoria-metrics.common.podLabels" -}}
-app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
+{{- $Release := (.helm).Release | default .Release -}}
+app.kubernetes.io/managed-by: {{ $Release.Service | trunc 63 | trimSuffix "-" }}
 {{- with .extraLabels }}
 {{ toYaml . }}
 {{- end }}
@@ -76,7 +35,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmstorage.matchLabels" -}}
-app: {{ .Values.vmstorage.name }}
+{{- $Values := (.helm).Values | default .Values -}}
+app: {{ $Values.vmstorage.name | default "vmstorage" }}
 {{ include "victoria-metrics.common.matchLabels" . }}
 {{- end -}}
 
@@ -91,7 +51,8 @@ app: {{ .Values.vmstorage.name }}
 {{- end -}}
 
 {{- define "victoria-metrics.vmselect.matchLabels" -}}
-app: {{ .Values.vmselect.name }}
+{{- $Values := (.helm).Values | default .Values -}}
+app: {{ $Values.vmselect.name | default "vmselect" }}
 {{ include "victoria-metrics.common.matchLabels" . }}
 {{- end -}}
 
@@ -106,131 +67,126 @@ app: {{ .Values.vmselect.name }}
 {{- end -}}
 
 {{- define "victoria-metrics.vminsert.matchLabels" -}}
-app: {{ .Values.vminsert.name }}
+{{- $Values := (.helm).Values | default .Values -}}
+app: {{ $Values.vminsert.name | default "vminsert" }}
 {{ include "victoria-metrics.common.matchLabels" . }}
 {{- end -}}
 
-{{/*
-Create a fully qualified vmstorage name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
-{{- define "victoria-metrics.vmstorage.fullname" -}}
-{{- if .Values.vmstorage.fullnameOverride -}}
-{{- .Values.vmstorage.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" .Release.Name .Values.vmstorage.name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s-%s" .Release.Name $name .Values.vmstorage.name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
+{{- define "victoria-metrics.vmauth.labels" -}}
+{{ include "victoria-metrics.vmauth.matchLabels" . }}   
+{{ include "victoria-metrics.common.metaLabels" . }}
 {{- end -}}
 
-{{/*
-Create a fully qualified vmselect name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
-{{- define "victoria-metrics.vmselect.fullname" -}}
-{{- if .Values.vmselect.fullnameOverride -}}
-{{- .Values.vmselect.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" .Release.Name .Values.vmselect.name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s-%s" .Release.Name $name .Values.vmselect.name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
+{{- define "victoria-metrics.vmauth.podLabels" -}}
+{{ include "victoria-metrics.vmauth.matchLabels" . }}
+{{ include "victoria-metrics.common.podLabels" . }}
 {{- end -}}
 
-{{/*
-Create a fully qualified vminsert name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
-{{- define "victoria-metrics.vminsert.fullname" -}}
-{{- if .Values.vminsert.fullnameOverride -}}
-{{- .Values.vminsert.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" .Release.Name .Values.vminsert.name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s-%s" .Release.Name $name .Values.vminsert.name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-
-{{- define "victoria-metrics.vminsert.vmstorage-pod-fqdn" -}}
-  {{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
-  {{- $namespace := (include "vm.namespace" .) -}}
-  {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
-  {{- $storageNodes := default list -}}
-  {{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
-    {{- $value := printf "%s-%d.%s.%s.svc.%s:8400" $svc $i $svc $namespace $dnsSuffix -}}
-    {{- $storageNodes = append $storageNodes $value -}}
-  {{- end -}}
-  {{- toYaml (dict "storageNode" $storageNodes) -}}
-{{- end -}}
-
-{{- define "victoria-metrics.vmselect.vmstorage-pod-fqdn" -}}
-  {{- $svc := include "victoria-metrics.vmstorage.fullname" . -}}
-  {{- $namespace := (include "vm.namespace" .) -}}
-  {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
-  {{- $storageNodes := default list -}}
-  {{- range $i := until (.Values.vmstorage.replicaCount | int) -}}
-    {{- $value := printf "%s-%d.%s.%s.svc.%s:8401" $svc $i $svc $namespace $dnsSuffix -}}
-    {{- $storageNodes = append $storageNodes $value -}}
-  {{- end -}}
-  {{- toYaml (dict "storageNode" $storageNodes) -}}
-{{- end -}}
-
-{{- define "victoria-metrics.vmselect.vmselect-pod-fqdn" -}}
-  {{- $svc := include "victoria-metrics.vmselect.fullname" . -}}
-  {{- $namespace := (include "vm.namespace" .) -}}
-  {{- $dnsSuffix := .Values.clusterDomainSuffix -}}
-  {{- $port := "8481" }}
-  {{- with .Values.vmselect.extraArgs.httpListenAddr }}
-    {{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" }}
-  {{- end -}}
-  {{- $selectNodes := default list -}}
-  {{- range $i := until (.Values.vmselect.replicaCount | int) -}}
-    {{- $value := printf "%s-%d.%s.%s.svc.%s:%s" $svc $i $svc $namespace $dnsSuffix $port -}}
-    {{- $selectNodes = append $selectNodes $value -}}
-  {{- end -}}
-  {{- toYaml (dict "selectNode" $selectNodes) -}}
+{{- define "victoria-metrics.vmauth.matchLabels" -}}
+{{- $Values := (.helm).Values | default .Values -}}
+app: {{ $Values.vmauth.name | default "vmauth" }}
+{{ include "victoria-metrics.common.matchLabels" . }}
 {{- end -}}
 
 {{- define "vminsert.args" -}}
-  {{- $app := .Values.vminsert -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $app := $Values.vminsert -}}
   {{- $args := default dict -}}
-  {{- if not (or $app.suppresStorageFQDNsRender $app.suppressStorageFQDNsRender) }}
-    {{- $args = (fromYaml (include "victoria-metrics.vminsert.vmstorage-pod-fqdn" .)) }}
+  {{- $_ := set . "style" "plain" }}
+  {{- $_ := set . "appKey" "vmstorage" }}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $storage := $Values.vmstorage }}
+  {{- if and (not $app.suppressStorageFQDNsRender) (and $storage.enabled $storage.replicaCount) }}
+    {{- $storageNodes := default list }}
+    {{- $fqdn := include "vm.fqdn" . }}
+    {{- if and $Values.autoDiscovery (eq (include "vm.enterprise.disabled" . ) "false") }}
+      {{- $storageNode := printf "srv+_vminsert._tcp.%s" $fqdn }}
+      {{- $storageNodes = append $storageNodes $storageNode }}
+    {{- else }}
+      {{- $port := "8400" }}
+      {{- range $i := until ($storage.replicaCount | int) -}}
+        {{- $_ := set $ "appIdx" $i }}
+        {{- $storageNode := include "vm.fqdn" $ -}}
+        {{- $storageNodes = append $storageNodes (printf "%s:%s" $storageNode $port) -}}
+      {{- end -}}
+      {{- $_ := unset $ "appIdx" }}
+    {{- end }}
+    {{- $_ := set $args "storageNode" (concat ($args.storageNode | default list) $storageNodes) }}
   {{- end -}}
+  {{- if empty $args.storageNode }}
+    {{- fail "no storageNodes found. Either set vmstorage.enabled to true or add nodes to vminsert.extraArgs.storageNode"}}
+  {{- end }}
+  {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
+{{- end -}}
+
+{{- define "vmauth.args" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $app := $Values.vmauth -}}
+  {{- $args := default dict -}}
+  {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
 {{- define "vmselect.args" -}}
-  {{- $app := .Values.vmselect -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $app := $Values.vmselect -}}
   {{- $args := default dict -}}
-  {{- if not (or $app.suppressStorageFQDNsRender $app.suppresStorageFQDNsRender) }}
-    {{- $args = (fromYaml (include "victoria-metrics.vmselect.vmstorage-pod-fqdn" .)) -}}
-  {{- end -}}
-  {{- if .Values.vmselect.statefulSet.enabled }}
-    {{- with (include "victoria-metrics.vmselect.vmselect-pod-fqdn" .) -}}
-      {{- $args = mergeOverwrite $args (fromYaml .) -}}
-    {{- end -}}
-  {{- end -}}
+  {{- $_ := set . "style" "plain" }}
+  {{- $_ := set . "appKey" "vmstorage" }}
   {{- $_ := set $args "cacheDataPath" $app.cacheMountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $storage := $Values.vmstorage }}
+  {{- if and (not $app.suppressStorageFQDNsRender) (and $storage.enabled $storage.replicaCount) }}
+    {{- $storageNodes := default list }}
+    {{- $fqdn := include "vm.fqdn" . }}
+    {{- if and $Values.autoDiscovery (eq (include "vm.enterprise.disabled" . ) "false") }}
+      {{- $storageNode := printf "srv+_vmselect._tcp.%s" $fqdn }}
+      {{- $storageNodes = append $storageNodes $storageNode }}
+    {{- else }}
+      {{- $port := "8401" }}
+      {{- range $i := until ($storage.replicaCount | int) -}}
+        {{- $_ := set $ "appIdx" $i }}
+        {{- $storageNode := include "vm.fqdn" $ -}}
+        {{- $storageNodes = append $storageNodes (printf "%s:%s" $storageNode $port) -}}
+      {{- end -}}
+      {{- $_ := unset . "appIdx" }}
+    {{- end }}
+    {{- $_ := set $args "storageNode" (concat ($args.storageNode | default list) $storageNodes) }}
+  {{- end }}
+  {{- if and $app.statefulSet.enabled $app.enabled $app.replicaCount }}
+    {{- $selectNodes := default list }}
+    {{- $_ := set . "appKey" "vmselect" }}
+    {{- $fqdn := include "vm.fqdn" . }}
+    {{- if and $Values.autoDiscovery (eq (include "vm.enterprise.disabled" . ) "false") }}
+      {{- $selectNode := printf "srv+_http._tcp.%s" $fqdn }}
+      {{- $selectNodes = append $selectNodes $selectNode }}
+    {{- else }}
+      {{- $port := "8481" }}
+      {{- with $app.extraArgs.httpListenAddr }}
+        {{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" }}
+      {{- end -}}
+      {{- range $i := until ($app.replicaCount | int) -}}
+        {{- $_ := set $ "appIdx" $i }}
+        {{- $selectNode := include "vm.fqdn" $ -}}
+        {{- $selectNodes = append $selectNodes (printf "%s:%s" $selectNode $port) -}}
+      {{- end -}}
+      {{- $_ := unset $ "appIdx" }}
+    {{- end }}
+    {{- $_ := set $args "selectNode" (concat ($args.selectNode | default list) $selectNodes) }}
+  {{- end -}}
+  {{- if empty $args.storageNode }}
+    {{- fail "no storageNodes found. Either set vmstorage.enabled to true or add nodes to vmselect.extraArgs.storageNode"}}
+  {{- end }}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
 {{- define "vmstorage.args" -}}
-  {{- $app := .Values.vmstorage -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $app := $Values.vmstorage -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "retentionPeriod" (toString $app.retentionPeriod) -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
@@ -240,7 +196,8 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "vmbackupmanager.args" -}}
-  {{- $app := .Values.vmstorage -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $app := $Values.vmstorage -}}
   {{- $manager := $app.vmbackupmanager -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "disableHourly" $manager.disableHourly -}}
@@ -261,7 +218,8 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "vmbackupmanager.restore.args" -}}
-  {{- $app := .Values.vmstorage -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $app := $Values.vmstorage -}}
   {{- $manager := $app.vmbackupmanager -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
@@ -270,4 +228,113 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
   {{- $output := (fromYaml (include "vm.args" $args)).args -}}
   {{- $output = concat (list "restore") $output -}}
   {{- toYaml $output -}}
+{{- end -}}
+
+{{- define "vmselect.ports" -}}
+- name: http
+  port: {{ .service.servicePort }}
+  protocol: TCP
+  targetPort: {{ .service.targetPort }}
+{{- range .service.extraPorts }}
+- name: {{ .name }}
+  port: {{ .port }}
+  protocol: TCP
+  targetPort: {{ .targetPort }}
+{{- end }}
+{{- with .extraArgs.clusternativeListenAddr }}
+- name: cluster-tcp
+  protocol: TCP
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: cluster-tcp
+{{- end }}
+{{- end -}}
+
+{{- define "vminsert.ports" -}}
+- name: http
+  port: {{ .service.servicePort }}
+  protocol: TCP
+  targetPort: {{ .service.targetPort }}
+{{- range .service.extraPorts }}
+- name: {{ .name }}
+  port: {{ .port }}
+  protocol: TCP
+  targetPort: {{ .targetPort }}
+{{- end }}
+{{- with .extraArgs.clusternativeListenAddr }}
+- name: cluster-tcp
+  protocol: TCP
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: cluster-tcp
+{{- end }}
+{{- with .extraArgs.graphiteListenAddr }}
+- name: graphite-tcp
+  protocol: TCP
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: graphite-tcp
+- name: graphite-udp
+  protocol: UDP
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: graphite-udp
+{{- end }}
+{{- with .extraArgs.influxListenAddr }}
+- name: influx-tcp
+  protocol: TCP
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: influx-tcp
+- name: influx-udp
+  protocol: UDP
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: influx-udp
+{{- end }}
+{{- with .extraArgs.opentsdbHTTPListenAddr }}
+- name: opentsdbhttp
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: opentsdbhttp
+{{- end }}
+{{- with .extraArgs.opentsdbListenAddr }}
+{{- if or .service.udp (ne .service.type "LoadBalancer") }}
+- name: opentsdb-udp
+  protocol: UDP
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: opentsdb-udp
+{{- end }}
+- name: opentsdb-tcp
+  protocol: TCP
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: opentsdb-tcp
+{{- end }}
+{{- end -}}
+
+{{- define "vmstorage.ports" -}}
+- port: {{ .service.servicePort }}
+  targetPort: http
+  protocol: TCP
+  name: http
+- port: {{ .service.vmselectPort }}
+  targetPort: vmselect
+  protocol: TCP
+  name: vmselect
+- port: {{ .service.vminsertPort }}
+  targetPort: vminsert
+  protocol: TCP
+  name: vminsert
+{{- range .service.extraPorts }}
+- name: {{ .name }}
+  port: {{ .port }}
+  protocol: TCP
+  targetPort: {{ .targetPort }}
+{{- end }}
+{{- end -}}
+
+{{- define "vmauth.ports" -}} 
+- port: {{ .service.servicePort }}
+  targetPort: http
+  protocol: TCP 
+  name: http 
+{{- range .service.extraPorts }}
+- name: {{ .name }}
+  port: {{ .port }}
+  protocol: TCP
+  targetPort: {{ .targetPort }}
+{{- end }}
 {{- end -}}
