@@ -100,7 +100,10 @@ app: {{ $Values.vmauth.name | default "vmauth" }}
   {{- if and (not $app.suppressStorageFQDNsRender) (and $storage.enabled $storage.replicaCount) }}
     {{- $storageNodes := default list }}
     {{- $fqdn := include "vm.fqdn" . }}
-    {{- if and $Values.autoDiscovery (eq (include "vm.enterprise.disabled" . ) "false") }}
+    {{- if $Values.autoDiscovery }}
+      {{- if (include "vm.enterprise.disabled" . ) "true" }}
+        {{- fail "SRV autodiscovery is only supported in enterprise. Either define license or set `autoDiscovery` to `false`" }}
+      {{- end }}
       {{- $storageNode := printf "srv+_vminsert._tcp.%s" $fqdn }}
       {{- $storageNodes = append $storageNodes $storageNode }}
     {{- else }}
@@ -143,7 +146,10 @@ app: {{ $Values.vmauth.name | default "vmauth" }}
   {{- if and (not $app.suppressStorageFQDNsRender) (and $storage.enabled $storage.replicaCount) }}
     {{- $storageNodes := default list }}
     {{- $fqdn := include "vm.fqdn" . }}
-    {{- if and $Values.autoDiscovery (eq (include "vm.enterprise.disabled" . ) "false") }}
+    {{- if $Values.autoDiscovery }}
+      {{- if (include "vm.enterprise.disabled" . ) "true" }}
+        {{- fail "SRV autodiscovery is only supported in enterprise. Either define license or set `autoDiscovery` to `false`" }}
+      {{- end }}
       {{- $storageNode := printf "srv+_vmselect._tcp.%s" $fqdn }}
       {{- $storageNodes = append $storageNodes $storageNode }}
     {{- else }}
@@ -161,7 +167,10 @@ app: {{ $Values.vmauth.name | default "vmauth" }}
     {{- $selectNodes := default list }}
     {{- $_ := set . "appKey" "vmselect" }}
     {{- $fqdn := include "vm.fqdn" . }}
-    {{- if and $Values.autoDiscovery (eq (include "vm.enterprise.disabled" . ) "false") }}
+    {{- if $Values.autoDiscovery }}
+      {{- if (include "vm.enterprise.disabled" . ) "true" }}
+        {{- fail "SRV autodiscovery is only supported in enterprise. Either define license or set `autoDiscovery` to `false`" }}
+      {{- end }}
       {{- $selectNode := printf "srv+_http._tcp.%s" $fqdn }}
       {{- $selectNodes = append $selectNodes $selectNode }}
     {{- else }}

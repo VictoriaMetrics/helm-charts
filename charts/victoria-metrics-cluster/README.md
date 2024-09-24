@@ -451,7 +451,7 @@ name: ""
 </code>
 </pre>
 </td>
-      <td><p>Enable deployment of vmauth component. Deployment is used</p>
+      <td><p>Enable deployment of vmauth component. With vmauth enabled please set <code>service.clusterIP: None</code> and <code>service.type: ClusterIP</code> for <code>vminsert</code> and <code>vmselect</code> to use vmauth balancing benefits.</p>
 </td>
     </tr>
     <tr>
