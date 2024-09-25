@@ -59,8 +59,9 @@ spec:
                 x-kubernetes-preserve-unknown-fields: true
               configMaps:
                 description: |-
-                  ConfigMaps is a list of ConfigMaps in the same namespace as the VLogs
-                  object, which shall be mounted into the VLogs Pods.
+                  ConfigMaps is a list of ConfigMaps in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/configs/CONFIGMAP_NAME folder
                 items:
                   type: string
                 type: array
@@ -76,6 +77,12 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              disableSelfServiceScrape:
+                description: |-
+                  DisableSelfServiceScrape controls creation of VMServiceScrape by operator
+                  for the application.
+                  Has priority over `VM_DISABLESELFSERVICESCRAPECREATION` operator env variable
+                type: boolean
               dnsConfig:
                 description: |-
                   Specifies the DNS parameters of a pod.
@@ -128,11 +135,11 @@ spec:
                 additionalProperties:
                   type: string
                 description: |-
-                  ExtraArgs that will be passed to  VLogs pod
+                  ExtraArgs that will be passed to the application container
                   for example remoteWrite.tmpDataPath: /tmp
                 type: object
               extraEnvs:
-                description: ExtraEnvs that will be added to VLogs pod
+                description: ExtraEnvs that will be passed to the application container
                 items:
                   description: EnvVar represents an environment variable present in
                     a Container.
@@ -162,6 +169,30 @@ spec:
                   FutureRetention for the stored logs
                   Log entries with timestamps bigger than now+futureRetention are rejected during data ingestion; see https://docs.victoriametrics.com/victorialogs/#retention
                 type: string
+              host_aliases:
+                description: |-
+                  HostAliasesUnderScore provides mapping for ip and hostname,
+                  that would be propagated to pod,
+                  cannot be used with HostNetwork.
+                  Has Priority over hostAliases field
+                items:
+                  description: |-
+                    HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                    pod's hosts file.
+                  properties:
+                    hostnames:
+                      description: Hostnames for the above IP address.
+                      items:
+                        type: string
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    ip:
+                      description: IP address of the host file entry.
+                      type: string
+                  required:
+                  - ip
+                  type: object
+                type: array
               hostAliases:
                 description: |-
                   HostAliases provides mapping for ip and hostname,
@@ -191,8 +222,8 @@ spec:
                 type: boolean
               image:
                 description: |-
-                  Image - docker image settings for VLogs
-                  if no specified operator uses default config version
+                  Image - docker image settings
+                  if no specified operator uses default version from operator config
                 properties:
                   pullPolicy:
                     description: PullPolicy describes how to pull docker image
@@ -231,12 +262,9 @@ spec:
                 type: array
               initContainers:
                 description: |-
-                  InitContainers allows adding initContainers to the pod definition. Those can be used to e.g.
-                  fetch secrets for injection into the VLogs configuration from external sources. Any
-                  errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-                  Using initContainers for any use case other then secret fetching is entirely outside the scope
-                  of what the maintainers will support and by doing so, you accept that this behaviour may break
-                  at any time without notice.
+                  InitContainers allows adding initContainers to the pod definition.
+                  Any errors during the execution of an initContainer will lead to a restart of the Pod.
+                  More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
                 items:
                   description: A single application container that you want to run
                     within a pod.
@@ -273,6 +301,13 @@ spec:
                   this can be useful for debugging of high cardinality issues with
                   log streams; see https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields
                 type: boolean
+              minReadySeconds:
+                description: |-
+                  MinReadySeconds defines a minim number os seconds to wait before starting update next pod
+                  if previous in healthy state
+                  Has no effect for VLogs and VMSingle
+                format: int32
+                type: integer
               nodeSelector:
                 additionalProperties:
                   type: string
@@ -317,10 +352,10 @@ spec:
                     type: string
                 type: object
               port:
-                description: Port listen port
+                description: Port listen address
                 type: string
               priorityClassName:
-                description: PriorityClassName assigned to the Pods
+                description: PriorityClassName class assigned to the Pods
                 type: string
               readinessGates:
                 description: ReadinessGates defines pod readiness gates
@@ -342,14 +377,11 @@ spec:
               removePvcAfterDelete:
                 description: |-
                   RemovePvcAfterDelete - if true, controller adds ownership to pvc
-                  and after VLogs objest deletion - pvc will be garbage collected
+                  and after VLogs object deletion - pvc will be garbage collected
                   by controller manager
                 type: boolean
               replicaCount:
-                description: |-
-                  ReplicaCount is the expected size of the VLogs
-                  it can be 0 or 1
-                  if you need more - use vm cluster
+                description: ReplicaCount is the expected size of the Application.
                 format: int32
                 type: integer
               resources:
@@ -415,7 +447,8 @@ spec:
               revisionHistoryLimitCount:
                 description: |-
                   The number of old ReplicaSets to retain to allow rollback in deployment or
-                  maximum number of revisions that will be maintained in the StatefulSet's revision history.
+                  maximum number of revisions that will be maintained in the Deployment revision history.
+                  Has no effect at StatefulSets
                   Defaults to 10.
                 format: int32
                 type: integer
@@ -429,8 +462,9 @@ spec:
                 type: string
               secrets:
                 description: |-
-                  Secrets is a list of Secrets in the same namespace as the VLogs
-                  object, which shall be mounted into the VLogs Pods.
+                  Secrets is a list of Secrets in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/secrets/SECRET_NAME folder
                 items:
                   type: string
                 type: array
@@ -441,9 +475,8 @@ spec:
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
               serviceAccountName:
-                description: |-
-                  ServiceAccountName is the name of the ServiceAccount to use to run the
-                  VLogs Pods.
+                description: ServiceAccountName is the name of the ServiceAccount
+                  to use to run the pods
                 type: string
               serviceScrapeSpec:
                 description: ServiceScrapeSpec that will be added to vlogs VMServiceScrape
@@ -801,6 +834,11 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              useDefaultResources:
+                description: |-
+                  UseDefaultResources controls resource settings
+                  By default, operator sets built-in resource requirements
+                type: boolean
               useStrictSecurity:
                 description: |-
                   UseStrictSecurity enables strict security mode for component
@@ -810,9 +848,8 @@ spec:
                 type: boolean
               volumeMounts:
                 description: |-
-                  VolumeMounts allows configuration of additional VolumeMounts on the output Deployment definition.
-                  VolumeMounts specified will be appended to other VolumeMounts in the VLogs container,
-                  that are generated as a result of StorageSpec objects.
+                  VolumeMounts allows configuration of additional VolumeMounts on the output Deployment/StatefulSet definition.
+                  VolumeMounts specified will be appended to other VolumeMounts in the Application container
                 items:
                   description: VolumeMount describes a mounting of a Volume within
                     a container.
@@ -881,9 +918,9 @@ spec:
                 type: array
               volumes:
                 description: |-
-                  Volumes allows configuration of additional volumes on the output deploy definition.
-                  Volumes specified will be appended to other volumes that are generated as a result of
-                  StorageSpec objects.
+                  Volumes allows configuration of additional volumes on the output Deployment/StatefulSet definition.
+                  Volumes specified will be appended to other volumes that are generated.
+                  / +optional
                 items:
                   description: Volume represents a named volume in a pod that may
                     be accessed by any container in the pod.
@@ -924,11 +961,6 @@ spec:
                   by this VLogs.
                 format: int32
                 type: integer
-            required:
-            - availableReplicas
-            - replicas
-            - unavailableReplicas
-            - updatedReplicas
             type: object
         type: object
     served: true
@@ -1740,9 +1772,9 @@ spec:
                 type: array
               configMaps:
                 description: |-
-                  ConfigMaps is a list of ConfigMaps in the same namespace as the vmagent
-                  object, which shall be mounted into the vmagent Pods.
-                  will be mounted at path  /etc/vm/configs
+                  ConfigMaps is a list of ConfigMaps in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/configs/CONFIGMAP_NAME folder
                 items:
                   type: string
                 type: array
@@ -1752,6 +1784,67 @@ spec:
                 description: |-
                   ConfigReloaderExtraArgs that will be passed to  VMAuths config-reloader container
                   for example resyncInterval: "30s"
+                type: object
+              configReloaderImageTag:
+                description: ConfigReloaderImageTag defines image:tag for config-reloader
+                  container
+                type: string
+              configReloaderResources:
+                description: |-
+                  ConfigReloaderResources config-reloader container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                  if not defined default resources from operator config will be used
+                properties:
+                  claims:
+                    description: |-
+                      Claims lists the names of resources, defined in spec.resourceClaims,
+                      that are used by this container.
+
+
+                      This is an alpha field and requires enabling the
+                      DynamicResourceAllocation feature gate.
+
+
+                      This field is immutable. It can only be set for containers.
+                    items:
+                      description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                      properties:
+                        name:
+                          description: |-
+                            Name must match the name of one entry in pod.spec.resourceClaims of
+                            the Pod where this field is used. It makes that resource available
+                            inside a container.
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                  limits:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Limits describes the maximum amount of compute resources allowed.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
+                  requests:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Requests describes the minimum amount of compute resources required.
+                      If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                      otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
                 type: object
               containers:
                 description: |-
@@ -1765,6 +1858,12 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              disableSelfServiceScrape:
+                description: |-
+                  DisableSelfServiceScrape controls creation of VMServiceScrape by operator
+                  for the application.
+                  Has priority over `VM_DISABLESELFSERVICESCRAPECREATION` operator env variable
+                type: boolean
               dnsConfig:
                 description: |-
                   Specifies the DNS parameters of a pod.
@@ -1811,7 +1910,7 @@ spec:
                     x-kubernetes-list-type: atomic
                 type: object
               dnsPolicy:
-                description: DNSPolicy set DNS policy for the pod
+                description: DNSPolicy sets DNS policy for the pod
                 type: string
               enforcedNamespaceLabel:
                 description: |-
@@ -1830,12 +1929,11 @@ spec:
                 additionalProperties:
                   type: string
                 description: |-
-                  ExtraArgs that will be passed to  VMAgent pod
+                  ExtraArgs that will be passed to the application container
                   for example remoteWrite.tmpDataPath: /tmp
-                  it would be converted to flag --remoteWrite.tmpDataPath=/tmp
                 type: object
               extraEnvs:
-                description: ExtraEnvs that will be added to VMAgent pod
+                description: ExtraEnvs that will be passed to the application container
                 items:
                   description: EnvVar represents an environment variable present in
                     a Container.
@@ -1862,7 +1960,31 @@ spec:
                 type: array
               host_aliases:
                 description: |-
-                  HostAliases provides mapping between ip and hostnames,
+                  HostAliasesUnderScore provides mapping for ip and hostname,
+                  that would be propagated to pod,
+                  cannot be used with HostNetwork.
+                  Has Priority over hostAliases field
+                items:
+                  description: |-
+                    HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                    pod's hosts file.
+                  properties:
+                    hostnames:
+                      description: Hostnames for the above IP address.
+                      items:
+                        type: string
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    ip:
+                      description: IP address of the host file entry.
+                      type: string
+                  required:
+                  - ip
+                  type: object
+                type: array
+              hostAliases:
+                description: |-
+                  HostAliases provides mapping for ip and hostname,
                   that would be propagated to pod,
                   cannot be used with HostNetwork.
                 items:
@@ -1895,8 +2017,8 @@ spec:
                 type: boolean
               image:
                 description: |-
-                  Image - docker image settings for VMAgent
-                  if no specified operator uses default config version
+                  Image - docker image settings
+                  if no specified operator uses default version from operator config
                 properties:
                   pullPolicy:
                     description: PullPolicy describes how to pull docker image
@@ -1941,12 +2063,9 @@ spec:
                 type: boolean
               initContainers:
                 description: |-
-                  InitContainers allows adding initContainers to the pod definition. Those can be used to e.g.
-                  fetch secrets for injection into the vmagent configuration from external sources. Any
-                  errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-                  Using initContainers for any use case other then secret fetching is entirely outside the scope
-                  of what the maintainers will support and by doing so, you accept that this behaviour may break
-                  at any time without notice.
+                  InitContainers allows adding initContainers to the pod definition.
+                  Any errors during the execution of an initContainer will lead to a restart of the Pod.
+                  More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
                 items:
                   description: A single application container that you want to run
                     within a pod.
@@ -2130,6 +2249,7 @@ spec:
                 description: |-
                   MinReadySeconds defines a minim number os seconds to wait before starting update next pod
                   if previous in healthy state
+                  Has no effect for VLogs and VMSingle
                 format: int32
                 type: integer
               minScrapeInterval:
@@ -2584,7 +2704,7 @@ spec:
                 description: Port listen address
                 type: string
               priorityClassName:
-                description: PriorityClassName assigned to the Pods
+                description: PriorityClassName class assigned to the Pods
                 type: string
               probeNamespaceSelector:
                 description: |-
@@ -3156,6 +3276,8 @@ spec:
                             type: string
                           type: array
                         ignoreFirstIntervals:
+                          description: IgnoreFirstIntervals instructs to ignore first
+                            interval
                           type: integer
                         ignoreOldSamples:
                           description: IgnoreOldSamples instructs to ignore samples
@@ -3683,17 +3805,13 @@ spec:
                     type: boolean
                 type: object
               replicaCount:
-                description: |-
-                  ReplicaCount is the expected size of the VMAgent cluster. The controller will
-                  eventually make the size of the running cluster equal to the expected
-                  size.
-                  NOTE enable VMSingle deduplication for replica usage
+                description: ReplicaCount is the expected size of the Application.
                 format: int32
                 type: integer
               resources:
                 description: |-
                   Resources container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-                  if not specified - default setting will be used
+                  if not defined default resources from operator config will be used
                 properties:
                   claims:
                     description: |-
@@ -3750,7 +3868,8 @@ spec:
               revisionHistoryLimitCount:
                 description: |-
                   The number of old ReplicaSets to retain to allow rollback in deployment or
-                  maximum number of revisions that will be maintained in the StatefulSet's revision history.
+                  maximum number of revisions that will be maintained in the Deployment revision history.
+                  Has no effect at StatefulSets
                   Defaults to 10.
                 format: int32
                 type: integer
@@ -3986,9 +4105,9 @@ spec:
                 type: string
               secrets:
                 description: |-
-                  Secrets is a list of Secrets in the same namespace as the vmagent
-                  object, which shall be mounted into the vmagent Pods.
-                  will be mounted at path /etc/vm/secrets
+                  Secrets is a list of Secrets in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/secrets/SECRET_NAME folder
                 items:
                   type: string
                 type: array
@@ -4006,9 +4125,8 @@ spec:
                   with selectAllByDefault: false - selects nothing
                 type: boolean
               serviceAccountName:
-                description: |-
-                  ServiceAccountName is the name of the ServiceAccount to use to run the
-                  VMAgent Pods.
+                description: ServiceAccountName is the name of the ServiceAccount
+                  to use to run the pods
                 type: string
               serviceScrapeNamespaceSelector:
                 description: |-
@@ -4957,6 +5075,7 @@ spec:
                       type: string
                     type: array
                   ignoreFirstIntervals:
+                    description: IgnoreFirstIntervals instructs to ignore first interval
                     type: integer
                   ignoreOldSamples:
                     description: IgnoreOldSamples instructs to ignore samples with
@@ -5306,12 +5425,23 @@ spec:
                 - Recreate
                 - RollingUpdate
                 type: string
+              useDefaultResources:
+                description: |-
+                  UseDefaultResources controls resource settings
+                  By default, operator sets built-in resource requirements
+                type: boolean
               useStrictSecurity:
                 description: |-
                   UseStrictSecurity enables strict security mode for component
                   it restricts disk writes access
                   uses non-root user out of the box
                   drops not needed security permissions
+                type: boolean
+              useVMConfigReloader:
+                description: |-
+                  UseVMConfigReloader replaces prometheus-like config-reloader
+                  with vm one. It uses secrets watch instead of file watch
+                  which greatly increases speed of config updates
                 type: boolean
               vmAgentExternalLabelName:
                 description: |-
@@ -5321,9 +5451,8 @@ spec:
                 type: string
               volumeMounts:
                 description: |-
-                  VolumeMounts allows configuration of additional VolumeMounts on the output deploy definition.
-                  VolumeMounts specified will be appended to other VolumeMounts in the vmagent container,
-                  that are generated as a result of StorageSpec objects.
+                  VolumeMounts allows configuration of additional VolumeMounts on the output Deployment/StatefulSet definition.
+                  VolumeMounts specified will be appended to other VolumeMounts in the Application container
                 items:
                   description: VolumeMount describes a mounting of a Volume within
                     a container.
@@ -5392,9 +5521,9 @@ spec:
                 type: array
               volumes:
                 description: |-
-                  Volumes allows configuration of additional volumes on the output deploy definition.
-                  Volumes specified will be appended to other volumes that are generated as a result of
-                  StorageSpec objects.
+                  Volumes allows configuration of additional volumes on the output Deployment/StatefulSet definition.
+                  Volumes specified will be appended to other volumes that are generated.
+                  / +optional
                 items:
                   description: Volume represents a named volume in a pod that may
                     be accessed by any container in the pod.
@@ -10061,11 +10190,17 @@ spec:
                   Needs to be provided for non RFC1918 [1] (public) addresses.
                   [1] RFC1918: https://tools.ietf.org/html/rfc1918
                 type: string
+              clusterDomainName:
+                description: |-
+                  ClusterDomainName defines domain name suffix for in-cluster dns addresses
+                  aka .cluster.local
+                  used to build pod peer addresses for in-cluster communication
+                type: string
               configMaps:
                 description: |-
-                  ConfigMaps is a list of ConfigMaps in the same namespace as the VMAlertmanager
-                  object, which shall be mounted into the VMAlertmanager Pods.
-                  The ConfigMaps are mounted into /etc/vm/configs/<configmap-name>.
+                  ConfigMaps is a list of ConfigMaps in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/configs/CONFIGMAP_NAME folder
                 items:
                   type: string
                 type: array
@@ -10133,6 +10268,67 @@ spec:
                   ConfigReloaderExtraArgs that will be passed to  VMAuths config-reloader container
                   for example resyncInterval: "30s"
                 type: object
+              configReloaderImageTag:
+                description: ConfigReloaderImageTag defines image:tag for config-reloader
+                  container
+                type: string
+              configReloaderResources:
+                description: |-
+                  ConfigReloaderResources config-reloader container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                  if not defined default resources from operator config will be used
+                properties:
+                  claims:
+                    description: |-
+                      Claims lists the names of resources, defined in spec.resourceClaims,
+                      that are used by this container.
+
+
+                      This is an alpha field and requires enabling the
+                      DynamicResourceAllocation feature gate.
+
+
+                      This field is immutable. It can only be set for containers.
+                    items:
+                      description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                      properties:
+                        name:
+                          description: |-
+                            Name must match the name of one entry in pod.spec.resourceClaims of
+                            the Pod where this field is used. It makes that resource available
+                            inside a container.
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                  limits:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Limits describes the maximum amount of compute resources allowed.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
+                  requests:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Requests describes the minimum amount of compute resources required.
+                      If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                      otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
+                type: object
               configSecret:
                 description: |-
                   ConfigSecret is the name of a Kubernetes Secret in the same namespace as the
@@ -10195,8 +10391,8 @@ spec:
                 x-kubernetes-map-type: atomic
               containers:
                 description: |-
-                  Containers allows injecting additional containers or patching existing containers.
-                  This is meant to allow adding an authentication proxy to an VMAlertmanager pod.
+                  Containers property allows to inject additions sidecars or to patch existing containers.
+                  It can be useful for proxies, backup, etc.
                 items:
                   description: A single application container that you want to run
                     within a pod.
@@ -10207,12 +10403,18 @@ spec:
                 type: array
               disableNamespaceMatcher:
                 description: |-
-                  DisableNamespaceMatcher disables namespace label matcher for VMAlertmanagerConfig
+                  DisableNamespaceMatcher disables top route namespace label matcher for VMAlertmanagerConfig
                   It may be useful if alert doesn't have namespace label for some reason
                 type: boolean
               disableRouteContinueEnforce:
                 description: DisableRouteContinueEnforce cancel the behavior for VMAlertmanagerConfig
                   that always enforce first-level route continue to true
+                type: boolean
+              disableSelfServiceScrape:
+                description: |-
+                  DisableSelfServiceScrape controls creation of VMServiceScrape by operator
+                  for the application.
+                  Has priority over `VM_DISABLESELFSERVICESCRAPECREATION` operator env variable
                 type: boolean
               dnsConfig:
                 description: |-
@@ -10262,6 +10464,15 @@ spec:
               dnsPolicy:
                 description: DNSPolicy sets DNS policy for the pod
                 type: string
+              enforcedTopRouteMatchers:
+                description: |-
+                  EnforcedTopRouteMatchers defines label matchers to be added for the top route
+                  of VMAlertmanagerConfig
+                  It allows to make some set of labels required for alerts.
+                  https://prometheus.io/docs/alerting/latest/configuration/#matcher
+                items:
+                  type: string
+                type: array
               externalURL:
                 description: |-
                   ExternalURL the VMAlertmanager instances will be available under. This is
@@ -10272,11 +10483,11 @@ spec:
                 additionalProperties:
                   type: string
                 description: |-
-                  ExtraArgs that will be passed to  VMAlertmanager pod
-                  for example log.level: debug
+                  ExtraArgs that will be passed to the application container
+                  for example remoteWrite.tmpDataPath: /tmp
                 type: object
               extraEnvs:
-                description: ExtraEnvs that will be added to VMAlertmanager pod
+                description: ExtraEnvs that will be passed to the application container
                 items:
                   description: EnvVar represents an environment variable present in
                     a Container.
@@ -10348,7 +10559,9 @@ spec:
                           mutually exclusive with CertSecretRef
                         type: string
                       cert_secret_ref:
-                        description: SecretKeySelector selects a key of a Secret.
+                        description: |-
+                          CertSecretRef defines reference for secret with certificate content under given key
+                          mutually exclusive with CertFile
                         properties:
                           key:
                             description: The key of the secret to select from.  Must
@@ -10425,7 +10638,9 @@ spec:
                           mutually exclusive with CertSecretRef
                         type: string
                       cert_secret_ref:
-                        description: SecretKeySelector selects a key of a Secret.
+                        description: |-
+                          CertSecretRef defines reference for secret with certificate content under given key
+                          mutually exclusive with CertFile
                         properties:
                           key:
                             description: The key of the secret to select from.  Must
@@ -10564,14 +10779,61 @@ spec:
                         type: boolean
                     type: object
                 type: object
+              host_aliases:
+                description: |-
+                  HostAliasesUnderScore provides mapping for ip and hostname,
+                  that would be propagated to pod,
+                  cannot be used with HostNetwork.
+                  Has Priority over hostAliases field
+                items:
+                  description: |-
+                    HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                    pod's hosts file.
+                  properties:
+                    hostnames:
+                      description: Hostnames for the above IP address.
+                      items:
+                        type: string
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    ip:
+                      description: IP address of the host file entry.
+                      type: string
+                  required:
+                  - ip
+                  type: object
+                type: array
+              hostAliases:
+                description: |-
+                  HostAliases provides mapping for ip and hostname,
+                  that would be propagated to pod,
+                  cannot be used with HostNetwork.
+                items:
+                  description: |-
+                    HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                    pod's hosts file.
+                  properties:
+                    hostnames:
+                      description: Hostnames for the above IP address.
+                      items:
+                        type: string
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    ip:
+                      description: IP address of the host file entry.
+                      type: string
+                  required:
+                  - ip
+                  type: object
+                type: array
               hostNetwork:
                 description: HostNetwork controls whether the pod may use the node
                   network namespace
                 type: boolean
               image:
                 description: |-
-                  Image - docker image settings for VMAlertmanager
-                  if no specified operator uses default config version
+                  Image - docker image settings
+                  if no specified operator uses default version from operator config
                 properties:
                   pullPolicy:
                     description: PullPolicy describes how to pull docker image
@@ -10610,12 +10872,9 @@ spec:
                 type: array
               initContainers:
                 description: |-
-                  InitContainers allows adding initContainers to the pod definition. Those can be used to e.g.
-                  fetch secrets for injection into the VMAlertmanager configuration from external sources. Any
-                  errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-                  Using initContainers for any use case other then secret fetching is entirely outside the scope
-                  of what the maintainers will support and by doing so, you accept that this behaviour may break
-                  at any time without notice.
+                  InitContainers allows adding initContainers to the pod definition.
+                  Any errors during the execution of an initContainer will lead to a restart of the Pod.
+                  More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
                 items:
                   description: A single application container that you want to run
                     within a pod.
@@ -10636,14 +10895,27 @@ spec:
                 x-kubernetes-preserve-unknown-fields: true
               logFormat:
                 description: LogFormat for VMAlertmanager to be configured with.
+                enum:
+                - logfmt
+                - json
                 type: string
               logLevel:
                 description: Log level for VMAlertmanager to be configured with.
+                enum:
+                - debug
+                - info
+                - warn
+                - error
+                - DEBUG
+                - INFO
+                - WARN
+                - ERROR
                 type: string
               minReadySeconds:
                 description: |-
                   MinReadySeconds defines a minim number os seconds to wait before starting update next pod
                   if previous in healthy state
+                  Has no effect for VLogs and VMSingle
                 format: int32
                 type: integer
               nodeSelector:
@@ -10721,7 +10993,7 @@ spec:
                     type: string
                 type: object
               port:
-                description: Port for listen
+                description: Port listen address
                 type: string
               portName:
                 description: |-
@@ -10749,16 +11021,13 @@ spec:
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
               replicaCount:
-                description: |-
-                  ReplicaCount Size is the expected size of the alertmanager cluster. The controller will
-                  eventually make the size of the running cluster equal to the expected
+                description: ReplicaCount is the expected size of the Application.
                 format: int32
-                minimum: 0
                 type: integer
               resources:
                 description: |-
-                  Resources container resource request and limits,
-                  https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                  Resources container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                  if not defined default resources from operator config will be used
                 properties:
                   claims:
                     description: |-
@@ -10821,7 +11090,8 @@ spec:
               revisionHistoryLimitCount:
                 description: |-
                   The number of old ReplicaSets to retain to allow rollback in deployment or
-                  maximum number of revisions that will be maintained in the StatefulSet's revision history.
+                  maximum number of revisions that will be maintained in the Deployment revision history.
+                  Has no effect at StatefulSets
                   Defaults to 10.
                 format: int32
                 type: integer
@@ -10848,9 +11118,9 @@ spec:
                 type: string
               secrets:
                 description: |-
-                  Secrets is a list of Secrets in the same namespace as the VMAlertmanager
-                  object, which shall be mounted into the VMAlertmanager Pods.
-                  The Secrets are mounted into /etc/vm/secrets/<secret-name>
+                  Secrets is a list of Secrets in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/secrets/SECRET_NAME folder
                 items:
                   type: string
                 type: array
@@ -10869,7 +11139,7 @@ spec:
                 type: boolean
               serviceAccountName:
                 description: ServiceAccountName is the name of the ServiceAccount
-                  to use
+                  to use to run the pods
                 type: string
               serviceScrapeSpec:
                 description: ServiceScrapeSpec that will be added to vmalertmanager
@@ -11488,6 +11758,11 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              useDefaultResources:
+                description: |-
+                  UseDefaultResources controls resource settings
+                  By default, operator sets built-in resource requirements
+                type: boolean
               useStrictSecurity:
                 description: |-
                   UseStrictSecurity enables strict security mode for component
@@ -11495,11 +11770,16 @@ spec:
                   uses non-root user out of the box
                   drops not needed security permissions
                 type: boolean
+              useVMConfigReloader:
+                description: |-
+                  UseVMConfigReloader replaces prometheus-like config-reloader
+                  with vm one. It uses secrets watch instead of file watch
+                  which greatly increases speed of config updates
+                type: boolean
               volumeMounts:
                 description: |-
-                  VolumeMounts allows configuration of additional VolumeMounts on the output StatefulSet definition.
-                  VolumeMounts specified will be appended to other VolumeMounts in the alertmanager container,
-                  that are generated as a result of StorageSpec objects.
+                  VolumeMounts allows configuration of additional VolumeMounts on the output Deployment/StatefulSet definition.
+                  VolumeMounts specified will be appended to other VolumeMounts in the Application container
                 items:
                   description: VolumeMount describes a mounting of a Volume within
                     a container.
@@ -11568,9 +11848,9 @@ spec:
                 type: array
               volumes:
                 description: |-
-                  Volumes allows configuration of additional volumes on the output StatefulSet definition.
-                  Volumes specified will be appended to other volumes that are generated as a result of
-                  StorageSpec objects.
+                  Volumes allows configuration of additional volumes on the output Deployment/StatefulSet definition.
+                  Volumes specified will be appended to other volumes that are generated.
+                  / +optional
                 items:
                   description: Volume represents a named volume in a pod that may
                     be accessed by any container in the pod.
@@ -11617,7 +11897,9 @@ spec:
                           mutually exclusive with CertSecretRef
                         type: string
                       cert_secret_ref:
-                        description: SecretKeySelector selects a key of a Secret.
+                        description: |-
+                          CertSecretRef defines reference for secret with certificate content under given key
+                          mutually exclusive with CertFile
                         properties:
                           key:
                             description: The key of the secret to select from.  Must
@@ -11840,9 +12122,9 @@ spec:
                 x-kubernetes-preserve-unknown-fields: true
               configMaps:
                 description: |-
-                  ConfigMaps is a list of ConfigMaps in the same namespace as the VMAlert
-                  object, which shall be mounted into the VMAlert Pods.
-                  The ConfigMaps are mounted into /etc/vm/configs/<configmap-name>.
+                  ConfigMaps is a list of ConfigMaps in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/configs/CONFIGMAP_NAME folder
                 items:
                   type: string
                 type: array
@@ -11852,6 +12134,67 @@ spec:
                 description: |-
                   ConfigReloaderExtraArgs that will be passed to  VMAuths config-reloader container
                   for example resyncInterval: "30s"
+                type: object
+              configReloaderImageTag:
+                description: ConfigReloaderImageTag defines image:tag for config-reloader
+                  container
+                type: string
+              configReloaderResources:
+                description: |-
+                  ConfigReloaderResources config-reloader container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                  if not defined default resources from operator config will be used
+                properties:
+                  claims:
+                    description: |-
+                      Claims lists the names of resources, defined in spec.resourceClaims,
+                      that are used by this container.
+
+
+                      This is an alpha field and requires enabling the
+                      DynamicResourceAllocation feature gate.
+
+
+                      This field is immutable. It can only be set for containers.
+                    items:
+                      description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                      properties:
+                        name:
+                          description: |-
+                            Name must match the name of one entry in pod.spec.resourceClaims of
+                            the Pod where this field is used. It makes that resource available
+                            inside a container.
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                  limits:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Limits describes the maximum amount of compute resources allowed.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
+                  requests:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Requests describes the minimum amount of compute resources required.
+                      If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                      otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
                 type: object
               containers:
                 description: |-
@@ -11992,6 +12335,12 @@ spec:
                 required:
                 - url
                 type: object
+              disableSelfServiceScrape:
+                description: |-
+                  DisableSelfServiceScrape controls creation of VMServiceScrape by operator
+                  for the application.
+                  Has priority over `VM_DISABLESELFSERVICESCRAPECREATION` operator env variable
+                type: boolean
               dnsConfig:
                 description: |-
                   Specifies the DNS parameters of a pod.
@@ -12061,11 +12410,11 @@ spec:
                 additionalProperties:
                   type: string
                 description: |-
-                  ExtraArgs that will be passed to  VMAlert pod
-                  for example -remoteWrite.tmpDataPath=/tmp
+                  ExtraArgs that will be passed to the application container
+                  for example remoteWrite.tmpDataPath: /tmp
                 type: object
               extraEnvs:
-                description: ExtraEnvs that will be added to VMAlert pod
+                description: ExtraEnvs that will be passed to the application container
                 items:
                   description: EnvVar represents an environment variable present in
                     a Container.
@@ -12090,14 +12439,61 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              host_aliases:
+                description: |-
+                  HostAliasesUnderScore provides mapping for ip and hostname,
+                  that would be propagated to pod,
+                  cannot be used with HostNetwork.
+                  Has Priority over hostAliases field
+                items:
+                  description: |-
+                    HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                    pod's hosts file.
+                  properties:
+                    hostnames:
+                      description: Hostnames for the above IP address.
+                      items:
+                        type: string
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    ip:
+                      description: IP address of the host file entry.
+                      type: string
+                  required:
+                  - ip
+                  type: object
+                type: array
+              hostAliases:
+                description: |-
+                  HostAliases provides mapping for ip and hostname,
+                  that would be propagated to pod,
+                  cannot be used with HostNetwork.
+                items:
+                  description: |-
+                    HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                    pod's hosts file.
+                  properties:
+                    hostnames:
+                      description: Hostnames for the above IP address.
+                      items:
+                        type: string
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    ip:
+                      description: IP address of the host file entry.
+                      type: string
+                  required:
+                  - ip
+                  type: object
+                type: array
               hostNetwork:
                 description: HostNetwork controls whether the pod may use the node
                   network namespace
                 type: boolean
               image:
                 description: |-
-                  Image - docker image settings for VMAlert
-                  if no specified operator uses default config version
+                  Image - docker image settings
+                  if no specified operator uses default version from operator config
                 properties:
                   pullPolicy:
                     description: PullPolicy describes how to pull docker image
@@ -12136,12 +12532,9 @@ spec:
                 type: array
               initContainers:
                 description: |-
-                  InitContainers allows adding initContainers to the pod definition. Those can be used to e.g.
-                  fetch secrets for injection into the VMAlert configuration from external sources. Any
-                  errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-                  Using initContainers for any use case other then secret fetching is entirely outside the scope
-                  of what the maintainers will support and by doing so, you accept that this behaviour may break
-                  at any time without notice.
+                  InitContainers allows adding initContainers to the pod definition.
+                  Any errors during the execution of an initContainer will lead to a restart of the Pod.
+                  More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
                 items:
                   description: A single application container that you want to run
                     within a pod.
@@ -12214,6 +12607,7 @@ spec:
                 description: |-
                   MinReadySeconds defines a minim number os seconds to wait before starting update next pod
                   if previous in healthy state
+                  Has no effect for VLogs and VMSingle
                 format: int32
                 type: integer
               nodeSelector:
@@ -12718,10 +13112,10 @@ spec:
                     type: string
                 type: object
               port:
-                description: Port for listen
+                description: Port listen address
                 type: string
               priorityClassName:
-                description: Priority class assigned to the Pods
+                description: PriorityClassName class assigned to the Pods
                 type: string
               readinessGates:
                 description: ReadinessGates defines pod readiness gates
@@ -13027,14 +13421,13 @@ spec:
                 - url
                 type: object
               replicaCount:
-                description: |-
-                  ReplicaCount is the expected size of the VMAlert cluster. The controller will
-                  eventually make the size of the running cluster equal to the expected
-                  size.
+                description: ReplicaCount is the expected size of the Application.
                 format: int32
                 type: integer
               resources:
-                description: Resources container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                description: |-
+                  Resources container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                  if not defined default resources from operator config will be used
                 properties:
                   claims:
                     description: |-
@@ -13091,7 +13484,8 @@ spec:
               revisionHistoryLimitCount:
                 description: |-
                   The number of old ReplicaSets to retain to allow rollback in deployment or
-                  maximum number of revisions that will be maintained in the StatefulSet's revision history.
+                  maximum number of revisions that will be maintained in the Deployment revision history.
+                  Has no effect at StatefulSets
                   Defaults to 10.
                 format: int32
                 type: integer
@@ -13255,9 +13649,9 @@ spec:
                 type: string
               secrets:
                 description: |-
-                  Secrets is a list of Secrets in the same namespace as the VMAlert
-                  object, which shall be mounted into the VMAlert Pods.
-                  The Secrets are mounted into /etc/vm/secrets/<secret-name>.
+                  Secrets is a list of Secrets in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/secrets/SECRET_NAME folder
                 items:
                   type: string
                 type: array
@@ -13275,9 +13669,8 @@ spec:
                   with selectAllByDefault: false - selects nothing
                 type: boolean
               serviceAccountName:
-                description: |-
-                  ServiceAccountName is the name of the ServiceAccount to use to run the
-                  VMAlert Pods.
+                description: ServiceAccountName is the name of the ServiceAccount
+                  to use to run the pods
                 type: string
               serviceScrapeSpec:
                 description: ServiceScrapeSpec that will be added to vmalert VMServiceScrape
@@ -13405,6 +13798,11 @@ spec:
                 - Recreate
                 - RollingUpdate
                 type: string
+              useDefaultResources:
+                description: |-
+                  UseDefaultResources controls resource settings
+                  By default, operator sets built-in resource requirements
+                type: boolean
               useStrictSecurity:
                 description: |-
                   UseStrictSecurity enables strict security mode for component
@@ -13412,11 +13810,16 @@ spec:
                   uses non-root user out of the box
                   drops not needed security permissions
                 type: boolean
+              useVMConfigReloader:
+                description: |-
+                  UseVMConfigReloader replaces prometheus-like config-reloader
+                  with vm one. It uses secrets watch instead of file watch
+                  which greatly increases speed of config updates
+                type: boolean
               volumeMounts:
                 description: |-
-                  VolumeMounts allows configuration of additional VolumeMounts on the output Deployment definition.
-                  VolumeMounts specified will be appended to other VolumeMounts in the VMAlert container,
-                  that are generated as a result of StorageSpec objects.
+                  VolumeMounts allows configuration of additional VolumeMounts on the output Deployment/StatefulSet definition.
+                  VolumeMounts specified will be appended to other VolumeMounts in the Application container
                 items:
                   description: VolumeMount describes a mounting of a Volume within
                     a container.
@@ -13485,9 +13888,9 @@ spec:
                 type: array
               volumes:
                 description: |-
-                  Volumes allows configuration of additional volumes on the output Deployment definition.
-                  Volumes specified will be appended to other volumes that are generated as a result of
-                  StorageSpec objects.
+                  Volumes allows configuration of additional volumes on the output Deployment/StatefulSet definition.
+                  Volumes specified will be appended to other volumes that are generated.
+                  / +optional
                 items:
                   description: Volume represents a named volume in a pod that may
                     be accessed by any container in the pod.
@@ -13601,8 +14004,9 @@ spec:
                 x-kubernetes-preserve-unknown-fields: true
               configMaps:
                 description: |-
-                  ConfigMaps is a list of ConfigMaps in the same namespace as the VMAuth
-                  object, which shall be mounted into the VMAuth Pods.
+                  ConfigMaps is a list of ConfigMaps in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/configs/CONFIGMAP_NAME folder
                 items:
                   type: string
                 type: array
@@ -13612,6 +14016,67 @@ spec:
                 description: |-
                   ConfigReloaderExtraArgs that will be passed to  VMAuths config-reloader container
                   for example resyncInterval: "30s"
+                type: object
+              configReloaderImageTag:
+                description: ConfigReloaderImageTag defines image:tag for config-reloader
+                  container
+                type: string
+              configReloaderResources:
+                description: |-
+                  ConfigReloaderResources config-reloader container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                  if not defined default resources from operator config will be used
+                properties:
+                  claims:
+                    description: |-
+                      Claims lists the names of resources, defined in spec.resourceClaims,
+                      that are used by this container.
+
+
+                      This is an alpha field and requires enabling the
+                      DynamicResourceAllocation feature gate.
+
+
+                      This field is immutable. It can only be set for containers.
+                    items:
+                      description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                      properties:
+                        name:
+                          description: |-
+                            Name must match the name of one entry in pod.spec.resourceClaims of
+                            the Pod where this field is used. It makes that resource available
+                            inside a container.
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                  limits:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Limits describes the maximum amount of compute resources allowed.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
+                  requests:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Requests describes the minimum amount of compute resources required.
+                      If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                      otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
                 type: object
               configSecret:
                 description: |-
@@ -13640,6 +14105,12 @@ spec:
                 items:
                   type: string
                 type: array
+              disableSelfServiceScrape:
+                description: |-
+                  DisableSelfServiceScrape controls creation of VMServiceScrape by operator
+                  for the application.
+                  Has priority over `VM_DISABLESELFSERVICESCRAPECREATION` operator env variable
+                type: boolean
               discover_backend_ips:
                 description: DiscoverBackendIPs instructs discovering URLPrefix backend
                   IPs via DNS.
@@ -13701,11 +14172,11 @@ spec:
                 additionalProperties:
                   type: string
                 description: |-
-                  ExtraArgs that will be passed to  VMAuth pod
+                  ExtraArgs that will be passed to the application container
                   for example remoteWrite.tmpDataPath: /tmp
                 type: object
               extraEnvs:
-                description: ExtraEnvs that will be added to VMAuth pod
+                description: ExtraEnvs that will be passed to the application container
                 items:
                   description: EnvVar represents an environment variable present in
                     a Container.
@@ -13740,6 +14211,30 @@ spec:
                 items:
                   type: string
                 type: array
+              host_aliases:
+                description: |-
+                  HostAliasesUnderScore provides mapping for ip and hostname,
+                  that would be propagated to pod,
+                  cannot be used with HostNetwork.
+                  Has Priority over hostAliases field
+                items:
+                  description: |-
+                    HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                    pod's hosts file.
+                  properties:
+                    hostnames:
+                      description: Hostnames for the above IP address.
+                      items:
+                        type: string
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    ip:
+                      description: IP address of the host file entry.
+                      type: string
+                  required:
+                  - ip
+                  type: object
+                type: array
               hostAliases:
                 description: |-
                   HostAliases provides mapping for ip and hostname,
@@ -13769,8 +14264,8 @@ spec:
                 type: boolean
               image:
                 description: |-
-                  Image - docker image settings for VMAuth
-                  if no specified operator uses default config version
+                  Image - docker image settings
+                  if no specified operator uses default version from operator config
                 properties:
                   pullPolicy:
                     description: PullPolicy describes how to pull docker image
@@ -14037,12 +14532,9 @@ spec:
                 type: object
               initContainers:
                 description: |-
-                  InitContainers allows adding initContainers to the pod definition. Those can be used to e.g.
-                  fetch secrets for injection into the vmSingle configuration from external sources. Any
-                  errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-                  Using initContainers for any use case other then secret fetching is entirely outside the scope
-                  of what the maintainers will support and by doing so, you accept that this behaviour may break
-                  at any time without notice.
+                  InitContainers allows adding initContainers to the pod definition.
+                  Any errors during the execution of an initContainer will lead to a restart of the Pod.
+                  More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
                 items:
                   description: A single application container that you want to run
                     within a pod.
@@ -14142,6 +14634,7 @@ spec:
                 description: |-
                   MinReadySeconds defines a minim number os seconds to wait before starting update next pod
                   if previous in healthy state
+                  Has no effect for VLogs and VMSingle
                 format: int32
                 type: integer
               nodeSelector:
@@ -14219,10 +14712,10 @@ spec:
                     type: string
                 type: object
               port:
-                description: Port listen port
+                description: Port listen address
                 type: string
               priorityClassName:
-                description: PriorityClassName assigned to the Pods
+                description: PriorityClassName class assigned to the Pods
                 type: string
               readinessGates:
                 description: ReadinessGates defines pod readiness gates
@@ -14242,7 +14735,7 @@ spec:
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
               replicaCount:
-                description: ReplicaCount is the expected size of the VMAuth
+                description: ReplicaCount is the expected size of the Application.
                 format: int32
                 type: integer
               resources:
@@ -14322,7 +14815,8 @@ spec:
               revisionHistoryLimitCount:
                 description: |-
                   The number of old ReplicaSets to retain to allow rollback in deployment or
-                  maximum number of revisions that will be maintained in the StatefulSet's revision history.
+                  maximum number of revisions that will be maintained in the Deployment revision history.
+                  Has no effect at StatefulSets
                   Defaults to 10.
                 format: int32
                 type: integer
@@ -14336,8 +14830,9 @@ spec:
                 type: string
               secrets:
                 description: |-
-                  Secrets is a list of Secrets in the same namespace as the VMAuth
-                  object, which shall be mounted into the VMAuth Pods.
+                  Secrets is a list of Secrets in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/secrets/SECRET_NAME folder
                 items:
                   type: string
                 type: array
@@ -14355,9 +14850,8 @@ spec:
                   with selectAllByDefault: false - selects nothing
                 type: boolean
               serviceAccountName:
-                description: |-
-                  ServiceAccountName is the name of the ServiceAccount to use to run the
-                  VMAuth Pods.
+                description: ServiceAccountName is the name of the ServiceAccount
+                  to use to run the pods
                 type: string
               serviceScrapeSpec:
                 description: ServiceScrapeSpec that will be added to vmauth VMServiceScrape
@@ -14720,12 +15214,23 @@ spec:
                       type: array
                   type: object
                 type: array
+              useDefaultResources:
+                description: |-
+                  UseDefaultResources controls resource settings
+                  By default, operator sets built-in resource requirements
+                type: boolean
               useStrictSecurity:
                 description: |-
                   UseStrictSecurity enables strict security mode for component
                   it restricts disk writes access
                   uses non-root user out of the box
                   drops not needed security permissions
+                type: boolean
+              useVMConfigReloader:
+                description: |-
+                  UseVMConfigReloader replaces prometheus-like config-reloader
+                  with vm one. It uses secrets watch instead of file watch
+                  which greatly increases speed of config updates
                 type: boolean
               userNamespaceSelector:
                 description: |-
@@ -14830,9 +15335,8 @@ spec:
                 x-kubernetes-map-type: atomic
               volumeMounts:
                 description: |-
-                  VolumeMounts allows configuration of additional VolumeMounts on the output Deployment definition.
-                  VolumeMounts specified will be appended to other VolumeMounts in the VMAuth container,
-                  that are generated as a result of StorageSpec objects.
+                  VolumeMounts allows configuration of additional VolumeMounts on the output Deployment/StatefulSet definition.
+                  VolumeMounts specified will be appended to other VolumeMounts in the Application container
                 items:
                   description: VolumeMount describes a mounting of a Volume within
                     a container.
@@ -14901,9 +15405,9 @@ spec:
                 type: array
               volumes:
                 description: |-
-                  Volumes allows configuration of additional volumes on the output deploy definition.
-                  Volumes specified will be appended to other volumes that are generated as a result of
-                  StorageSpec objects.
+                  Volumes allows configuration of additional volumes on the output Deployment/StatefulSet definition.
+                  Volumes specified will be appended to other volumes that are generated.
+                  / +optional
                 items:
                   description: Volume represents a named volume in a pod that may
                     be accessed by any container in the pod.
@@ -15003,6 +15507,12 @@ spec:
           spec:
             description: VMClusterSpec defines the desired state of VMCluster
             properties:
+              clusterDomainName:
+                description: |-
+                  ClusterDomainName defines domain name suffix for in-cluster dns addresses
+                  aka .cluster.local
+                  used by vminsert and vmselect to build vmstorage address
+                type: string
               clusterVersion:
                 description: |-
                   ClusterVersion defines default images tag for all components.
@@ -15115,9 +15625,9 @@ spec:
                     type: string
                   configMaps:
                     description: |-
-                      ConfigMaps is a list of ConfigMaps in the same namespace as the VMInsert
-                      object, which shall be mounted into the VMInsert Pods.
-                      The ConfigMaps are mounted into /etc/vm/configs/<configmap-name>.
+                      ConfigMaps is a list of ConfigMaps in the same namespace as the Application
+                      object, which shall be mounted into the Application container
+                      at /etc/vm/configs/CONFIGMAP_NAME folder
                     items:
                       type: string
                     type: array
@@ -15133,6 +15643,12 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  disableSelfServiceScrape:
+                    description: |-
+                      DisableSelfServiceScrape controls creation of VMServiceScrape by operator
+                      for the application.
+                      Has priority over `VM_DISABLESELFSERVICESCRAPECREATION` operator env variable
+                    type: boolean
                   dnsConfig:
                     description: |-
                       Specifies the DNS parameters of a pod.
@@ -15184,9 +15700,13 @@ spec:
                   extraArgs:
                     additionalProperties:
                       type: string
+                    description: |-
+                      ExtraArgs that will be passed to the application container
+                      for example remoteWrite.tmpDataPath: /tmp
                     type: object
                   extraEnvs:
-                    description: ExtraEnvs that will be added to VMInsert pod
+                    description: ExtraEnvs that will be passed to the application
+                      container
                     items:
                       description: EnvVar represents an environment variable present
                         in a Container.
@@ -15212,6 +15732,53 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  host_aliases:
+                    description: |-
+                      HostAliasesUnderScore provides mapping for ip and hostname,
+                      that would be propagated to pod,
+                      cannot be used with HostNetwork.
+                      Has Priority over hostAliases field
+                    items:
+                      description: |-
+                        HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                        pod's hosts file.
+                      properties:
+                        hostnames:
+                          description: Hostnames for the above IP address.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
+                        ip:
+                          description: IP address of the host file entry.
+                          type: string
+                      required:
+                      - ip
+                      type: object
+                    type: array
+                  hostAliases:
+                    description: |-
+                      HostAliases provides mapping for ip and hostname,
+                      that would be propagated to pod,
+                      cannot be used with HostNetwork.
+                    items:
+                      description: |-
+                        HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                        pod's hosts file.
+                      properties:
+                        hostnames:
+                          description: Hostnames for the above IP address.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
+                        ip:
+                          description: IP address of the host file entry.
+                          type: string
+                      required:
+                      - ip
+                      type: object
+                    type: array
                   hostNetwork:
                     description: HostNetwork controls whether the pod may use the
                       node network namespace
@@ -15222,7 +15789,9 @@ spec:
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
                   image:
-                    description: Image - docker image settings for VMInsert
+                    description: |-
+                      Image - docker image settings
+                      if no specified operator uses default version from operator config
                     properties:
                       pullPolicy:
                         description: PullPolicy describes how to pull docker image
@@ -15235,14 +15804,35 @@ spec:
                         description: Tag contains desired docker image version
                         type: string
                     type: object
+                  imagePullSecrets:
+                    description: |-
+                      ImagePullSecrets An optional list of references to secrets in the same namespace
+                      to use for pulling images from registries
+                      see https://kubernetes.io/docs/concepts/containers/images/#referring-to-an-imagepullsecrets-on-a-pod
+                    items:
+                      description: |-
+                        LocalObjectReference contains enough information to let you locate the
+                        referenced object inside the same namespace.
+                      properties:
+                        name:
+                          default: ""
+                          description: |-
+                            Name of the referent.
+                            This field is effectively required, but due to backwards compatibility is
+                            allowed to be empty. Instances of this type with an empty value here are
+                            almost certainly wrong.
+                            TODO: Add other useful fields. apiVersion, kind, uid?
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
                   initContainers:
                     description: |-
-                      InitContainers allows adding initContainers to the pod definition. Those can be used to e.g.
-                      fetch secrets for injection into the VMInsert configuration from external sources. Any
-                      errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-                      Using initContainers for any use case other then secret fetching is entirely outside the scope
-                      of what the maintainers will support and by doing so, you accept that this behaviour may break
-                      at any time without notice.
+                      InitContainers allows adding initContainers to the pod definition.
+                      Any errors during the execution of an initContainer will lead to a restart of the Pod.
+                      More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
                     items:
                       description: A single application container that you want to
                         run within a pod.
@@ -15292,6 +15882,7 @@ spec:
                     description: |-
                       MinReadySeconds defines a minim number os seconds to wait before starting update next pod
                       if previous in healthy state
+                      Has no effect for VLogs and VMSingle
                     format: int32
                     type: integer
                   nodeSelector:
@@ -15300,6 +15891,11 @@ spec:
                     description: NodeSelector Define which Nodes the Pods are scheduled
                       on.
                     type: object
+                  paused:
+                    description: |-
+                      Paused If set to true all actions on the underlying managed objects are not
+                      going to be performed, except for delete actions.
+                    type: boolean
                   podDisruptionBudget:
                     description: PodDisruptionBudget created by operator
                     properties:
@@ -15364,10 +15960,10 @@ spec:
                         type: string
                     type: object
                   port:
-                    description: Port listen port
+                    description: Port listen address
                     type: string
                   priorityClassName:
-                    description: Priority class assigned to the Pods
+                    description: PriorityClassName class assigned to the Pods
                     type: string
                   readinessGates:
                     description: ReadinessGates defines pod readiness gates
@@ -15388,15 +15984,13 @@ spec:
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
                   replicaCount:
-                    description: |-
-                      ReplicaCount is the expected size of the VMInsert cluster. The controller will
-                      eventually make the size of the running cluster equal to the expected
-                      size.
+                    description: ReplicaCount is the expected size of the Application.
                     format: int32
                     type: integer
                   resources:
-                    description: Resources container resource request and limits,
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    description: |-
+                      Resources container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                      if not defined default resources from operator config will be used
                     properties:
                       claims:
                         description: |-
@@ -15453,7 +16047,8 @@ spec:
                   revisionHistoryLimitCount:
                     description: |-
                       The number of old ReplicaSets to retain to allow rollback in deployment or
-                      maximum number of revisions that will be maintained in the StatefulSet's revision history.
+                      maximum number of revisions that will be maintained in the Deployment revision history.
+                      Has no effect at StatefulSets
                       Defaults to 10.
                     format: int32
                     type: integer
@@ -15504,9 +16099,9 @@ spec:
                     type: string
                   secrets:
                     description: |-
-                      Secrets is a list of Secrets in the same namespace as the VMInsert
-                      object, which shall be mounted into the VMInsert Pods.
-                      The Secrets are mounted into /etc/vm/secrets/<secret-name>.
+                      Secrets is a list of Secrets in the same namespace as the Application
+                      object, which shall be mounted into the Application container
+                      at /etc/vm/secrets/SECRET_NAME folder
                     items:
                       type: string
                     type: array
@@ -15516,6 +16111,10 @@ spec:
                       This defaults to the default PodSecurityContext.
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
+                  serviceAccountName:
+                    description: ServiceAccountName is the name of the ServiceAccount
+                      to use to run the pods
+                    type: string
                   serviceScrapeSpec:
                     description: ServiceScrapeSpec that will be added to vminsert
                       VMServiceScrape spec
@@ -15643,11 +16242,22 @@ spec:
                     - Recreate
                     - RollingUpdate
                     type: string
+                  useDefaultResources:
+                    description: |-
+                      UseDefaultResources controls resource settings
+                      By default, operator sets built-in resource requirements
+                    type: boolean
+                  useStrictSecurity:
+                    description: |-
+                      UseStrictSecurity enables strict security mode for component
+                      it restricts disk writes access
+                      uses non-root user out of the box
+                      drops not needed security permissions
+                    type: boolean
                   volumeMounts:
                     description: |-
-                      VolumeMounts allows configuration of additional VolumeMounts on the output Deployment definition.
-                      VolumeMounts specified will be appended to other VolumeMounts in the VMInsert container,
-                      that are generated as a result of StorageSpec objects.
+                      VolumeMounts allows configuration of additional VolumeMounts on the output Deployment/StatefulSet definition.
+                      VolumeMounts specified will be appended to other VolumeMounts in the Application container
                     items:
                       description: VolumeMount describes a mounting of a Volume within
                         a container.
@@ -15716,9 +16326,9 @@ spec:
                     type: array
                   volumes:
                     description: |-
-                      Volumes allows configuration of additional volumes on the output Deployment definition.
-                      Volumes specified will be appended to other volumes that are generated as a result of
-                      StorageSpec objects.
+                      Volumes allows configuration of additional volumes on the output Deployment/StatefulSet definition.
+                      Volumes specified will be appended to other volumes that are generated.
+                      / +optional
                     items:
                       description: Volume represents a named volume in a pod that
                         may be accessed by any container in the pod.
@@ -15727,8 +16337,6 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
-                required:
-                - replicaCount
                 type: object
               vmselect:
                 properties:
@@ -16168,9 +16776,9 @@ spec:
                     type: string
                   configMaps:
                     description: |-
-                      ConfigMaps is a list of ConfigMaps in the same namespace as the VMSelect
-                      object, which shall be mounted into the VMSelect Pods.
-                      The ConfigMaps are mounted into /etc/vm/configs/<configmap-name>.
+                      ConfigMaps is a list of ConfigMaps in the same namespace as the Application
+                      object, which shall be mounted into the Application container
+                      at /etc/vm/configs/CONFIGMAP_NAME folder
                     items:
                       type: string
                     type: array
@@ -16186,6 +16794,12 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  disableSelfServiceScrape:
+                    description: |-
+                      DisableSelfServiceScrape controls creation of VMServiceScrape by operator
+                      for the application.
+                      Has priority over `VM_DISABLESELFSERVICESCRAPECREATION` operator env variable
+                    type: boolean
                   dnsConfig:
                     description: |-
                       Specifies the DNS parameters of a pod.
@@ -16237,9 +16851,13 @@ spec:
                   extraArgs:
                     additionalProperties:
                       type: string
+                    description: |-
+                      ExtraArgs that will be passed to the application container
+                      for example remoteWrite.tmpDataPath: /tmp
                     type: object
                   extraEnvs:
-                    description: ExtraEnvs that will be added to VMSelect pod
+                    description: ExtraEnvs that will be passed to the application
+                      container
                     items:
                       description: EnvVar represents an environment variable present
                         in a Container.
@@ -16265,6 +16883,53 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  host_aliases:
+                    description: |-
+                      HostAliasesUnderScore provides mapping for ip and hostname,
+                      that would be propagated to pod,
+                      cannot be used with HostNetwork.
+                      Has Priority over hostAliases field
+                    items:
+                      description: |-
+                        HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                        pod's hosts file.
+                      properties:
+                        hostnames:
+                          description: Hostnames for the above IP address.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
+                        ip:
+                          description: IP address of the host file entry.
+                          type: string
+                      required:
+                      - ip
+                      type: object
+                    type: array
+                  hostAliases:
+                    description: |-
+                      HostAliases provides mapping for ip and hostname,
+                      that would be propagated to pod,
+                      cannot be used with HostNetwork.
+                    items:
+                      description: |-
+                        HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                        pod's hosts file.
+                      properties:
+                        hostnames:
+                          description: Hostnames for the above IP address.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
+                        ip:
+                          description: IP address of the host file entry.
+                          type: string
+                      required:
+                      - ip
+                      type: object
+                    type: array
                   hostNetwork:
                     description: HostNetwork controls whether the pod may use the
                       node network namespace
@@ -16276,7 +16941,9 @@ spec:
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
                   image:
-                    description: Image - docker image settings for VMSelect
+                    description: |-
+                      Image - docker image settings
+                      if no specified operator uses default version from operator config
                     properties:
                       pullPolicy:
                         description: PullPolicy describes how to pull docker image
@@ -16289,14 +16956,35 @@ spec:
                         description: Tag contains desired docker image version
                         type: string
                     type: object
+                  imagePullSecrets:
+                    description: |-
+                      ImagePullSecrets An optional list of references to secrets in the same namespace
+                      to use for pulling images from registries
+                      see https://kubernetes.io/docs/concepts/containers/images/#referring-to-an-imagepullsecrets-on-a-pod
+                    items:
+                      description: |-
+                        LocalObjectReference contains enough information to let you locate the
+                        referenced object inside the same namespace.
+                      properties:
+                        name:
+                          default: ""
+                          description: |-
+                            Name of the referent.
+                            This field is effectively required, but due to backwards compatibility is
+                            allowed to be empty. Instances of this type with an empty value here are
+                            almost certainly wrong.
+                            TODO: Add other useful fields. apiVersion, kind, uid?
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
                   initContainers:
                     description: |-
-                      InitContainers allows adding initContainers to the pod definition. Those can be used to e.g.
-                      fetch secrets for injection into the VMSelect configuration from external sources. Any
-                      errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-                      Using initContainers for any use case other then secret fetching is entirely outside the scope
-                      of what the maintainers will support and by doing so, you accept that this behaviour may break
-                      at any time without notice.
+                      InitContainers allows adding initContainers to the pod definition.
+                      Any errors during the execution of an initContainer will lead to a restart of the Pod.
+                      More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
                     items:
                       description: A single application container that you want to
                         run within a pod.
@@ -16330,6 +17018,7 @@ spec:
                     description: |-
                       MinReadySeconds defines a minim number os seconds to wait before starting update next pod
                       if previous in healthy state
+                      Has no effect for VLogs and VMSingle
                     format: int32
                     type: integer
                   nodeSelector:
@@ -16338,6 +17027,11 @@ spec:
                     description: NodeSelector Define which Nodes the Pods are scheduled
                       on.
                     type: object
+                  paused:
+                    description: |-
+                      Paused If set to true all actions on the underlying managed objects are not
+                      going to be performed, except for delete actions.
+                    type: boolean
                   persistentVolume:
                     description: |-
                       Storage - add persistent volume for cacheMountPath
@@ -16444,10 +17138,10 @@ spec:
                         type: string
                     type: object
                   port:
-                    description: Port listen port
+                    description: Port listen address
                     type: string
                   priorityClassName:
-                    description: Priority class assigned to the Pods
+                    description: PriorityClassName class assigned to the Pods
                     type: string
                   readinessGates:
                     description: ReadinessGates defines pod readiness gates
@@ -16468,15 +17162,13 @@ spec:
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
                   replicaCount:
-                    description: |-
-                      ReplicaCount is the expected size of the VMSelect cluster. The controller will
-                      eventually make the size of the running cluster equal to the expected
-                      size.
+                    description: ReplicaCount is the expected size of the Application.
                     format: int32
                     type: integer
                   resources:
-                    description: Resources container resource request and limits,
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    description: |-
+                      Resources container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                      if not defined default resources from operator config will be used
                     properties:
                       claims:
                         description: |-
@@ -16533,7 +17225,8 @@ spec:
                   revisionHistoryLimitCount:
                     description: |-
                       The number of old ReplicaSets to retain to allow rollback in deployment or
-                      maximum number of revisions that will be maintained in the StatefulSet's revision history.
+                      maximum number of revisions that will be maintained in the Deployment revision history.
+                      Has no effect at StatefulSets
                       Defaults to 10.
                     format: int32
                     type: integer
@@ -16553,9 +17246,9 @@ spec:
                     type: string
                   secrets:
                     description: |-
-                      Secrets is a list of Secrets in the same namespace as the VMSelect
-                      object, which shall be mounted into the VMSelect Pods.
-                      The Secrets are mounted into /etc/vm/secrets/<secret-name>.
+                      Secrets is a list of Secrets in the same namespace as the Application
+                      object, which shall be mounted into the Application container
+                      at /etc/vm/secrets/SECRET_NAME folder
                     items:
                       type: string
                     type: array
@@ -16565,6 +17258,10 @@ spec:
                       This defaults to the default PodSecurityContext.
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
+                  serviceAccountName:
+                    description: ServiceAccountName is the name of the ServiceAccount
+                      to use to run the pods
+                    type: string
                   serviceScrapeSpec:
                     description: ServiceScrapeSpec that will be added to vmselect
                       VMServiceScrape spec
@@ -17168,11 +17865,22 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  useDefaultResources:
+                    description: |-
+                      UseDefaultResources controls resource settings
+                      By default, operator sets built-in resource requirements
+                    type: boolean
+                  useStrictSecurity:
+                    description: |-
+                      UseStrictSecurity enables strict security mode for component
+                      it restricts disk writes access
+                      uses non-root user out of the box
+                      drops not needed security permissions
+                    type: boolean
                   volumeMounts:
                     description: |-
-                      VolumeMounts allows configuration of additional VolumeMounts on the output Deployment definition.
-                      VolumeMounts specified will be appended to other VolumeMounts in the VMSelect container,
-                      that are generated as a result of StorageSpec objects.
+                      VolumeMounts allows configuration of additional VolumeMounts on the output Deployment/StatefulSet definition.
+                      VolumeMounts specified will be appended to other VolumeMounts in the Application container
                     items:
                       description: VolumeMount describes a mounting of a Volume within
                         a container.
@@ -17241,9 +17949,9 @@ spec:
                     type: array
                   volumes:
                     description: |-
-                      Volumes allows configuration of additional volumes on the output Deployment definition.
-                      Volumes specified will be appended to other volumes that are generated as a result of
-                      StorageSpec objects.
+                      Volumes allows configuration of additional volumes on the output Deployment/StatefulSet definition.
+                      Volumes specified will be appended to other volumes that are generated.
+                      / +optional
                     items:
                       description: Volume represents a named volume in a pod that
                         may be accessed by any container in the pod.
@@ -17252,8 +17960,6 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
-                required:
-                - replicaCount
                 type: object
               vmstorage:
                 properties:
@@ -17683,9 +18389,9 @@ spec:
                     type: array
                   configMaps:
                     description: |-
-                      ConfigMaps is a list of ConfigMaps in the same namespace as the VMStorage
-                      object, which shall be mounted into the VMStorage Pods.
-                      The ConfigMaps are mounted into /etc/vm/configs/<configmap-name>.
+                      ConfigMaps is a list of ConfigMaps in the same namespace as the Application
+                      object, which shall be mounted into the Application container
+                      at /etc/vm/configs/CONFIGMAP_NAME folder
                     items:
                       type: string
                     type: array
@@ -17701,6 +18407,12 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  disableSelfServiceScrape:
+                    description: |-
+                      DisableSelfServiceScrape controls creation of VMServiceScrape by operator
+                      for the application.
+                      Has priority over `VM_DISABLESELFSERVICESCRAPECREATION` operator env variable
+                    type: boolean
                   dnsConfig:
                     description: |-
                       Specifies the DNS parameters of a pod.
@@ -17752,9 +18464,13 @@ spec:
                   extraArgs:
                     additionalProperties:
                       type: string
+                    description: |-
+                      ExtraArgs that will be passed to the application container
+                      for example remoteWrite.tmpDataPath: /tmp
                     type: object
                   extraEnvs:
-                    description: ExtraEnvs that will be added to VMStorage pod
+                    description: ExtraEnvs that will be passed to the application
+                      container
                     items:
                       description: EnvVar represents an environment variable present
                         in a Container.
@@ -17780,12 +18496,61 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  host_aliases:
+                    description: |-
+                      HostAliasesUnderScore provides mapping for ip and hostname,
+                      that would be propagated to pod,
+                      cannot be used with HostNetwork.
+                      Has Priority over hostAliases field
+                    items:
+                      description: |-
+                        HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                        pod's hosts file.
+                      properties:
+                        hostnames:
+                          description: Hostnames for the above IP address.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
+                        ip:
+                          description: IP address of the host file entry.
+                          type: string
+                      required:
+                      - ip
+                      type: object
+                    type: array
+                  hostAliases:
+                    description: |-
+                      HostAliases provides mapping for ip and hostname,
+                      that would be propagated to pod,
+                      cannot be used with HostNetwork.
+                    items:
+                      description: |-
+                        HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                        pod's hosts file.
+                      properties:
+                        hostnames:
+                          description: Hostnames for the above IP address.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
+                        ip:
+                          description: IP address of the host file entry.
+                          type: string
+                      required:
+                      - ip
+                      type: object
+                    type: array
                   hostNetwork:
                     description: HostNetwork controls whether the pod may use the
                       node network namespace
                     type: boolean
                   image:
-                    description: Image - docker image settings for VMStorage
+                    description: |-
+                      Image - docker image settings
+                      if no specified operator uses default version from operator config
                     properties:
                       pullPolicy:
                         description: PullPolicy describes how to pull docker image
@@ -17798,14 +18563,35 @@ spec:
                         description: Tag contains desired docker image version
                         type: string
                     type: object
+                  imagePullSecrets:
+                    description: |-
+                      ImagePullSecrets An optional list of references to secrets in the same namespace
+                      to use for pulling images from registries
+                      see https://kubernetes.io/docs/concepts/containers/images/#referring-to-an-imagepullsecrets-on-a-pod
+                    items:
+                      description: |-
+                        LocalObjectReference contains enough information to let you locate the
+                        referenced object inside the same namespace.
+                      properties:
+                        name:
+                          default: ""
+                          description: |-
+                            Name of the referent.
+                            This field is effectively required, but due to backwards compatibility is
+                            allowed to be empty. Instances of this type with an empty value here are
+                            almost certainly wrong.
+                            TODO: Add other useful fields. apiVersion, kind, uid?
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
                   initContainers:
                     description: |-
-                      InitContainers allows adding initContainers to the pod definition. Those can be used to e.g.
-                      fetch secrets for injection into the VMStorage configuration from external sources. Any
-                      errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-                      Using initContainers for any use case other then secret fetching is entirely outside the scope
-                      of what the maintainers will support and by doing so, you accept that this behaviour may break
-                      at any time without notice.
+                      InitContainers allows adding initContainers to the pod definition.
+                      Any errors during the execution of an initContainer will lead to a restart of the Pod.
+                      More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
                     items:
                       description: A single application container that you want to
                         run within a pod.
@@ -17856,6 +18642,7 @@ spec:
                     description: |-
                       MinReadySeconds defines a minim number os seconds to wait before starting update next pod
                       if previous in healthy state
+                      Has no effect for VLogs and VMSingle
                     format: int32
                     type: integer
                   nodeSelector:
@@ -17864,6 +18651,11 @@ spec:
                     description: NodeSelector Define which Nodes the Pods are scheduled
                       on.
                     type: object
+                  paused:
+                    description: |-
+                      Paused If set to true all actions on the underlying managed objects are not
+                      going to be performed, except for delete actions.
+                    type: boolean
                   podDisruptionBudget:
                     description: PodDisruptionBudget created by operator
                     properties:
@@ -17928,10 +18720,10 @@ spec:
                         type: string
                     type: object
                   port:
-                    description: Port for health check connetions
+                    description: Port listen address
                     type: string
                   priorityClassName:
-                    description: Priority class assigned to the Pods
+                    description: PriorityClassName class assigned to the Pods
                     type: string
                   readinessGates:
                     description: ReadinessGates defines pod readiness gates
@@ -17952,15 +18744,13 @@ spec:
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
                   replicaCount:
-                    description: |-
-                      ReplicaCount is the expected size of the VMStorage cluster. The controller will
-                      eventually make the size of the running cluster equal to the expected
-                      size.
+                    description: ReplicaCount is the expected size of the Application.
                     format: int32
                     type: integer
                   resources:
-                    description: Resources container resource request and limits,
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    description: |-
+                      Resources container resource request and limits, https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                      if not defined default resources from operator config will be used
                     properties:
                       claims:
                         description: |-
@@ -18017,7 +18807,8 @@ spec:
                   revisionHistoryLimitCount:
                     description: |-
                       The number of old ReplicaSets to retain to allow rollback in deployment or
-                      maximum number of revisions that will be maintained in the StatefulSet's revision history.
+                      maximum number of revisions that will be maintained in the Deployment revision history.
+                      Has no effect at StatefulSets
                       Defaults to 10.
                     format: int32
                     type: integer
@@ -18037,9 +18828,9 @@ spec:
                     type: string
                   secrets:
                     description: |-
-                      Secrets is a list of Secrets in the same namespace as the VMStorage
-                      object, which shall be mounted into the VMStorage Pods.
-                      The Secrets are mounted into /etc/vm/secrets/<secret-name>.
+                      Secrets is a list of Secrets in the same namespace as the Application
+                      object, which shall be mounted into the Application container
+                      at /etc/vm/secrets/SECRET_NAME folder
                     items:
                       type: string
                     type: array
@@ -18049,6 +18840,10 @@ spec:
                       This defaults to the default PodSecurityContext.
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
+                  serviceAccountName:
+                    description: ServiceAccountName is the name of the ServiceAccount
+                      to use to run the pods
+                    type: string
                   serviceScrapeSpec:
                     description: ServiceScrapeSpec that will be added to vmstorage
                       VMServiceScrape spec
@@ -18214,6 +19009,18 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  useDefaultResources:
+                    description: |-
+                      UseDefaultResources controls resource settings
+                      By default, operator sets built-in resource requirements
+                    type: boolean
+                  useStrictSecurity:
+                    description: |-
+                      UseStrictSecurity enables strict security mode for component
+                      it restricts disk writes access
+                      uses non-root user out of the box
+                      drops not needed security permissions
+                    type: boolean
                   vmBackup:
                     description: VMBackup configuration for backup
                     properties:
@@ -18603,9 +19410,8 @@ spec:
                     type: string
                   volumeMounts:
                     description: |-
-                      VolumeMounts allows configuration of additional VolumeMounts on the output Deployment definition.
-                      VolumeMounts specified will be appended to other VolumeMounts in the VMStorage container,
-                      that are generated as a result of StorageSpec objects.
+                      VolumeMounts allows configuration of additional VolumeMounts on the output Deployment/StatefulSet definition.
+                      VolumeMounts specified will be appended to other VolumeMounts in the Application container
                     items:
                       description: VolumeMount describes a mounting of a Volume within
                         a container.
@@ -18674,9 +19480,9 @@ spec:
                     type: array
                   volumes:
                     description: |-
-                      Volumes allows configuration of additional volumes on the output Deployment definition.
-                      Volumes specified will be appended to other volumes that are generated as a result of
-                      StorageSpec objects.
+                      Volumes allows configuration of additional volumes on the output Deployment/StatefulSet definition.
+                      Volumes specified will be appended to other volumes that are generated.
+                      / +optional
                     items:
                       description: Volume represents a named volume in a pod that
                         may be accessed by any container in the pod.
@@ -18685,8 +19491,6 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
-                required:
-                - replicaCount
                 type: object
             required:
             - retentionPeriod
@@ -27633,8 +28437,9 @@ spec:
                 x-kubernetes-preserve-unknown-fields: true
               configMaps:
                 description: |-
-                  ConfigMaps is a list of ConfigMaps in the same namespace as the VMSingle
-                  object, which shall be mounted into the VMSingle Pods.
+                  ConfigMaps is a list of ConfigMaps in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/configs/CONFIGMAP_NAME folder
                 items:
                   type: string
                 type: array
@@ -27650,6 +28455,12 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              disableSelfServiceScrape:
+                description: |-
+                  DisableSelfServiceScrape controls creation of VMServiceScrape by operator
+                  for the application.
+                  Has priority over `VM_DISABLESELFSERVICESCRAPECREATION` operator env variable
+                type: boolean
               dnsConfig:
                 description: |-
                   Specifies the DNS parameters of a pod.
@@ -27702,11 +28513,11 @@ spec:
                 additionalProperties:
                   type: string
                 description: |-
-                  ExtraArgs that will be passed to  VMSingle pod
+                  ExtraArgs that will be passed to the application container
                   for example remoteWrite.tmpDataPath: /tmp
                 type: object
               extraEnvs:
-                description: ExtraEnvs that will be added to VMSingle pod
+                description: ExtraEnvs that will be passed to the application container
                 items:
                   description: EnvVar represents an environment variable present in
                     a Container.
@@ -27730,6 +28541,30 @@ spec:
                   - name
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
+                type: array
+              host_aliases:
+                description: |-
+                  HostAliasesUnderScore provides mapping for ip and hostname,
+                  that would be propagated to pod,
+                  cannot be used with HostNetwork.
+                  Has Priority over hostAliases field
+                items:
+                  description: |-
+                    HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                    pod's hosts file.
+                  properties:
+                    hostnames:
+                      description: Hostnames for the above IP address.
+                      items:
+                        type: string
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    ip:
+                      description: IP address of the host file entry.
+                      type: string
+                  required:
+                  - ip
+                  type: object
                 type: array
               hostAliases:
                 description: |-
@@ -27760,8 +28595,8 @@ spec:
                 type: boolean
               image:
                 description: |-
-                  Image - docker image settings for VMSingle
-                  if no specified operator uses default config version
+                  Image - docker image settings
+                  if no specified operator uses default version from operator config
                 properties:
                   pullPolicy:
                     description: PullPolicy describes how to pull docker image
@@ -27800,12 +28635,9 @@ spec:
                 type: array
               initContainers:
                 description: |-
-                  InitContainers allows adding initContainers to the pod definition. Those can be used to e.g.
-                  fetch secrets for injection into the vmSingle configuration from external sources. Any
-                  errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-                  Using initContainers for any use case other then secret fetching is entirely outside the scope
-                  of what the maintainers will support and by doing so, you accept that this behaviour may break
-                  at any time without notice.
+                  InitContainers allows adding initContainers to the pod definition.
+                  Any errors during the execution of an initContainer will lead to a restart of the Pod.
+                  More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
                 items:
                   description: A single application container that you want to run
                     within a pod.
@@ -27889,6 +28721,13 @@ spec:
                 - FATAL
                 - PANIC
                 type: string
+              minReadySeconds:
+                description: |-
+                  MinReadySeconds defines a minim number os seconds to wait before starting update next pod
+                  if previous in healthy state
+                  Has no effect for VLogs and VMSingle
+                format: int32
+                type: integer
               nodeSelector:
                 additionalProperties:
                   type: string
@@ -27933,10 +28772,10 @@ spec:
                     type: string
                 type: object
               port:
-                description: Port listen port
+                description: Port listen address
                 type: string
               priorityClassName:
-                description: PriorityClassName assigned to the Pods
+                description: PriorityClassName class assigned to the Pods
                 type: string
               readinessGates:
                 description: ReadinessGates defines pod readiness gates
@@ -27958,14 +28797,11 @@ spec:
               removePvcAfterDelete:
                 description: |-
                   RemovePvcAfterDelete - if true, controller adds ownership to pvc
-                  and after VMSingle objest deletion - pvc will be garbage collected
+                  and after VMSingle object deletion - pvc will be garbage collected
                   by controller manager
                 type: boolean
               replicaCount:
-                description: |-
-                  ReplicaCount is the expected size of the VMSingle
-                  it can be 0 or 1
-                  if you need more - use vm cluster
+                description: ReplicaCount is the expected size of the Application.
                 format: int32
                 type: integer
               resources:
@@ -28035,7 +28871,8 @@ spec:
               revisionHistoryLimitCount:
                 description: |-
                   The number of old ReplicaSets to retain to allow rollback in deployment or
-                  maximum number of revisions that will be maintained in the StatefulSet's revision history.
+                  maximum number of revisions that will be maintained in the Deployment revision history.
+                  Has no effect at StatefulSets
                   Defaults to 10.
                 format: int32
                 type: integer
@@ -28049,8 +28886,9 @@ spec:
                 type: string
               secrets:
                 description: |-
-                  Secrets is a list of Secrets in the same namespace as the VMSingle
-                  object, which shall be mounted into the VMSingle Pods.
+                  Secrets is a list of Secrets in the same namespace as the Application
+                  object, which shall be mounted into the Application container
+                  at /etc/vm/secrets/SECRET_NAME folder
                 items:
                   type: string
                 type: array
@@ -28061,9 +28899,8 @@ spec:
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
               serviceAccountName:
-                description: |-
-                  ServiceAccountName is the name of the ServiceAccount to use to run the
-                  VMSingle Pods.
+                description: ServiceAccountName is the name of the ServiceAccount
+                  to use to run the pods
                 type: string
               serviceScrapeSpec:
                 description: ServiceScrapeSpec that will be added to vmsingle VMServiceScrape
@@ -28404,6 +29241,7 @@ spec:
                       type: string
                     type: array
                   ignoreFirstIntervals:
+                    description: IgnoreFirstIntervals instructs to ignore first interval
                     type: integer
                   ignoreOldSamples:
                     description: IgnoreOldSamples instructs to ignore samples with
@@ -28745,6 +29583,11 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              useDefaultResources:
+                description: |-
+                  UseDefaultResources controls resource settings
+                  By default, operator sets built-in resource requirements
+                type: boolean
               useStrictSecurity:
                 description: |-
                   UseStrictSecurity enables strict security mode for component
@@ -29132,9 +29975,8 @@ spec:
                 type: object
               volumeMounts:
                 description: |-
-                  VolumeMounts allows configuration of additional VolumeMounts on the output Deployment definition.
-                  VolumeMounts specified will be appended to other VolumeMounts in the VMSingle container,
-                  that are generated as a result of StorageSpec objects.
+                  VolumeMounts allows configuration of additional VolumeMounts on the output Deployment/StatefulSet definition.
+                  VolumeMounts specified will be appended to other VolumeMounts in the Application container
                 items:
                   description: VolumeMount describes a mounting of a Volume within
                     a container.
@@ -29203,9 +30045,9 @@ spec:
                 type: array
               volumes:
                 description: |-
-                  Volumes allows configuration of additional volumes on the output deploy definition.
-                  Volumes specified will be appended to other volumes that are generated as a result of
-                  StorageSpec objects.
+                  Volumes allows configuration of additional volumes on the output Deployment/StatefulSet definition.
+                  Volumes specified will be appended to other volumes that are generated.
+                  / +optional
                 items:
                   description: Volume represents a named volume in a pod that may
                     be accessed by any container in the pod.
@@ -29246,11 +30088,6 @@ spec:
                   by this VMSingle.
                 format: int32
                 type: integer
-            required:
-            - availableReplicas
-            - replicas
-            - unavailableReplicas
-            - updatedReplicas
             type: object
         type: object
     served: true
