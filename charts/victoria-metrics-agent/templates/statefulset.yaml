@@ -105,8 +105,12 @@ spec:
           volumeMounts:
             - name: tmpdata
               mountPath: /tmpData
-            - name: config
-              mountPath: /config
+            - name: scrape-config
+              mountPath: /config/scrape
+            {{- with (include "chart.rw.config" .) }}
+            - name: rw-config
+              mountPath: /config/rw
+            {{- end }}
             {{- range .Values.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
@@ -156,7 +160,12 @@ spec:
           emptyDir: {{ toYaml .Values.emptyDir | nindent 12 }}
           {{- end }}
         {{- end }}
-        - name: config
+        {{- with (include "chart.rw.config" .) }}
+        - name: rw-config
+          configMap:
+            name: {{ include "chart.fullname" $ -}}-rw
+        {{- end }}
+        - name: scrape-config
           configMap:
             name: {{ include "chart.configname" . }}
         {{- range .Values.extraHostPathMounts }}

@@ -1,4 +1,5 @@
 {{- if eq .Values.configMap "" }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -14,4 +15,22 @@ data:
     {{ dict $k $v | toYaml | nindent 4 }}
     {{- end }}
     {{- end }}
+{{- end }}
+{{- $rwcm := default dict }}
+{{- range $i, $rw := .Values.remoteWrite }}
+  {{- range $rwKey, $rwValue := $rw }}
+    {{- if or (kindIs "slice" $rwValue) (kindIs "map" $rwValue) }}
+      {{- $_ := set $rwcm (printf "%d-%s.yaml" $i $rwKey) (toYaml $rwValue) }}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- with (include "chart.rw.config" .) }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "chart.fullname" $ -}}-rw
+  namespace: {{ include "vm.namespace" $ }}
+  labels: {{- include "chart.labels" $ | nindent 4 }}
+data: {{ . | nindent 2 }}
 {{- end }}

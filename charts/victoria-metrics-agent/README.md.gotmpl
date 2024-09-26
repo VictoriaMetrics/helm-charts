@@ -10,6 +10,28 @@
 
 {{ include "chart.installSection" . }}
 
+## Upgrade guide
+
+### Upgrade to 0.13.0
+
+- replace `remoteWriteUrls` to `remoteWrite`:
+
+Given below config
+
+```yaml
+remoteWriteUrls:
+- http://address1/api/v1/write
+- http://address2/api/v1/write
+```
+
+should be changed to
+
+```yaml
+remoteWrite:
+- url: http://address1/api/v1/write
+- url: http://address2/api/v1/write
+```
+
 {{ include "chart.uninstallSection" . }}
 
 {{ include "chart.helmDocs" . }}

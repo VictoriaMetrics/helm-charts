@@ -1,5 +1,9 @@
-remoteWriteUrls:
-  - http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/0/prometheus/
+remoteWrite:
+  - url: http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/0/prometheus/
+    urlRelabelConfig:
+      - action: keep
+        source_labels: [env]
+        regex: "dev"
 
 replicaCount: 3
 deployment:

@@ -91,16 +91,15 @@ podDisruptionBudget:
   # maxUnavailable: 1
   labels: {}
 
-# -- WARN: need to specify at least one remote write url or one multi tenant url
-remoteWriteUrls: []
-# remoteWriteUrls:
-#   - http://vm-insert:8480/insert/0/prometheus
-#   - http://prometheus:8480/insert/0/prometheus
-
-# -- Destination multitenant endpoint for scraped/received metrics
-multiTenantUrls: []
-#   - http://vm-insert-az1:8480
-#   - http://vm-insert-az2:8480
+# -- Generates `remoteWrite.*` flags and config maps with value content for values, that are of type list of map.
+# Each item should contain `url` param to pass validation.
+remoteWrite:
+# - url: http://vm-insert:8480/insert/0/prometheus
+#   urlRelabelConfig:
+#     - action: keep
+#       source_labels: [env]
+#       regex: "dev"
+# - url: http://prometheus:8480/insert/0/prometheus
 
 # -- VMAgent extra command line arguments
 extraArgs:
