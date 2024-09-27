@@ -1,6 +1,9 @@
 ## Next release
 
+**Update note**: `remoteWriteUrls` and `multiTenantUrls` parameters were replaced by `remoteWrite`. Please follow [upgrade guide](./README.md#upgrade-to-0130)
+
 - Fail if no remoteWriteUrls set
+- Added `remoteWrite` array param, which can contain all `remoteWrite.*` flag values. Please check chart docs for details.
 
 ## 0.12.2
 
