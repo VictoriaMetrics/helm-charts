@@ -29,13 +29,12 @@ kubeControllerManager:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             insecureSkipVerify: true
 kubeEtcd:
+  service:
+    port: 2381
+    targetPort: 2381
   vmScrape:
     spec:
       endpoints:
         - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
           port: http-metrics
-          scheme: https
-          tlsConfig:
-            caFile: /var/lib/minikube/certs/etcd/ca.crt
-            certFile: /var/lib/minikube/certs/etcd/peer.crt
-            keyFile: /var/lib/minikube/certs/etcd/peer.key
+          scheme: http
