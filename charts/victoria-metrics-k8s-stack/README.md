@@ -1,4 +1,4 @@
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.26.0](https://img.shields.io/badge/Version-0.26.0-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.27.0](https://img.shields.io/badge/Version-0.27.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -2165,7 +2165,7 @@ extraArgs:
     promscrape.dropOriginalLabels: "true"
     promscrape.streamParse: "true"
 image:
-    tag: v1.103.0
+    tag: v1.104.0
 port: "8429"
 scrapeInterval: 20s
 selectAllByDefault: true
@@ -2258,7 +2258,7 @@ externalLabels: {}
 extraArgs:
     http.pathPrefix: /
 image:
-    tag: v1.103.0
+    tag: v1.104.0
 port: "8080"
 selectAllByDefault: true
 </code>
@@ -2640,7 +2640,7 @@ retentionPeriod: "1"
 vminsert:
     extraArgs: {}
     image:
-        tag: v1.103.0-cluster
+        tag: v1.104.0-cluster
     port: "8480"
     replicaCount: 2
     resources: {}
@@ -2648,7 +2648,7 @@ vmselect:
     cacheMountPath: /select-cache
     extraArgs: {}
     image:
-        tag: v1.103.0-cluster
+        tag: v1.104.0-cluster
     port: "8481"
     replicaCount: 2
     resources: {}
@@ -2660,7 +2660,7 @@ vmselect:
                         storage: 2Gi
 vmstorage:
     image:
-        tag: v1.103.0-cluster
+        tag: v1.104.0-cluster
     replicaCount: 2
     resources: {}
     storage:
@@ -2814,7 +2814,7 @@ vmstorage:
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
 <code class="language-yaml">extraArgs: {}
 image:
-    tag: v1.103.0
+    tag: v1.104.0
 port: "8429"
 replicaCount: 1
 retentionPeriod: "1"
