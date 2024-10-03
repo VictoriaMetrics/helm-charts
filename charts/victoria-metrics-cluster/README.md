@@ -1257,6 +1257,17 @@ timeoutSeconds: 5
 </td>
     </tr>
     <tr>
+      <td>vminsert.excludeStorageIDs</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td><p>IDs of vmstorage nodes to exclude from writing</p>
+</td>
+    </tr>
+    <tr>
       <td>vminsert.extraArgs</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -2374,7 +2385,7 @@ loggerFormat: json
       <td>vmselect.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">vmselect
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
