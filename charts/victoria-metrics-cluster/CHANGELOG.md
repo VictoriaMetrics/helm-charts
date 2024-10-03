@@ -1,8 +1,9 @@
 ## Next release
 
 - Support extra storageNodes. Fail if no storageNodes set
-- Support enabling automatic discovery of vmstorage addresses using DNS SRV records in enterprise version.
+- Support enabling automatic discovery of vmstorage addresses using DNS SRV records in enterprise version
 - Added HPA with scaledown disabled by default
+- Allow excluding vmstorage nodes from vminsert. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1549)
 
 ## 0.14.0
 

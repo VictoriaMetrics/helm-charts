@@ -109,9 +109,11 @@ app: {{ $Values.vmauth.name | default "vmauth" }}
     {{- else }}
       {{- $port := "8400" }}
       {{- range $i := until ($storage.replicaCount | int) -}}
-        {{- $_ := set $ "appIdx" $i }}
-        {{- $storageNode := include "vm.fqdn" $ -}}
-        {{- $storageNodes = append $storageNodes (printf "%s:%s" $storageNode $port) -}}
+        {{- if not (has (float64 $i) $app.excludeStorageIDs) -}}
+          {{- $_ := set $ "appIdx" $i }}
+          {{- $storageNode := include "vm.fqdn" $ -}}
+          {{- $storageNodes = append $storageNodes (printf "%s:%s" $storageNode $port) -}}
+        {{- end -}}
       {{- end -}}
       {{- $_ := unset $ "appIdx" }}
     {{- end }}
