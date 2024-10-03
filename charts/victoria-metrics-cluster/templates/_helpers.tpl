@@ -101,7 +101,7 @@ app: {{ $Values.vmauth.name | default "vmauth" }}
     {{- $storageNodes := default list }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- if $Values.autoDiscovery }}
-      {{- if (include "vm.enterprise.disabled" . ) "true" }}
+      {{- if eq (include "vm.enterprise.disabled" . ) "true" }}
         {{- fail "SRV autodiscovery is only supported in enterprise. Either define license or set `autoDiscovery` to `false`" }}
       {{- end }}
       {{- $storageNode := printf "srv+_vminsert._tcp.%s" $fqdn }}
@@ -147,7 +147,7 @@ app: {{ $Values.vmauth.name | default "vmauth" }}
     {{- $storageNodes := default list }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- if $Values.autoDiscovery }}
-      {{- if (include "vm.enterprise.disabled" . ) "true" }}
+      {{- if eq (include "vm.enterprise.disabled" . ) "true" }}
         {{- fail "SRV autodiscovery is only supported in enterprise. Either define license or set `autoDiscovery` to `false`" }}
       {{- end }}
       {{- $storageNode := printf "srv+_vmselect._tcp.%s" $fqdn }}
@@ -168,7 +168,7 @@ app: {{ $Values.vmauth.name | default "vmauth" }}
     {{- $_ := set . "appKey" "vmselect" }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- if $Values.autoDiscovery }}
-      {{- if (include "vm.enterprise.disabled" . ) "true" }}
+      {{- if eq (include "vm.enterprise.disabled" . ) "true" }}
         {{- fail "SRV autodiscovery is only supported in enterprise. Either define license or set `autoDiscovery` to `false`" }}
       {{- end }}
       {{- $selectNode := printf "srv+_http._tcp.%s" $fqdn }}
