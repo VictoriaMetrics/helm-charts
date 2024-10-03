@@ -1,6 +1,12 @@
 config:
+  preset: "default"
+  models:
+    model_univariate_1:
+      class: 'zscore'
+      z_threshold: 2.5
   reader:
     datasource_url: http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481/select/
+    tenant_id: "123"
     queries:
       active_timeseries:
         expr: 'sum(vm_cache_entries{type="storage/hour_metric_ids"})'
@@ -14,12 +20,14 @@ config:
         expr: 'sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))'
   writer:
     datasource_url: http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/
+    tenant_id: "123"
   monitoring:
     pull:
       enabled: true
       port: 8440
     push:
       url: http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480/insert/
+      tenant_id: "0"
       extra_labels:
         job: vmanomaly
 license:

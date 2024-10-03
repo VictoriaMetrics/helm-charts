@@ -53,8 +53,11 @@ spec:
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- $env := default list }}
-          {{- if .Values.persistentVolume.enabled }}
-          {{- $env = append $env (dict "name" "VMANOMALY_MODEL_DUMPS_DIR" "value" "/tmp/vmanomaly-model-dumps") }}
+          {{- if and .Values.persistentVolume.enabled .Values.persistentVolume.dumpModels }}
+          {{- $env = append $env (dict "name" "VMANOMALY_MODEL_DUMPS_DIR" "value" "/tmp/vmanomaly-storage/models") }}
+          {{- end }}
+          {{- if and .Values.persistentVolume.enabled .Values.persistentVolume.dumpData }}
+          {{- $env = append $env (dict "name" "VMANOMALY_DATA_DUMPS_DIR" "value" "/tmp/vmanomaly-storage/data") }}
           {{- end }}
           {{- with (concat $env (.Values.env | default list)) }}
           env: {{ toYaml . | nindent 12 }}
@@ -74,7 +77,7 @@ spec:
             {{- include "vm.license.mount" . | nindent 12 }}
             {{- if .Values.persistentVolume.enabled }}
             - name: models-dump
-              mountPath: /tmp/vmanomaly-model-dumps
+              mountPath: /tmp/vmanomaly-storage
             {{- end }}
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
