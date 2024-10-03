@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+- Support extra storageNodes. Fail if no storageNodes set
+- Support enabling automatic discovery of vmstorage addresses using DNS SRV records in enterprise version.
+- Added HPA with scaledown disabled by default
 
 ## 0.14.0
 

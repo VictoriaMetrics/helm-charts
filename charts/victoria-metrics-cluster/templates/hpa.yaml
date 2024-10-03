@@ -1,0 +1,28 @@
+{{- $ctx := dict "helm" . }}
+{{- range $name, $app := .Values }}
+{{- if and (kindIs "map" $app) $app.enabled ($app.horizontalPodAutoscaler).enabled }}
+{{- $hpa := $app.horizontalPodAutoscaler }}
+{{- $_ := set $ctx "extraLabels" $app.extraLabels }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  {{- $labelsTpl := printf "victoria-metrics.%s.labels" $name }}
+  labels: {{ include $labelsTpl $ctx | nindent 4 }}
+  {{- $nameTpl := printf "victoria-metrics.%s.fullname" $name }}
+  {{- $name := include $nameTpl $ }}
+  name: {{ $name }}
+  namespace: {{ include "vm.namespace" $ }}
+spec:
+  maxReplicas: {{ $hpa.maxReplicas }}
+  minReplicas: {{ $hpa.minReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $name }}
+  metrics: {{ toYaml $hpa.metrics | nindent 4 }}
+  {{- with $hpa.behavior }}
+  behavior: {{ toYaml . | nindent 4 }}
+  {{- end -}}
+{{- end }}
+{{- end }}

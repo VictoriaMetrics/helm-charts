@@ -1,0 +1,26 @@
+{{- $ctx := dict "helm" . }}
+{{- range $name, $app := .Values }}
+{{- if and (kindIs "map" $app) $app.enabled ($app.podDisruptionBudget).enabled }}
+{{- $pdb := $app.podDisruptionBudget }}
+{{- $_ := set $ctx "extraLabels" $pdb.labels }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  {{- $_ := set $ctx "appKey" $name }}
+  name: {{ include "vm.plain.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ }}
+  {{- $labelsTpl := printf "victoria-metrics.%s.labels" $name }}
+  labels: {{ include $labelsTpl $ctx | nindent 4 }}
+spec:
+  {{- with $pdb.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with $pdb.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  selector:
+    {{- $selectorTpl := printf "victoria-metrics.%s.matchLabels" $name }}
+    matchLabels: {{ include $selectorTpl $ | nindent 6 }}
+{{- end }}
+{{- end }}
