@@ -18,7 +18,7 @@ image:
   # -- Victoria Metrics anomaly Docker repository and image name
   repository: victoriametrics/vmanomaly
   # -- Tag of Docker image
-  tag: v1.15.9 # rewrites Chart.AppVersion
+  tag: v1.16.1 # rewrites Chart.AppVersion
   # -- Pull policy of Docker image
   pullPolicy: IfNotPresent
 
@@ -85,7 +85,7 @@ extraContainers: []
 # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
 podSecurityContext:
   enabled: true
-  # fsGroup: 2000
+  fsGroup: 1000
 
 # -- Check [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for details.
 securityContext:
@@ -183,6 +183,11 @@ emptyDir: {}
 persistentVolume:
   # -- Create/use Persistent Volume Claim for models dump.
   enabled: false
+
+  # -- Enables dumping models to persistence disk. This is helpful to reduce memory usage.
+  dumpModels: true
+  # -- Enables dumpling data which is fetched from VictoriaMetrics to persistence disk. This is helpful to reduce memory usage.
+  dumpData: true
 
   # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](http://kubernetes.io/docs/user-guide/persistent-volumes/)
   accessModes:

@@ -1,3 +1,10 @@
+{{- if not .Values.config.reader.tenant_id -}}
+{{- $ := unset .Values.config.reader "tenant_id" }}
+{{- end -}}
+{{- if not .Values.config.writer.tenant_id -}}
+{{- $ := unset .Values.config.writer "tenant_id" }}
+{{- end -}}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:

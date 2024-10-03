@@ -1,6 +1,9 @@
 ## Next release
 
-- TODO
+- Upgraded vmanomaly to [1.16.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1161)
+- Added the ability to enable persistence for models and data via `.Values.persistentVolume.dumpModels` and `.Values.persistentVolume.dumpData` variables respectively.
+- Fix default `podSecurityContext` configuration to ensure fs group matches container user.
+- Fix passing empty `tenant_id` in case tenant is not defined in values.
 
 ## 1.4.6
 
