@@ -673,7 +673,7 @@ labels: {}
       <td>podSecurityContext</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>
@@ -790,7 +790,7 @@ view:
       <td>securityContext</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
+<code class="language-yaml">enabled: true
 </code>
 </pre>
 </td>

@@ -21,7 +21,7 @@ spec:
     spec:
       serviceAccountName: {{ include "chart.serviceAccountName" . }}
       {{- if .Values.podSecurityContext.enabled }}
-      securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" .) | nindent 8 }}
+      securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
       {{- with (.Values.imagePullSecrets | default "" (.Values.global).imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
@@ -29,7 +29,7 @@ spec:
       containers:
         - name: vmauth
           {{- if .Values.securityContext.enabled }}
-          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
           workingDir: {{ .Values.containerWorkingDir }}

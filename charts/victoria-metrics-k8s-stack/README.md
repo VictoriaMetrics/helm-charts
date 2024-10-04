@@ -2159,8 +2159,6 @@ tls: []
 extraArgs:
     promscrape.dropOriginalLabels: "true"
     promscrape.streamParse: "true"
-image:
-    tag: v1.104.0
 port: "8429"
 scrapeInterval: 20s
 selectAllByDefault: true
@@ -2252,8 +2250,6 @@ tls: []
 externalLabels: {}
 extraArgs:
     http.pathPrefix: /
-image:
-    tag: v1.104.0
 port: "8080"
 selectAllByDefault: true
 </code>
@@ -2634,16 +2630,12 @@ port: "8427"
 retentionPeriod: "1"
 vminsert:
     extraArgs: {}
-    image:
-        tag: v1.104.0-cluster
     port: "8480"
     replicaCount: 2
     resources: {}
 vmselect:
     cacheMountPath: /select-cache
     extraArgs: {}
-    image:
-        tag: v1.104.0-cluster
     port: "8481"
     replicaCount: 2
     resources: {}
@@ -2654,8 +2646,6 @@ vmselect:
                     requests:
                         storage: 2Gi
 vmstorage:
-    image:
-        tag: v1.104.0-cluster
     replicaCount: 2
     resources: {}
     storage:
@@ -2808,8 +2798,6 @@ vmstorage:
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
 <code class="language-yaml">extraArgs: {}
-image:
-    tag: v1.104.0
 port: "8429"
 replicaCount: 1
 retentionPeriod: "1"
