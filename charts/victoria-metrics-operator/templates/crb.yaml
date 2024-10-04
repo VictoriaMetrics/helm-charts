@@ -17,21 +17,21 @@ roleRef:
   name: {{ include "vm-operator.fullname" . }}
   apiGroup: rbac.authorization.k8s.io
 {{- end -}}
-{{- if .Values.crd.cleanup.enabled }}
+{{- if .Values.crds.cleanup.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "vm-operator.cleanupHookName" . }}
+  name: {{ include "vm-operator.fullname" . }}-cleanup-hook
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
   annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-4") | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "vm-operator.cleanupHookName" . }}
+  name: {{ include "vm-operator.fullname" . }}-cleanup-hook
 subjects:
 - kind: ServiceAccount
-  name: {{ include "vm-operator.cleanupHookName" . }}
+  name: {{ include "vm-operator.fullname" . }}-cleanup-hook
   namespace: {{ include "vm.namespace" . }}
 {{- end }}

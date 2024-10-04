@@ -311,7 +311,7 @@ issuer: {}
 </td>
     </tr>
     <tr>
-      <td>crd.cleanup.enabled</td>
+      <td>crds.cleanup.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
 <code class="language-yaml">false
@@ -322,7 +322,7 @@ issuer: {}
 </td>
     </tr>
     <tr>
-      <td>crd.cleanup.image</td>
+      <td>crds.cleanup.image</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
 <code class="language-yaml">pullPolicy: IfNotPresent
@@ -335,14 +335,14 @@ tag: ""
 </td>
     </tr>
     <tr>
-      <td>crd.create</td>
+      <td>crds.plain</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
-      <td><p>Enables CRD creation and management. With this option, if you remove this chart, all CRD resources will be deleted with it.</p>
+      <td><p>check if plain or templated CRDs should be created. with this option set to <code>false</code>, all CRDs will be rendered from templates. with this option set to <code>true</code>, all CRDs are immutable and require manual upgrade.</p>
 </td>
     </tr>
     <tr>

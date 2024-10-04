@@ -1,5 +1,6 @@
 ## Next release
 
+- Moved crds to a shared chart and import them as a dependency
 - Generate VM components tag version from chart app name by default
 
 ## 0.27.0
