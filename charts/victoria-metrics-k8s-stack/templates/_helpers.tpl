@@ -377,8 +377,8 @@ If release name contains chart name it will be used as a full name.
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
   {{- $spec := (include "vm.select.spec" . | fromYaml) -}}
-  {{- $_ := set $spec.vminsert "image" (dict "tag" (printf "%s-cluster" $Chart.AppVersion)) -}}
-  {{- $_ := set $spec.vmstorage "image" (dict "tag" (printf "%s-cluster" $Chart.AppVersion)) -}}
+  {{- $_ := set $spec "vminsert" (dict "image" (dict "tag" (printf "%s-cluster" $Chart.AppVersion))) -}}
+  {{- $_ := set $spec "vmstorage" (dict "image" (dict "tag" (printf "%s-cluster" $Chart.AppVersion))) -}}
   {{- $clusterSpec := (deepCopy $Values.vmcluster.spec) -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
