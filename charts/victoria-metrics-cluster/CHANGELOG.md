@@ -4,6 +4,7 @@
 - Support enabling automatic discovery of vmstorage addresses using DNS SRV records in enterprise version
 - Added HPA with scaledown disabled by default
 - Allow excluding vmstorage nodes from vminsert. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1549)
+- Upgraded common chart dependency
 
 ## 0.14.0
 

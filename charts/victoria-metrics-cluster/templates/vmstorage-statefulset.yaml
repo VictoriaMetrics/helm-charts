@@ -43,7 +43,7 @@ spec:
           image: {{ include "vm.image" (merge (deepCopy .) (dict "app" $manager)) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.securityContext.enabled }}
-          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           args: {{ include "vmbackupmanager.restore.args" . | nindent 12 }}
           {{- with $manager.resources }}
@@ -82,7 +82,7 @@ spec:
           workingDir: {{ . }}
           {{- end }}
           {{- if $app.securityContext.enabled }}
-          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           args: {{ include "vmstorage.args" . | nindent 12 }}
           ports:
@@ -161,7 +161,7 @@ spec:
           image: {{ include "vm.image" (dict "helm" . "app" $manager) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.securityContext.enabled }}
-          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           args: {{ include "vmbackupmanager.args" . }}
           {{- with $manager.resources }}
@@ -214,7 +214,7 @@ spec:
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- if $app.podSecurityContext.enabled }}
-      securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
+      securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "vm.sa.name" . }}
       {{- with $app.tolerations }}
