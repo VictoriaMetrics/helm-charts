@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fixed openshift compatibility templates
 
 ## 0.0.13
 
