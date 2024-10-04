@@ -9,9 +9,9 @@
 {{- /*
 Return true if the detected platform is Openshift
 Usage:
-{{- include "vm.compatibility.isOpenshift" . -}}
+{{- include "vm.isOpenshift" . -}}
 */ -}}
-{{- define "vm.compatibility.isOpenshift" -}}
+{{- define "vm.isOpenshift" -}}
   {{- $Capabilities := (.helm).Capabilities | default .Capabilities -}}
   {{- if $Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
     {{- true -}}
@@ -19,23 +19,21 @@ Usage:
 {{- end -}}
 
 {{- /*
-Render a compatible securityContext depending on the platform. By default it is maintained as it is. In other platforms like Openshift we remove default user/group values that do not work out of the box with the restricted-v1 SCC
+Render a compatible securityContext depending on the platform.
 Usage:
-{{- include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "helm" $) -}}
+{{- include "vm.securityContext" (dict "securityContext" .Values.containerSecurityContext "helm" .) -}}
 */ -}}
-{{- define "vm.compatibility.renderSecurityContext" -}}
-  {{- $adaptedContext := .secContext -}}
+{{- define "vm.securityContext" -}}
+  {{- $securityContext := .securityContext -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $adaptSecurityCtx := (((($Values).global).compatibility).openshift).adaptSecurityContext | default "" -}}
-  {{- if or (eq $adaptSecurityCtx "force") (and (eq $adaptSecurityCtx "auto") (include "vm.compatibility.isOpenshift" .)) -}}
-    {{- /* Remove incompatible user/group values that do not work in Openshift out of the box */ -}}
-    {{- $adaptedContext = omit $adaptedContext "fsGroup" "runAsUser" "runAsGroup" -}}
-    {{- if not $adaptedContext.seLinuxOptions -}}
-      {{- /* If it is an empty object, we remove it from the resulting context because it causes validation issues */ -}}
-      {{- $adaptedContext = omit $adaptedContext "seLinuxOptions" -}}
+  {{- $adaptMode := (((($Values).global).compatibility).openshift).adaptSecurityContext | default "" -}}
+  {{- if or (eq $adaptMode "force") (and (eq $adaptMode "auto") (include "vm.isOpenshift" .)) -}}
+    {{- $securityContext = omit $securityContext "fsGroup" "runAsUser" "runAsGroup" -}}
+    {{- if not $securityContext.seLinuxOptions -}}
+      {{- $securityContext = omit $securityContext "seLinuxOptions" -}}
     {{- end -}}
   {{- end -}}
-  {{- omit $adaptedContext "enabled" | toYaml -}}
+  {{- omit $securityContext "enabled" | toYaml -}}
 {{- end -}}
 
 {{- /*
