@@ -261,8 +261,6 @@ vmsingle:
   # -- Full spec for VMSingle CRD. Allowed values describe [here](https://docs.victoriametrics.com/operator/api#vmsinglespec)
   spec:
     port: "8429"
-    image:
-      tag: v1.104.0
     # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
     retentionPeriod: "1"
     replicaCount: 1
@@ -320,8 +318,6 @@ vmcluster:
     retentionPeriod: "1"
     replicationFactor: 2
     vmstorage:
-      image:
-        tag: v1.104.0-cluster
       replicaCount: 2
       storageDataPath: "/vm-data"
       storage:
@@ -337,8 +333,6 @@ vmcluster:
         #   memory: 1500Mi
     vmselect:
       port: "8481"
-      image:
-        tag: v1.104.0-cluster
       replicaCount: 2
       cacheMountPath: "/select-cache"
       extraArgs: {}
@@ -358,8 +352,6 @@ vmcluster:
         #   memory: "500Mi"
     vminsert:
       port: "8480"
-      image:
-        tag: v1.104.0-cluster
       replicaCount: 2
       extraArgs: {}
       resources:
@@ -667,8 +659,6 @@ vmalert:
   spec:
     port: "8080"
     selectAllByDefault: true
-    image:
-      tag: v1.104.0
     evaluationInterval: 15s
     extraArgs:
       http.pathPrefix: "/"
@@ -748,8 +738,6 @@ vmagent:
   spec:
     port: "8429"
     selectAllByDefault: true
-    image:
-      tag: v1.104.0
     scrapeInterval: 20s
     externalLabels: {}
       # For multi-cluster setups it is useful to use "cluster" label to identify the metrics source.

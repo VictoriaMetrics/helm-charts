@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Generate VM components tag version from chart app name by default
 
 ## 0.27.0
 
