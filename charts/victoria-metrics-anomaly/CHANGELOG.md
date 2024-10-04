@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 1.5.1
+
+**Release date:** 2024-10-04
+
+![AppVersion: v1.16.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.16.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - upgraded common chart dependency
 
 ## 1.5.0
