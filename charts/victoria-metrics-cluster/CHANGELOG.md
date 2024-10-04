@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 0.14.1
+
+**Release date:** 2024-10-04
+
+![AppVersion: v1.104.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.104.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Support extra storageNodes. Fail if no storageNodes set
 - Support enabling automatic discovery of vmstorage addresses using DNS SRV records in enterprise version
 - Added HPA with scaledown disabled by default
