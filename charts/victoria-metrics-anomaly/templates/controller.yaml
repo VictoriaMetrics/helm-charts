@@ -32,7 +32,7 @@ spec:
       labels: {{ include "chart.selectorLabels" . | nindent 8 }}
     spec:
       {{- if .Values.podSecurityContext}}
-      securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" .) | nindent 8 }}
+      securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
       {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
@@ -63,7 +63,7 @@ spec:
           env: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- if .Values.securityContext.enabled }}
-          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           {{- with .Values.image.pullPolicy }}
           imagePullPolicy: {{ . }}

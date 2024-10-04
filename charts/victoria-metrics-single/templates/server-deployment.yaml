@@ -82,7 +82,7 @@ spec:
       containers:
         - name: vmsingle
           {{- if $app.securityContext.enabled }}
-          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
@@ -237,7 +237,7 @@ spec:
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- if $app.podSecurityContext.enabled }}
-      securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
+      securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "victoria-metrics.serviceAccountName" . }}
       {{- with $app.tolerations }}

@@ -28,7 +28,7 @@ spec:
       serviceAccountName: {{ include "vmalert.serviceAccountName" . }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- if $app.podSecurityContext.enabled }}
-      securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
+      securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
       {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
@@ -39,7 +39,7 @@ spec:
       containers:
         - name: alertmanager
           {{- if $app.securityContext.enabled }}
-          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
           args: {{ include "alertmanager.args" . | nindent 12 }}

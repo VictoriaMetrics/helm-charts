@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- upgraded common chart dependency
 
 ## 1.5.0
 

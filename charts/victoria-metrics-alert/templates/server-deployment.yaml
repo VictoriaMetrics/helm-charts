@@ -36,7 +36,7 @@ spec:
     spec:
       serviceAccountName: {{ include "vmalert.serviceAccountName" . }}
       {{- if $app.podSecurityContext.enabled }}
-      securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.podSecurityContext "context" .) | nindent 8 }}
+      securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
@@ -48,7 +48,7 @@ spec:
       containers:
         - name: vmalert
           {{- if $app.securityContext.enabled }}
-          securityContext: {{ include "vm.compatibility.renderSecurityContext" (dict "secContext" $app.securityContext "context" .) | nindent 12 }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
           args: {{ include "vmalert.args" . | nindent 12 }}
