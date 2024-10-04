@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- Moved crds to a shared chart and import them as a dependency
+- replaced `crd.enabled` property to `crds.plain`. Instead of disabling CRDs it selects if CRDs should be rendered from template or as plain CRDs
 
 ## 0.35.2
 
