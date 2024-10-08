@@ -39,8 +39,8 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
-condition: {{ .Values.coreDns.enabled }}
-description: 'This is a modern CoreDNS dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
+condition: {{ .Values.kubeApiServer.enabled }}
+description: 'This is a modern API Server dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
 editable: false
 fiscalYearStartMonth: 0
 graphTooltip: 1
@@ -68,36 +68,142 @@ panels:
           value: 1
     overrides: []
   gridPos:
-    h: 3
-    w: 24
+    h: 8
+    w: 12
     x: 0
     'y': 0
-  id: 25
+  id: 42
   options:
     colorMode: background
     graphMode: none
     justifyMode: auto
-    orientation: vertical
+    orientation: horizontal
     reduceOptions:
       calcs:
       - lastNotNull
       fields: ''
       values: false
-    showPercentChange: false
     textMode: value_and_name
-    wideLayout: true
-  pluginVersion: 10.4.1
+  pluginVersion: 10.0.1
   targets:
   - datasource:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: up{job=~"$job", instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: up{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}
     interval: ''
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
-  title: CoreDNS - Health Status
+  title: API Server - Health Status
   type: stat
+- datasource:
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      custom:
+        align: auto
+        cellOptions:
+          type: auto
+        inspect: false
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+    overrides:
+    - matcher:
+        id: byName
+        options: __name__
+      properties:
+      - id: custom.width
+        value: 188
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    'y': 0
+  id: 60
+  options:
+    cellHeight: sm
+    footer:
+      countRows: false
+      fields: ''
+      reducer:
+      - sum
+      show: false
+    showHeader: true
+    sortBy:
+    - desc: false
+      displayName: removed_release
+  pluginVersion: 10.0.1
+  targets:
+  - datasource:
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      uid: ${datasource}
+    exemplar: true
+    expr: apiserver_requested_deprecated_apis{ {{ $.Values.global.clusterLabel }}=~"$cluster"}
+    interval: ''
+    legendFormat: ''
+    refId: A
+  title: Deprecated Kubernetes Resources
+  transformations:
+  - id: labelsToFields
+    options:
+      keepLabels:
+      - group
+      - job
+      - removed_release
+      - resource
+      - version
+      - name
+      mode: columns
+  - id: merge
+    options: {}
+  - id: organize
+    options:
+      excludeByName:
+        Time: true
+        Value: true
+        job: true
+      indexByName:
+        Time: 6
+        Value: 7
+        group: 1
+        job: 5
+        namespace: 0
+        removed_release: 4
+        resource: 3
+        version: 2
+      renameByName: {}
+  - id: groupBy
+    options:
+      fields:
+        group:
+          aggregations:
+          - lastNotNull
+          operation: groupby
+        job:
+          aggregations: []
+          operation: groupby
+        namespace:
+          aggregations:
+          - lastNotNull
+          operation: groupby
+        removed_release:
+          aggregations: []
+          operation: groupby
+        resource:
+          aggregations:
+          - lastNotNull
+          operation: groupby
+        version:
+          aggregations: []
+          operation: groupby
+  type: table
 - datasource:
     type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
@@ -106,7 +212,6 @@ panels:
       color:
         mode: palette-classic
       custom:
-        axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
         axisLabel: ''
@@ -119,7 +224,568 @@ panels:
           legend: false
           tooltip: false
           viz: false
-        insertNulls: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: 'off'
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: short
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    'y': 8
+  id: 38
+  options:
+    legend:
+      calcs: []
+      displayMode: list
+      placement: bottom
+      showLegend: true
+    tooltip:
+      mode: multi
+      sort: desc
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      uid: ${datasource}
+    exemplar: true
+    expr: sum by (code) (rate(apiserver_request_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    interval: $resolution
+    legendFormat: '{{`{{`}} code {{`}}`}}'
+    refId: A
+  title: API Server - HTTP Requests by code
+  type: timeseries
+- datasource:
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        drawStyle: line
+        fillOpacity: 25
+        gradientMode: opacity
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: 'off'
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: short
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    'y': 8
+  id: 39
+  options:
+    legend:
+      calcs: []
+      displayMode: list
+      placement: bottom
+      showLegend: true
+    tooltip:
+      mode: multi
+      sort: desc
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      uid: ${datasource}
+    exemplar: true
+    expr: sum by (verb) (rate(apiserver_request_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    interval: $resolution
+    legendFormat: '{{`{{`}} verb{{`}}`}}'
+    refId: A
+  title: API Server - HTTP Requests by verb
+  type: timeseries
+- datasource:
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        drawStyle: line
+        fillOpacity: 25
+        gradientMode: opacity
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: 'off'
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: ms
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    'y': 16
+  id: 53
+  options:
+    legend:
+      calcs: []
+      displayMode: list
+      placement: bottom
+      showLegend: true
+    tooltip:
+      mode: single
+      sort: none
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      uid: ${datasource}
+    exemplar: true
+    expr: |-
+      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+      /
+      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    interval: $resolution
+    legendFormat: '{{`{{`}} instance {{`}}`}}'
+    refId: A
+  title: API Server - HTTP Requests Latency by instance
+  type: timeseries
+- datasource:
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        drawStyle: line
+        fillOpacity: 25
+        gradientMode: opacity
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: 'off'
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: ms
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    'y': 16
+  id: 54
+  options:
+    legend:
+      calcs: []
+      displayMode: list
+      placement: bottom
+      showLegend: true
+    tooltip:
+      mode: multi
+      sort: desc
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      uid: ${datasource}
+    exemplar: true
+    expr: |-
+      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
+      /
+      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
+    interval: $resolution
+    legendFormat: '{{`{{`}} verb {{`}}`}}'
+    refId: A
+  title: API Server - HTTP Requests Latency by verb
+  type: timeseries
+- datasource:
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        drawStyle: line
+        fillOpacity: 25
+        gradientMode: opacity
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: 'off'
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: short
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    'y': 24
+  id: 50
+  options:
+    legend:
+      calcs: []
+      displayMode: list
+      placement: bottom
+      showLegend: true
+    tooltip:
+      mode: single
+      sort: none
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      uid: ${datasource}
+    exemplar: true
+    expr: |-
+      sum by(instance) (rate(apiserver_request_total{code=~"5..", job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+       / sum by(instance) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    interval: $resolution
+    legendFormat: '{{`{{`}} instance {{`}}`}}'
+    refId: A
+  title: API Server - Errors by Instance
+  type: timeseries
+- datasource:
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        drawStyle: line
+        fillOpacity: 25
+        gradientMode: opacity
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: 'off'
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: short
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    'y': 24
+  id: 51
+  options:
+    legend:
+      calcs: []
+      displayMode: list
+      placement: bottom
+      showLegend: true
+    tooltip:
+      mode: multi
+      sort: none
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      uid: ${datasource}
+    exemplar: true
+    expr: |-
+      sum by(verb) (rate(apiserver_request_total{code=~"5..",job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+       / sum by(verb) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    interval: $resolution
+    legendFormat: '{{`{{`}} verb {{`}}`}}'
+    refId: A
+  title: API Server - Errors by verb
+  type: timeseries
+- datasource:
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        drawStyle: line
+        fillOpacity: 25
+        gradientMode: opacity
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: normal
+        thresholdsStyle:
+          mode: 'off'
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: short
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    'y': 32
+  id: 40
+  options:
+    legend:
+      calcs: []
+      displayMode: list
+      placement: bottom
+      showLegend: true
+    tooltip:
+      mode: single
+      sort: none
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      uid: ${datasource}
+    exemplar: true
+    expr: sum(rate(apiserver_request_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    interval: $resolution
+    legendFormat: '{{`{{`}} instance {{`}}`}}'
+    refId: A
+  title: API Server - Stacked HTTP Requests by instance
+  type: timeseries
+- datasource:
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        drawStyle: line
+        fillOpacity: 25
+        gradientMode: opacity
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: 'off'
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: short
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    'y': 32
+  id: 56
+  options:
+    legend:
+      calcs: []
+      displayMode: list
+      placement: bottom
+      showLegend: true
+    tooltip:
+      mode: single
+      sort: none
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      uid: ${datasource}
+    exemplar: true
+    expr: sum(rate(workqueue_depth{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    interval: $resolution
+    legendFormat: '{{`{{`}} instance {{`}}`}}'
+    refId: A
+  title: API Server - Work Queue by instance
+  type: timeseries
+- datasource:
+    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        drawStyle: line
+        fillOpacity: 25
+        gradientMode: opacity
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
         lineInterpolation: smooth
         lineWidth: 2
         pointSize: 5
@@ -147,8 +813,8 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 3
-  id: 19
+    'y': 40
+  id: 47
   options:
     legend:
       calcs: []
@@ -164,11 +830,11 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: rate(process_cpu_seconds_total{job=~"$job", instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
+    expr: rate(process_cpu_seconds_total{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
-  title: CoreDNS - CPU Usage by instance
+  title: API Server - CPU Usage by instance
   type: timeseries
 - datasource:
     type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
@@ -178,7 +844,6 @@ panels:
       color:
         mode: palette-classic
       custom:
-        axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
         axisLabel: ''
@@ -191,7 +856,6 @@ panels:
           legend: false
           tooltip: false
           viz: false
-        insertNulls: false
         lineInterpolation: smooth
         lineWidth: 2
         pointSize: 5
@@ -218,8 +882,8 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 3
-  id: 21
+    'y': 40
+  id: 48
   options:
     legend:
       calcs: []
@@ -235,767 +899,15 @@ panels:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: process_resident_memory_bytes{job=~"$job", instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}
-    interval: ''
+    expr: process_resident_memory_bytes{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}
+    interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
-  title: CoreDNS - Memory Usage by instance
+  title: API Server - Memory Usage by instance
   type: timeseries
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ''
-        axisPlacement: auto
-        barAlignment: 0
-        drawStyle: line
-        fillOpacity: 25
-        gradientMode: opacity
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: smooth
-        lineWidth: 2
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: 'off'
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: null
-        - color: red
-          value: 80
-      unit: short
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 0
-    'y': 11
-  id: 9
-  options:
-    legend:
-      calcs: []
-      displayMode: list
-      placement: bottom
-      showLegend: false
-    tooltip:
-      mode: multi
-      sort: none
-  pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(rate(coredns_dns_requests_total{instance=~"$instance",proto="$protocol", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
-    interval: $resolution
-    legendFormat: total $protocol requests
-    refId: A
-  title: CoreDNS - Total DNS Requests ($protocol)
-  type: timeseries
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ''
-        axisPlacement: auto
-        barAlignment: 0
-        drawStyle: line
-        fillOpacity: 25
-        gradientMode: opacity
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: smooth
-        lineWidth: 2
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: 'off'
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: null
-        - color: red
-          value: 80
-      unit: bytes
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 12
-    'y': 11
-  id: 7
-  options:
-    legend:
-      calcs: []
-      displayMode: list
-      placement: bottom
-      showLegend: false
-    tooltip:
-      mode: multi
-      sort: none
-  pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(rate(coredns_dns_request_size_bytes_sum{instance=~"$instance",proto="$protocol", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (proto) / sum(rate(coredns_dns_request_size_bytes_count{instance=~"$instance",proto="$protocol", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (proto)
-    interval: $resolution
-    legendFormat: average $protocol packet size
-    refId: A
-  title: CoreDNS - Average Packet Size  ($protocol)
-  type: timeseries
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ''
-        axisPlacement: auto
-        barAlignment: 0
-        drawStyle: line
-        fillOpacity: 25
-        gradientMode: opacity
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: smooth
-        lineWidth: 2
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: 'off'
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: null
-        - color: red
-          value: 80
-      unit: short
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 0
-    'y': 19
-  id: 2
-  options:
-    legend:
-      calcs: []
-      displayMode: list
-      placement: bottom
-      showLegend: true
-    tooltip:
-      mode: multi
-      sort: desc
-  pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(rate(coredns_dns_requests_total{instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
-    interval: $resolution
-    legendFormat: '{{`{{`}} type {{`}}`}}'
-    refId: A
-  title: CoreDNS - Requests by type
-  type: timeseries
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ''
-        axisPlacement: auto
-        barAlignment: 0
-        drawStyle: line
-        fillOpacity: 25
-        gradientMode: opacity
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: smooth
-        lineWidth: 2
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: 'off'
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: null
-        - color: red
-          value: 80
-      unit: short
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 12
-    'y': 19
-  id: 4
-  options:
-    legend:
-      calcs: []
-      displayMode: list
-      placement: bottom
-      showLegend: true
-    tooltip:
-      mode: multi
-      sort: desc
-  pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(rate(coredns_dns_responses_total{instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (rcode)
-    interval: $resolution
-    legendFormat: '{{`{{`}} rcode {{`}}`}}'
-    refId: A
-  title: CoreDNS - Requests by return code
-  type: timeseries
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ''
-        axisPlacement: auto
-        barAlignment: 0
-        drawStyle: line
-        fillOpacity: 25
-        gradientMode: opacity
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: smooth
-        lineWidth: 2
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: 'off'
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: null
-        - color: red
-          value: 80
-      unit: short
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 0
-    'y': 27
-  id: 23
-  options:
-    legend:
-      calcs: []
-      displayMode: list
-      placement: bottom
-      showLegend: false
-    tooltip:
-      mode: multi
-      sort: none
-  pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(rate(coredns_forward_requests_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
-    interval: $resolution
-    legendFormat: total forward requests
-    refId: A
-  title: CoreDNS - Total Forward Requests
-  type: timeseries
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ''
-        axisPlacement: auto
-        barAlignment: 0
-        drawStyle: line
-        fillOpacity: 25
-        gradientMode: opacity
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: smooth
-        lineWidth: 2
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: 'off'
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: null
-        - color: red
-          value: 80
-      unit: short
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 12
-    'y': 27
-  id: 13
-  options:
-    legend:
-      calcs: []
-      displayMode: list
-      placement: bottom
-      showLegend: true
-    tooltip:
-      mode: multi
-      sort: none
-  pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(rate(coredns_forward_responses_total{rcode=~"SERVFAIL|REFUSED", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (rcode)
-    interval: $resolution
-    legendFormat: '{{`{{`}} rcode {{`}}`}}'
-    refId: A
-  title: CoreDNS - DNS Errors
-  type: timeseries
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ''
-        axisPlacement: auto
-        barAlignment: 0
-        drawStyle: line
-        fillOpacity: 25
-        gradientMode: opacity
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: smooth
-        lineWidth: 2
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: 'off'
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: null
-        - color: red
-          value: 80
-      unit: short
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 0
-    'y': 35
-  id: 17
-  options:
-    legend:
-      calcs: []
-      displayMode: list
-      placement: bottom
-      showLegend: true
-    tooltip:
-      mode: multi
-      sort: desc
-  pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(rate(coredns_cache_hits_total{instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
-    interval: $resolution
-    legendFormat: '{{`{{`}} type {{`}}`}}'
-    refId: A
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(rate(coredns_cache_misses_total{instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
-    interval: $resolution
-    legendFormat: misses
-    refId: B
-  title: CoreDNS - Cache Hits / Misses
-  type: timeseries
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ''
-        axisPlacement: auto
-        barAlignment: 0
-        drawStyle: line
-        fillOpacity: 25
-        gradientMode: opacity
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: smooth
-        lineWidth: 2
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: 'off'
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: null
-        - color: red
-          value: 80
-      unit: bytes
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 12
-    'y': 35
-  id: 15
-  options:
-    legend:
-      calcs: []
-      displayMode: list
-      placement: bottom
-      showLegend: true
-    tooltip:
-      mode: multi
-      sort: desc
-  pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(coredns_cache_entries{ {{ $.Values.global.clusterLabel }}=~"$cluster"}) by (type)
-    interval: ''
-    legendFormat: '{{`{{`}} type {{`}}`}}'
-    refId: A
-  title: CoreDNS - Cache Size
-  type: timeseries
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      custom:
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        scaleDistribution:
-          type: linear
-    overrides: []
-  gridPos:
-    h: 10
-    w: 12
-    x: 0
-    'y': 43
-  id: 27
-  options:
-    calculate: false
-    cellGap: 1
-    color:
-      exponent: 0.5
-      fill: dark-orange
-      mode: scheme
-      reverse: false
-      scale: exponential
-      scheme: RdYlBu
-      steps: 64
-    exemplars:
-      color: rgba(255,0,255,0.7)
-    filterValues:
-      le: 1.0e-09
-    legend:
-      show: true
-    rowsFrame:
-      layout: auto
-    tooltip:
-      mode: single
-      showColorScale: false
-      yHistogram: false
-    yAxis:
-      axisPlacement: left
-      reverse: false
-      unit: s
-  pluginVersion: 10.4.1
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    editorMode: code
-    expr: sum(increase(coredns_dns_request_duration_seconds_bucket{instance=~"$instance", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
-    format: heatmap
-    legendFormat: '{{`{{`}}le{{`}}`}}'
-    range: true
-    refId: A
-  title: CoreDNS - DNS request duration
-  type: heatmap
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      custom:
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        scaleDistribution:
-          type: linear
-    overrides: []
-  gridPos:
-    h: 10
-    w: 12
-    x: 12
-    'y': 43
-  id: 28
-  options:
-    calculate: false
-    cellGap: 1
-    color:
-      exponent: 0.5
-      fill: dark-orange
-      mode: scheme
-      reverse: false
-      scale: exponential
-      scheme: RdYlBu
-      steps: 64
-    exemplars:
-      color: rgba(255,0,255,0.7)
-    filterValues:
-      le: 1.0e-09
-    legend:
-      show: true
-    rowsFrame:
-      layout: auto
-    tooltip:
-      mode: single
-      showColorScale: false
-      yHistogram: false
-    yAxis:
-      axisPlacement: left
-      reverse: false
-      unit: decbytes
-  pluginVersion: 10.4.1
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    editorMode: code
-    expr: sum(increase(coredns_dns_request_size_bytes_bucket{instance=~"$instance", le!="0", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
-    format: heatmap
-    legendFormat: '{{`{{`}}le{{`}}`}}'
-    range: true
-    refId: A
-  title: CoreDNS - DNS request size
-  type: heatmap
-- datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      custom:
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        scaleDistribution:
-          type: linear
-    overrides: []
-  gridPos:
-    h: 10
-    w: 12
-    x: 0
-    'y': 53
-  id: 29
-  options:
-    calculate: false
-    cellGap: 1
-    color:
-      exponent: 0.5
-      fill: dark-orange
-      mode: scheme
-      reverse: false
-      scale: exponential
-      scheme: RdYlBu
-      steps: 64
-    exemplars:
-      color: rgba(255,0,255,0.7)
-    filterValues:
-      le: 1.0e-09
-    legend:
-      show: true
-    rowsFrame:
-      layout: auto
-    tooltip:
-      mode: single
-      showColorScale: false
-      yHistogram: false
-    yAxis:
-      axisPlacement: left
-      reverse: false
-      unit: decbytes
-  pluginVersion: 10.4.1
-  targets:
-  - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    editorMode: code
-    expr: sum(increase(coredns_dns_response_size_bytes_bucket{instance=~"$instance", le!="0", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
-    format: heatmap
-    legendFormat: '{{`{{`}}le{{`}}`}}'
-    range: true
-    refId: A
-  title: CoreDNS - DNS response size
-  type: heatmap
 refresh: 30s
-schemaVersion: 39
+schemaVersion: 38
+style: dark
 tags:
 - Kubernetes
 - Prometheus
@@ -1008,6 +920,7 @@ templating:
       value: Prometheus
     hide: 0
     includeAll: false
+    label: ''
     multi: false
     name: datasource
     options: []
@@ -1038,59 +951,7 @@ templating:
     sort: 1
     type: {{ ternary "query" "constant" $.Values.grafana.sidecar.dashboards.multicluster }}
   - current:
-      selected: false
-      text: All
-      value: $__all
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(up{job="$job", {{ $.Values.global.clusterLabel }}=~"$cluster"},instance)
-    hide: 0
-    includeAll: true
-    label: ''
-    multi: false
-    name: instance
-    options: []
-    query:
-      qryType: 1
-      query: label_values(up{job="$job", {{ $.Values.global.clusterLabel }}=~"$cluster"},instance)
-      refId: PrometheusVariableQueryEditor-VariableQuery
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    tagValuesQuery: ''
-    tagsQuery: ''
-    type: query
-    useTags: false
-  - allValue: udp,tcp
-    current:
-      selected: false
-      text: udp
-      value: udp
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(coredns_dns_requests_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}, proto)
-    hide: 0
-    includeAll: false
-    label: ''
-    multi: false
-    name: protocol
-    options: []
-    query:
-      query: label_values(coredns_dns_requests_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}, proto)
-      refId: StandardVariableQuery
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    tagValuesQuery: ''
-    tagsQuery: ''
-    type: query
-    useTags: false
-  - current:
-      selected: false
+      selected: true
       text: 30s
       value: 30s
     hide: 0
@@ -1120,36 +981,12 @@ templating:
     queryValue: ''
     skipUrlSync: false
     type: custom
-  - current:
-      selected: true
-      text:
-      - coredns
-      value:
-      - coredns
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(coredns_build_info{ {{ $.Values.global.clusterLabel }}=~"$cluster"},job)
-    hide: 0
-    includeAll: false
-    multi: true
-    name: job
-    options: []
-    query:
-      qryType: 1
-      query: label_values(coredns_build_info{ {{ $.Values.global.clusterLabel }}=~"$cluster"},job)
-      refId: PrometheusVariableQueryEditor-VariableQuery
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    type: query
 time:
   from: now-1h
   to: now
 timepicker: {}
 timezone: {{ .Values.grafana.defaultDashboardsTimezone }}
-title: Kubernetes / System / CoreDNS
-uid: k8s_system_coredns
-version: 18
+title: Kubernetes / System / API Server
+uid: k8s_system_apisrv
+version: 17
 weekStart: ''

@@ -1,6 +1,7 @@
 ## Next release
 
 - upgraded common chart dependency
+- made webhook pod port configurable. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1565)
 
 ## 0.35.2
 

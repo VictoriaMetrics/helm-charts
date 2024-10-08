@@ -41,7 +41,7 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
-condition: {{ true }}
+condition: {{ or (not (empty ((((.Values).vmsingle).spec).vmBackup).destination)) (not (empty (((((.Values).vmcluster).spec).storage).vmBackup).destination)) }}
 description: Overview for VictoriaMetrics backupmanager v1.85.3 or higher
 editable: false
 fiscalYearStartMonth: 0

@@ -44,13 +44,27 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-# -- Enable dashboards despite it's dependency is not installed
-dashboards:
-  vmalert: false
-  operator: false
-  # -- In ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply
-  # See [this issue](https://github.com/VictoriaMetrics/helm-charts/tree/disable-node-exporter-dashboard-by-default/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards)
-  node-exporter-full: true
+
+defaultDashboards:
+  # -- Enable custom dashboards installation
+  enabled: true
+  grafanaOperator:
+    # -- Create dashboards as CRDs (reuqires grafana-operator to be installed)
+    enabled: false
+    instanceSelector:
+      matchLabels:
+        dashboards: "grafana"
+    allowCrossNamespaceImport: false
+  # -- Create dashboards as ConfigMap despite dependency it requires is not installed
+  dashboards:
+    vmalert:
+      enabled: false
+    operator:
+      enabled: false
+    # -- In ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply
+    # See [this issue](https://github.com/VictoriaMetrics/helm-charts/tree/disable-node-exporter-dashboard-by-default/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards)
+    node-exporter-full:
+      enabled: true
 
 # -- Create default rules for monitoring the cluster
 defaultRules:
@@ -215,20 +229,6 @@ defaultRules:
   labels: {}
   # -- Annotations for default rules
   annotations: {}
-
-# -- Create default dashboards
-defaultDashboardsEnabled: true
-
-# -- Create experimental dashboards
-experimentalDashboardsEnabled: true
-
-# -- Create dashboards as CRDs (reuqires grafana-operator to be installed)
-grafanaOperatorDashboardsFormat:
-  enabled: false
-  instanceSelector:
-    matchLabels:
-      dashboards: "grafana"
-  allowCrossNamespaceImport: false
 
 # -- Provide custom recording or alerting rules to be deployed into the cluster.
 additionalVictoriaMetricsMap:
