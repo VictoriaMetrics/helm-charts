@@ -40,6 +40,14 @@ crd:
       # use image tag that matches k8s API version by default
       tag: ""
       pullPolicy: IfNotPresent
+    # -- Cleanup hook resources
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "256Mi"
+      requests:
+        cpu: "100m"
+        memory: "56Mi"
 
 # -- Number of operator replicas
 replicaCount: 1
@@ -141,6 +149,12 @@ podDisruptionBudget:
   # minAvailable: 1
   # maxUnavailable: 1
   labels: {}
+
+# -- Graceful pod termination timeout. See [this article](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution) for details.
+terminationGracePeriodSeconds: 30
+
+# -- Operator lifecycle. See [this article](https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/) for details.
+lifecycle: {}
 
 # -- Resource object
 resources:
