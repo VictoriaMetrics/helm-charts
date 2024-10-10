@@ -98,7 +98,7 @@ spec:
               containerPort: {{ include "vm.port.from.flag" (dict "flag" (index .Values.extraArgs "health-probe-bind-address") "default" "8081") }}
               protocol: TCP
             - name: webhook
-              containerPort: 9443
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" (index .Values.extraArgs "webhook.port") "default" "9443") }}
               protocol: TCP
           {{- with (fromYaml (include "vm.probe" (dict "app" .Values "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
@@ -127,6 +127,10 @@ spec:
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- with .Values.lifecycle }}
+      lifecycle: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.affinity }}
       affinity: {{ toYaml . | nindent 8 }}
