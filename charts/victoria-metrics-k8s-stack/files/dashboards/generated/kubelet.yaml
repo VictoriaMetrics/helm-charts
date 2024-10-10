@@ -861,7 +861,7 @@ templating:
     includeAll: true
     label: instance
     name: instance
-    query: label_values(up{job="kubelet", metrics_path="/metrics",cluster="$cluster"}, instance)
+    query: label_values(up{job="kubelet", metrics_path="/metrics", {{ $.Values.global.clusterLabel }}=~"$cluster"}, instance)
     refresh: 2
     type: query
 time:

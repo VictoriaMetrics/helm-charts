@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fixed dashboards variable queries
 
 ## 0.27.1
 

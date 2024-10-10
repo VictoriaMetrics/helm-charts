@@ -187,6 +187,8 @@ def patch_dashboard(dashboard, name):
                         variable["query"]["query"] = fix_query(
                             variable["query"]["query"]
                         )
+                    elif isinstance(variable["query"], str):
+                        variable["query"] = fix_query(variable["query"])
                 if variable.get("type", "") == "datasource":
                     variable["query"] = (
                         '[[ default "prometheus" .Values.grafana.defaultDatasourceType ]]'

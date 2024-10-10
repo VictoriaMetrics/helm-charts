@@ -444,7 +444,7 @@ templating:
     includeAll: true
     label: instance
     name: instance
-    query: label_values(up{job="kube-proxy", cluster="$cluster", job="kube-proxy"}, instance)
+    query: label_values(up{job="kube-proxy", {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-proxy"}, instance)
     refresh: 2
     type: query
 time:
