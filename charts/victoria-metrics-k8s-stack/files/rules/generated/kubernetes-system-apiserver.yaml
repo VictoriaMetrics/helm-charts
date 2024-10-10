@@ -56,7 +56,7 @@ rules:
     runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubeapiterminatedrequests'
     summary: 'The kubernetes apiserver has terminated {{`{{`}} $value | humanizePercentage {{`}}`}} of its incoming requests.'
   condition: '{{ true }}'
-  expr: sum(rate(apiserver_request_terminations_total{job="apiserver"}[10m]))  / (  sum(rate(apiserver_request_total{job="apiserver"}[10m])) + sum(rate(apiserver_request_terminations_total{job="apiserver"}[10m])) ) > 0.20
+  expr: sum by ({{ .Values.global.clusterLabel }}) (rate(apiserver_request_terminations_total{job="apiserver"}[10m])) / ( sum by ({{ .Values.global.clusterLabel }}) (rate(apiserver_request_total{job="apiserver"}[10m])) + sum by ({{ .Values.global.clusterLabel }}) (rate(apiserver_request_terminations_total{job="apiserver"}[10m])) ) > 0.20
   for: 5m
   labels:
     severity: warning

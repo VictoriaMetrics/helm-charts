@@ -1183,7 +1183,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 11
+      'y': 35
     id: 109
     options:
       legend:
@@ -1272,6 +1272,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1280,7 +1281,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 11
+      'y': 35
     id: 111
     options:
       legend:
@@ -1362,6 +1363,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: bytes
@@ -1376,7 +1378,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 19
+      'y': 43
     id: 81
     options:
       legend:
@@ -1463,6 +1465,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: bps
@@ -1477,7 +1480,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 19
+      'y': 43
     id: 7
     options:
       legend:
@@ -1563,6 +1566,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1571,7 +1575,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 27
+      'y': 51
     id: 83
     options:
       legend:
@@ -1647,6 +1651,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -1655,7 +1660,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 27
+      'y': 51
     id: 39
     options:
       legend:
@@ -1733,6 +1738,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1741,7 +1747,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 35
+      'y': 59
     id: 135
     options:
       legend:
@@ -1769,6 +1775,87 @@ panels:
       range: true
       refId: A
     title: CPU spent on GC ($instance)
+    type: timeseries
+  - datasource:
+      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      uid: $ds
+    description: "Shows the time goroutines have spent in runnable state before actually running. The lower is better.\n\nHigh values or values exceeding the threshold is usually a sign of            insufficient CPU resources or CPU throttling. \n\nVerify that service has enough CPU resources. Otherwise, the service could work unreliably with delays in processing."
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: line
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 0.1
+        unit: s
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      'y': 59
+    id: 149
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: multi
+        sort: desc
+    pluginVersion: 9.2.6
+    targets:
+    - datasource:
+        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+        uid: $ds
+      editorMode: code
+      expr: max(histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket{job=~"$job"}[$__rate_interval])) by (job, instance, le))) by(job)
+      format: time_series
+      interval: ''
+      intervalFactor: 2
+      legendFormat: __auto
+      range: true
+      refId: A
+    title: Go scheduling latency
     type: timeseries
   - datasource:
       type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
@@ -1812,6 +1899,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -1820,7 +1908,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 35
+      'y': 67
     id: 41
     options:
       legend:
@@ -1914,7 +2002,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 12
+      'y': 20
     id: 92
     options:
       legend:
@@ -1992,7 +2080,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 12
+      'y': 20
     id: 95
     options:
       legend:
@@ -2073,7 +2161,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 20
+      'y': 28
     id: 98
     options:
       legend:
@@ -2154,7 +2242,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 20
+      'y': 28
     id: 99
     options:
       legend:
@@ -2235,7 +2323,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 28
+      'y': 36
     id: 79
     options:
       legend:
@@ -2313,7 +2401,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 28
+      'y': 36
     id: 18
     links:
     - targetBlank: true
@@ -2394,7 +2482,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 36
+      'y': 44
     id: 127
     options:
       legend:
@@ -2470,7 +2558,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 36
+      'y': 44
     id: 50
     options:
       legend:
@@ -2534,7 +2622,7 @@ panels:
       h: 7
       w: 24
       x: 0
-      'y': 44
+      'y': 52
     id: 129
     options:
       footer:
@@ -2635,7 +2723,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -2644,7 +2731,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 37
+      'y': 45
     id: 48
     options:
       legend:
@@ -2716,7 +2803,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -2725,7 +2811,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 37
+      'y': 45
     id: 76
     options:
       legend:
@@ -2795,7 +2881,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -2804,7 +2889,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 44
+      'y': 52
     id: 132
     options:
       legend:
@@ -2876,7 +2961,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -2885,7 +2969,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 44
+      'y': 52
     id: 133
     options:
       legend:
@@ -2956,7 +3040,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -2965,7 +3048,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 51
+      'y': 59
     id: 20
     options:
       legend:
@@ -3035,7 +3118,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -3044,7 +3126,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 51
+      'y': 59
     id: 126
     options:
       legend:
@@ -3113,7 +3195,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: bytes
@@ -3122,7 +3203,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 59
+      'y': 67
     id: 46
     options:
       legend:
@@ -3191,7 +3272,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: s
@@ -3200,7 +3280,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 59
+      'y': 67
     id: 148
     options:
       legend:
@@ -3269,7 +3349,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -3278,7 +3357,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 67
+      'y': 75
     id: 31
     options:
       legend:
@@ -3410,7 +3489,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 14
+      'y': 22
     id: 73
     options:
       legend:
@@ -3498,7 +3577,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 6
+      'y': 14
     id: 131
     options:
       legend:
@@ -3576,7 +3655,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 14
+      'y': 22
     id: 130
     options:
       legend:
@@ -3664,7 +3743,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 14
+      'y': 22
     id: 77
     options:
       legend:
@@ -3761,7 +3840,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 7
+      'y': 15
     id: 146
     options:
       legend:
@@ -3837,7 +3916,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 7
+      'y': 15
     id: 143
     options:
       legend:
@@ -3908,7 +3987,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 15
+      'y': 23
     id: 147
     options:
       legend:
@@ -3985,7 +4064,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 15
+      'y': 23
     id: 139
     options:
       legend:
@@ -4077,7 +4156,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 23
+      'y': 31
     id: 142
     options:
       legend:
@@ -4149,7 +4228,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 23
+      'y': 31
     id: 137
     options:
       legend:
@@ -4234,7 +4313,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 31
+      'y': 39
     id: 141
     options:
       legend:
@@ -4338,7 +4417,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 8
+      'y': 16
     id: 60
     options:
       legend:
@@ -4416,7 +4495,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 8
+      'y': 16
     id: 66
     options:
       legend:
@@ -4500,7 +4579,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 16
+      'y': 24
     id: 61
     options:
       legend:
@@ -4581,7 +4660,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 16
+      'y': 24
     id: 65
     options:
       legend:
@@ -4661,7 +4740,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 24
+      'y': 32
     id: 88
     options:
       legend:
@@ -4735,7 +4814,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 24
+      'y': 32
     id: 84
     options:
       legend:
@@ -4820,7 +4899,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 32
+      'y': 40
     id: 90
     options:
       legend:
@@ -4867,7 +4946,7 @@ panels:
       h: 2
       w: 24
       x: 0
-      'y': 17
+      'y': 25
     id: 115
     options:
       code:
@@ -4927,7 +5006,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 19
+      'y': 27
     id: 119
     options:
       legend:
@@ -5009,7 +5088,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 19
+      'y': 27
     id: 117
     options:
       legend:
@@ -5089,7 +5168,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 27
+      'y': 35
     id: 125
     links:
     - title: Troubleshooting
@@ -5175,7 +5254,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 27
+      'y': 35
     id: 123
     options:
       legend:
@@ -5271,7 +5350,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 35
+      'y': 43
     id: 121
     options:
       legend:

@@ -8,9 +8,9 @@ rules:
     summary: 'The API server is burning too much error budget.'
   condition: '{{ true }}'
   expr: |-
-    sum(apiserver_request:burnrate1h) > (14.40 * 0.01000)
-    and
-    sum(apiserver_request:burnrate5m) > (14.40 * 0.01000)
+    sum by ({{ .Values.global.clusterLabel }}) (apiserver_request:burnrate1h) > (14.40 * 0.01000)
+    and on ({{ .Values.global.clusterLabel }})
+    sum by ({{ .Values.global.clusterLabel }}) (apiserver_request:burnrate5m) > (14.40 * 0.01000)
   for: 2m
   labels:
     long: 1h
@@ -23,9 +23,9 @@ rules:
     summary: 'The API server is burning too much error budget.'
   condition: '{{ true }}'
   expr: |-
-    sum(apiserver_request:burnrate6h) > (6.00 * 0.01000)
-    and
-    sum(apiserver_request:burnrate30m) > (6.00 * 0.01000)
+    sum by ({{ .Values.global.clusterLabel }}) (apiserver_request:burnrate6h) > (6.00 * 0.01000)
+    and on ({{ .Values.global.clusterLabel }})
+    sum by ({{ .Values.global.clusterLabel }}) (apiserver_request:burnrate30m) > (6.00 * 0.01000)
   for: 15m
   labels:
     long: 6h
@@ -38,9 +38,9 @@ rules:
     summary: 'The API server is burning too much error budget.'
   condition: '{{ true }}'
   expr: |-
-    sum(apiserver_request:burnrate1d) > (3.00 * 0.01000)
-    and
-    sum(apiserver_request:burnrate2h) > (3.00 * 0.01000)
+    sum by ({{ .Values.global.clusterLabel }}) (apiserver_request:burnrate1d) > (3.00 * 0.01000)
+    and on ({{ .Values.global.clusterLabel }})
+    sum by ({{ .Values.global.clusterLabel }}) (apiserver_request:burnrate2h) > (3.00 * 0.01000)
   for: 1h
   labels:
     long: 1d
@@ -53,9 +53,9 @@ rules:
     summary: 'The API server is burning too much error budget.'
   condition: '{{ true }}'
   expr: |-
-    sum(apiserver_request:burnrate3d) > (1.00 * 0.01000)
-    and
-    sum(apiserver_request:burnrate6h) > (1.00 * 0.01000)
+    sum by ({{ .Values.global.clusterLabel }}) (apiserver_request:burnrate3d) > (1.00 * 0.01000)
+    and on ({{ .Values.global.clusterLabel }})
+    sum by ({{ .Values.global.clusterLabel }}) (apiserver_request:burnrate6h) > (1.00 * 0.01000)
   for: 3h
   labels:
     long: 3d
