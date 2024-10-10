@@ -14882,6 +14882,81 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - Generate VM components tag version from chart app name by default
+        - Added k8s apiserver, kube-proxy, controller-manager and kubelet dashboards
+        - Moved `dashboards.<dashboard>` to `defaultDashboards.dashboards.<dashboard>.enabled`
+        - Moved `defaultDashboardsEnabled` to `defaultDashboards.enabled`
+        - Moved `grafanaOperatorDashboardsFormat` to `defaultDashboards.grafanaOperator`
+        - Added condition for `grafana-overview`, `alertmanager-overview` and `vmbackupmanager` dashboards. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1564)
+        - Removed `experimentalDashboardsEnabled` param
+        - Upgraded default Alertmanager tag 0.25.0 -> 0.27.0
+        - Upgraded operator chart 0.35.2 -> 0.35.3
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://docs.victoriametrics.com/vmgateway
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: v1.104.0
+    created: "2024-10-10T07:00:43.037309372Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    - condition: victoria-metrics-operator.enabled
+      name: victoria-metrics-operator
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.35.*
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.25.*
+    - condition: prometheus-node-exporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.39.*
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 8.4.*
+    - condition: crds.enabled
+      name: crds
+      repository: ""
+      version: 0.0.0
+    - condition: prometheus-operator-crds.enabled
+      name: prometheus-operator-crds
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 11.0.*
+    description: Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics
+      Operator, Grafana dashboards, ServiceScrapes and VMRules
+    digest: 7c00d3b2a476f24c30144efdf1fe95b5cf8b49eec5b62d25aa889842cbefce53
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-k8s-stack
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-k8s-stack-0.27.1/victoria-metrics-k8s-stack-0.27.1.tgz
+    version: 0.27.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - bump version of VM components to [v1.104.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.104.0)
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -28058,4 +28133,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-10-10T06:52:04.172930832Z"
+generated: "2024-10-10T07:00:43.153222973Z"
