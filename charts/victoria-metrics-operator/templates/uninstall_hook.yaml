@@ -9,6 +9,8 @@
 {{- if empty ($app.image).tag }}
   {{- $tag := (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor) | replace "+" "" -}}
   {{- $_ := set $app.image "tag" $tag }}
+{{- else if not (kindIs "string" ($app.image).tag) }}
+  {{- fail "`crd.cleanup.image.tag` is not string, most probably you need to enquote provided value" -}}
 {{- end }}
 ---
 apiVersion: batch/v1
@@ -32,13 +34,7 @@ spec:
         - name: kubectl
           image: {{ include "vm.image" (dict "helm" . "app" $app) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
-          resources:
-            limits:
-              cpu: "500m"
-              memory: "256Mi"
-            requests:
-              cpu: "100m"
-              memory: "56Mi"
+          resources: {{ toYaml $app.resources | nindent 12 }}
           args:
             - delete
             - {{ (keys .Values.admissionWebhooks.enabledCRDValidation) | sortAlpha | join "," }}
