@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 0.27.2
+
+**Release date:** 2024-10-10
+
+![AppVersion: v1.104.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.104.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Fixed dashboards variable queries
 
 ## 0.27.1
