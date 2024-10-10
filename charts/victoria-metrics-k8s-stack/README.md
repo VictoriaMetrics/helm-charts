@@ -626,9 +626,9 @@ selectAllByDefault: true
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
 <code class="language-yaml">node-exporter-full:
     enabled: true
-operator:
+victoriametrics-operator:
     enabled: false
-vmalert:
+victoriametrics-vmalert:
     enabled: false
 </code>
 </pre>
