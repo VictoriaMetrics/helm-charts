@@ -8,6 +8,7 @@
 - Added condition for `grafana-overview`, `alertmanager-overview` and `vmbackupmanager` dashboards. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1564)
 - Removed `experimentalDashboardsEnabled` param
 - Upgraded default Alertmanager tag 0.25.0 -> 0.27.0
+- Upgraded operator chart 0.35.2 -> 0.35.3
 
 ## 0.27.0
 
