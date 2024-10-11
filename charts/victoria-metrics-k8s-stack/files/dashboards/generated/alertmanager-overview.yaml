@@ -1,8 +1,9 @@
+{{- $Values := (.helm).Values | default .Values }}
 __inputs: []
 __requires: []
 annotations:
   list: []
-condition: {{ .Values.alertmanager.enabled }}
+condition: {{ $Values.alertmanager.enabled }}
 editable: false
 gnetId: null
 graphTooltip: 1
@@ -348,7 +349,7 @@ templating:
     label: Data Source
     name: datasource
     options: []
-    query: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    query: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     refresh: 1
     regex: ''
     type: datasource
@@ -437,7 +438,7 @@ timepicker:
   - 2d
   - 7d
   - 30d
-timezone: {{ .Values.grafana.defaultDashboardsTimezone }}
+timezone: {{ $Values.grafana.defaultDashboardsTimezone }}
 title: Alertmanager / Overview
 uid: alertmanager-overview
 version: 0

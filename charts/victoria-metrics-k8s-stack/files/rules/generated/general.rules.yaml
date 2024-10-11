@@ -1,13 +1,14 @@
+{{- $Values := (.helm).Values | default .Values }}
 condition: '{{ true }}'
 name: general.rules
 rules:
 - alert: TargetDown
   annotations:
     description: '{{`{{`}} printf "%.4g" $value {{`}}`}}% of the {{`{{`}} $labels.job {{`}}`}}/{{`{{`}} $labels.service {{`}}`}} targets in {{`{{`}} $labels.namespace {{`}}`}} namespace are down.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/general/targetdown'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/general/targetdown'
     summary: 'One or more targets are unreachable.'
   condition: '{{ true }}'
-  expr: 100 * (count(up == 0) BY (job,namespace,service,{{ .Values.global.clusterLabel }}) / count(up) BY (job,namespace,service,{{ .Values.global.clusterLabel }})) > 10
+  expr: 100 * (count(up == 0) BY (job,namespace,service,{{ $Values.global.clusterLabel }}) / count(up) BY (job,namespace,service,{{ $Values.global.clusterLabel }})) > 10
   for: 10m
   labels:
     severity: warning
@@ -24,7 +25,7 @@ rules:
       "DeadMansSnitch" integration in PagerDuty.
 
       '
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/general/watchdog'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/general/watchdog'
     summary: 'An alert that should always be firing to certify that Alertmanager is working properly.'
   condition: '{{ true }}'
   expr: vector(1)
@@ -45,9 +46,9 @@ rules:
       This alert should be routed to a null receiver and configured to inhibit alerts with severity="info".
 
       '
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/general/infoinhibitor'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/general/infoinhibitor'
     summary: 'Info-level alert inhibition.'
   condition: '{{ true }}'
-  expr: ALERTS{severity = "info"} == 1 unless on (namespace,{{ .Values.global.clusterLabel }}) ALERTS{alertname != "InfoInhibitor", severity =~ "warning|critical", alertstate="firing"} == 1
+  expr: ALERTS{severity = "info"} == 1 unless on (namespace,{{ $Values.global.clusterLabel }}) ALERTS{alertname != "InfoInhibitor", severity =~ "warning|critical", alertstate="firing"} == 1
   labels:
     severity: none

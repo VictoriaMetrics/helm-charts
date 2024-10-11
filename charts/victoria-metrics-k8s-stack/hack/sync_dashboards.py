@@ -71,29 +71,29 @@ allowed_dashboards = [
 
 # Additional conditions map
 condition_map = {
-    "alertmanager-overview": ".Values.alertmanager.enabled",
-    "apiserver": ".Values.kubeApiServer.enabled",
-    "controller-manager": ".Values.kubeControllerManager.enabled",
-    "etcd": ".Values.kubeEtcd.enabled",
-    "grafana-coredns-k8s": ".Values.coreDns.enabled",
-    "grafana-overview": ".Values.grafana.enabled",
-    "kubelet": ".Values.kubelet.enabled",
-    "kubernetes-system-api-server": ".Values.kubeApiServer.enabled",
-    "kubernetes-system-coredns": ".Values.coreDns.enabled",
-    "kubernetes-views-global": ".Values.kubelet.enabled",
-    "kubernetes-views-namespaces": ".Values.kubelet.enabled",
-    "kubernetes-views-nodes": ".Values.kubelet.enabled",
-    "kubernetes-views-pods": ".Values.kubelet.enabled",
-    "node-cluster-rsrc-use": '(index .Values "prometheus-node-exporter" "enabled")',
+    "alertmanager-overview": "$Values.alertmanager.enabled",
+    "apiserver": "$Values.kubeApiServer.enabled",
+    "controller-manager": "$Values.kubeControllerManager.enabled",
+    "etcd": "$Values.kubeEtcd.enabled",
+    "grafana-coredns-k8s": "$Values.coreDns.enabled",
+    "grafana-overview": "$Values.grafana.enabled",
+    "kubelet": "$Values.kubelet.enabled",
+    "kubernetes-system-api-server": "$Values.kubeApiServer.enabled",
+    "kubernetes-system-coredns": "$Values.coreDns.enabled",
+    "kubernetes-views-global": "$Values.kubelet.enabled",
+    "kubernetes-views-namespaces": "$Values.kubelet.enabled",
+    "kubernetes-views-nodes": "$Values.kubelet.enabled",
+    "kubernetes-views-pods": "$Values.kubelet.enabled",
+    "node-cluster-rsrc-use": '(index $Values "prometheus-node-exporter" "enabled")',
     "node-exporter-full": "false",
-    "node-rsrc-use": '(index .Values "prometheus-node-exporter" "enabled")',
-    "proxy": ".Values.kubeProxy.enabled",
-    "scheduler": ".Values.kubeScheduler.enabled",
-    "victoriametrics-backupmanager": "or (not (empty ((((.Values).vmsingle).spec).vmBackup).destination)) (not (empty (((((.Values).vmcluster).spec).storage).vmBackup).destination))",
-    "victoriametrics-cluster": ".Values.vmcluster.enabled",
-    "victoriametrics-operator": '(index .Values "victoria-metrics-operator" "enabled")',
-    "victoriametrics-single-node": ".Values.vmsingle.enabled",
-    "victoriametrics-vmalert": ".Values.vmalert.enabled",
+    "node-rsrc-use": '(index $Values "prometheus-node-exporter" "enabled")',
+    "proxy": "$Values.kubeProxy.enabled",
+    "scheduler": "$Values.kubeScheduler.enabled",
+    "victoriametrics-backupmanager": "or (not (empty (((($Values).vmsingle).spec).vmBackup).destination)) (not (empty ((((($Values).vmcluster).spec).storage).vmBackup).destination))",
+    "victoriametrics-cluster": "$Values.vmcluster.enabled",
+    "victoriametrics-operator": '(index $Values "victoria-metrics-operator" "enabled")',
+    "victoriametrics-single-node": "$Values.vmsingle.enabled",
+    "victoriametrics-vmalert": "$Values.vmalert.enabled",
 }
 
 
@@ -118,7 +118,7 @@ def init_yaml_styles():
 def fix_query(query):
     query = re.sub(
         '[\\s]*[\\w-]+[\\s]*=[~]*[\\s]*\\"\\$cluster\\"',
-        ' [[ $.Values.global.clusterLabel ]]=~"$cluster"',
+        ' [[ $Values.global.clusterLabel ]]=~"$cluster"',
         query.rstrip(),
     )
     if "\n" in query:
@@ -139,7 +139,7 @@ def replace_ds_type_in_panel(panel):
         if "type" in panel["datasource"]:
             panel["datasource"][
                 "type"
-            ] = '[[ default "prometheus" .Values.grafana.defaultDatasourceType ]]'
+            ] = '[[ default "prometheus" $Values.grafana.defaultDatasourceType ]]'
     for target in panel.get("targets", []):
         if "expr" in target:
             fix_expr(target)
@@ -147,7 +147,7 @@ def replace_ds_type_in_panel(panel):
             if "type" in target["datasource"]:
                 target["datasource"][
                     "type"
-                ] = '[[ default "prometheus" .Values.grafana.defaultDatasourceType ]]'
+                ] = '[[ default "prometheus" $Values.grafana.defaultDatasourceType ]]'
     if "panels" in panel:
         for p in panel["panels"]:
             replace_ds_type_in_panel(p)
@@ -163,16 +163,16 @@ def patch_dashboard(dashboard, name):
             if variable.get("name", "") == "cluster":
                 if "definition" in variable and "cluster" in variable["definition"]:
                     variable["definition"] = variable["definition"].replace(
-                        "cluster", "[[ $.Values.global.clusterLabel ]]"
+                        "cluster", "[[ $Values.global.clusterLabel ]]"
                     )
                 variable["type"] = (
-                    '[[ ternary "query" "constant" $.Values.grafana.sidecar.dashboards.multicluster ]]'
+                    '[[ ternary "query" "constant" $Values.grafana.sidecar.dashboards.multicluster ]]'
                 )
                 variable["hide"] = (
-                    "[[ ternary 0 2 $.Values.grafana.sidecar.dashboards.multicluster ]]"
+                    "[[ ternary 0 2 $Values.grafana.sidecar.dashboards.multicluster ]]"
                 )
                 variable["query"] = (
-                    f'[[ ternary (b64dec "%(query)s" | replace "cluster" $.Values.global.clusterLabel) ".*" $.Values.grafana.sidecar.dashboards.multicluster ]]'
+                    f'[[ ternary (b64dec "%(query)s" | replace "cluster" $Values.global.clusterLabel) ".*" $Values.grafana.sidecar.dashboards.multicluster ]]'
                     % {
                         "query": base64.b64encode(
                             json.dumps(variable["query"]).encode("ascii")
@@ -191,7 +191,7 @@ def patch_dashboard(dashboard, name):
                         variable["query"] = fix_query(variable["query"])
                 if variable.get("type", "") == "datasource":
                     variable["query"] = (
-                        '[[ default "prometheus" .Values.grafana.defaultDatasourceType ]]'
+                        '[[ default "prometheus" $Values.grafana.defaultDatasourceType ]]'
                     )
 
     ## fix drilldown links. see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/659
@@ -205,7 +205,7 @@ def patch_dashboard(dashboard, name):
     if "tags" in dashboard:
         dashboard["tags"].append("vm-k8s-stack")
 
-    dashboard["timezone"] = "[[ .Values.grafana.defaultDashboardsTimezone ]]"
+    dashboard["timezone"] = "[[ $Values.grafana.defaultDashboardsTimezone ]]"
     dashboard["editable"] = False
     dashboard["condition"] = "[[ %(condition)s ]]" % {
         "condition": condition_map.get(name, "true")
@@ -231,7 +231,10 @@ def write_dashboard_to_file(resource_name, content, destination):
 
     # recreate the file
     with open(new_filename, "w") as f:
-        f.write(escape(content))
+        content = "{{- $Values := (.helm).Values | default .Values }}\n" + escape(
+            content
+        )
+        f.write(content)
 
     print(f"Generated {new_filename}")
 

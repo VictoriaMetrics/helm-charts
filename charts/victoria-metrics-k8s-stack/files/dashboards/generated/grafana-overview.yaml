@@ -1,3 +1,4 @@
+{{- $Values := (.helm).Values | default .Values }}
 annotations:
   list:
   - builtIn: 1
@@ -12,7 +13,7 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
-condition: {{ .Values.grafana.enabled }}
+condition: {{ $Values.grafana.enabled }}
 editable: false
 gnetId: null
 graphTooltip: 0
@@ -351,7 +352,7 @@ templating:
     multi: false
     name: datasource
     options: []
-    query: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    query: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     queryValue: ''
     refresh: 1
     regex: ''
@@ -425,7 +426,7 @@ timepicker:
   - 1h
   - 2h
   - 1d
-timezone: {{ .Values.grafana.defaultDashboardsTimezone }}
+timezone: {{ $Values.grafana.defaultDashboardsTimezone }}
 title: Grafana Overview
 uid: 6be0s85Mk
 version: 2

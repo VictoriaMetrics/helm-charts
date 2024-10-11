@@ -1,4 +1,5 @@
-condition: {{ .Values.kubeScheduler.enabled }}
+{{- $Values := (.helm).Values | default .Values }}
+condition: {{ $Values.kubeScheduler.enabled }}
 editable: false
 links:
 - asDropdown: true
@@ -11,7 +12,7 @@ links:
   type: dashboards
 panels:
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -28,14 +29,14 @@ panels:
   pluginVersion: v11.1.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: sum(up{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler"})
+    expr: sum(up{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler"})
     instant: true
   title: Up
   type: stat
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -64,29 +65,29 @@ panels:
   pluginVersion: v11.1.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: sum(rate(scheduler_e2e_scheduling_duration_seconds_count{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
+    expr: sum(rate(scheduler_e2e_scheduling_duration_seconds_count{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} e2e'
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: sum(rate(scheduler_binding_duration_seconds_count{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
+    expr: sum(rate(scheduler_binding_duration_seconds_count{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} binding'
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: sum(rate(scheduler_scheduling_algorithm_duration_seconds_count{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
+    expr: sum(rate(scheduler_scheduling_algorithm_duration_seconds_count{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} scheduling algorithm'
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: sum(rate(scheduler_volume_scheduling_duration_seconds_count{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
+    expr: sum(rate(scheduler_volume_scheduling_duration_seconds_count{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} volume'
   title: Scheduling Rate
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -115,29 +116,29 @@ panels:
   pluginVersion: v11.1.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_duration_seconds_bucket{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
+    expr: histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} e2e'
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(scheduler_binding_duration_seconds_bucket{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
+    expr: histogram_quantile(0.99, sum(rate(scheduler_binding_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} binding'
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(scheduler_scheduling_algorithm_duration_seconds_bucket{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
+    expr: histogram_quantile(0.99, sum(rate(scheduler_scheduling_algorithm_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} scheduling algorithm'
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(scheduler_volume_scheduling_duration_seconds_bucket{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
+    expr: histogram_quantile(0.99, sum(rate(scheduler_volume_scheduling_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} volume'
   title: Scheduling latency 99th Quantile
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -166,29 +167,29 @@ panels:
   pluginVersion: v11.1.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"2.."}[$__rate_interval]))
+    expr: sum(rate(rest_client_requests_total{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"2.."}[$__rate_interval]))
     legendFormat: 2xx
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"3.."}[$__rate_interval]))
+    expr: sum(rate(rest_client_requests_total{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"3.."}[$__rate_interval]))
     legendFormat: 3xx
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"4.."}[$__rate_interval]))
+    expr: sum(rate(rest_client_requests_total{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"4.."}[$__rate_interval]))
     legendFormat: 4xx
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"5.."}[$__rate_interval]))
+    expr: sum(rate(rest_client_requests_total{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"5.."}[$__rate_interval]))
     legendFormat: 5xx
   title: Kube API Request Rate
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -217,14 +218,14 @@ panels:
   pluginVersion: v11.1.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance", verb="POST"}[$__rate_interval])) by (verb, url, le))
+    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance", verb="POST"}[$__rate_interval])) by (verb, url, le))
     legendFormat: '{{`{{`}}verb{{`}}`}} {{`{{`}}url{{`}}`}}'
   title: Post Request Latency 99th Quantile
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -253,14 +254,14 @@ panels:
   pluginVersion: v11.1.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance", verb="GET"}[$__rate_interval])) by (verb, url, le))
+    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance", verb="GET"}[$__rate_interval])) by (verb, url, le))
     legendFormat: '{{`{{`}}verb{{`}}`}} {{`{{`}}url{{`}}`}}'
   title: Get Request Latency 99th Quantile
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -289,14 +290,14 @@ panels:
   pluginVersion: v11.1.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: process_resident_memory_bytes{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}
+    expr: process_resident_memory_bytes{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}
     legendFormat: '{{`{{`}}instance{{`}}`}}'
   title: Memory
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -325,14 +326,14 @@ panels:
   pluginVersion: v11.1.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: rate(process_cpu_seconds_total{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])
+    expr: rate(process_cpu_seconds_total{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])
     legendFormat: '{{`{{`}}instance{{`}}`}}'
   title: CPU usage
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -361,9 +362,9 @@ panels:
   pluginVersion: v11.1.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
-    expr: go_goroutines{ {{ $.Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}
+    expr: go_goroutines{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}
     legendFormat: '{{`{{`}}instance{{`}}`}}'
   title: Goroutines
   type: timeseries
@@ -381,19 +382,19 @@ templating:
     hide: 0
     label: Data source
     name: datasource
-    query: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    query: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     regex: ''
     type: datasource
   - datasource:
       type: prometheus
       uid: ${datasource}
-    hide: {{ ternary 0 2 $.Values.grafana.sidecar.dashboards.multicluster }}
+    hide: {{ ternary 0 2 $Values.grafana.sidecar.dashboards.multicluster }}
     label: cluster
     name: cluster
-    query: {{ ternary (b64dec "ImxhYmVsX3ZhbHVlcyh1cHtqb2I9XCJrdWJlLXNjaGVkdWxlclwifSwgY2x1c3Rlciki" | replace "cluster" $.Values.global.clusterLabel) ".*" $.Values.grafana.sidecar.dashboards.multicluster }}
+    query: {{ ternary (b64dec "ImxhYmVsX3ZhbHVlcyh1cHtqb2I9XCJrdWJlLXNjaGVkdWxlclwifSwgY2x1c3Rlciki" | replace "cluster" $Values.global.clusterLabel) ".*" $Values.grafana.sidecar.dashboards.multicluster }}
     refresh: 2
     sort: 1
-    type: {{ ternary "query" "constant" $.Values.grafana.sidecar.dashboards.multicluster }}
+    type: {{ ternary "query" "constant" $Values.grafana.sidecar.dashboards.multicluster }}
   - allValue: .+
     datasource:
       type: prometheus
@@ -402,12 +403,12 @@ templating:
     includeAll: true
     label: instance
     name: instance
-    query: label_values(up{job="kube-scheduler", {{ $.Values.global.clusterLabel }}=~"$cluster"}, instance)
+    query: label_values(up{job="kube-scheduler", {{ $Values.global.clusterLabel }}=~"$cluster"}, instance)
     refresh: 2
     type: query
 time:
   from: now-1h
   to: now
-timezone: {{ .Values.grafana.defaultDashboardsTimezone }}
+timezone: {{ $Values.grafana.defaultDashboardsTimezone }}
 title: Kubernetes / Scheduler
 uid: 2e6b6a3b4bddf1427b3a55aa1311c656

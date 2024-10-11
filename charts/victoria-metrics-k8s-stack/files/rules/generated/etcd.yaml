@@ -1,4 +1,5 @@
-condition: '{{ .Values.kubeEtcd.enabled }}'
+{{- $Values := (.helm).Values | default .Values }}
+condition: '{{ $Values.kubeEtcd.enabled }}'
 name: etcd
 rules:
 - alert: etcdMembersDown

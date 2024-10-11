@@ -1,9 +1,10 @@
-condition: {{ .Values.kubeEtcd.enabled }}
+{{- $Values := (.helm).Values | default .Values }}
+condition: {{ $Values.kubeEtcd.enabled }}
 description: etcd sample Grafana dashboard with Prometheus
 editable: false
 panels:
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   gridPos:
     h: 7
@@ -21,16 +22,16 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: sum(etcd_server_has_leader{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"})
+    expr: sum(etcd_server_has_leader{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"})
     legendFormat: '{{`{{`}}cluster{{`}}`}} - {{`{{`}}namespace{{`}}`}}
 
       '
   title: Up
   type: stat
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -49,19 +50,19 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: sum(rate(grpc_server_started_total{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster",grpc_type="unary"}[$__rate_interval]))
+    expr: sum(rate(grpc_server_started_total{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster",grpc_type="unary"}[$__rate_interval]))
     legendFormat: RPC rate
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: sum(rate(grpc_server_handled_total{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster",grpc_type="unary",grpc_code=~"Unknown|FailedPrecondition|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded"}[$__rate_interval]))
+    expr: sum(rate(grpc_server_handled_total{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster",grpc_type="unary",grpc_code=~"Unknown|FailedPrecondition|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded"}[$__rate_interval]))
     legendFormat: RPC failed rate
   title: RPC rate
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -79,19 +80,19 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: sum(grpc_server_started_total{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{ {{ $.Values.global.clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"})
+    expr: sum(grpc_server_started_total{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{ {{ $Values.global.clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"})
     legendFormat: Watch streams
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: sum(grpc_server_started_total{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{ {{ $.Values.global.clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"})
+    expr: sum(grpc_server_started_total{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{ {{ $Values.global.clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"})
     legendFormat: Lease streams
   title: Active streams
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -110,14 +111,14 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}
     legendFormat: '{{`{{`}}instance{{`}}`}} DB size'
   title: DB size
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -136,19 +137,19 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance, le))
+    expr: histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance, le))
     legendFormat: '{{`{{`}}instance{{`}}`}} WAL fsync'
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance, le))
+    expr: histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance, le))
     legendFormat: '{{`{{`}}instance{{`}}`}} DB fsync'
   title: Disk sync duration
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -167,14 +168,14 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: process_resident_memory_bytes{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: process_resident_memory_bytes{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}
     legendFormat: '{{`{{`}}instance{{`}}`}} resident memory'
   title: Memory
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -193,14 +194,14 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: rate(etcd_network_client_grpc_received_bytes_total{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
+    expr: rate(etcd_network_client_grpc_received_bytes_total{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
     legendFormat: '{{`{{`}}instance{{`}}`}} client traffic in'
   title: Client traffic in
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -219,14 +220,14 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: rate(etcd_network_client_grpc_sent_bytes_total{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
+    expr: rate(etcd_network_client_grpc_sent_bytes_total{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
     legendFormat: '{{`{{`}}instance{{`}}`}} client traffic out'
   title: Client traffic out
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -245,14 +246,14 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: sum(rate(etcd_network_peer_received_bytes_total{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    expr: sum(rate(etcd_network_peer_received_bytes_total{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     legendFormat: '{{`{{`}}instance{{`}}`}} peer traffic in'
   title: Peer traffic in
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -271,14 +272,14 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: sum(rate(etcd_network_peer_sent_bytes_total{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    expr: sum(rate(etcd_network_peer_sent_bytes_total{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     legendFormat: '{{`{{`}}instance{{`}}`}} peer traffic out'
   title: Peer traffic out
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -296,14 +297,14 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: changes(etcd_server_leader_changes_seen_total{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}[1d])
+    expr: changes(etcd_server_leader_changes_seen_total{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}[1d])
     legendFormat: '{{`{{`}}instance{{`}}`}} total leader elections per day'
   title: Raft proposals
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -321,14 +322,14 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: changes(etcd_server_leader_changes_seen_total{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}[1d])
+    expr: changes(etcd_server_leader_changes_seen_total{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}[1d])
     legendFormat: '{{`{{`}}instance{{`}}`}} total leader elections per day'
   title: Total leader elections per day
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -347,9 +348,9 @@ panels:
   pluginVersion: v10.0.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $datasource
-    expr: histogram_quantile(0.99, sum by (instance, le) (rate(etcd_network_peer_round_trip_time_seconds_bucket{job=~".*etcd.*", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])))
+    expr: histogram_quantile(0.99, sum by (instance, le) (rate(etcd_network_peer_round_trip_time_seconds_bucket{job=~".*etcd.*", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])))
     legendFormat: '{{`{{`}}instance{{`}}`}} peer round trip time'
   title: Peer round trip time
   type: timeseries
@@ -362,20 +363,20 @@ templating:
   list:
   - label: Data Source
     name: datasource
-    query: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    query: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     type: datasource
   - datasource:
       type: prometheus
       uid: ${datasource}
-    hide: {{ ternary 0 2 $.Values.grafana.sidecar.dashboards.multicluster }}
+    hide: {{ ternary 0 2 $Values.grafana.sidecar.dashboards.multicluster }}
     label: cluster
     name: cluster
-    query: {{ ternary (b64dec "ImxhYmVsX3ZhbHVlcyhldGNkX3NlcnZlcl9oYXNfbGVhZGVye2pvYj1+XCIuKmV0Y2QuKlwifSwgam9iKSI=" | replace "cluster" $.Values.global.clusterLabel) ".*" $.Values.grafana.sidecar.dashboards.multicluster }}
+    query: {{ ternary (b64dec "ImxhYmVsX3ZhbHVlcyhldGNkX3NlcnZlcl9oYXNfbGVhZGVye2pvYj1+XCIuKmV0Y2QuKlwifSwgam9iKSI=" | replace "cluster" $Values.global.clusterLabel) ".*" $Values.grafana.sidecar.dashboards.multicluster }}
     refresh: 2
-    type: {{ ternary "query" "constant" $.Values.grafana.sidecar.dashboards.multicluster }}
+    type: {{ ternary "query" "constant" $Values.grafana.sidecar.dashboards.multicluster }}
 time:
   from: now-15m
   to: now
-timezone: {{ .Values.grafana.defaultDashboardsTimezone }}
+timezone: {{ $Values.grafana.defaultDashboardsTimezone }}
 title: etcd
 uid: c2f4e12cdf69feb95caa41a5a1b423d9

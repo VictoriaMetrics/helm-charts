@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Human-readable error about Helm version requirement
 
 ## 1.5.1
 

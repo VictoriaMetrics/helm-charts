@@ -1,3 +1,4 @@
+{{- $Values := (.helm).Values | default .Values }}
 __elements: []
 __inputs:
 - description: ''
@@ -39,7 +40,7 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
-condition: {{ .Values.kubeApiServer.enabled }}
+condition: {{ $Values.kubeApiServer.enabled }}
 description: 'This is a modern API Server dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
 editable: false
 fiscalYearStartMonth: 0
@@ -48,7 +49,7 @@ links: []
 liveNow: false
 panels:
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -87,17 +88,17 @@ panels:
   pluginVersion: 10.0.1
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: up{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: up{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}
     interval: ''
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
   title: API Server - Health Status
   type: stat
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -142,10 +143,10 @@ panels:
   pluginVersion: 10.0.1
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: apiserver_requested_deprecated_apis{ {{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: apiserver_requested_deprecated_apis{ {{ $Values.global.clusterLabel }}=~"$cluster"}
     interval: ''
     legendFormat: ''
     refId: A
@@ -205,7 +206,7 @@ panels:
           operation: groupby
   type: table
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -264,17 +265,17 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum by (code) (rate(apiserver_request_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum by (code) (rate(apiserver_request_total{ {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: '{{`{{`}} code {{`}}`}}'
     refId: A
   title: API Server - HTTP Requests by code
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -333,17 +334,17 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum by (verb) (rate(apiserver_request_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum by (verb) (rate(apiserver_request_total{ {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: '{{`{{`}} verb{{`}}`}}'
     refId: A
   title: API Server - HTTP Requests by verb
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -402,20 +403,20 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: |-
-      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
       /
-      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
   title: API Server - HTTP Requests Latency by instance
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -474,20 +475,20 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: |-
-      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
+      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
       /
-      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
+      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
     interval: $resolution
     legendFormat: '{{`{{`}} verb {{`}}`}}'
     refId: A
   title: API Server - HTTP Requests Latency by verb
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -546,19 +547,19 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: |-
-      sum by(instance) (rate(apiserver_request_total{code=~"5..", job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
-       / sum by(instance) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+      sum by(instance) (rate(apiserver_request_total{code=~"5..", job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+       / sum by(instance) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
   title: API Server - Errors by Instance
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -617,19 +618,19 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: |-
-      sum by(verb) (rate(apiserver_request_total{code=~"5..",job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
-       / sum by(verb) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+      sum by(verb) (rate(apiserver_request_total{code=~"5..",job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+       / sum by(verb) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: '{{`{{`}} verb {{`}}`}}'
     refId: A
   title: API Server - Errors by verb
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -688,17 +689,17 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(apiserver_request_total{ {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    expr: sum(rate(apiserver_request_total{ {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
   title: API Server - Stacked HTTP Requests by instance
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -757,17 +758,17 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(workqueue_depth{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    expr: sum(rate(workqueue_depth{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
   title: API Server - Work Queue by instance
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -827,17 +828,17 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: rate(process_cpu_seconds_total{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
+    expr: rate(process_cpu_seconds_total{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
   title: API Server - CPU Usage by instance
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -896,10 +897,10 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
-    expr: process_resident_memory_bytes{job=~"kubernetes-apiservers|apiserver", {{ $.Values.global.clusterLabel }}=~"$cluster"}
+    expr: process_resident_memory_bytes{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -924,7 +925,7 @@ templating:
     multi: false
     name: datasource
     options: []
-    query: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    query: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     queryValue: ''
     refresh: 1
     regex: ''
@@ -938,18 +939,18 @@ templating:
     datasource:
       type: prometheus
       uid: ${datasource}
-    definition: label_values(kube_node_info,{{ $.Values.global.clusterLabel }})
-    hide: {{ ternary 0 2 $.Values.grafana.sidecar.dashboards.multicluster }}
+    definition: label_values(kube_node_info,{{ $Values.global.clusterLabel }})
+    hide: {{ ternary 0 2 $Values.grafana.sidecar.dashboards.multicluster }}
     includeAll: false
     multi: false
     name: cluster
     options: []
-    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyhrdWJlX25vZGVfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $.Values.global.clusterLabel) ".*" $.Values.grafana.sidecar.dashboards.multicluster }}
+    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyhrdWJlX25vZGVfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $Values.global.clusterLabel) ".*" $Values.grafana.sidecar.dashboards.multicluster }}
     refresh: 1
     regex: ''
     skipUrlSync: false
     sort: 1
-    type: {{ ternary "query" "constant" $.Values.grafana.sidecar.dashboards.multicluster }}
+    type: {{ ternary "query" "constant" $Values.grafana.sidecar.dashboards.multicluster }}
   - current:
       selected: true
       text: 30s
@@ -985,7 +986,7 @@ time:
   from: now-1h
   to: now
 timepicker: {}
-timezone: {{ .Values.grafana.defaultDashboardsTimezone }}
+timezone: {{ $Values.grafana.defaultDashboardsTimezone }}
 title: Kubernetes / System / API Server
 uid: k8s_system_apisrv
 version: 17

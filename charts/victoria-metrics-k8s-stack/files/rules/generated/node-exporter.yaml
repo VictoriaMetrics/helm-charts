@@ -1,10 +1,11 @@
+{{- $Values := (.helm).Values | default .Values }}
 condition: '{{ true }}'
 name: node-exporter
 rules:
 - alert: NodeFilesystemSpaceFillingUp
   annotations:
     description: 'Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left and is filling up.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodefilesystemspacefillingup'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodefilesystemspacefillingup'
     summary: 'Filesystem is predicted to run out of space within the next 24 hours.'
   condition: '{{ true }}'
   expr: |-
@@ -21,7 +22,7 @@ rules:
 - alert: NodeFilesystemSpaceFillingUp
   annotations:
     description: 'Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left and is filling up fast.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodefilesystemspacefillingup'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodefilesystemspacefillingup'
     summary: 'Filesystem is predicted to run out of space within the next 4 hours.'
   condition: '{{ true }}'
   expr: |-
@@ -38,7 +39,7 @@ rules:
 - alert: NodeFilesystemAlmostOutOfSpace
   annotations:
     description: 'Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodefilesystemalmostoutofspace'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodefilesystemalmostoutofspace'
     summary: 'Filesystem has less than 5% space left.'
   condition: '{{ true }}'
   expr: |-
@@ -53,7 +54,7 @@ rules:
 - alert: NodeFilesystemAlmostOutOfSpace
   annotations:
     description: 'Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodefilesystemalmostoutofspace'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodefilesystemalmostoutofspace'
     summary: 'Filesystem has less than 3% space left.'
   condition: '{{ true }}'
   expr: |-
@@ -68,7 +69,7 @@ rules:
 - alert: NodeFilesystemFilesFillingUp
   annotations:
     description: 'Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left and is filling up.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodefilesystemfilesfillingup'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodefilesystemfilesfillingup'
     summary: 'Filesystem is predicted to run out of inodes within the next 24 hours.'
   condition: '{{ true }}'
   expr: |-
@@ -85,7 +86,7 @@ rules:
 - alert: NodeFilesystemFilesFillingUp
   annotations:
     description: 'Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left and is filling up fast.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodefilesystemfilesfillingup'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodefilesystemfilesfillingup'
     summary: 'Filesystem is predicted to run out of inodes within the next 4 hours.'
   condition: '{{ true }}'
   expr: |-
@@ -102,7 +103,7 @@ rules:
 - alert: NodeFilesystemAlmostOutOfFiles
   annotations:
     description: 'Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodefilesystemalmostoutoffiles'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodefilesystemalmostoutoffiles'
     summary: 'Filesystem has less than 5% inodes left.'
   condition: '{{ true }}'
   expr: |-
@@ -117,7 +118,7 @@ rules:
 - alert: NodeFilesystemAlmostOutOfFiles
   annotations:
     description: 'Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodefilesystemalmostoutoffiles'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodefilesystemalmostoutoffiles'
     summary: 'Filesystem has less than 3% inodes left.'
   condition: '{{ true }}'
   expr: |-
@@ -132,7 +133,7 @@ rules:
 - alert: NodeNetworkReceiveErrs
   annotations:
     description: '{{`{{`}} $labels.instance {{`}}`}} interface {{`{{`}} $labels.device {{`}}`}} has encountered {{`{{`}} printf "%.0f" $value {{`}}`}} receive errors in the last two minutes.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodenetworkreceiveerrs'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodenetworkreceiveerrs'
     summary: 'Network interface is reporting many receive errors.'
   condition: '{{ true }}'
   expr: rate(node_network_receive_errs_total{job="node-exporter"}[2m]) / rate(node_network_receive_packets_total{job="node-exporter"}[2m]) > 0.01
@@ -142,7 +143,7 @@ rules:
 - alert: NodeNetworkTransmitErrs
   annotations:
     description: '{{`{{`}} $labels.instance {{`}}`}} interface {{`{{`}} $labels.device {{`}}`}} has encountered {{`{{`}} printf "%.0f" $value {{`}}`}} transmit errors in the last two minutes.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodenetworktransmiterrs'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodenetworktransmiterrs'
     summary: 'Network interface is reporting many transmit errors.'
   condition: '{{ true }}'
   expr: rate(node_network_transmit_errs_total{job="node-exporter"}[2m]) / rate(node_network_transmit_packets_total{job="node-exporter"}[2m]) > 0.01
@@ -152,7 +153,7 @@ rules:
 - alert: NodeHighNumberConntrackEntriesUsed
   annotations:
     description: '{{`{{`}} $value | humanizePercentage {{`}}`}} of conntrack entries are used.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodehighnumberconntrackentriesused'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodehighnumberconntrackentriesused'
     summary: 'Number of conntrack are getting close to the limit.'
   condition: '{{ true }}'
   expr: (node_nf_conntrack_entries{job="node-exporter"} / node_nf_conntrack_entries_limit) > 0.75
@@ -161,7 +162,7 @@ rules:
 - alert: NodeTextFileCollectorScrapeError
   annotations:
     description: 'Node Exporter text file collector on {{`{{`}} $labels.instance {{`}}`}} failed to scrape.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodetextfilecollectorscrapeerror'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodetextfilecollectorscrapeerror'
     summary: 'Node Exporter text file collector failed to scrape.'
   condition: '{{ true }}'
   expr: node_textfile_scrape_error{job="node-exporter"} == 1
@@ -170,7 +171,7 @@ rules:
 - alert: NodeClockSkewDetected
   annotations:
     description: 'Clock at {{`{{`}} $labels.instance {{`}}`}} is out of sync by more than 0.05s. Ensure NTP is configured correctly on this host.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodeclockskewdetected'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodeclockskewdetected'
     summary: 'Clock skew detected.'
   condition: '{{ true }}'
   expr: |-
@@ -191,7 +192,7 @@ rules:
 - alert: NodeClockNotSynchronising
   annotations:
     description: 'Clock at {{`{{`}} $labels.instance {{`}}`}} is not synchronising. Ensure NTP is configured on this host.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodeclocknotsynchronising'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodeclocknotsynchronising'
     summary: 'Clock not synchronising.'
   condition: '{{ true }}'
   expr: |-
@@ -204,7 +205,7 @@ rules:
 - alert: NodeRAIDDegraded
   annotations:
     description: 'RAID array ''{{`{{`}} $labels.device {{`}}`}}'' at {{`{{`}} $labels.instance {{`}}`}} is in degraded state due to one or more disks failures. Number of spare drives is insufficient to fix issue automatically.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/noderaiddegraded'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/noderaiddegraded'
     summary: 'RAID Array is degraded.'
   condition: '{{ true }}'
   expr: node_md_disks_required{job="node-exporter",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"} - ignoring (state) (node_md_disks{state="active",job="node-exporter",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"}) > 0
@@ -214,7 +215,7 @@ rules:
 - alert: NodeRAIDDiskFailure
   annotations:
     description: 'At least one device in RAID array at {{`{{`}} $labels.instance {{`}}`}} failed. Array ''{{`{{`}} $labels.device {{`}}`}}'' needs attention and possibly a disk swap.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/noderaiddiskfailure'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/noderaiddiskfailure'
     summary: 'Failed device in RAID array.'
   condition: '{{ true }}'
   expr: node_md_disks{state="failed",job="node-exporter",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"} > 0
@@ -223,7 +224,7 @@ rules:
 - alert: NodeFileDescriptorLimit
   annotations:
     description: 'File descriptors limit at {{`{{`}} $labels.instance {{`}}`}} is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodefiledescriptorlimit'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodefiledescriptorlimit'
     summary: 'Kernel is predicted to exhaust file descriptors limit soon.'
   condition: '{{ true }}'
   expr: |-
@@ -236,7 +237,7 @@ rules:
 - alert: NodeFileDescriptorLimit
   annotations:
     description: 'File descriptors limit at {{`{{`}} $labels.instance {{`}}`}} is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodefiledescriptorlimit'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodefiledescriptorlimit'
     summary: 'Kernel is predicted to exhaust file descriptors limit soon.'
   condition: '{{ true }}'
   expr: |-
@@ -251,7 +252,7 @@ rules:
     description: 'CPU usage at {{`{{`}} $labels.instance {{`}}`}} has been above 90% for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
 
       '
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodecpuhighusage'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodecpuhighusage'
     summary: 'High CPU usage.'
   condition: '{{ true }}'
   expr: sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job="node-exporter", mode!="idle"}[2m]))) * 100 > 90
@@ -265,7 +266,7 @@ rules:
       This might indicate this instance resources saturation and can cause it becoming unresponsive.
 
       '
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodesystemsaturation'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodesystemsaturation'
     summary: 'System saturated, load per core is very high.'
   condition: '{{ true }}'
   expr: |-
@@ -281,7 +282,7 @@ rules:
       Please check that there is enough memory available at this instance.
 
       '
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodememorymajorpagesfaults'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodememorymajorpagesfaults'
     summary: 'Memory major page faults are occurring at very high rate.'
   condition: '{{ true }}'
   expr: rate(node_vmstat_pgmajfault{job="node-exporter"}[5m]) > 500
@@ -293,7 +294,7 @@ rules:
     description: 'Memory is filling up at {{`{{`}} $labels.instance {{`}}`}}, has been above 90% for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
 
       '
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodememoryhighutilization'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodememoryhighutilization'
     summary: 'Host is running out of memory.'
   condition: '{{ true }}'
   expr: 100 - (node_memory_MemAvailable_bytes{job="node-exporter"} / node_memory_MemTotal_bytes{job="node-exporter"} * 100) > 90
@@ -307,7 +308,7 @@ rules:
       This symptom might indicate disk saturation.
 
       '
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodediskiosaturation'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodediskiosaturation'
     summary: 'Disk IO queue is high.'
   condition: '{{ true }}'
   expr: rate(node_disk_io_time_weighted_seconds_total{job="node-exporter", device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"}[5m]) > 10
@@ -317,7 +318,7 @@ rules:
 - alert: NodeSystemdServiceFailed
   annotations:
     description: 'Systemd service {{`{{`}} $labels.name {{`}}`}} has entered failed state at {{`{{`}} $labels.instance {{`}}`}}'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodesystemdservicefailed'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodesystemdservicefailed'
     summary: 'Systemd service has entered failed state.'
   condition: '{{ true }}'
   expr: node_systemd_unit_state{job="node-exporter", state="failed"} == 1
@@ -327,7 +328,7 @@ rules:
 - alert: NodeBondingDegraded
   annotations:
     description: 'Bonding interface {{`{{`}} $labels.master {{`}}`}} on {{`{{`}} $labels.instance {{`}}`}} is in degraded state due to one or more slave failures.'
-    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/node/nodebondingdegraded'
+    runbook_url: '{{ $Values.defaultRules.runbookUrl }}/node/nodebondingdegraded'
     summary: 'Bonding interface is degraded'
   condition: '{{ true }}'
   expr: (node_bonding_slaves - node_bonding_active) != 0
