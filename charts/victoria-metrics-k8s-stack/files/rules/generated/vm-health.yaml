@@ -1,3 +1,4 @@
+{{- $Values := (.helm).Values | default .Values }}
 condition: '{{ true }}'
 name: vm-health
 rules:
@@ -64,7 +65,7 @@ rules:
       '
     summary: '"{{`{{`}} $labels.job {{`}}`}}"("{{`{{`}} $labels.instance {{`}}`}}") has insufficient CPU resources for >15m'
   condition: '{{ true }}'
-  expr: histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket[5m])) by (le,job,instance,{{ .Values.global.clusterLabel }})) > 0.1
+  expr: histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket[5m])) by (le,job,instance,{{ $Values.global.clusterLabel }})) > 0.1
   for: 15m
   labels:
     severity: critical

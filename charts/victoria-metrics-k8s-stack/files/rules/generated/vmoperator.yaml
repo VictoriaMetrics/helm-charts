@@ -1,3 +1,4 @@
+{{- $Values := (.helm).Values | default .Values }}
 condition: '{{ true }}'
 name: vmoperator
 rules:
@@ -49,7 +50,7 @@ rules:
         job=~".*((victoria.*)|vm)-?operator",
         name=~"(vmagent|vmalert|vmalertmanager|vmauth|vmcluster|vmnodescrape|vmpodscrape|vmprobe|vmrule|vmservicescrape|vmsingle|vmstaticscrape)"
       }
-    ) by (name,{{ .Values.global.clusterLabel }}) > 10
+    ) by (name,{{ $Values.global.clusterLabel }}) > 10
   for: 15m
   labels:
     severity: warning
@@ -63,7 +64,7 @@ rules:
   expr: |-
     sum(
       operator_controller_bad_objects_count{job=~".*((victoria.*)|vm)-?operator"}
-    ) by (controller,{{ .Values.global.clusterLabel }}) > 0
+    ) by (controller,{{ $Values.global.clusterLabel }}) > 0
   for: 15m
   labels:
     severity: warning

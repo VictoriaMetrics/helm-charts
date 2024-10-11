@@ -50,29 +50,29 @@ rules = [
 
 # Additional conditions map
 condition_map = {
-    "etcd": ".Values.kubeEtcd.enabled",
-    "kube-apiserver-availability.rules": ".Values.kubeApiServer.enabled",
-    "kube-apiserver-burnrate.rules": ".Values.kubeApiServer.enabled",
-    "kube-apiserver-histogram.rules": ".Values.kubeApiServer.enabled",
-    "kube-apiserver-slos": ".Values.kubeApiServer.enabled",
-    "kube-apiserver.rules": ".Values.kubeApiServer.enabled",
-    "kube-scheduler.rules": ".Values.kubeScheduler.enabled",
-    "kubelet.rules": ".Values.kubelet.enabled",
-    "kubernetes-system-controller-manager": ".Values.kubeControllerManager.enabled",
-    "kubernetes-system-scheduler": ".Values.kubeScheduler.enabled",
+    "etcd": "$Values.kubeEtcd.enabled",
+    "kube-apiserver-availability.rules": "$Values.kubeApiServer.enabled",
+    "kube-apiserver-burnrate.rules": "$Values.kubeApiServer.enabled",
+    "kube-apiserver-histogram.rules": "$Values.kubeApiServer.enabled",
+    "kube-apiserver-slos": "$Values.kubeApiServer.enabled",
+    "kube-apiserver.rules": "$Values.kubeApiServer.enabled",
+    "kube-scheduler.rules": "$Values.kubeScheduler.enabled",
+    "kubelet.rules": "$Values.kubelet.enabled",
+    "kubernetes-system-controller-manager": "$Values.kubeControllerManager.enabled",
+    "kubernetes-system-scheduler": "$Values.kubeScheduler.enabled",
 }
 
 alert_condition_map = {
-    "KubeAPIDown": ".Values.kubeApiServer.enabled",  # there are more alerts which are left enabled, because they'll never fire without metrics
-    "KubeControllerManagerDown": ".Values.kubeControllerManager.enabled",
-    "KubeSchedulerDown": ".Values.kubeScheduler.enabled",
-    "KubeStateMetricsDown": ' (index .Values "kube-state-metrics" "enabled")',  # there are more alerts which are left enabled, because they'll never fire without metrics
-    "KubeletDown": ".Values.kubelet.enabled",  # there are more alerts which are left enabled, because they'll never fire without metrics
-    "PrometheusOperatorDown": ".Values.prometheusOperator.enabled",
-    "NodeExporterDown": ".Values.nodeExporter.enabled",
-    "CoreDNSDown": ".Values.kubeDns.enabled",
-    "AlertmanagerDown": ".Values.alertmanager.enabled",
-    "KubeProxyDown": ".Values.kubeProxy.enabled",
+    "KubeAPIDown": "$Values.kubeApiServer.enabled",  # there are more alerts which are left enabled, because they'll never fire without metrics
+    "KubeControllerManagerDown": "$Values.kubeControllerManager.enabled",
+    "KubeSchedulerDown": "$Values.kubeScheduler.enabled",
+    "KubeStateMetricsDown": ' (index $Values "kube-state-metrics" "enabled")',  # there are more alerts which are left enabled, because they'll never fire without metrics
+    "KubeletDown": "$Values.kubelet.enabled",  # there are more alerts which are left enabled, because they'll never fire without metrics
+    "PrometheusOperatorDown": "$Values.prometheusOperator.enabled",
+    "NodeExporterDown": "$Values.nodeExporter.enabled",
+    "CoreDNSDown": "$Values.kubeDns.enabled",
+    "AlertmanagerDown": "$Values.alertmanager.enabled",
+    "KubeProxyDown": "$Values.kubeProxy.enabled",
 }
 
 skip_list = [
@@ -93,7 +93,7 @@ def escape(s):
 
 
 def cluster_label_var(mo):
-    labels = ["[[ .Values.global.clusterLabel ]]"]
+    labels = ["[[ $Values.global.clusterLabel ]]"]
     labelsStr = mo.group(2).strip()
     group = mo.group(1)
     if len(labelsStr) > 0:
@@ -108,7 +108,7 @@ def cluster_label_var(mo):
 
 replacement_map = {
     "https://runbooks.prometheus-operator.dev/runbooks": {
-        "replacement": "[[ .Values.defaultRules.runbookUrl ]]",
+        "replacement": "[[ $Values.defaultRules.runbookUrl ]]",
     },
     'job="kube-state-metrics"': {
         "replacement": 'job="kube-state-metrics", namespace=~"[[ .targetNamespace ]]"',
@@ -119,7 +119,7 @@ replacement_map = {
         "limitGroup": ["kubernetes-storage"],
     },
     "http://localhost:3000": {
-        "replacement": "[[ index .Values.grafana.ingress.hosts 0 ]]",
+        "replacement": "[[ index $Values.grafana.ingress.hosts 0 ]]",
         "init": "",
     },
     'job="alertmanager-main"': {
@@ -199,7 +199,8 @@ def write_group_to_file(group, url, destination):
 
     # recreate the file
     with open(new_filename, "w") as f:
-        f.write(escape(lines))
+        content = "{{- $Values := (.helm).Values | default .Values }}\n" + escape(lines)
+        f.write(content)
 
     print(f"Generated {new_filename}")
 

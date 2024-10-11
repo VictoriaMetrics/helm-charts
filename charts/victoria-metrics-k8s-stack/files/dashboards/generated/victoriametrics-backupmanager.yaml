@@ -1,3 +1,4 @@
+{{- $Values := (.helm).Values | default .Values }}
 __elements: {}
 __inputs: []
 __requires:
@@ -41,7 +42,7 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
-condition: {{ or (not (empty ((((.Values).vmsingle).spec).vmBackup).destination)) (not (empty (((((.Values).vmcluster).spec).storage).vmBackup).destination)) }}
+condition: {{ or (not (empty (((($Values).vmsingle).spec).vmBackup).destination)) (not (empty ((((($Values).vmcluster).spec).storage).vmBackup).destination)) }}
 description: Overview for VictoriaMetrics backupmanager v1.85.3 or higher
 editable: false
 fiscalYearStartMonth: 0
@@ -61,7 +62,7 @@ panels:
   title: Stats
   type: row
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: $ds
   fieldConfig:
     defaults:
@@ -96,7 +97,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     exemplar: false
@@ -108,7 +109,7 @@ panels:
   title: Instances
   type: stat
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: $ds
   description: Status of last backup operation.
   fieldConfig:
@@ -149,7 +150,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(vm_backup_last_run_failed)
@@ -159,7 +160,7 @@ panels:
   title: Last backup status
   type: stat
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: $ds
   description: Number of backups stored in remote storage.
   fieldConfig:
@@ -195,7 +196,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(vm_backups_stored{job=~"$job", instance=~"$instance"})
@@ -205,7 +206,7 @@ panels:
   title: Total backups stored
   type: stat
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: $ds
   description: Space used in remote storage.
   fieldConfig:
@@ -242,7 +243,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(vm_backups_size_bytes{job=~"$job", instance=~"$instance"})
@@ -252,7 +253,7 @@ panels:
   title: Backups size
   type: stat
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: $ds
   description: ''
   fieldConfig:
@@ -295,7 +296,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(increase(vm_backup_errors_total{job=~"$job", instance=~"$instance"}[1h]))
@@ -305,7 +306,7 @@ panels:
   title: 'Backups errors '
   type: stat
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: $ds
   description: 'Status of last retention run.
 
@@ -349,7 +350,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(vm_retention_last_run_failed)
@@ -359,7 +360,7 @@ panels:
   title: Last retention status
   type: stat
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: $ds
   fieldConfig:
     defaults:
@@ -401,7 +402,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     expr: sum(increase(vm_retention_errors_total{job=~"$job", instance=~"$instance"}[1h]))
@@ -411,7 +412,7 @@ panels:
   title: Retention errors
   type: stat
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: $ds
   fieldConfig:
     defaults:
@@ -464,7 +465,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     exemplar: false
@@ -491,7 +492,7 @@ panels:
           operation: groupby
   type: table
 - datasource:
-    type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     uid: $ds
   fieldConfig:
     defaults:
@@ -544,7 +545,7 @@ panels:
   pluginVersion: 10.4.0
   targets:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     editorMode: code
     exemplar: false
@@ -579,7 +580,7 @@ panels:
   id: 12
   panels:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     description: 'Max duration of backup run. Lower better.
 
@@ -641,7 +642,7 @@ panels:
       xTickLabelSpacing: 100
     targets:
     - datasource:
-        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+        type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: max(increase(vm_backup_duration_seconds_total{job=~"$job", instance=~"$instance"})) by (type) > 0
@@ -651,7 +652,7 @@ panels:
     title: Max backup duration
     type: barchart
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     fieldConfig:
       defaults:
@@ -705,7 +706,7 @@ panels:
         sort: none
     targets:
     - datasource:
-        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+        type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: sum(increase(vm_backup_errors_total{job=~"$job", instance=~"$instance"})[$__interval]) by (instance) > 0
@@ -715,7 +716,7 @@ panels:
     title: Backup errors
     type: timeseries
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     fieldConfig:
       defaults:
@@ -770,7 +771,7 @@ panels:
         sort: none
     targets:
     - datasource:
-        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+        type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: vm_backups_size_bytes{job=~"$job", instance=~"$instance"}
@@ -780,7 +781,7 @@ panels:
     title: Backups size
     type: timeseries
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     fieldConfig:
       defaults:
@@ -819,7 +820,7 @@ panels:
     pluginVersion: 9.0.4
     targets:
     - datasource:
-        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+        type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       exemplar: false
@@ -848,7 +849,7 @@ panels:
             operation: groupby
     type: table
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     fieldConfig:
       defaults:
@@ -901,7 +902,7 @@ panels:
       xTickLabelSpacing: 100
     targets:
     - datasource:
-        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+        type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: sum(increase(vm_backups_total{job=~"$job", instance=~"$instance"}[24h])) by (type) > 0
@@ -911,7 +912,7 @@ panels:
     title: Backup runs
     type: barchart
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     fieldConfig:
       defaults:
@@ -966,7 +967,7 @@ panels:
         sort: none
     targets:
     - datasource:
-        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+        type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: sum(rollup_rate(vm_backups_uploaded_bytes_total[$__rate_interval])) by (rollup)
@@ -986,7 +987,7 @@ panels:
   id: 18
   panels:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     description: 'Max duration of retention run. Lower better.
 
@@ -1042,7 +1043,7 @@ panels:
     pluginVersion: 9.0.4
     targets:
     - datasource:
-        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+        type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: max(increase(vm_retention_duration_seconds_total{job=~"$job", instance=~"$instance"})) > 0
@@ -1052,7 +1053,7 @@ panels:
     title: Max retention duration
     type: barchart
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     fieldConfig:
       defaults:
@@ -1106,7 +1107,7 @@ panels:
         sort: none
     targets:
     - datasource:
-        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+        type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: sum(increase(vm_retention_errors_total{job=~"$job", instance=~"$instance"})[$__interval]) by (instance) > 0
@@ -1126,7 +1127,7 @@ panels:
   id: 34
   panels:
   - datasource:
-      type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
       uid: $ds
     description: 'Duration of backup run. Lower better.
 
@@ -1183,7 +1184,7 @@ panels:
       xTickLabelSpacing: 100
     targets:
     - datasource:
-        type: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+        type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
         uid: $ds
       editorMode: code
       expr: increase(vm_backup_duration_seconds_total{job=~"$job", instance=~"$instance"}) > 0
@@ -1209,7 +1210,7 @@ templating:
     multi: false
     name: ds
     options: []
-    query: {{ default "prometheus" .Values.grafana.defaultDatasourceType }}
+    query: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
     queryValue: ''
     refresh: 1
     regex: ''
@@ -1269,7 +1270,7 @@ time:
   from: now-7d
   to: now
 timepicker: {}
-timezone: {{ .Values.grafana.defaultDashboardsTimezone }}
+timezone: {{ $Values.grafana.defaultDashboardsTimezone }}
 title: VictoriaMetrics - backupmanager
 uid: gF-lxRdVz
 version: 1

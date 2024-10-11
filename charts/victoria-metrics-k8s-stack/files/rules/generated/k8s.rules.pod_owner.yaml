@@ -1,15 +1,16 @@
+{{- $Values := (.helm).Values | default .Values }}
 condition: '{{ true }}'
 name: k8s.rules.pod_owner
 rules:
 - condition: '{{ true }}'
   expr: |-
-    max by (namespace,workload,pod,{{ .Values.global.clusterLabel }}) (
+    max by (namespace,workload,pod,{{ $Values.global.clusterLabel }}) (
       label_replace(
         label_replace(
           kube_pod_owner{job="kube-state-metrics", owner_kind="ReplicaSet"},
           "replicaset", "$1", "owner_name", "(.*)"
-        ) * on (replicaset,namespace,{{ .Values.global.clusterLabel }}) group_left(owner_name) topk by (replicaset,namespace,{{ .Values.global.clusterLabel }}) (
-          1, max by (replicaset,namespace,owner_name,{{ .Values.global.clusterLabel }}) (
+        ) * on (replicaset,namespace,{{ $Values.global.clusterLabel }}) group_left(owner_name) topk by (replicaset,namespace,{{ $Values.global.clusterLabel }}) (
+          1, max by (replicaset,namespace,owner_name,{{ $Values.global.clusterLabel }}) (
             kube_replicaset_owner{job="kube-state-metrics"}
           )
         ),
@@ -21,7 +22,7 @@ rules:
   record: namespace_workload_pod:kube_pod_owner:relabel
 - condition: '{{ true }}'
   expr: |-
-    max by (namespace,workload,pod,{{ .Values.global.clusterLabel }}) (
+    max by (namespace,workload,pod,{{ $Values.global.clusterLabel }}) (
       label_replace(
         kube_pod_owner{job="kube-state-metrics", owner_kind="DaemonSet"},
         "workload", "$1", "owner_name", "(.*)"
@@ -32,7 +33,7 @@ rules:
   record: namespace_workload_pod:kube_pod_owner:relabel
 - condition: '{{ true }}'
   expr: |-
-    max by (namespace,workload,pod,{{ .Values.global.clusterLabel }}) (
+    max by (namespace,workload,pod,{{ $Values.global.clusterLabel }}) (
       label_replace(
         kube_pod_owner{job="kube-state-metrics", owner_kind="StatefulSet"},
         "workload", "$1", "owner_name", "(.*)"
@@ -43,7 +44,7 @@ rules:
   record: namespace_workload_pod:kube_pod_owner:relabel
 - condition: '{{ true }}'
   expr: |-
-    max by (namespace,workload,pod,{{ .Values.global.clusterLabel }}) (
+    max by (namespace,workload,pod,{{ $Values.global.clusterLabel }}) (
       label_replace(
         kube_pod_owner{job="kube-state-metrics", owner_kind="Job"},
         "workload", "$1", "owner_name", "(.*)"
