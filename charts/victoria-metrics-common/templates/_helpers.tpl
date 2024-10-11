@@ -1,6 +1,10 @@
 {{- define "vm.namespace" -}}
   {{- $Release := (.helm).Release | default .Release -}}
   {{- $Values := (.helm).Values | default .Values -}}
+  {{- $Capabilities := (.helm).Capabilities | default .Capabilities -}}
+  {{- if semverCompare "<3.14.0" $Capabilities.HelmVersion.Version }}
+    {{- fail "This chart requires helm version 3.14.0 or higher" }}
+  {{- end }}
   {{- $Values.namespaceOverride | default ($Values.global).namespaceOverride | default $Release.Namespace -}}
 {{- end -}}
 
