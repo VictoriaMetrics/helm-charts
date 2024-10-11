@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Display compatibility error message
 
 ## 0.0.14
 
