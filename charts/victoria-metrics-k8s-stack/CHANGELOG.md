@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fixed default image tags template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1587)
 
 ## 0.27.3
 
