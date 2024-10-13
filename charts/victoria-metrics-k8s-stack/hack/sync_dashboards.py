@@ -47,6 +47,7 @@ sources = [
     "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics-cluster.json",
     "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmalert.json",
     "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/operator.json",
+    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victorialogs.json",
     "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json",
     "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json",
     "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json",
@@ -71,6 +72,7 @@ allowed_dashboards = [
 
 # Additional conditions map
 condition_map = {
+    "victorialogs": "false",
     "alertmanager-overview": "$Values.alertmanager.enabled",
     "apiserver": "$Values.kubeApiServer.enabled",
     "controller-manager": "$Values.kubeControllerManager.enabled",

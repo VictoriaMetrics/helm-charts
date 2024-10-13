@@ -439,6 +439,14 @@ If release name contains chart name it will be used as a full name.
       {{- end -}}
     {{- end -}}
   {{- end -}}
+  {{- if $Values.alertmanager.enabled -}}
+    {{- $ds := deepCopy $grafana.sidecar.datasources.alertmanager -}}
+    {{- $appSecure := (not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config)) -}}
+    {{- $ctx := dict "helm" . "appKey" "alertmanager" "appSecure" $appSecure "appRoute" (($Values.alertmanager).spec).routePrefix -}}
+    {{- $_ := set $ds "url" (include "vm.url" $ctx) -}}
+    {{- $_ := set $ds "type" "alertmanager" -}}
+    {{- $datasources = append $datasources $ds -}}
+  {{- end -}}
   {{- toYaml $datasources -}}
 {{- end }}
 

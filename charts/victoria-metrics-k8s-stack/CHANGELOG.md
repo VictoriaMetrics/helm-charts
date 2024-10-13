@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added alertmanager datasource. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1592)
 
 ## 0.27.5
 

@@ -57,6 +57,8 @@ defaultDashboards:
     allowCrossNamespaceImport: false
   # -- Create dashboards as ConfigMap despite dependency it requires is not installed
   dashboards:
+    victorialogs:
+      enabled: false
     victoriametrics-vmalert:
       enabled: false
     victoriametrics-operator:
@@ -793,6 +795,12 @@ grafana:
         - name: VictoriaMetrics (DS)
           isDefault: false
           type: victoriametrics-datasource
+      alertmanager:
+        name: Alertmanager
+        access: proxy
+        uid: alertmanager
+        jsonData:
+          implementation: prometheus
       initDatasources: true
       createVMReplicasDatasources: false
     dashboards:
