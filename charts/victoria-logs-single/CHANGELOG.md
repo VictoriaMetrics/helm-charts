@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added grafana dashboard. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1590)
 
 ## 0.6.6
 

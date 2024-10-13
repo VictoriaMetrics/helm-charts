@@ -141,7 +141,7 @@ def replace_ds_type_in_panel(panel):
         if "type" in panel["datasource"]:
             panel["datasource"][
                 "type"
-            ] = '[[ default "prometheus" $Values.grafana.defaultDatasourceType ]]'
+            ] = '[[ default "prometheus" ($Values.grafana).defaultDatasourceType ]]'
     for target in panel.get("targets", []):
         if "expr" in target:
             fix_expr(target)
@@ -149,7 +149,7 @@ def replace_ds_type_in_panel(panel):
             if "type" in target["datasource"]:
                 target["datasource"][
                     "type"
-                ] = '[[ default "prometheus" $Values.grafana.defaultDatasourceType ]]'
+                ] = '[[ default "prometheus" ($Values.grafana).defaultDatasourceType ]]'
     if "panels" in panel:
         for p in panel["panels"]:
             replace_ds_type_in_panel(p)
@@ -193,7 +193,7 @@ def patch_dashboard(dashboard, name):
                         variable["query"] = fix_query(variable["query"])
                 if variable.get("type", "") == "datasource":
                     variable["query"] = (
-                        '[[ default "prometheus" $Values.grafana.defaultDatasourceType ]]'
+                        '[[ default "prometheus" ($Values.grafana).defaultDatasourceType ]]'
                     )
 
     ## fix drilldown links. see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/659
@@ -207,7 +207,10 @@ def patch_dashboard(dashboard, name):
     if "tags" in dashboard:
         dashboard["tags"].append("vm-k8s-stack")
 
-    dashboard["timezone"] = "[[ $Values.grafana.defaultDashboardsTimezone ]]"
+    timezone = dashboard["timezone"] if dashboard["timezone"] else "null"
+    dashboard["timezone"] = (
+        f'[[ default "{timezone}" ($Values.grafana).defaultDashboardsTimezone ]]'
+    )
     dashboard["editable"] = False
     dashboard["condition"] = "[[ %(condition)s ]]" % {
         "condition": condition_map.get(name, "true")

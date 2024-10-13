@@ -144,6 +144,39 @@ Change the values according to the need of the environment in ``victoria-logs-si
   </thead>
   <tbody>
     <tr>
+      <td>dashboards.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Dashboard annotations</p>
+</td>
+    </tr>
+    <tr>
+      <td>dashboards.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Create VictoriaLogs dashboards</p>
+</td>
+    </tr>
+    <tr>
+      <td>dashboards.labels</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Dashboard labels</p>
+</td>
+    </tr>
+    <tr>
       <td>extraObjects</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">

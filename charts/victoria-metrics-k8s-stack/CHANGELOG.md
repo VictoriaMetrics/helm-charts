@@ -1,6 +1,8 @@
 ## Next release
 
 - Added alertmanager datasource. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1592)
+- Renamed `grafana.sidecar.dashboards.additionalDashboardLabels` to `grafana.sidecar.dashboards.labels`
+- Renamed `grafana.sidecar.dashboards.additionalDashboardAnnotations` to `grafana.sidecar.dashboards.annotations`
 
 ## 0.27.5
 

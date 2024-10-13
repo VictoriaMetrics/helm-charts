@@ -49,7 +49,7 @@ links: []
 liveNow: false
 panels:
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -90,7 +90,7 @@ panels:
   pluginVersion: 10.4.1
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: up{job=~"$job", instance=~"$instance", {{ $Values.global.clusterLabel }}=~"$cluster"}
@@ -100,7 +100,7 @@ panels:
   title: CoreDNS - Health Status
   type: stat
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -162,7 +162,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: rate(process_cpu_seconds_total{job=~"$job", instance=~"$instance", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
@@ -172,7 +172,7 @@ panels:
   title: CoreDNS - CPU Usage by instance
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -233,7 +233,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: process_resident_memory_bytes{job=~"$job", instance=~"$instance", {{ $Values.global.clusterLabel }}=~"$cluster"}
@@ -243,7 +243,7 @@ panels:
   title: CoreDNS - Memory Usage by instance
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -304,7 +304,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(coredns_dns_requests_total{instance=~"$instance",proto="$protocol", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
@@ -314,7 +314,7 @@ panels:
   title: CoreDNS - Total DNS Requests ($protocol)
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -375,7 +375,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(coredns_dns_request_size_bytes_sum{instance=~"$instance",proto="$protocol", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (proto) / sum(rate(coredns_dns_request_size_bytes_count{instance=~"$instance",proto="$protocol", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (proto)
@@ -385,7 +385,7 @@ panels:
   title: CoreDNS - Average Packet Size  ($protocol)
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -446,7 +446,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(coredns_dns_requests_total{instance=~"$instance", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
@@ -456,7 +456,7 @@ panels:
   title: CoreDNS - Requests by type
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -517,7 +517,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(coredns_dns_responses_total{instance=~"$instance", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (rcode)
@@ -527,7 +527,7 @@ panels:
   title: CoreDNS - Requests by return code
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -588,7 +588,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(coredns_forward_requests_total{ {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
@@ -598,7 +598,7 @@ panels:
   title: CoreDNS - Total Forward Requests
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -659,7 +659,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(coredns_forward_responses_total{rcode=~"SERVFAIL|REFUSED", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (rcode)
@@ -669,7 +669,7 @@ panels:
   title: CoreDNS - DNS Errors
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -730,7 +730,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(coredns_cache_hits_total{instance=~"$instance", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
@@ -738,7 +738,7 @@ panels:
     legendFormat: '{{`{{`}} type {{`}}`}}'
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(coredns_cache_misses_total{instance=~"$instance", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (type)
@@ -748,7 +748,7 @@ panels:
   title: CoreDNS - Cache Hits / Misses
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -809,7 +809,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     exemplar: true
     expr: sum(coredns_cache_entries{ {{ $Values.global.clusterLabel }}=~"$cluster"}) by (type)
@@ -819,7 +819,7 @@ panels:
   title: CoreDNS - Cache Size
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -867,7 +867,7 @@ panels:
   pluginVersion: 10.4.1
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     editorMode: code
     expr: sum(increase(coredns_dns_request_duration_seconds_bucket{instance=~"$instance", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
@@ -878,7 +878,7 @@ panels:
   title: CoreDNS - DNS request duration
   type: heatmap
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -926,7 +926,7 @@ panels:
   pluginVersion: 10.4.1
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     editorMode: code
     expr: sum(increase(coredns_dns_request_size_bytes_bucket{instance=~"$instance", le!="0", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
@@ -937,7 +937,7 @@ panels:
   title: CoreDNS - DNS request size
   type: heatmap
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -985,7 +985,7 @@ panels:
   pluginVersion: 10.4.1
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
       uid: ${datasource}
     editorMode: code
     expr: sum(increase(coredns_dns_response_size_bytes_bucket{instance=~"$instance", le!="0", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (le)
@@ -1012,7 +1012,7 @@ templating:
     multi: false
     name: datasource
     options: []
-    query: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    query: {{ default "prometheus" ($Values.grafana).defaultDatasourceType }}
     queryValue: ''
     refresh: 1
     regex: ''
@@ -1149,7 +1149,7 @@ time:
   from: now-1h
   to: now
 timepicker: {}
-timezone: {{ $Values.grafana.defaultDashboardsTimezone }}
+timezone: {{ default "null" ($Values.grafana).defaultDashboardsTimezone }}
 title: Kubernetes / System / CoreDNS
 uid: k8s_system_coredns
 version: 18

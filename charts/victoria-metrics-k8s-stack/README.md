@@ -626,6 +626,8 @@ selectAllByDefault: true
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
 <code class="language-yaml">node-exporter-full:
     enabled: true
+victorialogs:
+    enabled: false
 victoriametrics-operator:
     enabled: false
 victoriametrics-vmalert:
@@ -1207,16 +1209,22 @@ ingress:
     tls: []
 sidecar:
     dashboards:
-        additionalDashboardAnnotations: {}
-        additionalDashboardLabels: {}
+        annotations: {}
         defaultFolderName: default
         enabled: true
         folder: /var/lib/grafana/dashboards
+        labels: {}
         multicluster: false
         provider:
             name: default
             orgid: 1
     datasources:
+        alertmanager:
+            access: proxy
+            jsonData:
+                implementation: prometheus
+            name: Alertmanager
+            uid: alertmanager
         createVMReplicasDatasources: false
         default:
             - isDefault: true
