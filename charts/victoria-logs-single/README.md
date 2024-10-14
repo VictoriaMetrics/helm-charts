@@ -158,12 +158,42 @@ Change the values according to the need of the environment in ``victoria-logs-si
       <td>dashboards.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
       <td><p>Create VictoriaLogs dashboards</p>
 </td>
+    </tr>
+    <tr>
+      <td>dashboards.grafanaOperator.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>dashboards.grafanaOperator.spec.allowCrossNamespaceImport</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>dashboards.grafanaOperator.spec.instanceSelector.matchLabels.dashboards</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">grafana
+</code>
+</pre>
+</td>
+      <td></td>
     </tr>
     <tr>
       <td>dashboards.labels</td>

@@ -661,16 +661,6 @@ victoriametrics-vmalert:
 </td>
     </tr>
     <tr>
-      <td>defaultDashboards.grafanaOperator.allowCrossNamespaceImport</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
       <td>defaultDashboards.grafanaOperator.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
@@ -682,7 +672,17 @@ victoriametrics-vmalert:
 </td>
     </tr>
     <tr>
-      <td>defaultDashboards.grafanaOperator.instanceSelector.matchLabels.dashboards</td>
+      <td>defaultDashboards.grafanaOperator.spec.allowCrossNamespaceImport</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>defaultDashboards.grafanaOperator.spec.instanceSelector.matchLabels.dashboards</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
 <code class="language-yaml">grafana
