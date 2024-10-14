@@ -72,30 +72,30 @@ allowed_dashboards = [
 
 # Additional conditions map
 condition_map = {
-    "victorialogs": "false",
-    "alertmanager-overview": "$Values.alertmanager.enabled",
-    "apiserver": "$Values.kubeApiServer.enabled",
-    "controller-manager": "$Values.kubeControllerManager.enabled",
-    "etcd": "$Values.kubeEtcd.enabled",
-    "grafana-coredns-k8s": "$Values.coreDns.enabled",
-    "grafana-overview": "$Values.grafana.enabled",
-    "kubelet": "$Values.kubelet.enabled",
-    "kubernetes-system-api-server": "$Values.kubeApiServer.enabled",
-    "kubernetes-system-coredns": "$Values.coreDns.enabled",
-    "kubernetes-views-global": "$Values.kubelet.enabled",
-    "kubernetes-views-namespaces": "$Values.kubelet.enabled",
-    "kubernetes-views-nodes": "$Values.kubelet.enabled",
-    "kubernetes-views-pods": "$Values.kubelet.enabled",
+    "victorialogs": "($Values.vlogs).enabled",
+    "alertmanager-overview": "($Values.alertmanager).enabled",
+    "apiserver": "($Values.kubeApiServer).enabled",
+    "controller-manager": "($Values.kubeControllerManager).enabled",
+    "etcd": "($Values.kubeEtcd).enabled",
+    "grafana-coredns-k8s": "($Values.coreDns).enabled",
+    "grafana-overview": "($Values.grafana).enabled",
+    "kubelet": "($Values.kubelet).enabled",
+    "kubernetes-system-api-server": "($Values.kubeApiServer).enabled",
+    "kubernetes-system-coredns": "($Values.coreDns).enabled",
+    "kubernetes-views-global": "($Values.kubelet).enabled",
+    "kubernetes-views-namespaces": "($Values.kubelet).enabled",
+    "kubernetes-views-nodes": "($Values.kubelet).enabled",
+    "kubernetes-views-pods": "($Values.kubelet).enabled",
     "node-cluster-rsrc-use": '(index $Values "prometheus-node-exporter" "enabled")',
     "node-exporter-full": "false",
     "node-rsrc-use": '(index $Values "prometheus-node-exporter" "enabled")',
     "proxy": "$Values.kubeProxy.enabled",
     "scheduler": "$Values.kubeScheduler.enabled",
     "victoriametrics-backupmanager": "or (not (empty (((($Values).vmsingle).spec).vmBackup).destination)) (not (empty ((((($Values).vmcluster).spec).storage).vmBackup).destination))",
-    "victoriametrics-cluster": "$Values.vmcluster.enabled",
+    "victoriametrics-cluster": "($Values.vmcluster).enabled",
     "victoriametrics-operator": '(index $Values "victoria-metrics-operator" "enabled")',
-    "victoriametrics-single-node": "$Values.vmsingle.enabled",
-    "victoriametrics-vmalert": "$Values.vmalert.enabled",
+    "victoriametrics-single-node": "($Values.vmsingle).enabled",
+    "victoriametrics-vmalert": "($Values.vmalert).enabled",
 }
 
 
@@ -139,17 +139,13 @@ def fix_expr(target):
 def replace_ds_type_in_panel(panel):
     if "datasource" in panel:
         if "type" in panel["datasource"]:
-            panel["datasource"][
-                "type"
-            ] = '[[ default "prometheus" ($Values.grafana).defaultDatasourceType ]]'
+            panel["datasource"]["type"] = "[[ $defaultDatasource ]]"
     for target in panel.get("targets", []):
         if "expr" in target:
             fix_expr(target)
         if "datasource" in target:
             if "type" in target["datasource"]:
-                target["datasource"][
-                    "type"
-                ] = '[[ default "prometheus" ($Values.grafana).defaultDatasourceType ]]'
+                target["datasource"]["type"] = "[[ $defaultDatasource ]]"
     if "panels" in panel:
         for p in panel["panels"]:
             replace_ds_type_in_panel(p)
@@ -192,9 +188,7 @@ def patch_dashboard(dashboard, name):
                     elif isinstance(variable["query"], str):
                         variable["query"] = fix_query(variable["query"])
                 if variable.get("type", "") == "datasource":
-                    variable["query"] = (
-                        '[[ default "prometheus" ($Values.grafana).defaultDatasourceType ]]'
-                    )
+                    variable["query"] = "[[ $defaultDatasource ]]"
 
     ## fix drilldown links. see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/659
     for row in dashboard.get("rows", []):
@@ -207,9 +201,9 @@ def patch_dashboard(dashboard, name):
     if "tags" in dashboard:
         dashboard["tags"].append("vm-k8s-stack")
 
-    timezone = dashboard["timezone"] if dashboard["timezone"] else "null"
+    timezone = dashboard["timezone"] if dashboard["timezone"] else "utc"
     dashboard["timezone"] = (
-        f'[[ default "{timezone}" ($Values.grafana).defaultDashboardsTimezone ]]'
+        f'[[ default "{timezone}" ((($Values.grafana).sidecar).dashboards).defaultTimezone ]]'
     )
     dashboard["editable"] = False
     dashboard["condition"] = "[[ %(condition)s ]]" % {
@@ -236,10 +230,13 @@ def write_dashboard_to_file(resource_name, content, destination):
 
     # recreate the file
     with open(new_filename, "w") as f:
-        content = "{{- $Values := (.helm).Values | default .Values }}\n" + escape(
-            content
-        )
-        f.write(content)
+        output = ""
+        output += "{{- $Values := (.helm).Values | default .Values }}\n"
+        output += '{{- $defaultDatasource := "prometheus" -}}\n'
+        output += "{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}\n"
+        output += "  {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}\n"
+        output += "{{- end }}\n" + escape(content)
+        f.write(output)
 
     print(f"Generated {new_filename}")
 

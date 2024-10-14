@@ -49,11 +49,8 @@ metadata:
     app: {{ $app }}
     {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
 spec:
-  {{- with $.Values.defaultDashboards.grafanaOperator.instanceSelector }}
-  instanceSelector: {{ toYaml . | nindent 4 }}
-  {{- end }}
-  allowCrossNamespaceImport: {{ $.Values.defaultDashboards.grafanaOperator.allowCrossNamespaceImport }}
   json: | {{ $dashboardResult | nindent 4 }}
+  {{- toYaml $.Values.defaultDashboards.grafanaOperator.spec | nindent 2 }}
 {{- else }}
 ---
 apiVersion: v1
