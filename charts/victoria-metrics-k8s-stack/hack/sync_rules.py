@@ -50,6 +50,7 @@ rules = [
 
 # Additional conditions map
 condition_map = {
+    "alertmanager.rules": "$Values.alertmanager.enabled",
     "etcd": "$Values.kubeEtcd.enabled",
     "kube-apiserver-availability.rules": "$Values.kubeApiServer.enabled",
     "kube-apiserver-burnrate.rules": "$Values.kubeApiServer.enabled",
