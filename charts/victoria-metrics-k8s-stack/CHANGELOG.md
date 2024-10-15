@@ -2,6 +2,7 @@
 
 - Fixed templates context issues
 - Added ability to disable alertmanager rules if alertmanager.enabled: false
+- Updated vm-operator to v0.48.4 release
 
 ## 0.27.4
 
