@@ -47,6 +47,8 @@ If release name contains chart name it will be used as a full name.
       {{- end -}}
       {{- if and (kindIs "map" $values) $values.name -}}
         {{- $fullname = $values.name -}}
+      {{- else if and (kindIs "map" $values) $values.fullnameOverride -}}
+        {{- $fullname = $values.fullnameOverride -}}
       {{- else if and (kindIs "map" $global) $global.name -}}
         {{- $fullname = $global.name -}}
       {{- end -}}

@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Allow extract name prefix from app level fullnameOverride property
 
 ## 0.0.15
 

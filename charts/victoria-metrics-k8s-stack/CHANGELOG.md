@@ -1,5 +1,6 @@
 ## Next release
 
+- Fixed templates context issues
 - Added ability to disable alertmanager rules if alertmanager.enabled: false
 
 ## 0.27.4

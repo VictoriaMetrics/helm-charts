@@ -198,9 +198,9 @@ If release name contains chart name it will be used as a full name.
     {{- $_ := set $remotes "notifierConfigRef" $notifierConfigRef -}}
   {{- else if $Values.alertmanager.enabled -}}
     {{- $notifiers := default list -}}
-    {{- $appSecure := (not (empty (((.Values.alertmanager).spec).webConfig).tls_server_config)) -}}
-    {{- $ctx := dict "helm" . "appKey" "alertmanager" "appSecure" $appSecure "appRoute" ((.Values.alertmanager).spec).routePrefix -}}
-    {{- $alertManagerReplicas := (.Values.alertmanager.spec.replicaCount | default 1 | int) -}}
+    {{- $appSecure := (not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config)) -}}
+    {{- $ctx := dict "helm" . "appKey" "alertmanager" "appSecure" $appSecure "appRoute" (($Values.alertmanager).spec).routePrefix -}}
+    {{- $alertManagerReplicas := ($Values.alertmanager.spec.replicaCount | default 1 | int) -}}
     {{- range until $alertManagerReplicas -}}
       {{- $_ := set $ctx "appIdx" . -}}
       {{- $notifiers = append $notifiers (dict "url" (include "vm.url" $ctx)) -}}
@@ -212,7 +212,7 @@ If release name contains chart name it will be used as a full name.
 
 {{- /* VMAlert templates */ -}}
 {{- define "vm.alert.templates" -}}
-  {{- $Values := (.helm).Values | default .Values}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $cms :=  ($Values.vmalert.spec.configMaps | default list) -}}
   {{- if $Values.vmalert.templateFiles -}}
     {{- $fullname := (include "victoria-metrics-k8s-stack.fullname" .) -}}
@@ -223,7 +223,8 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{- define "vm.license.global" -}}
-  {{- $license := (deepCopy (.Values.global).license) | default dict -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $license := (deepCopy ($Values.global).license) | default dict -}}
   {{- if $license.key -}}
     {{- if hasKey $license "keyRef" -}}
       {{- $_ := unset $license "keyRef" -}}
@@ -253,7 +254,7 @@ If release name contains chart name it will be used as a full name.
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- with concat ($vmAlertRemotes.notifiers | default list) (.Values.vmalert.spec.notifiers | default list) }}
+  {{- with concat ($vmAlertRemotes.notifiers | default list) ($Values.vmalert.spec.notifiers | default list) }}
     {{- $_ := set $vmAlertRemotes "notifiers" . }}
   {{- end }}
   {{- $spec := deepCopy (omit $Values.vmalert.spec "notifiers") | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec }}
@@ -337,7 +338,7 @@ If release name contains chart name it will be used as a full name.
     {{- $templates = append $templates (dict "name" $configMap "key" "monzo.tmpl") -}}
   {{- end -}}
   {{- $configMap := (printf "%s-alertmanager-extra-tpl" $fullname) -}}
-  {{- range $key, $value := (.Values.alertmanager.templateFiles | default dict) -}}
+  {{- range $key, $value := ($Values.alertmanager.templateFiles | default dict) -}}
     {{- $templates = append $templates (dict "name" $configMap "key" $key) -}}
   {{- end -}}
   {{- $_ := set $spec "templates" $templates -}}
