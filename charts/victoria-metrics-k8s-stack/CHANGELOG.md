@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fixed templates context issues
 
 ## 0.27.4
 
