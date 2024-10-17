@@ -6,7 +6,7 @@
 
 **Release date:** 2024-10-17
 
-![AppVersion: v1.17.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.16.1&color=success&logo=)
+![AppVersion: v1.17.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.17.0&color=success&logo=)
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
 - Upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.17.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1170)
