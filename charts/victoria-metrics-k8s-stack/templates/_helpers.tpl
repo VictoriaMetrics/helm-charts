@@ -450,19 +450,6 @@ If release name contains chart name it will be used as a full name.
       {{- $datasources = append $datasources $ds -}}
     {{- end }}
   {{- end -}}
-  {{- if $Values.vlogs.enabled -}}
-    {{- range $ds := $grafana.sidecar.datasources.victorialogs }}
-      {{- $ctx := dict "helm" $ "appKey" "vlogs" -}}
-      {{- $ds = (deepCopy $ds) -}}
-      {{- $_ := set $ds "url" (include "vm.url" $ctx) -}}
-      {{- $_ := set $ds "type" "victorialogs-datasource" -}}
-      {{- $_ := set $ctx "ds" $ds -}}
-      {{- $allowedDatasource := (ternary false true (empty (include "vm.data.source.enabled" $ctx))) -}}
-      {{- if $allowedDatasource }}
-        {{- $datasources = append $datasources $ds -}}
-      {{- end }}
-    {{- end }}
-  {{- end -}}
   {{- toYaml $datasources -}}
 {{- end }}
 

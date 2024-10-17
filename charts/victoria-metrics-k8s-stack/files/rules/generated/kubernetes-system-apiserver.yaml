@@ -46,7 +46,7 @@ rules:
     description: 'KubeAPI has disappeared from Prometheus target discovery.'
     runbook_url: '{{ $Values.defaultRules.runbookUrl }}/kubernetes/kubeapidown'
     summary: 'Target disappeared from Prometheus target discovery.'
-  condition: '{{ $Values.kubeApiServer.enabled }}'
+  condition: '{{ ($Values.kubeApiServer).enabled }}'
   expr: absent(up{job="apiserver"} == 1)
   for: 15m
   labels:

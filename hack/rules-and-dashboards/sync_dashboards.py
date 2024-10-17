@@ -13,9 +13,18 @@ import requests
 import yaml
 from yaml.representer import SafeRepresenter
 
-dashboardsDir = join(
-    dirname(realpath(__file__)), "..", "files", "dashboards", "generated"
-)
+
+def dashboardsDir(chart):
+    return join(
+        dirname(realpath(__file__)),
+        "..",
+        "..",
+        "charts",
+        chart,
+        "files",
+        "dashboards",
+        "generated",
+    )
 
 
 # https://stackoverflow.com/a/20863889/961092
@@ -42,22 +51,102 @@ def change_style(style, representer):
 
 
 sources = [
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics-cluster.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmalert.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/operator.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victorialogs.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json",
-    "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml",
-    "https://raw.githubusercontent.com/etcd-io/etcd/main/contrib/mixin/mixin.libsonnet",
-    "https://grafana.com/api/dashboards/1860/revisions/37/download",
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics-cluster.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmalert.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/operator.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victorialogs.json",
+        "charts": [
+            "victoria-logs-single",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/etcd-io/etcd/main/contrib/mixin/mixin.libsonnet",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://grafana.com/api/dashboards/1860/revisions/37/download",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
 ]
 
 allowed_dashboards = [
@@ -222,23 +311,25 @@ def yaml_dump(struct):
     )
 
 
-def write_dashboard_to_file(resource_name, content, destination):
-    new_filename = f"{destination}/{resource_name}.yaml"
+def write_dashboard_to_file(resource_name, content, charts):
+    for chart in charts:
+        destination = dashboardsDir(chart)
+        new_filename = f"{destination}/{resource_name}.yaml"
 
-    # make sure directories to store the file exist
-    makedirs(destination, exist_ok=True)
+        # make sure directories to store the file exist
+        makedirs(destination, exist_ok=True)
 
-    # recreate the file
-    with open(new_filename, "w") as f:
-        output = ""
-        output += "{{- $Values := (.helm).Values | default .Values }}\n"
-        output += '{{- $defaultDatasource := "prometheus" -}}\n'
-        output += "{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}\n"
-        output += "  {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}\n"
-        output += "{{- end }}\n" + escape(content)
-        f.write(output)
+        # recreate the file
+        with open(new_filename, "w") as f:
+            output = ""
+            output += "{{- $Values := (.helm).Values | default .Values }}\n"
+            output += '{{- $defaultDatasource := "prometheus" -}}\n'
+            output += "{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}\n"
+            output += "  {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}\n"
+            output += "{{- end }}\n" + escape(content)
+            f.write(output)
 
-    print(f"Generated {new_filename}")
+        print(f"Generated {new_filename}")
 
 
 def jsonnet_import(directory, file_name):
@@ -270,8 +361,9 @@ def main():
     init_yaml_styles()
     # read the rules, create a new template file per group
     for src in sources:
-        print(f"Generating dashboards from {src}")
-        response = requests.get(src)
+        url = src["url"]
+        print(f"Generating dashboards from {url}")
+        response = requests.get(url)
         if response.status_code != 200:
             print(
                 f"Skipping the file, response code {response.status_code} not equals 200"
@@ -279,14 +371,14 @@ def main():
             continue
         raw_text = response.text
         dashboards = {}
-        path = pathlib.Path(src)
+        path = pathlib.Path(url)
         suffix = path.suffix
         if not suffix:
             suffix = ".json"
         if suffix in [".json", ".libsonnet"]:
             if suffix == ".libsonnet":
                 raw_text = _jsonnet.evaluate_snippet(
-                    src,
+                    url,
                     "(" + raw_text + ").grafanaDashboards",
                     import_callback=jsonnet_import,
                 )
@@ -317,7 +409,7 @@ def main():
         for d in dashboards:
             dashboard = dashboards[d]
             dashboard = patch_dashboard(dashboard, d)
-            write_dashboard_to_file(d, yaml_dump(dashboard), dashboardsDir)
+            write_dashboard_to_file(d, yaml_dump(dashboard), src["charts"])
 
     print("Finished")
 

@@ -626,8 +626,6 @@ selectAllByDefault: true
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
 <code class="language-yaml">node-exporter-full:
     enabled: true
-victorialogs:
-    enabled: false
 victoriametrics-operator:
     enabled: false
 victoriametrics-vmalert:
@@ -1226,8 +1224,6 @@ sidecar:
         enabled: true
         extra: []
         initDatasources: true
-        victorialogs:
-            - name: VictoriaLogs
         victoriametrics:
             - isDefault: true
               name: VictoriaMetrics
@@ -1294,17 +1290,6 @@ vmScrape:
 </pre>
 </td>
       <td><p>Configure additional grafana datasources (passed through tpl). Check <a href="http://docs.grafana.org/administration/provisioning/#datasources" target="_blank">here</a> for details</p>
-</td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.datasources.victorialogs</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">- name: VictoriaLogs
-</code>
-</pre>
-</td>
-      <td><p>List of VictoriaLogs datasources. VLogs generated <code>url</code> will be added to each datasource in template if vlogs is enabled</p>
 </td>
     </tr>
     <tr>
@@ -2145,158 +2130,6 @@ serviceMonitor:
 </pre>
 </td>
       <td><p>By default, operator converts prometheus-operator objects.</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VLogs annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Create VLogs CR</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.ingress.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Ingress annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.ingress.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enable deployment of ingress for server component</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.ingress.extraPaths</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.ingress.hosts</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Array of host objects</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.ingress.ingressClassName</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Ingress controller class name</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.ingress.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Ingress extra labels</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.ingress.path</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Ingress default path</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.ingress.pathType</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">Prefix
-</code>
-</pre>
-</td>
-      <td><p>Ingress path type</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.ingress.tls</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Array of TLS objects</p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">extraArgs: {}
-port: "9428"
-replicaCount: 1
-retentionPeriod: "1"
-storage:
-    accessModes:
-        - ReadWriteOnce
-    resources:
-        requests:
-            storage: 20Gi
-</code>
-</pre>
-</td>
-      <td><p>Full spec for VLogs CRD. Allowed values describe <a href="https://docs.victoriametrics.com/operator/api#vlogsspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>vlogs.spec.retentionPeriod</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">"1"
-</code>
-</pre>
-</td>
-      <td><p>Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these <a href="https://docs.victoriametrics.com/single-server-victoriametrics/#retention" target="_blank">docs</a></p>
 </td>
     </tr>
     <tr>

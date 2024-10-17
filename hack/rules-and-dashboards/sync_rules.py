@@ -12,7 +12,18 @@ import requests
 import yaml
 from yaml.representer import SafeRepresenter
 
-rulesDir = join(dirname(realpath(__file__)), "..", "files", "rules", "generated")
+
+def rulesDir(chart):
+    return join(
+        dirname(realpath(__file__)),
+        "..",
+        "..",
+        "charts",
+        chart,
+        "files",
+        "rules",
+        "generated",
+    )
 
 
 # https://stackoverflow.com/a/20863889/961092
@@ -34,63 +45,110 @@ def change_style(style, representer):
 
 
 # Source files list
-rules = [
-    "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/alertmanager-prometheusRule.yaml",
-    "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetesControlPlane-prometheusRule.yaml",
-    "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubePrometheus-prometheusRule.yaml",
-    "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubeStateMetrics-prometheusRule.yaml",
-    "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/nodeExporter-prometheusRule.yaml",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-cluster.yml",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-health.yml",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-vmagent.yml",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts.yml",
-    "https://raw.githubusercontent.com/VictoriaMetrics/operator/master/config/alerting/vmoperator-rules.yaml",
-    "https://raw.githubusercontent.com/etcd-io/etcd/main/contrib/mixin/mixin.libsonnet",
+sources = [
+    {
+        "url": "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/alertmanager-prometheusRule.yaml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetesControlPlane-prometheusRule.yaml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubePrometheus-prometheusRule.yaml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubeStateMetrics-prometheusRule.yaml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/nodeExporter-prometheusRule.yaml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-cluster.yml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-health.yml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-vmagent.yml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-vlogs.yml",
+        "charts": [
+            "victoria-logs-single",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts.yml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/operator/master/config/alerting/vmoperator-rules.yaml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/etcd-io/etcd/main/contrib/mixin/mixin.libsonnet",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
 ]
 
 # Additional conditions map
 condition_map = {
-    "alertmanager.rules": "$Values.alertmanager.enabled",
-    "etcd": "$Values.kubeEtcd.enabled",
-    "kube-apiserver-availability.rules": "$Values.kubeApiServer.enabled",
-    "kube-apiserver-burnrate.rules": "$Values.kubeApiServer.enabled",
-    "kube-apiserver-histogram.rules": "$Values.kubeApiServer.enabled",
-    "kube-apiserver-slos": "$Values.kubeApiServer.enabled",
-    "kube-apiserver.rules": "$Values.kubeApiServer.enabled",
-    "kube-scheduler.rules": "$Values.kubeScheduler.enabled",
-    "kubelet.rules": "$Values.kubelet.enabled",
-    "kubernetes-system-controller-manager": "$Values.kubeControllerManager.enabled",
-    "kubernetes-system-scheduler": "$Values.kubeScheduler.enabled",
+    "alertmanager.rules": "($Values.alertmanager).enabled",
+    "etcd": "($Values.kubeEtcd).enabled",
+    "kube-apiserver-availability.rules": "($Values.kubeApiServer).enabled",
+    "kube-apiserver-burnrate.rules": "($Values.kubeApiServer).enabled",
+    "kube-apiserver-histogram.rules": "($Values.kubeApiServer).enabled",
+    "kube-apiserver-slos": "($Values.kubeApiServer).enabled",
+    "kube-apiserver.rules": "($Values.kubeApiServer).enabled",
+    "kube-scheduler.rules": "($Values.kubeScheduler).enabled",
+    "kubelet.rules": "($Values.kubelet).enabled",
+    "kubernetes-system-controller-manager": "($Values.kubeControllerManager).enabled",
+    "kubernetes-system-scheduler": "($Values.kubeScheduler).enabled",
 }
 
 alert_condition_map = {
-    "KubeAPIDown": "$Values.kubeApiServer.enabled",  # there are more alerts which are left enabled, because they'll never fire without metrics
-    "KubeControllerManagerDown": "$Values.kubeControllerManager.enabled",
-    "KubeSchedulerDown": "$Values.kubeScheduler.enabled",
-    "KubeStateMetricsDown": ' (index $Values "kube-state-metrics" "enabled")',  # there are more alerts which are left enabled, because they'll never fire without metrics
-    "KubeletDown": "$Values.kubelet.enabled",  # there are more alerts which are left enabled, because they'll never fire without metrics
-    "PrometheusOperatorDown": "$Values.prometheusOperator.enabled",
-    "NodeExporterDown": "$Values.nodeExporter.enabled",
-    "CoreDNSDown": "$Values.kubeDns.enabled",
-    "AlertmanagerDown": "$Values.alertmanager.enabled",
-    "KubeProxyDown": "$Values.kubeProxy.enabled",
+    "KubeAPIDown": "($Values.kubeApiServer).enabled",  # there are more alerts which are left enabled, because they'll never fire without metrics
+    "KubeControllerManagerDown": "($Values.kubeControllerManager).enabled",
+    "KubeSchedulerDown": "($Values.kubeScheduler).enabled",
+    "KubeStateMetricsDown": '(index $Values "kube-state-metrics" "enabled")',  # there are more alerts which are left enabled, because they'll never fire without metrics
+    "KubeletDown": "($Values.kubelet).enabled",  # there are more alerts which are left enabled, because they'll never fire without metrics
+    "PrometheusOperatorDown": "($Values.prometheusOperator).enabled",
+    "NodeExporterDown": "($Values.nodeExporter).enabled",
+    "CoreDNSDown": "($Values.kubeDns).enabled",
+    "AlertmanagerDown": "($Values.alertmanager).enabled",
+    "KubeProxyDown": "($Values.kubeProxy).enabled",
 }
 
-skip_list = [
-    # 'kube-prometheus-general.rules',
-    # 'kube-prometheus-node-recording.rules'
-]
-
-
-def escape(s):
-    return (
-        s.replace("{{", "{{`{{")
-        .replace("}}", "}}`}}")
-        .replace("{{`{{", "{{`{{`}}")
-        .replace("}}`}}", "{{`}}`}}")
-        .replace("]]", "}}")
-        .replace("[[", "{{")
-    )
+skip_list = []
 
 
 def cluster_label_var(mo):
@@ -120,7 +178,7 @@ replacement_map = {
         "limitGroup": ["kubernetes-storage"],
     },
     "http://localhost:3000": {
-        "replacement": "[[ index $Values.grafana.ingress.hosts 0 ]]",
+        "replacement": "[[ index (($Values.grafana).ingress).hosts 0 ]]",
         "init": "",
     },
     'job="alertmanager-main"': {
@@ -134,6 +192,17 @@ replacement_map = {
         "replacement": cluster_label_var,
     },
 }
+
+
+def escape(s):
+    return (
+        s.replace("{{", "{{`{{")
+        .replace("}}", "}}`}}")
+        .replace("{{`{{", "{{`{{`}}")
+        .replace("}}`}}", "{{`}}`}}")
+        .replace("]]", "}}")
+        .replace("[[", "{{")
+    )
 
 
 def quoted_presenter(dumper, data):
@@ -171,7 +240,7 @@ def yaml_dump(struct):
     )
 
 
-def write_group_to_file(group, url, destination):
+def write_group_to_file(group, url, charts):
     fix_expr(group["rules"])
     group_name = group["name"]
     group["condition"] = "[[ %(condition)s ]]" % {
@@ -193,17 +262,21 @@ def write_group_to_file(group, url, destination):
     # rules themselves
     lines += rules
 
-    new_filename = f"{destination}/{group['name']}.yaml"
+    for chart in charts:
+        destination = rulesDir(chart)
+        new_filename = f"{destination}/{group['name']}.yaml"
 
-    # make sure directories to store the file exist
-    makedirs(destination, exist_ok=True)
+        # make sure directories to store the file exist
+        makedirs(destination, exist_ok=True)
 
-    # recreate the file
-    with open(new_filename, "w") as f:
-        content = "{{- $Values := (.helm).Values | default .Values }}\n" + escape(lines)
-        f.write(content)
+        # recreate the file
+        with open(new_filename, "w") as f:
+            content = "{{- $Values := (.helm).Values | default .Values }}\n" + escape(
+                lines
+            )
+            f.write(content)
 
-    print(f"Generated {new_filename}")
+        print(f"Generated {new_filename}")
 
 
 def jsonnet_import(directory, file_name):
@@ -234,19 +307,20 @@ def jsonnet_import(directory, file_name):
 def main():
     init_yaml_styles()
     # read the rules, create a new template file per group
-    for source in rules:
-        print(f"Generating rules from {source}")
-        response = requests.get(source)
+    for src in sources:
+        url = src["url"]
+        print(f"Generating rules from {url}")
+        response = requests.get(url)
         if response.status_code != 200:
             print(
                 f"Skipping the file, response code {response.status_code} not equals 200"
             )
             continue
         raw_text = response.text
-        if pathlib.Path(source).suffix == ".libsonnet":
+        if pathlib.Path(url).suffix == ".libsonnet":
             yaml_text = json.loads(
                 _jsonnet.evaluate_snippet(
-                    source,
+                    url,
                     f"({raw_text}).prometheusAlerts",
                     import_callback=jsonnet_import,
                 )
@@ -263,7 +337,7 @@ def main():
         for group in groups:
             if group["name"] in skip_list:
                 continue
-            write_group_to_file(group, source, rulesDir)
+            write_group_to_file(group, url, src["charts"])
 
     print("Finished")
 

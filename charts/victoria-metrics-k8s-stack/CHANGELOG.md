@@ -7,7 +7,6 @@
 - Renamed `grafana.additionalDataSources` to `grafana.sidecar.datasources.extra`
 - Renamed `grafana.defaultDashboardsTimezone` to `grafana.sidecar.dashboards.defaultTimezone`
 - Moved `grafana.defaultDatasourceType` to `grafana.sidecar.datasources.victoriametrics`
-- Added `vlogs` resource management
 
 ## 0.27.5
 

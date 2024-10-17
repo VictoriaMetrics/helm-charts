@@ -58,8 +58,6 @@ defaultDashboards:
       allowCrossNamespaceImport: false
   # -- Create dashboards as ConfigMap despite dependency it requires is not installed
   dashboards:
-    victorialogs:
-      enabled: false
     victoriametrics-vmalert:
       enabled: false
     victoriametrics-operator:
@@ -254,61 +252,6 @@ externalVM:
     # bearerTokenSecret:
     #   name: dbaas-read-access-token
     #   key: bearerToken
-
-# Configures vlogs params
-vlogs:
-  # -- VLogs annotations
-  annotations: {}
-  # -- Create VLogs CR
-  enabled: false
-  # -- Full spec for VLogs CRD. Allowed values describe [here](https://docs.victoriametrics.com/operator/api#vlogsspec)
-  spec:
-    port: "9428"
-    # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
-    retentionPeriod: "1"
-    replicaCount: 1
-    extraArgs: {}
-    storage:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 20Gi
-  ingress:
-    # -- Enable deployment of ingress for server component
-    enabled: false
-    # -- Ingress annotations
-    annotations:
-      {}
-      # kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
-    # -- Ingress extra labels
-    labels: {}
-    # -- Ingress default path
-    path: ""
-    # -- Ingress path type
-    pathType: Prefix
-    # -- Ingress controller class name
-    ingressClassName: ""
-
-    # -- Array of host objects
-    hosts: []
-    #  - vlogs.domain.com
-    # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
-    extraPaths: []
-    # - path: /*
-    #   pathType: Prefix
-    #   backend:
-    #     service:
-    #       name: ssl-redirect
-    #       port:
-    #
-
-    # -- Array of TLS objects
-    tls: []
-    #  - secretName: vlogs-ingress-tls
-    #    hosts:
-    #      - vlogs.domain.com
 
 # Configures vmsingle params
 vmsingle:
@@ -859,10 +802,6 @@ grafana:
           access: proxy
           jsonData:
             implementation: prometheus
-      # -- List of VictoriaLogs datasources.
-      # VLogs generated `url` will be added to each datasource in template if vlogs is enabled
-      victorialogs:
-        - name: VictoriaLogs
       # -- Configure additional grafana datasources (passed through tpl).
       # Check [here](http://docs.grafana.org/administration/provisioning/#datasources) for details
       extra: []
@@ -899,12 +838,11 @@ grafana:
   # Note that Grafana will need internet access to install the datasource plugin.
   # Uncomment the block below, if you want to enable VictoriaMetrics Datasource in Grafana:
   #plugins:
-  #  - "https://github.com/VictoriaMetrics/victoriametrics-datasource/releases/download/v0.5.0/victoriametrics-datasource-v0.5.0.zip;victoriametrics-datasource"
-  #  - "https://github.com/VictoriaMetrics/victorialogs-datasource/releases/download/v0.5.0/victorialogs-datasource-v0.5.0.zip;victorialogs-datasource"
+  #  - "https://github.com/VictoriaMetrics/victoriametrics-datasource/releases/download/v0.10.1/victoriametrics-datasource-v0.10.1.zip;victoriametrics-datasource"
   #grafana.ini:
   #  plugins:
   #    # Why VictoriaMetrics datasource is unsigned: https://github.com/VictoriaMetrics/grafana-datasource/blob/main/README.md#why-victoriametrics-datasource-is-unsigned
-  #    allow_loading_unsigned_plugins: victoriametrics-datasource,victorialogs-datasource
+  #    allow_loading_unsigned_plugins: victoriametrics-datasource
 
   ingress:
     enabled: false
