@@ -1,0 +1,38 @@
+{{- $Values := (.helm).Values | default .Values }}
+concurrency: 2
+condition: '{{ true }}'
+interval: 30s
+name: vlogs
+rules:
+- alert: DiskRunsOutOfSpace
+  annotations:
+    description: "Disk utilisation on instance {{`{{`}} $labels.instance {{`}}`}} is more than 80%.\n Having less than 20% of free disk space could cripple merge processes and overall performance. Consider to limit the ingestion rate, decrease retention or scale the disk space if possible."
+    summary: 'Instance {{`{{`}} $labels.instance {{`}}`}} (job={{`{{`}} $labels.job {{`}}`}}) will run out of disk space soon'
+  condition: '{{ true }}'
+  expr: |-
+    sum(vl_data_size_bytes) by (job,instance,{{ $Values.global.clusterLabel }}) /
+    (
+     sum(vl_free_disk_space_bytes) by (job,instance,{{ $Values.global.clusterLabel }}) +
+     sum(vl_data_size_bytes) by (job,instance,{{ $Values.global.clusterLabel }})
+    ) > 0.8
+  for: 30m
+  labels:
+    severity: critical
+- alert: RequestErrorsToAPI
+  annotations:
+    description: 'Requests to path {{`{{`}} $labels.path {{`}}`}} are receiving errors. Please verify if clients are sending correct requests.'
+    summary: 'Too many errors served for path {{`{{`}} $labels.path {{`}}`}} (instance {{`{{`}} $labels.instance {{`}}`}})'
+  condition: '{{ true }}'
+  expr: increase(vl_http_errors_total[5m]) > 0
+  for: 15m
+  labels:
+    severity: warning
+- alert: RowsRejectedOnIngestion
+  annotations:
+    description: 'VictoriaLogs is rejecting to ingest rows on "{{`{{`}} $labels.instance {{`}}`}}" due to the following reason: "{{`{{`}} $labels.reason {{`}}`}}"'
+    summary: 'Some rows are rejected on "{{`{{`}} $labels.instance {{`}}`}}" on ingestion attempt'
+  condition: '{{ true }}'
+  expr: rate(vl_rows_dropped_total[5m]) > 0
+  for: 15m
+  labels:
+    severity: warning
