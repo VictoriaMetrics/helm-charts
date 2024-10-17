@@ -1,5 +1,5 @@
-{{- $files := .Files }}
-{{- $fileContentsList := $files.Get "crd.yaml" | splitList "---" }}
+{{- $rules := default dict }}
+{{- $fileContentsList := .Files.Get "crd.yaml" | splitList "---" }}
 {{- $groups := dict }}
 {{- range $fileContentsList }}
   {{- $fileContents := . | fromYaml }}
@@ -10,7 +10,6 @@
   {{- $groups = set $groups $group $resources }}
 {{- end }}
 
-{{- $rules := default dict }}
 {{- $verbs := dict "admin" (list "*") "view" (list "get" "list" "watch") }}
 {{- range $group, $resources := $groups }}
   {{- range $name, $v := $verbs }}
@@ -20,12 +19,14 @@
   {{- end }}
 {{- end -}}
 
+{{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
+
 {{- if .Values.rbac.create }}
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: {{ include "vm-operator.fullname" . }}
-  {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
@@ -50,7 +51,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ template "vm-operator.fullname" . }}
-  {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
@@ -173,21 +173,23 @@ rules:
   - list
   - watch
   - get
-{{ toYaml $rules.admin }}
+{{- with $rules.admin }}
+{{ toYaml . }}
 {{- end }}
-{{- if .Values.crd.cleanup.enabled }}
+{{- end }}
+{{- if .Values.crds.cleanup.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "vm-operator.cleanupHookName" . }}
+  name: {{ include "vm-operator.fullname" . }}-cleanup-hook
   namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vm-operator.labels" . | nindent 4 }}
   annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-5") | nindent 4 }}
 rules: {{ toYaml $rules.admin | nindent 2 }}
 {{- end }}
 
-{{- if and .Values.crd.create .Values.rbac.aggregatedClusterRoles.enabled }}
+{{- if .Values.rbac.aggregatedClusterRoles.enabled }}
 {{- /* This template generates readonly and admin cluster roles for */ -}}
 {{- /* each CRD present in the helm chart.  The clusterroles use the */ -}}
 {{- /* kubernetes clusterrole aggregation feature to include these */ -}}
