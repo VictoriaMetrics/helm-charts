@@ -163,7 +163,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          args: {{ include "vmbackupmanager.args" . }}
+          args: {{ include "vmbackupmanager.args" . | nindent 12 }}
           {{- with $manager.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
