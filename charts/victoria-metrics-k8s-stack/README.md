@@ -690,6 +690,71 @@ victoriametrics-vmalert:
       <td></td>
     </tr>
     <tr>
+      <td>defaultDatasources.alertmanager</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">datasources:
+    - access: proxy
+      jsonData:
+        implementation: prometheus
+      name: Alertmanager
+perReplica: false
+</code>
+</pre>
+</td>
+      <td><p>List of alertmanager datasources. Alertmanager generated <code>url</code> will be added to each datasource in template if alertmanager is enabled</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultDatasources.alertmanager.perReplica</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td><p>Create per replica alertmanager compatible datasource</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultDatasources.extra</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td><p>Configure additional grafana datasources (passed through tpl). Check <a href="http://docs.grafana.org/administration/provisioning/#datasources" target="_blank">here</a> for details</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultDatasources.victoriametrics.datasources</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">- isDefault: true
+  name: VictoriaMetrics
+  type: prometheus
+- isDefault: false
+  name: VictoriaMetrics (DS)
+  type: victoriametrics-datasource
+</code>
+</pre>
+</td>
+      <td><p>List of prometheus compatible datasource configurations. VM <code>url</code> will be added to each of them in templates.</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultDatasources.victoriametrics.perReplica</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td><p>Create per replica prometheus compatible datasource</p>
+</td>
+    </tr>
+    <tr>
       <td>defaultRules</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -1215,22 +1280,8 @@ sidecar:
             name: default
             orgid: 1
     datasources:
-        alertmanager:
-            - access: proxy
-              jsonData:
-                implementation: prometheus
-              name: Alertmanager
-        createVMReplicasDatasources: false
         enabled: true
-        extra: []
         initDatasources: true
-        victoriametrics:
-            - isDefault: true
-              name: VictoriaMetrics
-              type: prometheus
-            - isDefault: false
-              name: VictoriaMetrics (DS)
-              type: victoriametrics-datasource
 vmScrape:
     enabled: true
     spec:
@@ -1265,47 +1316,6 @@ vmScrape:
 </pre>
 </td>
       <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
-</td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.datasources.alertmanager</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">- access: proxy
-  jsonData:
-    implementation: prometheus
-  name: Alertmanager
-</code>
-</pre>
-</td>
-      <td><p>List of alertmanager datasources. Alertmanager generated <code>url</code> will be added to each datasource in template if alertmanager is enabled</p>
-</td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.datasources.extra</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Configure additional grafana datasources (passed through tpl). Check <a href="http://docs.grafana.org/administration/provisioning/#datasources" target="_blank">here</a> for details</p>
-</td>
-    </tr>
-    <tr>
-      <td>grafana.sidecar.datasources.victoriametrics</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">- isDefault: true
-  name: VictoriaMetrics
-  type: prometheus
-- isDefault: false
-  name: VictoriaMetrics (DS)
-  type: victoriametrics-datasource
-</code>
-</pre>
-</td>
-      <td><p>List of prometheus compatible datasource configurations. VM <code>url</code> will be added to each of them in templates.</p>
 </td>
     </tr>
     <tr>
@@ -2317,7 +2327,7 @@ selectAllByDefault: true
       <td>vmauth.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
@@ -2351,7 +2361,7 @@ port: "8427"
       <td>vmcluster.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
@@ -2720,7 +2730,7 @@ vmstorage:
       <td>vmsingle.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+<code class="language-yaml">false
 </code>
 </pre>
 </td>

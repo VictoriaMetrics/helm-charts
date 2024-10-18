@@ -779,6 +779,45 @@ vmagent:
     #    hosts:
     #      - vmagent.domain.com
 
+defaultDatasources:
+  victoriametrics:
+    # -- Create per replica prometheus compatible datasource
+    perReplica: false
+    # -- List of prometheus compatible datasource configurations.
+    # VM `url` will be added to each of them in templates.
+    datasources:
+      - name: VictoriaMetrics
+        type: prometheus
+        isDefault: true
+      - name: VictoriaMetrics (DS)
+        isDefault: false
+        type: victoriametrics-datasource
+  # -- List of alertmanager datasources.
+  # Alertmanager generated `url` will be added to each datasource in template if alertmanager is enabled
+  alertmanager:
+    # -- Create per replica alertmanager compatible datasource
+    perReplica: false
+    datasources:
+      - name: Alertmanager
+        access: proxy
+        jsonData:
+          implementation: prometheus
+  # -- Configure additional grafana datasources (passed through tpl).
+  # Check [here](http://docs.grafana.org/administration/provisioning/#datasources) for details
+  extra: []
+    # - name: prometheus-sample
+    #   access: proxy
+    #   basicAuth: true
+    #   basicAuthPassword: pass
+    #   basicAuthUser: daco
+    #   editable: false
+    #   jsonData:
+    #       tlsSkipVerify: true
+    #   orgId: 1
+    #   type: prometheus
+    #   url: https://{{ printf "%s-prometheus.svc" .Release.Name }}:9090
+    #   version: 1
+
 # -- Grafana dependency chart configuration. For possible values refer [here](https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration)
 grafana:
   enabled: true
@@ -786,39 +825,7 @@ grafana:
   sidecar:
     datasources:
       enabled: true
-      # -- List of prometheus compatible datasource configurations.
-      # VM `url` will be added to each of them in templates.
-      victoriametrics:
-        - name: VictoriaMetrics
-          type: prometheus
-          isDefault: true
-        - name: VictoriaMetrics (DS)
-          isDefault: false
-          type: victoriametrics-datasource
-      # -- List of alertmanager datasources.
-      # Alertmanager generated `url` will be added to each datasource in template if alertmanager is enabled
-      alertmanager:
-        - name: Alertmanager
-          access: proxy
-          jsonData:
-            implementation: prometheus
-      # -- Configure additional grafana datasources (passed through tpl).
-      # Check [here](http://docs.grafana.org/administration/provisioning/#datasources) for details
-      extra: []
-        # - name: prometheus-sample
-        #   access: proxy
-        #   basicAuth: true
-        #   basicAuthPassword: pass
-        #   basicAuthUser: daco
-        #   editable: false
-        #   jsonData:
-        #       tlsSkipVerify: true
-        #   orgId: 1
-        #   type: prometheus
-        #   url: https://{{ printf "%s-prometheus.svc" .Release.Name }}:9090
-        #   version: 1
       initDatasources: true
-      createVMReplicasDatasources: false
     dashboards:
       defaultTimezone: utc
       provider:

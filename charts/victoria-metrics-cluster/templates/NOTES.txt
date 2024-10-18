@@ -1,7 +1,11 @@
-{{ if .Values.printNotes }}
+{{- if .Values.printNotes }}
 {{- $ctx := dict "helm" . "style" "plain" }}
-{{ if .Values.vminsert.enabled }}
-{{- $_ := set $ctx "appKey" "vminsert" }}
+{{- if .Values.vminsert.enabled }}
+{{- if .Values.vmauth.enabled }}
+  {{- $_ := set $ctx "appKey" "vmauth" }}
+{{- else }}
+  {{- $_ := set $ctx "appKey" "vminsert" }}
+{{- end }}
 Write API:
 
 The Victoria Metrics write api can be accessed via port {{ .Values.vminsert.service.servicePort }} with the following DNS name from within your cluster:
@@ -40,7 +44,11 @@ for example -  inside the Kubernetes cluster:
 {{- end }}
 
 {{- if .Values.vmselect.enabled }}
-{{- $_ := set $ctx "appKey" "vmselect" }}
+{{- if .Values.vmauth.enabled }}
+  {{- $_ := set $ctx "appKey" "vmauth" }}
+{{- else }}
+  {{- $_ := set $ctx "appKey" "vmselect" }}
+{{- end }}
 Read API:
 
 The VictoriaMetrics read api can be accessed via port {{ .Values.vmselect.service.servicePort }} with the following DNS name from within your cluster:

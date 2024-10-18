@@ -147,7 +147,11 @@ If release name contains chart name it will be used as a full name.
     {{- $_ := set $ctx "appKey" "vmsingle" -}}
     {{- $_ := set $endpoint "url" (include "vm.url" $ctx) -}}
   {{- else if $Values.vmcluster.enabled -}}
-    {{- $_ := set $ctx "appKey" (list "vmcluster" "vmselect") -}}
+    {{- if $Values.vmauth.enabled -}}
+      {{- $_ := set $ctx "appKey" "vmauth" -}}
+    {{- else -}}
+      {{- $_ := set $ctx "appKey" (list "vmcluster" "vmselect") -}}
+    {{- end -}}
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
     {{- $tenant := ($Values.tenant | default 0) -}}
     {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
@@ -166,7 +170,11 @@ If release name contains chart name it will be used as a full name.
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
     {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
   {{- else if $Values.vmcluster.enabled -}}
-    {{- $_ := set $ctx "appKey" (list "vmcluster" "vminsert") -}}
+    {{- if $Values.vmauth.enabled -}}
+      {{- $_ := set $ctx "appKey" "vmauth" -}}
+    {{- else -}}
+      {{- $_ := set $ctx "appKey" (list "vmcluster" "vminsert") -}}
+    {{- end -}}
     {{- $baseURL := (trimSuffix "/" (include "vm.url" $ctx)) -}}
     {{- $tenant := ($Values.tenant | default 0) -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
@@ -412,13 +420,12 @@ If release name contains chart name it will be used as a full name.
 {{- /* Datasources */ -}}
 {{- define "vm.data.sources" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $grafana := $Values.grafana -}}
-  {{- $datasources := $Values.grafana.sidecar.datasources.extra | default list -}}
+  {{- $datasources := $Values.defaultDatasources.extra | default list -}}
   {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled -}}
     {{- $ctx := dict "helm" . -}}
     {{- $readEndpoint:= (include "vm.read.endpoint" $ctx | fromYaml) -}}
     {{- $defaultDatasources := default list -}}
-    {{- range $ds := $grafana.sidecar.datasources.victoriametrics }}
+    {{- range $ds := $Values.defaultDatasources.victoriametrics.datasources }}
       {{- $_ := set $ctx "ds" $ds }}
       {{- $allowedDatasource := (ternary false true (empty (include "vm.data.source.enabled" $ctx))) -}}
       {{- if $allowedDatasource -}}
@@ -427,7 +434,7 @@ If release name contains chart name it will be used as a full name.
       {{- end -}}
     {{- end }}
     {{- $datasources = concat $datasources $defaultDatasources -}}
-    {{- if and $grafana.sidecar.datasources.createVMReplicasDatasources $defaultDatasources -}}
+    {{- if and $Values.defaultDatasources.victoriametrics.perReplica $defaultDatasources -}}
       {{- range $id := until (int $Values.vmsingle.spec.replicaCount) -}}
         {{- $_ := set $ctx "appIdx" $id -}}
         {{- $readEndpoint := (include "vm.read.endpoint" $ctx | fromYaml) -}}
@@ -442,7 +449,7 @@ If release name contains chart name it will be used as a full name.
     {{- end -}}
   {{- end -}}
   {{- if $Values.alertmanager.enabled -}}
-    {{- range $ds := $grafana.sidecar.datasources.alertmanager }}
+    {{- range $ds := $Values.defaultDatasources.alertmanager.datasources }}
       {{- $appSecure := (not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config)) -}}
       {{- $ctx := dict "helm" $ "appKey" "alertmanager" "appSecure" $appSecure "appRoute" (($Values.alertmanager).spec).routePrefix -}}
       {{- $_ := set $ds "url" (include "vm.url" $ctx) -}}
