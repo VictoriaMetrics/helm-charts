@@ -1,11 +1,11 @@
 ## Next release
 
 - Added alertmanager datasource. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1592)
-- Renamed `grafana.sidecar.dashboards.additionalDashboardLabels` to `grafana.sidecar.dashboards.labels`
-- Renamed `grafana.sidecar.dashboards.additionalDashboardAnnotations` to `grafana.sidecar.dashboards.annotations`
+- Renamed `grafana.sidecar.dashboards.additionalDashboardLabels` to `defaultDashboards.labels`
+- Renamed `grafana.sidecar.dashboards.additionalDashboardAnnotations` to `defaultDashboards.annotations`
 - Renamed `grafana.sidecar.datasources.default` to `defaultDatasources.victoriametrics.datasources`
 - Renamed `grafana.additionalDataSources` to `defaultDatasources.extra`
-- Renamed `grafana.defaultDashboardsTimezone` to `grafana.sidecar.dashboards.defaultTimezone`
+- Renamed `grafana.defaultDashboardsTimezone` to `defaultDashboards.defaultTimezone`
 - Removed `grafana.defaultDatasourceType` and default datasource type is picked from `defaultDatasources.victoriametrics.datasources[*].isDefault: true`
 
 ## 0.27.5

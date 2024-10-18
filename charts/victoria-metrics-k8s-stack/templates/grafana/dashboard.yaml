@@ -62,12 +62,12 @@ metadata:
     {{- if $.Values.grafana.sidecar.dashboards.label }}
     {{ $.Values.grafana.sidecar.dashboards.label }}: "1"
     {{- end }}
-    {{- range $key, $val := $.Values.grafana.sidecar.dashboards.labels }}
+    {{- range $key, $val := $.Values.defaultDashboards.labels }}
     {{ $key }}: {{ $val | quote }}
     {{- end }}
     app: {{ $app }}
     {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
-  {{- with $.Values.grafana.sidecar.dashboards.annotations }}
+  {{- with $.Values.defaultDashboards.annotations }}
   annotations:
     {{- range $key, $val := . }}
     {{ $key }}: {{ $val | quote }}

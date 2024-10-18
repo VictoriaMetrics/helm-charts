@@ -292,7 +292,7 @@ def patch_dashboard(dashboard, name):
 
     timezone = dashboard["timezone"] if dashboard["timezone"] else "utc"
     dashboard["timezone"] = (
-        f'[[ default "{timezone}" ((($Values.grafana).sidecar).dashboards).defaultTimezone ]]'
+        f'[[ default "{timezone}" ($Values.defaultDashboards).defaultTimezone ]]'
     )
     dashboard["editable"] = False
     dashboard["condition"] = "[[ %(condition)s ]]" % {
