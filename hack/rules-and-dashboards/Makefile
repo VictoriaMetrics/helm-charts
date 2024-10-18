@@ -16,8 +16,8 @@ sync-dashboards: sync
 sync: hack-image
 	$(CONTAINER) run --rm \
 		$(CONTAINER_USER_OPTION) \
-		--volume "$(HACK_PATH)/../:/k8s-stack$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
-		-w /k8s-stack/hack/ \
+		--volume "$(HACK_PATH)/../..:/vm" \
+		-w /vm/hack/rules-and-dashboards \
 		k8s-stack-hack:latest sh -c "\
 			python3 -m black $(BLACK_OPTS) $(SCRIPT) && \
 			python3 $(SCRIPT) \

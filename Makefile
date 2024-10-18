@@ -7,7 +7,7 @@ CONTAINER_TOOL ?= docker
 REPODIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 WORKDIR := $(REPODIR)/..
 
-include $(shell find charts -name Makefile)
+include $(shell find hack -name Makefile)
 
 ifeq ($(CONTAINER_TOOL),docker)
     CONTAINER_USER_OPTION = --user $(shell id -u):$(shell id -g)
