@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fixed HPA template name
 
 ## 0.14.2
 
