@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fixed vmbackupmanager args
 
 ## 0.14.4
 
