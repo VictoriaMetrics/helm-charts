@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fixed annotations in service account template
 
 ## 0.14.3
 
