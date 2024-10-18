@@ -31,6 +31,11 @@ Delete condition from dashboard
 */}}
 {{- $_ := unset $dashboardData "condition" -}}
 
+{{- if and $.Values.grafana.sidecar.dashboards.enabled $.Values.grafana.dashboards -}}
+{{ fail `It is not possible to use both "grafana.sidecar.dashboards.enabled: true" and "grafana.dashboards" at the same time.
+Disable either sidecar or dashboards configuration. See more details at https://docs.victoriametrics.com/helm/victoriametrics-k8s-stack/#adding-external-dashboards` }}
+{{- end -}}
+
 {{- /*
 Check if dashboard is enabled
 */}}
