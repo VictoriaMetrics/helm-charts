@@ -7,6 +7,7 @@
 - Renamed `grafana.additionalDataSources` to `defaultDatasources.extra`
 - Renamed `grafana.defaultDashboardsTimezone` to `defaultDashboards.defaultTimezone`
 - Removed `grafana.defaultDatasourceType` and default datasource type is picked from `defaultDatasources.victoriametrics.datasources[*].isDefault: true`
+- Add an explicit fail in case both Grafana dashboard via sidecar and `grafana.dashboards` are enabled. Previously, this configuration would be accepted and sidecar configuration would silently override `.grafana.dashboards` configuration. See [these docs](https://docs.victoriametrics.com/helm/victoriametrics-k8s-stack/#adding-external-dashboards) for information about adding external dashboards.
 
 ## 0.27.5
 
