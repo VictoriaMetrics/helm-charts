@@ -13,12 +13,6 @@ global:
       adaptSecurityContext: "auto"
   # -- Global name override
   nameOverride: ""
-  victoriaLogs:
-    server:
-      # -- Overrides the full name of server component
-      fullnameOverride:
-      # -- Server container name
-      name: server
 # -- Print chart notes
 printNotes: true
 
@@ -310,6 +304,9 @@ fluent-bit:
     - name: varlibdockercontainers
       hostPath:
         path: /var/lib/docker/containers
+    - name: victorialogs-outputs
+      configMap:
+        name: victorialogs-outputs
 
   daemonSetVolumeMounts:
     - name: varlog
@@ -317,6 +314,8 @@ fluent-bit:
     - name: varlibdockercontainers
       mountPath: /var/lib/docker/containers
       readOnly: true
+    - name: victorialogs-outputs
+      mountPath: /fluent-bit/etc/conf/vl
 
   resources: {}
 
@@ -325,20 +324,7 @@ fluent-bit:
     # Default format points to VictoriaLogs service.
     # @notationType -- tpl
     outputs: |
-      [OUTPUT]
-          Name             http
-          Match            kube.*
-          Host             {{ include "victoria-logs.server.fullname" . }}
-          port             9428
-          compress         gzip
-          uri              /insert/jsonline
-          format           json_lines
-          json_date_format iso8601
-          header           AccountID 0
-          header           ProjectID 0
-          header           VL-Msg-Field log
-          header           VL-Time-Field date
-          header           VL-Stream-Fields stream,kubernetes_pod_name,kubernetes_container_name,kubernetes_namespace_name
+      @INCLUDE /fluent-bit/etc/conf/vl/output_*.conf
     # -- FluentBit configuration filters
     # @notationType -- tpl
     filters: |
