@@ -1,6 +1,7 @@
 ## Next release
 
 - Human-readable error about Helm version requirement
+- bump version of VM components to [v1.105.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.105.0)
 
 ## 0.4.0
 
