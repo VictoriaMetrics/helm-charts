@@ -1,15 +1,16 @@
 {{- if .Values.server.persistentVolume.enabled -}}
 {{- if not .Values.server.statefulSet.enabled -}}
 {{- if not .Values.server.persistentVolume.existingClaim -}}
+{{- $ctx := dict "helm" . "appKey" "server" }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ include "victoria-logs.server.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
   {{- with .Values.server.persistentVolume.annotations  }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  labels: {{ include "victoria-logs.server.labels" . | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
  {{- with .Values.server.persistentVolume.accessModes }}
   accessModes: {{ toYaml . | nindent 4 }}

@@ -1,6 +1,6 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
+{{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $app := .Values.server }}
-{{- $fullname := (include "victoria-logs.server.fullname" .) }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- if and $app.enabled $app.statefulSet.enabled -}}
 apiVersion: apps/v1
 kind: StatefulSet
@@ -10,12 +10,13 @@ metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
-  labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
+  {{- $_ := set $ctx "extraLabels" $app.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
 spec:
   serviceName: {{ $fullname }}
   selector:
-    matchLabels: {{ include "victoria-logs.server.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   replicas: {{ $app.replicaCount }}
   podManagementPolicy: {{ $app.podManagementPolicy }}
   template:
@@ -23,8 +24,8 @@ spec:
       {{- with $app.podAnnotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.podLabels) }}
-      labels: {{ include "victoria-logs.server.labels" $ctx | nindent 8 }}
+      {{- $_ := set $ctx "extraLabels" $app.podLabels }}
+      labels: {{ include "vm.labels" $ctx | nindent 8 }}
     spec:
       {{- with $app.priorityClassName }}
       priorityClassName: {{ . }}
@@ -43,7 +44,8 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
+          {{- $_ := set $ctx "app" $app }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
