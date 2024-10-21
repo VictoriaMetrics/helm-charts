@@ -1,43 +1,28 @@
-{{- range $zone := .Values.availabilityZones }}
-{{- if $zone.vmauthIngest.enabled }}
+{{- $ctx := dict "helm" . }}
+{{- range $i, $zone := .Values.availabilityZones }}
+{{- if $zone.write.vmauth.enabled }}
+{{- $_ := set $ctx "appKey" (list "availabilityZones" $i "vmcluster" "spec" "vminsert") }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
-  name: {{ $zone.vmauthIngest.name | default (printf "vmauth-write-balancer-%s" $zone.name ) }}
+  {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "write" "vmauth") }}
+  name: write-balancer-{{ include "vm.fullname" $ctx }}
   namespace: {{ include "vm.namespace" $ }}
   labels: {{ include "victoria-metrics-distributed.labels" $ | nindent 4 }}
-  {{- with $zone.vmauthIngest.annotations }}
+  {{- with $zone.write.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-spec:
-{{- $nodeSelector := deepCopy $zone.nodeSelector }}
-{{- if $zone.vmauthIngest.spec.nodeSelector }}
-{{- $nodeSelector = mergeOverwrite (deepCopy $zone.nodeSelector) $zone.vmauthIngest.spec.nodeSelector }}
-{{- end }}
-  nodeSelector: {{ toYaml $nodeSelector | nindent 4 }}
-{{- if or $zone.extraAffinity ( and $zone.vmauthIngest.spec $zone.vmauthIngest.spec.affinity ) }}
-{{- $affinity := mergeOverwrite (deepCopy $zone.extraAffinity) ($zone.vmauthIngest.spec.affinity | default (dict)) }}
-  affinity:
-{{- toYaml $affinity | nindent 4 }}
-{{- end }}
-{{- $topologySpreadConstraints := deepCopy $zone.topologySpreadConstraints }}
-{{- if $zone.vmauthIngest.spec.topologySpreadConstraints }}
-{{- $topologySpreadConstraints = mergeOverwrite (deepCopy $zone.topologySpreadConstraints) $zone.vmauthIngest.spec.topologySpreadConstraints }}
-{{- end }}
-  topologySpreadConstraints: {{ toYaml $topologySpreadConstraints | nindent 4 }}
+{{- $spec := $zone.spec | default dict }}
+{{- $spec = merge (deepCopy $.Values.common.vmauth.spec) (deepCopy $spec) (deepCopy $zone.write.vmauth.spec) }}
+spec: {{ toYaml (omit $spec "unauthorizedAccessConfig") | nindent 2 }}
+  {{- $_ := set $ctx "style" "managed" }}
+  {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "vmcluster" "spec" "vminsert") }}
   unauthorizedAccessConfig:
-    - src_paths:
-        - "/insert/.+"
-      url_prefix:
-        - "http://vminsert-vmcluster-{{ $zone.name }}-additional-service:8480/"
-{{- $spec := deepCopy $zone.vmauthIngest.spec }}
-{{- $spec := unset $spec "nodeSelector" }}
-{{- $spec := unset $spec "affinity" }}
-{{- $spec := unset $spec "topologySpreadConstraints" }}
-{{- $spec := unset $spec "unauthorizedAccessConfig" }}
-{{- if $spec }}
-{{- toYaml $spec | nindent 2 }}
-{{- end }}
+  - src_paths:
+    - "/insert/.+"
+    url_prefix:
+    - {{ include "vm.url" $ctx }}
+    {{- $_ := unset $ctx "style" }}
 {{- end }}
 {{- end }}
