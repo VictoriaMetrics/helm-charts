@@ -1,21 +1,14 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- include "vm.enterprise.only" . -}}
-{{- if hasKey .Values.rateLimiter "enable" }}
-  {{- fail "`rateLimiter.enable` is deprecated. Use `rateLimiter.enabled` instead" }}
-{{- end }}
-{{- if hasKey .Values.auth "enable" }}
-  {{- fail "`auth.enable` is deprecated. Use `auth.enabled` instead" }}
-{{- end }}
 {{- if not (or .Values.auth.enabled .Values.rateLimiter.enabled) -}}
   {{- fail "at least one item in `.auth.enabled` or `.rateLimiter.enabled` must be set to `true`" -}}
 {{- end -}}
 
 {{- if .Values.rateLimiter.enabled -}}
   {{- if not .Values.rateLimiter.datasource.url -}}
-  {{- fail "please specify datasource url (`.rateLimiter.datasource.url`) for Rate Limiting" -}}
+    {{- fail "please specify datasource url (`.rateLimiter.datasource.url`) for Rate Limiting" -}}
   {{- end -}}
   {{- if not .Values.clusterMode -}}
-  {{- fail "ratelimiting works only with cluster, please enable `.clusterMode`" -}}
+    {{- fail "ratelimiting works only with cluster, please enable `.clusterMode`" -}}
   {{- end -}}
 {{- end -}}
 
@@ -30,26 +23,29 @@
 {{- $isExtraVolumes := or $isHost (gt (len .Values.extraVolumes) 0)  -}}
 {{- $isVolumes := or $isExtraVolumes .Values.rateLimiter.enabled  (and .Values.license.secret.name .Values.license.secret.key) -}}
 
+{{- $ctx := dict "helm" . -}}
+{{- $fullname := include "vm.plain.fullname" $ctx -}}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
-  labels: {{ include "chart.labels" . | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
-      labels: {{ include "chart.selectorLabels" . | nindent 8 }}
+      labels: {{ include "vm.selectorLabels" $ctx | nindent 8 }}
       {{- $annotations := merge (dict "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum)) .Values.podAnnotations }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+      serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
       {{- if .Values.podSecurityContext.enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
@@ -61,7 +57,8 @@ spec:
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
+          {{- $_ := set $ctx "app" .Values }}
+          image: {{ include "vm.image" $ctx }}
           workingDir: {{ .Values.containerWorkingDir }}
           args: {{ include "vmgateway.args" . | nindent 12 }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -124,7 +121,7 @@ spec:
         {{- if .Values.rateLimiter.enabled }}
         - name: config
           configMap:
-            name: {{ include "chart.fullname" .}}
+            name: {{ $fullname }}
         {{- end }}
         {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
