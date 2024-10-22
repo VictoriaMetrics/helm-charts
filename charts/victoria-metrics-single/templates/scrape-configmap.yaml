@@ -1,10 +1,12 @@
 {{- if and .Values.server.scrape.enabled (eq .Values.server.scrape.configMap "") }}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "victoria-metrics.server.fullname" . }}-scrapeconfig
+  name: {{ $fullname }}-scrapeconfig
   namespace: {{ include "vm.namespace" . }}
-  labels: {{ include "victoria-metrics.server.labels" . | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
   scrape.yml: |
     {{- range $k, $v := .Values.server.scrape.config }}
