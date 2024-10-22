@@ -1,13 +1,11 @@
 {{- if .Values.horizontalPodAutoscaling.enabled }}
+{{- $ctx := dict "helm" . }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  labels:
-    {{- include "chart.labels" . | nindent 4 }}
-{{- with .Values.extraLabels }}
-{{ toYaml . | indent 4 }}
-{{- end }}
-  name: {{ include "chart.fullname" . }}
+  {{- $_ := set $ctx "extraLabels" .Values.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
 spec:
   maxReplicas: {{ .Values.horizontalPodAutoscaling.maxReplicas }}
@@ -15,11 +13,9 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "chart.fullname" . }}
-  metrics:
-{{ toYaml .Values.horizontalPodAutoscaling.metrics | indent 4 }}
-{{- if .Values.horizontalPodAutoscaling.behavior }}
-  behavior:
-{{ toYaml .Values.horizontalPodAutoscaling.behavior | indent 4 }}
-{{- end -}}
+    name: {{ include "vm.plain.fullname" $ctx }}
+  metrics: {{ toYaml .Values.horizontalPodAutoscaling.metrics | nindent 4 }}
+  {{- with .Values.horizontalPodAutoscaling.behavior }}
+  behavior: {{ toYaml . | nindent 4 }}
+  {{- end -}}
 {{- end -}}

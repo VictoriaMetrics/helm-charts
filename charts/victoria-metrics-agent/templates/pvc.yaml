@@ -1,14 +1,13 @@
 {{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) .Values.deployment.enabled }}
+{{- $ctx := dict "helm" . }}
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ include "vm.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
-  labels:
-    {{- include "chart.labels" . | nindent 4 }}
-    {{- with .Values.persistence.extraLabels }}
-    {{- toYaml . | nindent 4}}
-    {{- end }}
+  {{- $_ := set $ctx "extraLabels" .Values.persistence.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.persistence.annotations  }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
@@ -26,4 +25,4 @@ spec:
   selector:
     matchLabels: {{ toYaml . | nindent 6 }}
   {{- end }}
-{{- end -}}
+{{- end }}

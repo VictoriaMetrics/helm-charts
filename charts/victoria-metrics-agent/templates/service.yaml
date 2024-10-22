@@ -1,13 +1,15 @@
 {{- if .Values.service.enabled -}}
+{{- $ctx := dict "helm" . }}
 apiVersion: v1
 kind: Service
 metadata:
   {{- with .Values.service.annotations }}
   annotations: {{ toYaml . | nindent 4}}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.service.extraLabels) }}
-  labels: {{ include "chart.labels" $ctx | nindent 4 }}
-  name: {{ include "chart.fullname" . }}
+  {{- $_ := set $ctx "extraLabels" .Values.service.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
 spec:
   {{- with .Values.service.clusterIP }}
@@ -78,5 +80,5 @@ spec:
       port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: opentsdb-tcp
     {{- end }}
-  selector: {{ include "chart.selectorLabels" . | nindent 4 }}
+  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}

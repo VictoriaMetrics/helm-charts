@@ -1,12 +1,14 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- if .Values.statefulset.enabled }}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" .Values.extraLabels) }}
-  labels: {{ include "chart.labels" $ctx | nindent 4 }}
+  {{- $_ := set $ctx "extraLabels" .Values.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
@@ -14,20 +16,21 @@ spec:
   {{- if not .Values.horizontalPodAutoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
-  serviceName: {{ include "chart.fullname" . }}
+  serviceName: {{ $fullname }}
   {{- with .Values.statefulset.updateStrategy }}
   updateStrategy: {{ toYaml . | nindent 4 }}
   {{- end }}
   selector:
-    matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
-      {{- $ctx := merge (deepCopy $global) (dict "extraLabels" (merge (deepCopy .Values.extraLabels) (deepCopy .Values.podLabels))) }}
-      labels: {{ include "chart.selectorLabels" $ctx | nindent 8 }}
+      {{- $_ := set $ctx "extraLabels" (merge (deepCopy .Values.extraLabels) (deepCopy .Values.podLabels)) }}
+      labels: {{ include "vm.selectorLabels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
       {{- $annotations := merge (dict "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum)) (deepCopy .Values.podAnnotations) }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+      serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
       {{- if .Values.podSecurityContext.enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
@@ -42,7 +45,8 @@ spec:
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
+          {{- $_ := set $ctx "app" .Values }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           workingDir: {{ .Values.containerWorkingDir }}
           args: {{ include "vmagent.args" . | nindent 12 }}
@@ -107,7 +111,7 @@ spec:
               mountPath: /tmpData
             - name: scrape-config
               mountPath: /config/scrape
-            {{- with (include "chart.rw.config" .) }}
+            {{- with (include "vmagent.rw.config" .) }}
             - name: rw-config
               mountPath: /config/rw
             {{- end }}
@@ -146,7 +150,7 @@ spec:
         - {{ toYaml $constraint | nindent 10 | trim }}
           {{- if not $constraint.labelSelector }}
           labelSelector:
-            matchLabels: {{ include "chart.selectorLabels" $ | nindent 14 }}
+            matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 14 }}
           {{- end }}
         {{- end }}
       {{- end }}
@@ -160,14 +164,14 @@ spec:
           emptyDir: {{ toYaml .Values.emptyDir | nindent 12 }}
           {{- end }}
         {{- end }}
-        {{- with (include "chart.rw.config" .) }}
+        {{- with (include "vmagent.rw.config" .) }}
         - name: rw-config
           configMap:
-            name: {{ include "chart.fullname" $ -}}-rw
+            name: {{ $fullname }}-rw
         {{- end }}
         - name: scrape-config
           configMap:
-            name: {{ include "chart.configname" . }}
+            name: {{ .Values.configMap | default (printf "%s-config" $fullname) }}
         {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
