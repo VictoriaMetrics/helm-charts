@@ -22,15 +22,16 @@ argocdReleaseOverride: ""
 # -- VictoriaMetrics Operator dependency chart configuration. More values can be found [here](https://docs.victoriametrics.com/helm/victoriametrics-operator#parameters). Also checkout [here](https://docs.victoriametrics.com/operator/vars) possible ENV variables to configure operator behaviour
 victoria-metrics-operator:
   enabled: true
-  serviceMonitor:
-    enabled: true
-  crd:
-    create: false
+  crds:
+    # -- added temporary, till new operator version released
+    plain: true
     cleanup:
       enabled: true
       image:
         repository: bitnami/kubectl
         pullPolicy: IfNotPresent
+  serviceMonitor:
+    enabled: true
   operator:
     # -- By default, operator converts prometheus-operator objects.
     disable_prometheus_converter: false
@@ -1211,10 +1212,6 @@ kubeProxy:
           scheme: https
           tlsConfig:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-
-# --  Install VM operator CRDs
-crds:
-  enabled: true
 
 # -- Install prometheus operator CRDs
 prometheus-operator-crds:
