@@ -1,3 +1,4 @@
+{{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $app := .Values.server }}
 {{- if $app.enabled -}}
 apiVersion: v1
@@ -7,9 +8,10 @@ metadata:
   {{- with $app.service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
-  labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-logs.server.fullname" . }}
+  {{- $_ := set $ctx "extraLabels" $app.service.labels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ include "vm.plain.fullname" $ctx }}
 spec:
   {{- $clusterIP := $app.service.clusterIP }}
   {{- if and (not $clusterIP) $app.statefulSet.enabled }}
@@ -52,5 +54,5 @@ spec:
       {{- with $app.service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
-  selector: {{ include "victoria-logs.server.matchLabels" . | nindent 4 }}
+  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}

@@ -1,14 +1,17 @@
 {{- if .Values.serviceMonitor.enabled -}}
 {{- $serviceMonitor := .Values.serviceMonitor -}}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   {{- with $serviceMonitor.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $serviceMonitor.extraLabels) }}
-  labels: {{ include "chart.labels" $ctx | nindent 4 }}
-  name: {{ include "chart.fullname" . }}
+  {{- $_ := set $ctx "extraLabels" $serviceMonitor.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
   {{- with $serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
@@ -17,7 +20,7 @@ spec:
     matchNames:
       - {{ include "vm.namespace" . }}
   selector:
-    matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   endpoints:
     - port: http
       {{- with $serviceMonitor.basicAuth }}

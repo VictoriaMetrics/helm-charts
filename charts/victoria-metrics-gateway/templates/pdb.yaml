@@ -1,11 +1,13 @@
 {{- if .Values.podDisruptionBudget.enabled }}
+{{- $ctx := dict "helm" . }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" . }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.podDisruptionBudget.labels) }}
-  labels: {{ include "chart.labels" $ctx | nindent 4 }}
+  {{- $_ := set $ctx "extraLabels" .Values.podDisruptionBudget.labels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
 spec:
   {{- with .Values.podDisruptionBudget.minAvailable }}
   minAvailable: {{ . }}
@@ -14,5 +16,5 @@ spec:
   maxUnavailable: {{ . }}
   {{- end }}
   selector:
-    matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
 {{- end }}

@@ -1,4 +1,4 @@
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.27.5](https://img.shields.io/badge/Version-0.27.5-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.27.6](https://img.shields.io/badge/Version-0.27.6-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -638,17 +638,6 @@ selectAllByDefault: true
 </pre>
 </td>
       <td><p>Spec for VMServiceScrape CRD is <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>crds</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-</code>
-</pre>
-</td>
-      <td><p>Install VM operator CRDs</p>
 </td>
     </tr>
     <tr>
@@ -2144,13 +2133,13 @@ selector:
       <td>victoria-metrics-operator</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">crd:
+<code class="language-yaml">crds:
     cleanup:
         enabled: true
         image:
             pullPolicy: IfNotPresent
             repository: bitnami/kubectl
-    create: false
+    plain: true
 enabled: true
 operator:
     disable_prometheus_converter: false
@@ -2160,6 +2149,17 @@ serviceMonitor:
 </pre>
 </td>
       <td><p>VictoriaMetrics Operator dependency chart configuration. More values can be found <a href="https://docs.victoriametrics.com/helm/victoriametrics-operator#parameters" target="_blank">here</a>. Also checkout <a href="https://docs.victoriametrics.com/operator/vars" target="_blank">here</a> possible ENV variables to configure operator behaviour</p>
+</td>
+    </tr>
+    <tr>
+      <td>victoria-metrics-operator.crds.plain</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>added temporary, till new operator version released</p>
 </td>
     </tr>
     <tr>

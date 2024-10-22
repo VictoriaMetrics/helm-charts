@@ -1,14 +1,16 @@
 {{- if .Values.rbac.create -}}
 {{- $namespaced := .Values.rbac.namespaced }}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ ternary "Role" "ClusterRole" $namespaced }}
 metadata:
-  name: {{ include "chart.fullname" . }}{{- ternary "" "-clusterrole" $namespaced }}
+  name: {{ $fullname }}{{- ternary "" "-clusterrole" $namespaced }}
   {{- if $namespaced }}
   namespace: {{ include "vm.namespace" . }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.rbac.extraLabels) }}
-  labels: {{ include "chart.labels" $ctx | nindent 4 }}
+  {{- $_ := set $ctx "extraLabels" .Values.rbac.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.rbac.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}

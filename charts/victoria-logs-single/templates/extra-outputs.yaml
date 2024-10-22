@@ -1,0 +1,30 @@
+{{- if index .Values "fluent-bit" "enabled" }}
+{{- $ctx := dict "helm" . "appKey" "server" "style" "plain" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: victorialogs-outputs
+  namespace: {{ include "vm.namespace" . }}
+  labels: {{- include "vm.labels" $ctx | nindent 4 }}
+data:
+  output_vlogs.conf: |
+    {{- range $i := until (int .Values.server.replicaCount) }}
+    {{- $_ := set $ctx "appIdx" $i }}
+    [OUTPUT]
+      Name             http
+      Match            kube.*
+      Host             {{ include "vm.fqdn" $ctx }}
+      port             9428
+      compress         gzip
+      uri              /insert/jsonline
+      format           json_lines
+      json_date_format iso8601
+      header           AccountID 0
+      header           ProjectID 0
+      header           VL-Msg-Field log
+      header           VL-Time-Field date
+      header           VL-Stream-Fields stream,kubernetes_pod_name,kubernetes_container_name,kubernetes_namespace_name
+    {{- end }}
+{{- end }}

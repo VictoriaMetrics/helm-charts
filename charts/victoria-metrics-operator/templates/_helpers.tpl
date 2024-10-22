@@ -80,7 +80,7 @@ app.kubernetes.io/managed-by: {{ $Release.Service | trunc 63 | trimSuffix "-" }}
 {{/*
 Create unified annotations for vm-operator components
 */}}
-{{- define "vm-operator.annotations" -}}
+{{- define "vm-operator.crds.annotations" -}}
 {{- $Release :=(.helm).Release | default .Release -}}
 helm.sh/resource-policy: keep
 meta.helm.sh/release-namespace: {{ include "vm.namespace" . }}
