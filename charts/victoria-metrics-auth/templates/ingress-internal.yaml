@@ -1,15 +1,16 @@
 {{- $app := .Values }}
 {{- if $app.ingressInternal.enabled }}
-{{- $serviceName := include "chart.fullname" . }}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   {{- with $app.ingressInternal.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.ingressInternal.extraLabels) }}
-  labels: {{ include "chart.labels" . | nindent 4 }}
-  name: {{ $serviceName }}-internal
+  {{- $_ := set $ctx "extraLabels" $app.ingressInternal.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  name: {{ $fullname }}-internal
   namespace: {{ include "vm.namespace" . }}
 spec:
   {{- with $app.ingressInternal.ingressClassName }}
@@ -29,7 +30,7 @@ spec:
             {{- end }}
             backend:
               service:
-                name: {{ $serviceName }}
+                name: {{ $fullname }}
                 port: {{ include "vm.ingress.port" . | nindent 18 }}
     {{- end }}
 {{- end }}
