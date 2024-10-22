@@ -1,11 +1,12 @@
+{{- $ctx := dict "helm" . }}
 {{- if eq .Values.configMap "" }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "chart.configname" .}}
+  name: {{ include "vm.plain.fullname" $ctx }}-config
   namespace: {{ include "vm.namespace" . }}
-  labels: {{- include "chart.labels" . | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
   scrape.yml: |
     {{- range $k, $v := .Values.config }}
@@ -24,13 +25,13 @@ data:
     {{- end -}}
   {{- end -}}
 {{- end -}}
-{{- with (include "chart.rw.config" .) }}
+{{- with (include "vmagent.rw.config" .) }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "chart.fullname" $ -}}-rw
+  name: {{ include "vm.plain.fullname" $ctx -}}-rw
   namespace: {{ include "vm.namespace" $ }}
-  labels: {{- include "chart.labels" $ | nindent 4 }}
+  labels: {{- include "vm.labels" $ctx | nindent 4 }}
 data: {{ . | nindent 2 }}
 {{- end }}
