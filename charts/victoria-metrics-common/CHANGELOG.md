@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added vm.podLabels template
 
 ## 0.0.16
 

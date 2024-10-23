@@ -138,6 +138,15 @@ If release name contains chart name it will be used as a full name.
   {{- toYaml $labels -}}
 {{- end -}}
 
+{{- define "vm.podLabels" -}}
+  {{- include "vm.validate.args" . -}}
+  {{- $Release := (.helm).Release | default .Release -}}
+  {{- $labels := fromYaml (include "vm.selectorLabels" .) -}}
+  {{- $labels = mergeOverwrite $labels (.extraLabels | default dict) -}}
+  {{- $_ := set $labels "app.kubernetes.io/managed-by" $Release.Service -}}
+  {{- toYaml $labels -}}
+{{- end -}}
+
 {{- /* Common labels */ -}}
 {{- define "vm.labels" -}}
   {{- include "vm.validate.args" . -}}
