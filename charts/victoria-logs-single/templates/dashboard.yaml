@@ -1,0 +1,67 @@
+{{- if .Values.dashboards.enabled }}
+
+{{- /*
+Create custom template context
+*/}}
+{{- $ctx := dict "helm" . -}}
+
+{{- /*
+Loop through all dashboard files
+*/}}
+{{- range $dashboardFile, $_ := .Files.Glob  "files/dashboards/**.yaml" -}}
+
+{{- /*
+Get dashboard name
+*/}}
+{{- $dashboardBase := base $dashboardFile }}
+{{- $dashboardName := (trimSuffix (ext $dashboardBase) $dashboardBase) -}}
+
+{{- /*
+Get dashboard data from file
+*/}}
+{{- $dashboardData := fromYaml (tpl ($.Files.Get $dashboardFile) $ctx) -}}
+
+{{- /*
+Delete condition from dashboard
+*/}}
+{{- $_ := unset $dashboardData "condition" -}}
+
+{{- $dashboardResult := toRawJson $dashboardData -}}
+{{- $app := ((printf "%s-grafana" (include "vm.name" $)) | trunc 63 | trimSuffix "-") }}
+{{- if $.Values.dashboards.grafanaOperator.enabled }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  namespace: {{ include "vm.namespace" $ }}
+  name: {{ printf "%s-%s" (include "vm.fullname" $) $dashboardName | replace "_" "" }}
+  labels:
+    app: {{ $app }}
+    {{- include "vm.labels" $ | nindent 4 }}
+spec:
+  json: | {{ $dashboardResult | nindent 4 }}
+  {{- toYaml $.Values.dashboards.grafanaOperator.spec | nindent 2 }}
+{{- else }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ include "vm.namespace" $ }}
+  name: {{ printf "%s-%s" (include "vm.fullname" $) $dashboardName }}
+  labels:
+    app: {{ $app }}
+    {{- range $key, $val := $.Values.dashboards.labels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- include "vm.labels" $ | nindent 4 }}
+  {{- with $.Values.dashboards.annotations }}
+  annotations:
+    {{- range $key, $val := . }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+  {{- end }}
+data:
+  {{ $dashboardName }}.json: | {{ $dashboardResult | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

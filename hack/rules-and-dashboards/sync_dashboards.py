@@ -13,9 +13,18 @@ import requests
 import yaml
 from yaml.representer import SafeRepresenter
 
-dashboardsDir = join(
-    dirname(realpath(__file__)), "..", "files", "dashboards", "generated"
-)
+
+def dashboardsDir(chart):
+    return join(
+        dirname(realpath(__file__)),
+        "..",
+        "..",
+        "charts",
+        chart,
+        "files",
+        "dashboards",
+        "generated",
+    )
 
 
 # https://stackoverflow.com/a/20863889/961092
@@ -42,21 +51,102 @@ def change_style(style, representer):
 
 
 sources = [
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics-cluster.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmalert.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/operator.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json",
-    "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json",
-    "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json",
-    "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml",
-    "https://raw.githubusercontent.com/etcd-io/etcd/main/contrib/mixin/mixin.libsonnet",
-    "https://grafana.com/api/dashboards/1860/revisions/37/download",
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics-cluster.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmalert.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/operator.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victorialogs.json",
+        "charts": [
+            "victoria-logs-single",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://raw.githubusercontent.com/etcd-io/etcd/main/contrib/mixin/mixin.libsonnet",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
+    {
+        "url": "https://grafana.com/api/dashboards/1860/revisions/37/download",
+        "charts": [
+            "victoria-metrics-k8s-stack",
+        ],
+    },
 ]
 
 allowed_dashboards = [
@@ -71,29 +161,30 @@ allowed_dashboards = [
 
 # Additional conditions map
 condition_map = {
-    "alertmanager-overview": "$Values.alertmanager.enabled",
-    "apiserver": "$Values.kubeApiServer.enabled",
-    "controller-manager": "$Values.kubeControllerManager.enabled",
-    "etcd": "$Values.kubeEtcd.enabled",
-    "grafana-coredns-k8s": "$Values.coreDns.enabled",
-    "grafana-overview": "$Values.grafana.enabled",
-    "kubelet": "$Values.kubelet.enabled",
-    "kubernetes-system-api-server": "$Values.kubeApiServer.enabled",
-    "kubernetes-system-coredns": "$Values.coreDns.enabled",
-    "kubernetes-views-global": "$Values.kubelet.enabled",
-    "kubernetes-views-namespaces": "$Values.kubelet.enabled",
-    "kubernetes-views-nodes": "$Values.kubelet.enabled",
-    "kubernetes-views-pods": "$Values.kubelet.enabled",
+    "victorialogs": "($Values.vlogs).enabled",
+    "alertmanager-overview": "($Values.alertmanager).enabled",
+    "apiserver": "($Values.kubeApiServer).enabled",
+    "controller-manager": "($Values.kubeControllerManager).enabled",
+    "etcd": "($Values.kubeEtcd).enabled",
+    "grafana-coredns-k8s": "($Values.coreDns).enabled",
+    "grafana-overview": "($Values.grafana).enabled",
+    "kubelet": "($Values.kubelet).enabled",
+    "kubernetes-system-api-server": "($Values.kubeApiServer).enabled",
+    "kubernetes-system-coredns": "($Values.coreDns).enabled",
+    "kubernetes-views-global": "($Values.kubelet).enabled",
+    "kubernetes-views-namespaces": "($Values.kubelet).enabled",
+    "kubernetes-views-nodes": "($Values.kubelet).enabled",
+    "kubernetes-views-pods": "($Values.kubelet).enabled",
     "node-cluster-rsrc-use": '(index $Values "prometheus-node-exporter" "enabled")',
     "node-exporter-full": "false",
     "node-rsrc-use": '(index $Values "prometheus-node-exporter" "enabled")',
     "proxy": "$Values.kubeProxy.enabled",
     "scheduler": "$Values.kubeScheduler.enabled",
     "victoriametrics-backupmanager": "or (not (empty (((($Values).vmsingle).spec).vmBackup).destination)) (not (empty ((((($Values).vmcluster).spec).storage).vmBackup).destination))",
-    "victoriametrics-cluster": "$Values.vmcluster.enabled",
+    "victoriametrics-cluster": "($Values.vmcluster).enabled",
     "victoriametrics-operator": '(index $Values "victoria-metrics-operator" "enabled")',
-    "victoriametrics-single-node": "$Values.vmsingle.enabled",
-    "victoriametrics-vmalert": "$Values.vmalert.enabled",
+    "victoriametrics-single-node": "($Values.vmsingle).enabled",
+    "victoriametrics-vmalert": "($Values.vmalert).enabled",
 }
 
 
@@ -137,17 +228,13 @@ def fix_expr(target):
 def replace_ds_type_in_panel(panel):
     if "datasource" in panel:
         if "type" in panel["datasource"]:
-            panel["datasource"][
-                "type"
-            ] = '[[ default "prometheus" $Values.grafana.defaultDatasourceType ]]'
+            panel["datasource"]["type"] = "[[ $defaultDatasource ]]"
     for target in panel.get("targets", []):
         if "expr" in target:
             fix_expr(target)
         if "datasource" in target:
             if "type" in target["datasource"]:
-                target["datasource"][
-                    "type"
-                ] = '[[ default "prometheus" $Values.grafana.defaultDatasourceType ]]'
+                target["datasource"]["type"] = "[[ $defaultDatasource ]]"
     if "panels" in panel:
         for p in panel["panels"]:
             replace_ds_type_in_panel(p)
@@ -190,9 +277,7 @@ def patch_dashboard(dashboard, name):
                     elif isinstance(variable["query"], str):
                         variable["query"] = fix_query(variable["query"])
                 if variable.get("type", "") == "datasource":
-                    variable["query"] = (
-                        '[[ default "prometheus" $Values.grafana.defaultDatasourceType ]]'
-                    )
+                    variable["query"] = "[[ $defaultDatasource ]]"
 
     ## fix drilldown links. see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/659
     for row in dashboard.get("rows", []):
@@ -205,7 +290,10 @@ def patch_dashboard(dashboard, name):
     if "tags" in dashboard:
         dashboard["tags"].append("vm-k8s-stack")
 
-    dashboard["timezone"] = "[[ $Values.grafana.defaultDashboardsTimezone ]]"
+    timezone = dashboard["timezone"] if dashboard["timezone"] else "utc"
+    dashboard["timezone"] = (
+        f'[[ default "{timezone}" ($Values.defaultDashboards).defaultTimezone ]]'
+    )
     dashboard["editable"] = False
     dashboard["condition"] = "[[ %(condition)s ]]" % {
         "condition": condition_map.get(name, "true")
@@ -223,20 +311,25 @@ def yaml_dump(struct):
     )
 
 
-def write_dashboard_to_file(resource_name, content, destination):
-    new_filename = f"{destination}/{resource_name}.yaml"
+def write_dashboard_to_file(resource_name, content, charts):
+    for chart in charts:
+        destination = dashboardsDir(chart)
+        new_filename = f"{destination}/{resource_name}.yaml"
 
-    # make sure directories to store the file exist
-    makedirs(destination, exist_ok=True)
+        # make sure directories to store the file exist
+        makedirs(destination, exist_ok=True)
 
-    # recreate the file
-    with open(new_filename, "w") as f:
-        content = "{{- $Values := (.helm).Values | default .Values }}\n" + escape(
-            content
-        )
-        f.write(content)
+        # recreate the file
+        with open(new_filename, "w") as f:
+            output = ""
+            output += "{{- $Values := (.helm).Values | default .Values }}\n"
+            output += '{{- $defaultDatasource := "prometheus" -}}\n'
+            output += "{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}\n"
+            output += "  {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}\n"
+            output += "{{- end }}\n" + escape(content)
+            f.write(output)
 
-    print(f"Generated {new_filename}")
+        print(f"Generated {new_filename}")
 
 
 def jsonnet_import(directory, file_name):
@@ -268,8 +361,9 @@ def main():
     init_yaml_styles()
     # read the rules, create a new template file per group
     for src in sources:
-        print(f"Generating dashboards from {src}")
-        response = requests.get(src)
+        url = src["url"]
+        print(f"Generating dashboards from {url}")
+        response = requests.get(url)
         if response.status_code != 200:
             print(
                 f"Skipping the file, response code {response.status_code} not equals 200"
@@ -277,14 +371,14 @@ def main():
             continue
         raw_text = response.text
         dashboards = {}
-        path = pathlib.Path(src)
+        path = pathlib.Path(url)
         suffix = path.suffix
         if not suffix:
             suffix = ".json"
         if suffix in [".json", ".libsonnet"]:
             if suffix == ".libsonnet":
                 raw_text = _jsonnet.evaluate_snippet(
-                    src,
+                    url,
                     "(" + raw_text + ").grafanaDashboards",
                     import_callback=jsonnet_import,
                 )
@@ -315,7 +409,7 @@ def main():
         for d in dashboards:
             dashboard = dashboards[d]
             dashboard = patch_dashboard(dashboard, d)
-            write_dashboard_to_file(d, yaml_dump(dashboard), dashboardsDir)
+            write_dashboard_to_file(d, yaml_dump(dashboard), src["charts"])
 
     print("Finished")
 

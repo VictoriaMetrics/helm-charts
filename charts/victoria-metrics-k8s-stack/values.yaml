@@ -49,13 +49,17 @@ serviceAccount:
 defaultDashboards:
   # -- Enable custom dashboards installation
   enabled: true
+  defaultTimezone: utc
+  labels: {}
+  annotations: {}
   grafanaOperator:
     # -- Create dashboards as CRDs (reuqires grafana-operator to be installed)
     enabled: false
-    instanceSelector:
-      matchLabels:
-        dashboards: "grafana"
-    allowCrossNamespaceImport: false
+    spec:
+      instanceSelector:
+        matchLabels:
+          dashboards: "grafana"
+      allowCrossNamespaceImport: false
   # -- Create dashboards as ConfigMap despite dependency it requires is not installed
   dashboards:
     victoriametrics-vmalert:
@@ -779,6 +783,45 @@ vmagent:
     #    hosts:
     #      - vmagent.domain.com
 
+defaultDatasources:
+  victoriametrics:
+    # -- Create per replica prometheus compatible datasource
+    perReplica: false
+    # -- List of prometheus compatible datasource configurations.
+    # VM `url` will be added to each of them in templates.
+    datasources:
+      - name: VictoriaMetrics
+        type: prometheus
+        isDefault: true
+      - name: VictoriaMetrics (DS)
+        isDefault: false
+        type: victoriametrics-datasource
+  # -- List of alertmanager datasources.
+  # Alertmanager generated `url` will be added to each datasource in template if alertmanager is enabled
+  alertmanager:
+    # -- Create per replica alertmanager compatible datasource
+    perReplica: false
+    datasources:
+      - name: Alertmanager
+        access: proxy
+        jsonData:
+          implementation: prometheus
+  # -- Configure additional grafana datasources (passed through tpl).
+  # Check [here](http://docs.grafana.org/administration/provisioning/#datasources) for details
+  extra: []
+    # - name: prometheus-sample
+    #   access: proxy
+    #   basicAuth: true
+    #   basicAuthPassword: pass
+    #   basicAuthUser: daco
+    #   editable: false
+    #   jsonData:
+    #       tlsSkipVerify: true
+    #   orgId: 1
+    #   type: prometheus
+    #   url: https://{{ printf "%s-prometheus.svc" .Release.Name }}:9090
+    #   version: 1
+
 # -- Grafana dependency chart configuration. For possible values refer [here](https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration)
 grafana:
   enabled: true
@@ -786,60 +829,28 @@ grafana:
   sidecar:
     datasources:
       enabled: true
-      # -- List of default prometheus compatible datasource configurations.
-      # VM `url` will be added to each of them in templates and `type` will be set to defaultDatasourceType if not defined
-      default:
-        - name: VictoriaMetrics
-          isDefault: true
-        - name: VictoriaMetrics (DS)
-          isDefault: false
-          type: victoriametrics-datasource
       initDatasources: true
-      createVMReplicasDatasources: false
     dashboards:
       provider:
         name: default
         orgid: 1
-      additionalDashboardLabels: {}
       folder: /var/lib/grafana/dashboards
       defaultFolderName: default
-      additionalDashboardAnnotations: {}
       enabled: true
       multicluster: false
 
   # -- Create datasource configmap even if grafana deployment has been disabled
   forceDeployDatasource: false
 
-  # -- Configure additional grafana datasources (passed through tpl). Check [here](http://docs.grafana.org/administration/provisioning/#datasources) for details
-  additionalDataSources: []
-  # - name: prometheus-sample
-  #   access: proxy
-  #   basicAuth: true
-  #   basicAuthPassword: pass
-  #   basicAuthUser: daco
-  #   editable: false
-  #   jsonData:
-  #       tlsSkipVerify: true
-  #   orgId: 1
-  #   type: prometheus
-  #   url: https://{{ printf "%s-prometheus.svc" .Release.Name }}:9090
-  #   version: 1
-
-  defaultDashboardsTimezone: utc
-
   # Enabling VictoriaMetrics Datasource in Grafana. See more details here: https://github.com/VictoriaMetrics/grafana-datasource/blob/main/README.md#victoriametrics-datasource-for-grafana
   # Note that Grafana will need internet access to install the datasource plugin.
   # Uncomment the block below, if you want to enable VictoriaMetrics Datasource in Grafana:
   #plugins:
-  #  - "https://github.com/VictoriaMetrics/grafana-datasource/releases/download/v0.5.0/victoriametrics-datasource-v0.5.0.zip;victoriametrics-datasource"
+  #  - "https://github.com/VictoriaMetrics/victoriametrics-datasource/releases/download/v0.10.1/victoriametrics-datasource-v0.10.1.zip;victoriametrics-datasource"
   #grafana.ini:
   #  plugins:
   #    # Why VictoriaMetrics datasource is unsigned: https://github.com/VictoriaMetrics/grafana-datasource/blob/main/README.md#why-victoriametrics-datasource-is-unsigned
   #    allow_loading_unsigned_plugins: victoriametrics-datasource
-
-  # Change datasource type in dashboards from Prometheus to VictoriaMetrics.
-  # you can use `victoriametrics-datasource` instead of `prometheus` if enabled VictoriaMetrics Datasource above
-  defaultDatasourceType: "prometheus"
 
   ingress:
     enabled: false

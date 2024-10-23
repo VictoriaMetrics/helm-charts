@@ -1,4 +1,8 @@
 {{- $Values := (.helm).Values | default .Values }}
+{{- $defaultDatasource := "prometheus" -}}
+{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+  {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
+{{- end }}
 __elements: []
 __inputs:
 - description: ''
@@ -48,7 +52,7 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
-condition: {{ $Values.kubelet.enabled }}
+condition: {{ ($Values.kubelet).enabled }}
 description: 'This is a modern ''Pods View'' dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
 editable: false
 fiscalYearStartMonth: 0
@@ -58,7 +62,7 @@ liveNow: false
 panels:
 - collapsed: false
   datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: grafana
   gridPos:
     h: 1
@@ -69,13 +73,13 @@ panels:
   panels: []
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: grafana
     refId: A
   title: Information
   type: row
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: Panel only works when a single pod is selected.
   fieldConfig:
@@ -111,7 +115,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -123,7 +127,7 @@ panels:
   title: Created by
   type: stat
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: Panel only works when a single pod is selected.
   fieldConfig:
@@ -162,7 +166,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -174,7 +178,7 @@ panels:
   title: Running on
   type: stat
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: Panel only works when a single pod is selected.
   fieldConfig:
@@ -210,7 +214,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -222,7 +226,7 @@ panels:
   title: Pod IP
   type: stat
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: Panel only works when a single pod is selected.
   fieldConfig:
@@ -258,7 +262,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -272,7 +276,7 @@ panels:
   title: Priority Class
   type: stat
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: Panel only works when a single pod is selected.
   fieldConfig:
@@ -325,7 +329,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -337,7 +341,7 @@ panels:
   title: QOS Class
   type: stat
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: Panel only works when a single pod is selected.
   fieldConfig:
@@ -374,7 +378,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -386,7 +390,7 @@ panels:
   title: Last Terminated Reason
   type: stat
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: Panel only works when a single pod is selected.
   fieldConfig:
@@ -425,7 +429,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -439,7 +443,7 @@ panels:
   type: stat
 - collapsed: false
   datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: grafana
   gridPos:
     h: 1
@@ -450,13 +454,13 @@ panels:
   panels: []
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: grafana
     refId: A
   title: Resources
   type: row
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -499,7 +503,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -511,7 +515,7 @@ panels:
   title: Total pod CPU Requests usage
   type: gauge
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -551,7 +555,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -563,7 +567,7 @@ panels:
   title: Total pod CPU Limits usage
   type: gauge
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -606,7 +610,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -618,7 +622,7 @@ panels:
   title: Total pod RAM Requests usage
   type: gauge
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -658,7 +662,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -670,7 +674,7 @@ panels:
   title: Total pod RAM Limits usage
   type: gauge
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -733,7 +737,7 @@ panels:
   pluginVersion: 11.2.0
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -745,7 +749,7 @@ panels:
     legendFormat: ''
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -757,7 +761,7 @@ panels:
     legendFormat: ''
     refId: B
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -768,7 +772,7 @@ panels:
     legendFormat: ''
     refId: C
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -779,7 +783,7 @@ panels:
     legendFormat: ''
     refId: D
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -791,7 +795,7 @@ panels:
     range: false
     refId: E
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -883,7 +887,7 @@ panels:
         container: Container
   type: table
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -953,7 +957,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -963,7 +967,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", image!="", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (container) / sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="cpu", job=~"$job", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (container)
@@ -974,7 +978,7 @@ panels:
   title: CPU Usage / Requests & Limits by container
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1047,7 +1051,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1057,7 +1061,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(container_memory_working_set_bytes{namespace="$namespace", pod=~"$pod", image!="", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (container) / sum(kube_pod_container_resource_limits{namespace="$namespace", pod=~"$pod", resource="memory", job=~"$job", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (container)
@@ -1068,7 +1072,7 @@ panels:
   title: Memory Usage / Requests & Limits by container
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1144,7 +1148,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1156,7 +1160,7 @@ panels:
   title: CPU Usage by container
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1224,7 +1228,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1236,7 +1240,7 @@ panels:
   title: Memory Usage by container
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: ''
   fieldConfig:
@@ -1307,7 +1311,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1329,7 +1333,7 @@ panels:
   title: Kubernetes
   type: row
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1402,7 +1406,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1414,7 +1418,7 @@ panels:
   title: OOM Events by container
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1487,7 +1491,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1500,7 +1504,7 @@ panels:
   type: timeseries
 - collapsed: false
   datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: grafana
   gridPos:
     h: 1
@@ -1511,13 +1515,13 @@ panels:
   panels: []
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: grafana
     refId: A
   title: Network
   type: row
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1579,7 +1583,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(container_network_receive_bytes_total{namespace="$namespace", pod=~"$pod", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
@@ -1587,7 +1591,7 @@ panels:
     legendFormat: Received
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
     expr: '- sum(rate(container_network_transmit_bytes_total{namespace="$namespace", pod=~"$pod", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
@@ -1597,7 +1601,7 @@ panels:
   title: Network - Bandwidth
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1659,7 +1663,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(container_network_receive_packets_total{namespace="$namespace", pod=~"$pod", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
@@ -1667,7 +1671,7 @@ panels:
     legendFormat: Received
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
     expr: '- sum(rate(container_network_transmit_packets_total{namespace="$namespace", pod=~"$pod", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
@@ -1677,7 +1681,7 @@ panels:
   title: Network - Packets Rate
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1739,7 +1743,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(container_network_receive_packets_dropped_total{namespace="$namespace", pod=~"$pod", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
@@ -1747,7 +1751,7 @@ panels:
     legendFormat: Received
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
     expr: '- sum(rate(container_network_transmit_packets_dropped_total{namespace="$namespace", pod=~"$pod", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
@@ -1757,7 +1761,7 @@ panels:
   title: Network - Packets Dropped
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1819,7 +1823,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
     expr: sum(rate(container_network_receive_errors_total{namespace="$namespace", pod=~"$pod", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
@@ -1827,7 +1831,7 @@ panels:
     legendFormat: Received
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
     expr: '- sum(rate(container_network_transmit_errors_total{namespace="$namespace", pod=~"$pod", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))'
@@ -1853,7 +1857,7 @@ templating:
     multi: false
     name: datasource
     options: []
-    query: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    query: {{ $defaultDatasource }}
     queryValue: ''
     refresh: 1
     regex: ''
@@ -1984,7 +1988,7 @@ time:
   from: now-1h
   to: now
 timepicker: {}
-timezone: {{ $Values.grafana.defaultDashboardsTimezone }}
+timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
 title: Kubernetes / Views / Pods
 uid: k8s_views_pods
 version: 32

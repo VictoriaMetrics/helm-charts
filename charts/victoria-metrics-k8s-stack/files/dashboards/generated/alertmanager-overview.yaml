@@ -1,9 +1,13 @@
 {{- $Values := (.helm).Values | default .Values }}
+{{- $defaultDatasource := "prometheus" -}}
+{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+  {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
+{{- end }}
 __inputs: []
 __requires: []
 annotations:
   list: []
-condition: {{ $Values.alertmanager.enabled }}
+condition: {{ ($Values.alertmanager).enabled }}
 editable: false
 gnetId: null
 graphTooltip: 1
@@ -349,7 +353,7 @@ templating:
     label: Data Source
     name: datasource
     options: []
-    query: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    query: {{ $defaultDatasource }}
     refresh: 1
     regex: ''
     type: datasource
@@ -438,7 +442,7 @@ timepicker:
   - 2d
   - 7d
   - 30d
-timezone: {{ $Values.grafana.defaultDashboardsTimezone }}
+timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
 title: Alertmanager / Overview
 uid: alertmanager-overview
 version: 0

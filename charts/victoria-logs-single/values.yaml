@@ -345,3 +345,19 @@ fluent-bit:
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []
+
+dashboards:
+  # -- Create VictoriaLogs dashboards
+  enabled: false
+  # -- Dashboard labels
+  labels: {}
+  #  grafana_dashboard: "1"
+  # -- Dashboard annotations
+  annotations: {}
+  grafanaOperator:
+    enabled: false
+    spec:
+      instanceSelector:
+        matchLabels:
+          dashboards: "grafana"
+      allowCrossNamespaceImport: false

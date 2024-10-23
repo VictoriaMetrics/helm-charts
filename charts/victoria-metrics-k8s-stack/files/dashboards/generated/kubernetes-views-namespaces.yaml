@@ -1,4 +1,8 @@
 {{- $Values := (.helm).Values | default .Values }}
+{{- $defaultDatasource := "prometheus" -}}
+{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+  {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
+{{- end }}
 __elements: {}
 __inputs:
 - description: ''
@@ -44,7 +48,7 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
-condition: {{ $Values.kubelet.enabled }}
+condition: {{ ($Values.kubelet).enabled }}
 description: 'This is a modern ''Namespaces View'' dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
 editable: false
 fiscalYearStartMonth: 0
@@ -54,7 +58,7 @@ liveNow: false
 panels:
 - collapsed: false
   datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: grafana
   gridPos:
     h: 1
@@ -66,7 +70,7 @@ panels:
   title: Overview
   type: row
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -104,10 +108,10 @@ panels:
     showThresholdMarkers: true
     sizing: auto
     text: {}
-  pluginVersion: 11.2.0
+  pluginVersion: 11.2.1
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: false
@@ -120,7 +124,7 @@ panels:
   title: Namespace(s) usage on total cluster CPU in %
   type: gauge
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -158,10 +162,10 @@ panels:
     showThresholdMarkers: true
     sizing: auto
     text: {}
-  pluginVersion: 11.2.0
+  pluginVersion: 11.2.1
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
     expr: sum(container_memory_working_set_bytes{namespace=~"$namespace", image!="", {{ $Values.global.clusterLabel }}=~"$cluster"}) / sum(machine_memory_bytes{ {{ $Values.global.clusterLabel }}=~"$cluster"})
@@ -171,7 +175,7 @@ panels:
   title: Namespace(s) usage on total cluster RAM in %
   type: gauge
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -238,77 +242,77 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_pod_info{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Running Pods
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_service_info{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Services
     refId: B
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_ingress_info{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Ingresses
     refId: C
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_deployment_labels{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Deployments
     refId: D
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_statefulset_labels{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Statefulsets
     refId: E
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_daemonset_labels{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Daemonsets
     refId: F
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_persistentvolumeclaim_info{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Persistent Volume Claims
     refId: G
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_hpa_labels{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Horizontal Pod Autoscalers
     refId: H
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_configmap_info{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Configmaps
     refId: I
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_secret_info{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Secrets
     refId: J
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_networkpolicy_labels{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
@@ -317,7 +321,7 @@ panels:
   title: Kubernetes Resource Count
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -351,10 +355,10 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 11.2.0
+  pluginVersion: 11.2.1
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -364,7 +368,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(kube_pod_container_resource_requests{namespace=~"$namespace", resource="cpu", {{ $Values.global.clusterLabel }}=~"$cluster"})
@@ -373,7 +377,7 @@ panels:
     range: true
     refId: B
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(kube_pod_container_resource_limits{namespace=~"$namespace", resource="cpu", {{ $Values.global.clusterLabel }}=~"$cluster"})
@@ -382,7 +386,7 @@ panels:
     range: true
     refId: C
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(machine_cpu_cores{ {{ $Values.global.clusterLabel }}=~"$cluster"})
@@ -393,7 +397,7 @@ panels:
   title: Namespace(s) CPU Usage in cores
   type: stat
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -427,10 +431,10 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 11.2.0
+  pluginVersion: 11.2.1
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -440,7 +444,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(kube_pod_container_resource_requests{namespace=~"$namespace", resource="memory", {{ $Values.global.clusterLabel }}=~"$cluster"})
@@ -449,7 +453,7 @@ panels:
     range: true
     refId: B
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(kube_pod_container_resource_limits{namespace=~"$namespace", resource="memory", {{ $Values.global.clusterLabel }}=~"$cluster"})
@@ -458,7 +462,7 @@ panels:
     range: true
     refId: C
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(machine_memory_bytes{ {{ $Values.global.clusterLabel }}=~"$cluster"})
@@ -470,7 +474,7 @@ panels:
   type: stat
 - collapsed: false
   datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: grafana
   gridPos:
     h: 1
@@ -482,7 +486,7 @@ panels:
   title: Resources
   type: row
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -544,7 +548,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -556,7 +560,7 @@ panels:
   title: CPU usage by Pod
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -618,7 +622,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -630,7 +634,7 @@ panels:
   title: Memory usage by Pod
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: ''
   fieldConfig:
@@ -701,7 +705,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -723,7 +727,7 @@ panels:
   title: Kubernetes
   type: row
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -790,7 +794,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -800,7 +804,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(kube_pod_info{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
@@ -811,7 +815,7 @@ panels:
   title: Kubernetes Pods QoS classes
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -878,7 +882,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -890,7 +894,7 @@ panels:
   title: Kubernetes Pods Status Reason
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: No data is generally a good thing here.
   fieldConfig:
@@ -958,7 +962,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -970,7 +974,7 @@ panels:
   title: OOM Events by namespace, pod
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: No data is generally a good thing here.
   fieldConfig:
@@ -1038,7 +1042,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1050,7 +1054,7 @@ panels:
   title: Container Restarts by namespace, pod
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1113,7 +1117,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(kube_pod_container_status_ready{namespace=~"$namespace", pod=~"${created_by}.*", {{ $Values.global.clusterLabel }}=~"$cluster"})
@@ -1122,7 +1126,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(kube_pod_container_status_running{namespace=~"$namespace", pod=~"${created_by}.*", {{ $Values.global.clusterLabel }}=~"$cluster"})
@@ -1131,21 +1135,21 @@ panels:
     range: true
     refId: B
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_pod_container_status_waiting{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Waiting
     refId: C
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_pod_container_status_restarts_total{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
     legendFormat: Restarts Total
     refId: D
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     expr: sum(kube_pod_container_status_terminated{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"})
     interval: ''
@@ -1154,7 +1158,7 @@ panels:
   title: Nb of pods by state
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1217,7 +1221,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(kube_pod_container_info{namespace=~"$namespace", pod=~"${created_by}.*", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (pod)
@@ -1228,7 +1232,7 @@ panels:
   title: Nb of containers by pod
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1290,7 +1294,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1302,7 +1306,7 @@ panels:
   title: Replicas available by deployment
   type: timeseries
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1364,7 +1368,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     expr: sum(kube_deployment_status_replicas_unavailable{namespace=~"$namespace", pod=~"${created_by}.*", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (deployment)
@@ -1374,176 +1378,98 @@ panels:
     refId: A
   title: Replicas unavailable by deployment
   type: timeseries
+- datasource:
+    default: false
+    type: {{ $defaultDatasource }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: bars
+        fillOpacity: 25
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: normal
+        thresholdsStyle:
+          mode: 'off'
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: short
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    'y': 64
+  id: 82
+  options:
+    legend:
+      calcs:
+      - min
+      - max
+      - last
+      displayMode: table
+      placement: right
+      showLegend: true
+    tooltip:
+      mode: multi
+      sort: desc
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    editorMode: code
+    expr: count(rate(container_cpu_usage_seconds_total{namespace=~"$namespace", image!="", pod=~"${created_by}.*", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (image)
+    interval: ''
+    legendFormat: '{{`{{`}} image {{`}}`}}'
+    range: true
+    refId: A
+  title: Container Image Used
+  type: timeseries
 - collapsed: false
   datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: grafana
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 64
+    'y': 72
   id: 42
   panels: []
   title: Kubernetes Storage
   type: row
 - datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ''
-        axisPlacement: auto
-        barAlignment: 0
-        barWidthFactor: 0.6
-        drawStyle: line
-        fillOpacity: 25
-        gradientMode: opacity
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: smooth
-        lineWidth: 2
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: 'off'
-      decimals: 2
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: null
-        - color: red
-          value: 80
-      unit: percentunit
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 0
-    'y': 65
-  id: 65
-  options:
-    legend:
-      calcs: []
-      displayMode: table
-      placement: right
-      showLegend: false
-    tooltip:
-      mode: multi
-      sort: desc
-  pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(kubelet_volume_stats_used_bytes{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim) / sum(kubelet_volume_stats_capacity_bytes{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
-    interval: ''
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
-    refId: A
-  title: Persistent Volumes - Capacity and usage in %
-  type: timeseries
-- datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
-    uid: ${datasource}
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ''
-        axisPlacement: auto
-        barAlignment: 0
-        barWidthFactor: 0.6
-        drawStyle: line
-        fillOpacity: 25
-        gradientMode: opacity
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: smooth
-        lineWidth: 2
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: 'off'
-      decimals: 2
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: null
-        - color: red
-          value: 80
-      unit: bytes
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 12
-    'y': 65
-  id: 66
-  options:
-    legend:
-      calcs: []
-      displayMode: table
-      placement: right
-      showLegend: false
-    tooltip:
-      mode: multi
-      sort: desc
-  pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(kubelet_volume_stats_used_bytes{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
-    interval: ''
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}} - Used'
-    refId: A
-  - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(kubelet_volume_stats_capacity_bytes{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
-    hide: false
-    interval: ''
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}} - Capacity'
-    refId: B
-  title: Persistent Volumes - Capacity and usage in bytes
-  type: timeseries
-- datasource:
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1593,6 +1519,161 @@ panels:
     w: 12
     x: 0
     'y': 73
+  id: 65
+  options:
+    legend:
+      calcs: []
+      displayMode: table
+      placement: right
+      showLegend: false
+    tooltip:
+      mode: multi
+      sort: desc
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    exemplar: true
+    expr: sum(kubelet_volume_stats_used_bytes{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim) / sum(kubelet_volume_stats_capacity_bytes{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
+    interval: ''
+    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
+    refId: A
+  title: Persistent Volumes - Capacity and usage in %
+  type: timeseries
+- datasource:
+    type: {{ $defaultDatasource }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 25
+        gradientMode: opacity
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: 'off'
+      decimals: 2
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: bytes
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    'y': 73
+  id: 66
+  options:
+    legend:
+      calcs: []
+      displayMode: table
+      placement: right
+      showLegend: false
+    tooltip:
+      mode: multi
+      sort: desc
+  pluginVersion: 8.3.3
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    exemplar: true
+    expr: sum(kubelet_volume_stats_used_bytes{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
+    interval: ''
+    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}} - Used'
+    refId: A
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    exemplar: true
+    expr: sum(kubelet_volume_stats_capacity_bytes{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
+    hide: false
+    interval: ''
+    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}} - Capacity'
+    refId: B
+  title: Persistent Volumes - Capacity and usage in bytes
+  type: timeseries
+- datasource:
+    type: {{ $defaultDatasource }}
+    uid: ${datasource}
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 25
+        gradientMode: opacity
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: smooth
+        lineWidth: 2
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: 'off'
+      decimals: 2
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: percentunit
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    'y': 81
   id: 27
   options:
     legend:
@@ -1606,7 +1687,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
     expr: 1 - sum(kubelet_volume_stats_inodes_used{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim) / sum(kubelet_volume_stats_inodes{namespace=~"$namespace", {{ $Values.global.clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
@@ -1620,14 +1701,14 @@ panels:
     h: 1
     w: 24
     x: 0
-    'y': 81
+    'y': 89
   id: 76
   panels: []
   title: Network
   type: row
 - datasource:
     default: false
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1675,7 +1756,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 82
+    'y': 90
   id: 78
   options:
     legend:
@@ -1689,7 +1770,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1699,7 +1780,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1712,7 +1793,7 @@ panels:
   type: timeseries
 - datasource:
     default: false
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1760,7 +1841,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 82
+    'y': 90
   id: 79
   options:
     legend:
@@ -1774,7 +1855,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1784,7 +1865,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1797,7 +1878,7 @@ panels:
   type: timeseries
 - datasource:
     default: false
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1845,7 +1926,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 90
+    'y': 98
   id: 80
   options:
     legend:
@@ -1859,7 +1940,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1869,7 +1950,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1882,7 +1963,7 @@ panels:
   type: timeseries
 - datasource:
     default: false
-    type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
@@ -1930,7 +2011,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 90
+    'y': 98
   id: 81
   options:
     legend:
@@ -1944,7 +2025,7 @@ panels:
   pluginVersion: 8.3.3
   targets:
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1954,7 +2035,7 @@ panels:
     range: true
     refId: A
   - datasource:
-      type: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+      type: {{ $defaultDatasource }}
       uid: ${datasource}
     editorMode: code
     exemplar: true
@@ -1979,7 +2060,7 @@ templating:
     multi: false
     name: datasource
     options: []
-    query: {{ default "prometheus" $Values.grafana.defaultDatasourceType }}
+    query: {{ $defaultDatasource }}
     queryValue: ''
     refresh: 1
     regex: ''
@@ -2076,8 +2157,8 @@ time:
   from: now-1h
   to: now
 timepicker: {}
-timezone: {{ $Values.grafana.defaultDashboardsTimezone }}
+timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
 title: Kubernetes / Views / Namespaces
 uid: k8s_views_ns
-version: 38
+version: 39
 weekStart: ''

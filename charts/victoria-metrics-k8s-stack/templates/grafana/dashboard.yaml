@@ -54,11 +54,8 @@ metadata:
     app: {{ $app }}
     {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
 spec:
-  {{- with $.Values.defaultDashboards.grafanaOperator.instanceSelector }}
-  instanceSelector: {{ toYaml . | nindent 4 }}
-  {{- end }}
-  allowCrossNamespaceImport: {{ $.Values.defaultDashboards.grafanaOperator.allowCrossNamespaceImport }}
   json: | {{ $dashboardResult | nindent 4 }}
+  {{- toYaml $.Values.defaultDashboards.grafanaOperator.spec | nindent 2 }}
 {{- else }}
 ---
 apiVersion: v1
@@ -70,19 +67,17 @@ metadata:
     {{- if $.Values.grafana.sidecar.dashboards.label }}
     {{ $.Values.grafana.sidecar.dashboards.label }}: "1"
     {{- end }}
-    {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
-    {{- range $key, $val := $.Values.grafana.sidecar.dashboards.additionalDashboardLabels }}
+    {{- range $key, $val := $.Values.defaultDashboards.labels }}
     {{ $key }}: {{ $val | quote }}
-    {{- end }}
     {{- end }}
     app: {{ $app }}
     {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
-    {{- if $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
+  {{- with $.Values.defaultDashboards.annotations }}
   annotations:
-    {{- range $key, $val := $.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations }}
+    {{- range $key, $val := . }}
     {{ $key }}: {{ $val | quote }}
     {{- end }}
-    {{- end }}
+  {{- end }}
 data:
   {{ $dashboardName }}.json: | {{ $dashboardResult | nindent 4 }}
 {{- end }}
