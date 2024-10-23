@@ -3,15 +3,16 @@
 {{- if and (kindIs "map" $app) $app.enabled ($app.podDisruptionBudget).enabled }}
 {{- $pdb := $app.podDisruptionBudget }}
 {{- $_ := set $ctx "extraLabels" $pdb.labels }}
+{{- $_ := set $ctx "appKey" $name }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  {{- $_ := set $ctx "appKey" $name }}
-  name: {{ include "vm.plain.fullname" $ctx }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" $ }}
-  {{- $labelsTpl := printf "victoria-metrics.%s.labels" $name }}
-  labels: {{ include $labelsTpl $ctx | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
 spec:
   {{- with $pdb.minAvailable }}
   minAvailable: {{ . }}
@@ -20,7 +21,6 @@ spec:
   maxUnavailable: {{ . }}
   {{- end }}
   selector:
-    {{- $selectorTpl := printf "victoria-metrics.%s.matchLabels" $name }}
-    matchLabels: {{ include $selectorTpl $ | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
 {{- end }}
 {{- end }}

@@ -3,6 +3,8 @@
 {{- if and (kindIs "map" $app) $app.enabled ($app.serviceMonitor).enabled }}
 {{- $serviceMonitor := $app.serviceMonitor }}
 {{- $_ := set $ctx "extraLabels" $serviceMonitor.extraLabels }}
+{{- $_ := set $ctx "appKey" $name }}
+{{ $fullname := include "vm.plain.fullname" $ctx }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -10,10 +12,9 @@ metadata:
   {{- with $serviceMonitor.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $labelsTpl := printf "victoria-metrics.%s.labels" $name }}
-  labels: {{ include $labelsTpl $ctx | nindent 4 }}
-  {{- $_ := set $ctx "appKey" $name }}
-  name: {{ include "vm.plain.fullname" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
   {{- with $serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
@@ -22,8 +23,7 @@ spec:
     matchNames:
       - {{ include "vm.namespace" $ }}
   selector:
-    {{- $selectorTpl := printf "victoria-metrics.%s.matchLabels" $name }}
-    matchLabels: {{ include $selectorTpl $ | nindent 6 }} 
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   endpoints:
     - port: http
       {{- with $serviceMonitor.basicAuth }}

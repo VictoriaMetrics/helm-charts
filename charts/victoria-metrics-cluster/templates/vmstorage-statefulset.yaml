@@ -1,19 +1,20 @@
 {{- $app := .Values.vmstorage }}
-{{- $ctx := dict "helm" . "extraLabels" $app.extraLabels "appKey" "vmstorage" }}
 {{- if $app.enabled -}}
+{{- $ctx := dict "helm" . "extraLabels" $app.extraLabels "appKey" "vmstorage" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  labels: {{ include "victoria-metrics.vmstorage.labels" $ctx | nindent 4 }}
-  name: {{ include "vm.plain.fullname" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
 spec:
-  serviceName: {{ include "vm.plain.fullname" $ctx }}
+  serviceName: {{ $fullname }}
   selector:
-    matchLabels: {{ include "victoria-metrics.vmstorage.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   replicas: {{ $app.replicaCount }}
   podManagementPolicy: {{ $app.podManagementPolicy }}
   template:
@@ -22,7 +23,7 @@ spec:
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
-      labels: {{ include "victoria-metrics.vmstorage.podLabels" $ctx | nindent 8 }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
     spec:
       {{- with $app.priorityClassName }}
       priorityClassName: {{ . }}
@@ -40,7 +41,7 @@ spec:
         {{- if $manager.restore.onStart.enabled }}
         {{- include "vm.enterprise.only" . }}
         - name: vmbackupmanager-restore
-          image: {{ include "vm.image" (merge (deepCopy .) (dict "app" $manager)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" $manager) }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
@@ -152,9 +153,6 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
             {{- include "vm.license.mount" . | nindent 12 }}
-        {{- if hasKey $manager "enable" }}
-          {{- fail "`vmstorage.vmbackupmanager.enable` is deprecated. Use `vmstorage.vmbackupmanager.enabled` instead" }}
-        {{- end }}
         {{- if $manager.enabled }}
         {{- include "vm.enterprise.only" . }}
         - name: vmbackupmanager

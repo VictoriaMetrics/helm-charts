@@ -1,5 +1,6 @@
 {{- $app := .Values.vminsert -}}
 {{- $ctx := dict "helm" . "appKey" "vminsert" "extraLabels" $app.extraLabels }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- if $app.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -7,12 +8,13 @@ metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  labels: {{ include "victoria-metrics.vminsert.labels" $ctx | nindent 4 }}
-  name: {{ include "vm.plain.fullname" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
 spec:
   selector:
-    matchLabels: {{ include "victoria-metrics.vminsert.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   {{- if not $app.horizontalPodAutoscaler.enabled }}
   replicas: {{ $app.replicaCount }}
   {{- end }}
@@ -25,7 +27,7 @@ spec:
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
-      labels: {{ include "victoria-metrics.vminsert.podLabels" $ctx | nindent 8 }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
     spec:
       {{- with $app.priorityClassName }}
       priorityClassName: {{ . }}
@@ -39,7 +41,8 @@ spec:
       {{- end }}
       containers:
         - name: vminsert
-          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
+          {{- $_ := set $ctx "app" $app }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}

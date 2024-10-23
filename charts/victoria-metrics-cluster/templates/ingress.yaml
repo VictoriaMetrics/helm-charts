@@ -4,7 +4,7 @@
 {{- $ingress := $app.ingress }}
 {{- $_ := set $ctx "extraLabels" $ingress.extraLabels }}
 {{- $_ := set $ctx "appKey" $name }}
-{{- $serviceName := include "vm.plain.fullname" $ctx }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -12,9 +12,8 @@ metadata:
   {{- with $ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $labelsTpl := printf "victoria-metrics.%s.labels" $name }}
-  labels: {{ include $labelsTpl $ctx | nindent 4 }}
-  name: {{ $serviceName }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" $ }}
 spec:
   {{- with $ingress.ingressClassName }}
@@ -34,7 +33,7 @@ spec:
             {{- end }}
             backend:
               service:
-                name: {{ $serviceName }}
+                name: {{ $fullname }}
                 port: {{ include "vm.ingress.port" . | nindent 18 }}
     {{- end }}
 {{- end }}

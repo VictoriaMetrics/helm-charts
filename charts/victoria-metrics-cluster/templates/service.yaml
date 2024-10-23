@@ -3,6 +3,8 @@
 {{- if and (kindIs "map" $app) $app.enabled ($app.service).enabled }}
 {{- $service := $app.service }}
 {{- $_ := set $ctx "extraLabels" $service.labels }}
+{{- $_ := set $ctx "appKey" $name }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 ---
 apiVersion: v1
 kind: Service
@@ -10,10 +12,9 @@ metadata:
   {{- with $service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $labelsTpl := printf "victoria-metrics.%s.labels" $name }}
-  labels: {{ include $labelsTpl $ctx | nindent 4 }}
-  {{- $_ := set $ctx "appKey" $name }}
-  name: {{ include "vm.plain.fullname" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" $ }}
 spec:
   {{- $clusterIP := $service.clusterIP }}
@@ -53,7 +54,6 @@ spec:
   {{- with include $portsTpl $app }}
   ports: {{ . | nindent 4 }}
   {{- end }}
-  {{- $selectorTpl := printf "victoria-metrics.%s.matchLabels" $name }}
-  selector: {{ include $selectorTpl $ | nindent 4 }}
+  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}
 {{- end }}

@@ -1,19 +1,20 @@
 {{- $app := .Values.vmselect }}
-{{- $ctx := dict "helm" . "appKey" "vmselect" }}
 {{- if and $app.enabled $app.statefulSet.enabled -}}
+{{- $ctx := dict "helm" . "appKey" "vmselect" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  labels: {{ include "victoria-metrics.vmselect.labels" $ctx | nindent 4 }}
-  name: {{ include "vm.plain.fullname" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" $ctx }}
 spec:
-  serviceName: {{ include "vm.plain.fullname" $ctx }}
+  serviceName: {{ $fullname }}
   selector:
-    matchLabels: {{ include "victoria-metrics.vmselect.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   replicas: {{ $app.replicaCount }}
   podManagementPolicy: {{ $app.statefulSet.podManagementPolicy }}
   template:
@@ -22,7 +23,8 @@ spec:
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
-      labels: {{ include "victoria-metrics.vmselect.podLabels" $ctx | nindent 8 }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
     spec:
       {{- with $app.priorityClassName }}
       priorityClassName: {{ . }}
