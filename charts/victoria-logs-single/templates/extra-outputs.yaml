@@ -5,13 +5,16 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: victorialogs-outputs
+  name: vl-outputs
   namespace: {{ include "vm.namespace" . }}
   labels: {{- include "vm.labels" $ctx | nindent 4 }}
 data:
-  output_vlogs.conf: |
-    {{- range $i := until (int .Values.server.replicaCount) }}
+  output_vl.conf: |
+    {{- $replicaCount := ternary (int .Values.server.replicaCount) 1 .Values.server.statefulSet.enabled }}
+    {{- range $i := until $replicaCount }}
+    {{- if gt $replicaCount 1 }}
     {{- $_ := set $ctx "appIdx" $i }}
+    {{- end }}
     [OUTPUT]
       Name             http
       Match            kube.*
@@ -26,5 +29,5 @@ data:
       header           VL-Msg-Field log
       header           VL-Time-Field date
       header           VL-Stream-Fields stream,kubernetes_pod_name,kubernetes_container_name,kubernetes_namespace_name
-    {{- end }}
+    {{ end }}
 {{- end }}

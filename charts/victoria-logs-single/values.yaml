@@ -296,6 +296,23 @@ server:
 fluent-bit:
   # -- Enable deployment of fluent-bit
   enabled: false
+  args:
+    - --workdir=/fluent-bit/etc
+    - --config=/fluent-bit/etc/conf/fluent-bit.conf
+    - --enable-hot-reload
+
+  extraContainers: |
+    - name: reloader
+      image: {{ include "fluent-bit.image" .Values.hotReload.image }}
+      args:
+        - {{ printf "-webhook-url=http://localhost:%s/api/v2/reload" (toString .Values.metricsPort) }}
+        - -volume-dir=/watch/config
+        - -volume-dir=/watch/outputs
+      volumeMounts:
+        - name: config
+          mountPath: /watch/config
+        - name: vl-outputs
+          mountPath: /watch/outputs
 
   daemonSetVolumes:
     - name: varlog
@@ -304,9 +321,9 @@ fluent-bit:
     - name: varlibdockercontainers
       hostPath:
         path: /var/lib/docker/containers
-    - name: victorialogs-outputs
+    - name: vl-outputs
       configMap:
-        name: victorialogs-outputs
+        name: vl-outputs
 
   daemonSetVolumeMounts:
     - name: varlog
@@ -314,7 +331,7 @@ fluent-bit:
     - name: varlibdockercontainers
       mountPath: /var/lib/docker/containers
       readOnly: true
-    - name: victorialogs-outputs
+    - name: vl-outputs
       mountPath: /fluent-bit/etc/conf/vl
 
   resources: {}
