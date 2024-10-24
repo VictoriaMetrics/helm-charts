@@ -246,6 +246,14 @@ additionalVictoriaMetricsMap:
 
 # -- External VM read and write URLs
 externalVM:
+  # -- VMAuth config sections for external VM urls
+  vmauth:
+    read:
+      - src_paths:
+          - /.*
+        url_prefix:
+          - /
+    write: []
   read:
     url: ""
     # bearerTokenSecret:
@@ -317,6 +325,15 @@ vmcluster:
   enabled: false
   # -- VMCluster annotations
   annotations: {}
+  # -- Custom VMAuth config, url_prefix requires only path, which will be appended to a select and insert base URL.
+  # To disable auth for vmselect or vminsert empty list for component config `vmcluster.vmauth.<component>: []`
+  vmauth:
+    vmselect:
+      - src_paths:
+          - /select/.*
+        url_prefix:
+          - /
+    vminsert: []
   # -- Full spec for VMCluster CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
   spec:
     # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
@@ -723,7 +740,7 @@ vmalert:
 
 vmauth:
   # -- Enable VMAuth CR
-  enabled: false
+  enabled: true
   # -- VMAuth annotations
   annotations: {}
   # -- (object) Full spec for VMAuth CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmauthspec)

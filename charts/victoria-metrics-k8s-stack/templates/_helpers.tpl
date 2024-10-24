@@ -306,22 +306,55 @@ If release name contains chart name it will be used as a full name.
     {{- $srcPath := clean (printf "%s/.*" (urlParse $url).path) }}
     {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $srcPath) "url_prefix" (list $url)) }}
   {{- else if $Values.vmcluster.enabled -}}
+    {{- $authConfig := ($Values.vmcluster).vmauth }}
     {{- $_ := set $ctx "appKey" (list "vmcluster" "vminsert") -}}
+    {{- $writeAuths := $authConfig.vminsert }}
     {{- $writeUrl := (include "vm.url" $ctx) }}
-    {{- $writeSrcPath := clean (printf "%s/insert/.*" (urlParse $writeUrl).path) }}
-    {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $writeSrcPath) "url_prefix" (list $writeUrl)) }}
+    {{- range $writeAuth := $writeAuths }}
+      {{- $urls := default list }}
+      {{- range $prefix := $writeAuth.url_prefix }}
+        {{- $urls = append $urls (printf "%s%s" (trimSuffix (urlParse $writeUrl).path $writeUrl) $prefix) }}
+      {{- end }}
+      {{- $_ := set $writeAuth "url_prefix" $urls}}
+      {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig $writeAuth -}}
+    {{- end }}
     {{- $_ := set $ctx "appKey" (list "vmcluster" "vmselect") -}}
+    {{- $readAuths := $authConfig.vmselect }}
     {{- $readUrl := (include "vm.url" $ctx) }}
-    {{- $readSrcPath := clean (printf "%s/select/.*" (urlParse $readUrl).path) }}
-    {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $readSrcPath) "url_prefix" (list $readUrl)) }}
+    {{- range $readAuth := $readAuths }}
+      {{- $urls := default list }}
+      {{- range $prefix := $readAuth.url_prefix }}
+        {{- $urls = append $urls (printf "%s%s" (trimSuffix (urlParse $readUrl).path $readUrl) $prefix) }}
+      {{- end }}
+      {{- $_ := set $readAuth "url_prefix" $urls}}
+      {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig $readAuth -}}
+    {{- end -}}
   {{- else if or $Values.externalVM.read.url $Values.externalVM.write.url }}
     {{- with $Values.externalVM.read.url }}
-      {{- $srcPath := regexReplaceAll "(.*)/api/.*" (clean (printf "%s/.*" (urlParse .).path)) "${1}" }}
-      {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $srcPath) "url_prefix" (list .)) }}
+      {{- $authConfig := ($.Values.externalVM).vmauth }}
+      {{- $readAuths := $authConfig.read }}
+      {{- $readUrl := . }}
+      {{- range $readAuth := $readAuths }}
+        {{- $urls := default list }}
+        {{- range $prefix := $readAuth.url_prefix }}
+          {{- $urls = append $urls (printf "%s%s" (trimSuffix (urlParse $readUrl).path $readUrl) $prefix) }}
+        {{- end }}
+        {{- $_ := set $readAuth "url_prefix" $urls}}
+        {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig $readAuth -}}
+      {{- end -}}
     {{- end -}}
     {{- with $Values.externalVM.write.url }}
-      {{- $srcPath := regexReplaceAll "(.*)/api/.*" (clean (printf "%s/.*" (urlParse .).path)) "${1}" }}
-      {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $srcPath) "url_prefix" (list .)) }}
+      {{- $authConfig := ($.Values.externalVM).vmauth }}
+      {{- $writeAuths := $authConfig.write }}
+      {{- $writeUrl := . }}
+      {{- range $writeAuth := $writeAuths }}
+        {{- $urls := default list }}
+        {{- range $prefix := $writeAuth.url_prefix }}
+          {{- $urls = append $urls (printf "%s%s" (trimSuffix (urlParse $writeUrl).path $writeUrl) $prefix) }}
+        {{- end }}
+        {{- $_ := set $writeAuth "url_prefix" $urls}}
+        {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig $writeAuth -}}
+      {{- end -}}
     {{- end -}}
   {{- end -}}
   {{- $spec := $Values.vmauth.spec }}

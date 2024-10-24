@@ -526,6 +526,7 @@ externalURL: ""
 image:
     tag: v0.27.0
 port: "9093"
+replicaCount: 1
 routePrefix: /
 selectAllByDefault: true
 </code>
@@ -641,6 +642,16 @@ selectAllByDefault: true
 </td>
     </tr>
     <tr>
+      <td>defaultDashboards.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
       <td>defaultDashboards.dashboards</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -666,6 +677,16 @@ victoriametrics-vmalert:
 </td>
       <td><p>In ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply See <a href="https://github.com/VictoriaMetrics/helm-charts/tree/disable-node-exporter-dashboard-by-default/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards" target="_blank">this issue</a></p>
 </td>
+    </tr>
+    <tr>
+      <td>defaultDashboards.defaultTimezone</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">utc
+</code>
+</pre>
+</td>
+      <td></td>
     </tr>
     <tr>
       <td>defaultDashboards.enabled</td>
@@ -704,6 +725,16 @@ victoriametrics-vmalert:
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
 <code class="language-yaml">grafana
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>defaultDashboards.labels</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">{}
 </code>
 </pre>
 </td>
@@ -1218,12 +1249,35 @@ vmsingle:
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
 <code class="language-yaml">read:
     url: ""
+vmauth:
+    read:
+        - src_paths:
+            - /.*
+          url_prefix:
+            - /
+    write: []
 write:
     url: ""
 </code>
 </pre>
 </td>
       <td><p>External VM read and write URLs</p>
+</td>
+    </tr>
+    <tr>
+      <td>externalVM.vmauth</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">read:
+    - src_paths:
+        - /.*
+      url_prefix:
+        - /
+write: []
+</code>
+</pre>
+</td>
+      <td><p>VMAuth config sections for external VM urls</p>
 </td>
     </tr>
     <tr>
@@ -1289,12 +1343,9 @@ ingress:
     tls: []
 sidecar:
     dashboards:
-        annotations: {}
         defaultFolderName: default
-        defaultTimezone: utc
         enabled: true
         folder: /var/lib/grafana/dashboards
-        labels: {}
         multicluster: false
         provider:
             name: default
@@ -2392,7 +2443,7 @@ port: "8427"
       <td>vmcluster.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">true
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
@@ -2747,6 +2798,22 @@ vmstorage:
 </td>
     </tr>
     <tr>
+      <td>vmcluster.vmauth</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
+<code class="language-yaml">vminsert: []
+vmselect:
+    - src_paths:
+        - /select/.*
+      url_prefix:
+        - /
+</code>
+</pre>
+</td>
+      <td><p>Custom VMAuth config, url_prefix requires only path, which will be appended to a select and insert base URL. To disable auth for vmselect or vminsert empty list for component config <code>vmcluster.vmauth.&lt;component&gt;: []</code></p>
+</td>
+    </tr>
+    <tr>
       <td>vmsingle.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -2761,7 +2828,7 @@ vmstorage:
       <td>vmsingle.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">false
+<code class="language-yaml">true
 </code>
 </pre>
 </td>
