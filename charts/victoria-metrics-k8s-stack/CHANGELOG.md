@@ -8,6 +8,7 @@
 - Renamed `grafana.defaultDashboardsTimezone` to `defaultDashboards.defaultTimezone`
 - Removed `grafana.defaultDatasourceType` and default datasource type is picked from `defaultDatasources.victoriametrics.datasources[*].isDefault: true`
 - Removed crds subchart as it's now included in operator
+- Fixed additionalNotifiersConfig
 
 ## 0.27.6
 
