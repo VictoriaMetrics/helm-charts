@@ -1,6 +1,7 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 {{- $app := .Values.server }}
 {{- if and $app.enabled $app.statefulSet.enabled -}}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -8,13 +9,14 @@ metadata:
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.extraLabels) }}
-  labels: {{ include "victoria-metrics.server.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-metrics.server.fullname" . }}
+  {{- $_ := set $ctx "extraLabels" $app.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
 spec:
-  serviceName: {{ include "victoria-metrics.server.fullname" . }}
+  serviceName: {{ $fullname }}
   selector:
-    matchLabels: {{ include "victoria-metrics.server.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   replicas: {{ $app.replicaCount }}
   podManagementPolicy: {{ $app.podManagementPolicy }}
   template:
@@ -22,8 +24,9 @@ spec:
       {{- with $app.podAnnotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- $ctx := merge (deepCopy $global) (dict "extraLabels" $app.podLabels) }}
-      labels: {{ include "victoria-metrics.server.labels" $ctx | nindent 8 }}
+      {{- $_ := set $ctx "extraLabels" $app.podLabels }}
+      labels: {{ include "vm.labels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
     spec:
       {{- with $app.priorityClassName }}
       priorityClassName: {{ . }}
@@ -41,7 +44,8 @@ spec:
       {{- if $manager.restore.onStart.enabled }}
       {{- include "vm.enterprise.only" . }}
       - name: vmbackupmanager-restore
-        image: {{ include "vm.image" (merge (deepCopy .) (dict "app" $manager)) }}
+        {{- $_ := set $ctx "app" $manager }}
+        image: {{ include "vm.image" $ctx }}
         imagePullPolicy: {{ $app.image.pullPolicy }}
         {{- with $app.podSecurityContext }}
         securityContext:  {{ toYaml . | nindent 10 }}
@@ -80,7 +84,8 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $app)) }}
+          {{- $_ := set $ctx "app" $app }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.containerWorkingDir }}
           workingDir: {{ $app.containerWorkingDir }}
@@ -192,7 +197,8 @@ spec:
         {{- if $manager.enabled }}
         {{- include "vm.enterprise.only" . }}
         - name: vmbackupmanager
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" $manager)) }}
+          {{- $_ := set $ctx "app" $manager }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           args: {{ include "vmbackupmanager.args" . | nindent 12 }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $manager "type" "readiness"))) }}
@@ -238,7 +244,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "victoria-metrics.serviceAccountName" . }}
+      serviceAccountName: {{ .Values.serviceAccount.name | default $fullname }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -250,12 +256,12 @@ spec:
         {{- if $app.scrape.enabled }}
         - name: scrapeconfig
           configMap:
-            name: {{ include "victoria-metrics.server.scrape.configname" . }}
+            name: {{ $fullname }}-scrapeconfig
         {{- end }}
         {{- if $app.relabel.enabled }}
         - name: relabelconfig
           configMap:
-            name: {{ include "victoria-metrics.server.relabel.configname" . }}
+            name: {{ $fullname }}-relabelconfig
         {{- end }}
         {{- if or (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
         - name: server-volume
