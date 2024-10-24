@@ -2,6 +2,9 @@
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- if and $app.enabled (not $app.statefulSet.enabled) -}}
+{{- if gt (int $app.replicaCount) 1 }}
+  {{- fail "VictoriaLogs HA mode is not supported for Deployment. Consider switching to statefulset instead using `server.statefulSet.enabled: true`" -}}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
