@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 0.7.1
+
+**Release date:** 2024-10-25
+
+![AppVersion: v0.37.0](https://img.shields.io/static/v1?label=AppVersion&message=v0.37.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Support multiple paths for a single ingress domain
 
 ## 0.7.0
