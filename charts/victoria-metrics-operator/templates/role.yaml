@@ -20,14 +20,15 @@
 {{- end -}}
 
 {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 
 {{- if .Values.rbac.create }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "vm-operator.fullname" . }}
-  labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
+  name: {{ $fullname }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
@@ -50,8 +51,8 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ template "vm-operator.fullname" . }}
-  labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
+  name: {{ $fullname }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
@@ -182,9 +183,9 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "vm-operator.fullname" . }}-cleanup-hook
+  name: {{ $fullname }}-cleanup-hook
   namespace: {{ include "vm.namespace" . }}
-  labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
   annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-5") | nindent 4 }}
 rules: {{ toYaml $rules.admin | nindent 2 }}
 {{- end }}
@@ -201,7 +202,7 @@ kind: ClusterRole
 metadata:
   name: victoriametrics:admin
   labels:
-    {{- include "vm-operator.labels" . | nindent 4 }}
+    {{- include "vm.labels" $ctx | nindent 4 }}
     {{- .Values.rbac.aggregatedClusterRoles.labels.admin | toYaml | nindent 4 }}
 rules: {{ toYaml $rules.admin | nindent 2 }}
 ---
@@ -210,7 +211,7 @@ kind: ClusterRole
 metadata:
   name: victoriametrics:view
   labels:
-    {{- include "vm-operator.labels" . | nindent 4 }}
+    {{- include "vm.labels" $ctx | nindent 4 }}
     {{- .Values.rbac.aggregatedClusterRoles.labels.view | toYaml | nindent 4 }}
 rules: {{ toYaml $rules.view | nindent 2 }}
 {{- end }}

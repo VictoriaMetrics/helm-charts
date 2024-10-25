@@ -1,10 +1,11 @@
 {{- /* do not update crds here, please update in /victoria-metrics-operator/crd.yaml */ -}}
 {{- /* this is used to add "helm.sh/resource-policy: keep" annotation for each crd */ -}}
 {{- /* see this pull request https://github.com/VictoriaMetrics/helm-charts/pull/771 for details */ -}}
+{{- $ctx := dict "helm" . }}
 {{- if not .Values.crds.plain }}
   {{- $files := .Files }}
   {{- $crds := $files.Get "crd.yaml" | splitList "---" }}
-  {{- $labels := (include "vm-operator.labels" .) | fromYaml -}}
+  {{- $labels := (include "vm.labels" $ctx) | fromYaml -}}
   {{- $annotations := (include "vm-operator.crds.annotations" .) | fromYaml -}}
   {{- $extra := dict "metadata" (dict "annotations" $annotations "labels" $labels) -}}
   {{- range $crds }}

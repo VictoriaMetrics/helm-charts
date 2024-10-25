@@ -1,33 +1,33 @@
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 ---
-{{- if hasKey .Values "watchNamespace" }}
-  {{- fail "`watchNamespace` is deprecated Please use `watchNamespaces` slice instead" -}}
-{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "vm-operator.fullname" . }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
-  {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
-  labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
+  {{- $_ := set $ctx "extraLabels" .Values.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  replicas: {{.Values.replicaCount}}
+  replicas: {{.Values.replicaCount }}
   selector:
-    matchLabels: {{ include "vm-operator.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
       {{- with .Values.annotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
-      labels: {{ include "vm-operator.selectorLabels" $ctx | nindent 8}}
+      labels: {{ include "vm.selectorLabels" $ctx | nindent 8}}
     spec:
       {{- if .Values.podSecurityContext.enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "vm-operator.serviceAccountName" . }}
+      serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
       {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -141,7 +141,7 @@ spec:
         - {{ toYaml $constraint | nindent 10 | trim }}
           {{- if not $constraint.labelSelector }}
           labelSelector:
-            matchLabels: {{ include "vm-operator.selectorLabels" $ | nindent 14 }}
+            matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 14 }}
           {{- end }}
         {{- end }}
       {{- end }}
@@ -153,7 +153,7 @@ spec:
         - name: cert
           secret:
             defaultMode: 420
-            secretName: {{ include "vm-operator.fullname" . }}-validation
+            secretName: {{ $fullname }}-validation
         {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml .| nindent 8 }}
