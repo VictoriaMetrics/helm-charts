@@ -9,14 +9,20 @@ metadata:
     {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
 stringData:
   {{- $configs := .Values.vmalert.additionalNotifierConfigs.static_configs | default list -}}
-  {{- $_ := set . "appKey" "alertmanager" -}}
-  {{- $_ := set . "appSecure" (not (empty (((.Values.alertmanager).spec).webConfig).tls_server_config)) -}}
-  {{- $_ := set . "appRoute" ((.Values.alertmanager).spec).routePrefix -}}
-  {{- $alertManagerReplicas := (.Values.alertmanager.spec.replicaCount | default 1 | int) -}}
-  {{- range until $alertManagerReplicas -}}
-    {{- $_ := set $ "appIdx" . -}}
-    {{- $configs = append $configs (dict "targets" (dict "url" (include "vm.url" $))) -}}
-    {{- $_ := unset $ "appIdx" -}}
+  {{- if (.Values.alertmanager).enabled }}
+    {{- $replicas := ((.Values.alertmanager).spec).replicaCount | int -}}
+    {{- if gt $replicas 0 }}
+      {{- $targets := default list -}}
+      {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
+      {{- $_ := set $ctx "appSecure" (not (empty (((.Values.alertmanager).spec).webConfig).tls_server_config)) -}}
+      {{- $_ := set $ctx "appRoute" ((.Values.alertmanager).spec).routePrefix -}}
+      {{- range until $replicas -}}
+        {{- $_ := set $ctx "appIdx" . -}}
+        {{- $targets = append $targets (include "vm.url" $ctx) -}}
+        {{- $_ := unset $ctx "appIdx" -}}
+      {{- end }}
+      {{- $configs = append $configs (dict "targets" $targets) -}}
+    {{- end }}
   {{- end }}
   {{- $_ := set .Values.vmalert.additionalNotifierConfigs "static_configs" $configs }}
   notifier-configs.yaml: |{{ toYaml .Values.vmalert.additionalNotifierConfigs | nindent 4 }}
