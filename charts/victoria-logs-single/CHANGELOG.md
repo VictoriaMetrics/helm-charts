@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Support multiple paths for a single ingress domain
 
 ## 0.7.0
 
