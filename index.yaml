@@ -4,6 +4,49 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - Added grafana dashboard. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1590)
+        - Custom fluent-bit template to push data to multiple VLogs instances when replica count is greated than 1
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/VictoriaLogs/
+    apiVersion: v2
+    appVersion: v0.37.0
+    created: "2024-10-25T14:37:30.198893752Z"
+    dependencies:
+    - condition: fluent-bit.enabled
+      name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.47.*
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Logs Single version - high-performance, cost-effective and
+      scalable logs storage
+    digest: 17601f9290fd9d80ffded674510e5aa9531f381245e73e60bd49618e8a2724b7
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - victorialogs
+    - logs
+    - kubernetes
+    - observability
+    - logsql
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-logs-single
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-single-0.7.0/victoria-logs-single-0.7.0.tgz
+    version: 0.7.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - Human-readable error about Helm version requirement
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -13284,6 +13327,39 @@ entries:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-cluster-0.1.0.tgz
     version: 0.1.0
   victoria-metrics-common:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - Added vm.podLabels template
+        - Do no append default `<component>` prefix/suffix when `<component>.fullnameOverride` set
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+    apiVersion: v2
+    created: "2024-10-25T14:37:31.038689219Z"
+    description: Victoria Metrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: d09848f6aa44d9ab6e1110d6d77a481394015768593595cc6fcf380c51a89451
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.0.17/victoria-metrics-common-0.0.17.tgz
+    version: 0.0.17
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
@@ -29582,4 +29658,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-10-22T13:26:59.867657626Z"
+generated: "2024-10-25T14:37:31.670204008Z"
