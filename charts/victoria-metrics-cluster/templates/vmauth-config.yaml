@@ -1,15 +1,14 @@
 {{- if and (empty .Values.vmauth.configSecretName) .Values.vmauth.enabled }}
-{{- $ctx := dict "helm" . "appKey" "vmauth" }}
+{{- $ctx := dict "helm" . "appKey" "vmauth" "style" "plain" }}
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" $ctx }}
-  labels: {{ include "victoria-metrics.vmauth.labels" . | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 type: Opaque
 data:
   {{- $config := .Values.vmauth.config }}
-  {{- $ctx := dict "helm" . "style" "plain" }}
   {{- $urlMap := ($config.unauthorized_user).url_map | default list }}
   {{- range $appKey := list "vmselect" "vminsert" }}
     {{- $app := index $.Values $appKey }}

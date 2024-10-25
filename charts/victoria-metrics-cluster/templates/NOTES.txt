@@ -39,7 +39,7 @@ prometheus.yml
 for example -  inside the Kubernetes cluster:
 
     remote_write:
-      - url: "http://{{ include "vm.fqdn" $ctx }}:{{ .Values.vminsert.service.servicePort }}/insert/0/prometheus/"
+      - url: {{ include "vm.url" $ctx }}/insert/0/prometheus/"
 
 {{- end }}
 
@@ -79,8 +79,8 @@ Input this URL field into Grafana
 
 
 for example - inside the Kubernetes cluster:
-
-    http://{{ include "vm.fqdn" $ctx }}:{{ .Values.vmselect.service.servicePort }}/select/0/prometheus/
+    {{- $_ := set $ctx "appKey" "vmselect" }}
+    {{ include "vm.url" $ctx }}/select/0/prometheus/
 
 {{- end }}
 {{- end }}
