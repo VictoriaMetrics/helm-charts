@@ -1,5 +1,7 @@
 {{- $app := .Values.server }}
 {{- if $app.enabled -}}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,9 +9,10 @@ metadata:
   {{- with $app.service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
-  labels: {{ include "victoria-metrics.server.labels" $ctx | nindent 4 }}
-  name: {{ include "victoria-metrics.server.fullname" . }}
+  {{- $_ := set $ctx "extraLabels" $app.service.labels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
 spec:
   {{- $clusterIP := $app.service.clusterIP }}
   {{- if and (not $clusterIP) $app.statefulSet.enabled }}
@@ -87,5 +90,5 @@ spec:
       port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: opentsdb-tcp
     {{- end }}
-  selector: {{ include "victoria-metrics.server.matchLabels" . | nindent 4 }}
+  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}

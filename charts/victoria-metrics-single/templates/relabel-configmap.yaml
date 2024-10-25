@@ -1,10 +1,12 @@
 {{- if and .Values.server.relabel.enabled (eq .Values.server.relabel.configMap "") }}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "victoria-metrics.server.fullname" . }}-relabelconfig
+  name: {{ $fullname }}-relabelconfig
   namespace: {{ include "vm.namespace" . }}
-  labels: {{ include "victoria-metrics.server.labels" . | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
   relabel.yml: |{{ toYaml .Values.server.relabel.config | nindent 4 }}
 {{- end }}
