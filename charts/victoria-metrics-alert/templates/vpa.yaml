@@ -1,8 +1,10 @@
 {{- if and (.Capabilities.APIVersions.Has "autoscaling.k8s.io/v1") (.Values.server.verticalPodAutoscaler.enabled) }}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: autoscaling.k8s.io/v1
 kind: VerticalPodAutoscaler
 metadata:
-  name: {{ include "vmalert.server.fullname" . }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
 spec:
   {{- with .Values.server.verticalPodAutoscaler.recommenders }}
@@ -11,7 +13,7 @@ spec:
   targetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "vmalert.server.fullname" . }}
+    name: {{ $fullname }}
   {{- with .Values.server.verticalPodAutoscaler.updatePolicy }}
   updatePolicy: {{ toYaml . | nindent 4 }}
   {{- end }}
