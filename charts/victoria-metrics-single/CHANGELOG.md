@@ -1,6 +1,7 @@
 ## Next release
 
 - replaced chart templates with common ones
+- multiple paths for a host in ingress
 
 ## 0.12.3
 

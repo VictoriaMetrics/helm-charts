@@ -6,12 +6,12 @@
       {{- if $ingress.enabled }}
         {{- $appKey := ternary $name (list $name $ingName) (eq $name $ingName) -}}
         {{- $ctx := dict "helm" $ "appKey" $appKey -}}
-        {{- $serviceName := include "vm.service" $ctx }}
+        {{- $fullname := include "vm.service" $ctx }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $serviceName }}
+  name: {{ $fullname }}
   namespace: {{ $ns }}
   {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-%s" (include "victoria-metrics-k8s-stack.name" $) $name) }}
   {{- $_ := set $ctx "extraLabels" (merge $extraLabels $ingress.labels) }}
@@ -36,9 +36,9 @@ spec:
           {{- end }}
           - backend:
               service:
-                name: {{ $serviceName }}
+                name: {{ $fullname }}
                 port:
-                  name: {{ $ingress.serviceName | default "http" }}
+                  name: {{ $ingress.portName | default "http" }}
             {{- with ($ingress.path | default (dig "spec" "extraArgs" "http.pathPrefix" "/" $config)) }}
             path: {{ tpl . $ }}
             {{- end }}
