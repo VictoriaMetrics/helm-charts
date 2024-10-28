@@ -12,7 +12,7 @@ spec:
   minReplicas: {{ .Values.horizontalPodAutoscaling.minReplicas }}
   scaleTargetRef:
     apiVersion: apps/v1
-    kind: Deployment
+    kind: {{ ternary "StatefulSet" "Deployment" (.Values.statefulset).enabled }}
     name: {{ include "vm.plain.fullname" $ctx }}
   metrics: {{ toYaml .Values.horizontalPodAutoscaling.metrics | nindent 4 }}
   {{- with .Values.horizontalPodAutoscaling.behavior }}

@@ -1,6 +1,7 @@
 {{- $ctx := dict "helm" . }}
 {{- range $name, $app := .Values }}
 {{- if and (kindIs "map" $app) $app.enabled ($app.horizontalPodAutoscaler).enabled }}
+{{- $isStatefulSet := or (eq $name "vmstorage") (default false ($app.statefulSet).enabled) }}
 {{- $hpa := $app.horizontalPodAutoscaler }}
 {{- $_ := set $ctx "extraLabels" $app.extraLabels }}
 {{- $_ := set $ctx "appKey" $name }}
@@ -17,7 +18,7 @@ spec:
   minReplicas: {{ $hpa.minReplicas }}
   scaleTargetRef:
     apiVersion: apps/v1
-    kind: Deployment
+    kind: {{ ternary "StatefulSet" "Deployment" $isStatefulSet }}
     name: {{ $fullname }}
   metrics: {{ toYaml $hpa.metrics | nindent 4 }}
   {{- with $hpa.behavior }}

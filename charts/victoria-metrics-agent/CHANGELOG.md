@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Support HPA for Statefulset
 
 ## 0.14.3
 
