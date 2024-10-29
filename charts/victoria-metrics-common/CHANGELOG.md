@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- vm.managed.fullname template modify prefixes
 
 ## 0.0.17
 
