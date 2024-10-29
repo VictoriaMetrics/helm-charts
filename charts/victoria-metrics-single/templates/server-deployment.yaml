@@ -265,7 +265,7 @@ spec:
         - name: server-volume
           {{- if $app.persistentVolume.enabled }}
           persistentVolumeClaim:
-            claimName: {{ $app.persistentVolume.existingClaim | default $fullname }}
+            claimName: {{ $app.persistentVolume.existingClaim | default $app.persistentVolume.name | default $fullname }}
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}

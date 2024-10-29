@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added ability to override PVC name for Deployment
 
 ## 0.7.1
 
