@@ -34,7 +34,7 @@ Create context for templating
 {{- /*
 Create sanitized group name retrieved from file
 */}}
-{{- $groupName := include "victoria-metrics-k8s-stack.rulegroup.key" $ctx -}}
+{{- $groupName := include "vm-k8s-stack.rulegroup.key" $ctx -}}
 
 {{- /*
 Merge common group with a group data of a current iteration
@@ -98,14 +98,14 @@ Filter out ignore rules
 Check if group is enabled
 */}}
 {{- if (and $rulesSpec (dig "create" true $group) $groupCondition) }}
-{{- $ruleName := (include "victoria-metrics-k8s-stack.rulegroup.name" $ctx) }}
+{{- $ruleName := (include "vm-k8s-stack.rulegroup.name" $ctx) }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
   namespace: {{ include "vm.namespace" $ }}
   name: {{ $ruleName }}
-  {{- with (include "victoria-metrics-k8s-stack.rulegroup.labels" $ctx) }}
+  {{- with (include "vm-k8s-stack.rulegroup.labels" $ctx) }}
   labels: {{ . | nindent 4 }}
   {{- end }}
   {{- with $.Values.defaultRules.annotations }}

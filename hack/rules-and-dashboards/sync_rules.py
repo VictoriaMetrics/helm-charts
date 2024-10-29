@@ -182,7 +182,7 @@ replacement_map = {
         "init": "",
     },
     'job="alertmanager-main"': {
-        "replacement": 'job="[[ include "victoria-metrics-k8s-stack.alertmanager.name" . ]]"',
+        "replacement": 'job="[[ include "vm-k8s-stack.alertmanager.name" . ]]"',
     },
     'namespace="monitoring"': {
         "replacement": 'namespace="[[ include "vm.namespace" . ]]"',

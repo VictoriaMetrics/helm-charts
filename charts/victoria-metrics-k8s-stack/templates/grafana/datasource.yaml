@@ -1,18 +1,20 @@
 {{- if or (and .Values.grafana.enabled .Values.grafana.sidecar.datasources.enabled ) .Values.grafana.forceDeployDatasource }}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.fullname" $ctx }}
 {{- with (include "vm.data.sources" .) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.fullname" $ }}-grafana-ds
+  name: {{ $fullname }}-grafana-ds
   namespace: {{ include "vm.namespace" $ }}
   {{- with $.Values.grafana.sidecar.datasources.annotations }}
   annotations: {{ toYaml $ | nindent 4 }}
   {{- end }}
   labels:
     {{ $.Values.grafana.sidecar.datasources.label }}: "1"
-    {{- $app := ((printf "%s-grafana" (include "victoria-metrics-k8s-stack.name" $)) | trunc 63 | trimSuffix "-") }}
+    {{- $app := ((printf "%s-grafana" (include "vm.name" $ctx)) | trunc 63 | trimSuffix "-") }}
     app: {{ $app }}
-    {{- include "victoria-metrics-k8s-stack.labels" $ | nindent 4 }}
+    {{- include "vm.labels" $ctx | nindent 4 }}
 data:
   datasource.yaml: |-
     apiVersion: 1
