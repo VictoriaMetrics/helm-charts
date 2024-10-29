@@ -2,21 +2,23 @@
 Create base alertmanager url for notifers
 */}}
 {{- define "vmalert.alertmanager.url" -}}
-  {{- if .Values.alertmanager.enabled -}}
-    {{- $ctx := dict "helm" . "appKey" "alertmanager" -}}
-    http://{{- include "vm.plain.fullname" $ctx -}}:9093{{ .Values.alertmanager.baseURLPrefix }}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- if $Values.alertmanager.enabled -}}
+    {{- $ctx := dict "helm" . "appKey" "alertmanager" "style" "plain" -}}
+    http://{{- include "vm.fqdn" $ctx -}}:9093{{ $Values.alertmanager.baseURLPrefix }}
   {{- else -}}
-    {{- .Values.server.notifier.alertmanager.url -}}
+    {{- $Values.server.notifier.alertmanager.url -}}
   {{- end -}}
 {{- end -}}
 
 {{- define "vmalert.alertmanager.urls" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $urls := list -}}
   {{- with (include "vmalert.alertmanager.url" .) -}}
     {{- $urls = append $urls . -}}
   {{- end -}}
-  {{- range .Values.server.notifiers }}
-    {{- if not (eq .alertmanager.url "") -}}
+  {{- range $Values.server.notifiers }}
+    {{- if not (empty .alertmanager.url) -}}
       {{- $urls = append $urls .alertmanager.url -}}
     {{- end -}}
   {{- end -}}
@@ -24,13 +26,14 @@ Create base alertmanager url for notifers
 {{- end -}}
 
 {{- define "vmalert.alertmanager.passwords" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $password := list -}}
-  {{- if .Values.alertmanager.enabled -}}
+  {{- if $Values.alertmanager.enabled -}}
     {{- $password = append $password "" -}}
   {{- end -}}
-  {{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+  {{- $notifiers := append $Values.server.notifiers $Values.server.notifier }}
   {{- range $notifiers }}
-    {{- if not (eq .alertmanager.url "") -}}
+    {{- if not (empty .alertmanager.url) -}}
       {{- if and .alertmanager.basicAuth .alertmanager.basicAuth.password -}}
         {{- $password = append $password .alertmanager.basicAuth.password -}}
       {{- else -}}
@@ -38,16 +41,18 @@ Create base alertmanager url for notifers
       {{- end -}}
     {{- end -}}
   {{- end -}}
+  {{- ternary "" (join "," $password) (eq (len (compact $password)) 0) }}
 {{- end -}}
 
 {{- define "vmalert.alertmanager.usernames" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $usernames := list -}}
-  {{- if .Values.alertmanager.enabled -}}
+  {{- if $Values.alertmanager.enabled -}}
     {{- $usernames = append $usernames "" -}}
   {{- end -}}
-  {{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+  {{- $notifiers := append $Values.server.notifiers $Values.server.notifier }}
   {{- range $notifiers }}
-    {{- if not (eq .alertmanager.url "") -}}
+    {{- if not (empty .alertmanager.url) -}}
       {{- if and .alertmanager.basicAuth .alertmanager.basicAuth.username -}}
         {{- $usernames = append $usernames .alertmanager.basicAuth.username -}}
       {{- else -}}
@@ -55,14 +60,16 @@ Create base alertmanager url for notifers
       {{- end -}}
     {{- end -}}
   {{- end -}}
+  {{- ternary "" (join "," $usernames) (eq (len (compact $usernames)) 0) }}
 {{- end -}}
 
 {{- define "vmalert.alertmanager.bearerTokens" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $tokens := list -}}
-  {{- if .Values.alertmanager.enabled -}}
+  {{- if $Values.alertmanager.enabled -}}
     {{- $tokens = append $tokens "" -}}
   {{- end -}}
-  {{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+  {{- $notifiers := append $Values.server.notifiers $Values.server.notifier }}
   {{- range $notifiers }}
     {{- if not (empty .alertmanager.url) -}}
       {{- if and .alertmanager.bearer .alertmanager.bearer.token -}}
@@ -72,16 +79,18 @@ Create base alertmanager url for notifers
       {{- end -}}
     {{- end -}}
   {{- end -}}
+  {{- ternary "" (join "," $tokens) (eq (len (compact $tokens)) 0) }}
 {{- end -}}
 
 {{- define "vmalert.alertmanager.bearerTokenFiles" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $files := list -}}
-  {{- if .Values.alertmanager.enabled -}}
+  {{- if $Values.alertmanager.enabled -}}
     {{- $files = append $files "" -}}
   {{- end -}}
-  {{- $notifiers := append .Values.server.notifiers .Values.server.notifier }}
+  {{- $notifiers := append $Values.server.notifiers $Values.server.notifier }}
   {{- range $notifiers }}
-    {{- if not (eq .alertmanager.url "") -}}
+    {{- if not (empty .alertmanager.url) -}}
       {{- if and .alertmanager.bearer .alertmanager.bearer.tokenFile -}}
         {{- $files = append $files .alertmanager.bearer.tokenFile -}}
       {{- else -}}
@@ -89,10 +98,12 @@ Create base alertmanager url for notifers
       {{- end -}}
     {{- end -}}
   {{- end -}}
+  {{- ternary "" (join "," $files) (eq (len (compact $files)) 0) }}
 {{- end -}}
 
 {{- define "alertmanager.args" -}}
-  {{- $app := .Values.alertmanager -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $app := $Values.alertmanager -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "config.file" "/config/alertmanager.yaml" -}}
   {{- $_ := set $args "storage.path" (ternary $app.persistentVolume.mountPath "/data" $app.persistentVolume.enabled) -}}
@@ -110,7 +121,8 @@ Create base alertmanager url for notifers
 {{- end -}}
 
 {{- define "vmalert.args" -}}
-  {{- $app := .Values.server -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $app := $Values.server -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "rule" "/config/alert-rules.yaml" -}}
   {{- $_ := set $args "datasource.url" $app.datasource.url -}}

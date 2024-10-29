@@ -1,4 +1,4 @@
-{{- if and .Values.server.scrape.enabled (eq .Values.server.scrape.configMap "") }}
+{{- if and .Values.server.scrape.enabled (empty .Values.server.scrape.configMap) }}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: v1
