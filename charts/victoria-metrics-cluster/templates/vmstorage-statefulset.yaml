@@ -9,6 +9,7 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
   name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
 spec:
