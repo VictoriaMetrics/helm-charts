@@ -676,6 +676,17 @@ loggerFormat: json
 </td>
     </tr>
     <tr>
+      <td>server.persistentVolume.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override Persistent Volume Claim name</p>
+</td>
+    </tr>
+    <tr>
       <td>server.persistentVolume.size</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
