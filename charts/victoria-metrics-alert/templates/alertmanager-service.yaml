@@ -1,5 +1,7 @@
 {{- $app := .Values.alertmanager }}
 {{- if $app.enabled -}}
+{{- $ctx := dict "helm" . "appKey" "alertmanager" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,9 +9,10 @@ metadata:
   {{- with $app.service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
-  labels: {{ include "vmalert.alertmanager.labels" $ctx | nindent 4 }}
-  name: {{ include "vmalert.alertmanager.fullname" . }}
+  {{- $_ := set $ctx "extraLabels" $app.service.labels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
 spec:
   {{- with $app.service.clusterIP }}
   clusterIP: {{ . }}
@@ -41,5 +44,5 @@ spec:
       port: 9093
       targetPort: web
       protocol: TCP
-  selector: {{ include "vmalert.alertmanager.matchLabels" . | nindent 4 }}
+  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}

@@ -1,5 +1,7 @@
 {{- $app := .Values.server }}
 {{- if $app.enabled -}}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,9 +10,10 @@ metadata:
   annotations:
   {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
-  labels: {{ include "vmalert.server.labels" $ctx | nindent 4 }}
-  name: {{ include "vmalert.server.fullname" . }}
+  {{- $_ := set $ctx "extraLabels" $app.service.labels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
 spec:
   {{- with $app.service.clusterIP }}
   clusterIP: {{ . }}
@@ -45,5 +48,5 @@ spec:
       {{- with $app.service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
-  selector: {{ include "vmalert.server.matchLabels" . | nindent 4 }}
+  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}
