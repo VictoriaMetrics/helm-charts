@@ -134,6 +134,12 @@ jobs:
             -p ${{ github.token }} \
             ghcr.io
           mkdir -p .cr-release-packages
+          for chart in charts/*; do
+            if git diff-index --name-status --exit-code HEAD $chart; then
+              echo "no release for chart $chart. removing it from uploading..."
+              rm -rf .cr-release-packages/$(basename $chart)*
+            fi
+          done
           find .cr-release-packages -name "*.tgz" -exec helm push {} oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts \;
 
       - name: Automatic update changelogs and readme
