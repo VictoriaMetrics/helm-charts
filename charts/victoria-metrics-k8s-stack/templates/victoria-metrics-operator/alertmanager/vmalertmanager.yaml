@@ -1,20 +1,20 @@
 {{- if .Values.alertmanager.enabled }}
-{{- if and .Values.alertmanager.spec.configRawYaml .Values.alertmanager.config }}
-{{- fail "ERROR: Both .Values.alertmanager.spec.configRawYaml and .Values.alertmanager.config are set, but only one is allowed." }}
-{{- end }}
-{{- if and (not .Values.alertmanager.spec.configSecret) (not .Values.alertmanager.spec.configRawYaml) }}
+  {{- $ctx := dict "helm" . "appKey" "alertmanager" "style" "managed" }}
+  {{- $fullname := include "vm.fullname" $ctx }}
+  {{- if and .Values.alertmanager.spec.configRawYaml .Values.alertmanager.config }}
+    {{- fail "ERROR: Both .Values.alertmanager.spec.configRawYaml and .Values.alertmanager.config are set, but only one is allowed." }}
+  {{- end }}
+  {{- if and (not .Values.alertmanager.spec.configSecret) (not .Values.alertmanager.spec.configRawYaml) }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-alertmanager
+  name: {{ $fullname }}-alertmanager
   namespace: {{ include "vm.namespace" . }}
-  labels: 
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" . }}-alertmanager
-    {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 stringData:
   alertmanager.yaml: |{{ toYaml .Values.alertmanager.config | nindent 4 }}
-{{- end }}
+  {{- end }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlertmanager
@@ -22,11 +22,8 @@ metadata:
   {{- with .Values.alertmanager.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-  {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
-  name: {{ include "victoria-metrics-k8s-stack.fullname" $ctx }}
+  name: {{ $fullname }}
   namespace: {{ include "vm.namespace" . }}
-  labels: 
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" . }}-alertmanager
-    {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
-spec: {{ include "vm.alertmanager.spec" . | nindent 2}}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+spec: {{ include "vm.alertmanager.spec" $ctx | nindent 2 }}
 {{- end }}

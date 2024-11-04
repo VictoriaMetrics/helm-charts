@@ -6,16 +6,15 @@
       {{- if $ingress.enabled }}
         {{- $appKey := ternary $name (list $name $ingName) (eq $name $ingName) -}}
         {{- $ctx := dict "helm" $ "appKey" $appKey -}}
-        {{- $fullname := include "vm.service" $ctx }}
+        {{- $fullname := include "vm.managed.fullname" $ctx }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
-  {{- $extraLabels := dict "app.kubernetes.io/component" (printf "%s-%s" (include "victoria-metrics-k8s-stack.name" $) $name) }}
-  {{- $_ := set $ctx "extraLabels" (merge $extraLabels $ingress.labels) }}
-  labels: {{ include "victoria-metrics-k8s-stack.labels" $ctx | nindent 4 }}
+  {{- $_ := set $ctx "extraLabels" $ingress.labels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}

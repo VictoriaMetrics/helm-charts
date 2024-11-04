@@ -1,12 +1,12 @@
 {{- if and .Values.vmalert.enabled .Values.vmalert.additionalNotifierConfigs }}
+{{- $ctx := dict "helm" . "appKey" "vmalert" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ include "victoria-metrics-k8s-stack.fullname" . }}-vmalert-additional-notifier
+  name: {{ $fullname }}-additional-notifier
   namespace: {{ include "vm.namespace" . }}
-  labels:
-    app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" . }}-vmalert
-    {{- include "victoria-metrics-k8s-stack.labels" . | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 stringData:
   {{- $configs := .Values.vmalert.additionalNotifierConfigs.static_configs | default list -}}
   {{- if (.Values.alertmanager).enabled }}
