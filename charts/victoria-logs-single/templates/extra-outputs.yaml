@@ -1,13 +1,14 @@
 {{- if index .Values "fluent-bit" "enabled" }}
 {{- $ctx := dict "helm" . "appKey" "server" "style" "plain" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: vl-outputs
-  namespace: {{ include "vm.namespace" . }}
-  labels: {{- include "vm.labels" $ctx | nindent 4 }}
+  namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
   output_vl.conf: |
     {{- $replicaCount := ternary (int .Values.server.replicaCount) 1 .Values.server.statefulSet.enabled }}

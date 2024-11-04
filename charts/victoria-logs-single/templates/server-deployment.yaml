@@ -1,6 +1,7 @@
 {{- $app := .Values.server }}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 {{- if and $app.enabled (not $app.statefulSet.enabled) -}}
 {{- if gt (int $app.replicaCount) 1 }}
   {{- fail "VictoriaLogs HA mode is not supported for Deployment. Consider switching to statefulset instead using `server.statefulSet.enabled: true`" -}}
@@ -9,7 +10,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
