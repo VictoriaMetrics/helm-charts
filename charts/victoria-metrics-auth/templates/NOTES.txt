@@ -1,5 +1,6 @@
 {{- $ctx := dict "helm" . "style" "plain" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 Write API:
 
 The Victoria Metrics Auth can be accessed via port {{ .Values.service.servicePort }} on the following DNS name from within your cluster:
@@ -7,18 +8,18 @@ The Victoria Metrics Auth can be accessed via port {{ .Values.service.servicePor
 
 Get the Victoria Metrics Auth service URL by running these commands in the same shell:
 {{- if contains "NodePort" .Values.service.type }}
-  export NODE_PORT=$(kubectl get --namespace {{ include "vm.namespace" . }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ $fullname }})
-  export NODE_IP=$(kubectl get nodes --namespace {{ include "vm.namespace" . }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  export NODE_PORT=$(kubectl get --namespace {{ $ns }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ $fullname }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ $ns }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.service.type }}
   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-        You can watch the status of by running 'kubectl get svc --namespace {{ include "vm.namespace" . }} -w {{ $fullname }}'
+        You can watch the status of by running 'kubectl get svc --namespace {{ $ns }} -w {{ $fullname }}'
 
-  export SERVICE_IP=$(kubectl get svc --namespace {{ include "vm.namespace" . }} {{ $fullname }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  export SERVICE_IP=$(kubectl get svc --namespace {{ $ns }} {{ $fullname }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
   echo http://$SERVICE_IP:{{ .Values.service.servicePort }}
 {{- else if contains "ClusterIP"  .Values.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ include "vm.namespace" . }} -l "app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace {{ include "vm.namespace" . }} port-forward $POD_NAME {{ .Values.service.servicePort }}
+  export POD_NAME=$(kubectl get pods --namespace {{ $ns }} -l "app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.service.servicePort }}
 {{- end }}
 
 You need to update your prometheus configuration file and add next lines into it:
