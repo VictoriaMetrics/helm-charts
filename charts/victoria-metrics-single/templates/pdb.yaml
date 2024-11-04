@@ -1,19 +1,21 @@
-{{- if .Values.podDisruptionBudget.enabled }}
+{{- $pdb := .Values.podDisruptionBudget }}
+{{- if $pdb.enabled }}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
-  {{- $_ := set $ctx "extraLabels" .Values.podDisruptionBudget.extraLabels }}
+  namespace: {{ $ns }}
+  {{- $_ := set $ctx "extraLabels" $pdb.extraLabels }}
   labels: {{ include "vm.metaLabels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
 spec:
-  {{- with .Values.podDisruptionBudget.minAvailable }}
+  {{- with $pdb.minAvailable }}
   minAvailable: {{ . }}
   {{- end }}
-  {{- with .Values.podDisruptionBudget.maxUnavailable }}
+  {{- with $pdb.maxUnavailable }}
   maxUnavailable: {{ . }}
   {{- end }}
   selector:

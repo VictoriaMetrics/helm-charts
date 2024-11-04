@@ -2,10 +2,11 @@
 {{- if and $app.enabled $app.statefulSet.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}

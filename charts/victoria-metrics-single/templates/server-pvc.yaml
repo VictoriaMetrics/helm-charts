@@ -5,11 +5,12 @@
 {{- if not $pvc.existingClaim -}}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ $pvc.name | default $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   {{- with $pvc.annotations  }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
