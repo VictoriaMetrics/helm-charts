@@ -7,7 +7,7 @@
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vmstorage }}
-  {{- if and (not $app.suppressStorageFQDNsRender) (and $storage.enabled $storage.replicaCount) }}
+  {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := default list }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- if $Values.autoDiscovery }}
@@ -55,7 +55,7 @@
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vmstorage }}
-  {{- if and (not $app.suppressStorageFQDNsRender) (and $storage.enabled $storage.replicaCount) }}
+  {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := default list }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- if $Values.autoDiscovery }}
