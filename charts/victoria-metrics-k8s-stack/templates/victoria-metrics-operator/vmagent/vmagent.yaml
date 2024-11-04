@@ -1,15 +1,17 @@
-{{- if .Values.vmagent.enabled }}
+{{- $app := .Values.vmagent }}
+{{- if $app.enabled }}
 {{- $ctx := dict "helm" . "appKey" "vmagent" }}
 {{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAgent
 metadata:
-  {{- with .Values.vmagent.annotations }}
+  {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   {{- $_ := set $ctx "style" "managed" }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec: {{ include "vm.agent.spec" $ctx | nindent 2 }}

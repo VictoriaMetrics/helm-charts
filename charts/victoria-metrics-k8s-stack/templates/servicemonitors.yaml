@@ -1,11 +1,11 @@
 {{- $ctx := dict "helm" . }}
 {{- $scrapeLabels := include "vm.labels" $ctx }}
 {{- $prefix := include "vm.fullname" $ctx }}
-{{- $namespace := include "vm.namespace" . }}
+{{- $ns := include "vm.namespace" $ctx }}
 {{- range $name, $config := .Values }}
   {{- if and (kindIs "map" $config) $config.enabled (hasKey $config "vmScrape") }}
     {{- $svc := kebabcase $name }}
-    {{- $fullname := (printf "%s-%s" $prefix $svc) }}
+    {{- $fullname := printf "%s-%s" $prefix $svc }}
     {{- $fullnameLabel := $fullname | trunc 63 | trimSuffix "-" }}
     {{- $ports := ($config.service).ports | default dict }}
     {{- if ($config.service).port }}
@@ -38,7 +38,6 @@ subsets:
         protocol: TCP
     {{- end }}
     {{- end }}
-
 
     {{- end }}
     {{- $selector := default dict }}
@@ -88,13 +87,13 @@ spec:
       {{- range $scrapeName, $scrapeConfig := $scrapes }}
         {{- $sc := mergeOverwrite (deepCopy $defaultScrape) (deepCopy $scrapeConfig) }}
         {{- if or (not (hasKey $sc "enabled")) $sc.enabled }}
-          {{- $fullname = (printf "%s-%s" $prefix $scrapeName) }}
+          {{- $fullname = printf "%s-%s" $prefix $scrapeName }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: {{ ternary "VMServiceScrape" $sc.kind (empty $sc.kind) }}
 metadata:
   name: {{ $fullname }}
-  namespace: {{ $namespace }}
+  namespace: {{ $ns }}
   labels: {{ $scrapeLabels | nindent 4 }}
 {{- $emptyParamsToDrop := list "endpoints" }}
 {{- $scrapeSpec := mergeOverwrite (deepCopy $spec) (deepCopy $sc.spec) }}
