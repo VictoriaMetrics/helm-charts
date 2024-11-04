@@ -3,24 +3,28 @@
   {{- fail "`config.monitoring.pull.port` is required and `config.monitoring.pull.enabled` should be `true`, when PodMonitor is enabled" -}}
 {{- end -}}
 {{- $podMonitor := .Values.podMonitor -}}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   {{- with $podMonitor.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $podMonitor.extraLabels) }}
-  labels: {{ include "chart.labels" $ctx | nindent 4 }}
-  name: {{ include "chart.fullname" . }}
+  {{- $_ := set $ctx "extraLabels" $podMonitor.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
   {{- with $podMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
 spec:
   namespaceSelector:
     matchNames:
-      - {{ include "vm.namespace" . }}
+      - {{ $ns }}
   selector:
-    matchLabels: {{ include "chart.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   podMetricsEndpoints:
     - port: metrics
       {{- with $podMonitor.basicAuth }}
@@ -44,4 +48,4 @@ spec:
       {{- with $podMonitor.metricRelabelings }}
       metricRelabelings: {{ toYaml . | nindent 8 }}
       {{- end }}
-  {{- end }}
+{{- end }}
