@@ -2,6 +2,7 @@
 {{- $serviceMonitor := .Values.serviceMonitor -}}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -18,7 +19,7 @@ metadata:
 spec:
   namespaceSelector:
     matchNames:
-      - {{ include "vm.namespace" . }}
+      - {{ $ns }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   endpoints:
@@ -44,4 +45,4 @@ spec:
       {{- with $serviceMonitor.metricRelabelings }}
       metricRelabelings: {{ toYaml . | nindent 8 }}
       {{- end }}
-  {{- end }}
+{{- end }}

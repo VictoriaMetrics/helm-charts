@@ -1,21 +1,22 @@
 {{- $app := .Values.server }}
 {{- if and $app.enabled -}}
   {{- if not $app.extraArgs.rule }}
-    {{- if and (empty $app.configMap) (eq (len $app.config.alerts.groups) 0) -}}
+    {{- if and (empty $app.configMap) (empty $app.config.alerts.groups) -}}
       {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
     {{- end -}}
   {{- end -}}
-  {{- if eq $app.datasource.url "" -}}
+  {{- if empty $app.datasource.url -}}
     {{- fail "server.datasource.url datasource URL must be specified" -}}
   {{- end }}
   {{- $ctx := dict "helm" . "appKey" "server" }}
   {{- $fullname := include "vm.plain.fullname" $ctx }}
-  {{- $sa := include "vm.plain.fullname" (dict "helm" .) }}
+  {{- $ns := include "vm.namespace" $ctx }}
+  {{- $sa := include "vm.fullname" $ctx }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}

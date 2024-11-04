@@ -2,11 +2,12 @@
 {{- if and .Values.alertmanager.persistentVolume.enabled (not .Values.alertmanager.persistentVolume.existingClaim)}}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.alertmanager.persistentVolume.annotations  }}
   annotations: {{ toYaml . | nindent 4 }}

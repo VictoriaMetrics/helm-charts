@@ -4,8 +4,16 @@ Create base alertmanager url for notifers
 {{- define "vmalert.alertmanager.url" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- if $Values.alertmanager.enabled -}}
-    {{- $ctx := dict "helm" . "appKey" "alertmanager" "style" "plain" -}}
-    http://{{- include "vm.fqdn" $ctx -}}:9093{{ $Values.alertmanager.baseURLPrefix }}
+    {{- $ctx := . -}}
+    {{- if not (hasKey . "helm") -}}
+      {{- $ctx = dict "helm" . }}
+    {{- end -}}
+    {{- $_ := set $ctx "style" "plain" -}}
+    {{- $_ := set $ctx "appKey" "alertmanager" -}}
+    {{- $appSecure := not (empty (($Values.alertmanager).webConfig).tls_server_config) -}}
+    {{- $_ := set $ctx "appSecure" $appSecure -}}
+    {{- $_ := set $ctx "appRoute" ($Values.alertmanager).baseURLPrefix -}}
+    {{- include "vm.url" $ctx -}}
   {{- else -}}
     {{- $Values.server.notifier.alertmanager.url -}}
   {{- end -}}
