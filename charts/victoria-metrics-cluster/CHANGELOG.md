@@ -2,6 +2,7 @@
 
 - multiple paths for a host in ingress
 - support HPA for vmselect statefulset
+- bump version of VM components to [v1.106.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.106.0)
 
 ## 0.14.6
 

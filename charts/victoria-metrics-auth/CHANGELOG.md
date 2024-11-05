@@ -1,6 +1,7 @@
 ## Next release
 
 - multiple paths for a host in ingress
+- bump version of VM components to [v1.106.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.106.0)
 
 ## 0.7.3
 

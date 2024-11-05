@@ -3,6 +3,7 @@
 - replaced chart templates with common ones
 - multiple paths for a host in ingress
 - Added ability to override PVC name for Deployment
+- bump version of VM components to [v1.106.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.106.0)
 
 ## 0.12.3
 

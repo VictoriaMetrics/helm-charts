@@ -11,6 +11,7 @@
 - Fixed additionalNotifiersConfig
 - Added `vmcluster.vmauth.<vminsert/vmselect>` and `externalVM.vmauth.<read/write>` to provide ability to override vmauth configs
 - Removed unused serviceaccount
+- bump version of VM components to [v1.106.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.106.0)
 
 ## 0.27.6
 
