@@ -1,49 +1,51 @@
-{{- if and .Values.service.enabled -}}
+{{- $service := .Values.service }}
+{{- if $service.enabled -}}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1
 kind: Service
 metadata:
-  {{- with .Values.service.annotations }}
+  {{- with $service.annotations }}
   annotations: {{ toYaml . | nindent 4}}
   {{- end }}
   {{- $_ := set $ctx "extraLabels" .Values.service.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
 spec:
-  {{- with .Values.service.clusterIP }}
+  {{- with $service.clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
-  {{- with .Values.service.externalIPs }}
+  {{- with $service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- with .Values.service.loadBalancerIP }}
+  {{- with $service.loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
-  {{- with .Values.service.loadBalancerSourceRanges }}
+  {{- with $service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
   {{- end }}
-  type: {{ .Values.service.type }}
-  {{- with .Values.service.healthCheckNodePort }}
+  type: {{ $service.type }}
+  {{- with $service.healthCheckNodePort }}
   healthCheckNodePort: {{ . }}
   {{- end }}
-  {{- with .Values.service.externalTrafficPolicy }}
+  {{- with $service.externalTrafficPolicy }}
   externalTrafficPolicy: {{ . }}
   {{- end }}
-  {{- with .Values.service.ipFamilyPolicy }}
+  {{- with $service.ipFamilyPolicy }}
   ipFamilyPolicy: {{ . }}
   {{- end }}
-  {{- with .Values.service.ipFamilies }}
+  {{- with $service.ipFamilies }}
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
     - name: http
-      port: {{ .Values.service.servicePort }}
+      port: {{ $service.servicePort }}
       protocol: TCP
       targetPort: http
-      {{- with .Values.service.nodePort }}
+      {{- with $service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}

@@ -1,34 +1,37 @@
 {{- $app := .Values }}
-{{- if $app.ingress.enabled }}
 {{- $ctx := dict "helm" . }}
+{{- $ingresses := dict "" $app.ingress "internal" $app.ingressInternal }}
+{{- range $suffix, $ingress := $ingresses }}
+{{- if $ingress.enabled }}
+{{- $_ := set $ctx "extraLabels" $ingress.extraLabels }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  {{- with $app.ingress.annotations }}
+  {{- with $ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
   {{- $_ := set $ctx "extraLabels" $app.ingress.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
-  name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  name: {{ $fullname }}{{ ternary "" (printf "-%s" $suffix) (empty $suffix) }}
+  namespace: {{ include "vm.namespace" $ctx }}
 spec:
-  {{- with $app.ingress.ingressClassName }}
+  {{- with $ingress.ingressClassName }}
   ingressClassName: {{ . }}
   {{- end }}
-  {{- with $app.ingress.tls }}
+  {{- with $ingress.tls }}
   tls: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   rules:
-    {{- range $host := $app.ingress.hosts }}
+    {{- range $host := $ingress.hosts }}
     {{- $paths := ternary (list $host.path) $host.path (kindIs "string" $host.path) }}
     - host: {{ tpl $host.name $ }}
       http:
         paths:
           {{- range $path := $paths }}
           - path: {{ $path }}
-            {{- with $app.ingress.pathType }}
+            {{- with $ingress.pathType }}
             pathType: {{ . }}
             {{- end }}
             backend:
@@ -37,4 +40,5 @@ spec:
                 port: {{ include "vm.ingress.port" $host | nindent 18 }}
           {{- end }}
     {{- end }}
+{{- end }}
 {{- end }}
