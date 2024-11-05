@@ -2,12 +2,13 @@
 {{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
-{{- $sa := include "vm.plain.fullname" (dict "helm" .) }}
+{{- $ns := include "vm.namespace" $ctx }}
+{{- $sa := include "vm.fullname" $ctx }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
   replicas: 1
