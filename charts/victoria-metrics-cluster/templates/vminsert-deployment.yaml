@@ -2,6 +2,7 @@
 {{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "vminsert" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $sa := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: Deployment
@@ -124,7 +125,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
+      serviceAccountName: {{ (.Values.serviceAccount).name | default $sa }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

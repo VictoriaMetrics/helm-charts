@@ -11,9 +11,9 @@ metadata:
 data:
   {{- $config := .Values.server.scrape.config }}
   {{- with .Values.server.scrape.extraScrapeConfigs }}
-    {{- if hasKey "scrape_configs" $config }}
-      {{- $_ := set $config (concat $config.scrape_configs .) }}
+    {{- if hasKey $config "scrape_configs" }}
+      {{- $_ := set $config "scrape_configs" (concat $config.scrape_configs .) }}
     {{- end }}
   {{- end }}
-  scrape.yml: |{{ toYaml $config }}
+  scrape.yml: |{{ toYaml $config | nindent 4 }}
 {{- end }}
