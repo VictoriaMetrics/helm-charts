@@ -1,10 +1,12 @@
 {{- $app := (include "vm.name" .) }}
 {{- if .Values.additionalVictoriaMetricsMap }}
+{{- $ctx := dict "helm" . }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1
 kind: List
 metadata:
   name: {{ include "vm.fullname" . }}-additional-victoria-metrics-rules
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
 items:
 {{- range $VMRuleName, $VMRule := .Values.additionalVictoriaMetricsMap }}
   - apiVersion: operator.victoriametrics.com/v1beta1
@@ -14,9 +16,10 @@ items:
       name: {{ $name }}
       namespace: {{ include "vm.namespace" $ }}
       {{- $extraLabels := (deepCopy ($VMRule.additionalLabels | default dict)) -}}
-      {{- $_ := set $extraLabels "app" $app -}}
-      {{- $ctx := dict "helm" $ "extraLabels" $extraLabels }}
+      {{- $_ := set $extraLabels "app" $app }}
+      {{- $_ := set $ctx "extraLabels" $extraLabels }}
       labels: {{ include "vm.labels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
     spec:
       groups: {{ toYaml $VMRule.groups | nindent 8 }}
 {{- end }}

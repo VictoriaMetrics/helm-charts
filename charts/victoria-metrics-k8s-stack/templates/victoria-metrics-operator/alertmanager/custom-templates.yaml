@@ -1,14 +1,16 @@
-{{- if and .Values.alertmanager.enabled .Values.alertmanager.templateFiles }}
+{{- $app := .Values.alertmanager }}
+{{- if and $app.enabled $app.templateFiles }}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" "style" "managed" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: {{ $fullname }}-extra-tpl
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | indent 4 }}
 data:
-{{- range $file, $template := .Values.alertmanager.templateFiles }}
+{{- range $file, $template := $app.templateFiles }}
   {{ $file }}: |-
      {{- $template | nindent 4 }}
 {{- end }}
