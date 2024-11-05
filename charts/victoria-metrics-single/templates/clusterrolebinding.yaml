@@ -1,10 +1,11 @@
 {{- if and .Values.rbac.create (not .Values.rbac.namespaced) .Values.server.scrape.enabled }}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ $fullname }}-clusterrolebinding
+  name: {{ $fullname }}
   {{- $_ := set $ctx "extraLabels" .Values.rbac.extraLabels }}
   labels: {{ include "vm.metaLabels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
@@ -14,9 +15,9 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: {{ .Values.serviceAccount.name | default $fullname }}
-    namespace: {{ include "vm.namespace" . }}
+    namespace: {{ $ns }}
 roleRef:
   kind: ClusterRole
-  name: {{ $fullname }}-clusterrole
+  name: {{ $fullname }}
   apiGroup: rbac.authorization.k8s.io
 {{- end -}}
