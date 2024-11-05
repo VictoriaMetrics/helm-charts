@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Updated dashboards
 
 ## 0.28.1
 

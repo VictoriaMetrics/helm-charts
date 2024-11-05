@@ -840,12 +840,91 @@ panels:
     refId: A
   title: Log stream churn rate
   type: timeseries
+- datasource:
+    type: {{ $defaultDatasource }}
+    uid: $ds
+  description: 'Shows the number of restarts per job. The chart can be useful to identify periodic process restarts and correlate them with potential issues or anomalies. Normally, processes shouldn''t restart unless restart was inited by user. The reason of restarts should be figured out by checking the logs of each specific service. '
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ''
+        axisPlacement: auto
+        axisSoftMin: 0
+        barAlignment: 0
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: stepAfter
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: 'off'
+      decimals: 0
+      links: []
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: null
+        - color: red
+          value: 80
+      unit: none
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    'y': 22
+  id: 62
+  options:
+    legend:
+      calcs:
+      - lastNotNull
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Last *
+      sortDesc: true
+    tooltip:
+      mode: multi
+      sort: desc
+  pluginVersion: 9.1.0
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    editorMode: code
+    expr: sum(changes(vm_app_start_timestamp{job=~"$job", instance=~"$instance"}[$__rate_interval]) > 0) by(job)
+    format: time_series
+    instant: false
+    legendFormat: '{{`{{`}}job{{`}}`}}'
+    refId: A
+  title: Restarts ($job)
+  type: timeseries
 - collapsed: true
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 22
+    'y': 30
   id: 28
   panels:
   - datasource:
@@ -892,7 +971,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -901,7 +979,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 3
+      'y': 11
     id: 38
     options:
       legend:
@@ -978,7 +1056,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: bytes
@@ -987,7 +1064,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 3
+      'y': 11
     id: 40
     options:
       legend:
@@ -1099,7 +1176,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1108,7 +1184,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 11
+      'y': 19
     id: 42
     options:
       legend:
@@ -1184,7 +1260,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1193,7 +1268,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 11
+      'y': 19
     id: 44
     options:
       legend:
@@ -1278,7 +1353,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1295,7 +1369,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 19
+      'y': 27
     id: 46
     options:
       legend:
@@ -1372,7 +1446,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -1389,7 +1462,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 19
+      'y': 27
     id: 48
     options:
       legend:
@@ -1473,7 +1546,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -1482,7 +1554,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 27
+      'y': 35
     id: 50
     options:
       legend:
@@ -1553,7 +1625,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: bytes
@@ -1568,7 +1639,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 27
+      'y': 35
     id: 52
     options:
       legend:
@@ -1650,7 +1721,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -1659,7 +1729,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 35
+      'y': 43
     id: 54
     options:
       legend:
@@ -1730,7 +1800,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -1745,7 +1814,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 35
+      'y': 43
     id: 56
     options:
       legend:
@@ -1831,7 +1900,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -1840,7 +1908,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 43
+      'y': 51
     id: 58
     options:
       legend:
@@ -1913,7 +1981,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 80
         unit: short
@@ -1922,7 +1989,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 43
+      'y': 51
     id: 60
     options:
       legend:
@@ -1996,7 +2063,6 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
           - color: red
             value: 0.1
         unit: s
@@ -2005,7 +2071,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 51
+      'y': 59
     id: 61
     options:
       legend:
