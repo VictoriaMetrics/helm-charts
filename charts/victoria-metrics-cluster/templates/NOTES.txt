@@ -1,11 +1,13 @@
 {{- if .Values.printNotes }}
 {{- $ctx := dict "helm" . "style" "plain" }}
+{{- $ns := include "vm.namespace" $ctx }}
 {{- if .Values.vminsert.enabled }}
 {{- if .Values.vmauth.enabled }}
   {{- $_ := set $ctx "appKey" "vmauth" }}
 {{- else }}
   {{- $_ := set $ctx "appKey" "vminsert" }}
 {{- end }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 Write API:
 
 The Victoria Metrics write api can be accessed via port {{ .Values.vminsert.service.servicePort }} with the following DNS name from within your cluster:
@@ -13,18 +15,18 @@ The Victoria Metrics write api can be accessed via port {{ .Values.vminsert.serv
 
 Get the Victoria Metrics insert service URL by running these commands in the same shell:
 {{- if contains "NodePort" .Values.vminsert.service.type }}
-  export NODE_PORT=$(kubectl get --namespace {{ include "vm.namespace" . }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "vm.service" $ctx }})
-  export NODE_IP=$(kubectl get nodes --namespace {{ include "vm.namespace" . }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  export NODE_PORT=$(kubectl get --namespace {{ $ns }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ $fullname }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ $ns }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.vminsert.service.type }}
   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-        You can watch the status of by running 'kubectl get svc --namespace {{ include "vm.namespace" . }} -w {{ include "vm.service" $ctx }}'
+        You can watch the status of by running 'kubectl get svc --namespace {{ $ns }} -w {{ $fullname }}'
 
-  export SERVICE_IP=$(kubectl get svc --namespace {{ include "vm.namespace" . }} {{ include "vm.service" $ctx }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  export SERVICE_IP=$(kubectl get svc --namespace {{ $ns }} {{ $fullname }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
   echo http://$SERVICE_IP:{{ .Values.vminsert.service.servicePort }}
 {{- else if contains "ClusterIP"  .Values.vminsert.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ include "vm.namespace" . }} -l "app={{ .Values.vminsert.name }}" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace {{ include "vm.namespace" . }} port-forward $POD_NAME {{ .Values.vminsert.service.servicePort }}
+  export POD_NAME=$(kubectl get pods --namespace {{ $ns }} -l "app={{ .Values.vminsert.name }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.vminsert.service.servicePort }}
 {{- end }}
 
 You need to update your Prometheus configuration file and add the following lines to it:
@@ -34,12 +36,10 @@ prometheus.yml
     remote_write:
       - url: "http://<insert-service>/insert/0/prometheus/"
 
-
-
 for example -  inside the Kubernetes cluster:
 
     remote_write:
-      - url: {{ include "vm.url" $ctx }}/insert/0/prometheus/"
+      - url: {{ include "vm.url" $ctx }}/insert/0/prometheus/
 
 {{- end }}
 
@@ -49,6 +49,7 @@ for example -  inside the Kubernetes cluster:
 {{- else }}
   {{- $_ := set $ctx "appKey" "vmselect" }}
 {{- end }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 Read API:
 
 The VictoriaMetrics read api can be accessed via port {{ .Values.vmselect.service.servicePort }} with the following DNS name from within your cluster:
@@ -56,18 +57,18 @@ The VictoriaMetrics read api can be accessed via port {{ .Values.vmselect.servic
 
 Get the VictoriaMetrics select service URL by running these commands in the same shell:
 {{- if contains "NodePort" .Values.vmselect.service.type }}
-  export NODE_PORT=$(kubectl get --namespace {{ include "vm.namespace" . }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "vm.service" $ctx }})
-  export NODE_IP=$(kubectl get nodes --namespace {{ include "vm.namespace" . }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  export NODE_PORT=$(kubectl get --namespace {{ $ns }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ $fullname }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ $ns }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.vmselect.service.type }}
   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-        You can watch the status of by running 'kubectl get svc --namespace {{ include "vm.namespace" . }} -w {{ include "vm.service" $ctx }}'
+        You can watch the status of by running 'kubectl get svc --namespace {{ $ns }} -w {{ $fullname }}'
 
-  export SERVICE_IP=$(kubectl get svc --namespace {{ include "vm.namespace" . }} {{ include "vm.service" $ctx }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  export SERVICE_IP=$(kubectl get svc --namespace {{ $ns }} {{ $fullname }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
   echo http://$SERVICE_IP:{{ .Values.vmselect.service.servicePort }}
 {{- else if contains "ClusterIP"  .Values.vmselect.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ include "vm.namespace" . }} -l "app={{ .Values.vmselect.name }}" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace {{ include "vm.namespace" . }} port-forward $POD_NAME {{ .Values.vmselect.service.servicePort }}
+  export POD_NAME=$(kubectl get pods --namespace {{ $ns }} -l "app={{ .Values.vmselect.name }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.vmselect.service.servicePort }}
 {{- end }}
 
 You need to specify select service URL into your Grafana:
@@ -79,7 +80,7 @@ Input this URL field into Grafana
 
 
 for example - inside the Kubernetes cluster:
-    {{- $_ := set $ctx "appKey" "vmselect" }}
+
     {{ include "vm.url" $ctx }}/select/0/prometheus/
 
 {{- end }}
