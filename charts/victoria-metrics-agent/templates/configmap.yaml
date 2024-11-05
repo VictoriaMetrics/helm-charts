@@ -1,11 +1,13 @@
 {{- $ctx := dict "helm" . }}
-{{- if eq .Values.configMap "" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+{{- if empty .Values.configMap }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "vm.plain.fullname" $ctx }}-config
-  namespace: {{ include "vm.namespace" . }}
+  name: {{ $fullname }}-config
+  namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
   scrape.yml: |
@@ -30,8 +32,8 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "vm.plain.fullname" $ctx -}}-rw
-  namespace: {{ include "vm.namespace" $ }}
+  name: {{ $fullname }}-rw
+  namespace: {{ $ns }}
   labels: {{- include "vm.labels" $ctx | nindent 4 }}
 data: {{ . | nindent 2 }}
 {{- end }}

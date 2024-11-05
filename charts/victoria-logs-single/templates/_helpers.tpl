@@ -1,5 +1,6 @@
 {{- define "vlogs.args" -}}
-  {{- $app := .Values.server -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $app := $Values.server -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "retentionPeriod" $app.retentionPeriod -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
