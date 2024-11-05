@@ -20,7 +20,12 @@
   {{- include "vm.validate.args" . -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $Values.nameOverride | default ($Values.global).nameOverride | default $Chart.Name | trunc 63 | trimSuffix "-" }}
+  {{- $nameOverride := $Values.nameOverride | default ($Values.global).nameOverride | default $Chart.Name -}}
+  {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
+    {{- $nameOverride -}}
+  {{- else -}}
+    {{- $nameOverride | trunc 63 | trimSuffix "-" -}}
+  {{- end -}}
 {{- end -}}
 
 {{- /*
@@ -78,7 +83,11 @@ If release name contains chart name it will be used as a full name.
   {{- with (ternary .suffix .oldSuffix $appendDefault) -}}
     {{- $fullname = printf "%s-%s" $fullname . -}}
   {{- end -}}
-  {{- $fullname | trunc 63 | trimSuffix "-" -}}
+  {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
+    {{- $fullname -}}
+  {{- else -}}
+    {{- $fullname | trunc 63 | trimSuffix "-" -}}
+  {{- end -}}
 {{- end }}
 
 {{- define "vm.managed.fullname" -}}
@@ -124,7 +133,12 @@ If release name contains chart name it will be used as a full name.
 {{- define "vm.chart" -}}
   {{- include "vm.validate.args" . -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
-  {{- printf "%s-%s" $Chart.Name $Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+  {{- $chart := printf "%s-%s" $Chart.Name $Chart.Version | replace "+" "_" -}}
+  {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
+    {{- $chart -}}
+  {{- else -}}
+    {{- $chart | trunc 63 | trimSuffix "-" -}}
+  {{- end }}
 {{- end }}
 
 {{- /* Create the name of the service account to use */ -}}
@@ -172,7 +186,12 @@ If release name contains chart name it will be used as a full name.
   {{- include "vm.validate.args" . -}}
   {{- $Release := (.helm).Release | default .Release -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- default $Release.Name $Values.argocdReleaseOverride | trunc 63 | trimSuffix "-" -}}
+  {{- $release := default $Release.Name $Values.argocdReleaseOverride -}}
+  {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
+    {{- $release -}}
+  {{- else -}}
+    {{- $release | trunc 63 | trimSuffix "-" -}}
+  {{- end -}}
 {{- end -}}
 
 {{- define "vm.app.name" -}}

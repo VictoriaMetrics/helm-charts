@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Added ability to disable name truncation
 
 ## 0.0.19
 
