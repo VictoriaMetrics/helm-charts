@@ -1,31 +1,34 @@
 {{- $app := .Values }}
+{{- $ingress := $app.ingress }}
+{{- if $ingress.enabled }}
 {{- $ctx := dict "helm" . }}
-{{- if $app.ingress.enabled }}
-{{- $fullname := include "vm.fullname" . }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  {{- with $app.ingress.annotations }}
+  {{- with $ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
   {{- $_ := set $ctx "extraLabels" $app.ingress.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ $ns }}
 spec:
-  {{- with $app.ingress.ingressClassName }}
+  {{- with $ingress.ingressClassName }}
   ingressClassName: {{ . }}
   {{- end }}
-  {{- with $app.ingress.tls }}
+  {{- with $ingress.tls }}
   tls: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   rules:
-    {{- range $app.ingress.hosts }}
+    {{- range $ingress.hosts }}
     - host: {{ tpl .name $ }}
       http:
         paths:
           - path: {{ .path }}
-            {{- with $app.ingress.pathType }}
+            {{- with $ingress.pathType }}
             pathType: {{ . }}
             {{- end }}
             backend:
