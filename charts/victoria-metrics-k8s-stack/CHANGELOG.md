@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Update vm-operator to v0.49.0 release
 
 ## 0.27.7
 
