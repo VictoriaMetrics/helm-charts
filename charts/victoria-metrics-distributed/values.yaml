@@ -4,248 +4,246 @@ nameOverride: "vm-distributed"
 # -- Overrides the chart's computed fullname.
 fullnameOverride: ""
 
-vmauthIngestGlobal:
-  # -- Create a vmauth as the global write entrypoint
-  enabled: true
-  # -- Override the name of the vmauth object
-  name: ""
-  # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
-  spec: {}
+# -- Global chart properties
+global: {}
 
-vmauthQueryGlobal:
-  # -- Create vmauth as the global read entrypoint
-  enabled: true
-  # -- Override the name of the vmauth object
-  name: ""
-  # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
-  spec: {}
+common:
+  vmauth:
+    spec: {}
+  vmagent:
+    # -- Common VMAgent spec, which can be overriden by each VMAgent configuration.
+    # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/index.html#vmagentspec)
+    spec: {}
+  vmcluster:
+    # -- Common VMCluster spec, which can be overriden by each VMCluster configuration.
+    # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/index.html#vmclusterspec)
+    spec:
+      vminsert:
+        serviceSpec:
+          spec:
+            clusterIP: None
+            type: ClusterIP
+
+write:
+  global:
+    vmauth:
+      # -- Create a vmauth as the global write entrypoint
+      enabled: true
+      # -- Override the name of the vmauth object
+      name: ""
+      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+      spec:
+        port: "8427"
+
+read:
+  global:
+    vmauth:
+      # -- Create vmauth as the global read entrypoint
+      enabled: true
+      # -- Override the name of the vmauth object
+      name: ""
+      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+      spec:
+        port: "8427"
 
 # Config per availability zone components, including vmagent, vmcluster, vmauth etc
 availabilityZones:
-  - 
+  -
     # -- Availability zone name
     name: zone-eu-1
-    # -- Allow data ingestion to this zone
-    allowIngest: true
-    # -- Allow data query from this zone through global query endpoint
-    allowQuery: true
-    # -- Node selector to restrict where pods of this zone can be placed.
-    # usually provided by cloud providers.
-    nodeSelector:
-      topology.kubernetes.io/zone: zone-eu-1
-    # -- Extra affinity adds user defined custom affinity rules
-    extraAffinity: {}
-      # preferredDuringSchedulingIgnoredDuringExecution:
-      # - weight: 1
-      #   preference:
-      #     matchExpressions:
-      #     - key: topology.kubernetes.io/zone
-      #       operator: In
-      #       values:
-      #       - us-central1-b
-    # -- Topology spread constraints allows to customize the default topologySpreadConstraints.
-    topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-    vmauthIngest:
-      # -- Create vmauth as a local write endpoint
-      enabled: true
-      # -- Override the name of the vmauth object
-      name: ""
-      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
+    common:
+      # -- Common for [VMAgent](https://docs.victoriametrics.com/operator/api/#vmagentspec),
+      # [VMAuth](https://docs.victoriametrics.com/operator/api/#vmauthspec),
+      # [VMCluster](https://docs.victoriametrics.com/operator/api/#vmclusterspec) spec params, like nodeSelector,
+      # affinity, topologySpreadConstraint, etc
       spec:
-        extraArgs:
-          # vmauth discovers backend IPs via periodic DNS queries,
-          # and performs load balancing between vminsert instances
-          # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
-          discoverBackendIPs: "true"
-    vmauthQueryPerZone:
-      # -- Create vmauth as a local read endpoint
-      enabled: true
-      # -- Override the name of the vmauth object
-      name: ""
-      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
-      spec:
-        extraArgs:
-          discoverBackendIPs: "true"
-    vmauthCrossAZQuery:
-      # -- Create a vmauth with all the zone with `allowQuery: true` as query backends
-      enabled: true
-      # -- Override the name of the vmauth object
-      name: ""
-      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
-      spec: {}
-    # -- VMAgent here only meant to proxy write requests to each az,
-    # doesn't support customized other remote write address.
-    vmagent:
-      enabled: true
-      # -- Override the name of the vmagent object
-      name: ""
-      # -- VMAgent annotations
-      annotations: {}
-      # -- VMAgent spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmagentspec)
-      spec: {}
-    vmcluster:
-      enabled: true
-      # -- Override the name of the vmcluster, by default is vmcluster-<zoneName>
-      name: ""
-      # -- Spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
-      spec:
-        retentionPeriod: "14"
-        replicationFactor: 2
-        vmstorage:
-          replicaCount: 2
-          storageDataPath: "/vm-data"
-          resources: {}
-        vmselect:
-          replicaCount: 2
-          extraArgs: {}
-          resources:
-            {}
-        vminsert:
-          replicaCount: 2
-          extraArgs: {}
-          resources:
-            {}
-    
-  - 
-    # -- Availability zone name
-    name: zone-us-1
-    # -- Allow data ingestion to this zone
-    allowIngest: true
-    # -- Allow data query from this zone through global query endpoint
-    allowQuery: true
-    # -- Node selector to restrict where pods of this zone can be placed.
-    # usually provided by cloud providers.
-    nodeSelector:
-      topology.kubernetes.io/zone: zone-us-1
-    # -- Extra affinity adds user defined custom affinity rules
-    extraAffinity: {}
-      # preferredDuringSchedulingIgnoredDuringExecution:
-      # - weight: 1
-      #   preference:
-      #     matchExpressions:
-      #     - key: topology.kubernetes.io/zone
-      #       operator: In
-      #       values:
-      #       - us-central1-c
-    # -- Topology spread constraints allows to customize the default topologySpreadConstraints.
-    topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-    vmauthIngest:
-      # -- Create vmauth as a local write endpoint
-      enabled: true
-      # -- Override the name of the vmauth object
-      name: ""
-      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
-      spec:
-        extraArgs:
-          # vmauth discovers backend IPs via periodic DNS queries,
-          # and performs load balancing between vminsert instances
-          # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
-          discoverBackendIPs: "true"
-    vmauthQueryPerZone:
-      # -- Create vmauth as a local read endpoint
-      enabled: true
-      # -- Override the name of the vmauth object
-      name: ""
-      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
-      spec:
-        extraArgs:
-          discoverBackendIPs: "true"
-    vmauthCrossAZQuery:
-      # -- Create a vmauth with all the zone with `allowQuery: true` as query backends
-      enabled: true
-      # -- Override the name of the vmauth object
-      name: ""
-      # -- VMAuth spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
-      spec: {}
-    # -- VMAgent only meant to proxy write requests to each az,
-    # doesn't support customized remote write address
-    vmagent:
-      enabled: true
-      # -- Override the name of the vmagent object
-      name: ""
-      # -- VMAgent annotations
-      annotations: {}
-      # -- VMAgent spec. More options can be found [here](https://docs.victoriametrics.com/operator/api/#vmagentspec)
-      spec: {}
-    vmcluster:
-      enabled: true
-      # -- Override the name of the vmcluster, by default is vmcluster-<zoneName>
-      name: ""
-      # -- Spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
-      spec:
-        retentionPeriod: "14"
-        replicationFactor: 2
-        vmstorage:
-          replicaCount: 2
-          storageDataPath: "/vm-data"
-          resources: {}
-        vmselect:
-          replicaCount: 2
-          extraArgs: {}
-          resources:
-            {}
-        vminsert:
-          replicaCount: 2
-          extraArgs: {}
-          resources:
-            {}
-
-  # add more zones if needed
-  # - name: zone-na-1
-  #   # -- allow data ingestion to this zone
-  #   allowIngest: true
-  #   # -- allow data query from this zone through global query endpoint
-  #   allowQuery: true
-  #   # -- nodeselector to restrict where pods of this zone can be placed.
-  #   # usually provided by cloud providers.
-  #   nodeSelector:
-  #     topology.kubernetes.io/zone: zone-na-1
-  #   # -- extraAffinity adds user defined custom affinity rules
-  #   extraAffinity: {}
-  #   # -- topologySpreadConstraints allows to customize the default topologySpreadConstraints.
-  #   topologySpreadConstraints:
-  #     - maxSkew: 1
-  #       topologyKey: kubernetes.io/hostname
-  #       whenUnsatisfiable: ScheduleAnyway
-  #   vmauthIngest:
-  #     enabled: true
-  #     # -- override the name of the vmauth object
-  #     name: ""
-  #     spec:
-  #       extraArgs:
+        nodeSelector:
+          topology.kubernetes.io/zone: zone-eu-1
+        affinity: {}
+          # preferredDuringSchedulingIgnoredDuringExecution:
+          # - weight: 1
+          #   preference:
+          #     matchExpressions:
+          #     - key: topology.kubernetes.io/zone
+          #       operator: In
+          #       values:
+          #       - us-central1-b
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+    write:
+      # -- Allow data ingestion to this zone
+      allow: true
+      vmauth:
+        # -- Create vmauth as a local write endpoint
+        enabled: true
+        # -- Override the name of the vmauth object
+        name: ""
+        # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+        spec:
+          port: "8427"
+          extraArgs:
             # vmauth discovers backend IPs via periodic DNS queries,
             # and performs load balancing between vminsert instances
             # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
-  #         discoverBackendIPs: "true"
-  #   vmauthQueryPerZone:
-  #     enabled: true
-  #     name: ""
-  #     spec:
-  #       extraArgs:
-  #         discoverBackendIPs: "true"
-  #   # -- set up a vmauth with all the zone with `allowQuery: true` as query backends
-  #   vmauthCrossAZQuery:
-  #     enabled: true
-  #     name: ""
-  #     spec: {}
-  #   # -- vmagent here only meant to proxy write requests to each az,
-  #   # doesn't support customized remote write address
-  #   vmagent:
-  #     enabled: true
-  #     name: ""
-  #     annotations: {}
-  #     spec: {}
-  #   vmcluster:
-  #     enabled: true
-  #     name: ""
-  #     # -- spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
-  #     spec: {}
+            discoverBackendIPs: "true"
+    read:
+      # -- Allow data query from this zone through global query endpoint
+      allow: true
+      perZone:
+        vmauth:
+          # -- Create vmauth as a local read endpoint
+          enabled: true
+          # -- Override the name of the vmauth object
+          name: ""
+          # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+          spec:
+            port: "8427"
+            extraArgs:
+              discoverBackendIPs: "true"
+      crossZone:
+        vmauth:
+          # -- Create a vmauth with all the zone with `allow: true` as query backends
+          enabled: true
+          # -- Override the name of the vmauth object
+          name: ""
+          # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+          spec:
+            port: "8427"
+    # vmagent here only meant to proxy write requests to each az,
+    # doesn't support customized other remote write address.
+    vmagent:
+      # -- Create VMAgent remote write proxy
+      enabled: true
+      # -- Override the name of the vmagent object
+      name: ""
+      # -- VMAgent remote write proxy annotations
+      annotations: {}
+      # -- Spec for VMAgent CRD, see [here](https://docs.victoriametrics.com/operator/api#vmagentspec)
+      spec:
+        port: "8429"
+    vmcluster:
+      # -- Create VMCluster
+      enabled: true
+      # -- Override the name of the vmcluster, by default is <zoneName>
+      name: ""
+      # -- Spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
+      spec:
+        retentionPeriod: "14"
+        replicationFactor: 2
+        vmstorage:
+          replicaCount: 2
+          storageDataPath: "/vm-data"
+          resources: {}
+        vmselect:
+          replicaCount: 2
+          extraArgs: {}
+          port: "8481"
+          resources: {}
+        vminsert:
+          replicaCount: 2
+          extraArgs: {}
+          port: "8480"
+          resources: {}
+  - 
+    # -- Availability zone name
+    name: zone-us-1
+    common:
+      # -- Common for [VMAgent](https://docs.victoriametrics.com/operator/api/#vmagentspec),
+      # [VMAuth](https://docs.victoriametrics.com/operator/api/#vmauthspec),
+      # [VMCluster](https://docs.victoriametrics.com/operator/api/#vmclusterspec) spec params, like nodeSelector,
+      # affinity, topologySpreadConstraint, etc
+      spec:
+        nodeSelector:
+          topology.kubernetes.io/zone: zone-us-1
+        affinity: {}
+          # preferredDuringSchedulingIgnoredDuringExecution:
+          # - weight: 1
+          #   preference:
+          #     matchExpressions:
+          #     - key: topology.kubernetes.io/zone
+          #       operator: In
+          #       values:
+          #       - us-central1-c
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+    write:
+      # -- Allow data ingestion to this zone
+      allow: true
+      vmauth:
+        # -- Create vmauth as a local write endpoint
+        enabled: true
+        # -- Override the name of the vmauth object
+        name: ""
+        # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+        spec:
+          port: "8427"
+          extraArgs:
+            # vmauth discovers backend IPs via periodic DNS queries,
+            # and performs load balancing between vminsert instances
+            # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
+            discoverBackendIPs: "true"
+    read:
+      # -- Allow data query from this zone through global query endpoint
+      allow: true
+      perZone:
+        vmauth:
+          # -- Create vmauth as a local read endpoint
+          enabled: true
+          # -- Override the name of the vmauth object
+          name: ""
+          # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+          spec:
+            port: "8427"
+            extraArgs:
+              discoverBackendIPs: "true"
+      crossZone:
+        vmauth:
+          # -- Create a vmauth with all the zone with `allow: true` as query backends
+          enabled: true
+          # -- Override the name of the vmauth object
+          name: ""
+          # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+          spec:
+            port: "8427"
+    # vmagent here only meant to proxy write requests to each az,
+    # doesn't support customized other remote write address.
+    vmagent:
+      # -- Create VMAgent remote write proxy
+      enabled: true
+      # -- Override the name of the vmagent object
+      name: ""
+      # -- VMAgent remote write proxy annotations
+      annotations: {}
+      # -- Spec for VMAgent CRD, see [here](https://docs.victoriametrics.com/operator/api#vmagentspec)
+      spec:
+        port: "8429"
+    vmcluster:
+      # -- Create VMCluster
+      enabled: true
+      # -- Override the name of the vmcluster, by default is <zoneName>
+      name: ""
+      # -- Spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
+      spec:
+        retentionPeriod: "14"
+        replicationFactor: 2
+        vmstorage:
+          replicaCount: 2
+          storageDataPath: "/vm-data"
+          resources: {}
+        vmselect:
+          replicaCount: 2
+          extraArgs: {}
+          port: "8481"
+          resources: {}
+        vminsert:
+          replicaCount: 2
+          extraArgs: {}
+          port: "8480"
+          resources: {}
 
 
 # -- Set up an extra vmagent to scrape all the scrape objects by default,

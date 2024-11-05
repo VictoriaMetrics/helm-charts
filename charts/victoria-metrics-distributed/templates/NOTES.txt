@@ -1,10 +1,10 @@
 VictoriaMetrics distributed chart has been installed successfully!
 
-{{ if .Values.vmauthIngestGlobal.enabled }}
+{{ if .Values.write.global.vmauth.enabled }}
 Global write endpoint is available now!
-You can send data to `http://vmauth-vmauth-global-write-{{ .Release.Name }}-vm-distributed:8427/prometheus/api/v1/write` from your client like vmagent, check more supported APIs [here](https://docs.victoriametrics.com/vmagent/#how-to-push-data-to-vmagent).
+You can send data to `http://vmauth-global-write-{{ .Release.Name }}-vm-distributed:8427/prometheus/api/v1/write` from your client like vmagent, check more supported APIs [here](https://docs.victoriametrics.com/vmagent/#how-to-push-data-to-vmagent).
 {{- end }}
-{{ if .Values.vmauthQueryGlobal.enabled }}
+{{ if .Values.read.global.vmauth.enabled }}
 Global read endpoint is available now!
-You can use `http://vmauth-vmauth-global-read-{{ .Release.Name }}-vm-distributed:8427/select/<accountID>/prometheus/<suffix>` as datasource of vmalert or grafana, check more supported APIs [here](https://docs.victoriametrics.com/cluster-victoriametrics/#url-format).
+You can use `http://vmauth-global-read-{{ .Release.Name }}-vm-distributed:8427/select/<accountID>/prometheus/<suffix>` as datasource of vmalert or grafana, check more supported APIs [here](https://docs.victoriametrics.com/cluster-victoriametrics/#url-format).
 {{- end }}
