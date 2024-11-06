@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fixed boolean args rendering
 
 ## 0.0.19
 

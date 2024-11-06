@@ -300,10 +300,25 @@ server:
     # -- Service Monitor metricRelabelings
     metricRelabelings: []
 
+config:
+  streamFields:
+    - stream
+    - kubernetes_pod_name
+    - kubernetes_container_name
+    - kubernetes_namespace_name
+  accountID: 0
+  projectID: 0
+  msgFields:
+    - msg
+    - _msg
+    - message
+  timeFields:
+    - date
+
 # -- Values for [fluent-bit helm chart](https://fluent.github.io/helm-charts/)
 fluent-bit:
   # -- Enable deployment of fluent-bit
-  enabled: false
+  enabled: true
   args:
     - --workdir=/fluent-bit/etc
     - --config=/fluent-bit/etc/conf/fluent-bit.conf

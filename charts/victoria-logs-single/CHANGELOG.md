@@ -1,6 +1,7 @@
 ## Next release
 
 - set default DNS domain to `cluster.local.`
+- made message, time, stream fields configurable. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1695)
 
 ## 0.7.2
 
