@@ -21,11 +21,11 @@ spec:
   {{- end }}
   template:
     metadata:
-      {{- $_ := set $ctx "extraLabels" $app.podMetadata.labels }}
-      labels: {{ include "vm.labels" $ctx | nindent 8 }}
+      {{- $_ := set $ctx "extraLabels" $app.podLabels }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraLabels" }}
       {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/alertmanager-configmap.yaml") . | sha256sum) }}
-      {{- $annotations = merge $annotations (deepCopy $app.podMetadata.annotations) }}
+      {{- $annotations = merge $annotations (deepCopy $app.podAnnotations) }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
       serviceAccountName: {{ (.Values.serviceAccount).name | default $sa }}

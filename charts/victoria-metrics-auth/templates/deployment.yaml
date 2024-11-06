@@ -18,7 +18,9 @@ spec:
     matchLabels: {{ include "vm.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      labels: {{ include "vm.selectorLabels" $ctx | nindent 8 }}
+      {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
       {{- $annotations := merge (dict "checksum/config" (include (print .Template.BasePath "/secret.yaml") . | sha256sum)) .Values.podAnnotations }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:

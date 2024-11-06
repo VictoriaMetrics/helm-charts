@@ -1,4 +1,4 @@
-{{- if .Values.statefulset.enabled }}
+{{- if .Values.statefulSet.enabled }}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
@@ -25,8 +25,8 @@ spec:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
-      {{- $_ := set $ctx "extraLabels" (merge (deepCopy .Values.extraLabels) (deepCopy .Values.podLabels)) }}
-      labels: {{ include "vm.selectorLabels" $ctx | nindent 8 }}
+      {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraLabels" }}
       {{- $annotations := merge (dict "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum)) (deepCopy .Values.podAnnotations) }}
       annotations: {{ toYaml $annotations | nindent 8 }}

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added extraLabels for Deployment and podLabels for Pods
 
 ## 0.5.4
 

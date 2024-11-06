@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added podLabels for pods only and use extraLabels for deployment
 
 ## 0.7.4
 

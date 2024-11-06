@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- Use only podLabels as extra labels for pods
+- Renamed `statefulset` to `statefulSet` for consistency
 
 ## 0.14.5
 

@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- changed `alertmanager.podMetadata.labels` to `alertmanager.podLabels`
+- changed `alertmanager.podMetadata.annotations` to `alertmanager.podAnnotations`
 
 ## 0.12.4
 
