@@ -25,10 +25,10 @@ data:
       uri              /insert/jsonline
       format           json_lines
       json_date_format iso8601
-      header           AccountID 0
-      header           ProjectID 0
-      header           VL-Msg-Field msg
-      header           VL-Time-Field date
-      header           VL-Stream-Fields stream,kubernetes_pod_name,kubernetes_container_name,kubernetes_namespace_name
+      header           AccountID {{ $.Values.config.accountID }}
+      header           ProjectID {{ $.Values.config.projectID }}
+      header           VL-Msg-Field {{ join "," $.Values.config.msgFields }}
+      header           VL-Time-Field {{ join "," $.Values.config.timeFields }}
+      header           VL-Stream-Fields {{ join "," $.Values.config.streamFields }}
     {{ end }}
 {{- end }}

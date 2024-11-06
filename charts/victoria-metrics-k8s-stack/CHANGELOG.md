@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- updated dashboards
+- set default DNS domain to `cluster.local.`
 
 ## 0.28.2
 

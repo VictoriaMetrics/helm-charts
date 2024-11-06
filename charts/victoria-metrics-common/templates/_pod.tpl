@@ -86,7 +86,7 @@ Net probe port
 {{- end -}}
 
 {{- define "vm.arg" -}}
-  {{- if empty .value }}
+  {{- if and (empty .value) (not (kindIs "bool" .value)) }}
     {{- .key -}}
   {{- else if and (kindIs "bool" .value) .value -}}
     -{{ ternary "" "-" (eq (len .key) 1) }}{{ .key }}

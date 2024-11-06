@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- set default DNS domain to `cluster.local.`
+- made message, time, stream fields configurable. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1695)
 
 ## 0.7.2
 
@@ -13,6 +14,7 @@
 - updated dashboards
 - added JSON parsing
 - upgraded victorialogs 0.37.0 -> 0.40.0
+- made configurable service port in fluent-bit output config. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1693)
 
 ## 0.7.1
 

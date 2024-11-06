@@ -5,7 +5,10 @@ nameOverride: "vm-distributed"
 fullnameOverride: ""
 
 # -- Global chart properties
-global: {}
+global:
+  cluster:
+    # -- K8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
+    dnsDomain: cluster.local.
 
 common:
   vmauth:
@@ -276,8 +279,3 @@ victoria-metrics-k8s-stack:
     enabled: false
   grafana:
     enabled: true 
-    sidecar:
-      datasources:
-        enabled: true
-  crds:
-    enabled: true

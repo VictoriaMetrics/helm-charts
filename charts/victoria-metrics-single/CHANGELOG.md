@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- set default DNS domain to `cluster.local.`
 
 ## 0.12.5
 
