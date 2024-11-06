@@ -4,6 +4,51 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - added ability to override PVC name for Deployment
+        - updated dashboards
+        - added JSON parsing
+        - upgraded victorialogs 0.37.0 -> 0.40.0
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/VictoriaLogs/
+    apiVersion: v2
+    appVersion: v0.40.0
+    created: "2024-11-06T17:22:38.332786701Z"
+    dependencies:
+    - condition: fluent-bit.enabled
+      name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.47.*
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Logs Single version - high-performance, cost-effective and
+      scalable logs storage
+    digest: 3f4410df07f57a92142a19da2b75123027797fa7b0410e05680992011e5a6aa6
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - victorialogs
+    - logs
+    - kubernetes
+    - observability
+    - logsql
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-logs-single
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-single-0.7.2/victoria-logs-single-0.7.2.tgz
+    version: 0.7.2
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - Support multiple paths for a single ingress domain
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -1054,6 +1099,51 @@ entries:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-logs-single-0.0.1.tgz
     version: 0.0.1
   victoria-metrics-agent:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - Use only podLabels as extra labels for pods
+        - Renamed `.Values.statefulset` to `.Values.statefulSet` for consistency
+        - 'Fix Deployment/StatefulSets when `serviceAccount.name` is empty and `serviceAccount.create: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1683).'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/vmagent
+    apiVersion: v2
+    appVersion: v1.106.0
+    created: "2024-11-06T17:22:38.51085328Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Metrics Agent - collects metrics from various sources and
+      stores them to VictoriaMetrics
+    digest: 209fdcd8bc25f3d37bcaf1e07f847eef69b52fe700c224ee90798c2cf50940ae
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmagent
+    - agent
+    - collector
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    - servicediscovery
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-agent
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-agent-0.14.6/victoria-metrics-agent-0.14.6.tgz
+    version: 0.14.6
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
@@ -8122,6 +8212,50 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - added podLabels for pods only and use extraLabels for deployment
+        - 'fix Deployment/StatefulSets when `serviceAccount.name` is empty and `serviceAccount.create: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1683).'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/vmauth
+    apiVersion: v2
+    appVersion: v1.106.0
+    created: "2024-11-06T17:22:39.044184257Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Metrics Auth - is a simple auth proxy and router for VictoriaMetrics.
+    digest: b1f10b10afbddd4827121a24d5f571ef68896dd253c300af3a5d0b1e3e0472eb
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmauth
+    - auth
+    - proxy
+    - router
+    - balancer
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-auth
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-auth-0.7.5/victoria-metrics-auth-0.7.5.tgz
+    version: 0.7.5
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - multiple paths for a host in ingress
         - bump version of VM components to [v1.106.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.106.0)
       artifacthub.io/license: Apache-2.0
@@ -14724,6 +14858,52 @@ entries:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-distributed-0.1.1/victoria-metrics-distributed-0.1.1.tgz
     version: 0.1.0
   victoria-metrics-gateway:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - added extraLabels for Deployment and podLabels for Pods
+        - 'fix Deployment/StatefulSets when `serviceAccount.name` is empty and `serviceAccount.create: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1683).'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/vmgateway
+    apiVersion: v2
+    appVersion: v1.106.0
+    created: "2024-11-06T17:22:39.230363766Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Metrics Gateway - Auth & Rate-Limitting proxy for Victoria
+      Metrics
+    digest: 251d1b4764d5857976607922d901183d2752f562d91aa6cc699c1ca81a6c7ee6
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmgateway
+    - auth
+    - proxy
+    - gateway
+    - router
+    - balancer
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-gateway
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-gateway-0.5.5/victoria-metrics-gateway-0.5.5.tgz
+    version: 0.5.5
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
@@ -27794,6 +27974,47 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - 'Fix Deployment/StatefulSets when `serviceAccount.name` is empty and `serviceAccount.create: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1683).'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/
+    apiVersion: v2
+    appVersion: v1.106.0
+    created: "2024-11-06T17:22:39.844459156Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Metrics Single version - high-performance, cost-effective
+      and scalable TSDB, long-term remote storage for Prometheus
+    digest: c091f456ec8de22d1695de8385fdde74cd0f9834edf95e79b3be316a6deb16cc
+    keywords:
+    - victoriametrics
+    - vmsingle
+    - single
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-single
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-single-0.12.5/victoria-metrics-single-0.12.5.tgz
+    version: 0.12.5
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - replaced chart templates with common ones
         - multiple paths for a host in ingress
         - Added ability to override PVC name for Deployment
@@ -30518,4 +30739,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-11-06T14:07:36.188770318Z"
+generated: "2024-11-06T17:22:39.846748018Z"
