@@ -1,7 +1,8 @@
 ## Next release
 
-- Added ability to override PVC name for Deployment
-- Updated dashboards
+- added ability to override PVC name for Deployment
+- updated dashboards
+- set default DNS domain to `cluster.local.`
 
 ## 0.7.1
 

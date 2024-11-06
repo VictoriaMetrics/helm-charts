@@ -1,6 +1,7 @@
 ## Next release
 
 - use common templates
+- set default DNS domain to `cluster.local.`
 
 ## 1.6.3
 
