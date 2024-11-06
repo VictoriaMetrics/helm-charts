@@ -23,9 +23,9 @@
   {{- end -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $Values.extraArgs -}}
-  {{- if and $Values.statefulset.enabled $Values.statefulset.clusterMode }}
+  {{- if and $Values.statefulSet.enabled $Values.statefulSet.clusterMode }}
     {{- $_ := set $args "promscrape.cluster.membersCount" $Values.replicaCount -}}
-    {{- $_ := set $args "promscrape.cluster.replicationFactor" $Values.statefulset.replicationFactor -}}
+    {{- $_ := set $args "promscrape.cluster.replicationFactor" $Values.statefulSet.replicationFactor -}}
     {{- $_ := set $args "promscrape.cluster.memberNum" "$(POD_NAME)" -}}
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}

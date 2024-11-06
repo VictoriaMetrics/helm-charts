@@ -26,9 +26,12 @@ spec:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
-      annotations:
-        checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum }}
-      labels: {{ include "vm.selectorLabels" $ctx | nindent 8 }}
+      {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum) }}
+      {{- $annotations = merge $annotations (deepCopy .Values.podAnnotations) }}
+      annotations: {{ toYaml $annotations | nindent 8 }}
+      {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
     spec:
       {{- if .Values.podSecurityContext}}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.podSecurityContext "helm" .) | nindent 8 }}
