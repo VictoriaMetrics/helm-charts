@@ -35,7 +35,6 @@ spec:
       {{- with $app.schedulerName }}
       schedulerName: {{ . }}
       {{- end }}
-      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- $manager := $app.vmbackupmanager }}
       {{- if or $app.initContainers $manager.restore.onStart.enabled }}
       initContainers:
@@ -218,7 +217,10 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
+      {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       serviceAccountName: {{ (.Values.serviceAccount).name | default $sa }}
+      {{- end }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

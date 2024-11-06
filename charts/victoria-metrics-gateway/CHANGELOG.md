@@ -1,6 +1,7 @@
 ## Next release
 
-- Added extraLabels for Deployment and podLabels for Pods
+- added extraLabels for Deployment and podLabels for Pods
+- fix Deployment/StatefulSets when `serviceAccount.name` is empty and `serviceAccount.create: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1683).
 
 ## 0.5.4
 

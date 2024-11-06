@@ -2,6 +2,7 @@
 
 - Use only podLabels as extra labels for pods
 - Renamed `statefulset` to `statefulSet` for consistency
+- Fix Deployment/StatefulSets when `serviceAccount.name` is empty and `serviceAccount.create: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1683).
 
 ## 0.14.5
 
