@@ -1,7 +1,9 @@
 ## Next release
 
-- Added ability to override PVC name for Deployment
-- Updated dashboards
+- added ability to override PVC name for Deployment
+- updated dashboards
+- added JSON parsing
+- upgraded victorialogs 0.37.0 -> 0.40.0
 
 ## 0.7.1
 
