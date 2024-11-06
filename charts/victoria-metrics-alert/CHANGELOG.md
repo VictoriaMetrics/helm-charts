@@ -1,5 +1,7 @@
 ## Next release
 
+- changed `alertmanager.podMetadata.labels` to `alertmanager.podLabels`
+- changed `alertmanager.podMetadata.annotations` to `alertmanager.podAnnotations`
 - fix Deployment/StatefulSets when `serviceAccount.name` is empty and `serviceAccount.create: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1683).
 - set default DNS domain to `cluster.local.`
 

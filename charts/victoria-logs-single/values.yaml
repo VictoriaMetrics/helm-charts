@@ -367,6 +367,16 @@ fluent-bit:
           Operation    lift
           Nested_under kubernetes
           Add_prefix   kubernetes_
+      [FILTER]
+          Name          parser
+          Match         *
+          Parser        json
+          Key_Name      log
+          Reserve_Data  On
+      [FILTER]
+          Name   modify
+          Match  *
+          Rename log msg
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []

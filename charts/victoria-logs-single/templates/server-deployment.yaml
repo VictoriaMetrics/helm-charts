@@ -32,7 +32,8 @@ spec:
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
-      labels: {{ include "vm.labels" $ctx | nindent 8 }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
     spec:
       {{- with $app.priorityClassName }}
       priorityClassName: {{ . }}
