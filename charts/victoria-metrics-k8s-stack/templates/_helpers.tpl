@@ -193,7 +193,7 @@
     {{- end -}}
   {{- else if or $Values.externalVM.read.url $Values.externalVM.write.url }}
     {{- with $Values.externalVM.read.url }}
-      {{- $authConfig := ($.Values.externalVM).vmauth }}
+      {{- $authConfig := ($Values.externalVM).vmauth }}
       {{- $readAuths := $authConfig.read }}
       {{- $readUrl := . }}
       {{- range $readAuth := $readAuths }}
@@ -206,7 +206,7 @@
       {{- end -}}
     {{- end -}}
     {{- with $Values.externalVM.write.url }}
-      {{- $authConfig := ($.Values.externalVM).vmauth }}
+      {{- $authConfig := ($Values.externalVM).vmauth }}
       {{- $writeAuths := $authConfig.write }}
       {{- $writeUrl := . }}
       {{- range $writeAuth := $writeAuths }}
