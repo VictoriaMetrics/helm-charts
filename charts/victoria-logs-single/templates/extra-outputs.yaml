@@ -20,7 +20,7 @@ data:
       Name             http
       Match            kube.*
       Host             {{ include "vm.fqdn" $ctx }}
-      port             9428
+      port             {{ $.Values.server.service.servicePort }}
       compress         gzip
       uri              /insert/jsonline
       format           json_lines
