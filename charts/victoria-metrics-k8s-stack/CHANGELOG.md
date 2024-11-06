@@ -1,6 +1,7 @@
 ## Next release
 
 - Updated dashboards
+- Fixed vmauth spec context
 
 ## 0.28.1
 
