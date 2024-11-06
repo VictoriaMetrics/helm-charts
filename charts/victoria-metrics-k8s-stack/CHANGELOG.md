@@ -2,6 +2,7 @@
 
 - updated dashboards
 - set default DNS domain to `cluster.local.`
+- updated common dependency 0.0.19 -> 0.0.20
 
 ## 0.28.2
 
