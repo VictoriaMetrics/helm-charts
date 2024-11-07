@@ -11,8 +11,8 @@
     {{- else -}}
       {{- $_ := set . "appKey" (list "vmcluster" "vmselect") -}}
     {{- end -}}
-    {{- $baseURL := (trimSuffix "/" (include "vm.url" .)) -}}
-    {{- $tenant := ($Values.tenant | default 0) -}}
+    {{- $baseURL := include "vm.url" . -}}
+    {{- $tenant := $Values.tenant | default 0 -}}
     {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
   {{- else if $Values.externalVM.read.url -}}
     {{- $endpoint = $Values.externalVM.read -}}
@@ -26,7 +26,7 @@
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set . "appKey" "vmsingle" -}}
-    {{- $baseURL := (trimSuffix "/" (include "vm.url" .)) -}}
+    {{- $baseURL := include "vm.url" . -}}
     {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
   {{- else if $Values.vmcluster.enabled -}}
     {{- if $Values.vmauth.enabled -}}
@@ -34,8 +34,8 @@
     {{- else -}}
       {{- $_ := set . "appKey" (list "vmcluster" "vminsert") -}}
     {{- end -}}
-    {{- $baseURL := (trimSuffix "/" (include "vm.url" .)) -}}
-    {{- $tenant := ($Values.tenant | default 0) -}}
+    {{- $baseURL := include "vm.url" . -}}
+    {{- $tenant := $Values.tenant | default 0 -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
   {{- else if $Values.externalVM.write.url -}}
     {{- $endpoint = $Values.externalVM.write -}}
@@ -48,15 +48,15 @@
   {{- $ctx := . -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $remotes := default dict -}}
-  {{- $fullname := (include "vm.fullname" .) -}}
+  {{- $fullname := include "vm.fullname" . -}}
   {{- $_ := set $ctx "style" "managed" -}}
-  {{- $remoteWrite := (include "vm.write.endpoint" $ctx | fromYaml) -}}
+  {{- $remoteWrite := include "vm.write.endpoint" $ctx | fromYaml -}}
   {{- if $Values.vmalert.remoteWriteVMAgent -}}
     {{- $_ := set $ctx "appKey" "vmagent" -}}
     {{- $remoteWrite = dict "url" (printf "%s/api/v1/write" (include "vm.url" $ctx)) -}}
     {{- $_ := unset $ctx "appKey" -}}
   {{- end -}}
-  {{- $remoteRead := (fromYaml (include "vm.read.endpoint" $ctx)) -}}
+  {{- $remoteRead := fromYaml (include "vm.read.endpoint" $ctx) -}}
   {{- $_ := set $remotes "remoteWrite" $remoteWrite -}}
   {{- $_ := set $remotes "remoteRead" $remoteRead -}}
   {{- $_ := set $remotes "datasource" $remoteRead -}}
@@ -66,11 +66,11 @@
     {{- $_ := set $remotes "notifierConfigRef" $notifierConfigRef -}}
   {{- else if $Values.alertmanager.enabled -}}
     {{- $notifiers := default list -}}
-    {{- $appSecure := (not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config)) -}}
+    {{- $appSecure := not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config) -}}
     {{- $_ := set $ctx "appKey" "alertmanager" -}}
     {{- $_ := set $ctx "appSecure" $appSecure -}}
     {{- $_ := set $ctx "appRoute" (($Values.alertmanager).spec).routePrefix -}}
-    {{- $alertManagerReplicas := ($Values.alertmanager.spec.replicaCount | default 1 | int) -}}
+    {{- $alertManagerReplicas := $Values.alertmanager.spec.replicaCount | default 1 | int -}}
     {{- range until $alertManagerReplicas -}}
       {{- $_ := set $ctx "appIdx" . -}}
       {{- $notifiers = append $notifiers (dict "url" (include "vm.url" $ctx)) -}}
@@ -85,7 +85,7 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $cms :=  ($Values.vmalert.spec.configMaps | default list) -}}
   {{- if $Values.vmalert.templateFiles -}}
-    {{- $fullname := (include "vm.fullname" .) -}}
+    {{- $fullname := include "vm.fullname" . -}}
     {{- $cms = append $cms (printf "%s-vmalert-extra-tpl" $fullname) -}}
   {{- end -}}
   {{- $output := dict "configMaps" (compact $cms) -}}
@@ -119,8 +119,8 @@
     {{- $ruleTmpl := printf "/etc/vm/configs/%s-extra-tpl/*.tmpl" $fullname -}}
     {{- $_ := set $extraArgs "rule.templates" $ruleTmpl -}}
   {{- end -}}
-  {{- $vmAlertRemotes := (include "vm.alert.remotes" . | fromYaml) -}}
-  {{- $vmAlertTemplates := (include "vm.alert.templates" . | fromYaml) -}}
+  {{- $vmAlertRemotes := include "vm.alert.remotes" . | fromYaml -}}
+  {{- $vmAlertTemplates := include "vm.alert.templates" . | fromYaml -}}
   {{- $spec := dict "extraArgs" $extraArgs "image" (dict "tag" $Chart.AppVersion) -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
@@ -149,7 +149,7 @@
 {{- define "vm.agent.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
-  {{- $spec := (include "vm.agent.remote.write" . | fromYaml) -}}
+  {{- $spec := include "vm.agent.remote.write" . | fromYaml -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
@@ -164,14 +164,14 @@
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set . "appKey" (list "vmsingle") -}}
-    {{- $url := (include "vm.url" .) }}
+    {{- $url := include "vm.url" . }}
     {{- $srcPath := clean (printf "%s/.*" (urlParse $url).path) }}
     {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $srcPath) "url_prefix" (list $url)) }}
   {{- else if $Values.vmcluster.enabled -}}
     {{- $authConfig := ($Values.vmcluster).vmauth }}
     {{- $_ := set . "appKey" (list "vmcluster" "vminsert") -}}
     {{- $writeAuths := $authConfig.vminsert }}
-    {{- $writeUrl := (include "vm.url" .) }}
+    {{- $writeUrl := include "vm.url" . }}
     {{- range $writeAuth := $writeAuths }}
       {{- $urls := default list }}
       {{- range $prefix := $writeAuth.url_prefix }}
@@ -182,7 +182,7 @@
     {{- end }}
     {{- $_ := set . "appKey" (list "vmcluster" "vmselect") -}}
     {{- $readAuths := $authConfig.vmselect }}
-    {{- $readUrl := (include "vm.url" .) }}
+    {{- $readUrl := include "vm.url" . }}
     {{- range $readAuth := $readAuths }}
       {{- $urls := default list }}
       {{- range $prefix := $readAuth.url_prefix }}
@@ -230,7 +230,7 @@
 {{- /* Alermanager spec */ -}}
 {{- define "vm.alertmanager.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $fullname := (include "vm.plain.fullname" .) -}}
+  {{- $fullname := include "vm.plain.fullname" . -}}
   {{- $spec := $Values.alertmanager.spec -}}
   {{- if and (not $Values.alertmanager.spec.configRawYaml) (not $Values.alertmanager.spec.configSecret) -}}
     {{- $_ := set $spec "configSecret" $fullname -}}
@@ -241,7 +241,7 @@
     {{- $templates = append $templates (dict "name" $configMap "key" "monzo.tmpl") -}}
   {{- end -}}
   {{- $configMap := printf "%s-extra-tpl" $fullname -}}
-  {{- range $key, $value := ($Values.alertmanager.templateFiles | default dict) -}}
+  {{- range $key, $value := $Values.alertmanager.templateFiles | default dict -}}
     {{- $templates = append $templates (dict "name" $configMap "key" $key) -}}
   {{- end -}}
   {{- $_ := set $spec "templates" $templates -}}
@@ -282,9 +282,9 @@
 {{- define "vm.cluster.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
-  {{- $spec := (include "vm.select.spec" . | fromYaml) -}}
-  {{- $clusterSpec := (deepCopy $Values.vmcluster.spec) -}}
-  {{- $imageSpec := (dict "image" (dict "tag" (printf "%s-cluster" $Chart.AppVersion))) -}}
+  {{- $spec := include "vm.select.spec" . | fromYaml -}}
+  {{- $clusterSpec := deepCopy $Values.vmcluster.spec -}}
+  {{- $imageSpec := dict "image" (dict "tag" (printf "%s-cluster" $Chart.AppVersion)) -}}
   {{- $clusterSpec = mergeOverwrite (dict "vminsert" (deepCopy $imageSpec)) $clusterSpec -}}
   {{- $clusterSpec = mergeOverwrite (dict "vmstorage" (deepCopy $imageSpec)) $clusterSpec -}}
   {{- with (include "vm.license.global" .) -}}
@@ -320,11 +320,11 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $datasources := $Values.defaultDatasources.extra | default list -}}
   {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled -}}
-    {{- $readEndpoint:= (include "vm.read.endpoint" $ctx | fromYaml) -}}
+    {{- $readEndpoint:= include "vm.read.endpoint" $ctx | fromYaml -}}
     {{- $defaultDatasources := default list -}}
     {{- range $ds := $Values.defaultDatasources.victoriametrics.datasources }}
       {{- $_ := set $ctx "ds" $ds }}
-      {{- $allowedDatasource := (ternary false true (empty (include "vm.data.source.enabled" $ctx))) -}}
+      {{- $allowedDatasource := ternary false true (empty (include "vm.data.source.enabled" $ctx)) -}}
       {{- if $allowedDatasource -}}
         {{- $_ := set $ds "url" $readEndpoint.url -}}
         {{- $defaultDatasources = append $defaultDatasources $ds -}}
@@ -334,9 +334,9 @@
     {{- if and $Values.defaultDatasources.victoriametrics.perReplica $defaultDatasources -}}
       {{- range $id := until (int $Values.vmsingle.spec.replicaCount) -}}
         {{- $_ := set $ctx "appIdx" $id -}}
-        {{- $readEndpoint := (include "vm.read.endpoint" $ctx | fromYaml) -}}
+        {{- $readEndpoint := include "vm.read.endpoint" $ctx | fromYaml -}}
         {{- range $ds := $defaultDatasources -}}
-          {{- $ds = (deepCopy $ds) -}}
+          {{- $ds = deepCopy $ds -}}
           {{- $_ := set $ds "url" $readEndpoint.url -}}
           {{- $_ := set $ds "name" (printf "%s-%d" $ds.name $id) -}}
           {{- $_ := set $ds "isDefault" false -}}
@@ -347,7 +347,7 @@
   {{- end -}}
   {{- if $Values.alertmanager.enabled -}}
     {{- range $ds := $Values.defaultDatasources.alertmanager.datasources }}
-      {{- $appSecure := (not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config)) -}}
+      {{- $appSecure := not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config) -}}
       {{- $_ := set $ctx "appKey" "alertmanager" -}}
       {{- $_ := set $ctx "appSecure" $appSecure -}}
       {{- $_ := set $ctx "appRoute" (($Values.alertmanager).spec).routePrefix -}}

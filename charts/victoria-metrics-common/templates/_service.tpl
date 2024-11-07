@@ -69,5 +69,5 @@
     {{- $proto = (ternary "https" "http" $isSecure) -}}
     {{- $path = dig "http.pathPrefix" $path ($spec.extraArgs | default dict) -}}
   {{- end -}}
-  {{- printf "%s://%s%s" $proto $host $path -}}
+  {{- printf "%s://%s%s" $proto $host (trimSuffix "/" $path) -}}
 {{- end -}}
