@@ -1,0 +1,14 @@
+{{- if and (.Values.vector).enabled (.Values.vector).existingConfigMaps }}
+{{- $ctx := dict "helm" . "appKey" "server" "style" "plain" }}
+{{- $ns := include "vm.namespace" $ctx }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ index (.Values.vector).existingConfigMaps 0 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  namespace: {{ $ns }}
+data:
+  {{- $tpl := toYaml (.Values.vector).customConfig | replace "<<" "{{" | replace ">>" "}}" }}
+  vector.yaml: |{{ tpl $tpl $ctx | nindent 4 }}
+{{- end }}
