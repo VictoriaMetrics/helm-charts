@@ -121,6 +121,7 @@ jobs:
           done
 
       - name: Release
+        if: ${{ hashFiles('chart/*/RELEASE_NOTES.md') != '' }}
         uses: helm/chart-releaser-action@v1.6.0
         env:
           CR_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
@@ -128,6 +129,7 @@ jobs:
           config: .github/ci/cr.yaml
 
       - name: Release OCI
+        if: ${{ hashFiles('chart/*/RELEASE_NOTES.md') != '' }}
         run: |
           helm registry login \
             -u ${{ github.actor }} \
@@ -135,14 +137,15 @@ jobs:
             ghcr.io
           mkdir -p .cr-release-packages
           for chart in charts/*; do
-            if git diff-index --name-status --exit-code HEAD $chart; then
-              echo "no release for chart $chart. removing it from uploading..."
+            if [ ! -f $chart/RELEASE_NOTES.md ]; then
+              echo "no release notes for chart $chart. removing it from uploading..."
               rm -rf .cr-release-packages/$(basename $chart)*
             fi
           done
           find .cr-release-packages -name "*.tgz" -exec helm push {} oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts \;
 
       - name: Automatic update changelogs and readme
+        if: ${{ hashFiles('chart/*/RELEASE_NOTES.md') != '' }}
         run: |
           rm -rf charts/*/RELEASE_NOTES.md
           export VM_GIT_BRANCH_NAME="changelog-update-$(date +%s)"
