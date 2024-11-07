@@ -259,12 +259,12 @@ spec:
         {{- if $app.scrape.enabled }}
         - name: scrapeconfig
           configMap:
-            name: {{ $fullname }}-scrapeconfig
+            name: {{ include "vmsingle.scrape.config.name" $ctx }}
         {{- end }}
         {{- if $app.relabel.enabled }}
         - name: relabelconfig
           configMap:
-            name: {{ $fullname }}-relabelconfig
+            name: {{ include "vmsingle.scrape.config.name" $ctx }}
         {{- end }}
         {{- if or (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
         - name: server-volume
