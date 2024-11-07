@@ -132,6 +132,7 @@ If release name contains chart name it will be used as a full name.
 {{- /* Create chart name and version as used by the chart label. */ -}}
 {{- define "vm.chart" -}}
   {{- include "vm.validate.args" . -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $chart := printf "%s-%s" $Chart.Name $Chart.Version | replace "+" "_" -}}
   {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}

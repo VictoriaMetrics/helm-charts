@@ -3,6 +3,7 @@
 ## Next release
 
 - Added ability to disable name truncation
+- Truncate `/` from `vm.url` output
 
 ## 0.0.20
 

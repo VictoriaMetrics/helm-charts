@@ -9,7 +9,7 @@ metadata:
   name: {{ .Values.extraVMAgent.name }}
   namespace: {{ $ns }}
 {{- $spec := (deepCopy .Values.extraVMAgent.spec) }}
-{{- $remoteWrites := list (dict "url" (printf "%s/prometheus/api/v1/write" (trimSuffix "/" (include "vm.url" $ctx)))) }}
+{{- $remoteWrites := list (dict "url" (printf "%s/prometheus/api/v1/write" (include "vm.url" $ctx))) }}
 {{- $_ := set $spec "remoteWrite" (concat $remoteWrites ($spec.remoteWrite | default list)) }}
 spec: {{ tpl (toYaml $spec) . | nindent 2 }}
 {{- end }}
