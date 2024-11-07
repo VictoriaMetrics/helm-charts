@@ -80,7 +80,7 @@ Filter out ignore rules
 {{- $commonInGroupRule := dig "rules" (default dict) $group }}
 {{- $filteredRulesSpec := default list }}
 {{- range $_, $ruleSpec := $rulesSpec }}
-  {{- $ruleName := $ruleSpec.alert | default "" }}
+  {{- $ruleName := $ruleSpec.alert | default $ruleSpec.record | default "" }}
   {{- $ruleKey := (hasKey $ruleSpec "record" | ternary "recording" "alerting") -}}
   {{- $ruleCondition := (eq $ruleSpec.condition "true") }}
   {{- $_ := unset $ruleSpec "condition" }}
