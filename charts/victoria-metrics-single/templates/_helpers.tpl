@@ -1,3 +1,15 @@
+{{- define "vmsingle.scrape.config.name" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $fullname := include "vm.plain.fullname" . -}}
+  {{- $Values.server.scrape.configMap | default (printf "%s-scrapeconfig" $fullname) -}}
+{{- end -}}
+
+{{- define "vmsingle.relabel.config.name" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $fullname := include "vm.plain.fullname" . -}}
+  {{- $Values.server.relabel.configMap | default (printf "%s-relabelconfig" $fullname) -}}
+{{- end -}}
+
 {{- define "vmsingle.args" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.server -}}

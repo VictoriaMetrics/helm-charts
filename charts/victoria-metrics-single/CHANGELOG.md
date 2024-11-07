@@ -2,6 +2,7 @@
 
 - set default DNS domain to `cluster.local.`
 - updated common dependency 0.0.19 -> 0.0.20
+- fixed ability to pass a custom scrape and relabel configs. see [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1700).
 
 ## 0.12.5
 
