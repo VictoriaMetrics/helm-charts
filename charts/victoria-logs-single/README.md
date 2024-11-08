@@ -18,9 +18,9 @@ This chart will do the following:
 * (optional) Rollout [fluentbit](https://fluentbit.io/) to collect logs from pods.
 
 Chart allows to configure logs collection from Kubernetes pods to VictoriaLogs.
-In order to do that you need to enable fluentbit:
+In order to do that you need to enable vector:
 ```yaml
-fluent-bit:
+vector:
   enabled: true
 ```
 By default, fluentbit will forward logs to VictoriaLogs installation deployed by this chart.
