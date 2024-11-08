@@ -300,99 +300,56 @@ server:
     # -- Service Monitor metricRelabelings
     metricRelabelings: []
 
-config:
-  streamFields:
-    - stream
-    - kubernetes_pod_name
-    - kubernetes_container_name
-    - kubernetes_namespace_name
-  accountID: 0
-  projectID: 0
-  msgFields:
-    - msg
-    - _msg
-    - message
-  timeFields:
-    - date
-
-# -- Values for [fluent-bit helm chart](https://fluent.github.io/helm-charts/)
-fluent-bit:
-  # -- Enable deployment of fluent-bit
+# -- Values for [vector helm chart](https://github.com/vectordotdev/helm-charts/tree/develop/charts/vector)
+vector:
+  # -- Enable deployment of vector
   enabled: false
-  args:
-    - --workdir=/fluent-bit/etc
-    - --config=/fluent-bit/etc/conf/fluent-bit.conf
-    - --enable-hot-reload
-
-  extraContainers: |
-    - name: reloader
-      image: {{ include "fluent-bit.image" .Values.hotReload.image }}
-      args:
-        - {{ printf "-webhook-url=http://localhost:%s/api/v2/reload" (toString .Values.metricsPort) }}
-        - -volume-dir=/watch/config
-        - -volume-dir=/watch/outputs
-      volumeMounts:
-        - name: config
-          mountPath: /watch/config
-        - name: vl-outputs
-          mountPath: /watch/outputs
-
-  daemonSetVolumes:
-    - name: varlog
-      hostPath:
-        path: /var/log
-    - name: varlibdockercontainers
-      hostPath:
-        path: /var/lib/docker/containers
-    - name: vl-outputs
-      configMap:
-        name: vl-outputs
-
-  daemonSetVolumeMounts:
-    - name: varlog
-      mountPath: /var/log
-    - name: varlibdockercontainers
-      mountPath: /var/lib/docker/containers
-      readOnly: true
-    - name: vl-outputs
-      mountPath: /fluent-bit/etc/conf/vl
-
+  role: Agent
+  dataDir: /vector-data-dir
   resources: {}
-
-  config:
-    # -- Note that Host must be replaced to match your VictoriaLogs service name
-    # Default format points to VictoriaLogs service.
-    # @notationType -- tpl
-    outputs: |
-      @INCLUDE /fluent-bit/etc/conf/vl/output_*.conf
-    # -- FluentBit configuration filters
-    # @notationType -- tpl
-    filters: |
-      [FILTER]
-          Name                kubernetes
-          Match               kube.*
-          Merge_Log           On
-          Keep_Log            On
-          K8S-Logging.Parser  On
-          K8S-Logging.Exclude On
-      [FILTER]
-          Name         nest
-          Match        *
-          Wildcard     pod_name
-          Operation    lift
-          Nested_under kubernetes
-          Add_prefix   kubernetes_
-      [FILTER]
-          Name          parser
-          Match         *
-          Parser        json
-          Key_Name      log
-          Reserve_Data  On
-      [FILTER]
-          Name   modify
-          Match  *
-          Rename log msg
-
+  service:
+    enabled: false
+  existingConfigMaps:
+    - vl-config
+  env:
+    - name: VECTOR_SELF_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+  customConfig:
+    data_dir: /vector-data-dir
+    api:
+      enabled: false
+      address: 127.0.0.1:8686
+      playground: true
+    sources:
+      k8s:
+        type: kubernetes_logs
+    transforms:
+      parser:
+        type: remap
+        inputs: [k8s]
+        source: |
+          .log = parse_json(.message) ?? .message
+          del(.message)
+    sinks:
+      vlogs:
+        type: elasticsearch
+        inputs: [parser]
+        endpoints: << include "vlogs.es.urls" . >>
+        mode: bulk
+        api_version: v8
+        compression: gzip
+        healthcheck:
+          enabled: false
+        request:
+          headers:
+            VL-Time-Field: timestamp
+            VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
+            VL-Msg-Field: message,msg,_msg,log.msg,log
+            AccountID: "0"
+            ProjectID: "0"
+      
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 
