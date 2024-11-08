@@ -1,4 +1,4 @@
- ![Version: 0.7.3](https://img.shields.io/badge/Version-0.7.3-informational?style=flat-square)
+ ![Version: 0.8.0](https://img.shields.io/badge/Version-0.8.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-logs-single)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -18,9 +18,9 @@ This chart will do the following:
 * (optional) Rollout [fluentbit](https://fluentbit.io/) to collect logs from pods.
 
 Chart allows to configure logs collection from Kubernetes pods to VictoriaLogs.
-In order to do that you need to enable fluentbit:
+In order to do that you need to enable vector:
 ```yaml
-fluent-bit:
+vector:
   enabled: true
 ```
 By default, fluentbit will forward logs to VictoriaLogs installation deployed by this chart.
