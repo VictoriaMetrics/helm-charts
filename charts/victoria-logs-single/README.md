@@ -15,7 +15,7 @@ Victoria Logs Single version - high-performance, cost-effective and scalable log
 This chart will do the following:
 
 * Rollout Victoria Logs Single.
-* (optional) Rollout [fluentbit](https://fluentbit.io/) to collect logs from pods.
+* (optional) Rollout [vector](https://vector.dev/) to collect logs from pods.
 
 Chart allows to configure logs collection from Kubernetes pods to VictoriaLogs.
 In order to do that you need to enable vector:
