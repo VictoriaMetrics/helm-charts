@@ -258,13 +258,12 @@ def patch_dashboard(dashboard, name):
                 variable["hide"] = (
                     "[[ ternary 0 2 $Values.grafana.sidecar.dashboards.multicluster ]]"
                 )
+                query = json.dumps(variable["query"])
+                if re.match('"label_values\\(.*\\)"', query):
+                    query = re.sub('\\w+\\)"$', 'cluster)"', query)
                 variable["query"] = (
                     f'[[ ternary (b64dec "%(query)s" | replace "cluster" $Values.global.clusterLabel) ".*" $Values.grafana.sidecar.dashboards.multicluster ]]'
-                    % {
-                        "query": base64.b64encode(
-                            json.dumps(variable["query"]).encode("ascii")
-                        ).decode("utf-8")
-                    }
+                    % {"query": base64.b64encode(query.encode("ascii")).decode("utf-8")}
                 )
             else:
                 if "definition" in variable:

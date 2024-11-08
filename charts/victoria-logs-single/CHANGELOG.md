@@ -2,6 +2,7 @@
 
 - Allow selecting multiple/all instances in a dashboard. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1699)
 - Upgraded VictoriaLogs 0.40.0 -> 0.41.0
+- updated common dependency 0.0.19 -> 0.0.21
 
 ## 0.7.3
 
