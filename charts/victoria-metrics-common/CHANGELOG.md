@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Removed unused cases from `vm.fullname`
 
 ## 0.0.21
 

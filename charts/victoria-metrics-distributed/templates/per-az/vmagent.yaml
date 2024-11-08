@@ -23,11 +23,10 @@ metadata:
   {{- if $rwZone.write.allow }}
     {{- $_ := set $ctx "style" "managed" }}
     {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "write" "vmauth") }}
-    {{- $_ := set $ctx "prefix" "write-balancer" }}
-    {{- $url := trimSuffix "/" (include "vm.url" $ctx) }}
+    {{- $_ := set $ctx "alias" "vmauth-write-balancer" }}
     {{- $_ := unset $ctx "style" }}
-    {{- $_ := unset $ctx "prefix" }}
-    {{- $remoteWrites = append $remoteWrites (dict "url" (printf "%s/insert/%s/prometheus/api/v1/write" $url $tenant)) }}
+    {{- $_ := unset $ctx "alias" }}
+    {{- $remoteWrites = append $remoteWrites (dict "url" (printf "%s/insert/%s/prometheus/api/v1/write" (include "vm.url" $ctx) $tenant)) }}
   {{- end }}
 {{- end }}
 {{- $_ := set $spec "remoteWrite" (concat $remoteWrites ($spec.remoteWrites | default list)) }}

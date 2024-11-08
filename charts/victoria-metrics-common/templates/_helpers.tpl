@@ -43,29 +43,21 @@ If release name contains chart name it will be used as a full name.
   {{- if .appKey -}}
     {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
     {{- $values := $Values -}}
-    {{- $global := (index $Values.global $Chart.Name) | default dict -}}
     {{- range $ak := $appKey }}
       {{- if $values -}}
         {{- $values = (index $values $ak) | default dict -}}
       {{- end -}}
-      {{- if $global -}}
-        {{- $global = (index $global $ak) | default dict -}}
-      {{- end -}}
-      {{- if and (kindIs "map" $values) $values.name -}}
-        {{- $fullname = $values.name -}}
-      {{- else if and (kindIs "map" $values) $values.fullnameOverride -}}
+      {{- if and (kindIs "map" $values) $values.fullnameOverride -}}
         {{- $fullname = $values.fullnameOverride -}}
         {{- $appendDefault = false -}}
-      {{- else if and (kindIs "map" $global) $global.name -}}
-        {{- $fullname = $global.name -}}
+      {{- else if and (kindIs "map" $values) $values.name -}}
+        {{- $fullname = $values.name -}}
       {{- end -}}
     {{- end }}
   {{- end -}}
   {{- if empty $fullname -}}
     {{- if $Values.fullnameOverride -}}
       {{- $fullname = $Values.fullnameOverride -}}
-    {{- else if (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
-      {{- $fullname = (dig $Chart.Name "fullnameOverride" "" ($Values.global)) -}}
     {{- else if ($Values.global).fullnameOverride -}}
       {{- $fullname = $Values.global.fullnameOverride -}}
     {{- else -}}
@@ -77,11 +69,14 @@ If release name contains chart name it will be used as a full name.
       {{- end -}}
     {{- end -}}
   {{- end -}}
-  {{- with (ternary .prefix .oldPrefix $appendDefault) -}}
-    {{- $fullname = printf "%s-%s" . $fullname -}}
-  {{- end -}}
-  {{- with (ternary .suffix .oldSuffix $appendDefault) -}}
-    {{- $fullname = printf "%s-%s" $fullname . -}}
+  {{- if $appendDefault -}}
+    {{- $alias := .alias -}}
+    {{- with .prefix -}}
+      {{- $fullname = printf "%s-%s" (ternary . $alias (empty $alias)) $fullname -}}
+    {{- end -}}
+    {{- with .suffix -}}
+      {{- $fullname = printf "%s-%s" $fullname (ternary . $alias (empty $alias)) }}
+    {{- end -}}
   {{- end -}}
   {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
     {{- $fullname -}}
@@ -96,18 +91,10 @@ If release name contains chart name it will be used as a full name.
     {{- $prefix = last $prefix -}}
   {{- end -}}
   {{- $prefix = ternary $prefix (printf "vm%s" $prefix) (or (hasPrefix "vm" $prefix) (hasPrefix "vl" $prefix)) -}}
-  {{- if or .prefix $prefix -}}
-    {{- $_ := set . "oldPrefix" .prefix }}
-  {{- end -}}
   {{- if $prefix -}}
-    {{- with .oldPrefix -}}
-      {{- $prefix = printf "%s-%s" $prefix . -}}
-    {{- end }}
     {{- $_ := set $ "prefix" $prefix -}}
   {{- end -}}
   {{- include "vm.fullname" . -}}
-  {{- $_ := set . "prefix" .oldPrefix -}}
-  {{- $_ := unset . "oldPrefix" -}}
 {{- end -}}
 
 {{- define "vm.plain.fullname" -}}
@@ -115,18 +102,10 @@ If release name contains chart name it will be used as a full name.
   {{- if kindIs "slice" $suffix -}}
     {{- $suffix = last $suffix }}
   {{- end -}}
-  {{- if or .suffix $suffix -}}
-    {{- $_ := set . "oldSuffix" .suffix }}
-  {{- end -}}
   {{- if $suffix -}}
-    {{- with .oldSuffix -}}
-      {{- $suffix = printf "%s-%s" $suffix . -}}
-    {{- end -}}
     {{- $_ := set . "suffix" $suffix -}}
   {{- end -}}
   {{- include "vm.fullname" . -}}
-  {{- $_ := set . "suffix" .oldSuffix -}}
-  {{- $_ := unset . "oldSuffix" -}}
 {{- end -}}
 
 {{- /* Create chart name and version as used by the chart label. */ -}}
@@ -198,18 +177,13 @@ If release name contains chart name it will be used as a full name.
 {{- define "vm.app.name" -}}
   {{- if .appKey -}}
     {{- $Values := (.helm).Values | default .Values -}}
-    {{- $Chart := (.helm).Chart | default .Chart -}}
     {{- $values := $Values -}}
-    {{- $global := (index $Values.global $Chart.Name) | default dict -}}
     {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
     {{- $name := last $appKey }}
     {{- range $ak := $appKey }}
       {{- $values = (index $values $ak) | default dict -}}
-      {{- $global = (index $global $ak) | default dict -}}
       {{- if $values.name -}}
         {{- $name = $values.name -}}
-      {{- else if $global.name -}}
-        {{- $name = $global.name -}}
       {{- end -}}
     {{- end -}}
     {{- $name -}}

@@ -24,14 +24,14 @@ spec: {{ toYaml (omit $spec "unauthorizedAccessConfig") | nindent 2 }}
     {{- $_ := set $ctx "style" "managed" }}
     {{- $urls := default list }}
     {{- if $zone.read.allow }}
-      {{- $_ := set $ctx "prefix" "read-balancer" }}
+      {{- $_ := set $ctx "alias" "vmauth-read-balancer" }}
       {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "read" "perZone" "vmauth") }}
       {{- $urls = append $urls (include "vm.url" $ctx) }}
     {{- end }}
-    {{- $_ := set $ctx "prefix" "read-proxy" }}
+    {{- $_ := set $ctx "alias" "vmauth-read-proxy" }}
     {{- range $j, $cross := $.Values.availabilityZones }}
       {{- if and (ne $j $i) $cross.read.allow }}
-        {{- $_ := set $ctx "appKey" (list "availabilityZones" $j "read" "perZone" "vmauth") }}
+        {{- $_ := set $ctx "appKey" (list "availabilityZones" $j "read" "crossZone" "vmauth") }}
         {{- $urls = append $urls (include "vm.url" $ctx)}}
       {{- end }}
     {{- end }}
@@ -40,6 +40,6 @@ spec: {{ toYaml (omit $spec "unauthorizedAccessConfig") | nindent 2 }}
     {{- end }}
     url_prefix: {{ toYaml $urls | nindent 4 }}
     {{- $_ := unset $ctx "style" }}
-    {{- $_ := unset $ctx "prefix" }}
+    {{- $_ := unset $ctx "alias" }}
 {{- end }}
 {{- end }}
