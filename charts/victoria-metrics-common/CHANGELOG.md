@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix: context cleanup
 
 ## 0.0.22
 

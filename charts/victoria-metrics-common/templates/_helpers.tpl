@@ -95,6 +95,7 @@ If release name contains chart name it will be used as a full name.
     {{- $_ := set $ "prefix" $prefix -}}
   {{- end -}}
   {{- include "vm.fullname" . -}}
+  {{- $_ := unset . "prefix" }}
 {{- end -}}
 
 {{- define "vm.plain.fullname" -}}
@@ -106,6 +107,7 @@ If release name contains chart name it will be used as a full name.
     {{- $_ := set . "suffix" $suffix -}}
   {{- end -}}
   {{- include "vm.fullname" . -}}
+  {{- $_ := unset . "suffix" }}
 {{- end -}}
 
 {{- /* Create chart name and version as used by the chart label. */ -}}
