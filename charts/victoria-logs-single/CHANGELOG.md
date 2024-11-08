@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 0.8.0
+
+**Release date:** 2024-11-08
+
+![AppVersion: v0.41.0](https://img.shields.io/static/v1?label=AppVersion&message=v0.41.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 **Update note 1**: In a response to multiple collector related configuration feature requests and inability to use fluent-bit YAML configuration parser to provide
 ability easily override parts of default configuration we've considered using Vector as a default logs collector instead of fluent-bit.
 Please consider using [vector chart docs](https://github.com/vectordotdev/helm-charts/tree/develop/charts/vector) values under `vector` key
