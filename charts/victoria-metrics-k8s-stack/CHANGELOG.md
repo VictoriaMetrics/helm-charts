@@ -2,8 +2,8 @@
 
 - updated dashboards
 - set default DNS domain to `cluster.local.`
-- updated common dependency 0.0.19 -> 0.0.20
 - fixed disabling recording rules in `.Values.defaultRules`
+- updated common dependency 0.0.19 -> 0.0.21
 - fixed cluster variable in etcd dashboard
 
 ## 0.28.2

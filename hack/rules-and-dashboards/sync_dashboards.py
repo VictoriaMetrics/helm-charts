@@ -259,7 +259,6 @@ def patch_dashboard(dashboard, name):
                     "[[ ternary 0 2 $Values.grafana.sidecar.dashboards.multicluster ]]"
                 )
                 query = json.dumps(variable["query"])
-                print(query)
                 if re.match('"label_values\\(.*\\)"', query):
                     query = re.sub('\\w+\\)"$', 'cluster)"', query)
                 variable["query"] = (
