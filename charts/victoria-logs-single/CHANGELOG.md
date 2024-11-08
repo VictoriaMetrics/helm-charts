@@ -9,6 +9,7 @@ to update your agent configuration if you are using it.
 - Upgraded VictoriaLogs 0.40.0 -> 0.41.0
 - Replaced default fluent-bit collector with vector
 - Parsed json fields are now nested into `log` key. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1708)
+- updated common dependency 0.0.19 -> 0.0.21
 
 ## 0.7.3
 
