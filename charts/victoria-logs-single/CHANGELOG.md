@@ -1,6 +1,7 @@
 ## Next release
 
-- updated common dependency 0.0.21 -> 0.0.22
+- updated common dependency 0.0.21 -> 0.0.23
+- added `log.message` to a list of default vector message fields
 
 ## 0.8.0
 
