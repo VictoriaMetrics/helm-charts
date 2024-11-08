@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.22
+
+**Release date:** 2024-11-08
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Removed unused cases from `vm.fullname`
 
 ## 0.0.21
