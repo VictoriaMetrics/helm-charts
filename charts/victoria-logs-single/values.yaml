@@ -11,7 +11,7 @@ global:
   compatibility:
     openshift:
       adaptSecurityContext: "auto"
-  # -- Global name override
+  # -- Override chart name
   nameOverride: ""
   cluster:
     # -- K8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
@@ -307,15 +307,16 @@ vector:
   role: Agent
   dataDir: /vector-data-dir
   resources: {}
+  podMonitor:
+    enabled: false
+  containerPorts:
+    - name: prom-exporter
+      containerPort: 9090
+      protocol: TCP
   service:
     enabled: false
   existingConfigMaps:
     - vl-config
-  env:
-    - name: VECTOR_SELF_NODE_NAME
-      valueFrom:
-        fieldRef:
-          fieldPath: spec.nodeName
   customConfig:
     data_dir: /vector-data-dir
     api:
@@ -325,6 +326,8 @@ vector:
     sources:
       k8s:
         type: kubernetes_logs
+      internal_metrics:
+        type: internal_metrics
     transforms:
       parser:
         type: remap
@@ -333,6 +336,10 @@ vector:
           .log = parse_json(.message) ?? .message
           del(.message)
     sinks:
+      exporter:
+        type: prometheus_exporter
+        address: 0.0.0.0:9090
+        inputs: [internal_metrics]
       vlogs:
         type: elasticsearch
         inputs: [parser]

@@ -1,4 +1,6 @@
 {{- $Values := (.helm).Values | default .Values }}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
@@ -35,7 +37,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(kubelet_node_name{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics"})
+    expr: sum(kubelet_node_name{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics"})
     instant: true
   title: Running Kubelets
   type: stat
@@ -59,7 +61,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(kubelet_running_pods{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"})
+    expr: sum(kubelet_running_pods{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"})
     instant: true
   title: Running Pods
   type: stat
@@ -83,7 +85,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(kubelet_running_containers{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"})
+    expr: sum(kubelet_running_containers{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"})
     instant: true
   title: Running Containers
   type: stat
@@ -107,7 +109,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(volume_manager_total_volumes{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance", state="actual_state_of_world"})
+    expr: sum(volume_manager_total_volumes{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance", state="actual_state_of_world"})
     instant: true
   title: Actual Volume Count
   type: stat
@@ -131,7 +133,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(volume_manager_total_volumes{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance",state="desired_state_of_world"})
+    expr: sum(volume_manager_total_volumes{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance",state="desired_state_of_world"})
     instant: true
   title: Desired Volume Count
   type: stat
@@ -155,7 +157,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(kubelet_node_config_error{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval]))
+    expr: sum(rate(kubelet_node_config_error{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval]))
     instant: true
   title: Config Error Count
   type: stat
@@ -191,7 +193,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(kubelet_runtime_operations_total{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (operation_type, instance)
+    expr: sum(rate(kubelet_runtime_operations_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (operation_type, instance)
     legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_type{{`}}`}}'
   title: Operation Rate
   type: timeseries
@@ -227,7 +229,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(kubelet_runtime_operations_errors_total{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_type)
+    expr: sum(rate(kubelet_runtime_operations_errors_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_type)
     legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_type{{`}}`}}'
   title: Operation Error Rate
   type: timeseries
@@ -263,7 +265,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_runtime_operations_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_type, le))
+    expr: histogram_quantile(0.99, sum(rate(kubelet_runtime_operations_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_type, le))
     legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_type{{`}}`}}'
   title: Operation Duration 99th quantile
   type: timeseries
@@ -299,12 +301,12 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(kubelet_pod_start_duration_seconds_count{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance)
+    expr: sum(rate(kubelet_pod_start_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance)
     legendFormat: '{{`{{`}}instance{{`}}`}} pod'
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(kubelet_pod_worker_duration_seconds_count{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance)
+    expr: sum(rate(kubelet_pod_worker_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance)
     legendFormat: '{{`{{`}}instance{{`}}`}} worker'
   title: Pod Start Rate
   type: timeseries
@@ -340,12 +342,12 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_pod_start_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
+    expr: histogram_quantile(0.99, sum(rate(kubelet_pod_start_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
     legendFormat: '{{`{{`}}instance{{`}}`}} pod'
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
+    expr: histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
     legendFormat: '{{`{{`}}instance{{`}}`}} worker'
   title: Pod Start Duration
   type: timeseries
@@ -381,7 +383,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(storage_operation_duration_seconds_count{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_name, volume_plugin)
+    expr: sum(rate(storage_operation_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_name, volume_plugin)
     legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_name{{`}}`}} {{`{{`}}volume_plugin{{`}}`}}'
   title: Storage Operation Rate
   type: timeseries
@@ -417,7 +419,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(storage_operation_errors_total{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_name, volume_plugin)
+    expr: sum(rate(storage_operation_errors_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_name, volume_plugin)
     legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_name{{`}}`}} {{`{{`}}volume_plugin{{`}}`}}'
   title: Storage Operation Error Rate
   type: timeseries
@@ -453,7 +455,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(storage_operation_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, operation_name, volume_plugin, le))
+    expr: histogram_quantile(0.99, sum(rate(storage_operation_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, operation_name, volume_plugin, le))
     legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_name{{`}}`}} {{`{{`}}volume_plugin{{`}}`}}'
   title: Storage Operation Duration 99th quantile
   type: timeseries
@@ -489,7 +491,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(kubelet_cgroup_manager_duration_seconds_count{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, operation_type)
+    expr: sum(rate(kubelet_cgroup_manager_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, operation_type)
     legendFormat: '{{`{{`}}operation_type{{`}}`}}'
   title: Cgroup manager operation rate
   type: timeseries
@@ -525,7 +527,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_cgroup_manager_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, operation_type, le))
+    expr: histogram_quantile(0.99, sum(rate(kubelet_cgroup_manager_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, operation_type, le))
     legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_type{{`}}`}}'
   title: Cgroup manager 99th quantile
   type: timeseries
@@ -561,7 +563,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(kubelet_pleg_relist_duration_seconds_count{ {{ $Values.global.clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance)
+    expr: sum(rate(kubelet_pleg_relist_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance)
     legendFormat: '{{`{{`}}instance{{`}}`}}'
   title: PLEG relist rate
   type: timeseries
@@ -597,7 +599,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_interval_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
+    expr: histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_interval_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
     legendFormat: '{{`{{`}}instance{{`}}`}}'
   title: PLEG relist interval
   type: timeseries
@@ -633,7 +635,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
+    expr: histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
     legendFormat: '{{`{{`}}instance{{`}}`}}'
   title: PLEG relist duration
   type: timeseries
@@ -669,22 +671,22 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"2.."}[$__rate_interval]))
+    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"2.."}[$__rate_interval]))
     legendFormat: 2xx
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"3.."}[$__rate_interval]))
+    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"3.."}[$__rate_interval]))
     legendFormat: 3xx
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"4.."}[$__rate_interval]))
+    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"4.."}[$__rate_interval]))
     legendFormat: 4xx
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"5.."}[$__rate_interval]))
+    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"5.."}[$__rate_interval]))
     legendFormat: 5xx
   title: RPC rate
   type: timeseries
@@ -720,7 +722,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, verb, url, le))
+    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, verb, url, le))
     legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}verb{{`}}`}} {{`{{`}}url{{`}}`}}'
   title: Request duration 99th quantile
   type: timeseries
@@ -756,7 +758,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: process_resident_memory_bytes{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}
+    expr: process_resident_memory_bytes{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}
     legendFormat: '{{`{{`}}instance{{`}}`}}'
   title: Memory
   type: timeseries
@@ -792,7 +794,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: rate(process_cpu_seconds_total{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])
+    expr: rate(process_cpu_seconds_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])
     legendFormat: '{{`{{`}}instance{{`}}`}}'
   title: CPU usage
   type: timeseries
@@ -828,7 +830,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: go_goroutines{ {{ $Values.global.clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}
+    expr: go_goroutines{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}
     legendFormat: '{{`{{`}}instance{{`}}`}}'
   title: Goroutines
   type: timeseries
@@ -852,13 +854,13 @@ templating:
   - datasource:
       type: prometheus
       uid: ${datasource}
-    hide: {{ ternary 0 2 $Values.grafana.sidecar.dashboards.multicluster }}
+    hide: {{ ternary 0 2 $multicluster }}
     label: cluster
     name: cluster
-    query: {{ ternary (b64dec "ImxhYmVsX3ZhbHVlcyh1cHtqb2I9XCJrdWJlbGV0XCIsIG1ldHJpY3NfcGF0aD1cIi9tZXRyaWNzXCJ9LCBjbHVzdGVyKSI=" | replace "cluster" $Values.global.clusterLabel) ".*" $Values.grafana.sidecar.dashboards.multicluster }}
+    query: {{ ternary (b64dec "ImxhYmVsX3ZhbHVlcyh1cHtqb2I9XCJrdWJlbGV0XCIsIG1ldHJpY3NfcGF0aD1cIi9tZXRyaWNzXCJ9LCBjbHVzdGVyKSI=" | replace "cluster" $clusterLabel) ".*" $multicluster }}
     refresh: 2
     sort: 1
-    type: {{ ternary "query" "constant" $Values.grafana.sidecar.dashboards.multicluster }}
+    type: {{ ternary "query" "constant" $multicluster }}
   - datasource:
       type: prometheus
       uid: ${datasource}
@@ -866,7 +868,7 @@ templating:
     includeAll: true
     label: instance
     name: instance
-    query: label_values(up{job="kubelet", metrics_path="/metrics", {{ $Values.global.clusterLabel }}=~"$cluster"}, instance)
+    query: label_values(up{job="kubelet", metrics_path="/metrics", {{ $clusterLabel }}=~"$cluster"}, instance)
     refresh: 2
     type: query
 time:

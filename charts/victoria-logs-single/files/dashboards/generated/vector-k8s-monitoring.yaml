@@ -1,0 +1,1220 @@
+{{- $Values := (.helm).Values | default .Values }}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
+{{- $defaultDatasource := "prometheus" -}}
+{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+  {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
+{{- end }}
+__elements: {}
+__inputs:
+- description: ''
+  label: VictoriaMetrics
+  name: DS_VICTORIAMETRICS
+  pluginId: prometheus
+  pluginName: Prometheus
+  type: datasource
+__requires:
+- id: bargauge
+  name: Bar gauge
+  type: panel
+  version: ''
+- id: grafana
+  name: Grafana
+  type: grafana
+  version: 11.3.0
+- id: prometheus
+  name: Prometheus
+  type: datasource
+  version: 1.0.0
+- id: timeseries
+  name: Time series
+  type: panel
+  version: ''
+annotations:
+  list:
+  - $$hashKey: object:1058
+    builtIn: 1
+    datasource:
+      type: datasource
+      uid: grafana
+    enable: true
+    hide: true
+    iconColor: rgba(0, 211, 255, 1)
+    name: Annotations & Alerts
+    target:
+      limit: 100
+      matchAny: false
+      tags: []
+      type: dashboard
+    type: dashboard
+condition: {{ true }}
+description: Vector.dev Kubernetes cluster monitoring dashboard
+editable: false
+fiscalYearStartMonth: 0
+graphTooltip: 1
+id: null
+links: []
+panels:
+- collapsed: true
+  gridPos:
+    h: 1
+    w: 24
+    x: 0
+    'y': 0
+  id: 364
+  panels:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    fieldConfig:
+      defaults:
+        color:
+          mode: thresholds
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: cps
+      overrides: []
+    gridPos:
+      h: 12
+      w: 6
+      x: 0
+      'y': 1
+    id: 360
+    options:
+      displayMode: lcd
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: false
+      maxVizHeight: 300
+      minVizHeight: 16
+      minVizWidth: 8
+      namePlacement: top
+      orientation: horizontal
+      reduceOptions:
+        calcs: []
+        fields: ''
+        values: false
+      showUnfilled: true
+      sizing: auto
+      text: {}
+      valueMode: color
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: topk(10, sum by (component_id, cluster, pod_namespace) (rate(vector_component_received_events_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
+      instant: true
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_namespace {{`}}`}}'
+      range: false
+      refId: A
+    title: Log events by top 10 namespaces (events/sec)
+    type: bargauge
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    fieldConfig:
+      defaults:
+        color:
+          mode: thresholds
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: Bps
+      overrides: []
+    gridPos:
+      h: 12
+      w: 6
+      x: 6
+      'y': 1
+    id: 365
+    options:
+      displayMode: lcd
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: false
+      maxVizHeight: 300
+      minVizHeight: 16
+      minVizWidth: 8
+      namePlacement: top
+      orientation: horizontal
+      reduceOptions:
+        calcs: []
+        fields: ''
+        values: false
+      showUnfilled: true
+      sizing: auto
+      valueMode: color
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: topk(10, sum by (component_id, pod_namespace) (rate(vector_component_received_event_bytes_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
+      instant: true
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_namespace {{`}}`}}'
+      range: false
+      refId: A
+    title: Log bytes by top 10 namespaces (bytes/sec)
+    type: bargauge
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    fieldConfig:
+      defaults:
+        color:
+          mode: thresholds
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: cps
+      overrides: []
+    gridPos:
+      h: 12
+      w: 6
+      x: 12
+      'y': 1
+    id: 367
+    options:
+      displayMode: lcd
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: false
+      maxVizHeight: 300
+      minVizHeight: 16
+      minVizWidth: 8
+      namePlacement: top
+      orientation: horizontal
+      reduceOptions:
+        calcs: []
+        fields: ''
+        values: false
+      showUnfilled: true
+      sizing: auto
+      text: {}
+      valueMode: color
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: topk(10, sum by (component_id, pod_name) (rate(vector_component_received_events_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
+      instant: true
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_name {{`}}`}}'
+      range: false
+      refId: A
+    title: Log events by top 10 pods (events/sec)
+    type: bargauge
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    fieldConfig:
+      defaults:
+        color:
+          mode: thresholds
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: Bps
+      overrides: []
+    gridPos:
+      h: 12
+      w: 6
+      x: 18
+      'y': 1
+    id: 366
+    options:
+      displayMode: lcd
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: false
+      maxVizHeight: 300
+      minVizHeight: 16
+      minVizWidth: 8
+      namePlacement: top
+      orientation: horizontal
+      reduceOptions:
+        calcs: []
+        fields: ''
+        values: false
+      showUnfilled: true
+      sizing: auto
+      valueMode: color
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: topk(10, sum by (pod_name, component_id) (rate(vector_component_received_event_bytes_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
+      instant: true
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_name {{`}}`}}'
+      range: false
+      refId: A
+    title: Log bytes by top 10 pods (bytes/sec)
+    type: bargauge
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: s
+      overrides: []
+    gridPos:
+      h: 7
+      w: 12
+      x: 0
+      'y': 13
+    id: 328
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: single
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: histogram_quantile(0.95, sum(rate(vector_source_lag_time_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[5m])) by (le,component_type, instance))
+      format: time_series
+      instant: false
+      interval: ''
+      legendFormat: '{{`{{`}}component_type{{`}}`}}: {{`{{`}}instance{{`}}`}}'
+      range: true
+      refId: A
+    title: Events lag seconds
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: none
+      overrides: []
+    gridPos:
+      h: 7
+      w: 6
+      x: 12
+      'y': 13
+    id: 368
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: single
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: avg by (component_id, instance) (vector_open_files{component_kind="source", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"})
+      format: time_series
+      instant: false
+      interval: ''
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}instance{{`}}`}}'
+      range: true
+      refId: A
+    title: Open files
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: none
+      overrides: []
+    gridPos:
+      h: 7
+      w: 6
+      x: 18
+      'y': 13
+    id: 369
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: single
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: avg by (component_id, error_type) (vector_component_errors_total{component_kind="source", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
+      format: time_series
+      instant: false
+      interval: ''
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
+      range: true
+      refId: A
+    title: Errors
+    type: timeseries
+  title: Source
+  type: row
+- collapsed: true
+  gridPos:
+    h: 1
+    w: 24
+    x: 0
+    'y': 1
+  id: 363
+  panels:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    description: The rate of bytes processed by the component.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: Bps
+      overrides: []
+    gridPos:
+      h: 8
+      w: 6
+      x: 0
+      'y': 21
+    id: 330
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: multi
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      expr: sum by (component_id, instance) (rate(vector_component_received_event_bytes_total{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m]))
+      format: time_series
+      group: []
+      hide: false
+      interval: ''
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
+      metricColumn: none
+      range: true
+      rawQuery: false
+      refId: A
+    title: Events bytes rate (bytes/sec)
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    description: A ratio from 0 to 1 of the load on a component. A value of 0 would indicate a completely idle component that is simply waiting for input. A value of 1 would indicate a that is never idle. This value is updated every 5 seconds.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: percentunit
+      overrides: []
+    gridPos:
+      h: 8
+      w: 6
+      x: 6
+      'y': 21
+    id: 332
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: multi
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      expr: avg by (component_id, instance) (vector_utilization{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"})
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}} instance {{`}}`}}'
+      range: true
+      refId: A
+    title: Utilization
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: none
+      overrides: []
+    gridPos:
+      h: 8
+      w: 6
+      x: 12
+      'y': 21
+    id: 370
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: single
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: avg by (component_id, error_type) (vector_component_errors_total{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
+      format: time_series
+      instant: false
+      interval: ''
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
+      range: true
+      refId: A
+    title: Errors
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: none
+      overrides: []
+    gridPos:
+      h: 8
+      w: 6
+      x: 18
+      'y': 21
+    id: 371
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: single
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: avg by (component_id, reason) (vector_events_discarded_total{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
+      format: time_series
+      instant: false
+      interval: ''
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}reason{{`}}`}}'
+      range: true
+      refId: A
+    title: Discarded events
+    type: timeseries
+  title: Transform
+  type: row
+- collapsed: true
+  gridPos:
+    h: 1
+    w: 24
+    x: 0
+    'y': 2
+  id: 324
+  panels:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    description: The count of bytes processed by the component.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: cps
+      overrides: []
+    gridPos:
+      h: 8
+      w: 6
+      x: 0
+      'y': 22
+    id: 362
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: multi
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      expr: sum by (component_id, instance) (rate(vector_component_received_events_total{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m]))
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
+      range: true
+      refId: A
+    title: Events rate (events/sec)
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    description: The rate of bytes processed by the component.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: Bps
+      overrides:
+      - matcher:
+          id: byName
+          options: akamai_out_prometheus
+        properties:
+        - id: displayName
+          value: akamai
+      - matcher:
+          id: byName
+          options: cloudfront_out_prometheus
+        properties:
+        - id: displayName
+          value: cloudfront
+      - matcher:
+          id: byName
+          options: out_prometheus_metrics
+        properties:
+        - id: displayName
+          value: vector_metrics
+    gridPos:
+      h: 8
+      w: 6
+      x: 6
+      'y': 22
+    id: 336
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: multi
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: sum by (component_id, instance) (rate(vector_component_received_event_bytes_total{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m]))
+      format: time_series
+      group: []
+      hide: false
+      instant: false
+      interval: ''
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
+      metricColumn: none
+      range: true
+      rawQuery: false
+      refId: A
+    title: Events bytes rate (bytes/sec)
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    description: A ratio from 0 to 1 of the load on a component. A value of 0 would indicate a completely idle component that is simply waiting for input. A value of 1 would indicate a that is never idle. This value is updated every 5 seconds.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: percentunit
+      overrides: []
+    gridPos:
+      h: 8
+      w: 6
+      x: 12
+      'y': 22
+    id: 338
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: multi
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      expr: avg by (component_id, instance) (vector_utilization{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"})
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}} instance{{`}}`}}'
+      range: true
+      refId: A
+    title: Utilization
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: none
+      overrides: []
+    gridPos:
+      h: 8
+      w: 6
+      x: 18
+      'y': 22
+    id: 372
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        mode: single
+        sort: none
+    pluginVersion: 11.3.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      editorMode: code
+      exemplar: false
+      expr: avg by (component_id, error_type) (vector_component_errors_total{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
+      format: time_series
+      instant: false
+      interval: ''
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
+      range: true
+      refId: A
+    title: Errors
+    type: timeseries
+  title: Sink
+  type: row
+refresh: 10s
+schemaVersion: 40
+tags:
+- vm-k8s-stack
+templating:
+  list:
+  - current: {}
+    includeAll: false
+    name: datasource
+    options: []
+    query: {{ $defaultDatasource }}
+    refresh: 1
+    regex: ''
+    type: datasource
+  - current: {}
+    definition: label_values(vector_build_info,{{ $clusterLabel }})
+    hide: {{ ternary 0 2 $multicluster }}
+    label: cluster
+    name: cluster
+    options: []
+    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyh2ZWN0b3JfYnVpbGRfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $clusterLabel) ".*" $multicluster }}
+    refresh: 1
+    regex: ''
+    type: {{ ternary "query" "constant" $multicluster }}
+  - current: {}
+    datasource:
+      type: prometheus
+      uid: $datasource
+    definition: label_values(vector_build_info,instance)
+    includeAll: true
+    label: instance
+    multi: true
+    name: instance
+    options: []
+    query:
+      qryType: 1
+      query: label_values(vector_build_info,instance)
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    refresh: 1
+    regex: ''
+    sort: 1
+    type: query
+  - current: {}
+    datasource:
+      type: prometheus
+      uid: $datasource
+    definition: label_values(vector_component_received_events_total{component_type="kubernetes_logs"},pod_namespace)
+    includeAll: true
+    multi: true
+    name: namespace
+    options: []
+    query:
+      qryType: 1
+      query: label_values(vector_component_received_events_total{component_type="kubernetes_logs"},pod_namespace)
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    refresh: 1
+    regex: ''
+    sort: 1
+    type: query
+time:
+  from: now-1h
+  to: now
+timepicker: {}
+timezone: {{ default "browser" ($Values.defaultDashboards).defaultTimezone }}
+title: Vector K8S Monitoring
+uid: ce3e6irowgf0gf
+version: 7
+weekStart: ''

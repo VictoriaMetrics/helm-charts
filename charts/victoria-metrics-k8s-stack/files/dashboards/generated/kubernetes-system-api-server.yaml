@@ -1,4 +1,6 @@
 {{- $Values := (.helm).Values | default .Values }}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
@@ -95,7 +97,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
-    expr: up{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}
+    expr: up{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}
     interval: ''
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -150,7 +152,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
-    expr: apiserver_requested_deprecated_apis{ {{ $Values.global.clusterLabel }}=~"$cluster"}
+    expr: apiserver_requested_deprecated_apis{ {{ $clusterLabel }}=~"$cluster"}
     interval: ''
     legendFormat: ''
     refId: A
@@ -272,7 +274,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
-    expr: sum by (code) (rate(apiserver_request_total{ {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum by (code) (rate(apiserver_request_total{ {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: '{{`{{`}} code {{`}}`}}'
     refId: A
@@ -341,7 +343,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
-    expr: sum by (verb) (rate(apiserver_request_total{ {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum by (verb) (rate(apiserver_request_total{ {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: '{{`{{`}} verb{{`}}`}}'
     refId: A
@@ -411,9 +413,9 @@ panels:
       uid: ${datasource}
     exemplar: true
     expr: |-
-      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
       /
-      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -483,9 +485,9 @@ panels:
       uid: ${datasource}
     exemplar: true
     expr: |-
-      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
+      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
       /
-      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
+      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
     interval: $resolution
     legendFormat: '{{`{{`}} verb {{`}}`}}'
     refId: A
@@ -555,8 +557,8 @@ panels:
       uid: ${datasource}
     exemplar: true
     expr: |-
-      sum by(instance) (rate(apiserver_request_total{code=~"5..", job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
-       / sum by(instance) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+      sum by(instance) (rate(apiserver_request_total{code=~"5..", job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
+       / sum by(instance) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -626,8 +628,8 @@ panels:
       uid: ${datasource}
     exemplar: true
     expr: |-
-      sum by(verb) (rate(apiserver_request_total{code=~"5..",job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
-       / sum by(verb) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval]))
+      sum by(verb) (rate(apiserver_request_total{code=~"5..",job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
+       / sum by(verb) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: '{{`{{`}} verb {{`}}`}}'
     refId: A
@@ -696,7 +698,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(apiserver_request_total{ {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    expr: sum(rate(apiserver_request_total{ {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -765,7 +767,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(workqueue_depth{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    expr: sum(rate(workqueue_depth{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -835,7 +837,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
-    expr: rate(process_cpu_seconds_total{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}[$__rate_interval])
+    expr: rate(process_cpu_seconds_total{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -904,7 +906,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
-    expr: process_resident_memory_bytes{job=~"kubernetes-apiservers|apiserver", {{ $Values.global.clusterLabel }}=~"$cluster"}
+    expr: process_resident_memory_bytes{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -943,18 +945,18 @@ templating:
     datasource:
       type: prometheus
       uid: ${datasource}
-    definition: label_values(kube_node_info,{{ $Values.global.clusterLabel }})
-    hide: {{ ternary 0 2 $Values.grafana.sidecar.dashboards.multicluster }}
+    definition: label_values(kube_node_info,{{ $clusterLabel }})
+    hide: {{ ternary 0 2 $multicluster }}
     includeAll: false
     multi: false
     name: cluster
     options: []
-    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyhrdWJlX25vZGVfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $Values.global.clusterLabel) ".*" $Values.grafana.sidecar.dashboards.multicluster }}
+    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyhrdWJlX25vZGVfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $clusterLabel) ".*" $multicluster }}
     refresh: 1
     regex: ''
     skipUrlSync: false
     sort: 1
-    type: {{ ternary "query" "constant" $Values.grafana.sidecar.dashboards.multicluster }}
+    type: {{ ternary "query" "constant" $multicluster }}
   - current:
       selected: true
       text: 30s
