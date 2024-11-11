@@ -1,4 +1,6 @@
 {{- $Values := (.helm).Values | default .Values }}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
@@ -14,6 +16,7 @@ graphTooltip: 1
 hideControls: false
 id: null
 links: []
+panels: []
 refresh: 30s
 rows:
 - collapse: false

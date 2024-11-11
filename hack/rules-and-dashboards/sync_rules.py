@@ -152,7 +152,7 @@ skip_list = []
 
 
 def cluster_label_var(mo):
-    labels = ["[[ $Values.global.clusterLabel ]]"]
+    labels = ["[[ $clusterLabel ]]"]
     labelsStr = mo.group(2).strip()
     group = mo.group(1)
     if len(labelsStr) > 0:
@@ -167,7 +167,7 @@ def cluster_label_var(mo):
 
 replacement_map = {
     "https://runbooks.prometheus-operator.dev/runbooks": {
-        "replacement": "[[ $Values.defaultRules.runbookUrl ]]",
+        "replacement": "[[ $runbookUrl ]]",
     },
     'job="kube-state-metrics"': {
         "replacement": 'job="kube-state-metrics", namespace=~"[[ .targetNamespace ]]"',
@@ -178,7 +178,7 @@ replacement_map = {
         "limitGroup": ["kubernetes-storage"],
     },
     "http://localhost:3000": {
-        "replacement": "[[ index (($Values.grafana).ingress).hosts 0 ]]",
+        "replacement": "[[ $host ]]",
         "init": "",
     },
     'job="alertmanager-main"': {
@@ -271,9 +271,12 @@ def write_group_to_file(group, url, charts):
 
         # recreate the file
         with open(new_filename, "w") as f:
-            content = "{{- $Values := (.helm).Values | default .Values }}\n" + escape(
-                lines
-            )
+            content = ""
+            content += "{{- $Values := (.helm).Values | default .Values }}\n"
+            content += '{{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}\n'
+            content += '{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}\n'
+            content += "{{- $host := index (($Values.grafana).ingress).hosts 0 }}\n"
+            content += escape(lines)
             f.write(content)
 
         print(f"Generated {new_filename}")

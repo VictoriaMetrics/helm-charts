@@ -88,6 +88,12 @@ sources = [
         ],
     },
     {
+        "url": "./dashboards/vector.json",
+        "charts": [
+            "victoria-logs-single",
+        ],
+    },
+    {
         "url": "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json",
         "charts": [
             "victoria-metrics-k8s-stack",
@@ -209,7 +215,7 @@ def init_yaml_styles():
 def fix_query(query):
     query = re.sub(
         '[\\s]*[\\w-]+[\\s]*=[~]*[\\s]*\\"\\$cluster\\"',
-        ' [[ $Values.global.clusterLabel ]]=~"$cluster"',
+        ' [[ $clusterLabel ]]=~"$cluster"',
         query.rstrip(),
     )
     if "\n" in query:
@@ -225,49 +231,80 @@ def fix_expr(target):
         target["expr"] = fix_query(target["expr"])
 
 
-def replace_ds_type_in_panel(panel):
-    if "datasource" in panel:
+def replace_ds_type_in_panel(panel, dsName):
+    if "datasource" in panel and panel["datasource"]:
         if "type" in panel["datasource"]:
             panel["datasource"]["type"] = "[[ $defaultDatasource ]]"
+        if "uid" in panel["datasource"]:
+            if (
+                panel["datasource"]["uid"] == f"${{{dsName}}}"
+                or panel["datasource"]["uid"] == dsName
+            ):
+                panel["datasource"]["uid"] = "$datasource"
     for target in panel.get("targets", []):
         if "expr" in target:
             fix_expr(target)
         if "datasource" in target:
             if "type" in target["datasource"]:
                 target["datasource"]["type"] = "[[ $defaultDatasource ]]"
+            if "uid" in panel["datasource"]:
+                if (
+                    target["datasource"]["uid"] == f"${{{dsName}}}"
+                    or target["datasource"]["uid"] == dsName
+                ):
+                    target["datasource"]["uid"] = "$datasource"
     if "panels" in panel:
         for p in panel["panels"]:
-            replace_ds_type_in_panel(p)
+            replace_ds_type_in_panel(p, dsName)
 
 
-def patch_dashboard(dashboard, name):
-    for panel in dashboard.get("panels", []):
-        replace_ds_type_in_panel(panel)
+def patch_dashboard(dashboard, name, omitRows):
+    skipPanels = False
+    panels = dashboard.get("panels", [])
+    dsName = ""
+    for input in dashboard.get("__inputs", []):
+        if input["type"] == "datasource":
+            dsName = input["name"]
+            break
+    dashboard["panels"] = []
+    for panel in panels:
+        if panel["type"] == "row":
+            if panel["title"] in omitRows:
+                skipPanels = True
+            else:
+                skipPanels = False
+        if skipPanels:
+            continue
+        replace_ds_type_in_panel(panel, dsName)
+        dashboard["panels"].append(panel)
 
     ## multicluster
+    hasDatasource = False
     if "templating" in dashboard:
         for variable in dashboard["templating"].get("list", []):
             if variable.get("name", "") == "cluster":
                 if "definition" in variable and "cluster" in variable["definition"]:
                     variable["definition"] = variable["definition"].replace(
-                        "cluster", "[[ $Values.global.clusterLabel ]]"
+                        "cluster", "[[ $clusterLabel ]]"
                     )
-                variable["type"] = (
-                    '[[ ternary "query" "constant" $Values.grafana.sidecar.dashboards.multicluster ]]'
-                )
-                variable["hide"] = (
-                    "[[ ternary 0 2 $Values.grafana.sidecar.dashboards.multicluster ]]"
-                )
+                if "datasource" in variable and "uid" in variable["datasource"]:
+                    if variable["datasource"]["uid"] == f"${{{dsName}}}":
+                        variable["datasource"]["uid"] = "$datasource"
+                variable["type"] = '[[ ternary "query" "constant" $multicluster ]]'
+                variable["hide"] = "[[ ternary 0 2 $multicluster ]]"
                 query = json.dumps(variable["query"])
                 if re.match('"label_values\\(.*\\)"', query):
                     query = re.sub('\\w+\\)"$', 'cluster)"', query)
                 variable["query"] = (
-                    f'[[ ternary (b64dec "%(query)s" | replace "cluster" $Values.global.clusterLabel) ".*" $Values.grafana.sidecar.dashboards.multicluster ]]'
+                    f'[[ ternary (b64dec "%(query)s" | replace "cluster" $clusterLabel) ".*" $multicluster ]]'
                     % {"query": base64.b64encode(query.encode("ascii")).decode("utf-8")}
                 )
             else:
                 if "definition" in variable:
                     variable["definition"] = fix_query(variable["definition"])
+                if "datasource" in variable and "uid" in variable["datasource"]:
+                    if variable["datasource"]["uid"] == f"${{{dsName}}}":
+                        variable["datasource"]["uid"] = "$datasource"
                 if "query" in variable:
                     if "query" in variable["query"]:
                         variable["query"]["query"] = fix_query(
@@ -276,12 +313,33 @@ def patch_dashboard(dashboard, name):
                     elif isinstance(variable["query"], str):
                         variable["query"] = fix_query(variable["query"])
                 if variable.get("type", "") == "datasource":
+                    hasDatasource = True
                     variable["query"] = "[[ $defaultDatasource ]]"
+    if not hasDatasource:
+        if "templating" not in dashboard:
+            dashboard["templating"] = {}
+        if "list" not in dashboard["templating"]:
+            dashboard["templating"]["list"] = []
+        dashboard["templating"]["list"].append(
+            {
+                "current": {},
+                "hide": 0,
+                "includeAll": False,
+                "multi": False,
+                "name": "datasource",
+                "query": "[[ $defaultDatasource ]]",
+                "queryValue": "",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": False,
+                "type": "datasource",
+            }
+        )
 
     ## fix drilldown links. see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/659
     for row in dashboard.get("rows", []):
         for panel in row.get("panels", []):
-            replace_ds_type_in_panel(panel)
+            replace_ds_type_in_panel(panel, dsName)
             for style in panel.get("styles", []):
                 if "linkUrl" in style and style["linkUrl"].startswith("./d"):
                     style["linkUrl"] = style["linkUrl"].replace("./d", "/d")
@@ -322,6 +380,8 @@ def write_dashboard_to_file(resource_name, content, charts):
         with open(new_filename, "w") as f:
             output = ""
             output += "{{- $Values := (.helm).Values | default .Values }}\n"
+            output += '{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}\n'
+            output += "{{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}\n"
             output += '{{- $defaultDatasource := "prometheus" -}}\n'
             output += "{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}\n"
             output += "  {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}\n"
@@ -362,13 +422,18 @@ def main():
     for src in sources:
         url = src["url"]
         print(f"Generating dashboards from {url}")
-        response = requests.get(url)
-        if response.status_code != 200:
-            print(
-                f"Skipping the file, response code {response.status_code} not equals 200"
-            )
-            continue
-        raw_text = response.text
+        raw_text = ""
+        if urlparse(url).scheme in ["http", "https"]:
+            response = requests.get(url)
+            if response.status_code != 200:
+                print(
+                    f"Skipping the file, response code {response.status_code} not equals 200"
+                )
+                continue
+            raw_text = response.text
+        else:
+            with open(url) as f:
+                raw_text = f.read()
         dashboards = {}
         path = pathlib.Path(url)
         suffix = path.suffix
@@ -405,9 +470,10 @@ def main():
         else:
             print(f"Format {suffix} is not supported")
             continue
+        omitRows = src.get("omitRows", [])
         for d in dashboards:
             dashboard = dashboards[d]
-            dashboard = patch_dashboard(dashboard, d)
+            dashboard = patch_dashboard(dashboard, d, omitRows)
             write_dashboard_to_file(d, yaml_dump(dashboard), src["charts"])
 
     print("Finished")
