@@ -30,6 +30,8 @@ image:
   pullPolicy: IfNotPresent
 
 crds:
+  # -- manages CRD creation. Disables CRD creation only in combination with `crds.plain: false` due to helm dependency conditions limitation
+  enabled: true
   # -- check if plain or templated CRDs should be created.
   # with this option set to `false`, all CRDs will be rendered from templates.
   # with this option set to `true`, all CRDs are immutable and require manual upgrade.
@@ -58,10 +60,10 @@ replicaCount: 1
 # -- Secret to pull images
 imagePullSecrets: []
 
-# -- VM operatror deployment name override
+# -- Override chart name
 nameOverride: ""
 
-# -- Overrides the full name of server component
+# -- Overrides the full name of server component resources
 fullnameOverride: ""
 
 # -- VM operator log level. Possible values: info and error.
