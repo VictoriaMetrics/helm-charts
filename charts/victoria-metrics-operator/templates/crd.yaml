@@ -2,7 +2,10 @@
 {{- /* this is used to add "helm.sh/resource-policy: keep" annotation for each crd */ -}}
 {{- /* see this pull request https://github.com/VictoriaMetrics/helm-charts/pull/771 for details */ -}}
 {{- $ctx := dict "helm" . }}
-{{- if not .Values.crds.plain }}
+{{- if and .Values.crds.plain (not .Values.crds.enabled) }}
+  {{- fail "When CRDs are disabled (`crds.enabled: false`) you need to disable plain CRD rendering (`crds.plain: false`)" -}}
+{{- end -}}
+{{- if and (not .Values.crds.plain) .Values.crds.enabled }}
   {{- $files := .Files }}
   {{- $crds := $files.Get "crd.yaml" | splitList "---" }}
   {{- $labels := (include "vm.labels" $ctx) | fromYaml -}}
