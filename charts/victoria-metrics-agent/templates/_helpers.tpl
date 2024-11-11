@@ -42,3 +42,9 @@
   {{- end -}}
   {{- toYaml $rwcm -}}
 {{- end -}}
+
+{{- define "vmagent.scrape.config.name" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $fullname := include "vm.plain.fullname" . -}}
+  {{- $Values.configMap | default (printf "%s-config" $fullname) -}}
+{{- end -}}

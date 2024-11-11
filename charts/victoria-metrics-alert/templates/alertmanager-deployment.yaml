@@ -116,7 +116,7 @@ spec:
           {{- end }}
         - name: config
           configMap:
-            name: {{ $fullname }}-config
+            name: {{ include "alertmanager.config.name" $ctx }}
         {{- range $app.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:

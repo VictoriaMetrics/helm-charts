@@ -174,7 +174,7 @@ spec:
         {{- end }}
         - name: scrape-config
           configMap:
-            name: {{ .Values.configMap | default (printf "%s-config" $fullname) }}
+            name: {{ include "vmagent.scrape.config.name" $ctx }}
         {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:

@@ -128,7 +128,7 @@ spec:
         {{- if .Values.rateLimiter.enabled }}
         - name: config
           configMap:
-            name: {{ $fullname }}
+            name: {{ include "vmgateway.config.name" $ctx }}
         {{- end }}
         {{- range .Values.extraHostPathMounts }}
         - name: {{ .name }}

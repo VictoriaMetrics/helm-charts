@@ -1,12 +1,11 @@
-{{- if eq .Values.configMap "" }}
+{{- if empty .Values.configMap }}
 {{- if .Values.rateLimiter.enabled }}
 {{- $ctx := dict "helm" . }}
-{{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ $fullname }}
+  name: {{ include "vmgateway.config.name" $ctx }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:

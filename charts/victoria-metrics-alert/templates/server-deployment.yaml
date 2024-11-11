@@ -115,7 +115,7 @@ spec:
       volumes:
         - name: alerts-config
           configMap:
-            name: {{ $fullname }}-alert-rules-config
+            name: {{ include "vmalert.rules.config.name" $ctx }}
         {{- range $app.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:
