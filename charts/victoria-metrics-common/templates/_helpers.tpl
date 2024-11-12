@@ -34,12 +34,12 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */ -}}
 {{- define "vm.fullname" -}}
+  {{- $overrideKey := .overrideKey | default "fullnameOverride" -}}
   {{- include "vm.validate.args" . -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $Release := (.helm).Release | default .Release -}}
   {{- $fullname := "" -}}
-  {{- $appendDefault := true -}}
   {{- if .appKey -}}
     {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
     {{- $values := $Values -}}
@@ -47,11 +47,8 @@ If release name contains chart name it will be used as a full name.
       {{- if $values -}}
         {{- $values = (index $values $ak) | default dict -}}
       {{- end -}}
-      {{- if and (kindIs "map" $values) $values.fullnameOverride -}}
-        {{- $fullname = $values.fullnameOverride -}}
-        {{- $appendDefault = false -}}
-      {{- else if and (kindIs "map" $values) $values.name -}}
-        {{- $fullname = $values.name -}}
+      {{- if and (kindIs "map" $values) (index $values $overrideKey) -}}
+        {{- $fullname = index $values $overrideKey -}}
       {{- end -}}
     {{- end }}
   {{- end -}}
@@ -69,13 +66,13 @@ If release name contains chart name it will be used as a full name.
       {{- end -}}
     {{- end -}}
   {{- end -}}
-  {{- if $appendDefault -}}
-    {{- $alias := .alias -}}
+  {{- $fullname = tpl $fullname . -}}
+  {{- if ne $overrideKey "fullnameOverride" -}}
     {{- with .prefix -}}
-      {{- $fullname = printf "%s-%s" (ternary . $alias (empty $alias)) $fullname -}}
+      {{- $fullname = printf "%s-%s" . $fullname -}}
     {{- end -}}
     {{- with .suffix -}}
-      {{- $fullname = printf "%s-%s" $fullname (ternary . $alias (empty $alias)) }}
+      {{- $fullname = printf "%s-%s" $fullname . -}}
     {{- end -}}
   {{- end -}}
   {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
@@ -85,7 +82,14 @@ If release name contains chart name it will be used as a full name.
   {{- end -}}
 {{- end }}
 
+{{- define "vm.cr.fullname" -}}
+  {{- $_ := set . "overrideKey" "name" -}}
+  {{- include "vm.fullname" . -}}
+  {{- $_ := unset . "overrideKey" -}}
+{{- end -}}
+
 {{- define "vm.managed.fullname" -}}
+  {{- $_ := set . "overrideKey" "name" -}}
   {{- $prefix := .appKey -}}
   {{- if kindIs "slice" $prefix -}}
     {{- $prefix = last $prefix -}}
@@ -95,10 +99,12 @@ If release name contains chart name it will be used as a full name.
     {{- $_ := set $ "prefix" $prefix -}}
   {{- end -}}
   {{- include "vm.fullname" . -}}
-  {{- $_ := unset . "prefix" }}
+  {{- $_ := unset . "prefix" -}}
+  {{- $_ := unset . "overrideKey" -}}
 {{- end -}}
 
 {{- define "vm.plain.fullname" -}}
+  {{- $_ := set . "overrideKey" "fullnameOverride" -}}
   {{- $suffix := .appKey -}}
   {{- if kindIs "slice" $suffix -}}
     {{- $suffix = last $suffix }}
@@ -107,7 +113,8 @@ If release name contains chart name it will be used as a full name.
     {{- $_ := set . "suffix" $suffix -}}
   {{- end -}}
   {{- include "vm.fullname" . -}}
-  {{- $_ := unset . "suffix" }}
+  {{- $_ := unset . "suffix" -}}
+  {{- $_ := unset . "overrideKey" -}}
 {{- end -}}
 
 {{- /* Create chart name and version as used by the chart label. */ -}}
@@ -184,7 +191,7 @@ If release name contains chart name it will be used as a full name.
     {{- $name := last $appKey }}
     {{- range $ak := $appKey }}
       {{- $values = (index $values $ak) | default dict -}}
-      {{- if $values.name -}}
+      {{- if and (kindIs "map" $values) $values.name -}}
         {{- $name = $values.name -}}
       {{- end -}}
     {{- end -}}

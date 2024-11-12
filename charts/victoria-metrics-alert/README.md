@@ -276,6 +276,17 @@ route:
 </td>
     </tr>
     <tr>
+      <td>alertmanager.fullnameOverride</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override Alertmanager resources fullname</p>
+</td>
+    </tr>
+    <tr>
       <td>alertmanager.image</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -894,6 +905,17 @@ name: ""
 </td>
     </tr>
     <tr>
+      <td>nameOverride</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override chart name</p>
+</td>
+    </tr>
+    <tr>
       <td>server.affinity</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
@@ -1087,7 +1109,7 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td><p>Full name prefix override</p>
+      <td><p>Override vmalert resources fullname</p>
 </td>
     </tr>
     <tr>
@@ -1234,18 +1256,7 @@ variant: ""
 </code>
 </pre>
 </td>
-      <td><p>Override fullname suffix</p>
-</td>
-    </tr>
-    <tr>
-      <td>server.nameOverride</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Full name suffix override</p>
+      <td><p>Override default <code>app</code> label name</p>
 </td>
     </tr>
     <tr>
