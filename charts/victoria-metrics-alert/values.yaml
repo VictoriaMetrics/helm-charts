@@ -26,8 +26,11 @@ serviceAccount:
   # -- Mount API token to pod directly
   automountToken: true
 
+# -- Override chart name
+nameOverride: ""
+
 server:
-  # -- Override fullname suffix
+  # -- Override default `app` label name
   name: ""
   # -- Create vmalert component
   enabled: true
@@ -40,9 +43,7 @@ server:
     # e.g. enterprise, scratch
     variant: ""
     pullPolicy: IfNotPresent
-  # -- Full name suffix override
-  nameOverride: ""
-  # -- Full name prefix override
+  # -- Override vmalert resources fullname
   fullnameOverride: ""
   # -- Image pull secrets
   imagePullSecrets: []
@@ -372,6 +373,8 @@ alertmanager:
   enabled: false
   # -- Alertmanager Pod labels
   podLabels: {}
+  # -- Override Alertmanager resources fullname
+  fullnameOverride: ""
   # -- Alertmanager Pod annotations
   podAnnotations: {}
   # -- Alertmanager image configuration
