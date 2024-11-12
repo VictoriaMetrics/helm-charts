@@ -1,5 +1,6 @@
 ## Next release
 
+- Upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.18.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1181)
 - use common templates
 - set default DNS domain to `cluster.local.`
 - added podLabels and podAnnotations to add extra pod labels and annotations
