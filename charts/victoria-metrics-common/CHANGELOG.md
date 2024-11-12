@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.25
+
+**Release date:** 2024-11-12
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - fixed adding suffix for `vm.plain.fullname`
 
 ## 0.0.24
