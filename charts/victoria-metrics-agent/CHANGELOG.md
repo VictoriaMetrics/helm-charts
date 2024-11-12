@@ -3,6 +3,7 @@
 - set default DNS domain to `cluster.local.`
 - updated common dependency 0.0.19 -> 0.0.23
 - added template for configmap name
+- fixed statefulset variable name typo
 
 ## 0.14.6
 

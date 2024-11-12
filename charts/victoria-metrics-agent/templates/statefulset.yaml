@@ -18,7 +18,7 @@ spec:
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   serviceName: {{ $fullname }}
-  {{- with .Values.statefulset.updateStrategy }}
+  {{- with .Values.statefulSet.updateStrategy }}
   updateStrategy: {{ toYaml . | nindent 4 }}
   {{- end }}
   selector:
@@ -88,9 +88,9 @@ spec:
           {{- with .Values.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or .Values.env .Values.statefulset.clusterMode }}
+          {{- if or .Values.env .Values.statefulSet.clusterMode }}
           env:
-            {{- if .Values.statefulset.clusterMode }}
+            {{- if .Values.statefulSet.clusterMode }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:
