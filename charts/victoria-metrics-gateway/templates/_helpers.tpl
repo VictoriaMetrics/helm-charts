@@ -17,3 +17,9 @@
   {{- $args = mergeOverwrite $args $Values.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
+
+{{- define "vmgateway.config.name" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $fullname := include "vm.plain.fullname" . -}}
+  {{- $Values.configMap | default (printf "%s-config" $fullname) -}}
+{{- end -}}

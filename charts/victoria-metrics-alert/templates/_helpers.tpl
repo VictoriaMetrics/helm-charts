@@ -189,3 +189,15 @@ Create base alertmanager url for notifers
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
+
+{{- define "vmalert.rules.config.name" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $fullname := include "vm.plain.fullname" . -}}
+  {{- $Values.server.configMap | default (printf "%s-alert-rules-config" $fullname) -}}
+{{- end -}}
+
+{{- define "alertmanager.config.name" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $fullname := include "vm.plain.fullname" . -}}
+  {{- $Values.alertmanager.configMap | default (printf "%s-config" $fullname) -}}
+{{- end -}}
