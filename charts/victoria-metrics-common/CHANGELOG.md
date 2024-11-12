@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed adding suffix for `vm.plain.fullname`
 
 ## 0.0.24
 

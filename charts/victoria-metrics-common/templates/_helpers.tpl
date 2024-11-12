@@ -34,6 +34,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */ -}}
 {{- define "vm.fullname" -}}
+  {{- $appendKey := ternary .appendKey true (hasKey . "appendKey") -}}
   {{- $overrideKey := .overrideKey | default "fullnameOverride" -}}
   {{- include "vm.validate.args" . -}}
   {{- $Values := (.helm).Values | default .Values -}}
@@ -67,7 +68,7 @@ If release name contains chart name it will be used as a full name.
     {{- end -}}
   {{- end -}}
   {{- $fullname = tpl $fullname . -}}
-  {{- if ne $overrideKey "fullnameOverride" -}}
+  {{- if $appendKey -}}
     {{- with .prefix -}}
       {{- $fullname = printf "%s-%s" . $fullname -}}
     {{- end -}}
@@ -84,7 +85,9 @@ If release name contains chart name it will be used as a full name.
 
 {{- define "vm.cr.fullname" -}}
   {{- $_ := set . "overrideKey" "name" -}}
+  {{- $_ := set . "appendKey" false -}}
   {{- include "vm.fullname" . -}}
+  {{- $_ := unset . "appendKey" }}
   {{- $_ := unset . "overrideKey" -}}
 {{- end -}}
 
