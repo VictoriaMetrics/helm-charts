@@ -1,4 +1,4 @@
-{{- if .Values.crds.cleanup.enabled }}
+{{- if and .Values.crds.enabled .Values.crds.cleanup.enabled }}
 {{- $app := .Values.crds.cleanup }}
 {{- if empty ($app.image).tag }}
   {{- $tag := (printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor) | replace "+" "" -}}
