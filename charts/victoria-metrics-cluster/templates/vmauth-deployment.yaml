@@ -17,7 +17,7 @@ metadata:
   namespace: {{ $ns }}
 spec:
   selector:
-    matchLabels: {{ include "vm.matchLabels" $ctx | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   {{- if not $app.horizontalPodAutoscaler.enabled }}
   replicas: {{ $app.replicaCount }}
   {{- end }}

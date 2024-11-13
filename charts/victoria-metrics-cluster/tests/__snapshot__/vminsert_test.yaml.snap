@@ -1,0 +1,122 @@
+deployment should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: vminsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: RELEASE-NAME-victoria-metrics-cluster-vminsert
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: vminsert
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-metrics-cluster
+      template:
+        metadata:
+          labels:
+            app: vminsert
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-cluster
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --envflag.enable=true
+                - --envflag.prefix=VM_
+                - --loggerFormat=json
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-0.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8400
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-1.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8400
+              image: victoriametrics/vminsert:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vminsert
+              ports:
+                - containerPort: 8480
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+          serviceAccountName: RELEASE-NAME-victoria-metrics-cluster
+deployment should match snapshot with fullnameOverride, extraLabels and podLabels:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: insert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        extraLabelName: extraLabelValue
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: vminsert-node
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: insert
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-metrics-cluster
+      template:
+        metadata:
+          labels:
+            app: insert
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-cluster
+            podLabelName: podLabelValue
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --envflag.enable=true
+                - --envflag.prefix=VM_
+                - --loggerFormat=json
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-0.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8400
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-1.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8400
+              image: victoriametrics/vminsert:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vminsert
+              ports:
+                - containerPort: 8480
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+          serviceAccountName: RELEASE-NAME-victoria-metrics-cluster

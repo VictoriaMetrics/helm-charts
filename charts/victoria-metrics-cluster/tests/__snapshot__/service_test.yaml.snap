@@ -1,0 +1,216 @@
+service should match snapshot:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: RELEASE-NAME-victoria-metrics-cluster-vmauth
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 8427
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-metrics-cluster
+      type: ClusterIP
+  2: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vminsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: RELEASE-NAME-victoria-metrics-cluster-vminsert
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 8480
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vminsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-metrics-cluster
+      type: ClusterIP
+  3: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vmselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: RELEASE-NAME-victoria-metrics-cluster-vmselect
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 8481
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vmselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-metrics-cluster
+      type: ClusterIP
+  4: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vmstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+      namespace: NAMESPACE
+    spec:
+      clusterIP: None
+      ports:
+        - name: http
+          port: 8482
+          protocol: TCP
+          targetPort: http
+        - name: vmselect
+          port: 8401
+          protocol: TCP
+          targetPort: vmselect
+        - name: vminsert
+          port: 8400
+          protocol: TCP
+          targetPort: vminsert
+      selector:
+        app: vmstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-metrics-cluster
+      type: ClusterIP
+service should match snapshot with fullnameOverride and extraLabels:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        extraServiceLabelName: authExtraServiceLabelValue
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: vmauth-node
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 8427
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-metrics-cluster
+      type: ClusterIP
+  2: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: insert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        extraServiceLabelName: insertExtraServiceLabelValue
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: vminsert-node
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 8480
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: insert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-metrics-cluster
+      type: ClusterIP
+  3: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: select
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        extraServiceLabelName: selectExtraServiceLabelValue
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: vmselect-node
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 8481
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: select
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-metrics-cluster
+      type: ClusterIP
+  4: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: storage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        extraServiceLabelName: storageExtraServiceLabelValue
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: vmstorage-node
+      namespace: NAMESPACE
+    spec:
+      clusterIP: None
+      ports:
+        - name: http
+          port: 8482
+          protocol: TCP
+          targetPort: http
+        - name: vmselect
+          port: 8401
+          protocol: TCP
+          targetPort: vmselect
+        - name: vminsert
+          port: 8400
+          protocol: TCP
+          targetPort: vminsert
+      selector:
+        app: storage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-metrics-cluster
+      type: ClusterIP

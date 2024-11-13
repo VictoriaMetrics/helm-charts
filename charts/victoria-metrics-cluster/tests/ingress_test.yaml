@@ -1,0 +1,72 @@
+suite: ingress templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - ingress.yaml
+tests:
+  - it: ingress should match snapshot
+    set:
+      vmauth:
+        enabled: true
+        ingress:
+          enabled: true
+          annotations:
+            kubernetes.io/ingress.class: nginx
+          hosts:
+            - name: vmselect.node.local
+              path: /select/test
+              port: http
+      vminsert:
+        ingress:
+          enabled: true
+          annotations: 
+            kubernetes.io/ingress.class: alb
+          tls:
+            - secretName: insert-ingress-tls
+              hosts:
+                - insert.local
+      vmselect:
+        ingress:
+          enabled: true
+          annotations: 
+            kubernetes.io/ingress.class: kong
+    asserts:
+      - matchSnapshot: {}
+  - it: ingress should match snapshot with fullnameOverride and extraLabels
+    set:
+      vminsert:
+        name: insert
+        fullnameOverride: vminsert-node
+        extraLabels:
+          extraLabelName: insertExtraLabelValue
+        ingress:
+          extraLabels:
+            extraIngressLabelName: insertExtraIngressLabelValue
+      vmauth:
+        enabled: true
+        name: auth
+        fullnameOverride: vmauth-node
+        extraLabels:
+          extraLabelName: authExtraLabelValue
+        ingress:
+          extraLabels:
+            extraIngressLabelName: authExtraIngressLabelValue
+      vmselect:
+        name: select
+        fullnameOverride: vmselect-node
+        extraLabels:
+          extraLabelName: selectExtraLabelValue
+        ingress:
+          extraLabels:
+            extraIngressLabelName: selectExtraIngressLabelValue
+      vmstorage:
+        name: storage
+        fullnameOverride: vmstorage-node
+        extraLabels:
+          extraLabelName: storageExtraLabelValue
+        ingress:
+          extraLabels:
+            extraIngressLabelName: storageExtraIngressLabelValue
+    asserts:
+      - matchSnapshot: {}

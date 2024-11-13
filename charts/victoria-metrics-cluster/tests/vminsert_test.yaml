@@ -1,0 +1,21 @@
+suite: vminsert templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - vminsert-deployment.yaml
+tests:
+  - it: deployment should match snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: deployment should match snapshot with fullnameOverride, extraLabels and podLabels
+    set:
+      vminsert:
+        name: insert
+        fullnameOverride: vminsert-node
+        extraLabels:
+          extraLabelName: extraLabelValue
+        podLabels:
+          podLabelName: podLabelValue
+    asserts:
+      - matchSnapshot: {}

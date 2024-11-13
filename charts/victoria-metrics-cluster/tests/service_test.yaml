@@ -1,0 +1,50 @@
+suite: service templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - service.yaml
+tests:
+  - it: service should match snapshot
+    set:
+      vmauth:
+        enabled: true
+    asserts:
+      - matchSnapshot: {}
+  - it: service should match snapshot with fullnameOverride and extraLabels
+    set:
+      vminsert:
+        name: insert
+        fullnameOverride: vminsert-node
+        extraLabels:
+          extraLabelName: insertExtraLabelValue
+        service:
+          labels:
+            extraServiceLabelName: insertExtraServiceLabelValue
+      vmauth:
+        enabled: true
+        name: auth
+        fullnameOverride: vmauth-node
+        extraLabels:
+          extraLabelName: authExtraLabelValue
+        service:
+          labels:
+            extraServiceLabelName: authExtraServiceLabelValue
+      vmselect:
+        name: select
+        fullnameOverride: vmselect-node
+        extraLabels:
+          extraLabelName: selectExtraLabelValue
+        service:
+          labels:
+            extraServiceLabelName: selectExtraServiceLabelValue
+      vmstorage:
+        name: storage
+        fullnameOverride: vmstorage-node
+        extraLabels:
+          extraLabelName: storageExtraLabelValue
+        service:
+          labels:
+            extraServiceLabelName: storageExtraServiceLabelValue
+    asserts:
+      - matchSnapshot: {}
