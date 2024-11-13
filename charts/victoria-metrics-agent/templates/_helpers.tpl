@@ -32,8 +32,9 @@
 {{- end -}}
 
 {{- define "vmagent.rw.config" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $rwcm := default dict }}
-  {{- range $i, $rw := .Values.remoteWrite }}
+  {{- range $i, $rw := $Values.remoteWrite }}
     {{- range $rwKey, $rwValue := $rw }}
       {{- if or (kindIs "slice" $rwValue) (kindIs "map" $rwValue) }}
         {{- $_ := set $rwcm (printf "%d-%s.yaml" $i $rwKey) (toYaml $rwValue) }}

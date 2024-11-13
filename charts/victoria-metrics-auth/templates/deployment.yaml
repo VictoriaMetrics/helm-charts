@@ -41,7 +41,7 @@ spec:
           {{- $_ := set $ctx "app" .Values }}
           image: {{ include "vm.image" $ctx }}
           workingDir: {{ .Values.containerWorkingDir }}
-          args: {{ include "vmauth.args" . | nindent 12 }}
+          args: {{ include "vmauth.args" $ctx | nindent 12 }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http

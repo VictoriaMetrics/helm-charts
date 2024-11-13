@@ -34,7 +34,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */ -}}
 {{- define "vm.fullname" -}}
-  {{- $appendKey := ternary .appendKey true (hasKey . "appendKey") -}}
+  {{- $appendKey := ternary .appendKey (not (hasKey . "overrideKey")) (hasKey . "appendKey") -}}
   {{- $overrideKey := .overrideKey | default "fullnameOverride" -}}
   {{- include "vm.validate.args" . -}}
   {{- $Values := (.helm).Values | default .Values -}}

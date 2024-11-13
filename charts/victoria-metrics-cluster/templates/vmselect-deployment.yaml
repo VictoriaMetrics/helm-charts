@@ -2,7 +2,7 @@
 {{- if and $app.enabled (not $app.statefulSet.enabled) -}}
 {{- $ctx := dict "helm" . "appKey" "vmselect" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
-{{- $sa := include "vm.fullname" $ctx }}
+{{- $sa := include "vm.fullname" . }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: Deployment
@@ -52,7 +52,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          args: {{ include "vmselect.args" . | nindent 12 }}
+          args: {{ include "vmselect.args" $ctx | nindent 12 }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
