@@ -2,11 +2,13 @@
 {{- define "vm.service" -}}
   {{- include "vm.validate.args" . -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $nameTpl := "vm.fullname" }}
+  {{- $nameTpl := "" -}}
   {{- if eq .style "managed" -}}
     {{- $nameTpl = "vm.managed.fullname" }}
   {{- else if eq .style "plain" -}}
     {{- $nameTpl = "vm.plain.fullname" }}
+  {{- else -}}
+    {{- fail ".style argument should be either `plain` or `managed`"}}
   {{- end -}}
   {{- include $nameTpl . -}}
 {{- end }}

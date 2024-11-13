@@ -1,0 +1,127 @@
+suite: helpers templates
+templates:
+  - helpers.yaml
+tests:
+  - it: with global fullnameOverride
+    set:
+      fullnameOverride: test
+    asserts:
+      - equal:
+          path: vm.fullname
+          value: test
+      - equal:
+          path: vm.plain.fullname
+          value: test
+      - equal:
+          path: vm.managed.fullname
+          value: test
+      - equal:
+          path: vm.cr.fullname
+          value: test
+      - equal:
+          path: vm.namespace
+          value: NAMESPACE
+      - equal:
+          path: vm.sa.name
+          value: test
+  - it: with appKey only
+    set:
+      ctx:
+        appKey: test
+      test:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.fullname
+          value: RELEASE-NAME-victoria-metrics-common
+      - equal:
+          path: vm.plain.fullname
+          value: RELEASE-NAME-victoria-metrics-common-test
+      - equal:
+          path: vm.managed.fullname
+          value: vmtest-RELEASE-NAME-victoria-metrics-common
+      - equal:
+          path: vm.cr.fullname
+          value: RELEASE-NAME-victoria-metrics-common
+      - equal:
+          path: vm.namespace
+          value: NAMESPACE
+      - equal:
+          path: vm.sa.name
+          value: RELEASE-NAME-victoria-metrics-common
+  - it: with appKey and name set
+    set:
+      ctx:
+        appKey: app
+      app:
+        name: test
+    asserts:
+      - equal:
+          path: vm.fullname
+          value: RELEASE-NAME-victoria-metrics-common
+      - equal:
+          path: vm.plain.fullname
+          value: RELEASE-NAME-victoria-metrics-common-app
+      - equal:
+          path: vm.managed.fullname
+          value: vmapp-test
+      - equal:
+          path: vm.cr.fullname
+          value: test
+      - equal:
+          path: vm.namespace
+          value: NAMESPACE
+      - equal:
+          path: vm.sa.name
+          value: RELEASE-NAME-victoria-metrics-common
+  - it: with appKey and fullnameOverride set
+    set:
+      ctx:
+        appKey: app
+      app:
+        fullnameOverride: test
+    asserts:
+      - equal:
+          path: vm.fullname
+          value: RELEASE-NAME-victoria-metrics-common
+      - equal:
+          path: vm.plain.fullname
+          value: test
+      - equal:
+          path: vm.managed.fullname
+          value: vmapp-RELEASE-NAME-victoria-metrics-common
+      - equal:
+          path: vm.cr.fullname
+          value: RELEASE-NAME-victoria-metrics-common
+      - equal:
+          path: vm.namespace
+          value: NAMESPACE
+      - equal:
+          path: vm.sa.name
+          value: RELEASE-NAME-victoria-metrics-common
+  - it: with appKey and toplevel fullnameOverride set
+    set:  
+      ctx:
+        appKey: app
+      fullnameOverride: global
+      app:
+        fullnameOverride: ""
+    asserts:
+      - equal:
+          path: vm.fullname
+          value: global
+      - equal:
+          path: vm.plain.fullname
+          value: global-app
+      - equal:
+          path: vm.managed.fullname
+          value: vmapp-global
+      - equal:
+          path: vm.cr.fullname
+          value: global
+      - equal:
+          path: vm.namespace
+          value: NAMESPACE
+      - equal:
+          path: vm.sa.name
+          value: global

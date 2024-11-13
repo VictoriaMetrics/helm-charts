@@ -1,0 +1,10 @@
+{{- $ctx := .Values.ctx | default dict -}}
+{{- $_ := unset .Values "ctx" -}}
+{{- range $k, $v := $ctx }}
+  {{- $_ := set $ $k $v -}}
+{{- end }}
+vm:
+  service: {{ include "vm.service" . }}
+  fqdn: {{ include "vm.fqdn" . }}
+  host: {{ include "vm.host" . }}
+  url: {{ include "vm.url" . }}
