@@ -125,3 +125,61 @@ tests:
       - equal:
           path: vm.sa.name
           value: global
+  - it: with appKey and both top level and nested fullnameOverride set
+    set:
+      ctx:
+        appKey:
+         - test
+         - single
+      fullnameOverride: global
+      test:
+        single:
+          fullnameOverride: override
+    asserts:
+      - equal:
+          path: vm.fullname
+          value: global
+      - equal:
+          path: vm.plain.fullname
+          value: override
+      - equal:
+          path: vm.managed.fullname
+          value: vmsingle-global
+      - equal:
+          path: vm.cr.fullname
+          value: global
+      - equal:
+          path: vm.namespace
+          value: NAMESPACE
+      - equal:
+          path: vm.sa.name
+          value: global
+  - it: with appKey and both top level and nested name set
+    set:
+      ctx:
+        appKey:
+         - test
+         - single
+      fullnameOverride: global
+      test:
+        single:
+          name: override
+    asserts:
+      - equal:
+          path: vm.fullname
+          value: global
+      - equal:
+          path: vm.plain.fullname
+          value: global-single
+      - equal:
+          path: vm.managed.fullname
+          value: vmsingle-override
+      - equal:
+          path: vm.cr.fullname
+          value: override
+      - equal:
+          path: vm.namespace
+          value: NAMESPACE
+      - equal:
+          path: vm.sa.name
+          value: global
