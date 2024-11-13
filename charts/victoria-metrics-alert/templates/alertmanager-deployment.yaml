@@ -3,7 +3,7 @@
 {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
-{{- $sa := include "vm.fullname" $ctx }}
+{{- $sa := include "vm.fullname" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -47,7 +47,7 @@ spec:
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           image: {{ include "vm.image" (dict "helm" . "app" $app) }}
-          args: {{ include "alertmanager.args" . | nindent 12 }}
+          args: {{ include "alertmanager.args" $ctx | nindent 12 }}
           ports:
             - name: web
               containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.listenAddress "default" "9093") }}
@@ -114,6 +114,7 @@ spec:
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
+          {{- $_ := set $ctx "appKey" "alertmanager" }}
         - name: config
           configMap:
             name: {{ include "alertmanager.config.name" $ctx }}

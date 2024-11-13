@@ -102,6 +102,8 @@
   {{- if empty $args.storageNode }}
     {{- fail "no storageNodes found. Either set vmstorage.enabled to true or add nodes to vmselect.extraArgs.storageNode"}}
   {{- end }}
+  {{- $_ := unset . "style" }}
+  {{- $_ := unset . "appKey" }}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 

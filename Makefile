@@ -1,5 +1,5 @@
-HELM_IMAGE = alpine/helm:3.15.3
-HELM_DOCS_IMAGE = jnorwood/helm-docs:v1.14.144
+HELM_IMAGE = alpine/helm:3.16.2
+HELM_DOCS_IMAGE = local/helm-docs:v1.14.144
 CT_IMAGE = quay.io/helmpack/chart-testing:v3.11.0
 HELM?=helm-docker
 CT?=ct-docker
@@ -56,6 +56,9 @@ ct-local:
 	ct \
 		$(CMD)
 
+helm-plugins:
+	CMD="plugin install https://github.com/helm-unittest/helm-unittest.git" $(MAKE) $(HELM)
+
 helm-repo-update:
 	CMD="repo update" $(MAKE) $(HELM)
 
@@ -79,6 +82,14 @@ template: helm-repo-update
 		$(eval chart := $(word 3, $(subst /, ,$(values)))) \
 		CMD="dep build charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
 		CMD="template charts/$(chart) -f $(values)" $(MAKE) $(HELM) || exit 1; \
+	)
+
+unittest: helm-repo-update
+	$(foreach values,$(wildcard */*/tests), \
+		$(eval chart := $(word 2, $(subst /, ,$(values)))) \
+		$(eval location := $(word 1, $(subst /, ,$(values)))) \
+		CMD="dep build $(location)/$(chart)" $(MAKE) $(HELM) || exit 1; \
+		CMD="unittest $(location)/$(chart)" $(MAKE) $(HELM) || exit 1; \
 	)
 
 lint-ct:

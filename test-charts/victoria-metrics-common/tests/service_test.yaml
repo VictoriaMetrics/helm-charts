@@ -1,0 +1,99 @@
+suite: service templates
+templates:
+  - service.yaml
+tests:
+  - it: with no style define
+    asserts:
+      - failedTemplate:
+          errorMessage: .style argument should be either `plain` or `managed`
+  - it: with appKey and plain style
+    set:
+      ctx:
+        appKey: test
+        style: plain
+      test:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.service
+          value: RELEASE-NAME-victoria-metrics-common-test
+      - equal:
+          path: vm.url
+          value: http://RELEASE-NAME-victoria-metrics-common-test.NAMESPACE.svc:80
+      - equal:
+          path: vm.host
+          value: RELEASE-NAME-victoria-metrics-common-test.NAMESPACE.svc:80
+      - equal:
+          path: vm.fqdn
+          value: RELEASE-NAME-victoria-metrics-common-test.NAMESPACE.svc
+  - it: with appKey and managed style
+    set:
+      ctx:
+        appKey: test
+        style: managed
+      test:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.service
+          value: vmtest-RELEASE-NAME-victoria-metrics-common
+      - equal:
+          path: vm.url
+          value: http://vmtest-RELEASE-NAME-victoria-metrics-common.NAMESPACE.svc:80
+      - equal:
+          path: vm.host
+          value: vmtest-RELEASE-NAME-victoria-metrics-common.NAMESPACE.svc:80
+      - equal:
+          path: vm.fqdn
+          value: vmtest-RELEASE-NAME-victoria-metrics-common.NAMESPACE.svc
+  - it: with appKey, nested name and managed style
+    set:
+      ctx:
+        appKey:
+          - managed
+          - vmsingle
+        style: managed
+      managed:
+        vmsingle:
+          name: test
+    asserts:
+      - equal:
+          path: vm.service
+          value: vmsingle-test
+      - equal:
+          path: vm.url
+          value: http://vmsingle-test.NAMESPACE.svc:80
+      - equal:
+          path: vm.host
+          value: vmsingle-test.NAMESPACE.svc:80
+      - equal:
+          path: vm.fqdn
+          value: vmsingle-test.NAMESPACE.svc
+  - it: with appKey, nested name and plain style
+    set:
+      ctx:
+        appKey:
+          - managed
+          - server
+        style: plain
+      managed:
+        server:
+          name: test
+    asserts:
+      - equal:
+          path: vm.service
+          value: RELEASE-NAME-victoria-metrics-common-server
+  - it: with appKey, nested fullnameOverride and plain style
+    set:
+      ctx:
+        appKey: 
+          - managed
+          - server
+        style: plain
+      managed:
+        server:
+          fullnameOverride: test
+    asserts:
+      - equal:
+          path: vm.service
+          value: test

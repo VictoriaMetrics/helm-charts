@@ -2,7 +2,7 @@
 {{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "vmstorage" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
-{{- $sa := include "vm.fullname" $ctx }}
+{{- $sa := include "vm.fullname" . }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
@@ -49,7 +49,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          args: {{ include "vmbackupmanager.restore.args" . | nindent 12 }}
+          args: {{ include "vmbackupmanager.restore.args" $ctx | nindent 12 }}
           {{- with $manager.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -88,7 +88,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          args: {{ include "vmstorage.args" . | nindent 12 }}
+          args: {{ include "vmstorage.args" $ctx | nindent 12 }}
           ports:
             - name: {{ $app.ports.name | default "http" }}
               containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8482") }}
@@ -164,7 +164,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          args: {{ include "vmbackupmanager.args" . | nindent 12 }}
+          args: {{ include "vmbackupmanager.args" $ctx | nindent 12 }}
           {{- with $manager.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}

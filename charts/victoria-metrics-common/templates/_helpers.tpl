@@ -34,48 +34,24 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */ -}}
 {{- define "vm.fullname" -}}
-  {{- $appendKey := ternary .appendKey true (hasKey . "appendKey") -}}
-  {{- $overrideKey := .overrideKey | default "fullnameOverride" -}}
   {{- include "vm.validate.args" . -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $Release := (.helm).Release | default .Release -}}
   {{- $fullname := "" -}}
-  {{- if .appKey -}}
-    {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
-    {{- $values := $Values -}}
-    {{- range $ak := $appKey }}
-      {{- if $values -}}
-        {{- $values = (index $values $ak) | default dict -}}
-      {{- end -}}
-      {{- if and (kindIs "map" $values) (index $values $overrideKey) -}}
-        {{- $fullname = index $values $overrideKey -}}
-      {{- end -}}
-    {{- end }}
-  {{- end -}}
-  {{- if empty $fullname -}}
-    {{- if $Values.fullnameOverride -}}
-      {{- $fullname = $Values.fullnameOverride -}}
-    {{- else if ($Values.global).fullnameOverride -}}
-      {{- $fullname = $Values.global.fullnameOverride -}}
+  {{- if $Values.fullnameOverride -}}
+    {{- $fullname = $Values.fullnameOverride -}}
+  {{- else if ($Values.global).fullnameOverride -}}
+    {{- $fullname = $Values.global.fullnameOverride -}}
+  {{- else -}}
+    {{- $name := default $Chart.Name $Values.nameOverride -}}
+    {{- if contains $name $Release.Name -}}
+      {{- $fullname = $Release.Name -}}
     {{- else -}}
-      {{- $name := default $Chart.Name $Values.nameOverride -}}
-      {{- if contains $name $Release.Name -}}
-        {{- $fullname = $Release.Name -}}
-      {{- else -}}
-        {{- $fullname = (printf "%s-%s" $Release.Name $name) }}
-      {{- end -}}
+      {{- $fullname = (printf "%s-%s" $Release.Name $name) }}
     {{- end -}}
   {{- end -}}
   {{- $fullname = tpl $fullname . -}}
-  {{- if $appendKey -}}
-    {{- with .prefix -}}
-      {{- $fullname = printf "%s-%s" . $fullname -}}
-    {{- end -}}
-    {{- with .suffix -}}
-      {{- $fullname = printf "%s-%s" $fullname . -}}
-    {{- end -}}
-  {{- end -}}
   {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
     {{- $fullname -}}
   {{- else -}}
@@ -84,40 +60,85 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{- define "vm.cr.fullname" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $_ := set . "overrideKey" "name" -}}
-  {{- $_ := set . "appendKey" false -}}
-  {{- include "vm.fullname" . -}}
-  {{- $_ := unset . "appendKey" }}
+  {{- $fullname := include "vm.internal.fullname" . -}}
   {{- $_ := unset . "overrideKey" -}}
+  {{- if empty $fullname -}}
+    {{- $fullname = include "vm.fullname" . -}}
+  {{- end -}}
+  {{- $fullname = tpl $fullname . -}}
+  {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
+    {{- $fullname -}}
+  {{- else -}}
+    {{- $fullname | trunc 63 | trimSuffix "-" -}}
+  {{- end -}}
 {{- end -}}
 
 {{- define "vm.managed.fullname" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $_ := set . "overrideKey" "name" -}}
+  {{- $fullname := include "vm.internal.fullname" . -}}
+  {{- $_ := unset . "overrideKey" -}}
+  {{- if empty $fullname -}}
+    {{- $fullname = include "vm.fullname" . -}}
+  {{- end -}}
   {{- $prefix := .appKey -}}
   {{- if kindIs "slice" $prefix -}}
     {{- $prefix = last $prefix -}}
   {{- end -}}
-  {{- $prefix = ternary $prefix (printf "vm%s" $prefix) (or (hasPrefix "vm" $prefix) (hasPrefix "vl" $prefix)) -}}
   {{- if $prefix -}}
-    {{- $_ := set $ "prefix" $prefix -}}
+    {{- $prefix = ternary $prefix (printf "vm%s" $prefix) (or (hasPrefix "vm" $prefix) (hasPrefix "vl" $prefix)) -}}
+    {{- $fullname = printf "%s-%s" $prefix $fullname -}}
   {{- end -}}
-  {{- include "vm.fullname" . -}}
-  {{- $_ := unset . "prefix" -}}
-  {{- $_ := unset . "overrideKey" -}}
+  {{- $fullname = tpl $fullname . -}}
+  {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
+    {{- $fullname -}}
+  {{- else -}}
+    {{- $fullname | trunc 63 | trimSuffix "-" -}}
+  {{- end -}}
 {{- end -}}
 
 {{- define "vm.plain.fullname" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
   {{- $_ := set . "overrideKey" "fullnameOverride" -}}
-  {{- $suffix := .appKey -}}
-  {{- if kindIs "slice" $suffix -}}
-    {{- $suffix = last $suffix }}
-  {{- end -}}
-  {{- if $suffix -}}
-    {{- $_ := set . "suffix" $suffix -}}
-  {{- end -}}
-  {{- include "vm.fullname" . -}}
-  {{- $_ := unset . "suffix" -}}
+  {{- $fullname := include "vm.internal.fullname" . -}}
   {{- $_ := unset . "overrideKey" -}}
+  {{- if empty $fullname -}}
+    {{- $fullname = include "vm.fullname" . -}}
+    {{- $suffix := .appKey -}}
+    {{- if kindIs "slice" $suffix -}}
+      {{- $suffix = last $suffix }}
+    {{- end -}}
+    {{- with $suffix -}}
+      {{- $fullname = printf "%s-%s" $fullname . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $fullname = tpl $fullname . -}}
+  {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
+    {{- $fullname -}}
+  {{- else -}}
+    {{- $fullname | trunc 63 | trimSuffix "-" -}}
+  {{- end -}}
+{{- end -}}
+
+{{- define "vm.internal.fullname" -}}
+  {{- $overrideKey := .overrideKey | default "fullnameOverride" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $fullname := "" -}}
+  {{- if .appKey -}}
+    {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
+    {{- $values := $Values -}}
+    {{- range $ak := $appKey }}
+      {{- if $values -}}
+        {{- $values = (index $values $ak) | default dict -}}
+        {{- if and (kindIs "map" $values) (index $values $overrideKey) -}}
+          {{- $fullname = index $values $overrideKey -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end }}
+  {{- end -}}
+  {{- $fullname -}}
 {{- end -}}
 
 {{- /* Create chart name and version as used by the chart label. */ -}}

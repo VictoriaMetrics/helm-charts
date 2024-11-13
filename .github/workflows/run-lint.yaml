@@ -34,6 +34,10 @@ jobs:
             helmv3
           helm: "${{ env.HELM_VERSION }}"
 
+      - name: Install deps
+        run: |
+          make helm-plugins
+
       - name: Run lint
         run: |
           make lint
@@ -41,3 +45,7 @@ jobs:
       - name: Run template
         run: |
           make template
+
+      - name: Run unittest
+        run: |
+          make unittest

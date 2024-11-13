@@ -11,7 +11,7 @@
   {{- $ctx := dict "helm" . "appKey" "server" }}
   {{- $fullname := include "vm.plain.fullname" $ctx }}
   {{- $ns := include "vm.namespace" $ctx }}
-  {{- $sa := include "vm.fullname" $ctx }}
+  {{- $sa := include "vm.fullname" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -57,7 +57,7 @@ spec:
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           image: {{ include "vm.image" (dict "helm" . "app" $app) }}
-          args: {{ include "vmalert.args" . | nindent 12 }}
+          args: {{ include "vmalert.args" $ctx | nindent 12 }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
@@ -112,6 +112,7 @@ spec:
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- $_ := set $ctx "appKey" "server" }}
       volumes:
         - name: alerts-config
           configMap:

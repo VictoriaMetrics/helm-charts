@@ -1,0 +1,24 @@
+{{- $ctx := .Values.ctx | default dict -}}
+{{- $_ := unset .Values "ctx" -}}
+{{- range $k, $v := $ctx }}
+  {{- $_ := set $ $k $v -}}
+{{- end }}
+vm:
+  fullname: {{ include "vm.fullname" . }}
+  plain:
+    fullname: {{ include "vm.plain.fullname" . }}
+  cr:
+    fullname: {{ include "vm.cr.fullname" . }}
+  managed:
+    fullname: {{ include "vm.managed.fullname" . }}
+  namespace: {{ include "vm.namespace" . }}
+  name: {{ include "vm.name" . }}
+  app:
+    name: {{ include "vm.app.name" . }}
+  selectorLabels: {{ include "vm.selectorLabels" . | nindent 4 }}
+  sa:
+    name: {{ include "vm.sa.name" . }}
+  metaLabels: {{ include "vm.metaLabels" . | nindent 4 }}
+  podLabels: {{ include "vm.podLabels" . | nindent 4 }}
+  release: {{ include "vm.release" . }}
+  labels: {{ include "vm.labels" . | nindent 4 }}

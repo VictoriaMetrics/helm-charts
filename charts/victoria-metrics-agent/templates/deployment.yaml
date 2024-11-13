@@ -51,7 +51,7 @@ spec:
           image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           workingDir: {{ .Values.containerWorkingDir }}
-          args: {{ include "vmagent.args" . | nindent 12 }}
+          args: {{ include "vmagent.args" $ctx | nindent 12 }}
           ports:
             - name: http
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .Values.extraArgs.httpListenAddr "default" "8429") }}

@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- do not append key only if it's passed to a template
 
 ## 0.0.25
 
