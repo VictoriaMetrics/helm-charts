@@ -1,17 +1,9 @@
 ## Next release
 
-- `vmauthIngestGlobal` was changed to `write.global.vmauth`
-- `vmauthQueryGlobal` was changed to `read.global.vmauth`
-- `availabilityZones[*].allowIngest` was changed to `availabilityZones[*].write.allow`
-- `availabilityZones[*].allowRead` was changed to `availabilityZones[*].read.allow`
-- `availabilityZones[*].nodeSelector` was moved to `availabilityZones[*].common.spec.nodeSelector`
-- `availabilityZones[*].extraAffinity` was moved to `availabilityZones[*].common.spec.affinity`
-- `availabilityZones[*].topologySpreadConstraints` was moved to `availabilityZones[*].common.spec.topologySpreadConstraints`
-- `availabilityZones[*].vmauthIngest` was moved to `availabilityZones[*].write.vmauth`
-- `availabilityZones[*].vmauthQueryPerZone` was moved to `availabilityZones[*].read.perZone.vmauth`
-- `availabilityZones[*].vmauthCrossAZQuery` was moved to `availabilityZones[*].read.crossZone.vmauth`
+**Update note**: This release contains breaking changes. please follow [upgrade guide](../#upgrade-to-050)
+
 - set default DNS domain to `cluster.local.`
-- updated common dependency 0.0.19 -> 0.0.23
+- updated common dependency 0.0.19 -> 0.0.24
 
 ## 0.4.2
 

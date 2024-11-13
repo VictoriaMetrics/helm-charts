@@ -7,7 +7,8 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
   {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "read" "crossZone" "vmauth") }}
-  name: read-proxy-{{ include "vm.fullname" $ctx }}
+  {{- $_ := set $ctx "zone" $zone }}
+  name: {{ include "vm.cr.fullname" $ctx }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ | nindent 4 }}
   {{- with $zone.read.crossZone.vmauth.annotations }}
@@ -24,14 +25,13 @@ spec: {{ toYaml (omit $spec "unauthorizedAccessConfig") | nindent 2 }}
     {{- $_ := set $ctx "style" "managed" }}
     {{- $urls := default list }}
     {{- if $zone.read.allow }}
-      {{- $_ := set $ctx "alias" "vmauth-read-balancer" }}
       {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "read" "perZone" "vmauth") }}
       {{- $urls = append $urls (include "vm.url" $ctx) }}
     {{- end }}
-    {{- $_ := set $ctx "alias" "vmauth-read-proxy" }}
     {{- range $j, $cross := $.Values.availabilityZones }}
       {{- if and (ne $j $i) $cross.read.allow }}
-        {{- $_ := set $ctx "appKey" (list "availabilityZones" $j "read" "crossZone" "vmauth") }}
+        {{- $_ := set $ctx "appKey" (list "availabilityZones" $j "read" "perZone" "vmauth") }}
+        {{- $_ := set $ctx "zone" $cross }}
         {{- $urls = append $urls (include "vm.url" $ctx)}}
       {{- end }}
     {{- end }}
@@ -40,6 +40,5 @@ spec: {{ toYaml (omit $spec "unauthorizedAccessConfig") | nindent 2 }}
     {{- end }}
     url_prefix: {{ toYaml $urls | nindent 4 }}
     {{- $_ := unset $ctx "style" }}
-    {{- $_ := unset $ctx "alias" }}
 {{- end }}
 {{- end }}

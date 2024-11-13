@@ -1,12 +1,11 @@
 {{- if .Values.write.global.vmauth.enabled }}
 {{- $ctx := dict "helm" . "appKey" (list "write" "global" "vmauth") }}
-{{- $fullname := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
-  name: write-global-{{ $fullname }}
+  name: {{ include "vm.cr.fullname" $ctx }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.write.global.vmauth.annotations }}

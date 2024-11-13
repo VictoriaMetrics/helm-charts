@@ -33,7 +33,7 @@ write:
       # -- Create a vmauth as the global write entrypoint
       enabled: true
       # -- Override the name of the vmauth object
-      name: ""
+      name: write-global
       # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
       spec:
         port: "8427"
@@ -44,7 +44,7 @@ read:
       # -- Create vmauth as the global read entrypoint
       enabled: true
       # -- Override the name of the vmauth object
-      name: ""
+      name: read-global
       # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
       spec:
         port: "8427"
@@ -82,7 +82,7 @@ availabilityZones:
         # -- Create vmauth as a local write endpoint
         enabled: true
         # -- Override the name of the vmauth object
-        name: ""
+        name: "write-balancer-{{ (.zone).name }}"
         # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
         spec:
           port: "8427"
@@ -99,7 +99,7 @@ availabilityZones:
           # -- Create vmauth as a local read endpoint
           enabled: true
           # -- Override the name of the vmauth object
-          name: ""
+          name: "read-balancer-{{ (.zone).name }}"
           # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
           spec:
             port: "8427"
@@ -110,7 +110,7 @@ availabilityZones:
           # -- Create a vmauth with all the zone with `allow: true` as query backends
           enabled: true
           # -- Override the name of the vmauth object
-          name: ""
+          name: "read-proxy-{{ (.zone).name }}"
           # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
           spec:
             port: "8427"
@@ -180,7 +180,7 @@ availabilityZones:
         # -- Create vmauth as a local write endpoint
         enabled: true
         # -- Override the name of the vmauth object
-        name: ""
+        name: "write-balancer-{{ (.zone).name }}"
         # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
         spec:
           port: "8427"
@@ -197,7 +197,7 @@ availabilityZones:
           # -- Create vmauth as a local read endpoint
           enabled: true
           # -- Override the name of the vmauth object
-          name: ""
+          name: "read-balancer-{{ (.zone).name }}"
           # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
           spec:
             port: "8427"
@@ -208,7 +208,7 @@ availabilityZones:
           # -- Create a vmauth with all the zone with `allow: true` as query backends
           enabled: true
           # -- Override the name of the vmauth object
-          name: ""
+          name: "read-proxy-{{ (.zone).name }}"
           # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
           spec:
             port: "8427"
@@ -250,12 +250,13 @@ availabilityZones:
 
 
 # -- Set up an extra vmagent to scrape all the scrape objects by default,
-# and write data to above vmauth-global-ingest endpoint.
-extraVMAgent:
-  enabled: true
-  name: test-vmagent
-  spec:
-    selectAllByDefault: true
+# and write data to above write-global endpoint.
+extra:
+  vmagent:
+    enabled: false
+    name: test-vmagent
+    spec:
+      selectAllByDefault: true
 
 
 # -- Enable multitenancy mode

@@ -1,12 +1,11 @@
 {{- if .Values.read.global.vmauth.enabled }}
-{{- $ctx := dict "helm" . "appKey" (list "write" "global" "vmauth") }}
-{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ctx := dict "helm" . "appKey" (list "read" "global" "vmauth") }}
 {{- $ns := include "vm.namespace" $ctx }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
-  name: read-global-{{ $fullname }}
+  name: {{ include "vm.cr.fullname" $ctx }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.read.global.vmauth.annotations }}
@@ -23,10 +22,10 @@ spec:
     - "/select/.+"
     load_balancing_policy: first_available
     {{- $_ := set $ctx "style" "managed" }}
-    {{- $_ := set $ctx "alias" "vmauth-read-proxy" }}
     {{- $urls := default list }}
     {{- range $i, $zone := $.Values.availabilityZones }}
       {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "read" "crossZone" "vmauth") }}
+      {{- $_ := set $ctx "zone" $zone }}
       {{- $urls = append $urls (include "vm.url" $ctx) }}
     {{- end }}
     {{- $_ := unset $ctx "style" }}

@@ -1,5 +1,5 @@
 {{ if and .Values.read.global.vmauth.enabled (index .Values "victoria-metrics-k8s-stack" "grafana" "enabled") }}
-{{- $ctx := dict "helm" . "appKey" (list "read" "global" "vmauth") "alias" "vmauth-read-global" "style" "managed" }}
+{{- $ctx := dict "helm" . "appKey" (list "read" "global" "vmauth") "style" "managed" }}
 {{- $url := (printf "%s/select/0/prometheus/" (include "vm.url" $ctx)) }}
 {{- $ns := include "vm.namespace" $ctx }}
 ---

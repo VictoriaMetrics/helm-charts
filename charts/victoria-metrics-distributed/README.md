@@ -22,17 +22,17 @@ The default setup is as shown below:
 
 For write:
 1. extra-vmagent(optional): scrapes external targets and all the components installed by this chart, sends data to global write entrypoint.
-2. vmauth-global-write: global write entrypoint, proxies requests to one of the zone `vmagent` with `least_loaded` policy.
-3. vmagent(per-zone): remote writes data to availability zones that enabled `.Values.availabilityZones.allowIngest`, and [buffer data on disk](https://docs.victoriametrics.com/vmagent/#calculating-disk-space-for-persistence-queue) when zone is unavailable to ingest.
-4. vmauth-write-balancer(per-zone): proxies requests to vminsert instances inside it's zone with `least_loaded` policy.
+2. write-global: global write entrypoint, proxies requests to one of the zone `vmagent` with `least_loaded` policy.
+3. vmagent(per-zone): remote writes data to availability zones that enabled `.Values.availabilityZones[*].write.allow`, and [buffer data on disk](https://docs.victoriametrics.com/vmagent/#calculating-disk-space-for-persistence-queue) when zone is unavailable to ingest.
+4. write-balancer(per-zone): proxies requests to vminsert instances inside it's zone with `least_loaded` policy.
 5. vmcluster(per-zone): processes write requests and stores data.
 
 For read:
 1. vmcluster(per-zone): processes query requests and returns results.
-2. vmauth-read-balancer(per-zone): proxies requests to vmselect instances inside it's zone with `least_loaded` policy.
-3. vmauth-read-proxy(per-zone): uses all the `vmauth-read-balancer` as servers if zone has `.Values.availabilityZones.allowQuery` enabled, always prefer "local" `vmauth-read-balancer` to reduce cross-zone traffic with `first_available` policy.
-4. vmauth-global-read: global query entrypoint, proxies requests to one of the zone `vnauth-read-proxy` with `first_available` policy.
-5. grafana(optional): uses `vmauth-global-read` as default datasource.
+2. read-balancer(per-zone): proxies requests to vmselect instances inside it's zone with `least_loaded` policy.
+3. read-proxy(per-zone): uses all the `read-balancer` as servers if zone has `.Values.availabilityZones[*].read.allow` enabled, always prefer "local" `read-balancer` to reduce cross-zone traffic with `first_available` policy.
+4. read-global: global query entrypoint, proxies requests to one of the zone `read-proxy` with `first_available` policy.
+5. grafana(optional): uses `read-global` as default datasource.
 
 >Note:
 As the topology shown above, this chart doesn't include components like vmalert, alertmanager, etc by default.
@@ -47,31 +47,31 @@ To avoid this, vmcluster must be installed on multiple availability zones, each 
 
 ### How to write data?
 
-The chart provides `vmauth-global-write` as global write entrypoint, it supports [push-based data ingestion protocols](https://docs.victoriametrics.com/vmagent/#how-to-push-data-to-vmagent) as VictoriaMetrics does.
+The chart provides `write-global` as global write entrypoint, it supports [push-based data ingestion protocols](https://docs.victoriametrics.com/vmagent/#how-to-push-data-to-vmagent) as VictoriaMetrics does.
 Optionally, you can push data to any of the per-zone vmagents, and they will replicate the received data across zones.
 
 ### How to query data?
 
-The chart provides `vmauth-global-read` as global read entrypoint, it picks the first available zone (see [first_available](https://docs.victoriametrics.com/vmauth/#high-availability) policy) as it's preferred datasource and switches automatically to next zone if first one is unavailable, check [vmauth `first_available`](https://docs.victoriametrics.com/vmauth/#high-availability) for more details.
-If you have services like [vmalert](https://docs.victoriametrics.com/vmalert) or Grafana deployed in each zone, then configure them to use local `vmauth-read-proxy`. Per-zone `vmauth-read-proxy` always prefers "local" vmcluster for querying and reduces cross-zone traffic. 
+The chart provides `read-global` as global read entrypoint, it picks the first available zone (see [first_available](https://docs.victoriametrics.com/vmauth/#high-availability) policy) as it's preferred datasource and switches automatically to next zone if first one is unavailable, check [vmauth `first_available`](https://docs.victoriametrics.com/vmauth/#high-availability) for more details.
+If you have services like [vmalert](https://docs.victoriametrics.com/vmalert) or Grafana deployed in each zone, then configure them to use local `read-proxy`. Per-zone `read-proxy` always prefers "local" vmcluster for querying and reduces cross-zone traffic.
 
 You can also pick other proxies like kubernetes service which supports [Topology Aware Routing](https://kubernetes.io/docs/concepts/services-networking/topology-aware-routing/) as global read entrypoint.
 
 ### What happens if zone outage happen?
 
-If availability zone `zone-eu-1` is experiencing an outage, `vmauth-global-write` and `vmauth-global-read` will work without interruption:
-1. `vmauth-global-write` stops proxying write requests to `zone-eu-1` automatically;
-2. `vmauth-global-read` and `vmauth-read-proxy` stops proxying read requests to `zone-eu-1` automatically;
-3. `vmagent` on `zone-us-1` fails to send data to `zone-eu-1.vmauth-write-balancer`, starts to buffer data on disk(unless `-remoteWrite.disableOnDiskQueue` is specified, which is not recommended for this topology);
+If availability zone `zone-eu-1` is experiencing an outage, `write-global` and `read-global` will work without interruption:
+1. `write-global` stops proxying write requests to `zone-eu-1` automatically;
+2. `read-global` and `read-proxy` stops proxying read requests to `zone-eu-1` automatically;
+3. `vmagent` on `zone-us-1` fails to send data to `zone-eu-1.write-balancer`, starts to buffer data on disk(unless `-remoteWrite.disableOnDiskQueue` is specified, which is not recommended for this topology);
 To keep data completeness for all the availability zones, make sure you have enough disk space on vmagent for buffer, see [this doc](https://docs.victoriametrics.com/vmagent/#calculating-disk-space-for-persistence-queue) for size recommendation.
 
-And to avoid getting incomplete responses from `zone-eu-1` which gets recovered from outage, check vmagent on `zone-us-1` to see if persistent queue has been drained. If not, remove `zone-eu-1` from serving query by setting `.Values.availabilityZones.{zone-eu-1}.allowQuery=false` and change it back after confirm all data are restored.
+And to avoid getting incomplete responses from `zone-eu-1` which gets recovered from outage, check vmagent on `zone-us-1` to see if persistent queue has been drained. If not, remove `zone-eu-1` from serving query by setting `.Values.availabilityZones.{zone-eu-1}.read.allow=false` and change it back after confirm all data are restored.
 
 ### How to use [multitenancy](https://docs.victoriametrics.com/cluster-victoriametrics/#multitenancy)?
 
-By default, all the data that written to `vmauth-global-write` belong to tenant `0`. To write data to different tenants, set `.Values.enableMultitenancy=true` and create new tenant users for `vmauth-global-write`.
+By default, all the data that written to `write-global` belong to tenant `0`. To write data to different tenants, set `.Values.enableMultitenancy=true` and create new tenant users for `write-global`.
 For example, writing data to tenant `1088` with following steps:
-1. create tenant VMUser for vmauth `vmauth-global-write` to use:
+1. create tenant VMUser for vmauth `write-global` to use:
 ```
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMUser
@@ -96,7 +96,7 @@ spec:
   password: secret
 ```
 
-Add extra VMUser selector in vmauth `vmauth-global-write`
+Add extra VMUser selector in vmauth `write-global`
 ```
 spec:
   userSelector:
@@ -104,10 +104,10 @@ spec:
       tenant-test: "true"
 ```
 
-2. send data to `vmauth-global-write` using above token.
+2. send data to `write-global` using above token.
 Example command using vmagent:
 ```
-/path/to/vmagent -remoteWrite.url=http://vmauth-vmauth-global-write-$ReleaseName-vm-distributed:8427/prometheus/api/v1/write -remoteWrite.basicAuth.username=tenant-1088 -remoteWrite.basicAuth.password=secret
+/path/to/vmagent -remoteWrite.url=http://vmauth-write-global-$ReleaseName-vm-distributed:8427/prometheus/api/v1/write -remoteWrite.basicAuth.username=tenant-1088 -remoteWrite.basicAuth.password=secret
 ```
 
 ## How to install
@@ -196,12 +196,115 @@ helm history vmd -n NAMESPACE
 
 In order to serving query and ingestion while upgrading components version or changing configurations, it's recommended to perform maintenance on availability zone one by one.
 First, performing update on availability zone `zone-eu-1`:
-1. remove `zone-eu-1` from serving query by setting `.Values.availabilityZones.{zone-eu-1}.allowQuery=false`;
+1. remove `zone-eu-1` from serving query by setting `.Values.availabilityZones.{zone-eu-1}.read.allow=false`;
 2. run `helm upgrade vm-dis -n NAMESPACE` with updated configurations for `zone-eu-1` in `values.yaml`;
 3. wait for all the components on zone `zone-eu-1` running;
-4. wait `zone-us-1` vmagent persistent queue for `zone-eu-1` been drained, add `zone-eu-1` back to serving query by setting `.Values.availabilityZones.{zone-eu-1}.allowQuery=true`.
+4. wait `zone-us-1` vmagent persistent queue for `zone-eu-1` been drained, add `zone-eu-1` back to serving query by setting `.Values.availabilityZones.{zone-eu-1}.read.allow=true`.
 
 Then, perform update on availability zone `zone-us-1` with the same steps1~4.
+
+### Upgrade to 0.5.0
+
+This release was refactored, names of the parameters was changed:
+
+- `vmauthIngestGlobal` was changed to `write.global.vmauth`
+- `vmauthQueryGlobal` was changed to `read.global.vmauth`
+- `availabilityZones[*].allowIngest` was changed to `availabilityZones[*].write.allow`
+- `availabilityZones[*].allowRead` was changed to `availabilityZones[*].read.allow`
+- `availabilityZones[*].nodeSelector` was moved to `availabilityZones[*].common.spec.nodeSelector`
+- `availabilityZones[*].extraAffinity` was moved to `availabilityZones[*].common.spec.affinity`
+- `availabilityZones[*].topologySpreadConstraints` was moved to `availabilityZones[*].common.spec.topologySpreadConstraints`
+- `availabilityZones[*].vmauthIngest` was moved to `availabilityZones[*].write.vmauth`
+- `availabilityZones[*].vmauthQueryPerZone` was moved to `availabilityZones[*].read.perZone.vmauth`
+- `availabilityZones[*].vmauthCrossAZQuery` was moved to `availabilityZones[*].read.crossZone.vmauth`
+
+Also naming convention was changed with a following reasoning:
+- it contained redundant prefixes. e.g: `vmauth-read-proxy` created resources, which already contain `vmauth` prefix: `vmauth-vmauth-read-proxy` or `vmcluster-zone-eu-1` creates resources with redundant `vmcluster` part: `vmselect-vmcluster-zone-eu-1`
+- to match new configuration keys: `vmauth-global-read` was renamed to `read-global` as it has `read.global` configuration parameter
+
+If you didn't override default name and want To keep old resource names please use `<component>.name`.
+
+Example:
+
+If before an upgrade you had given below configuration
+
+```yaml
+vmauthIngestGlobal:
+  spec:
+    extraArgs:
+      discoverBackendIPs: "true"
+vmauthQueryGlobal:
+  spec:
+    extraArgs:
+      discoverBackendIPs: "true"
+availabilityZones:
+  - name: zone-eu-1
+    vmauthIngest:
+      spec:
+        extraArgs:
+          discoverBackendIPs: "true"
+    vmcluster:
+      spec:
+        retentionPeriod: "14"
+```
+
+after upgrade it will look like this:
+
+```yaml
+write:
+  global:
+    vmauth:
+      spec:
+        extraArgs:
+          discoverBackendIPs: "true"
+read:
+  global:
+    vmauth:
+      spec:
+        extraArgs:
+          discoverBackendIPs: "true"
+availabilityZones:
+  - name: zone-eu-1
+    write:
+      vmauth:
+        spec:
+          extraArgs:
+            discoverBackendIPs: "true"
+    vmcluster:
+      spec:
+        retentionPeriod: "14"
+```
+
+but to keep old names for `write.vmauth` and `vmcluster` after uograde please add fullname override
+
+```yaml
+write:
+  global:
+    vmauth:
+      name: vmauth-global-write
+      spec:
+        extraArgs:
+          discoverBackendIPs: "true"
+read:
+  global:
+    vmauth:
+      name: vmauth-global-read
+      spec:
+        extraArgs:
+          discoverBackendIPs: "true"
+availabilityZones:
+  - name: zone-eu-1
+    write:
+      vmauth:
+        name: "vmauth-write-balancer-{{ (.zone).name }}"
+        spec:
+          extraArgs:
+            discoverBackendIPs: "true"
+    vmcluster:
+      namee: vmcluster-{{ (.zone).name }}
+      spec:
+        retentionPeriod: "14"
+```
 
 ## How to uninstall
 
@@ -293,7 +396,7 @@ topologySpreadConstraints:
       <td>availabilityZones[0].read.crossZone.vmauth.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
+<code class="language-yaml">read-proxy-{{ (.zone).name }}
 </code>
 </pre>
 </td>
@@ -326,7 +429,7 @@ topologySpreadConstraints:
       <td>availabilityZones[0].read.perZone.vmauth.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
+<code class="language-yaml">read-balancer-{{ (.zone).name }}
 </code>
 </pre>
 </td>
@@ -464,7 +567,7 @@ vmstorage:
       <td>availabilityZones[0].write.vmauth.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
+<code class="language-yaml">write-balancer-{{ (.zone).name }}
 </code>
 </pre>
 </td>
@@ -538,7 +641,7 @@ topologySpreadConstraints:
       <td>availabilityZones[1].read.crossZone.vmauth.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
+<code class="language-yaml">read-proxy-{{ (.zone).name }}
 </code>
 </pre>
 </td>
@@ -571,7 +674,7 @@ topologySpreadConstraints:
       <td>availabilityZones[1].read.perZone.vmauth.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
+<code class="language-yaml">read-balancer-{{ (.zone).name }}
 </code>
 </pre>
 </td>
@@ -709,7 +812,7 @@ vmstorage:
       <td>availabilityZones[1].write.vmauth.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
+<code class="language-yaml">write-balancer-{{ (.zone).name }}
 </code>
 </pre>
 </td>
@@ -777,17 +880,18 @@ port: "8427"
 </td>
     </tr>
     <tr>
-      <td>extraVMAgent</td>
+      <td>extra</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-name: test-vmagent
-spec:
-    selectAllByDefault: true
+<code class="language-yaml">vmagent:
+    enabled: false
+    name: test-vmagent
+    spec:
+        selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td><p>Set up an extra vmagent to scrape all the scrape objects by default, and write data to above vmauth-global-ingest endpoint.</p>
+      <td><p>Set up an extra vmagent to scrape all the scrape objects by default, and write data to above write-global endpoint.</p>
 </td>
     </tr>
     <tr>
@@ -850,7 +954,7 @@ spec:
       <td>read.global.vmauth.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
+<code class="language-yaml">read-global
 </code>
 </pre>
 </td>
@@ -908,7 +1012,7 @@ vmsingle:
       <td>write.global.vmauth.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
-<code class="language-yaml">""
+<code class="language-yaml">write-global
 </code>
 </pre>
 </td>
