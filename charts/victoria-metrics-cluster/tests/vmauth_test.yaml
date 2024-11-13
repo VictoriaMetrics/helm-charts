@@ -1,0 +1,28 @@
+suite: vmauth templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - vmauth-deployment.yaml
+tests:
+  - it: deployment should match empty snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: deployment should match snapshot
+    set:
+      vmauth:
+        enabled: true
+    asserts:
+      - matchSnapshot: {}
+  - it: deployment should match snapshot with fullnameOverride, extraLabels and podLabels
+    set:
+      vmauth:
+        enabled: true
+        name: auth
+        fullnameOverride: vmauth-node
+        extraLabels:
+          extraLabelName: extraLabelValue
+        podLabels:
+          podLabelName: podLabelValue
+    asserts:
+      - matchSnapshot: {}

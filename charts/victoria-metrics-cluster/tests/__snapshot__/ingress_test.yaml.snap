@@ -1,0 +1,66 @@
+ingress should match snapshot:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: RELEASE-NAME-victoria-metrics-cluster-vmauth
+      namespace: NAMESPACE
+    spec:
+      rules:
+        - host: vmselect.node.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-victoria-metrics-cluster-vmauth
+                    port:
+                      name: http
+                path: /select/test
+                pathType: Prefix
+  2: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: alb
+      labels:
+        app: vminsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: RELEASE-NAME-victoria-metrics-cluster-vminsert
+      namespace: NAMESPACE
+    spec:
+      rules: null
+      tls:
+        - hosts:
+            - insert.local
+          secretName: insert-ingress-tls
+  3: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: kong
+      labels:
+        app: vmselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: RELEASE-NAME-victoria-metrics-cluster-vmselect
+      namespace: NAMESPACE
+    spec:
+      rules: null

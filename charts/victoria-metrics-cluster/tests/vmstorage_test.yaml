@@ -1,0 +1,21 @@
+suite: vmstorage templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - vmstorage-statefulset.yaml
+tests:
+  - it: statefulset should match snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: statefulset should match snapshot with fullnameOverride, extraLabels and podLabels
+    set:
+      vmstorage:
+        name: storage
+        fullnameOverride: vmstorage-node
+        extraLabels:
+          extraLabelName: extraLabelValue
+        podLabels:
+          podLabelName: podLabelValue
+    asserts:
+      - matchSnapshot: {}

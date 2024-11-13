@@ -1,0 +1,288 @@
+deployment should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: vmselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: RELEASE-NAME-victoria-metrics-cluster-vmselect
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: vmselect
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-metrics-cluster
+      template:
+        metadata:
+          labels:
+            app: vmselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-cluster
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --cacheDataPath=/cache
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --loggerFormat=json
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-0.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-1.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+              image: victoriametrics/vmselect:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmselect
+              ports:
+                - containerPort: 8481
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /cache
+                  name: cache-volume
+          securityContext: {}
+          serviceAccountName: RELEASE-NAME-victoria-metrics-cluster
+          volumes:
+            - emptyDir: {}
+              name: cache-volume
+deployment should match snapshot with fullnameOverride, extraLabels and podLabels:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: select
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        extraLabelName: extraLabelValue
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: vmselect-node
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: select
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-metrics-cluster
+      template:
+        metadata:
+          labels:
+            app: select
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-cluster
+            podLabelName: podLabelValue
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --cacheDataPath=/cache
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --loggerFormat=json
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-0.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-1.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+              image: victoriametrics/vmselect:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmselect
+              ports:
+                - containerPort: 8481
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /cache
+                  name: cache-volume
+          securityContext: {}
+          serviceAccountName: RELEASE-NAME-victoria-metrics-cluster
+          volumes:
+            - emptyDir: {}
+              name: cache-volume
+statefulset should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      labels:
+        app: vmselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: RELEASE-NAME-victoria-metrics-cluster-vmselect
+      namespace: NAMESPACE
+    spec:
+      podManagementPolicy: OrderedReady
+      replicas: 2
+      selector:
+        matchLabels:
+          app: vmselect
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-metrics-cluster
+      serviceName: RELEASE-NAME-victoria-metrics-cluster-vmselect
+      template:
+        metadata:
+          labels:
+            app: vmselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-cluster
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --cacheDataPath=/cache
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --loggerFormat=json
+                - --selectNode=RELEASE-NAME-victoria-metrics-cluster-vmselect-0.RELEASE-NAME-victoria-metrics-cluster-vmselect.NAMESPACE.svc.cluster.local.:8481
+                - --selectNode=RELEASE-NAME-victoria-metrics-cluster-vmselect-1.RELEASE-NAME-victoria-metrics-cluster-vmselect.NAMESPACE.svc.cluster.local.:8481
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-0.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-1.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+              image: victoriametrics/vmselect:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmselect
+              ports:
+                - containerPort: 8481
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /cache
+                  name: cache-volume
+          securityContext: {}
+          serviceAccountName: RELEASE-NAME-victoria-metrics-cluster
+          volumes:
+            - emptyDir: {}
+              name: cache-volume
+statefulset should match snapshot with fullnameOverride, extraLabels and podLabels:
+  1: |
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      labels:
+        app: select
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-cluster
+        app.kubernetes.io/version: 0.1.0
+        extraLabelName: extraLabelValue
+        helm.sh/chart: victoria-metrics-cluster-0.1.1
+      name: vmselect-node
+      namespace: NAMESPACE
+    spec:
+      podManagementPolicy: OrderedReady
+      replicas: 2
+      selector:
+        matchLabels:
+          app: select
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-metrics-cluster
+      serviceName: vmselect-node
+      template:
+        metadata:
+          labels:
+            app: select
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-cluster
+            podLabelName: podLabelValue
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --cacheDataPath=/cache
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --loggerFormat=json
+                - --selectNode=vmselect-node-0.vmselect-node.NAMESPACE.svc.cluster.local.:8481
+                - --selectNode=vmselect-node-1.vmselect-node.NAMESPACE.svc.cluster.local.:8481
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-0.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+                - --storageNode=RELEASE-NAME-victoria-metrics-cluster-vmstorage-1.RELEASE-NAME-victoria-metrics-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+              image: victoriametrics/vmselect:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmselect
+              ports:
+                - containerPort: 8481
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /cache
+                  name: cache-volume
+          securityContext: {}
+          serviceAccountName: RELEASE-NAME-victoria-metrics-cluster
+          volumes:
+            - emptyDir: {}
+              name: cache-volume
