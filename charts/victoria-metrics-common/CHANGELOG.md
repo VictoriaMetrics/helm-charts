@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.26
+
+**Release date:** 2024-11-13
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - do not append key only if it's passed to a template
 
 ## 0.0.25
