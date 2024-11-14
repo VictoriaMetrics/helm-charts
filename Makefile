@@ -113,6 +113,7 @@ gen-docs:
 		-w /helm-charts \
                 --entrypoint /bin/helm-docs \
 		$(HELM_DOCS_IMAGE) \
+		-c charts \
 		-t hack/docs/template.tmpl -t README.md.gotmpl
 
 docs-image:
