@@ -128,13 +128,18 @@ If release name contains chart name it will be used as a full name.
   {{- $fullname := "" -}}
   {{- if .appKey -}}
     {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
+    {{- $ctx := . -}}
     {{- $values := $Values -}}
     {{- range $ak := $appKey }}
-      {{- if $values -}}
-        {{- $values = (index $values $ak) | default dict -}}
-        {{- if and (kindIs "map" $values) (index $values $overrideKey) -}}
-          {{- $fullname = index $values $overrideKey -}}
-        {{- end -}}
+      {{- $values = ternary (default dict) (index $values $ak | default dict) (empty $values) -}}
+      {{- $ctx = ternary (default dict) (index $ctx $ak | default dict) (empty $ctx) -}}
+      {{- if and (empty $values) (empty $ctx) -}}
+        {{- fail (printf "No data for appKey %s" (join "->" $appKey)) -}}
+      {{- end -}}
+      {{- if and (kindIs "map" $values) (index $values $overrideKey) -}}
+        {{- $fullname = index $values $overrideKey -}}
+      {{- else if and (kindIs "map" $ctx) (index $ctx $overrideKey) -}}
+        {{- $fullname = index $ctx $overrideKey -}}
       {{- end -}}
     {{- end }}
   {{- end -}}

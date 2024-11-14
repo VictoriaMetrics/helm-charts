@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- fail fullname templates if data for appKey is not found
+- find by appKey in Values and context root
 
 ## 0.0.26
 
