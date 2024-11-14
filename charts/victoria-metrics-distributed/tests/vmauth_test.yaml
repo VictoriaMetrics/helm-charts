@@ -1,0 +1,14 @@
+suite: vmauth templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - vmauth-*.yaml
+  - per-az/vmauth-*.yaml
+tests:
+  - it: vmauth should match snapshot
+    set:
+      vmauth:
+        enabled: true
+    asserts:
+      - matchSnapshot: {}

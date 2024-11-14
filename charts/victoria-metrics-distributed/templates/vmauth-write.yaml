@@ -1,5 +1,6 @@
 {{- if .Values.write.global.vmauth.enabled }}
-{{- $ctx := dict "helm" . "appKey" (list "write" "global" "vmauth") }}
+{{- $fullname := include "vm.fullname" . }}
+{{- $ctx := dict "helm" . "appKey" (list "write" "global" "vmauth") "fullname" $fullname }}
 {{- $ns := include "vm.namespace" $ctx }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
@@ -7,7 +8,7 @@ kind: VMAuth
 metadata:
   name: {{ include "vm.cr.fullname" $ctx }}
   namespace: {{ $ns }}
-  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  labels: {{ include "vm.labels" $ | nindent 4 }}
   {{- with .Values.write.global.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
@@ -25,8 +26,14 @@ spec:
     - "/api/v1/import/.+"
     {{- $_ := set $ctx "style" "managed" }}
     {{- $urls := default list }}
-    {{- range $i, $zone := $.Values.availabilityZones }}
-      {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "vmagent") }}
+    {{- range $i, $z := $.Values.availabilityZones }}
+      {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
+      {{- if $zone.vmagent }}
+        {{- $urlSpec := $zone.vmagent.spec | default dict }}
+        {{- $_ := set $zone.vmagent "spec" (mergeOverwrite (deepCopy $.Values.common.vmagent.spec) $urlSpec) }}
+      {{- end }}
+      {{- $_ := set $ctx "zone" $zone }}
+      {{- $_ := set $ctx "appKey" (list "zone" "vmagent" "spec") }}
       {{- $urls = append $urls (include "vm.url" $ctx) }}
     {{- end }}
     {{- $_ := unset $ctx "style" }}

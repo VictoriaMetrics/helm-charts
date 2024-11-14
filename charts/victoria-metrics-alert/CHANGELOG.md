@@ -1,7 +1,7 @@
 ## Next release
 
 - updated context for serviceaccount name
-- updated common dependency 0.0.23 -> 0.0.25
+- updated common dependency 0.0.23 -> 0.0.28
 
 ## 0.12.5
 

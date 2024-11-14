@@ -4,7 +4,8 @@
     {{- $ingresses := ternary (dict $name $config.ingress) $config.ingress (hasKey $config.ingress "enabled") }}
     {{- range $ingName, $ingress := $ingresses }}
       {{- if $ingress.enabled }}
-        {{- $appKey := ternary $name (list $name $ingName) (eq $name $ingName) -}}
+        {{- $ingName = ternary $ingName (printf "vm%s" $ingName) (or (hasPrefix "vm" $ingName) (not (hasPrefix "vm" $name))) }}
+        {{- $appKey := ternary $name (list $name "spec" $ingName) (eq $name $ingName) -}}
         {{- $ctx := dict "helm" $ "appKey" $appKey -}}
         {{- $fullname := include "vm.managed.fullname" $ctx }}
 ---

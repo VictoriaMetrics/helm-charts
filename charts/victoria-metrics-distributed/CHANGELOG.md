@@ -3,7 +3,8 @@
 **Update note**: This release contains breaking changes. please follow [upgrade guide](../#upgrade-to-050)
 
 - set default DNS domain to `cluster.local.`
-- updated common dependency 0.0.19 -> 0.0.24
+- added `.Values.zoneTpl` to define a default configuration for each `.Values.availabilityZones`
+- updated common dependency 0.0.19 -> 0.0.28
 
 ## 0.4.2
 
