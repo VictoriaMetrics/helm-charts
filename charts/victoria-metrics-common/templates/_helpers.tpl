@@ -85,7 +85,7 @@ If release name contains chart name it will be used as a full name.
   {{- end -}}
   {{- $prefix := .appKey -}}
   {{- if kindIs "slice" $prefix -}}
-    {{- $prefix = last $prefix -}}
+    {{- $prefix = last (without $prefix "spec") -}}
   {{- end -}}
   {{- if $prefix -}}
     {{- $prefix = ternary $prefix (printf "vm%s" $prefix) (or (hasPrefix "vm" $prefix) (hasPrefix "vl" $prefix)) -}}
