@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Allow lookup in context root for `vm.url`, `vm.host` templates
 
 ## 0.0.27
 

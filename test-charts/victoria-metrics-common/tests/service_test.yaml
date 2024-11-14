@@ -97,3 +97,20 @@ tests:
       - equal:
           path: vm.service
           value: test
+  - it: with appKey, nested name and managed style with port
+    set:
+      ctx:
+        appKey: 
+          - managed
+          - server
+          - spec
+        style: managed
+        managed:
+          server:
+            name: test
+            spec:
+              port: 4321
+    asserts:
+      - equal:
+          path: vm.url
+          value: http://vmserver-test.NAMESPACE.svc:4321

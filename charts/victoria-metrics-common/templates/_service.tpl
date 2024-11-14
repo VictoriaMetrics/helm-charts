@@ -34,14 +34,17 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- if .appKey -}}
     {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
-    {{- $spec := $Values -}}
+    {{- $values := $Values -}}
+    {{- $ctx := . -}}
     {{- range $ak := $appKey -}}
-      {{- if index $spec $ak -}}
-        {{- $spec = (index $spec $ak) -}}
-      {{- end -}}
-      {{- if and (kindIs "map" $spec) (hasKey $spec "spec") -}}
-        {{- $spec = $spec.spec -}}
-      {{- end -}}
+      {{- $values = ternary (default dict) (index $values $ak | default dict) (empty $values) -}}
+      {{- $ctx = ternary (default dict) (index $ctx $ak | default dict) (empty $ctx) -}}
+    {{- end -}}
+    {{- $spec := default dict -}}
+    {{- if $ctx -}}
+      {{- $spec = $ctx -}}
+    {{- else if $values -}}
+      {{- $spec = $values -}}
     {{- end -}}
     {{- $isSecure = (eq ($spec.extraArgs).tls "true") | default $isSecure -}}
     {{- $port = (ternary 443 80 $isSecure) -}}
@@ -58,14 +61,17 @@
   {{- $isSecure := ternary false true (empty .appSecure) -}}
   {{- if .appKey -}}
     {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
-    {{- $spec := $Values -}}
+    {{- $values := $Values -}}
+    {{- $ctx := . -}}
     {{- range $ak := $appKey -}}
-      {{- if index $spec $ak -}}
-        {{- $spec = (index $spec $ak) -}}
-      {{- end -}}
-      {{- if and (kindIs "map" $spec) (hasKey $spec "spec") -}}
-        {{- $spec = $spec.spec -}}
-      {{- end -}}
+      {{- $values = ternary (default dict) (index $values $ak | default dict) (empty $values) -}}
+      {{- $ctx = ternary (default dict) (index $ctx $ak | default dict) (empty $ctx) -}}
+    {{- end -}}
+    {{- $spec := default dict -}}
+    {{- if $values -}}
+      {{- $spec = $values -}}
+    {{- else if $ctx -}}
+      {{- $spec = $ctx -}}
     {{- end -}}
     {{- $isSecure = (eq ($spec.extraArgs).tls "true") | default $isSecure -}}
     {{- $proto = (ternary "https" "http" $isSecure) -}}

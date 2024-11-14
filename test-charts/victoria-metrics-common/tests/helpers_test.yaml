@@ -232,3 +232,38 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: No data for appKey test->single->absent
+  - it: with appKey in ctx with spec
+    set:
+      ctx:
+        appKey:
+         - test
+         - single
+         - spec
+        test:
+          single:
+            name: override-1
+            spec:
+              value: {}
+      test:
+        single:
+          name: override-2
+      fullnameOverride: global
+    asserts:
+      - equal:
+          path: vm.fullname
+          value: global
+      - equal:
+          path: vm.plain.fullname
+          value: global-spec
+      - equal:
+          path: vm.managed.fullname
+          value: vmsingle-override-2
+      - equal:
+          path: vm.cr.fullname
+          value: override-2
+      - equal:
+          path: vm.namespace
+          value: NAMESPACE
+      - equal:
+          path: vm.sa.name
+          value: global
