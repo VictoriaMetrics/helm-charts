@@ -183,3 +183,52 @@ tests:
       - equal:
           path: vm.sa.name
           value: global
+  - it: with appKey in ctx and values
+    set:
+      ctx:
+        appKey:
+         - test
+         - single
+        test:
+          single:
+            name: override-1
+      test:
+        single:
+          name: override-2
+      fullnameOverride: global
+    asserts:
+      - equal:
+          path: vm.fullname
+          value: global
+      - equal:
+          path: vm.plain.fullname
+          value: global-single
+      - equal:
+          path: vm.managed.fullname
+          value: vmsingle-override-2
+      - equal:
+          path: vm.cr.fullname
+          value: override-2
+      - equal:
+          path: vm.namespace
+          value: NAMESPACE
+      - equal:
+          path: vm.sa.name
+          value: global
+  - it: with appKey but no data for a key
+    set:
+      ctx:
+        appKey:
+         - test
+         - single
+         - absent
+        test:
+          single:
+            name: override-1
+      test:
+        single:
+          name: override-2
+      fullnameOverride: global
+    asserts:
+      - failedTemplate:
+          errorMessage: No data for appKey test->single->absent
