@@ -1,7 +1,8 @@
 {{- $ctx := dict "helm" . }}
 {{- $isMultitenant := .Values.enableMultitenancy }}
 {{- $tenant := ternary "multitenant" "0" $isMultitenant }}
-{{- range $i, $zone := .Values.availabilityZones }}
+{{- range $i, $z := .Values.availabilityZones }}
+{{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
 {{- if $zone.vmagent.enabled }}
 {{- if (($zone.vmagent).spec).remoteWrite }} 
   {{- fail "Error: distributed vmagent doesn't support customized remoteWrite address" }}
@@ -10,29 +11,34 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAgent
 metadata:
+  {{- $_ := set $ctx "appKey" (list "zone" "vmagent") }}
+  {{- $_ := set $ctx "zone" $zone }}
   labels: {{ include "vm.labels" $ | nindent 4 }}
   {{- with $zone.vmagent.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-  {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "vmagent") }}
-  name: {{ include "vm.fullname" $ctx }}
+  name: {{ include "vm.cr.fullname" $ctx }}
   namespace: {{ include "vm.namespace" $ }}
 {{- $spec := mergeOverwrite (deepCopy $.Values.common.vmagent.spec) (deepCopy ($zone.common).spec) (deepCopy ($zone.vmagent).spec) }}
 {{- $remoteWrites := default list }}
-{{- range $rwZone := $.Values.availabilityZones }}
+{{- range $rwz := $.Values.availabilityZones }}
+  {{- $rwZone := mergeOverwrite (deepCopy $.Values.zoneTpl) $rwz }}
   {{- if $rwZone.write.allow }}
+    {{- if ($rwZone.write).vmauth }}
+      {{- $urlSpec := $rwZone.write.vmauth.spec | default dict }}
+      {{- $_ := set $rwZone.write.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) $urlSpec) }}
+    {{- end }}
     {{- $_ := set $ctx "style" "managed" }}
-    {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "write" "vmauth") }}
-    {{- $_ := set $ctx "alias" "vmauth-write-balancer" }}
-    {{- $_ := unset $ctx "style" }}
-    {{- $_ := unset $ctx "alias" }}
+    {{- $_ := set $ctx "appKey" (list "zone" "write" "vmauth" "spec") }}
+    {{- $_ := set $ctx "zone" $rwZone }}
     {{- $remoteWrites = append $remoteWrites (dict "url" (printf "%s/insert/%s/prometheus/api/v1/write" (include "vm.url" $ctx) $tenant)) }}
+    {{- $_ := unset $ctx "style" }}
   {{- end }}
 {{- end }}
 {{- $_ := set $spec "remoteWrite" (concat $remoteWrites ($spec.remoteWrites | default list)) }}
 {{- if $isMultitenant }}
   {{- $_ := set $spec "remoteWriteSettings" (dict "useMultitenantMode" true) }}
 {{- end }}
-spec: {{ toYaml $spec | nindent 2 }}
+spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
 {{- end }}
 {{- end }}

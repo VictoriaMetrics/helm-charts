@@ -3,13 +3,13 @@
   {{- $endpoint := default dict -}}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmsingle.enabled -}}
-    {{- $_ := set . "appKey" "vmsingle" -}}
+    {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
     {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
   {{- else if $Values.vmcluster.enabled -}}
     {{- if $Values.vmauth.enabled -}}
-      {{- $_ := set . "appKey" "vmauth" -}}
+      {{- $_ := set . "appKey" (list "vmauth" "spec") -}}
     {{- else -}}
-      {{- $_ := set . "appKey" (list "vmcluster" "vmselect") -}}
+      {{- $_ := set . "appKey" (list "vmcluster" "spec" "vmselect") -}}
     {{- end -}}
     {{- $baseURL := include "vm.url" . -}}
     {{- $tenant := $Values.tenant | default 0 -}}
@@ -25,14 +25,14 @@
   {{- $endpoint := default dict -}}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmsingle.enabled -}}
-    {{- $_ := set . "appKey" "vmsingle" -}}
+    {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
     {{- $baseURL := include "vm.url" . -}}
     {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
   {{- else if $Values.vmcluster.enabled -}}
     {{- if $Values.vmauth.enabled -}}
-      {{- $_ := set . "appKey" "vmauth" -}}
+      {{- $_ := set . "appKey" (list "vmauth" "spec") -}}
     {{- else -}}
-      {{- $_ := set . "appKey" (list "vmcluster" "vminsert") -}}
+      {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
     {{- end -}}
     {{- $baseURL := include "vm.url" . -}}
     {{- $tenant := $Values.tenant | default 0 -}}
@@ -52,7 +52,7 @@
   {{- $_ := set $ctx "style" "managed" -}}
   {{- $remoteWrite := include "vm.write.endpoint" $ctx | fromYaml -}}
   {{- if $Values.vmalert.remoteWriteVMAgent -}}
-    {{- $_ := set $ctx "appKey" "vmagent" -}}
+    {{- $_ := set $ctx "appKey" (list "vmagent" "spec") -}}
     {{- $remoteWrite = dict "url" (printf "%s/api/v1/write" (include "vm.url" $ctx)) -}}
     {{- $_ := unset $ctx "appKey" -}}
   {{- end -}}
@@ -67,7 +67,7 @@
   {{- else if $Values.alertmanager.enabled -}}
     {{- $notifiers := default list -}}
     {{- $appSecure := not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config) -}}
-    {{- $_ := set $ctx "appKey" "alertmanager" -}}
+    {{- $_ := set $ctx "appKey" (list "alertmanager" "spec") -}}
     {{- $_ := set $ctx "appSecure" $appSecure -}}
     {{- $_ := set $ctx "appRoute" (($Values.alertmanager).spec).routePrefix -}}
     {{- $alertManagerReplicas := $Values.alertmanager.spec.replicaCount | default 1 | int -}}
@@ -163,13 +163,13 @@
   {{- $unauthorizedAccessConfig := default list }}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmsingle.enabled -}}
-    {{- $_ := set . "appKey" (list "vmsingle") -}}
+    {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
     {{- $url := include "vm.url" . }}
     {{- $srcPath := clean (printf "%s/.*" (urlParse $url).path) }}
     {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $srcPath) "url_prefix" (list $url)) }}
   {{- else if $Values.vmcluster.enabled -}}
     {{- $authConfig := ($Values.vmcluster).vmauth }}
-    {{- $_ := set . "appKey" (list "vmcluster" "vminsert") -}}
+    {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
     {{- $writeAuths := $authConfig.vminsert }}
     {{- $writeUrl := include "vm.url" . }}
     {{- range $writeAuth := $writeAuths }}
@@ -180,7 +180,7 @@
       {{- $_ := set $writeAuth "url_prefix" $urls}}
       {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig $writeAuth -}}
     {{- end }}
-    {{- $_ := set . "appKey" (list "vmcluster" "vmselect") -}}
+    {{- $_ := set . "appKey" (list "vmcluster" "spec" "vmselect") -}}
     {{- $readAuths := $authConfig.vmselect }}
     {{- $readUrl := include "vm.url" . }}
     {{- range $readAuth := $readAuths }}
@@ -255,7 +255,7 @@
   {{- $extraArgs := default dict -}}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmalert.enabled }}
-    {{- $_ := set . "appKey" "vmalert" }}
+    {{- $_ := set . "appKey" (list "vmalert" "spec") }}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" .) -}}
   {{- end -}}
   {{- $spec := dict "extraArgs" $extraArgs "image" (dict "tag" $Chart.AppVersion) -}}
@@ -272,7 +272,7 @@
   {{- $extraArgs := default dict -}}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmalert.enabled -}}
-    {{- $_ := set . "appKey" "vmalert" -}}
+    {{- $_ := set . "appKey" (list "vmalert" "spec") -}}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" .) -}}
   {{- end -}}
   {{- $spec := dict "extraArgs" $extraArgs "image" (dict "tag" (printf "%s-cluster" $Chart.AppVersion)) -}}
@@ -348,7 +348,7 @@
   {{- if $Values.alertmanager.enabled -}}
     {{- range $ds := $Values.defaultDatasources.alertmanager.datasources }}
       {{- $appSecure := not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config) -}}
-      {{- $_ := set $ctx "appKey" "alertmanager" -}}
+      {{- $_ := set $ctx "appKey" (list "alertmanager" "spec") -}}
       {{- $_ := set $ctx "appSecure" $appSecure -}}
       {{- $_ := set $ctx "appRoute" (($Values.alertmanager).spec).routePrefix -}}
       {{- $_ := set $ds "url" (include "vm.url" $ctx) -}}
@@ -381,6 +381,6 @@
 {{- /* VMAlertmanager name */ -}}
 {{- define "vm-k8s-stack.alertmanager.name" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $_ := set . "appKey" "alertmanager" -}}
+  {{- $_ := set . "appKey" (list "alertmanager" "spec") -}}
   {{- $Values.alertmanager.name | default (include "vm.managed.fullname" .) -}}
 {{- end -}}

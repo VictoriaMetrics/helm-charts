@@ -1,5 +1,8 @@
-{{ if and .Values.read.global.vmauth.enabled (index .Values "victoria-metrics-k8s-stack" "grafana" "enabled") }}
-{{- $ctx := dict "helm" . "appKey" (list "read" "global" "vmauth") "alias" "vmauth-read-global" "style" "managed" }}
+{{ if and (((.Values.read).global).vmauth).enabled (index .Values "victoria-metrics-k8s-stack" "grafana" "enabled") }}
+{{- $read := deepCopy (.Values.read).global  }}
+{{- $fullname := include "vm.fullname" . }}
+{{- $_ := set $read.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) $read.vmauth.spec) }}
+{{- $ctx := dict "helm" . "appKey" (list "globalRead" "vmauth" "spec") "globalRead" $read "style" "managed" "fullname" $fullname }}
 {{- $url := (printf "%s/select/0/prometheus/" (include "vm.url" $ctx)) }}
 {{- $ns := include "vm.namespace" $ctx }}
 ---

@@ -1,24 +1,30 @@
 {{- $ns := include "vm.namespace" . }}
 {{- $ctx := dict "helm" . }}
-{{- range $i, $zone := .Values.availabilityZones }}
+{{- range $i, $z := .Values.availabilityZones }}
+{{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
 {{- if $zone.read.perZone.vmauth.enabled }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
-  {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "read" "perZone" "vmauth") }}
-  name: read-balancer-{{ include "vm.fullname" $ctx }}
+  {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
+  {{- $_ := set $ctx "zone" $zone }}
+  name: {{ include "vm.cr.fullname" $ctx }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ | nindent 4 }}
   {{- with $zone.read.perZone.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
 {{- $spec := mergeOverwrite (deepCopy $.Values.common.vmauth.spec) (deepCopy (($zone.common).spec)) (deepCopy (((($zone.read).perZone).vmauth).spec)) }}
-spec: {{ toYaml (omit $spec "unauthorizedAccessConfig") | nindent 2 }}
+spec: {{ tpl (toYaml (omit $spec "unauthorizedAccessConfig")) $ctx | nindent 2 }}
   unauthorizedAccessConfig:
   - src_paths:
     - "/select/.+"
-    {{- $_ := set $ctx "appKey" (list "availabilityZones" $i "vmcluster" "spec" "vmselect") }}
+    {{- $_ := set $ctx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
+    {{- if $zone.vmcluster }}
+      {{- $urlSpec := $zone.vmcluster.spec | default dict }}
+      {{- $_ := set $zone.vmcluster "spec" (mergeOverwrite (deepCopy $.Values.common.vmcluster.spec) $urlSpec) }}
+    {{- end }}
     {{- $_ := set $ctx "style" "managed" }}
     url_prefix: 
     - {{ include "vm.url" $ctx }}

@@ -6,7 +6,13 @@ Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstrai
   {{- $Values := $ctx.Values }}
   {{- $zones := (dict) -}}
   {{- $commonClusterSpec := ((($Values.common).vmcluster).spec) | default dict -}}
-  {{- range $idx, $rolloutZone := $Values.availabilityZones -}}
+  {{- range $idx, $z := $Values.availabilityZones -}}
+    {{- $rolloutZone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
+    {{- $fullname := $rolloutZone.name }}
+    {{- if $rolloutZone.vmcluster.name -}}
+      {{- $fullname = $rolloutZone.vmcluster.name -}}
+    {{- end -}}
+    {{- $fullname = tpl $fullname (dict "zone" $rolloutZone) -}}
     {{- $commonSpec := $rolloutZone.common.spec | default dict -}}
     {{- $clusterSpec := mergeOverwrite (deepCopy $commonClusterSpec) (deepCopy $rolloutZone.vmcluster.spec) -}}
     {{- range $name, $config := $clusterSpec -}}
@@ -15,7 +21,8 @@ Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstrai
         {{- $_ := set $clusterSpec $name $config -}}
       {{- end -}}
     {{- end -}}
-    {{- $_ := set $zones $rolloutZone.name $clusterSpec -}}
+    {{- $clusterSpec = fromYaml (tpl (toYaml $clusterSpec) (dict "zone" $rolloutZone)) -}}
+    {{- $_ := set $zones $fullname $clusterSpec -}}
   {{- end -}}
   {{- tpl (toYaml $zones) $ctx -}}
 {{- end -}}
