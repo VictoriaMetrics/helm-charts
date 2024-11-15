@@ -132,7 +132,6 @@ Create base alertmanager url for notifers
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.server -}}
   {{- $args := default dict -}}
-  {{- $_ := set $args "rule" "/config/alert-rules.yaml" -}}
   {{- $_ := set $args "datasource.url" $app.datasource.url -}}
   {{- if or $app.datasource.basicAuth.password $app.datasource.basicAuth.username -}}
     {{- $_ := set $args "datasource.basicAuth.password" $app.datasource.basicAuth.password -}}
