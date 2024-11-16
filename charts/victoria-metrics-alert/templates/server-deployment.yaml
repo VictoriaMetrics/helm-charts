@@ -91,11 +91,8 @@ spec:
               {{- end }}
             {{- end }}
             {{- range $app.extraVolumeMounts }}
-            - name: {{ .name}}
-              mountPath: {{ .mountPath }}
-              {{- with .subPath }}
-              subPath: {{ . }}
-              {{- end }}
+            - name: {{ .name }}
+              {{- toYaml (omit . "name") | nindent 14 }}
             {{- end }}
           {{- include "vm.license.mount" . | nindent 12 }}
           {{- with $app.resources }}
@@ -128,8 +125,7 @@ spec:
         {{- end }}
         {{- range $app.extraVolumes }}
         - name: {{ .name }}
-          configMap:
-            name: {{ .configMap.name }}
+          {{- toYaml (omit . "name") | nindent 10 }}
         {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
 {{- end }}
