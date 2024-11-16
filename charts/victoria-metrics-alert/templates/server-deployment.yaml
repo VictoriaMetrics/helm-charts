@@ -90,8 +90,9 @@ spec:
               readOnly: {{ . }}
               {{- end }}
             {{- end }}
-            {{- with $app.extraVolumeMounts }}
-            {{- toYaml . | nindent 12 }}
+            {{- range $app.extraVolumeMounts }}
+            - name: {{ .name }}
+              {{- toYaml (omit . "name") | nindent 14 }}
             {{- end }}
           {{- include "vm.license.mount" . | nindent 12 }}
           {{- with $app.resources }}
@@ -122,8 +123,9 @@ spec:
           hostPath:
             path: {{ .hostPath }}
         {{- end }}
-        {{- with $app.extraVolumes }}
-        {{- toYaml . | nindent 8 }}
+        {{- range $app.extraVolumes }}
+        - name: {{ .name }}
+          {{- toYaml (omit . "name") | nindent 10 }}
         {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
 {{- end }}
