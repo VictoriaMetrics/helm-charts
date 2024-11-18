@@ -194,8 +194,8 @@ If release name contains chart name it will be used as a full name.
   {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $labels := fromYaml (include "vm.selectorLabels" .) -}}
   {{- $labels = mergeOverwrite $labels (fromYaml (include "vm.metaLabels" .)) -}}
-  {{- with $Chart.AppVersion -}}
-    {{- $_ := set $labels "app.kubernetes.io/version" ($Chart.AppVersion) -}}
+  {{- with (include "vm.image.tag" .) -}}
+    {{- $_ := set $labels "app.kubernetes.io/version" . -}}
   {{- end -}}
   {{- toYaml $labels -}}
 {{- end -}}

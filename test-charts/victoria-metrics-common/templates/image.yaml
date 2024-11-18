@@ -1,0 +1,9 @@
+{{- $ctx := .Values.ctx | default dict -}}
+{{- $_ := unset .Values "ctx" -}}
+{{- range $k, $v := $ctx }}
+  {{- $_ := set $ $k $v -}}
+{{- end }}
+vm:
+  image:
+    name: '{{ include "vm.image" . }}'
+    tag: '{{ include "vm.image.tag" . }}'
