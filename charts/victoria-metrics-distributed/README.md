@@ -1,4 +1,4 @@
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.4.2](https://img.shields.io/badge/Version-0.4.2-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-distributed)
 [![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](https://slack.victoriametrics.com/)
 
@@ -314,7 +314,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td><p>Config per availability zone components, including vmagent, vmcluster, vmauth etc Each zone uses config from <code>zoneTpl</code> by default, override it for each availability zone if it&rsquo;s needed</p>
+      <td><p>Config for all availability zones. Each element represents custom zone config, which overrides a default one from <code>zoneTpl</code></p>
 </td>
     </tr>
     <tr>
@@ -347,7 +347,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 </code>
 </pre>
 </td>
-      <td><p>Common VMAgent spec, which can be overriden by each VMAgent configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmagentspec" target="_blank">here</a></p>
+      <td><p>Common VMAgent spec, which can be overridden by each VMAgent configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmagentspec" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
@@ -375,7 +375,7 @@ vmselect:
 </code>
 </pre>
 </td>
-      <td><p>Common VMCluster spec, which can be overriden by each VMCluster configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmclusterspec" target="_blank">here</a></p>
+      <td><p>Common VMCluster spec, which can be overridden by each VMCluster configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmclusterspec" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
@@ -601,7 +601,7 @@ write:
 </code>
 </pre>
 </td>
-      <td><p>Defines a template for each availability zone, which can be overriden for each availability zone at <code>availabilityZones[*]</code></p>
+      <td><p>Default config for each availability zone components, including vmagent, vmcluster, vmauth etc. Defines a template for each availability zone, which can be overridden for each availability zone at <code>availabilityZones[*]</code></p>
 </td>
     </tr>
     <tr>

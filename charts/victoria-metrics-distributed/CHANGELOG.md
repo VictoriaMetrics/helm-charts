@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 0.5.0
+
+**Release date:** 2024-11-18
+
+![AppVersion: v1.106.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.106.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 **Update note**: This release contains breaking changes. please follow [upgrade guide](../#upgrade-to-050)
 
 - set default DNS domain to `cluster.local.`
