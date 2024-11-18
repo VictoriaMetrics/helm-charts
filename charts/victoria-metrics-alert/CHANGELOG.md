@@ -2,6 +2,7 @@
 
 - updated context for serviceaccount name
 - updated common dependency 0.0.23 -> 0.0.28
+- bump version of VM components to [v1.106.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.106.1)
 
 ## 0.12.5
 

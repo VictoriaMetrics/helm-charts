@@ -5,6 +5,7 @@
 - set default DNS domain to `cluster.local.`
 - added `.Values.zoneTpl` to define a default configuration for each `.Values.availabilityZones`
 - updated common dependency 0.0.19 -> 0.0.28
+- bump version of VM components to [v1.106.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.106.1)
 
 ## 0.4.2
 
