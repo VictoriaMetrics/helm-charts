@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 0.38.0
+
+**Release date:** 2024-11-18
+
+![AppVersion: v0.49.1](https://img.shields.io/static/v1?label=AppVersion&message=v0.49.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - fix Deployment/StatefulSets when `serviceAccount.name` is empty and `serviceAccount.create: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1683).
 - set default DNS domain to `cluster.local.`
 - updated common dependency 0.0.19 -> 0.0.28
