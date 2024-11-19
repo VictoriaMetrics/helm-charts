@@ -4,10 +4,25 @@ Victoria Metrics Image
 {{- define "vm.image" -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $tag := .app.image.tag -}}
+  {{- $tag := include "vm.image.tag" . -}}
+  {{- if empty ((.app).image).repository -}}
+    {{- fail "cannot create image without `.repository` defined" -}}
+  {{- end -}}
+  {{- $image := tpl (printf "%s:%s" ((.app).image).repository $tag) . -}}
+  {{- with ((.app).image).registry | default (($Values.global).image).registry | default "" -}}
+    {{- $image = (printf "%s/%s" . $image) -}}
+  {{- end -}}
+  {{- $image -}}
+{{- end -}}
+
+{{- define "vm.image.tag" -}}
+  {{- $Chart := (.helm).Chart | default .Chart -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $image := (.app).image | default dict -}}
+  {{- $tag := $image.tag -}}
   {{- if empty $tag }}
     {{- $tag = $Chart.AppVersion -}}
-    {{- $variant := .app.image.variant }}
+    {{- $variant := $image.variant }}
     {{- if eq (include "vm.enterprise.disabled" .) "false" -}}
       {{- if $variant }}
         {{- $variant = printf "enterprise-%s" $variant }}
@@ -19,9 +34,5 @@ Victoria Metrics Image
       {{- $tag = (printf "%s-%s" $tag .) -}}
     {{- end -}}
   {{- end -}}
-  {{- $image := tpl (printf "%s:%s" .app.image.repository $tag) . -}}
-  {{- with .app.image.registry | default (($Values.global).image).registry | default "" -}}
-    {{- $image = (printf "%s/%s" . $image) -}}
-  {{- end -}}
-  {{- $image -}}
+  {{- $tag -}}
 {{- end -}}
