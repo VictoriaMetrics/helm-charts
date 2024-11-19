@@ -1,6 +1,7 @@
-{{- if and .Values.vmalert.enabled .Values.vmalert.additionalNotifierConfigs }}
-{{- $ctx := dict "helm" . "appKey" "vmalert" }}
-{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $app := .Values.vmalert }}
+{{- if and $app.enabled $app.additionalNotifierConfigs }}
+{{- $ctx := dict "helm" . "appKey" (list "vmalert" "spec") }}
+{{- $fullname := include "vm.managed.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1
 kind: Secret
@@ -9,7 +10,7 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 stringData:
-  {{- $configs := .Values.vmalert.additionalNotifierConfigs.static_configs | default list -}}
+  {{- $configs := $app.additionalNotifierConfigs.static_configs | default list -}}
   {{- if (.Values.alertmanager).enabled }}
     {{- $replicas := ((.Values.alertmanager).spec).replicaCount | int -}}
     {{- if gt $replicas 0 }}
@@ -25,6 +26,6 @@ stringData:
       {{- $configs = append $configs (dict "targets" $targets) -}}
     {{- end }}
   {{- end }}
-  {{- $_ := set .Values.vmalert.additionalNotifierConfigs "static_configs" $configs }}
-  notifier-configs.yaml: |{{ toYaml .Values.vmalert.additionalNotifierConfigs | nindent 4 }}
+  {{- $_ := set $app.additionalNotifierConfigs "static_configs" $configs }}
+  notifier-configs.yaml: |{{ toYaml $app.additionalNotifierConfigs | nindent 4 }}
 {{- end }}

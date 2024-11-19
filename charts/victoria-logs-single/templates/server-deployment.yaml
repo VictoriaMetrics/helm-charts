@@ -52,7 +52,6 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{- include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" $ctx) | nindent 12 }}
           {{- end }}
-          {{- $_ := set $ctx "app" $app }}
           image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.containerWorkingDir }}

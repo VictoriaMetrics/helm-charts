@@ -8,7 +8,43 @@ templates:
 tests:
   - it: vmauth should match snapshot
     set:
-      vmauth:
-        enabled: true
+      write:
+        global:
+          vmauth:
+            spec:
+              image:
+                tag: v1.0.2
+      read:
+        global:
+          vmauth:
+            spec:
+              image:
+                tag: v1.0.3
+      zoneTpl:
+        read:
+          perZone:
+            vmauth:
+              spec:
+                image:
+                  tag: v1.0.4
+          crossZone:
+            vmauth:
+              spec:
+                image:
+                  tag: v1.0.5
+        write:
+          vmauth:
+            spec:
+              image:
+                tag: v1.0.6
+        cluster:
+          spec:
+            image:
+              tag: v1.0.7
+        vmagent:
+          spec:
+            image:
+              tag: v1.0.8
+        
     asserts:
       - matchSnapshot: {}

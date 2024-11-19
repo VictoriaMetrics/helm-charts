@@ -21,6 +21,7 @@ kind: {{ ternary "StatefulSet" "Deployment" .Values.persistentVolume.enabled }}
 metadata:
   namespace: {{ $ns }}
   name: {{ $fullname }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}

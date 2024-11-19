@@ -1,4 +1,5 @@
-{{- if and .Values.server.relabel.enabled (empty .Values.server.relabel.configMap) }}
+{{- $app := .Values.server }}
+{{- if and $app.relabel.enabled (empty $app.relabel.configMap) }}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
@@ -9,5 +10,5 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
-  relabel.yml: |{{ toYaml .Values.server.relabel.config | nindent 4 }}
+  relabel.yml: |{{ toYaml $app.relabel.config | nindent 4 }}
 {{- end }}

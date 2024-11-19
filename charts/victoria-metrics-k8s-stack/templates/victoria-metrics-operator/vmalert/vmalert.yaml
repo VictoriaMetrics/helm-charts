@@ -1,12 +1,13 @@
-{{- if .Values.vmalert.enabled }}
-{{- $ctx := dict "helm" . "appKey" "vmalert" }}
+{{- $app := .Values.vmalert }}
+{{- if $app.enabled }}
+{{- $ctx := dict "helm" . "appKey" (list "vmalert" "spec") }}
 {{- $fullname := include "vm.cr.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlert
 metadata:
-  {{- with .Values.vmalert.annotations }}
+  {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
   name: {{ $fullname }}

@@ -15,7 +15,7 @@ metadata:
   {{- $_ := set $ctx "zone" $zone }}
   name: {{ include "vm.cr.fullname" $ctx }}
   namespace: {{ $ns }}
-  labels: {{ include "vm.labels" $ | nindent 4 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $zone.read.crossZone.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}

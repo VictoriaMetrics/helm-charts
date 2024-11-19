@@ -61,7 +61,7 @@
   {{- $_ := set $remotes "remoteRead" $remoteRead -}}
   {{- $_ := set $remotes "datasource" $remoteRead -}}
   {{- if $Values.vmalert.additionalNotifierConfigs }}
-    {{- $configName := printf "%s-vmalert-additional-notifier" $fullname -}}
+    {{- $configName := printf "%s-additional-notifier" $fullname -}}
     {{- $notifierConfigRef := dict "name" $configName "key" "notifier-configs.yaml" -}}
     {{- $_ := set $remotes "notifierConfigRef" $notifierConfigRef -}}
   {{- else if $Values.alertmanager.enabled -}}
@@ -85,8 +85,8 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $cms :=  ($Values.vmalert.spec.configMaps | default list) -}}
   {{- if $Values.vmalert.templateFiles -}}
-    {{- $fullname := include "vm.fullname" . -}}
-    {{- $cms = append $cms (printf "%s-vmalert-extra-tpl" $fullname) -}}
+    {{- $fullname := include "vm.managed.fullname" . -}}
+    {{- $cms = append $cms (printf "%s-extra-tpl" $fullname) -}}
   {{- end -}}
   {{- $output := dict "configMaps" (compact $cms) -}}
   {{- toYaml $output -}}
@@ -114,7 +114,7 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
   {{- $extraArgs := dict "remoteWrite.disablePathAppend" "true" -}}
-  {{- $fullname := include "vm.plain.fullname" . }}
+  {{- $fullname := include "vm.managed.fullname" . }}
   {{- if $Values.vmalert.templateFiles -}}
     {{- $ruleTmpl := printf "/etc/vm/configs/%s-extra-tpl/*.tmpl" $fullname -}}
     {{- $_ := set $extraArgs "rule.templates" $ruleTmpl -}}
@@ -230,7 +230,7 @@
 {{- /* Alermanager spec */ -}}
 {{- define "vm.alertmanager.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $fullname := include "vm.plain.fullname" . -}}
+  {{- $fullname := include "vm.managed.fullname" . -}}
   {{- $spec := $Values.alertmanager.spec -}}
   {{- if and (not $Values.alertmanager.spec.configRawYaml) (not $Values.alertmanager.spec.configSecret) -}}
     {{- $_ := set $spec "configSecret" $fullname -}}

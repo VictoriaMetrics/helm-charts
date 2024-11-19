@@ -67,7 +67,6 @@ spec:
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          {{- $_ := set $ctx "app" .Values }}
           image: {{ include "vm.image" $ctx }}
           workingDir: {{ .Values.containerWorkingDir }}
           args: {{ include "vmgateway.args" $ctx | nindent 12 }}

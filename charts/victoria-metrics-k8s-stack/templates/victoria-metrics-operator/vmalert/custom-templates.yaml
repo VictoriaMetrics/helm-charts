@@ -1,6 +1,7 @@
-{{- if and .Values.vmalert.enabled .Values.vmalert.templateFiles }}
-{{- $ctx := dict "helm" . "appKey" "vmalert" }}
-{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $app := .Values.vmalert }}
+{{- if and $app.enabled $app.templateFiles }}
+{{- $ctx := dict "helm" . "appKey" (list "vmalert" "spec") }}
+{{- $fullname := include "vm.managed.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 kind: ConfigMap
 apiVersion: v1
@@ -9,7 +10,7 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
-  {{- range $file, $template := .Values.vmalert.templateFiles }}
+  {{- range $file, $template := $app.templateFiles }}
   {{ $file }}: |{{ $template | nindent 4 }}
   {{- end }}
 {{- end }}
