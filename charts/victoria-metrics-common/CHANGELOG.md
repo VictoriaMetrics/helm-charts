@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.29
+
+**Release date:** 2024-11-19
+
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Allow lookup in context root for `vm.url`, `vm.host` templates
 
 ## 0.0.28
