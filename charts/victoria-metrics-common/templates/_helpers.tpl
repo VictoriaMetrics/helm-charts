@@ -62,7 +62,7 @@ If release name contains chart name it will be used as a full name.
 {{- define "vm.cr.fullname" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $_ := set . "overrideKey" "name" -}}
-  {{- $fullname := include "vm.internal.fullname" . -}}
+  {{- $fullname := include "vm.internal.key" . -}}
   {{- $_ := unset . "overrideKey" -}}
   {{- if empty $fullname -}}
     {{- $fullname = include "vm.fullname" . -}}
@@ -78,17 +78,13 @@ If release name contains chart name it will be used as a full name.
 {{- define "vm.managed.fullname" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $_ := set . "overrideKey" "name" -}}
-  {{- $fullname := include "vm.internal.fullname" . -}}
+  {{- $fullname := include "vm.internal.key" . -}}
   {{- $_ := unset . "overrideKey" -}}
   {{- if empty $fullname -}}
     {{- $fullname = include "vm.fullname" . -}}
   {{- end -}}
-  {{- $prefix := .appKey -}}
-  {{- if kindIs "slice" $prefix -}}
-    {{- $prefix = last (without $prefix "spec") -}}
-  {{- end -}}
-  {{- if $prefix -}}
-    {{- $prefix = ternary $prefix (printf "vm%s" $prefix) (or (hasPrefix "vm" $prefix) (hasPrefix "vl" $prefix)) -}}
+  {{- with include "vm.internal.key.default" . -}}
+    {{- $prefix := ternary . (printf "vm%s" .) (or (hasPrefix "vm" .) (hasPrefix "vl" .)) -}}
     {{- $fullname = printf "%s-%s" $prefix $fullname -}}
   {{- end -}}
   {{- $fullname = tpl $fullname . -}}
@@ -102,15 +98,11 @@ If release name contains chart name it will be used as a full name.
 {{- define "vm.plain.fullname" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $_ := set . "overrideKey" "fullnameOverride" -}}
-  {{- $fullname := include "vm.internal.fullname" . -}}
+  {{- $fullname := include "vm.internal.key" . -}}
   {{- $_ := unset . "overrideKey" -}}
   {{- if empty $fullname -}}
     {{- $fullname = include "vm.fullname" . -}}
-    {{- $suffix := .appKey -}}
-    {{- if kindIs "slice" $suffix -}}
-      {{- $suffix = last $suffix }}
-    {{- end -}}
-    {{- with $suffix -}}
+    {{- with include "vm.internal.key.default" . -}}
       {{- $fullname = printf "%s-%s" $fullname . -}}
     {{- end -}}
   {{- end -}}
@@ -122,10 +114,10 @@ If release name contains chart name it will be used as a full name.
   {{- end -}}
 {{- end -}}
 
-{{- define "vm.internal.fullname" -}}
+{{- define "vm.internal.key" -}}
   {{- $overrideKey := .overrideKey | default "fullnameOverride" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $fullname := "" -}}
+  {{- $key := "" -}}
   {{- if .appKey -}}
     {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
     {{- $ctx := . -}}
@@ -137,13 +129,23 @@ If release name contains chart name it will be used as a full name.
         {{- fail (printf "No data for appKey %s" (join "->" $appKey)) -}}
       {{- end -}}
       {{- if and (kindIs "map" $values) (index $values $overrideKey) -}}
-        {{- $fullname = index $values $overrideKey -}}
+        {{- $key = index $values $overrideKey -}}
       {{- else if and (kindIs "map" $ctx) (index $ctx $overrideKey) -}}
-        {{- $fullname = index $ctx $overrideKey -}}
+        {{- $key = index $ctx $overrideKey -}}
       {{- end -}}
     {{- end }}
+    {{- if and (empty $key) .fallback -}}
+      {{- $key = include "vm.internal.key.default" . -}}
+    {{- end -}}
   {{- end -}}
-  {{- $fullname -}}
+  {{- $key -}}
+{{- end -}}
+
+{{- define "vm.internal.key.default" -}}
+  {{- with .appKey -}}
+  {{- $key := ternary (list .) . (kindIs "string" .) -}}
+  {{- last (without $key "spec") -}}
+  {{- end -}}
 {{- end -}}
 
 {{- /* Create chart name and version as used by the chart label. */ -}}
@@ -191,11 +193,11 @@ If release name contains chart name it will be used as a full name.
 {{- /* Common labels */ -}}
 {{- define "vm.labels" -}}
   {{- include "vm.validate.args" . -}}
-  {{- $Chart := (.helm).Chart | default .Chart -}}
   {{- $labels := fromYaml (include "vm.selectorLabels" .) -}}
   {{- $labels = mergeOverwrite $labels (fromYaml (include "vm.metaLabels" .)) -}}
-  {{- with (include "vm.image.tag" .) -}}
-    {{- $_ := set $labels "app.kubernetes.io/version" . -}}
+  {{- $tag := include "vm.image.tag" . -}}
+  {{- if .app }}
+    {{- $_ := set $labels "app.kubernetes.io/version" $tag -}}
   {{- end -}}
   {{- toYaml $labels -}}
 {{- end -}}
@@ -213,19 +215,11 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{- define "vm.app.name" -}}
-  {{- if .appKey -}}
-    {{- $Values := (.helm).Values | default .Values -}}
-    {{- $values := $Values -}}
-    {{- $appKey := ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
-    {{- $name := last $appKey }}
-    {{- range $ak := $appKey }}
-      {{- $values = (index $values $ak) | default dict -}}
-      {{- if and (kindIs "map" $values) $values.name -}}
-        {{- $name = $values.name -}}
-      {{- end -}}
-    {{- end -}}
-    {{- $name -}}
-  {{- end -}}
+  {{- $_ := set . "overrideKey" "name" -}}
+  {{- $_ := set . "fallback" true -}}
+  {{- tpl (include "vm.internal.key" .) . -}}
+  {{- $_ := unset . "overrideKey" -}}
+  {{- $_ := unset . "fallback" -}}
 {{- end -}}
 
 {{- /* Selector labels */ -}}
