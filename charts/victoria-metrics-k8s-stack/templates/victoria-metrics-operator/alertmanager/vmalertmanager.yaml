@@ -1,7 +1,7 @@
 {{- $app := .Values.alertmanager }}
 {{- if $app.enabled }}
   {{- $ctx := dict "helm" . "appKey" "alertmanager" "style" "managed" }}
-  {{- $fullname := include "vm.fullname" $ctx }}
+  {{- $fullname := include "vm.cr.fullname" $ctx }}
   {{- $ns := include "vm.namespace" $ctx }}
   {{- if and $app.spec.configRawYaml $app.config }}
     {{- fail "ERROR: Both .Values.alertmanager.spec.configRawYaml and .Values.alertmanager.config are set, but only one is allowed." }}
