@@ -79,24 +79,16 @@
     {{- $selectNodes := default list }}
     {{- $_ := set . "appKey" "vmselect" }}
     {{- $fqdn := include "vm.fqdn" . }}
-    {{- if $Values.autoDiscovery }}
-      {{- if eq (include "vm.enterprise.disabled" . ) "true" }}
-        {{- fail "SRV autodiscovery is only supported in enterprise. Either define license or set `autoDiscovery` to `false`" }}
-      {{- end }}
-      {{- $selectNode := printf "srv+_http._tcp.%s" $fqdn }}
-      {{- $selectNodes = append $selectNodes $selectNode }}
-    {{- else }}
-      {{- $port := "8481" }}
-      {{- with $app.extraArgs.httpListenAddr }}
-        {{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" }}
-      {{- end -}}
-      {{- range $i := until ($app.replicaCount | int) -}}
-        {{- $_ := set $ "appIdx" $i }}
-        {{- $selectNode := include "vm.fqdn" $ -}}
-        {{- $selectNodes = append $selectNodes (printf "%s:%s" $selectNode $port) -}}
-      {{- end -}}
-      {{- $_ := unset $ "appIdx" }}
-    {{- end }}
+    {{- $port := "8481" }}
+    {{- with $app.extraArgs.httpListenAddr }}
+      {{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" }}
+    {{- end -}}
+    {{- range $i := until ($app.replicaCount | int) -}}
+      {{- $_ := set $ "appIdx" $i }}
+      {{- $selectNode := include "vm.fqdn" $ -}}
+      {{- $selectNodes = append $selectNodes (printf "%s:%s" $selectNode $port) -}}
+    {{- end -}}
+    {{- $_ := unset $ "appIdx" }}
     {{- $_ := set $args "selectNode" (concat ($args.selectNode | default list) $selectNodes) }}
   {{- end -}}
   {{- if empty $args.storageNode }}
