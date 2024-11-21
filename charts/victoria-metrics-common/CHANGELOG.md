@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed minor typo in vm.labels
 
 ## 0.0.30
 

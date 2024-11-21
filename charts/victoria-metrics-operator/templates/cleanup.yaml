@@ -29,7 +29,8 @@ spec:
       {{- end }}
       containers:
         - name: kubectl
-          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
+          {{- $_ := set $ctx "appKey" (list "crds" "cleanup") }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           resources: {{ toYaml $app.resources | nindent 12 }}
           args:
