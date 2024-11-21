@@ -46,7 +46,7 @@ spec:
       {{- if $manager.restore.onStart.enabled }}
       {{- include "vm.enterprise.only" . }}
       - name: vmbackupmanager-restore
-        {{- $_ := set $ctx "app" "manager" }}
+        {{- $_ := set $ctx "appKey" (list "server" "vmbackupmanager") }}
         image: {{ include "vm.image" $ctx }}
         imagePullPolicy: {{ $app.image.pullPolicy }}
         {{- with $app.podSecurityContext }}
@@ -86,7 +86,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          {{- $_ := set $ctx "app" $app }}
+          {{- $_ := set $ctx "appKey" "server" }}
           image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.containerWorkingDir }}
@@ -196,7 +196,7 @@ spec:
         {{- if $manager.enabled }}
         {{- include "vm.enterprise.only" . }}
         - name: vmbackupmanager
-          {{- $_ := set $ctx "app" $manager }}
+          {{- $_ := set $ctx "appKey" (list "server" "vmbackupmanager") }}
           image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           args: {{ include "vmbackupmanager.args" $ctx | nindent 12 }}

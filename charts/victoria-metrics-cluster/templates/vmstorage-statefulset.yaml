@@ -44,7 +44,8 @@ spec:
         {{- if $manager.restore.onStart.enabled }}
         {{- include "vm.enterprise.only" . }}
         - name: vmbackupmanager-restore
-          image: {{ include "vm.image" (dict "helm" . "app" $manager) }}
+          {{- $_ := set $ctx "appKey" (list "vmstorage" "vmbackupmanager") }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
@@ -80,7 +81,8 @@ spec:
       {{- end }}
       containers:
         - name: vmstorage
-          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
+          {{- $_ := set $ctx "appKey" "vmstorage" }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
@@ -159,7 +161,8 @@ spec:
         {{- if $manager.enabled }}
         {{- include "vm.enterprise.only" . }}
         - name: vmbackupmanager
-          image: {{ include "vm.image" (dict "helm" . "app" $manager) }}
+          {{- $_ := set $ctx "appKey" (list "vmstorage" "vmbackupmanager") }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}

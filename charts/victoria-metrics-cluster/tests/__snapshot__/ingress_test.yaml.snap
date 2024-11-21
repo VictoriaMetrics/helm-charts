@@ -10,7 +10,6 @@ ingress should match snapshot:
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-metrics-cluster
-        app.kubernetes.io/version: 0.1.0
         helm.sh/chart: victoria-metrics-cluster-0.1.1
       name: RELEASE-NAME-victoria-metrics-cluster-vmauth
       namespace: NAMESPACE
@@ -37,12 +36,21 @@ ingress should match snapshot:
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-metrics-cluster
-        app.kubernetes.io/version: 0.1.0
         helm.sh/chart: victoria-metrics-cluster-0.1.1
       name: RELEASE-NAME-victoria-metrics-cluster-vminsert
       namespace: NAMESPACE
     spec:
-      rules: null
+      rules:
+        - host: vminsert.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-victoria-metrics-cluster-vminsert
+                    port:
+                      name: http
+                path: /insert
+                pathType: Prefix
       tls:
         - hosts:
             - insert.local
@@ -58,9 +66,18 @@ ingress should match snapshot:
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-metrics-cluster
-        app.kubernetes.io/version: 0.1.0
         helm.sh/chart: victoria-metrics-cluster-0.1.1
       name: RELEASE-NAME-victoria-metrics-cluster-vmselect
       namespace: NAMESPACE
     spec:
-      rules: null
+      rules:
+        - host: vmselect.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-victoria-metrics-cluster-vmselect
+                    port:
+                      name: http
+                path: /select
+                pathType: Prefix

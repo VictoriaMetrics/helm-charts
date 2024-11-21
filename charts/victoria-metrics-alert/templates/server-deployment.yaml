@@ -56,7 +56,7 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
-          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
+          image: {{ include "vm.image" $ctx }}
           args: {{ include "vmalert.args" $ctx | nindent 12 }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.envFrom }}

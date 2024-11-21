@@ -41,7 +41,7 @@ spec:
       {{- end }}
       containers:
         - name: model
-          image: {{ include "vm.image" (dict "helm" . "app" .Values) }}
+          image: {{ include "vm.image" $ctx }}
           workingDir: {{ .Values.containerWorkingDir }}
           {{- if (((.Values.config).monitoring).pull).enabled }}
           {{- with (((.Values.config).monitoring).pull).port }}

@@ -23,17 +23,20 @@ spec:
   tls: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   rules:
-    {{- range $ingress.hosts }}
+    {{- range $host := $ingress.hosts }}
+    {{- $paths := ternary (list $host.path) $host.path (kindIs "string" $host.path) }}
     - host: {{ tpl .name $ }}
       http:
         paths:
-          - path: {{ .path }}
+          {{- range $path := $paths }}
+          - path: {{ $path }}
             {{- with $ingress.pathType }}
             pathType: {{ . }}
             {{- end }}
             backend:
               service:
                 name: {{ $fullname }}
-                port: {{ include "vm.ingress.port" . | nindent 18 }}
+                port: {{ include "vm.ingress.port" $host | nindent 18 }}
+          {{- end }}
     {{- end }}
 {{- end }}

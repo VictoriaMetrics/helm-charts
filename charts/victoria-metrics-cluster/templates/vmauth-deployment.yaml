@@ -45,7 +45,7 @@ spec:
       {{- end }}
       containers:
         - name: vmauth
-          image: {{ include "vm.image" (dict "helm" . "app" $app) }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}

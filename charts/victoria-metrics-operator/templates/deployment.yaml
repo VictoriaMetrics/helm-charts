@@ -37,7 +37,7 @@ spec:
       {{- end }}
       containers:
         - name: operator
-          image: {{ include "vm.image" (dict "helm" . "app" .Values ) }}
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
