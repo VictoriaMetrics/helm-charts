@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 0.14.9
+
+**Release date:** 2024-11-22
+
+![AppVersion: v1.106.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.106.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - updated common dependency 0.0.28 -> 0.0.31
 - fixed app.kubernetes.io/version tag override if custom tag is set. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1766).
 
