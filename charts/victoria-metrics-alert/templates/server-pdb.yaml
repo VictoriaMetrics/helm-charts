@@ -1,4 +1,5 @@
-{{- $pdb := .Values.server.podDisruptionBudget }}
+{{- $app := .Values.server }}
+{{- $pdb := $app.podDisruptionBudget }}
 {{- if $pdb.enabled }}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}

@@ -3,7 +3,7 @@
 {{- /*
 Create custom template context
 */}}
-{{- $ctx := dict "helm" . -}}
+{{- $ctx := dict "helm" . "appKey" "server" -}}
 
 {{- /*
 Loop through all dashboard files
@@ -37,7 +37,7 @@ metadata:
   name: {{ printf "%s-%s" (include "vm.fullname" $) $dashboardName | replace "_" "" }}
   labels:
     app: {{ $app }}
-    {{- include "vm.labels" $ | nindent 4 }}
+    {{- include "vm.labels" $ctx | nindent 4 }}
 spec:
   json: | {{ $dashboardResult | nindent 4 }}
   {{- toYaml $.Values.dashboards.grafanaOperator.spec | nindent 2 }}

@@ -1,7 +1,7 @@
 {{- $app := .Values.alertmanager }}
 {{- if and $app.enabled $app.templateFiles }}
-{{- $ctx := dict "helm" . "appKey" "alertmanager" "style" "managed" }}
-{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ctx := dict "helm" . "appKey" (list "alertmanager" "spec") "style" "managed" }}
+{{- $fullname := include "vm.managed.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 kind: ConfigMap
 apiVersion: v1

@@ -1,5 +1,6 @@
-{{- if .Values.alertmanager.enabled -}}
-{{- if and .Values.alertmanager.persistentVolume.enabled (not .Values.alertmanager.persistentVolume.existingClaim)}}
+{{- $app := .Values.alertmanager }}
+{{- if $app.enabled -}}
+{{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim)}}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
@@ -9,17 +10,17 @@ metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
-  {{- with .Values.alertmanager.persistentVolume.annotations  }}
+  {{- with $app.persistentVolume.annotations  }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- with .Values.alertmanager.persistentVolume.accessModes }}
+  {{- with $app.persistentVolume.accessModes }}
   accessModes: {{ toYaml . | nindent 4 }}
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.alertmanager.persistentVolume.size }}
-  {{- with .Values.alertmanager.persistentVolume.storageClassName }}
+      storage: {{ $app.persistentVolume.size }}
+  {{- with $app.persistentVolume.storageClassName }}
   storageClassName: {{ . }}
   {{- end }}
 {{- end }}

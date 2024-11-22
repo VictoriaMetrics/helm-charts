@@ -1,4 +1,5 @@
-{{- if and .Values.server.scrape.enabled (empty .Values.server.scrape.configMap) }}
+{{- $app := .Values.server }}
+{{- if and $app.scrape.enabled (empty $app.scrape.configMap) }}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
@@ -9,8 +10,8 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
-  {{- $config := .Values.server.scrape.config }}
-  {{- with .Values.server.scrape.extraScrapeConfigs }}
+  {{- $config := $app.scrape.config }}
+  {{- with $app.scrape.extraScrapeConfigs }}
     {{- if hasKey $config "scrape_configs" }}
       {{- $_ := set $config "scrape_configs" (concat $config.scrape_configs .) }}
     {{- end }}

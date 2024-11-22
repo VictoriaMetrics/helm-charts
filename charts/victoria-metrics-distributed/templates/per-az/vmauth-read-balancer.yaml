@@ -1,31 +1,33 @@
-{{- $ns := include "vm.namespace" . }}
 {{- $ctx := dict "helm" . }}
 {{- range $i, $z := .Values.availabilityZones }}
-{{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
-{{- if $zone.read.perZone.vmauth.enabled }}
+  {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
+  {{- if ((($zone.read).perZone).vmauth).enabled }}
+    {{- $authSpec := ((($zone.read).perZone).vmauth).spec | default dict }}
+    {{- $commonSpec := ($zone.common).spec | default dict }}
+    {{- $commonAuthSpec := ((($.Values).common).vmauth).spec | default dict }}
+    {{- $commonClusterSpec := ((($.Values).common).vmcluster).spec | default dict }}
+    {{- $authSpec = mergeOverwrite (deepCopy $commonAuthSpec) (deepCopy ($zone.common).spec) (deepCopy $authSpec) }}
+    {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
+    {{- $_ := set $zone.read.perZone.vmauth "spec" $authSpec }}
+    {{- $_ := set $ctx "zone" $zone }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
-  {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
-  {{- $_ := set $ctx "zone" $zone }}
   name: {{ include "vm.cr.fullname" $ctx }}
-  namespace: {{ $ns }}
-  labels: {{ include "vm.labels" $ | nindent 4 }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $zone.read.perZone.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-{{- $spec := mergeOverwrite (deepCopy $.Values.common.vmauth.spec) (deepCopy (($zone.common).spec)) (deepCopy (((($zone.read).perZone).vmauth).spec)) }}
-spec: {{ tpl (toYaml (omit $spec "unauthorizedAccessConfig")) $ctx | nindent 2 }}
+spec: {{ tpl (toYaml (omit $zone.read.perZone.vmauth.spec "unauthorizedAccessConfig")) $ctx | nindent 2 }}
+  {{- $clusterSpec := ($zone.vmcluster).spec | default dict }}
+  {{- $_ := set $ctx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
+  {{- $_ := set $zone.vmcluster "spec" (mergeOverwrite (deepCopy $commonClusterSpec) (deepCopy $commonSpec) (deepCopy $clusterSpec)) }}
+  {{- $_ := set $ctx "style" "managed" }}
   unauthorizedAccessConfig:
   - src_paths:
     - "/select/.+"
-    {{- $_ := set $ctx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
-    {{- if $zone.vmcluster }}
-      {{- $urlSpec := $zone.vmcluster.spec | default dict }}
-      {{- $_ := set $zone.vmcluster "spec" (mergeOverwrite (deepCopy $.Values.common.vmcluster.spec) $urlSpec) }}
-    {{- end }}
-    {{- $_ := set $ctx "style" "managed" }}
     url_prefix: 
     - {{ include "vm.url" $ctx }}
     {{- $_ := unset $ctx "style" }}

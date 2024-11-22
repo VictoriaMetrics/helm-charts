@@ -1,11 +1,12 @@
-{{- if .Values.vmsingle.enabled }}
-{{- $ctx := dict "helm" . "appKey" "vmsingle" }}
+{{- $app := .Values.vmsingle }}
+{{- if $app.enabled }}
+{{- $ctx := dict "helm" . "appKey" (list "vmsingle" "spec") }}
 {{- $fullname := include "vm.cr.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMSingle
 metadata:
-  {{- with .Values.vmsingle.annotations }}
+  {{- with $app.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
   name: {{ $fullname }}

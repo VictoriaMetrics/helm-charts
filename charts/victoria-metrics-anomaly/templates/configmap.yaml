@@ -1,9 +1,10 @@
-{{- if not .Values.config.reader.tenant_id -}}
-  {{- $ := unset .Values.config.reader "tenant_id" }}
+{{- $app := .Values }}
+{{- if not $app.config.reader.tenant_id -}}
+  {{- $ := unset $app.config.reader "tenant_id" }}
 {{- end -}}
 
-{{- if not .Values.config.writer.tenant_id -}}
-  {{- $ := unset .Values.config.writer "tenant_id" }}
+{{- if not $app.config.writer.tenant_id -}}
+  {{- $ := unset $app.config.writer "tenant_id" }}
 {{- end -}}
 
 {{- $ctx := dict "helm" . }}
@@ -15,8 +16,8 @@ metadata:
   name: {{ $fullname }}
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{- include "vm.labels" $ctx | nindent 4 }}
-  {{- with .Values.configMapAnnotations }}
+  {{- with $app.configMapAnnotations }}
   annotations: {{ toYaml . | nindent 10 }}
   {{- end }}
 data:
-  config.yml: |{{ toYaml (.Values.config | default dict) | nindent 4 }}
+  config.yml: |{{ toYaml ($app.config | default dict) | nindent 4 }}

@@ -9,6 +9,8 @@ metadata:
   {{- end  }}
   name: {{ $name }}
   namespace: {{ include "vm.namespace" $ }}
+  {{- $_ := set $ "zone" $rolloutZone }}
+  {{- $_ := set $ "appKey" "zone" }}
   labels: {{ include "vm.labels" $ | nindent 4 }}
 spec: {{ toYaml (deepCopy $rolloutZone) | nindent 2 }}
 {{- end }}

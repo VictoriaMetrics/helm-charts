@@ -1,6 +1,7 @@
-{{- if and .Values.server.enabled .Values.server.serviceMonitor.enabled -}}
+{{- $app := .Values.server }}
+{{- if and $app.enabled $app.serviceMonitor.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "server" }}
-{{- $serviceMonitor := .Values.server.serviceMonitor -}}
+{{- $serviceMonitor := $app.serviceMonitor -}}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: monitoring.coreos.com/v1

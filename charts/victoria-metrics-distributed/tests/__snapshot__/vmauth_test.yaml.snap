@@ -4,9 +4,11 @@ vmauth should match snapshot:
     kind: VMAuth
     metadata:
       labels:
+        app: vmauth-read-balancer-zone-eu-1
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: vm-distributed
+        app.kubernetes.io/version: v1.0.4
         helm.sh/chart: victoria-metrics-distributed-0.1.1
       name: vmauth-read-balancer-zone-eu-1
       namespace: NAMESPACE
@@ -14,6 +16,8 @@ vmauth should match snapshot:
       affinity: {}
       extraArgs:
         discoverBackendIPs: "true"
+      image:
+        tag: v1.0.4
       nodeSelector:
         topology.kubernetes.io/zone: zone-eu-1
       port: "8427"
@@ -31,9 +35,11 @@ vmauth should match snapshot:
     kind: VMAuth
     metadata:
       labels:
+        app: vmauth-read-balancer-zone-us-1
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: vm-distributed
+        app.kubernetes.io/version: v1.0.4
         helm.sh/chart: victoria-metrics-distributed-0.1.1
       name: vmauth-read-balancer-zone-us-1
       namespace: NAMESPACE
@@ -41,6 +47,8 @@ vmauth should match snapshot:
       affinity: {}
       extraArgs:
         discoverBackendIPs: "true"
+      image:
+        tag: v1.0.4
       nodeSelector:
         topology.kubernetes.io/zone: zone-us-1
       port: "8427"
@@ -58,14 +66,18 @@ vmauth should match snapshot:
     kind: VMAuth
     metadata:
       labels:
+        app: vmauth-read-proxy-zone-eu-1
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: vm-distributed
+        app.kubernetes.io/version: 0.1.0
         helm.sh/chart: victoria-metrics-distributed-0.1.1
       name: vmauth-read-proxy-zone-eu-1
       namespace: NAMESPACE
     spec:
       affinity: {}
+      image:
+        tag: v1.0.5
       nodeSelector:
         topology.kubernetes.io/zone: zone-eu-1
       port: "8427"
@@ -87,14 +99,18 @@ vmauth should match snapshot:
     kind: VMAuth
     metadata:
       labels:
+        app: vmauth-read-proxy-zone-us-1
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: vm-distributed
+        app.kubernetes.io/version: 0.1.0
         helm.sh/chart: victoria-metrics-distributed-0.1.1
       name: vmauth-read-proxy-zone-us-1
       namespace: NAMESPACE
     spec:
       affinity: {}
+      image:
+        tag: v1.0.5
       nodeSelector:
         topology.kubernetes.io/zone: zone-us-1
       port: "8427"
@@ -116,9 +132,11 @@ vmauth should match snapshot:
     kind: VMAuth
     metadata:
       labels:
+        app: vmauth-write-balancer-zone-eu-1
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: vm-distributed
+        app.kubernetes.io/version: v1.0.6
         helm.sh/chart: victoria-metrics-distributed-0.1.1
       name: vmauth-write-balancer-zone-eu-1
       namespace: NAMESPACE
@@ -126,6 +144,8 @@ vmauth should match snapshot:
       affinity: {}
       extraArgs:
         discoverBackendIPs: "true"
+      image:
+        tag: v1.0.6
       nodeSelector:
         topology.kubernetes.io/zone: zone-eu-1
       port: "8427"
@@ -143,9 +163,11 @@ vmauth should match snapshot:
     kind: VMAuth
     metadata:
       labels:
+        app: vmauth-write-balancer-zone-us-1
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: vm-distributed
+        app.kubernetes.io/version: v1.0.6
         helm.sh/chart: victoria-metrics-distributed-0.1.1
       name: vmauth-write-balancer-zone-us-1
       namespace: NAMESPACE
@@ -153,6 +175,8 @@ vmauth should match snapshot:
       affinity: {}
       extraArgs:
         discoverBackendIPs: "true"
+      image:
+        tag: v1.0.6
       nodeSelector:
         topology.kubernetes.io/zone: zone-us-1
       port: "8427"
@@ -170,13 +194,17 @@ vmauth should match snapshot:
     kind: VMAuth
     metadata:
       labels:
+        app: vmauth-global-read-RELEASE-NAME-vm-distributed
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: vm-distributed
+        app.kubernetes.io/version: v1.0.3
         helm.sh/chart: victoria-metrics-distributed-0.1.1
       name: vmauth-global-read-RELEASE-NAME-vm-distributed
       namespace: NAMESPACE
     spec:
+      image:
+        tag: v1.0.3
       port: "8427"
       unauthorizedAccessConfig:
         - load_balancing_policy: first_available
@@ -190,13 +218,17 @@ vmauth should match snapshot:
     kind: VMAuth
     metadata:
       labels:
+        app: vmauth-global-write-RELEASE-NAME-vm-distributed
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: vm-distributed
+        app.kubernetes.io/version: v1.0.2
         helm.sh/chart: victoria-metrics-distributed-0.1.1
       name: vmauth-global-write-RELEASE-NAME-vm-distributed
       namespace: NAMESPACE
     spec:
+      image:
+        tag: v1.0.2
       port: "8427"
       unauthorizedAccessConfig:
         - src_paths:

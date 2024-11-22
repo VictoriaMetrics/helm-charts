@@ -1,20 +1,24 @@
-{{- if .Values.write.global.vmauth.enabled }}
+{{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" . }}
-{{- $ctx := dict "helm" . "appKey" (list "write" "global" "vmauth") "fullname" $fullname }}
-{{- $ns := include "vm.namespace" $ctx }}
+{{- if ((((.Values).write).global).vmauth).enabled }}
+  {{- $commonAuth := dict "spec" ((((.Values).common).vmauth).spec | default dict) }}
+  {{- $auth := .Values.write.global.vmauth | default dict }}
+  {{- $auth = mergeOverwrite (deepCopy $commonAuth) (deepCopy $auth) }}
+  {{- $_ := set $ctx "appKey" (list "vmauth" "spec") }}
+  {{- $_ := set $ctx "fullname" $fullname }}
+  {{- $_ := set $ctx "vmauth" $auth }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
   name: {{ include "vm.cr.fullname" $ctx }}
-  namespace: {{ $ns }}
-  labels: {{ include "vm.labels" $ | nindent 4 }}
-  {{- with .Values.write.global.vmauth.annotations }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with ((((.Values).write).global).vmauth).annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-{{- $spec := mergeOverwrite (deepCopy .Values.common.vmauth.spec) (deepCopy .Values.write.global.vmauth.spec) }}
 spec:
-  {{- with (omit $spec "unauthorizedAccessConfig") }}
+  {{- with (omit $auth.spec "unauthorizedAccessConfig") }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
   unauthorizedAccessConfig:
@@ -26,12 +30,11 @@ spec:
     - "/api/v1/import/.+"
     {{- $_ := set $ctx "style" "managed" }}
     {{- $urls := default list }}
+    {{- $commonAgentSpec := (((.Values).common).vmagent).spec | default dict }}
     {{- range $i, $z := $.Values.availabilityZones }}
       {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
-      {{- if $zone.vmagent }}
-        {{- $urlSpec := $zone.vmagent.spec | default dict }}
-        {{- $_ := set $zone.vmagent "spec" (mergeOverwrite (deepCopy $.Values.common.vmagent.spec) $urlSpec) }}
-      {{- end }}
+      {{- $agentSpec := $zone.vmagent.spec | default dict }}
+      {{- $_ := set $zone.vmagent "spec" (mergeOverwrite (deepCopy $commonAgentSpec) $agentSpec) }}
       {{- $_ := set $ctx "zone" $zone }}
       {{- $_ := set $ctx "appKey" (list "zone" "vmagent" "spec") }}
       {{- $urls = append $urls (include "vm.url" $ctx) }}

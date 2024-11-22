@@ -1,8 +1,9 @@
-{{- if .Values.podMonitor.enabled }}
-{{- if or (not (((.Values.config).monitoring).pull).port) (not (((.Values.config).monitoring).pull).enabled) -}}
+{{- $app := .Values }}
+{{- if $app.podMonitor.enabled }}
+{{- if or (not ((($app.config).monitoring).pull).port) (not ((($app.config).monitoring).pull).enabled) -}}
   {{- fail "`config.monitoring.pull.port` is required and `config.monitoring.pull.enabled` should be `true`, when PodMonitor is enabled" -}}
 {{- end -}}
-{{- $podMonitor := .Values.podMonitor -}}
+{{- $podMonitor := $app.podMonitor -}}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
