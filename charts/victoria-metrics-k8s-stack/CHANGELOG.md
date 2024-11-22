@@ -1,7 +1,7 @@
 ## Next release
 
 - fixed ability to override CR names using `<component>.name`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1778)
-- updated common dependency 0.0.28 -> 0.0.31
+- updated common dependency 0.0.28 -> 0.0.29
 - bump operator chart version to 0.38.0
 
 ## 0.28.4
