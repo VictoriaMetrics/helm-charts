@@ -15,7 +15,7 @@
 - updated common dependency 0.0.19 -> 0.0.28
 - added back `crds.enabled: false` option, which disables CRD creation, but due to limitation of dependencies condition it allows to disable only in combination with `crds.plain: false`
 - disabled cleanup, while `crds.enabled: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1563).
-- updates operator to [v0.49.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.49.1) version
+- updates operator to [v0.50.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.49.0) version
 
 ## 0.37.0
 
