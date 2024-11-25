@@ -196,7 +196,7 @@ If release name contains chart name it will be used as a full name.
   {{- $labels := fromYaml (include "vm.selectorLabels" .) -}}
   {{- $labels = mergeOverwrite $labels (fromYaml (include "vm.metaLabels" .)) -}}
   {{- with (include "vm.image.tag" .) }}
-    {{- $_ := set $labels "app.kubernetes.io/version" . -}}
+    {{- $_ := set $labels "app.kubernetes.io/version" (regexReplaceAll "(.*)(@sha.*)" . "${1}") -}}
   {{- end -}}
   {{- toYaml $labels -}}
 {{- end -}}

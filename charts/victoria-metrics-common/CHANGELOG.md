@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- removed suffix, that starts with `@sha` from app version label. see [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1801).
 
 ## 0.0.31
 
