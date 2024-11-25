@@ -97,11 +97,9 @@ where `<fullname>` is output of `{{ include "vm-operator.fullname" }}` for your 
 If one of dashboards ConfigMap is failing with error `Too long: must have at most 262144 bytes`, please make sure you've added `argocd.argoproj.io/sync-options: ServerSideApply=true` annotation to your dashboards:
 
 ```yaml
-grafana:
-  sidecar:
-    dashboards:
-      additionalDashboardAnnotations
-        argocd.argoproj.io/sync-options: ServerSideApply=true
+defaultDashboards:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
 ```
 
 argocd.argoproj.io/sync-options: ServerSideApply=true
@@ -109,7 +107,7 @@ argocd.argoproj.io/sync-options: ServerSideApply=true
 ### Rules and dashboards
 
 This chart by default install multiple dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
-you can disable dashboards with `defaultDashboardsEnabled: false` and `experimentalDashboardsEnabled: false`
+you can disable dashboards with `defaultDashboards.enabled: false` and `experimentalDashboardsEnabled: false`
 and rules can be configured under `defaultRules`
 
 ### Adding external dashboards
@@ -157,12 +155,13 @@ kubelet:
 ### Using externally managed Grafana
 
 If you want to use an externally managed Grafana instance but still want to use the dashboards provided by this chart you can set
- `grafana.enabled` to `false` and set `defaultDashboardsEnabled` to `true`. This will install the dashboards
+ `grafana.enabled` to `false` and set `defaultDashboards.enabled` to `true`. This will install the dashboards
  but will not install Grafana.
 
 For example:
 ```yaml
-defaultDashboardsEnabled: true
+defaultDashboards:
+  enabled: true
 
 grafana:
   enabled: false
@@ -175,16 +174,12 @@ set `.grafana.sidecar.dashboards.additionalDashboardLabels` or `.grafana.sidecar
 
 For example:
 ```yaml
-defaultDashboardsEnabled: true
-
-grafana:
-  enabled: false
-  sidecar:
-    dashboards:
-      additionalDashboardLabels:
-        key: value
-      additionalDashboardAnnotations:
-        key: value
+defaultDashboards:
+  enabled: true
+  labels:
+    key: value
+  annotations:
+    key: value
 ```
 
 ## Prerequisites
