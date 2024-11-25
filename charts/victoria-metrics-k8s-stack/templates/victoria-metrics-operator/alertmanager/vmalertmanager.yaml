@@ -1,7 +1,6 @@
 {{- $app := .Values.alertmanager }}
 {{- if $app.enabled }}
   {{- $ctx := dict "helm" . "appKey" (list "alertmanager" "spec") "style" "managed" }}
-  {{- $fullname := include "vm.cr.fullname" $ctx }}
   {{- $ns := include "vm.namespace" $ctx }}
   {{- if and $app.spec.configRawYaml $app.config }}
     {{- fail "ERROR: Both .Values.alertmanager.spec.configRawYaml and .Values.alertmanager.config are set, but only one is allowed." }}
@@ -11,7 +10,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ $fullname }}-alertmanager
+  name: {{ include "vm.managed.fullname" $ctx }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 stringData:
@@ -24,7 +23,7 @@ metadata:
   {{- with .Values.alertmanager.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-  name: {{ $fullname }}
+  name: {{ include "vm.cr.fullname" $ctx }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec: {{ include "vm.alertmanager.spec" $ctx | nindent 2 }}
