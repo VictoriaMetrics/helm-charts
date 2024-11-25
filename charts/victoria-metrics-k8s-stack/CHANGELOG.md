@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 0.29.1
+
+**Release date:** 2024-11-25
+
+![AppVersion: v1.106.1](https://img.shields.io/static/v1?label=AppVersion&message=v1.106.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - updated common dependency 0.0.31 -> 0.0.32
 - updated operator dependency 0.39.0 -> 0.39.1
 - fixed alertmanager config name. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1805)
