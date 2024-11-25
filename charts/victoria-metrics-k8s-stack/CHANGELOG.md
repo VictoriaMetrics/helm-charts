@@ -1,6 +1,7 @@
 ## Next release
 
 - updated common dependency 0.0.31 -> 0.0.32
+- updated operator dependency 0.39.0 -> 0.39.1
 - fixed alertmanager config name. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1805)
 
 ## 0.29.0
