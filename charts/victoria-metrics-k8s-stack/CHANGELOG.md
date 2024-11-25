@@ -7,6 +7,7 @@
 - bump operator chart version to 0.38.0
 - replaced all `<component>.vmauth` params to `vmauth.spec` to provide more flexibility in vmauth configuration. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1793)
 - synced dashboards
+- updates operator to [v0.50.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.49.0) version
 
 ## 0.28.4
 
