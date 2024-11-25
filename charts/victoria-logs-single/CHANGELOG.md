@@ -1,6 +1,7 @@
 ## Next release
 
-- Removed duplicated app label from dashboards. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1795).
+- removed duplicated app label from dashboards. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1795).
+- synced dashboards
 
 ## 0.8.2
 

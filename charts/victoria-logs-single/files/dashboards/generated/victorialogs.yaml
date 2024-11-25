@@ -133,7 +133,7 @@ panels:
 - datasource:
     type: {{ $defaultDatasource }}
     uid: $ds
-  description: Shows the datapoints ingestion rate.
+  description: Shows the logs ingestion rate.
   fieldConfig:
     defaults:
       color:
@@ -439,7 +439,7 @@ panels:
       uid: $ds
     editorMode: code
     exemplar: false
-    expr: sum(rate(vl_http_requests_total{job=~"$job", instance=~"$instance", path!~".*(/insert|/metrics)"}[$__rate_interval]))
+    expr: sum(rate(vl_http_requests_total{job=~"$job", instance=~"$instance", path=~"/select/.*"}[$__rate_interval]))
     format: time_series
     instant: true
     interval: ''
@@ -512,7 +512,7 @@ panels:
 - datasource:
     type: {{ $defaultDatasource }}
     uid: $ds
-  description: How many datapoints are inserted into storage per second
+  description: How many logs are inserted into storage per second
   fieldConfig:
     defaults:
       color:
@@ -588,7 +588,7 @@ panels:
     legendFormat: '{{`{{`}}type{{`}}`}}'
     range: true
     refId: A
-  title: 'Datapoints ingestion rate '
+  title: 'Logs ingestion rate '
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
