@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- synced dashboards
 
 ## 0.8.2
 
