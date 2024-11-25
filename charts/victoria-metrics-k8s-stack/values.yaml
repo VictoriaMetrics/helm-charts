@@ -239,19 +239,6 @@ additionalVictoriaMetricsMap:
 
 # -- External VM read and write URLs
 externalVM:
-  # -- Custom VMAuth config, url_prefix requires only path, which will be appended to a read and write base URL.
-  # To disable auth for read or write empty list for component config `externalVM.vmauth.<component>: []`
-  vmauth:
-    read:
-      - src_paths:
-          - /select/.*
-        url_prefix:
-          - /
-    write:
-      - src_paths:
-          - /insert/.*
-        url_prefix:
-          - /
   read:
     url: ""
     # bearerTokenSecret:
@@ -323,19 +310,6 @@ vmcluster:
   enabled: false
   # -- VMCluster annotations
   annotations: {}
-  # -- Custom VMAuth config, url_prefix requires only path, which will be appended to a select and insert base URL.
-  # To disable auth for vmselect or vminsert empty list for component config `vmcluster.vmauth.<component>: []`
-  vmauth:
-    vmselect:
-      - src_paths:
-          - /select/.*
-        url_prefix:
-          - /
-    vminsert:
-      - src_paths:
-          - /insert/.*
-        url_prefix:
-          - /
   # -- Full spec for VMCluster CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
   spec:
     # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
@@ -746,9 +720,17 @@ vmauth:
   # -- VMAuth annotations
   annotations: {}
   # -- (object) Full spec for VMAuth CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+  # It's possible to use given below predefined variables in spec:
+  # * `{{ .vm.read }}` - parsed vmselect, vmsingle or externalVM.read URL
+  # * `{{ .vm.write }}` - parsed vminsert, vmsingle or externalVM.write URL
   spec:
     discover_backend_ips: true
     port: "8427"
+    unauthorizedAccessConfig:
+      - src_paths:
+          - '{{ .vm.read.path }}/.*'
+        url_prefix:
+          - '{{ urlJoin (omit .vm.read "path") }}/'
 
 vmagent:
   # -- Create VMAgent CR

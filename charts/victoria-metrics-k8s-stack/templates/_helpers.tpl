@@ -29,11 +29,7 @@
     {{- $baseURL := include "vm.url" . -}}
     {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
   {{- else if $Values.vmcluster.enabled -}}
-    {{- if $Values.vmauth.enabled -}}
-      {{- $_ := set . "appKey" (list "vmauth" "spec") -}}
-    {{- else -}}
-      {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
-    {{- end -}}
+    {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
     {{- $baseURL := include "vm.url" . -}}
     {{- $tenant := $Values.tenant | default 0 -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
@@ -160,67 +156,29 @@
 {{- /* VMAuth spec */ -}}
 {{- define "vm.auth.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $unauthorizedAccessConfig := default list }}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
-    {{- $url := include "vm.url" . }}
-    {{- $srcPath := clean (printf "%s/.*" (urlParse $url).path) }}
-    {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig (dict "src_paths" (list $srcPath) "url_prefix" (list $url)) }}
+    {{- $url := urlParse (include "vm.url" .) -}}
+    {{- $_ := set . "vm" (dict "read" $url "write" $url) }}
   {{- else if $Values.vmcluster.enabled -}}
-    {{- $authConfig := ($Values.vmcluster).vmauth }}
     {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
-    {{- $writeAuths := $authConfig.vminsert }}
-    {{- $writeUrl := include "vm.url" . }}
-    {{- range $writeAuth := $writeAuths }}
-      {{- $urls := default list }}
-      {{- range $prefix := $writeAuth.url_prefix }}
-        {{- $urls = append $urls (printf "%s%s" (trimSuffix (urlParse $writeUrl).path $writeUrl) $prefix) }}
-      {{- end }}
-      {{- $_ := set $writeAuth "url_prefix" $urls}}
-      {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig $writeAuth -}}
-    {{- end }}
+    {{- $writeURL := urlParse (include "vm.url" .) -}}
+    {{- $_ := set $writeURL "path" (printf "%s/insert" $writeURL.path) -}}
     {{- $_ := set . "appKey" (list "vmcluster" "spec" "vmselect") -}}
-    {{- $readAuths := $authConfig.vmselect }}
-    {{- $readUrl := include "vm.url" . }}
-    {{- range $readAuth := $readAuths }}
-      {{- $urls := default list }}
-      {{- range $prefix := $readAuth.url_prefix }}
-        {{- $urls = append $urls (printf "%s%s" (trimSuffix (urlParse $readUrl).path $readUrl) $prefix) }}
-      {{- end }}
-      {{- $_ := set $readAuth "url_prefix" $urls}}
-      {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig $readAuth -}}
+    {{- $readURL := urlParse (include "vm.url" .) -}}
+    {{- $_ := set $readURL "path" (printf "%s/select" $readURL.path) -}}
+    {{- $_ := set . "vm" (dict "read" $readURL "write" $writeURL) -}}
+  {{- else if or $Values.externalVM.read.url $Values.externalVM.write.url -}}
+    {{- $_ := set . "vm" (default dict) -}}
+    {{- with $Values.externalVM.read.url -}}
+      {{- $_ := set $.vm "read" (urlParse .) -}}
     {{- end -}}
-  {{- else if or $Values.externalVM.read.url $Values.externalVM.write.url }}
-    {{- with $Values.externalVM.read.url }}
-      {{- $authConfig := ($Values.externalVM).vmauth }}
-      {{- $readAuths := $authConfig.read }}
-      {{- $readUrl := . }}
-      {{- range $readAuth := $readAuths }}
-        {{- $urls := default list }}
-        {{- range $prefix := $readAuth.url_prefix }}
-          {{- $urls = append $urls (printf "%s%s" (trimSuffix (urlParse $readUrl).path $readUrl) $prefix) }}
-        {{- end }}
-        {{- $_ := set $readAuth "url_prefix" $urls}}
-        {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig $readAuth -}}
-      {{- end -}}
-    {{- end -}}
-    {{- with $Values.externalVM.write.url }}
-      {{- $authConfig := ($Values.externalVM).vmauth }}
-      {{- $writeAuths := $authConfig.write }}
-      {{- $writeUrl := . }}
-      {{- range $writeAuth := $writeAuths }}
-        {{- $urls := default list }}
-        {{- range $prefix := $writeAuth.url_prefix }}
-          {{- $urls = append $urls (printf "%s%s" (trimSuffix (urlParse $writeUrl).path $writeUrl) $prefix) }}
-        {{- end }}
-        {{- $_ := set $writeAuth "url_prefix" $urls}}
-        {{- $unauthorizedAccessConfig = append $unauthorizedAccessConfig $writeAuth -}}
-      {{- end -}}
+    {{- with $Values.externalVM.write.url -}}
+      {{- $_ := set $.vm "write" (urlParse .) -}}
     {{- end -}}
   {{- end -}}
   {{- $spec := $Values.vmauth.spec }}
-  {{- $_ := set $spec "unauthorizedAccessConfig" (concat $unauthorizedAccessConfig ($spec.unauthorizedAccessConfig | default list)) }}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
@@ -319,7 +277,7 @@
   {{- $ctx := . }}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $datasources := $Values.defaultDatasources.extra | default list -}}
-  {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled -}}
+  {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled $Values.externalVM.read -}}
     {{- $readEndpoint:= include "vm.read.endpoint" $ctx | fromYaml -}}
     {{- $defaultDatasources := default list -}}
     {{- range $ds := $Values.defaultDatasources.victoriametrics.datasources }}
