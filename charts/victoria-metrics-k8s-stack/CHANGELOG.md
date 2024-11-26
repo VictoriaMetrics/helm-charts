@@ -1,6 +1,7 @@
 ## Next release
 
 - synced rules
+- added workaround for DiskRunsOutOfSpace alerts. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1809)
 
 ## 0.29.1
 

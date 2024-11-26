@@ -166,6 +166,10 @@ def cluster_label_var(mo):
 
 
 replacement_map = {
+    "( |\n|\r)+\\) > 0.8": {
+        "replacement": ' -\n     sum(label_value(flag{name="storage.minFreeDiskSpaceBytes"}, "value")) by (job, instance)\n    ) > 0.8',
+        "limitGroup": ["vmsingle", "vmcluster"],
+    },
     "https://runbooks.prometheus-operator.dev/runbooks": {
         "replacement": "[[ $runbookUrl ]]",
     },

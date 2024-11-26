@@ -35,7 +35,8 @@ rules:
     sum(vm_data_size_bytes) by (job,instance,{{ $clusterLabel }}) /
     (
      sum(vm_free_disk_space_bytes) by (job,instance,{{ $clusterLabel }}) +
-     sum(vm_data_size_bytes) by (job,instance,{{ $clusterLabel }})
+     sum(vm_data_size_bytes) by (job,instance,{{ $clusterLabel }}) -
+     sum(label_value(flag{name="storage.minFreeDiskSpaceBytes"}, "value")) by (job,instance,{{ $clusterLabel }})
     ) > 0.8
   for: 30m
   labels:
