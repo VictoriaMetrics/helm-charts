@@ -1,7 +1,7 @@
 {{- $app := .Values.alertmanager }}
 {{- $ingress := $app.ingress }}
 {{- if and $app.enabled $ingress.enabled  }}
-{{- $ctx := dict "helm" . }}
+{{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: networking.k8s.io/v1
