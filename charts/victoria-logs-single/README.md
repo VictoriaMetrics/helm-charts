@@ -207,6 +207,17 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </td>
     </tr>
     <tr>
+      <td>dashboards.namespace</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override default namespace, where to create dashboards</p>
+</td>
+    </tr>
+    <tr>
       <td>extraObjects</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">

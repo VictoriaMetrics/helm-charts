@@ -77,31 +77,31 @@ sources = [
         ],
     },
     {
-        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-cluster.yml",
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-cluster.yml",
         "charts": [
             "victoria-metrics-k8s-stack",
         ],
     },
     {
-        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-health.yml",
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-health.yml",
         "charts": [
             "victoria-metrics-k8s-stack",
         ],
     },
     {
-        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-vmagent.yml",
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-vmagent.yml",
         "charts": [
             "victoria-metrics-k8s-stack",
         ],
     },
     {
-        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts-vlogs.yml",
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-vlogs.yml",
         "charts": [
             "victoria-logs-single",
         ],
     },
     {
-        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/alerts.yml",
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts.yml",
         "charts": [
             "victoria-metrics-k8s-stack",
         ],

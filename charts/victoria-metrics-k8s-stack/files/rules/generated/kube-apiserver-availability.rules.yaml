@@ -20,17 +20,17 @@ rules:
     verb: write
   record: code:apiserver_request_total:increase30d
 - condition: '{{ true }}'
-  expr: sum by (verb,scope,{{ $clusterLabel }}) (increase(apiserver_request_sli_duration_seconds_count{job="apiserver"}[1h]))
-  record: cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase1h
-- condition: '{{ true }}'
-  expr: sum by (verb,scope,{{ $clusterLabel }}) (avg_over_time(cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase1h[30d]) * 24 * 30)
-  record: cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase30d
-- condition: '{{ true }}'
   expr: sum by (verb,scope,le,{{ $clusterLabel }}) (increase(apiserver_request_sli_duration_seconds_bucket[1h]))
   record: cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase1h
 - condition: '{{ true }}'
   expr: sum by (verb,scope,le,{{ $clusterLabel }}) (avg_over_time(cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase1h[30d]) * 24 * 30)
   record: cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d
+- condition: '{{ true }}'
+  expr: sum by (verb,scope,{{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase1h{le="+Inf"})
+  record: cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase1h
+- condition: '{{ true }}'
+  expr: sum by (verb,scope,{{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{le="+Inf"} * 24 * 30)
+  record: cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase30d
 - condition: '{{ true }}'
   expr: |-
     1 - (

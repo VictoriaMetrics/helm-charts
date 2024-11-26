@@ -33,7 +33,7 @@ Delete condition from dashboard
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  namespace: {{ include "vm.namespace" $ }}
+  namespace: {{ $.Values.dashboards.namespace | default (include "vm.namespace" $) }}
   name: {{ printf "%s-%s" (include "vm.fullname" $) $dashboardName | replace "_" "" }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $.Values.dashboards.annotations }}
@@ -47,7 +47,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ include "vm.namespace" $ }}
+  namespace: {{ $.Values.dashboards.namespace | default (include "vm.namespace" $) }}
   name: {{ printf "%s-%s" (include "vm.fullname" $) $dashboardName | replace "_" "" }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $.Values.dashboards.annotations }}

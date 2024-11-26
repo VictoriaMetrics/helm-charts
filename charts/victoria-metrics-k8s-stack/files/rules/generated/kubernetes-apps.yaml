@@ -170,11 +170,11 @@ rules:
     severity: warning
 - alert: KubeContainerWaiting
   annotations:
-    description: 'pod/{{`{{`}} $labels.pod {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} on container {{`{{`}} $labels.container{{`}}`}} has been in waiting state for longer than 1 hour.'
+    description: 'pod/{{`{{`}} $labels.pod {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} on container {{`{{`}} $labels.container{{`}}`}} has been in waiting state for longer than 1 hour. (reason: "{{`{{`}} $labels.reason {{`}}`}}").'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubecontainerwaiting'
     summary: 'Pod container waiting longer than 1 hour'
   condition: '{{ true }}'
-  expr: sum by (namespace,pod,container,{{ $clusterLabel }}) (kube_pod_container_status_waiting_reason{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}) > 0
+  expr: kube_pod_container_status_waiting_reason{reason!="CrashLoopBackOff", job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"} > 0
   for: 1h
   labels:
     severity: warning
