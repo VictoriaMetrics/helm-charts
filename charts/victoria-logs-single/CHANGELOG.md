@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added `vector.customConfigNamespace` to force Vector configmap creation in a given namespace even if vector.enabled: false
 
 ## 0.8.4
 
