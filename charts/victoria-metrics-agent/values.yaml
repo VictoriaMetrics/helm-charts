@@ -203,6 +203,8 @@ service:
   loadBalancerSourceRanges: []
   # -- Service port
   servicePort: 8429
+  # -- Target port
+  targetPort: http
   # nodePort: 30000
   # -- Service type
   type: ClusterIP
@@ -302,13 +304,15 @@ serviceMonitor:
   basicAuth: {}
   # -- Service Monitor metricRelabelings
   metricRelabelings: []
-#    interval: 15s
-#    scrapeTimeout: 5s
+  # -- Service Monitor targetPort
+  targetPort: http
+  # interval: 15s
+  # scrapeTimeout: 5s
   # -- Commented. HTTP scheme to use for scraping.
-#    scheme: https
+  # scheme: https
   # -- Commented. TLS configuration to use when scraping the endpoint
-#    tlsConfig:
-#      insecureSkipVerify: true
+  # tlsConfig:
+  #   insecureSkipVerify: true
 
 # -- Empty dir configuration for a case, when persistence is disabled
 emptyDir: {}

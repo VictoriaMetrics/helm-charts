@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added service.targetPort and serviceMonitor.targetPort to add ability to point service to one of extraContainers port, like oauth2-proxy
 
 ## 0.8.4
 
