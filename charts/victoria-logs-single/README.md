@@ -1181,6 +1181,7 @@ customConfig:
                 .log = parse_json(.message) ?? .message
                 del(.message)
             type: remap
+customConfigNamespace: ""
 dataDir: /vector-data-dir
 enabled: false
 existingConfigMaps:
@@ -1195,6 +1196,17 @@ service:
 </pre>
 </td>
       <td><p>Values for <a href="https://github.com/vectordotdev/helm-charts/tree/develop/charts/vector" target="_blank">vector helm chart</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>vector.customConfigNamespace</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Forces custom configuration creation in a given namespace even if vector.enabled is false</p>
 </td>
     </tr>
     <tr>

@@ -1,6 +1,7 @@
 ## Next release
 
-- Added service.targetPort and serviceMonitor.targetPort to add ability to point service to one of extraContainers port, like oauth2-proxy
+- Added `vector.customConfigNamespace` to force Vector configmap creation in a given namespace even if vector.enabled: false
+- Added `service.targetPort` and `serviceMonitor.targetPort` to add ability to point service to one of extraContainers port, like oauth2-proxy
 
 ## 0.8.4
 
