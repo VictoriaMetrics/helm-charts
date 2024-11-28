@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Use only pod FQDN for statefulsets in `vm.es.urls` template
 
 ## 0.8.5
 

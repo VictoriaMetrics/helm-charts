@@ -20,12 +20,15 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $port := int $Values.server.service.servicePort -}}
   {{- $fullname := include "vm.plain.fullname" $ctx }}
-  {{- $replicaCount := ternary (int $Values.server.replicaCount) 1 $Values.server.statefulSet.enabled }}
   {{- $urls := default list }}
-  {{- range $i := until $replicaCount }}
-    {{- if gt $replicaCount 1 }}
-      {{- $_ := set $ctx "appIdx" $i }}
+  {{- if $Values.server.statefulSet.enabled }}
+    {{- range $i := until (int $Values.server.replicaCount) }}
+      {{- if $Values.server.statefulSet.enabled }}
+        {{- $_ := set $ctx "appIdx" $i }}
+      {{- end }}
+      {{- $urls = append $urls (printf "http://%s:%d%s" (include "vm.fqdn" $ctx) $port $path) }}
     {{- end }}
+  {{- else }}
     {{- $urls = append $urls (printf "http://%s:%d%s" (include "vm.fqdn" $ctx) $port $path) }}
   {{- end }}
   {{- toJson $urls -}}
