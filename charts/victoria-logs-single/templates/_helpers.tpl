@@ -26,10 +26,10 @@
       {{- if $Values.server.statefulSet.enabled }}
         {{- $_ := set $ctx "appIdx" $i }}
       {{- end }}
-      {{- $urls = append $urls (printf "http://%s:%d%s" (include "vm.fqdn" $ctx) $port $path) }}
+      {{- $urls = append $urls (printf "%s%s" (include "vm.url" $ctx) $path) }}
     {{- end }}
   {{- else }}
-    {{- $urls = append $urls (printf "http://%s:%d%s" (include "vm.fqdn" $ctx) $port $path) }}
+    {{- $urls = append $urls (printf "%s%s" (include "vm.url" $ctx) $path) }}
   {{- end }}
   {{- toJson $urls -}}
 {{- end -}}

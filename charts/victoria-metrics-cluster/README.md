@@ -425,9 +425,11 @@ name: ""
       <td>vmauth.extraArgs</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">envflag.enable: "true"
+<code class="language-yaml">envflag.enable: true
 envflag.prefix: VM_
+httpListenAddr: :8427
 loggerFormat: json
+tls: true
 </code>
 </pre>
 </td>
@@ -1219,8 +1221,9 @@ timeoutSeconds: 5
       <td>vminsert.extraArgs</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">envflag.enable: "true"
+<code class="language-yaml">envflag.enable: true
 envflag.prefix: VM_
+httpListenAddr: :8480
 loggerFormat: json
 </code>
 </pre>
@@ -2061,6 +2064,7 @@ timeoutSeconds: 5
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
 <code class="language-yaml">envflag.enable: true
 envflag.prefix: VM_
+httpListenAddr: :8481
 loggerFormat: json
 </code>
 </pre>
@@ -2998,8 +3002,9 @@ timeoutSeconds: 5
       <td>vmstorage.extraArgs</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">envflag.enable: "true"
+<code class="language-yaml">envflag.enable: true
 envflag.prefix: VM_
+httpListenAddr: :8482
 loggerFormat: json
 </code>
 </pre>
@@ -3867,7 +3872,7 @@ timeoutSeconds: 5
       <td>vmstorage.vmbackupmanager.extraArgs</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="plaintext">
-<code class="language-yaml">envflag.enable: "true"
+<code class="language-yaml">envflag.enable: true
 envflag.prefix: VM_
 loggerFormat: json
 </code>
