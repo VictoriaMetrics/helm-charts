@@ -46,9 +46,12 @@
     {{- else if $values -}}
       {{- $spec = $values -}}
     {{- end -}}
-    {{- $isSecure = (eq ($spec.extraArgs).tls "true") | default $isSecure -}}
+    {{- $isSecure = ($spec.extraArgs).tls | default $isSecure -}}
     {{- $port = (ternary 443 80 $isSecure) -}}
-    {{- $port = $spec.port | default ($spec.service).servicePort | default $port -}}
+    {{- $port = $spec.port | default ($spec.service).servicePort | default ($spec.service).port | default $port -}}
+    {{- if hasKey . "appIdx" -}}
+      {{- $port = (include "vm.port.from.flag" (dict "flag" ($spec.extraArgs).httpListenAddr "default" $port)) -}}
+    {{- end }}
   {{- end }}
   {{- $fqdn }}:{{ $port }}
 {{- end -}}
@@ -73,7 +76,7 @@
     {{- else if $ctx -}}
       {{- $spec = $ctx -}}
     {{- end -}}
-    {{- $isSecure = (eq ($spec.extraArgs).tls "true") | default $isSecure -}}
+    {{- $isSecure = ($spec.extraArgs).tls | default $isSecure -}}
     {{- $proto = (ternary "https" "http" $isSecure) -}}
     {{- $path = dig "http.pathPrefix" $path ($spec.extraArgs | default dict) -}}
   {{- end -}}

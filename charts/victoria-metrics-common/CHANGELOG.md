@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- use container port instead of service one in `vm.host` template, while appIdx is defined
+- expect tls extraArg parameter as boolean value
 
 ## 0.0.32
 
