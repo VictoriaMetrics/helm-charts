@@ -429,7 +429,6 @@ name: ""
 envflag.prefix: VM_
 httpListenAddr: :8427
 loggerFormat: json
-tls: true
 </code>
 </pre>
 </td>
