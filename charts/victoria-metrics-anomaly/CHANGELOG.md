@@ -1,5 +1,6 @@
 ## Next release
 
+- Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.18.6](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1186).
 - updated common dependency 0.0.32 -> 0.0.33
 
 ## 1.6.8
