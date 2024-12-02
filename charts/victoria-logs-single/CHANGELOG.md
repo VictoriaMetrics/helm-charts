@@ -1,6 +1,7 @@
 ## Next release
 
 - enable watch-config in vector by default
+- exclude default service port, when serviceMonitor.targetPort is defined
 
 ## 0.8.7
 

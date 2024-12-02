@@ -24,7 +24,12 @@ spec:
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   endpoints:
-    - port: http
+    -
+      {{- with $serviceMonitor.targetPort }}
+      targetPort: {{ . }}
+      {{- else }}
+      port: http
+      {{- end }}
       {{- with $serviceMonitor.basicAuth }}
       basicAuth: {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -45,8 +50,5 @@ spec:
       {{- end }}
       {{- with $serviceMonitor.metricRelabelings }}
       metricRelabelings: {{ toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with $serviceMonitor.targetPort }}
-      targetPort: {{ . }}
       {{- end }}
 {{- end }}
