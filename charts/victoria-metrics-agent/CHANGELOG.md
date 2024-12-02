@@ -2,6 +2,7 @@
 
 - updated common dependency 0.0.31 -> 0.0.33
 - Added service.targetPort and serviceMonitor.targetPort to add ability to point service to one of extraContainers port, like oauth2-proxy
+- bump version of VM components to [v1.107.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.107.0)
 
 ## 0.14.9
 
