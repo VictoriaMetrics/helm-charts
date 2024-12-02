@@ -1213,8 +1213,6 @@ dataDir: /vector-data-dir
 enabled: false
 existingConfigMaps:
     - vl-config
-podMonitor:
-    enabled: false
 resources: {}
 role: Agent
 service:
