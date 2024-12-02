@@ -18,7 +18,7 @@ rules:
           level="error",job=~".*((victoria.*)|vm)-?operator"
         }[5m]
       )
-    ) > 0
+    ) by ({{ $clusterLabel }}) > 0
   for: 15m
   labels:
     severity: warning
@@ -36,7 +36,7 @@ rules:
           job=~".*((victoria.*)|vm)-?operator"
         }[5m]
       )
-    ) > 0
+    ) by ({{ $clusterLabel }}) > 0
   for: 10m
   labels:
     severity: warning

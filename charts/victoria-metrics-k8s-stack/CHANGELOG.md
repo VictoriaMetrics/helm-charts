@@ -1,6 +1,6 @@
 ## Next release
 
-- synced rules
+- synced rules and dashboards
 - updated common dependency 0.0.32 -> 0.0.33
 
 ## 0.29.1
