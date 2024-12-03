@@ -14,17 +14,33 @@ rules:
     summary: 'Instance {{`{{`}} $labels.instance {{`}}`}} will run out of disk space in 3 days'
   condition: '{{ true }}'
   expr: |-
-    vm_free_disk_space_bytes / ignoring(path)
+    sum(vm_free_disk_space_bytes) without(path) /
     (
-      rate(vm_rows_added_to_storage_total[1d])
-      * scalar(
-        sum(vm_data_size_bytes{type!~"indexdb.*"}) /
-        sum(vm_rows{type!~"indexdb.*"})
-       )
+      rate(vm_rows_added_to_storage_total[1d]) * (
+        sum(vm_data_size_bytes{type!~"indexdb.*"}) without(type) /
+        sum(vm_rows{type!~"indexdb.*"}) without(type)
+      )
     ) < 3 * 24 * 3600 > 0
   for: 30m
   labels:
     severity: critical
+- alert: NodeBecomesReadonlyIn3Days
+  annotations:
+    dashboard: '{{ $host }}/d/oS7Bi_0Wz?viewPanel=113&var-instance={{`{{`}} $labels.instance {{`}}`}}'
+    description: "Taking into account current ingestion rate, free disk space and -storage.minFreeDiskSpaceBytes instance {{`{{`}} $labels.instance {{`}}`}} will remain writable for {{`{{`}} $value | humanizeDuration {{`}}`}}.\n Consider to limit the ingestion rate, decrease retention or scale the disk space up if possible."
+    summary: 'Instance {{`{{`}} $labels.instance {{`}}`}} will become read-only in 3 days'
+  condition: '{{ true }}'
+  expr: |-
+    sum(vm_free_disk_space_bytes - vm_free_disk_space_limit_bytes) without(path) /
+    (
+      rate(vm_rows_added_to_storage_total[1d]) * (
+        sum(vm_data_size_bytes{type!~"indexdb.*"}) without(type) /
+        sum(vm_rows{type!~"indexdb.*"}) without(type)
+      )
+    ) < 3 * 24 * 3600 > 0
+  for: 30m
+  labels:
+    severity: warning
 - alert: DiskRunsOutOfSpace
   annotations:
     dashboard: '{{ $host }}/d/oS7Bi_0Wz?viewPanel=200&var-instance={{`{{`}} $labels.instance {{`}}`}}'
@@ -87,9 +103,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-       sum(rate(vm_new_timeseries_created_total[5m]))
+       sum(rate(vm_new_timeseries_created_total[5m])) by (job,{{ $clusterLabel }})
        /
-       sum(rate(vm_rows_inserted_total[5m]))
+       sum(rate(vm_rows_inserted_total[5m])) by (job,{{ $clusterLabel }})
      ) > 0.1
   for: 15m
   labels:
@@ -101,9 +117,9 @@ rules:
     summary: 'Too high number of new series created over last 24h'
   condition: '{{ true }}'
   expr: |-
-    sum(increase(vm_new_timeseries_created_total[24h]))
+    sum(increase(vm_new_timeseries_created_total[24h])) by (job,{{ $clusterLabel }})
     >
-    (sum(vm_cache_entries{type="storage/hour_metric_ids"}) * 3)
+    (sum(vm_cache_entries{type="storage/hour_metric_ids"}) by (job,{{ $clusterLabel }}) * 3)
   for: 15m
   labels:
     severity: warning
@@ -115,9 +131,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-       sum(rate(vm_slow_row_inserts_total[5m]))
+       sum(rate(vm_slow_row_inserts_total[5m])) by (job,{{ $clusterLabel }})
        /
-       sum(rate(vm_rows_inserted_total[5m]))
+       sum(rate(vm_rows_inserted_total[5m])) by (job,{{ $clusterLabel }})
      ) > 0.05
   for: 15m
   labels:
