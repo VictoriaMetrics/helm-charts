@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fail template if both vmcluster and vmsingle are enabled
 
 ## 0.30.0
 
