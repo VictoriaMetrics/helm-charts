@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `server.retentionDiskUsage` to control [retention by disk space](https://docs.victoriametrics.com/victorialogs/#retention-by-disk-space-usage). See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1845)
 
 ## 0.8.9
 
