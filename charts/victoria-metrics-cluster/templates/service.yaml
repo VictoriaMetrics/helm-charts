@@ -17,8 +17,13 @@ metadata:
   name: {{ $fullname }}
   namespace: {{ include "vm.namespace" $ }}
 spec:
+  {{- $type := $service.type }}
+  {{- if and (not $type) ($app.statefulSet).enabled }}
+    {{- $type = "ClusterIP" }}
+  {{- end }}
+  type: {{ $type }}
   {{- $clusterIP := $service.clusterIP }}
-  {{- if and (not $clusterIP) ($app.statefulSet).enabled }}
+  {{- if and (not $clusterIP) (eq $type "ClusterIP") ($app.statefulSet).enabled }}
     {{- $clusterIP = "None" }}
   {{- end }}
   {{- with $clusterIP }}
@@ -33,11 +38,6 @@ spec:
   {{- with $service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $type := $service.type }}
-  {{- if and (not $type) ($app.statefulSet).enabled }}
-    {{- $type = "ClusterIP" }}
-  {{- end }}
-  type: {{ $type }}
   {{- with $service.healthCheckNodePort }}
   healthCheckNodePort: {{ . }}
   {{- end }}
