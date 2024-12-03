@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 1.6.11
+
+**Release date:** 2024-12-03
+
+![AppVersion: v1.18.8](https://img.shields.io/static/v1?label=AppVersion&message=v1.18.8&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.18.8](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1188).
 
 ## 1.6.10
