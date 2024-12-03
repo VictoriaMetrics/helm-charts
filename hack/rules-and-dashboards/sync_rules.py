@@ -253,7 +253,7 @@ def write_group_to_file(group, url, charts):
     for line in replacement_map:
         if group_name in replacement_map[line].get(
             "limitGroup", [group_name]
-        ) and re.findall(line, rules):
+        ) and re.findall(line, rules, re.I):
             print(f"Applying replace rule for '{line}' in {group_name}")
             rules = re.sub(
                 line, replacement_map[line]["replacement"], rules, flags=re.I
