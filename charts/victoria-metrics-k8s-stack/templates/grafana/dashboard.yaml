@@ -24,7 +24,10 @@ Get dashboard data from file
 {{- /*
 Save condition for a dashboard from file
 */}}
-{{- $dashboardCondition := or $dashboardData.condition (dig $dashboardName "enabled" false $.Values.defaultDashboards.dashboards) -}}
+{{- $dashboardCondition := $dashboardData.condition }}
+{{- if hasKey (index ((($.Values).defaultDashboards).dashboards) $dashboardName) "enabled" }}
+  {{- $dashboardCondition = index $.Values.defaultDashboards.dashboards $dashboardName "enabled" }}
+{{- end }}
 
 {{- /*
 Delete condition from dashboard

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Set higher priority for `defaultDashboards.dashboards.<name>.enabled` flag comparing to default dashboard conditions to allow install or ignore dashboards regardless of whether component it's for is installed or monitored. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1851).
 
 ## 0.30.2
 
