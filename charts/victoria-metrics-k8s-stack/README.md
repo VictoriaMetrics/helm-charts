@@ -108,6 +108,11 @@ defaultDashboards:
 
 argocd.argoproj.io/sync-options: ServerSideApply=true
 
+#### Resources are not completely removed after chart uninstallation
+
+This chart uses `pre-delete` Helm hook to cleanup resources managed by operator, but it's not supported in ArgoCD and this hook is ignored.
+To have a control over resources removal please consider using either [ArgoCD sync phases and waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) or [installing operator chart separately](#install-operator-separately)
+
 ### Rules and dashboards
 
 This chart by default install multiple dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
@@ -282,6 +287,16 @@ See the history of versions of `vmks` application with command.
 helm history vmks -n NAMESPACE
 ```
 
+### Install operator separately
+
+To have control over an order of managed resources removal or to be able to remove a whole namespace with managed resources it's recommended to disable operator in k8s-stack chart (`victoria-metrics-operator.enabled: false`) and [install it](https://docs.victoriametrics.com/helm/victoriametrics-operator/) separately. To move operator from existing k8s-stack release to a separate one please follow the steps below:
+
+- disable cleanup webhook (`victoria-metrics-operator.crds.cleanup.enabled: false`) and apply changes
+- disable operator (`victoria-metrics-operator.enabled: false`) and apply changes
+- [deploy operator](https://docs.victoriametrics.com/helm/victoriametrics-operator/) separately with `crds.plain: true`
+
+If you're planning to delete k8s-stack by a whole namespace removal please consider deploying operator in a separate namespace as due to uncontrollable removal order process can hang if operator is removed before at least one resource it manages.
+
 ### Install locally (Minikube)
 
 To run VictoriaMetrics stack locally it's possible to use [Minikube](https://github.com/kubernetes/minikube). To avoid dashboards and alert rules issues please follow the steps below:
@@ -306,10 +321,7 @@ Remove application with command.
 helm uninstall vmks -n NAMESPACE
 ```
 
-By default with a Helm chart uninstallation CRDs will be removed as well by a chart hook.
-If you want to disable CRDs removal please set `victoria-metrics-operator.crds.cleanup.enabled` to `false`
-
-To remove CRDs manually please use:
+CRDs created by this chart are not removed by default and should be manually cleaned up:
 
 ```console
 kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl delete crd {}
