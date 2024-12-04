@@ -853,6 +853,17 @@ timeoutSeconds: 5
 </td>
     </tr>
     <tr>
+      <td>server.retentionDiskSpaceUsage</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value" language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Data retention max capacity. Default unit is GiB. See these <a href="https://docs.victoriametrics.com/victorialogs/#retention-by-disk-space-usage" target="_blank">docs</a></p>
+</td>
+    </tr>
+    <tr>
       <td>server.retentionPeriod</td>
       <td>int</td>
       <td><pre class="helm-vars-default-value" language-yaml" lang="">
