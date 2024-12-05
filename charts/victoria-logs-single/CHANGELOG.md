@@ -1,6 +1,7 @@
 ## Next release
 
 - added `server.retentionDiskUsage` to control [retention by disk space](https://docs.victoriametrics.com/victorialogs/#retention-by-disk-space-usage). See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1845)
+- victorialogs version: v1.0.0 -> v1.1.0
 
 ## 0.8.9
 
