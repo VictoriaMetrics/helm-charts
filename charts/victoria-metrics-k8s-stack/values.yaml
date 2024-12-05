@@ -11,9 +11,9 @@ global:
     # -- K8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
     dnsDomain: cluster.local.
 
-# -- Resource full name suffix override
+# -- Override chart name
 nameOverride: ""
-# -- Resource full name prefix override
+# -- Resource full name override
 fullnameOverride: ""
 # -- Tenant to use for Grafana datasources and remote write
 tenant: "0"
@@ -56,9 +56,9 @@ defaultDashboards:
   # -- Create dashboards as ConfigMap despite dependency it requires is not installed
   dashboards:
     victoriametrics-vmalert:
-      enabled: false
+      enabled: true
     victoriametrics-operator:
-      enabled: false
+      enabled: true
     # -- In ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply
     # See [this issue](https://github.com/VictoriaMetrics/helm-charts/tree/disable-node-exporter-dashboard-by-default/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards)
     node-exporter-full:
