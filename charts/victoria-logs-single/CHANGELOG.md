@@ -1,5 +1,14 @@
 ## Next release
 
+- TODO
+
+## 0.8.10
+
+**Release date:** 2024-12-05
+
+![AppVersion: v1.1.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.1.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
 - added `server.retentionDiskUsage` to control [retention by disk space](https://docs.victoriametrics.com/victorialogs/#retention-by-disk-space-usage). See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1845)
 - victorialogs version: v1.0.0 -> v1.1.0
 
