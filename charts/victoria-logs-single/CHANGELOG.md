@@ -2,6 +2,8 @@
 
 - TODO
 
+- victorialogs version: v1.1.0 -> v1.3.2
+
 ## 0.8.10
 
 **Release date:** 2024-12-05
