@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- moved helm chart requirement to a common template
 
 ## 0.0.33
 

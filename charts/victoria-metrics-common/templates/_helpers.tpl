@@ -1,15 +1,16 @@
 {{- define "vm.namespace" -}}
+  {{- include "vm.validate.args" . -}}
   {{- $Release := (.helm).Release | default .Release -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $Capabilities := (.helm).Capabilities | default .Capabilities -}}
-  {{- if semverCompare "<3.14.0" $Capabilities.HelmVersion.Version }}
-    {{- fail "This chart requires helm version 3.14.0 or higher" }}
-  {{- end }}
   {{- $Values.namespaceOverride | default ($Values.global).namespaceOverride | default $Release.Namespace -}}
 {{- end -}}
 
 {{- define "vm.validate.args" -}}
   {{- $Chart := (.helm).Chart | default .Chart -}}
+  {{- $Capabilities := (.helm).Capabilities | default .Capabilities -}}
+  {{- if semverCompare "<3.14.0" $Capabilities.HelmVersion.Version }}
+    {{- fail "This chart requires helm version 3.14.0 or higher" }}
+  {{- end }}
   {{- if empty $Chart -}}
     {{- fail "invalid template data" -}}
   {{- end -}}
@@ -115,6 +116,7 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{- define "vm.internal.key" -}}
+  {{- include "vm.validate.args" . -}}
   {{- $overrideKey := .overrideKey | default "fullnameOverride" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $key := "" -}}
