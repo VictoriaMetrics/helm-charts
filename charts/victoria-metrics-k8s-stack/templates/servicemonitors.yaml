@@ -17,7 +17,7 @@ apiVersion: v1
 kind: Endpoints
 metadata:
   name: {{ $fullname }}
-  namespace: kube-system
+  namespace: {{ $config.service.namespace | default "kube-system" }}
   {{- $extraLabels := dict "app" $fullnameLabel "k8s-app" $svc }}
   {{- $_ := set $ctx "extraLabels" $extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
