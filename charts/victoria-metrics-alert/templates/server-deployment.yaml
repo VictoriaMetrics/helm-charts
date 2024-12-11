@@ -1,17 +1,16 @@
 {{- $app := .Values.server }}
-{{- if and $app.enabled -}}
-  {{- if not $app.extraArgs.rule }}
-    {{- if and (empty $app.configMap) (empty $app.config.alerts.groups) -}}
-      {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
-    {{- end -}}
+{{- if not $app.extraArgs.rule }}
+  {{- if and (empty $app.configMap) (empty $app.config.alerts.groups) -}}
+    {{- fail "at least one item in `.server.config.alerts.groups` or `.server.extraArgs.rule` must be set " -}}
   {{- end -}}
-  {{- if empty $app.datasource.url -}}
-    {{- fail "server.datasource.url datasource URL must be specified" -}}
-  {{- end }}
-  {{- $ctx := dict "helm" . "appKey" "server" }}
-  {{- $fullname := include "vm.plain.fullname" $ctx }}
-  {{- $ns := include "vm.namespace" $ctx }}
-  {{- $sa := include "vm.fullname" . }}
+{{- end -}}
+{{- if empty $app.datasource.url -}}
+  {{- fail "server.datasource.url datasource URL must be specified" -}}
+{{- end }}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+{{- $sa := include "vm.fullname" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -128,4 +127,3 @@ spec:
           {{- toYaml (omit . "name") | nindent 10 }}
         {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
-{{- end }}
