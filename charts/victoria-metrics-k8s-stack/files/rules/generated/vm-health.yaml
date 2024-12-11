@@ -115,19 +115,12 @@ rules:
   expr: increase(vm_indexdb_items_dropped_total[5m]) > 0
   labels:
     severity: critical
-- alert: TooLongLabelValues
+- alert: RowsRejectedOnIngestion
   annotations:
-    description: "The maximum length of a label value is limited via `-maxLabelValueLen` cmd-line flag. \nLonger label values are truncated and may result into time series overlapping.\nPlease, check your logs to find which labels were truncated and  \neither reduce the size of label values or increase `-maxLabelValueLen`.\n"
-    summary: 'VictoriaMetrics truncates too long label values'
+    description: 'Ingested rows on instance "{{`{{`}} $labels.instance {{`}}`}}" are rejected due to the following reason: "{{`{{`}} $labels.reason {{`}}`}}"'
+    summary: 'Some rows are rejected on "{{`{{`}} $labels.instance {{`}}`}}" on ingestion attempt'
   condition: '{{ true }}'
-  expr: increase(vm_too_long_label_values_total[5m]) > 0
+  expr: rate(vm_rows_ignored_total[5m]) > 0
+  for: 15m
   labels:
-    severity: critical
-- alert: TooLongLabelNames
-  annotations:
-    description: 'The maximum length of a label name is limited by 256 bytes.  Longer label names are truncated and may result into time series overlapping.'
-    summary: 'VictoriaMetrics truncates too long label names'
-  condition: '{{ true }}'
-  expr: increase(vm_too_long_label_names_total[5m]) > 0
-  labels:
-    severity: critical
+    severity: warning

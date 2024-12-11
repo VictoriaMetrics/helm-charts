@@ -66,16 +66,6 @@ rules:
   for: 15m
   labels:
     severity: warning
-- alert: RowsRejectedOnIngestion
-  annotations:
-    dashboard: '{{ $host }}/d/wNf0q_kZk?viewPanel=58&var-instance={{`{{`}} $labels.instance {{`}}`}}'
-    description: 'VM is rejecting to ingest rows on "{{`{{`}} $labels.instance {{`}}`}}" due to the following reason: "{{`{{`}} $labels.reason {{`}}`}}"'
-    summary: 'Some rows are rejected on "{{`{{`}} $labels.instance {{`}}`}}" on ingestion attempt'
-  condition: '{{ true }}'
-  expr: rate(vm_rows_ignored_total[5m]) > 0
-  for: 15m
-  labels:
-    severity: warning
 - alert: TooHighChurnRate
   annotations:
     dashboard: '{{ $host }}/d/wNf0q_kZk?viewPanel=66&var-instance={{`{{`}} $labels.instance {{`}}`}}'
@@ -116,16 +106,6 @@ rules:
        /
        sum(rate(vm_rows_inserted_total[5m])) by (instance,{{ $clusterLabel }})
      ) > 0.05
-  for: 15m
-  labels:
-    severity: warning
-- alert: LabelsLimitExceededOnIngestion
-  annotations:
-    dashboard: '{{ $host }}/d/wNf0q_kZk?viewPanel=74&var-instance={{`{{`}} $labels.instance {{`}}`}}'
-    description: "VictoriaMetrics limits the number of labels per each metric with `-maxLabelsPerTimeseries` command-line flag.\n This prevents ingestion of metrics with too many labels. Please verify that `-maxLabelsPerTimeseries` is configured correctly or that clients which send these metrics aren't misbehaving."
-    summary: 'Metrics ingested in ({{`{{`}} $labels.instance {{`}}`}}) are exceeding labels limit'
-  condition: '{{ true }}'
-  expr: increase(vm_metrics_with_dropped_labels_total[5m]) > 0
   for: 15m
   labels:
     severity: warning

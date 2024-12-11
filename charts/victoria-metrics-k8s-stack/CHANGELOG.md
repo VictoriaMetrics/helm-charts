@@ -1,6 +1,7 @@
 ## Next release
 
 - Added ability to override namespace for scrape config endpoints. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1859).
+- Synced dashboards and rules
 
 ## 0.30.3
 
