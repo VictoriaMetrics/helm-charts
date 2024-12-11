@@ -3,6 +3,7 @@
 - Added ability to override namespace for scrape config endpoints. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1859).
 - Synced dashboards and rules
 - Kube state metrics chart: 5.26.0 -> 5.27.0
+- Prometheus node exporter chart: 4.41.0 -> 4.42.0
 
 ## 0.30.3
 
