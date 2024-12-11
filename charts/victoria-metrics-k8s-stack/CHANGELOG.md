@@ -4,6 +4,7 @@
 - Synced dashboards and rules
 - Kube state metrics chart: 5.26.0 -> 5.27.0
 - Prometheus node exporter chart: 4.41.0 -> 4.42.0
+- Grafana chart: 8.5.12 -> 8.6.4
 
 ## 0.30.3
 
