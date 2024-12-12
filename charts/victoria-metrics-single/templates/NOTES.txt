@@ -1,6 +1,6 @@
 {{- if .Values.printNotes }}
 {{- if .Values.server.enabled }}
-{{- $ctx := dict "helm" . "appKey" "server" "style" "managed" }}
+{{- $ctx := dict "helm" . "appKey" "server" "style" "plain" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 The VictoriaMetrics write api can be accessed via port {{ .Values.server.service.servicePort }} on the following DNS name from within your cluster:
@@ -24,7 +24,12 @@ Metrics Ingestion:
     kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.server.service.servicePort }}
 {{- end }}
 
-  Write url inside the kubernetes cluster:
+  Write URL inside the kubernetes cluster:
+    {{ include "vm.url" $ctx }}/<protocol-specific-write-endpoint>
+
+  All supported write endpoints can be found at https://docs.victoriametrics.com/single-server-victoriametrics/#how-to-import-time-series-data
+
+  E.g: for Prometheus:
     {{ include "vm.url" $ctx }}/api/v1/write
 
 {{- if .Values.server.scrape.enabled }}
@@ -47,7 +52,7 @@ Metrics Scrape:
 {{- end }}
 
 Read Data:
-  The following url can be used as the datasource url in Grafana::
+  The following URL can be used as the datasource URL in Grafana::
     {{ include "vm.url" $ctx }}
 {{- end }}
 {{- end }}

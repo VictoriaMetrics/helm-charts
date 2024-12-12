@@ -28,11 +28,13 @@ Logs Ingestion:
     kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.server.service.servicePort }}
 {{- end }}
 
-  Write url inside the kubernetes cluster:
-    {{ $url }}
+  Write URL inside the kubernetes cluster:
+    {{ $url }}<protocol-specific-write-endpoint>
+
+  All supported write endpoints can be found at https://docs.victoriametrics.com/victorialogs/data-ingestion/
 
 Read Data:
-  The following url can be used to query data:
+  The following URL can be used to query data:
     {{ $url }}
 {{- end }}
 {{- end }}
