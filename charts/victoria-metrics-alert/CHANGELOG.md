@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- removed .Values.server.enabled, vmalert is now always enabled
 
 ## 0.13.0
 
