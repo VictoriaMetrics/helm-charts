@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Alertmanager 0.25.0 -> 0.27.0
 
 ## 0.13.1
 
