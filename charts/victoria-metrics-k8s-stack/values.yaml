@@ -50,7 +50,7 @@ defaultDashboards:
     spec:
       instanceSelector:
         matchLabels:
-          dashboards: "grafana"
+          dashboards: grafana
       allowCrossNamespaceImport: false
   # -- Create dashboards as ConfigMap despite dependency it requires is not installed
   dashboards:
@@ -316,7 +316,7 @@ vmcluster:
     replicationFactor: 2
     vmstorage:
       replicaCount: 2
-      storageDataPath: "/vm-data"
+      storageDataPath: /vm-data
       storage:
         volumeClaimTemplate:
           spec:
@@ -331,7 +331,7 @@ vmcluster:
     vmselect:
       port: "8481"
       replicaCount: 2
-      cacheMountPath: "/select-cache"
+      cacheMountPath: /select-cache
       extraArgs: {}
       storage:
         volumeClaimTemplate:
@@ -959,6 +959,11 @@ kubelet:
       enabled: true
       spec:
         path: /metrics/probes
+    # -- Enabled scraping /metrics/resource from kubelet's service
+    resources:
+      enabled: true
+      spec:
+        path: /metrics/resource
     kubelet:
       spec: {}
   # -- Spec for VMNodeScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmnodescrapespec)
@@ -971,8 +976,8 @@ kubelet:
       scrapeTimeout: "5s"
       tlsConfig:
         insecureSkipVerify: true
-        caFile: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-      bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
       # drop high cardinality label and useless metrics for cadvisor and kubelet
       metricRelabelConfigs:
         - action: labeldrop
@@ -987,8 +992,8 @@ kubelet:
           regex: __meta_kubernetes_node_label_(.+)
         - sourceLabels: [__metrics_path__]
           targetLabel: metrics_path
-        - targetLabel: "job"
-          replacement: "kubelet"
+        - targetLabel: job
+          replacement: kubelet
       # ignore timestamps of cadvisor's metrics by default
       # more info here https://github.com/VictoriaMetrics/VictoriaMetrics/issues/4697#issuecomment-1656540535
       honorTimestamps: false
@@ -1046,7 +1051,7 @@ kubeControllerManager:
       jobLabel: jobLabel
       namespaceSelector:
         matchNames:
-          - "kube-system"
+          - kube-system
       endpoints:
         - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
           # bearerTokenSecret:
