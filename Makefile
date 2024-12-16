@@ -25,8 +25,8 @@ helm-docker:
 	mkdir -p .helm/cache
 	$(CONTAINER_TOOL) run --rm --name helm-exec  \
 		$(CONTAINER_USER_OPTION) \
-		--volume "$(PWD):/helm-charts$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
-		--volume "$(PWD)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(REPODIR):/helm-charts$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(REPODIR)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
 		-w /helm-charts \
 		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
 		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
@@ -42,8 +42,8 @@ ct-docker:
 	mkdir -p .helm/cache
 	$(CONTAINER_TOOL) run --rm --name helm-exec  \
 		$(CONTAINER_USER_OPTION) \
-		--volume "$(PWD):/helm-charts$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
-		--volume "$(PWD)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(REPODIR):/helm-charts$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(REPODIR)/.github/ci/helm-repos.yaml:/helm-charts/.helm/config/repositories.yaml$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
 		-w /helm-charts \
 		-e HELM_CACHE_HOME=/helm-charts/.helm/cache \
 		-e HELM_CONFIG_HOME=/helm-charts/.helm/config \
@@ -105,11 +105,11 @@ template-local:
 	HELM="helm-local" $(MAKE) template
 
 gen-docs:
-	$(CONTAINER_TOOL) build $(PWD)/hack/docs \
+	$(CONTAINER_TOOL) build $(REPODIR)/hack/docs \
 		-t $(HELM_DOCS_IMAGE) && \
 	$(CONTAINER_TOOL) run --rm \
 		$(CONTAINER_USER_OPTION) \
-		--volume "$(PWD):/helm-charts$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
+		--volume "$(REPODIR):/helm-charts$(CONTAINER_VOLUME_OPTION_SUFFIX)" \
 		-w /helm-charts \
                 --entrypoint /bin/helm-docs \
 		$(HELM_DOCS_IMAGE) \
