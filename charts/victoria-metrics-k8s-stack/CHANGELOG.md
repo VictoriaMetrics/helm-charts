@@ -6,6 +6,7 @@
 - Prometheus node exporter chart: 4.41.0 -> 4.42.0
 - Grafana chart: 8.5.12 -> 8.6.4
 - Prometheus operator chart: 15.0.0 -> 16.0.1
+- bump version of VM components to [v1.108.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.108.0)
 
 ## 0.30.3
 
