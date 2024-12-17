@@ -46,7 +46,9 @@
     {{- else if $values -}}
       {{- $spec = $values -}}
     {{- end -}}
-    {{- $isSecure = ($spec.extraArgs).tls | default $isSecure -}}
+    {{- with ($spec.extraArgs).tls -}}
+      {{- $isSecure = eq (toString .) "true" -}}
+    {{- end -}}
     {{- $port = (ternary 443 80 $isSecure) -}}
     {{- $port = $spec.port | default ($spec.service).servicePort | default ($spec.service).port | default $port -}}
     {{- if hasKey . "appIdx" -}}
@@ -76,7 +78,9 @@
     {{- else if $ctx -}}
       {{- $spec = $ctx -}}
     {{- end -}}
-    {{- $isSecure = ($spec.extraArgs).tls | default $isSecure -}}
+    {{- with ($spec.extraArgs).tls -}}
+      {{- $isSecure = eq (toString .) "true" -}}
+    {{- end -}}
     {{- $proto = (ternary "https" "http" $isSecure) -}}
     {{- $path = dig "http.pathPrefix" $path ($spec.extraArgs | default dict) -}}
   {{- end -}}

@@ -75,7 +75,11 @@ HTTP GET probe path
 HTTP GET probe scheme
 */ -}}
 {{- define "vm.probe.http.scheme" -}}
-  {{- ternary "HTTPS" "HTTP" (.app.extraArgs.tls | default false) -}}
+  {{- $isSecure := false -}}
+  {{- with ((.app).extraArgs).tls -}}
+    {{- $isSecure = eq (toString .) "true" -}}
+  {{- end -}}
+  {{- ternary "HTTPS" "HTTP" $isSecure -}}
 {{- end -}}
 
 {{- /*

@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed tls in common templates. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1874)
 
 ## 0.0.34
 
