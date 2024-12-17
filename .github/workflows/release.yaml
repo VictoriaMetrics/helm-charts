@@ -57,8 +57,7 @@ jobs:
         run: |
           for CHANGELOG in $(find charts/*/CHANGELOG.md)
           do
-              if grep -q "^## Next release$" $CHANGELOG
-              then
+              if grep -q "^## Next release$" $CHANGELOG; then
                 echo "Processing $CHANGELOG"
               else
                 echo "ERROR: Not found 'Next release' section in $CHANGELOG"
@@ -76,47 +75,30 @@ jobs:
                 echo "There is nothing to release for $CHANGELOG"
               else
                 # Release notes file
-                export RN_FILE="$(dirname $CHANGELOG)/RELEASE_NOTES.md"
-                export RN_CONTENT="$(awk '/^## Next release/{flag=1;next}/^## /{flag=0}flag' $CHANGELOG | awk 'NF {p=1} p')"
+                export NOTES="$(sed -n '/## Next release/,/## /p' $CHANGELOG | sed -e '$d' -e '1d')"
+                export HELM_BADGE="\![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)"
+                export APP_BADGE="\![AppVersion: $APP_VERSION](https://img.shields.io/static/v1?label=AppVersion&message=$APP_VERSION&color=success&logo=)"
+                export RELEASE_DATE="**Release date:** $(date -I)"
+                export BADGES=$([ "$APP_VERSION" != "null" ] && printf "$APP_BADGE\n$HELM_BADGE" || printf "$HELM_BADGE")
           
                 # ArtifactHub annotation in Chart.yaml file
                 export CHANGELOG
                 yq -M -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | .changes | split("\n") | .[] |= sub("^[\s]*-[\s]+", "") | filter(length > 0) | to_yaml)' $CHART_FILE
           
                 # Create release notes
-                echo "# Release notes for version $CHART_VERSION" > $RN_FILE
-                echo "" >> $RN_FILE
-                echo "**Release date:** $(date -I)" >> $RN_FILE
-                echo "" >> $RN_FILE
-                if [[ $APP_VERSION != "null" ]]; then
-                  echo "![AppVersion: $APP_VERSION](https://img.shields.io/static/v1?label=AppVersion&message=$APP_VERSION&color=success&logo=)" >> $RN_FILE
-                fi
-                echo "![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)" >> $RN_FILE
-                echo "" >> $RN_FILE
-                echo "$RN_CONTENT" >> $RN_FILE
-                echo "" >> $RN_FILE 
-          
+                cat <<EOT > $(dirname $CHANGELOG)/RELEASE_NOTES.md
+                # Release notes for version $CHART_VERSION
+
+                $RELEASE_DATE
+
+                $BADGES
+                $NOTES
+                EOT
+
+                export BADGES="$(echo $BADGES | sed -e 's/[\/]/\\&/g')"
+
                 # Update chart version in CHANGELOG
-                cp $CHANGELOG $CHANGELOG.copy
-                : > $CHANGELOG
-                while read -r line; do 
-                  echo "$line" >> $CHANGELOG
-                  if [[ $line == "## Next release" ]]
-                  then
-                    echo "" >> $CHANGELOG
-                    echo "- TODO" >> $CHANGELOG
-                    echo "" >> $CHANGELOG
-                    echo "## $CHART_VERSION" >> $CHANGELOG
-                    echo "" >> $CHANGELOG
-                    echo "**Release date:** $(date -I)" >> $CHANGELOG
-                    echo "" >> $CHANGELOG
-                    if [[ $APP_VERSION != "null" ]]; then
-                      echo "![AppVersion: $APP_VERSION](https://img.shields.io/static/v1?label=AppVersion&message=$APP_VERSION&color=success&logo=)" >> $CHANGELOG
-                    fi
-                    echo "![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)" >> $CHANGELOG
-                  fi 
-                done < $CHANGELOG.copy
-                rm $CHANGELOG.copy
+                sed -i "s/## Next release/&\n\n- TODO\n\n## $CHART_VERSION\n\n$RELEASE_DATE\n\n$BADGES/" $CHANGELOG
               fi
           done
 

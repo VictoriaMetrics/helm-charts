@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added explicit defaultRules toggles
 
 ## 0.31.0
 
