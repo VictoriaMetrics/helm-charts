@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added default value for `.Values.grafana.sidecar.datasources.label` for case when `grafana.enabled: false` but datasource provision is still enabled. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1875).
 
 ## 0.31.2
 
