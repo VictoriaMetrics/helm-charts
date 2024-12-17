@@ -1,6 +1,7 @@
 ## Next release
 
 - updated common dependency 0.0.34 -> 0.0.35
+- updated k8s-stack chart 0.28.4 -> 0.31.2
 
 ## 0.6.1
 
