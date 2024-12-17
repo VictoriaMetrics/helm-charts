@@ -15721,6 +15721,38 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - fixed tls in common templates. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1874)
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-common
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+    apiVersion: v2
+    created: "2024-12-17T20:17:39.783153507Z"
+    description: Victoria Metrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: 1d472f688506f93f334d4c8b1202385da4cf924a00b7d0ed0a5fe50879f26039
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.0.35/victoria-metrics-common-0.0.35.tgz
+    version: 0.0.35
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - moved helm chart requirement to a common template
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -28005,6 +28037,54 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - updated common dependency 0.0.32 -> 0.0.33
+        - add an option to mount `ServiceAccount` token manually for security hardening reasons.
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/operator
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: v0.51.0-rc1
+    created: "2024-12-17T20:17:40.104941375Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    - condition: crds.plain
+      name: crds
+      repository: ""
+      version: 0.0.*
+    description: Victoria Metrics Operator
+    digest: acc72cd8206341a6f66298517d56f9f9e7a3d312575a6e33ea4e4f09e8a7ba55
+    home: https://github.com/VictoriaMetrics/operator
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-operator
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    - https://github.com/VictoriaMetrics/operator
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-operator-0.40.0-rc.1/victoria-metrics-operator-0.40.0-rc.1.tgz
+    version: 0.40.0-rc.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - updated common dependency 0.0.31 -> 0.0.32
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -34463,4 +34543,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2024-12-17T14:25:33.700287981Z"
+generated: "2024-12-17T20:17:40.106858471Z"
