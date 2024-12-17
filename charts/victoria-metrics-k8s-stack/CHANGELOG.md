@@ -6,7 +6,8 @@
 
 **Release date:** 2024-12-17
 
-\![AppVersion: v1.108.0](https://img.shields.io/static/v1?label=AppVersion## Next releasemessage=v1.108.0## Next releasecolor=success## Next releaselogo=) \![Helm: v3](https://img.shields.io/static/v1?label=Helm## Next releasemessage=v3## Next releasecolor=informational## Next releaselogo=helm)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+![AppVersion: v1.108.0](https://img.shields.io/static/v1?label=AppVersion&message=v1.108.0&color=success&logo=)
 
 - Added explicit defaultRules toggles
 

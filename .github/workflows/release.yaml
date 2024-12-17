@@ -75,30 +75,33 @@ jobs:
                 echo "There is nothing to release for $CHANGELOG"
               else
                 # Release notes file
-                export NOTES="$(sed -n '/## Next release/,/## /p' $CHANGELOG | sed -e '$d' -e '1d')"
-                export HELM_BADGE="\![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)"
-                export APP_BADGE="\![AppVersion: $APP_VERSION](https://img.shields.io/static/v1?label=AppVersion&message=$APP_VERSION&color=success&logo=)"
-                export RELEASE_DATE="**Release date:** $(date -I)"
-                export BADGES=$([ "$APP_VERSION" != "null" ] && printf "$APP_BADGE\n$HELM_BADGE" || printf "$HELM_BADGE")
-          
-                # ArtifactHub annotation in Chart.yaml file
+                BADGES='![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)'
+                if [ "$APP_VERSION" != "null" ]; then
+                  BADGES+='\n![AppVersion: '$APP_VERSION'](https://img.shields.io/static/v1?label=AppVersion&message='$APP_VERSION'&color=success&logo=)'
+                fi
+
+                export BADGES=$(printf "$BADGES")
                 export CHANGELOG
+                export RELEASE_DATE="**Release date:** $(date -I)"
+                export NOTES="$(sed -n '/## Next release/,/## /p' $CHANGELOG | sed -e '$d' -e '1d')"
+
+                # ArtifactHub annotation in Chart.yaml file
                 yq -M -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | .changes | split("\n") | .[] |= sub("^[\s]*-[\s]+", "") | filter(length > 0) | to_yaml)' $CHART_FILE
           
                 # Create release notes
                 cat <<EOT > $(dirname $CHANGELOG)/RELEASE_NOTES.md
-                # Release notes for version $CHART_VERSION
+          # Release notes for version $CHART_VERSION
 
-                $RELEASE_DATE
+          $RELEASE_DATE
 
-                $BADGES
-                $NOTES
+          $BADGES
+          $NOTES
           EOT
 
-                export BADGES="$(echo $BADGES | sed -e 's/[\/]/\\&/g')"
-
                 # Update chart version in CHANGELOG
-                sed -i "s/## Next release/&\n\n- TODO\n\n## $CHART_VERSION\n\n$RELEASE_DATE\n\n$BADGES/" $CHANGELOG
+                sed -i 's/## Next release/&\n\n- TODO\n\n## $CHART_VERSION\n\n$RELEASE_DATE\n\n$BADGES/' $CHANGELOG
+                envsubst < $CHANGELOG > $CHANGELOG.copy
+                mv $CHANGELOG.copy $CHANGELOG
               fi
           done
 
