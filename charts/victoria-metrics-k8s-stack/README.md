@@ -1162,7 +1162,7 @@ kubernetesResources:
 kubernetesStorage:
     create: true
     rules: {}
-    targetNamespace: ".*"
+    targetNamespace: .*
 kubernetesSystem:
     create: true
     rules: {}
