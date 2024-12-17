@@ -1,4 +1,4 @@
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.31.0](https://img.shields.io/badge/Version-0.31.0-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.31.1](https://img.shields.io/badge/Version-0.31.1-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-k8s-stack)
 
 Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics Operator, Grafana dashboards, ServiceScrapes and VMRules
@@ -889,6 +889,9 @@ groups:
     k8sContainerCpuUsageSecondsTotal:
         create: true
         rules: {}
+    k8sContainerMemoryCache:
+        create: true
+        rules: {}
     k8sContainerMemoryLimits:
         create: true
         rules: {}
@@ -898,19 +901,16 @@ groups:
     k8sContainerMemoryRss:
         create: true
         rules: {}
-    k8sContainerMemoryCache:
+    k8sContainerMemorySwap:
         create: true
         rules: {}
     k8sContainerMemoryWorkingSetBytes:
         create: true
         rules: {}
-    k8sContainerMemorySwap:
+    k8sContainerResource:
         create: true
         rules: {}
     k8sPodOwner:
-        create: true
-        rules: {}
-    k8sContainerResource:
         create: true
         rules: {}
     kubeApiserver:
@@ -1098,6 +1098,9 @@ k8sContainerCpuRequests:
 k8sContainerCpuUsageSecondsTotal:
     create: true
     rules: {}
+k8sContainerMemoryCache:
+    create: true
+    rules: {}
 k8sContainerMemoryLimits:
     create: true
     rules: {}
@@ -1107,19 +1110,16 @@ k8sContainerMemoryRequests:
 k8sContainerMemoryRss:
     create: true
     rules: {}
-k8sContainerMemoryCache:
+k8sContainerMemorySwap:
     create: true
     rules: {}
 k8sContainerMemoryWorkingSetBytes:
     create: true
     rules: {}
-k8sContainerMemorySwap:
+k8sContainerResource:
     create: true
     rules: {}
 k8sPodOwner:
-    create: true
-    rules: {}
-k8sContainerResource:
     create: true
     rules: {}
 kubeApiserver:
@@ -2993,3 +2993,4 @@ storage:
     </tr>
   </tbody>
 </table>
+
