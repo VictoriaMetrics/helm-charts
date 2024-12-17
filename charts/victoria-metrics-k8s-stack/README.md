@@ -880,25 +880,37 @@ groups:
     general:
         create: true
         rules: {}
+    k8sContainerCpuLimits:
+        create: true
+        rules: {}
+    k8sContainerCpuRequests:
+        create: true
+        rules: {}
     k8sContainerCpuUsageSecondsTotal:
         create: true
         rules: {}
-    k8sContainerMemoryCache:
+    k8sContainerMemoryLimits:
+        create: true
+        rules: {}
+    k8sContainerMemoryRequests:
         create: true
         rules: {}
     k8sContainerMemoryRss:
         create: true
         rules: {}
-    k8sContainerMemorySwap:
+    k8sContainerMemoryCache:
         create: true
         rules: {}
     k8sContainerMemoryWorkingSetBytes:
         create: true
         rules: {}
-    k8sContainerResource:
+    k8sContainerMemorySwap:
         create: true
         rules: {}
     k8sPodOwner:
+        create: true
+        rules: {}
+    k8sContainerResource:
         create: true
         rules: {}
     kubeApiserver:
@@ -1077,25 +1089,37 @@ etcd:
 general:
     create: true
     rules: {}
+k8sContainerCpuLimits:
+    create: true
+    rules: {}
+k8sContainerCpuRequests:
+    create: true
+    rules: {}
 k8sContainerCpuUsageSecondsTotal:
     create: true
     rules: {}
-k8sContainerMemoryCache:
+k8sContainerMemoryLimits:
+    create: true
+    rules: {}
+k8sContainerMemoryRequests:
     create: true
     rules: {}
 k8sContainerMemoryRss:
     create: true
     rules: {}
-k8sContainerMemorySwap:
+k8sContainerMemoryCache:
     create: true
     rules: {}
 k8sContainerMemoryWorkingSetBytes:
     create: true
     rules: {}
-k8sContainerResource:
+k8sContainerMemorySwap:
     create: true
     rules: {}
 k8sPodOwner:
+    create: true
+    rules: {}
+k8sContainerResource:
     create: true
     rules: {}
 kubeApiserver:
@@ -1138,7 +1162,7 @@ kubernetesResources:
 kubernetesStorage:
     create: true
     rules: {}
-    targetNamespace: .*
+    targetNamespace: ".*"
 kubernetesSystem:
     create: true
     rules: {}
@@ -2969,4 +2993,3 @@ storage:
     </tr>
   </tbody>
 </table>
-
