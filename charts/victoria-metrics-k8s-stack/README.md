@@ -1417,6 +1417,7 @@ sidecar:
     datasources:
         enabled: true
         initDatasources: true
+        label: grafana_datasource
 vmScrape:
     enabled: true
     spec:
