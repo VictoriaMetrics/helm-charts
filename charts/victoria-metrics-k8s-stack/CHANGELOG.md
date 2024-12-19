@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.32.0
+
+**Release date:** 19 Dec 2024
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.108.1](https://img.shields.io/badge/v1.108.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11081)
+
 - updates operator to [v0.51.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.51.1) version
 
 ## 0.31.4
