@@ -1,5 +1,7 @@
 ## Next release
 
+- Replaced deprecated `.Values.vmauth.spec.unauthorizedAccessConfig` with `.Values.vmauth.spec.unauthorizedUserAccessSpec`
+- Replaced deprecated `.Values.vmauth.spec.discover_backend_ips` with `.Values.vmauth.spec.unauthorizedUserAccessSpec.discover_backend_ips`
 - Exclude markdown files from package
 
 ## 0.32.0

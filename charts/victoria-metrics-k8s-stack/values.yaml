@@ -735,13 +735,14 @@ vmauth:
   # * `{{ .vm.read }}` - parsed vmselect, vmsingle or externalVM.read URL
   # * `{{ .vm.write }}` - parsed vminsert, vmsingle or externalVM.write URL
   spec:
-    discover_backend_ips: true
     port: "8427"
-    unauthorizedAccessConfig:
-      - src_paths:
-          - '{{ .vm.read.path }}/.*'
-        url_prefix:
-          - '{{ urlJoin (omit .vm.read "path") }}/'
+    unauthorizedUserAccessSpec:
+      discover_backend_ips: true
+      url_map:
+        - src_paths:
+            - '{{ .vm.read.path }}/.*'
+          url_prefix:
+            - '{{ urlJoin (omit .vm.read "path") }}/'
 
 vmagent:
   # -- Create VMAgent CR
