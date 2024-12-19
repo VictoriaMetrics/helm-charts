@@ -55,6 +55,7 @@ jobs:
 
       - name: Generate release notes
         run: |
+          mkdir deploy-charts
           for CHANGELOG in $(find charts/*/CHANGELOG.md)
           do
               if grep -q "^## Next release$" $CHANGELOG; then
@@ -65,7 +66,8 @@ jobs:
               fi
               
               # Useful variables
-              export CHART_FILE="$(dirname $CHANGELOG)/Chart.yaml"
+              export CHART_DIR="$(dirname $CHANGELOG)"
+              export CHART_FILE="${CHART_DIR}/Chart.yaml"
               export APP_VERSION="$(yq -M '.appVersion' $CHART_FILE)"
               export CHART_VERSION="$(yq -M '.version' $CHART_FILE)"
               
@@ -90,9 +92,13 @@ jobs:
 
                 # ArtifactHub annotation in Chart.yaml file
                 yq -M -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | .changes | split("\n") | .[] |= sub("^[\s]*-[\s]+", "") | filter(length > 0) | to_yaml)' $CHART_FILE
+
+                cp -r ${CHART_DIR} deploy-${CHART_DIR}
+                rm deploy-${CHART_DIR}/*.md
+                rm deploy-${CHART_DIR}/*.gotmpl
           
                 # Create release notes
-                cat <<EOT > $(dirname $CHANGELOG)/RELEASE_NOTES.md
+                cat <<EOT > ${CHART_DIR}/RELEASE_NOTES.md
           # Release notes for version $CHART_VERSION
 
           $RELEASE_DATE
@@ -114,27 +120,25 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
         with:
+          charts_dir: deploy-charts
           config: .github/ci/cr.yaml
 
       - name: Release OCI
         if: ${{ hashFiles('charts/*/RELEASE_NOTES.md') != '' }}
         run: |
+          mkdir -p .cr-release-packages
           helm registry login \
             -u ${{ github.actor }} \
             -p ${{ github.token }} \
             ghcr.io
-          mkdir -p .cr-release-packages
-          for chart in charts/*; do
-            if [ ! -f $chart/RELEASE_NOTES.md ]; then
-              echo "no release notes for chart $chart. removing it from uploading..."
-              rm -rf .cr-release-packages/$(basename $chart)*
-            fi
-          done
-          find .cr-release-packages -name "*.tgz" -exec helm push {} oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts \;
+          find .cr-release-packages \
+            -name "*.tgz" \
+            -exec helm push {} oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts \;
 
       - name: Automatic update changelogs and readme
         if: ${{ hashFiles('charts/*/RELEASE_NOTES.md') != '' }}
         run: |
+          rm -rf deploy-charts
           rm -rf charts/*/RELEASE_NOTES.md
           export VM_GIT_BRANCH_NAME="changelog-update-$(date +%s)"
           git checkout -b "${VM_GIT_BRANCH_NAME}"

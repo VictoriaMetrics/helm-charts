@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Compact CRD template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1888).
 
 ## 0.40.0
 

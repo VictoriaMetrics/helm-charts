@@ -12,8 +12,11 @@
   {{- $annotations := (include "vm-operator.crds.annotations" .) | fromYaml -}}
   {{- $extra := dict "metadata" (dict "annotations" $annotations "labels" $labels) -}}
   {{- range $crds }}
-    {{- $crd := . | fromYaml }}
-    {{- toYaml (merge $crd $extra) }}
+    {{- $crd := merge (fromYaml .) $extra }}
+    {{- range $attrKey, $attrValue := $crd }}
+      {{- $attrKey }}: {{ toJson $attrValue }}
+      {{- printf "\n" -}}
+    {{ end }}
     {{- print "\n---\n" }}
   {{- end }}
 {{- end }}
