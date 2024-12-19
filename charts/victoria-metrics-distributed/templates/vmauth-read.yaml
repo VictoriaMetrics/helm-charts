@@ -18,27 +18,28 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
 spec:
-  {{- with (omit $auth.spec "unauthorizedAccessConfig") }}
+  {{- with (omit $auth.spec "unauthorizedUserAccessSpec") }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
-  unauthorizedAccessConfig:
-  - src_paths:
-    - "/select/.+"
-    load_balancing_policy: first_available
-    {{- $_ := set $ctx "style" "managed" }}
-    {{- $urls := default list }}
-    {{- range $i, $z := $.Values.availabilityZones }}
-      {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
-      {{- $authSpec := ((($zone.read).crossZone).vmauth).spec | default dict }}
-      {{- $_ := set $zone.read.crossZone.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $authSpec) }}
-      {{- $_ := set $ctx "zone" $zone }}
-      {{- $_ := set $ctx "appKey" (list "zone" "read" "crossZone" "vmauth" "spec") }}
-      {{- $urls = append $urls (include "vm.url" $ctx) }}
-    {{- end }}
-    {{- $_ := unset $ctx "style" }}
-    {{- if empty $urls }}
-      {{- fail "No global vmauth read backend urls defined" -}}
-    {{- end }}
-    url_prefix: {{ toYaml $urls | nindent 4 }}
+  unauthorizedUserAccessSpec:
+    url_map:
+      - src_paths:
+          - "/select/.+"
+        load_balancing_policy: first_available
+        {{- $_ := set $ctx "style" "managed" }}
+        {{- $urls := default list }}
+        {{- range $i, $z := $.Values.availabilityZones }}
+          {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
+          {{- $authSpec := ((($zone.read).crossZone).vmauth).spec | default dict }}
+          {{- $_ := set $zone.read.crossZone.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $authSpec) }}
+          {{- $_ := set $ctx "zone" $zone }}
+          {{- $_ := set $ctx "appKey" (list "zone" "read" "crossZone" "vmauth" "spec") }}
+          {{- $urls = append $urls (include "vm.url" $ctx) }}
+        {{- end }}
+        {{- $_ := unset $ctx "style" }}
+        {{- if empty $urls }}
+          {{- fail "No global vmauth read backend urls defined" -}}
+        {{- end }}
+        url_prefix: {{ toYaml $urls | nindent 10 }}
 {{- end }}
 

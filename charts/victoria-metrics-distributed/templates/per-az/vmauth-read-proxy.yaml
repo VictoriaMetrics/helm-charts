@@ -20,35 +20,36 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 {{- $spec := mergeOverwrite (deepCopy $.Values.common.vmauth.spec) (deepCopy (($zone.common).spec)) (deepCopy (((($zone.read).crossZone).vmauth).spec)) }}
-spec: {{ tpl (toYaml (omit $spec "unauthorizedAccessConfig")) $ctx | nindent 2 }}
-  unauthorizedAccessConfig:
-  - src_paths:
-    - "/select/.+"
-    load_balancing_policy: first_available
-    retry_status_codes:
-    - 503
-    {{- $_ := set $ctx "style" "managed" }}
-    {{- $urls := default list }}
-    {{- if $zone.read.allow }}
-      {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
-      {{- $urls = append $urls (include "vm.url" $ctx) }}
-    {{- end }}
-    {{- range $j, $c := $.Values.availabilityZones }}
-      {{- $cross := mergeOverwrite (deepCopy $.Values.zoneTpl) $c }}
-      {{- if and (ne $j $i) $cross.read.allow }}
-        {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
-        {{- if (($cross.read).perZone).vmauth }}
-          {{- $urlSpec := $cross.read.perZone.vmauth.spec | default dict }}
-          {{- $_ := set $cross.read.perZone.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) $urlSpec) }}
+spec: {{ tpl (toYaml (omit $spec "unauthorizedUserAccessSpec")) $ctx | nindent 2 }}
+  unauthorizedUserAccessSpec:
+    url_map:
+      - src_paths:
+          - "/select/.+"
+        load_balancing_policy: first_available
+        retry_status_codes:
+          - 503
+        {{- $_ := set $ctx "style" "managed" }}
+        {{- $urls := default list }}
+        {{- if $zone.read.allow }}
+          {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
+          {{- $urls = append $urls (include "vm.url" $ctx) }}
         {{- end }}
-        {{- $_ := set $ctx "zone" $cross }}
-        {{- $urls = append $urls (include "vm.url" $ctx)}}
-      {{- end }}
-    {{- end }}
-    {{- if empty $urls }}
-      {{- fail (printf "No read backend urls defined for vmauth in AZ %s" $zone.name) -}}
-    {{- end }}
-    url_prefix: {{ toYaml $urls | nindent 4 }}
-    {{- $_ := unset $ctx "style" }}
+        {{- range $j, $c := $.Values.availabilityZones }}
+          {{- $cross := mergeOverwrite (deepCopy $.Values.zoneTpl) $c }}
+          {{- if and (ne $j $i) $cross.read.allow }}
+            {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
+            {{- if (($cross.read).perZone).vmauth }}
+              {{- $urlSpec := $cross.read.perZone.vmauth.spec | default dict }}
+              {{- $_ := set $cross.read.perZone.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) $urlSpec) }}
+            {{- end }}
+            {{- $_ := set $ctx "zone" $cross }}
+            {{- $urls = append $urls (include "vm.url" $ctx)}}
+          {{- end }}
+        {{- end }}
+        {{- if empty $urls }}
+          {{- fail (printf "No read backend urls defined for vmauth in AZ %s" $zone.name) -}}
+        {{- end }}
+        url_prefix: {{ toYaml $urls | nindent 10 }}
+        {{- $_ := unset $ctx "style" }}
 {{- end }}
 {{- end }}

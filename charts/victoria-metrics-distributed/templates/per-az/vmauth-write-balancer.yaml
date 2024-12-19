@@ -19,16 +19,17 @@ metadata:
   {{- with $zone.write.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-spec: {{ tpl (toYaml (omit $zone.write.vmauth.spec "unauthorizedAccessConfig")) $ctx | nindent 2 }}
+spec: {{ tpl (toYaml (omit $zone.write.vmauth.spec "unauthorizedUserAccessSpec")) $ctx | nindent 2 }}
   {{- $_ := set $ctx "style" "managed" }}
   {{- $clusterSpec := ($zone.vmcluster).spec | default dict }}
   {{- $_ := set $zone.vmcluster "spec" (mergeOverwrite (deepCopy $commonClusterSpec) (deepCopy $commonSpec) (deepCopy $clusterSpec)) }}
   {{- $_ := set $ctx "appKey" (list "zone" "vmcluster" "spec" "vminsert") }}
-  unauthorizedAccessConfig:
-  - src_paths:
-    - "/insert/.+"
-    url_prefix:
-    - {{ include "vm.url" $ctx }}
-    {{- $_ := unset $ctx "style" }}
+  unauthorizedUserAccessSpec:
+    url_map:
+      - src_paths:
+          - "/insert/.+"
+        url_prefix:
+          - {{ include "vm.url" $ctx }}
+  {{- $_ := unset $ctx "style" }}
 {{- end }}
 {{- end }}

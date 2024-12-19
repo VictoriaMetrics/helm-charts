@@ -18,30 +18,31 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
 spec:
-  {{- with (omit $auth.spec "unauthorizedAccessConfig") }}
+  {{- with (omit $auth.spec "unauthorizedUserAccessSpec") }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
-  unauthorizedAccessConfig:
-  - src_paths:
-    - "/api/v1/write"
-    - "/prometheus/api/v1/write"
-    - "/write"
-    - "/api/v1/import"
-    - "/api/v1/import/.+"
-    {{- $_ := set $ctx "style" "managed" }}
-    {{- $urls := default list }}
-    {{- $commonAgentSpec := (((.Values).common).vmagent).spec | default dict }}
-    {{- range $i, $z := $.Values.availabilityZones }}
-      {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
-      {{- $agentSpec := $zone.vmagent.spec | default dict }}
-      {{- $_ := set $zone.vmagent "spec" (mergeOverwrite (deepCopy $commonAgentSpec) $agentSpec) }}
-      {{- $_ := set $ctx "zone" $zone }}
-      {{- $_ := set $ctx "appKey" (list "zone" "vmagent" "spec") }}
-      {{- $urls = append $urls (include "vm.url" $ctx) }}
-    {{- end }}
-    {{- $_ := unset $ctx "style" }}
-    {{- if empty $urls }}
-      {{- fail "No global vmauth write backend urls defined" -}}
-    {{- end }}
-    url_prefix: {{ toYaml $urls | nindent 4 }}
+  unauthorizedUserAccessSpec:
+    url_map:
+      - src_paths:
+          - "/api/v1/write"
+          - "/prometheus/api/v1/write"
+          - "/write"
+          - "/api/v1/import"
+          - "/api/v1/import/.+"
+        {{- $_ := set $ctx "style" "managed" }}
+        {{- $urls := default list }}
+        {{- $commonAgentSpec := (((.Values).common).vmagent).spec | default dict }}
+        {{- range $i, $z := $.Values.availabilityZones }}
+          {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
+          {{- $agentSpec := $zone.vmagent.spec | default dict }}
+          {{- $_ := set $zone.vmagent "spec" (mergeOverwrite (deepCopy $commonAgentSpec) $agentSpec) }}
+          {{- $_ := set $ctx "zone" $zone }}
+          {{- $_ := set $ctx "appKey" (list "zone" "vmagent" "spec") }}
+          {{- $urls = append $urls (include "vm.url" $ctx) }}
+        {{- end }}
+        {{- $_ := unset $ctx "style" }}
+        {{- if empty $urls }}
+          {{- fail "No global vmauth write backend urls defined" -}}
+        {{- end }}
+        url_prefix: {{ toYaml $urls | nindent 10 }}
 {{- end }}

@@ -20,17 +20,18 @@ metadata:
   {{- with $zone.read.perZone.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-spec: {{ tpl (toYaml (omit $zone.read.perZone.vmauth.spec "unauthorizedAccessConfig")) $ctx | nindent 2 }}
+spec: {{ tpl (toYaml (omit $zone.read.perZone.vmauth.spec "unauthorizedUserAccessSpec")) $ctx | nindent 2 }}
   {{- $clusterSpec := ($zone.vmcluster).spec | default dict }}
   {{- $_ := set $ctx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
   {{- $_ := set $zone.vmcluster "spec" (mergeOverwrite (deepCopy $commonClusterSpec) (deepCopy $commonSpec) (deepCopy $clusterSpec)) }}
   {{- $_ := set $ctx "style" "managed" }}
-  unauthorizedAccessConfig:
-  - src_paths:
-    - "/select/.+"
-    url_prefix: 
-    - {{ include "vm.url" $ctx }}
-    {{- $_ := unset $ctx "style" }}
+  unauthorizedUserAccessSpec:
+    url_map:
+      - src_paths:
+          - "/select/.+"
+        url_prefix:
+          - {{ include "vm.url" $ctx }}
+  {{- $_ := unset $ctx "style" }}
 {{- end }}
 {{- end }}
 

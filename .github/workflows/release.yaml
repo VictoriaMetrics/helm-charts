@@ -91,7 +91,7 @@ jobs:
                 yq -M -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | .changes | split("\n") | .[] |= sub("^[\s]*-[\s]+", "") | filter(length > 0) | to_yaml)' $CHART_FILE
 
                 # Create release notes
-                cat <<EOT > ${CHART_DIR}/RELEASE_NOTES.md
+                cat <<EOT > ${CHART_DIR}/RELEASE_NOTES
           # Release notes for version $CHART_VERSION
 
           $RELEASE_DATE
@@ -108,7 +108,7 @@ jobs:
           done
 
       - name: Release
-        if: ${{ hashFiles('charts/*/RELEASE_NOTES.md') != '' }}
+        if: ${{ hashFiles('charts/*/RELEASE_NOTES') != '' }}
         uses: helm/chart-releaser-action@v1.6.0
         env:
           CR_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
@@ -116,7 +116,7 @@ jobs:
           config: .github/ci/cr.yaml
 
       - name: Release OCI
-        if: ${{ hashFiles('charts/*/RELEASE_NOTES.md') != '' }}
+        if: ${{ hashFiles('charts/*/RELEASE_NOTES') != '' }}
         run: |
           helm registry login \
             -u ${{ github.actor }} \
@@ -124,7 +124,7 @@ jobs:
             ghcr.io
           mkdir -p .cr-release-packages
           for chart in charts/*; do
-            if [ ! -f $chart/RELEASE_NOTES.md ]; then
+            if [ ! -f $chart/RELEASE_NOTES ]; then
               echo "no release notes for chart $chart. removing it from uploading..."
               rm -rf .cr-release-packages/$(basename $chart)*
             fi
@@ -132,9 +132,9 @@ jobs:
           find .cr-release-packages -name "*.tgz" -exec helm push {} oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts \;
 
       - name: Automatic update changelogs and readme
-        if: ${{ hashFiles('charts/*/RELEASE_NOTES.md') != '' }}
+        if: ${{ hashFiles('charts/*/RELEASE_NOTES') != '' }}
         run: |
-          rm -rf charts/*/RELEASE_NOTES.md
+          rm -rf charts/*/RELEASE_NOTES
           export VM_GIT_BRANCH_NAME="changelog-update-$(date +%s)"
           git checkout -b "${VM_GIT_BRANCH_NAME}"
           git add charts/*/CHANGELOG.md
