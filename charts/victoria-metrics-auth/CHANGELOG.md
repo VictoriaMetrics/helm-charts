@@ -1,6 +1,7 @@
 ## Next release
 
 - updated common dependency 0.0.34 -> 0.0.35
+- bump version of VM components to [v1.108.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.108.1)
 
 ## 0.8.1
 
