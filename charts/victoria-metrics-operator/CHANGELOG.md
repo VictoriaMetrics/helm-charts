@@ -1,6 +1,8 @@
 ## Next release
 
 - updated common dependency 0.0.34 -> 0.0.35
+- updates operator to [v0.51.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.51.1) version
+
 
 ## 0.40.0-rc.1
 
