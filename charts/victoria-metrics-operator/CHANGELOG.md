@@ -2,6 +2,7 @@
 
 - add option to enable hostNetwork for custom CNI based deployments
 - updated common dependency 0.0.35 -> 0.0.36
+- updates operator to [v0.51.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.51.2) version
 
 ## 0.40.1
 
