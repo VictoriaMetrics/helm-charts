@@ -3,6 +3,7 @@
 ## Next release
 
 - Exclude markdown files from package
+- Unset empty registry in `vm.image` template to fix global registry propagation
 
 ## 0.0.35
 

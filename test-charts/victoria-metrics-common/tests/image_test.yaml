@@ -38,6 +38,26 @@ tests:
       - equal:
           path: vm.image.tag
           value: 0.4.0
+  - it: custom image tag, empty local and set global registry
+    set:
+      ctx:
+        appKey:
+          - app
+        app:
+          image:
+            registry: ""
+            repository: vmagent
+            tag: 0.4.0
+      global:
+        image:
+          registry: localhost:8080
+    asserts:
+      - equal:
+          path: vm.image.name
+          value: localhost:8080/vmagent:0.4.0
+      - equal:
+          path: vm.image.tag
+          value: 0.4.0
   - it: no image tag, and global registry only
     set:
       ctx:
