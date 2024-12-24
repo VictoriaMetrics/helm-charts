@@ -1,6 +1,7 @@
 ## Next release
 
 - add option to enable hostNetwork for custom CNI based deployments
+- updated common dependency 0.0.35 -> 0.0.36
 
 ## 0.40.1
 
