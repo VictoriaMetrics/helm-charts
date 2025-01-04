@@ -29,7 +29,7 @@ rules:
   expr: sum by (verb,scope,{{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase1h{le="+Inf"})
   record: cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase1h
 - condition: '{{ true }}'
-  expr: sum by (verb,scope,{{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{le="+Inf"} * 24 * 30)
+  expr: sum by (verb,scope,{{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{le="+Inf"})
   record: cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase30d
 - condition: '{{ true }}'
   expr: |-

@@ -33,11 +33,12 @@ rules:
     severity: critical
 - alert: KubeAggregatedAPIErrors
   annotations:
-    description: 'Kubernetes aggregated API {{`{{`}} $labels.name {{`}}`}}/{{`{{`}} $labels.namespace {{`}}`}} has reported errors. It has appeared unavailable {{`{{`}} $value | humanize {{`}}`}} times averaged over the past 10m.'
+    description: 'Kubernetes aggregated API {{`{{`}} $labels.instance {{`}}`}}/{{`{{`}} $labels.name {{`}}`}} has reported {{`{{`}} $labels.reason {{`}}`}} errors on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeaggregatedapierrors'
     summary: 'Kubernetes aggregated API has reported errors.'
   condition: '{{ true }}'
-  expr: sum by (name,namespace,{{ $clusterLabel }})(increase(aggregator_unavailable_apiservice_total{job="apiserver"}[10m])) > 4
+  expr: sum by (instance,name,reason,{{ $clusterLabel }})(increase(aggregator_unavailable_apiservice_total{job="apiserver"}[1m])) > 0
+  for: 10m
   labels:
     severity: warning
 - alert: KubeAggregatedAPIDown

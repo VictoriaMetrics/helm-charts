@@ -155,7 +155,7 @@ rules:
     severity: warning
 - alert: NodeHighNumberConntrackEntriesUsed
   annotations:
-    description: '{{`{{`}} $value | humanizePercentage {{`}}`}} of conntrack entries are used.'
+    description: '{{`{{`}} $labels.instance {{`}}`}} {{`{{`}} $value | humanizePercentage {{`}}`}} of conntrack entries are used.'
     runbook_url: '{{ $runbookUrl }}/node/nodehighnumberconntrackentriesused'
     summary: 'Number of conntrack are getting close to the limit.'
   condition: '{{ true }}'
@@ -258,7 +258,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodecpuhighusage'
     summary: 'High CPU usage.'
   condition: '{{ true }}'
-  expr: sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job="node-exporter", mode!="idle"}[2m]))) * 100 > 90
+  expr: sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job="node-exporter", mode!~"idle|iowait"}[2m]))) * 100 > 90
   for: 15m
   labels:
     severity: info
