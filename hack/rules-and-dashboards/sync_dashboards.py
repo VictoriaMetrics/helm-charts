@@ -393,10 +393,9 @@ def write_dashboard_to_file(resource_name, content, charts):
 
 def jsonnet_import(directory, file_name):
     src = join(directory, file_name)
-    if file_name.startswith("github.com"):
-        (empty, repo_org, repo_name, repo_path) = urlparse(
-            f"https://{file_name}"
-        ).path.split("/", 3)
+    parsed_url = urlparse(f"https://{file_name}")
+    if parsed_url.hostname == "github.com":
+        (empty, repo_org, repo_name, repo_path) = parsed_url.path.split("/", 3)
         repo_slug = f"{repo_org}/{repo_name}"
         repo_resp = requests.get(f"https://api.github.com/repos/{repo_slug}")
         if repo_resp.status_code != 200:
