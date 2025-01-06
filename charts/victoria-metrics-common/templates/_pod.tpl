@@ -90,12 +90,12 @@ Net probe port
 {{- end -}}
 
 {{- define "vm.arg" -}}
-  {{- if and (empty .value) (not (kindIs "bool" .value)) }}
+  {{- if and (empty .value) (kindIs "string" .value) }}
     {{- .key -}}
-  {{- else if and (kindIs "bool" .value) .value -}}
+  {{- else if eq (toString .value) "true" -}}
     -{{ ternary "" "-" (eq (len .key) 1) }}{{ .key }}
   {{- else -}}
-    -{{ ternary "" "-" (eq (len .key) 1) }}{{ .key }}={{ .value }}
+    -{{ ternary "" "-" (eq (len .key) 1) }}{{ .key }}={{ ternary (toJson .value | squote) .value (has (kindOf .value) (list "map" "slice")) }}
   {{- end -}}
 {{- end -}}
 

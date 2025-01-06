@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- quote collection values in arguments
 
 ## 0.0.36
 
