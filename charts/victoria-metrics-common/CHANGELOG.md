@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.37
+
+**Release date:** 06 Jan 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - quote collection values in arguments
 
 ## 0.0.36
