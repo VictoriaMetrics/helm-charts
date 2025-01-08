@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- vmstorage: reduce the default readiness probe interval to 5s (was 15s) and the failure threshold to 10 (was 3).
 
 ## 0.16.2
 
