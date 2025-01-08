@@ -40,13 +40,6 @@ statefulset should match snapshot:
                 - --storageDataPath=/storage
               image: victoriametrics/vmstorage:0.1.0-cluster
               imagePullPolicy: IfNotPresent
-              livenessProbe:
-                failureThreshold: 10
-                initialDelaySeconds: 30
-                periodSeconds: 30
-                tcpSocket:
-                  port: http
-                timeoutSeconds: 5
               name: vmstorage
               ports:
                 - containerPort: 8482
@@ -55,6 +48,15 @@ statefulset should match snapshot:
                   name: vminsert
                 - containerPort: 8401
                   name: vmselect
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
               volumeMounts:
                 - mountPath: /storage
                   name: vmstorage-volume
@@ -115,13 +117,6 @@ statefulset should match snapshot with fullnameOverride, extraLabels and podLabe
                 - --storageDataPath=/storage
               image: victoriametrics/vmstorage:0.1.0-cluster
               imagePullPolicy: IfNotPresent
-              livenessProbe:
-                failureThreshold: 10
-                initialDelaySeconds: 30
-                periodSeconds: 30
-                tcpSocket:
-                  port: http
-                timeoutSeconds: 5
               name: vmstorage
               ports:
                 - containerPort: 8482
@@ -130,6 +125,15 @@ statefulset should match snapshot with fullnameOverride, extraLabels and podLabe
                   name: vminsert
                 - containerPort: 8401
                   name: vmselect
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
               volumeMounts:
                 - mountPath: /storage
                   name: vmstorage-volume
