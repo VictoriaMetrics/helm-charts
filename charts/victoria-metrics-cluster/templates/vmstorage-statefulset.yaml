@@ -250,6 +250,7 @@ spec:
         {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
       {{- end }}
+  minReadySeconds: {{ $app.minReadySeconds }}
   {{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1
