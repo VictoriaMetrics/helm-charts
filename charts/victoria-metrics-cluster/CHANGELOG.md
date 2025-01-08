@@ -1,6 +1,7 @@
 ## Next release
 
-- all: reduce the default readiness probe interval to 5s (was 15s) and the failure threshold to 10 (was 3).
+- vmstorage: remove readiness probe (reason: vminsert already handles routing and retries, and readiness probes can inadvertently introduce delays, DNS instability, and unnecessary disruptions)
+- all (except vmstorage): reduce the default readiness probe interval to 5s (was 15s) and the failure threshold to 10 (was 3).
 
 ## 0.16.2
 
