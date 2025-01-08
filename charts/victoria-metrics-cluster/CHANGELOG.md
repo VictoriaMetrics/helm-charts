@@ -1,6 +1,6 @@
 ## Next release
 
-- Remove vmstorage readiness probe, as vminsert already handles routing and retries, while readiness probes can inadvertently introduce delays, DNS instability, and unnecessary disruptions.
+- Remove vmstorage liveness probe, as vminsert already handles routing and retries, while liveness probes can inadvertently introduce delays, DNS instability, and unnecessary disruptions.
 - Reduce the default readiness probe interval to 5s (was 15s) and the failure threshold to 10 (was 3).
 - Add a default minReadySeconds for vmstorage, to help stabilizing service during rollout.
 
