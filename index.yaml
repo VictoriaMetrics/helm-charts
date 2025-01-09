@@ -12030,6 +12030,57 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '**Update note**: A default `minReadySeconds` has been added for the vmstorage statefulset, vmstorage pods will restart after the upgrade.'
+        - '**Update note**: The default probes of vminsert, vmselect, vmauth, and vmstorage have been changed, all pods will restart after the upgrade.'
+        - Remove vmstorage liveness probe, as vminsert already handles routing and retries, while liveness probes can inadvertently introduce delays, DNS instability, and unnecessary disruptions.
+        - Reduce the default readiness probe interval to 5s (was 15s) and the failure threshold to 10 (was 3).
+        - Add a default minReadySeconds for vmstorage, to help stabilizing service during rollout.
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-cluster
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/cluster-victoriametrics
+        - name: Changelog
+          url: https://docs.victoriametrics.com/changelog
+    apiVersion: v2
+    appVersion: v1.108.1
+    created: "2025-01-09T09:40:20.556799852Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: Victoria Metrics Cluster version - high-performance, cost-effective
+      and scalable TSDB, long-term remote storage for Prometheus
+    digest: eda2945b083632c632b2e200c0797b27ae520ccc320bb53405ee93dba090bb78
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmcluster
+    - vmselect
+    - vminsert
+    - vmstorage
+    - tsdb
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-cluster
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-cluster-0.17.0/victoria-metrics-cluster-0.17.0.tgz
+    version: 0.17.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - Exclude markdown files from package
         - updated common dependency 0.0.35 -> 0.0.37
         - support templating in `.Values.extraObjects`
@@ -36059,4 +36110,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2025-01-06T07:33:57.126995333Z"
+generated: "2025-01-09T09:40:21.466853954Z"
