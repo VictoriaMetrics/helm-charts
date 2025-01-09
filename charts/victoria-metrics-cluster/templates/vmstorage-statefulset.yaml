@@ -21,6 +21,7 @@ spec:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   replicas: {{ $app.replicaCount }}
   podManagementPolicy: {{ $app.podManagementPolicy }}
+  minReadySeconds: {{ $app.minReadySeconds }}
   template:
     metadata:
       {{- with $app.podAnnotations }}
