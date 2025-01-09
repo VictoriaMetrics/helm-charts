@@ -1591,10 +1591,10 @@ labels: {}
     tcpSocket: {}
     timeoutSeconds: 5
 readiness:
-    failureThreshold: 3
+    failureThreshold: 10
     httpGet: {}
     initialDelaySeconds: 5
-    periodSeconds: 15
+    periodSeconds: 5
     timeoutSeconds: 5
 startup: {}
 </code>
@@ -2531,10 +2531,10 @@ labels: {}
     tcpSocket: {}
     timeoutSeconds: 5
 readiness:
-    failureThreshold: 3
+    failureThreshold: 10
     httpGet: {}
     initialDelaySeconds: 5
-    periodSeconds: 15
+    periodSeconds: 5
     timeoutSeconds: 5
 startup: {}
 </code>
@@ -3435,10 +3435,10 @@ labels: {}
     tcpSocket: {}
     timeoutSeconds: 5
 readiness:
-    failureThreshold: 3
+    failureThreshold: 10
     httpGet: {}
     initialDelaySeconds: 5
-    periodSeconds: 15
+    periodSeconds: 5
     timeoutSeconds: 5
 startup: {}
 </code>
@@ -3952,11 +3952,11 @@ loggerFormat: json
         port: manager-http
     timeoutSeconds: 5
 readiness:
-    failureThreshold: 3
+    failureThreshold: 10
     httpGet:
         port: manager-http
     initialDelaySeconds: 5
-    periodSeconds: 15
+    periodSeconds: 5
     timeoutSeconds: 5
 startup: {}
 </code>

@@ -109,9 +109,9 @@ vmselect:
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
-      periodSeconds: 15
+      periodSeconds: 5
       timeoutSeconds: 5
-      failureThreshold: 3
+      failureThreshold: 10
     # -- VMSelect liveness probe
     liveness:
       tcpSocket: {}
@@ -389,9 +389,9 @@ vminsert:
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
-      periodSeconds: 15
+      periodSeconds: 5
       timeoutSeconds: 5
-      failureThreshold: 3
+      failureThreshold: 10
     # -- VMInsert liveness probe
     liveness:
       tcpSocket: {}
@@ -639,9 +639,9 @@ vmauth:
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
-      periodSeconds: 15
+      periodSeconds: 5
       timeoutSeconds: 5
-      failureThreshold: 3
+      failureThreshold: 10
     # -- VMAuth liveness probe
     liveness:
       tcpSocket: {}
@@ -1021,20 +1021,14 @@ vmstorage:
     ipFamilies: []
   # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60
-  # -- Readiness & Liveness probes
+  minReadySeconds: 5
+  # -- Readiness probes
   probe:
     # -- VMStorage readiness probe
     readiness:
       httpGet: {}
       initialDelaySeconds: 5
-      periodSeconds: 15
-      timeoutSeconds: 5
-      failureThreshold: 3
-    # -- VMStorage liveness probe
-    liveness:
-      tcpSocket: {}
-      initialDelaySeconds: 30
-      periodSeconds: 30
+      periodSeconds: 5
       timeoutSeconds: 5
       failureThreshold: 10
     # -- VMStorage startup probe
@@ -1108,9 +1102,9 @@ vmstorage:
         httpGet:
           port: manager-http
         initialDelaySeconds: 5
-        periodSeconds: 15
+        periodSeconds: 5
         timeoutSeconds: 5
-        failureThreshold: 3
+        failureThreshold: 10
       # -- VMBackupManager liveness probe
       liveness:
         tcpSocket:
