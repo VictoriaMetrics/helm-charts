@@ -792,10 +792,10 @@ timeoutSeconds: 5
       <td>vmauth.probe.readiness</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">failureThreshold: 3
+<code class="language-yaml">failureThreshold: 10
 httpGet: {}
 initialDelaySeconds: 5
-periodSeconds: 15
+periodSeconds: 5
 timeoutSeconds: 5
 </code>
 </pre>
@@ -1591,10 +1591,10 @@ labels: {}
     tcpSocket: {}
     timeoutSeconds: 5
 readiness:
-    failureThreshold: 3
+    failureThreshold: 10
     httpGet: {}
     initialDelaySeconds: 5
-    periodSeconds: 15
+    periodSeconds: 5
     timeoutSeconds: 5
 startup: {}
 </code>
@@ -1622,10 +1622,10 @@ timeoutSeconds: 5
       <td>vminsert.probe.readiness</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">failureThreshold: 3
+<code class="language-yaml">failureThreshold: 10
 httpGet: {}
 initialDelaySeconds: 5
-periodSeconds: 15
+periodSeconds: 5
 timeoutSeconds: 5
 </code>
 </pre>
@@ -2531,10 +2531,10 @@ labels: {}
     tcpSocket: {}
     timeoutSeconds: 5
 readiness:
-    failureThreshold: 3
+    failureThreshold: 10
     httpGet: {}
     initialDelaySeconds: 5
-    periodSeconds: 15
+    periodSeconds: 5
     timeoutSeconds: 5
 startup: {}
 </code>
@@ -2562,10 +2562,10 @@ timeoutSeconds: 5
       <td>vmselect.probe.readiness</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">failureThreshold: 3
+<code class="language-yaml">failureThreshold: 10
 httpGet: {}
 initialDelaySeconds: 5
-periodSeconds: 15
+periodSeconds: 5
 timeoutSeconds: 5
 </code>
 </pre>
@@ -3216,6 +3216,16 @@ loggerFormat: json
 </td>
     </tr>
     <tr>
+      <td>vmstorage.minReadySeconds</td>
+      <td>int</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">5
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
       <td>vmstorage.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
@@ -3428,48 +3438,27 @@ labels: {}
       <td>vmstorage.probe</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">liveness:
+<code class="language-yaml">readiness:
     failureThreshold: 10
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    tcpSocket: {}
-    timeoutSeconds: 5
-readiness:
-    failureThreshold: 3
     httpGet: {}
     initialDelaySeconds: 5
-    periodSeconds: 15
+    periodSeconds: 5
     timeoutSeconds: 5
 startup: {}
 </code>
 </pre>
 </td>
-      <td><p>Readiness &amp; Liveness probes</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmstorage.probe.liveness</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">failureThreshold: 10
-initialDelaySeconds: 30
-periodSeconds: 30
-tcpSocket: {}
-timeoutSeconds: 5
-</code>
-</pre>
-</td>
-      <td><p>VMStorage liveness probe</p>
+      <td><p>Readiness probes</p>
 </td>
     </tr>
     <tr>
       <td>vmstorage.probe.readiness</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">failureThreshold: 3
+<code class="language-yaml">failureThreshold: 10
 httpGet: {}
 initialDelaySeconds: 5
-periodSeconds: 15
+periodSeconds: 5
 timeoutSeconds: 5
 </code>
 </pre>
@@ -3952,11 +3941,11 @@ loggerFormat: json
         port: manager-http
     timeoutSeconds: 5
 readiness:
-    failureThreshold: 3
+    failureThreshold: 10
     httpGet:
         port: manager-http
     initialDelaySeconds: 5
-    periodSeconds: 15
+    periodSeconds: 5
     timeoutSeconds: 5
 startup: {}
 </code>
@@ -3985,11 +3974,11 @@ timeoutSeconds: 5
       <td>vmstorage.vmbackupmanager.probe.readiness</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">failureThreshold: 3
+<code class="language-yaml">failureThreshold: 10
 httpGet:
     port: manager-http
 initialDelaySeconds: 5
-periodSeconds: 15
+periodSeconds: 5
 timeoutSeconds: 5
 </code>
 </pre>
