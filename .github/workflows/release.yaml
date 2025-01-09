@@ -141,7 +141,8 @@ jobs:
           git add charts/*/README.md
           git commit -S -m "Automatic update CHANGELOGs and READMEs"
           git push origin ${VM_GIT_BRANCH_NAME}
-          gh pr create -f
+          gh pr create \
+          --head $(git branch --show-current)
         env:
           GH_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
           GITHUB_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
