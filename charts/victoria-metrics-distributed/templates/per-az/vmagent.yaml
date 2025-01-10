@@ -40,7 +40,7 @@ metadata:
 {{- $_ := set $zone.vmagent.spec "remoteWrite" (concat $remoteWrites ($zone.vmagent.spec.remoteWrites | default list)) }}
 {{- if $isMultitenant }}
   {{- $remoteWriteSettings := (dict "useMultiTenantMode" true) }}
-  {{- $_ := set $zone.vmagent.spec "remoteWriteSettings" (mergeOverwrite (deepcopy ($zone.vmagent.spec.remoteWriteSettings | default dict)) $remoteWriteSettings) }}
+  {{- $_ := set $zone.vmagent.spec "remoteWriteSettings" (mergeOverwrite (deepCopy ($zone.vmagent.spec.remoteWriteSettings | default dict)) $remoteWriteSettings) }}
 {{- end }}
 spec: {{ tpl (toYaml $zone.vmagent.spec) $ctx | nindent 2 }}
 {{- end }}
