@@ -142,7 +142,9 @@ jobs:
           git commit -S -m "Automatic update CHANGELOGs and READMEs"
           git push origin ${VM_GIT_BRANCH_NAME}
           gh pr create \
-          --head $(git branch --show-current)
+            -H $(git branch --show-current) \
+            -t "Automatic update CHANGELOGs and READMEs" \
+            -b "Automatic update CHANGELOGs and READMEs"
         env:
           GH_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
           GITHUB_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
