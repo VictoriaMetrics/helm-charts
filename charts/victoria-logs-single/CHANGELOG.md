@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- update victorialogs version to v1.6.1
 
 ## 0.8.13
 
