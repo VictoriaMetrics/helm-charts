@@ -1,5 +1,6 @@
 ## Next release
 
+- Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.19.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1190).
 - updated common dependency 0.0.34 -> 0.0.37
 - Exclude markdown files from package
 - support templating in `.Values.extraObjects`
