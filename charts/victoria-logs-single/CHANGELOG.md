@@ -1,6 +1,7 @@
 ## Next release
 
-- Added `.Values.statefulSet.updateStrategy`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1928) for details.
+- update victorialogs version to v1.6.1
+- add `.Values.statefulSet.updateStrategy`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1928) for details.
 
 ## 0.8.13
 
