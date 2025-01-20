@@ -66,10 +66,10 @@ metadata:
   namespace: {{ $ns }}
 spec:
   secretName: {{ $fullname }}-root-ca
-  duration: 63800h0m0s
+  duration: {{ .Values.admissionWebhooks.certManager.ca.duration }}
   issuerRef:
     name: {{ $fullname }}-root
-  commonName: "ca.validation.victoriametrics"
+  commonName: {{ .Values.admissionWebhooks.certManager.ca.commonName }}
   isCA: true
 ---
 apiVersion: cert-manager.io/v1
@@ -90,7 +90,7 @@ metadata:
   namespace: {{ $ns }}
 spec:
   secretName: {{ $fullname }}-validation
-  duration: 45800h0m0s
+  duration: {{ .Values.admissionWebhooks.certManager.cert.duration }}
   {{- $issuerRef := .Values.admissionWebhooks.certManager.issuer | default dict }}
   {{- if empty $issuerRef }}
     {{- $_ := set $issuerRef "name" (printf "%s-issuer" $fullname) }}

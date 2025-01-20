@@ -255,6 +255,11 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">certManager:
+    ca:
+        commonName: ca.validation.victoriametrics
+        duration: 63800h0m0s
+    cert:
+        duration: 45800h0m0s
     enabled: false
     issuer: {}
 enabled: true
@@ -285,12 +290,40 @@ tls:
       <td>admissionWebhooks.certManager</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: false
+<code class="language-yaml">ca:
+    commonName: ca.validation.victoriametrics
+    duration: 63800h0m0s
+cert:
+    duration: 45800h0m0s
+enabled: false
 issuer: {}
 </code>
 </pre>
 </td>
       <td><p>Enables custom ca bundle, if you are not using cert-manager. In case of custom ca, you have to create secret - {chart-name}-validation with keys: tls.key, tls.crt, ca.crt</p>
+</td>
+    </tr>
+    <tr>
+      <td>admissionWebhooks.certManager.ca</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">commonName: ca.validation.victoriametrics
+duration: 63800h0m0s
+</code>
+</pre>
+</td>
+      <td><p>Certificate Authority parameters</p>
+</td>
+    </tr>
+    <tr>
+      <td>admissionWebhooks.certManager.cert</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">duration: 45800h0m0s
+</code>
+</pre>
+</td>
+      <td><p>Certificate parameters</p>
 </td>
     </tr>
     <tr>
@@ -777,6 +810,17 @@ labels: {}
 </pre>
 </td>
       <td><p>Pod&rsquo;s security context. Details are <a href="https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>priorityClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Name of Priority Class</p>
 </td>
     </tr>
     <tr>

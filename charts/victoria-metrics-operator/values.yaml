@@ -177,6 +177,9 @@ resources:
 # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/user-guide/node-selection/)
 nodeSelector: {}
 
+# -- Name of Priority Class
+priorityClassName: ""
+
 # -- Array of tolerations object. Spec is [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
 tolerations: []
 
@@ -255,6 +258,13 @@ admissionWebhooks:
     enabled: false
     # --If needed, provide own issuer. Operator will create self-signed if empty.
     issuer: {}
+    # -- Certificate Authority parameters
+    ca:
+      duration: 63800h0m0s
+      commonName: ca.validation.victoriametrics
+    # -- Certificate parameters
+    cert:
+      duration: 45800h0m0s
   keepTLSSecret: true
   # tls specifies TLS cert/key for the webhook
   tls:
