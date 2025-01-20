@@ -19,6 +19,9 @@ spec:
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   replicas: {{ $app.replicaCount }}
+  {{- with $app.statefulSet.updateStrategy }}
+  updateStrategy: {{ toYaml . | nindent 4 }}
+  {{- end }}
   podManagementPolicy: {{ $app.podManagementPolicy }}
   template:
     metadata:
