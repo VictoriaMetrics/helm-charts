@@ -264,7 +264,7 @@ spec:
         {{- if $app.relabel.enabled }}
         - name: relabelconfig
           configMap:
-            name: {{ include "vmsingle.scrape.config.name" $ctx }}
+            name: {{ include "vmsingle.relabel.config.name" $ctx }}
         {{- end }}
         {{- if or (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
         - name: server-volume
