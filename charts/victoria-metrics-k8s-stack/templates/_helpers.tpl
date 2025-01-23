@@ -14,8 +14,8 @@
     {{- $baseURL := include "vm.url" . -}}
     {{- $tenant := $Values.tenant | default 0 -}}
     {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
-  {{- else if $Values.externalVM.read.url -}}
-    {{- $endpoint = $Values.externalVM.read -}}
+  {{- else if $Values.external.vm.read.url -}}
+    {{- $endpoint = $Values.external.vm.read -}}
   {{- end -}}
   {{- toYaml $endpoint -}}
 {{- end }}
@@ -33,8 +33,8 @@
     {{- $baseURL := include "vm.url" . -}}
     {{- $tenant := $Values.tenant | default 0 -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
-  {{- else if $Values.externalVM.write.url -}}
-    {{- $endpoint = $Values.externalVM.write -}}
+  {{- else if $Values.external.vm.write.url -}}
+    {{- $endpoint = $Values.external.vm.write -}}
   {{- end -}}
   {{- toYaml $endpoint -}}
 {{- end -}}
@@ -135,7 +135,7 @@
 {{- define "vm.agent.remote.write" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $remoteWrites := $Values.vmagent.additionalRemoteWrites | default list -}}
-  {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled $Values.externalVM.write.url -}}
+  {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled $Values.external.vm.write.url -}}
     {{- $remoteWrites = append $remoteWrites (fromYaml (include "vm.write.endpoint" .)) -}}
   {{- end -}}
   {{- toYaml (dict "remoteWrite" $remoteWrites) -}}
@@ -169,12 +169,12 @@
     {{- $readURL := urlParse (include "vm.url" .) -}}
     {{- $_ := set $readURL "path" (printf "%s/select" $readURL.path) -}}
     {{- $_ := set . "vm" (dict "read" $readURL "write" $writeURL) -}}
-  {{- else if or $Values.externalVM.read.url $Values.externalVM.write.url -}}
+  {{- else if or $Values.external.vm.read.url $Values.external.vm.write.url -}}
     {{- $_ := set . "vm" (default dict) -}}
-    {{- with $Values.externalVM.read.url -}}
+    {{- with $Values.external.vm.read.url -}}
       {{- $_ := set $.vm "read" (urlParse .) -}}
     {{- end -}}
-    {{- with $Values.externalVM.write.url -}}
+    {{- with $Values.external.vm.write.url -}}
       {{- $_ := set $.vm "write" (urlParse .) -}}
     {{- end -}}
   {{- end -}}
@@ -265,7 +265,7 @@
       {{- end }}
     {{- end }}
     {{- $unsignedPlugins := ((index $grafana "grafana.ini").plugins).allow_loading_unsigned_plugins | default "" -}}
-    {{- $allowUnsigned := contains "victoriametrics-datasource" $unsignedPlugins -}}
+    {{- $allowUnsigned := contains "victoriametrics-metrics-datasource" $unsignedPlugins -}}
     {{- ternary "true" "" (and $isEnabled $allowUnsigned) -}}
   {{- else -}}
     {{ "true" }}
@@ -277,7 +277,7 @@
   {{- $ctx := . }}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $datasources := $Values.defaultDatasources.extra | default list -}}
-  {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled $Values.externalVM.read -}}
+  {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled $Values.external.vm.read -}}
     {{- $readEndpoint:= include "vm.read.endpoint" $ctx | fromYaml -}}
     {{- $defaultDatasources := default list -}}
     {{- range $ds := $Values.defaultDatasources.victoriametrics.datasources }}

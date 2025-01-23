@@ -178,7 +178,7 @@ replacement_map = {
         "limitGroup": ["kubernetes-storage"],
     },
     "http://localhost:3000": {
-        "replacement": "[[ $host ]]",
+        "replacement": "[[ $grafanaHost ]]",
         "init": "",
     },
     'job="alertmanager-main"': {
@@ -275,7 +275,7 @@ def write_group_to_file(group, url, charts):
             content += "{{- $Values := (.helm).Values | default .Values }}\n"
             content += '{{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}\n'
             content += '{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}\n'
-            content += "{{- $host := index (($Values.grafana).ingress).hosts 0 }}\n"
+            content += "{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}\n"
             content += escape(lines)
             f.write(content)
 

@@ -268,8 +268,8 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-proxy",instance=~"$instance",verb="POST"}[$__rate_interval])) by (verb, url, le))
-    legendFormat: '{{`{{`}}verb{{`}}`}} {{`{{`}}url{{`}}`}}'
+    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-proxy",instance=~"$instance",verb="POST"}[$__rate_interval])) by (verb, le))
+    legendFormat: '{{`{{`}}verb{{`}}`}}'
   title: Post Request Latency 99th Quantile
   type: timeseries
 - datasource:
@@ -304,8 +304,8 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-proxy", instance=~"$instance", verb="GET"}[$__rate_interval])) by (verb, url, le))
-    legendFormat: '{{`{{`}}verb{{`}}`}} {{`{{`}}url{{`}}`}}'
+    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-proxy", instance=~"$instance", verb="GET"}[$__rate_interval])) by (verb, le))
+    legendFormat: '{{`{{`}}verb{{`}}`}}'
   title: Get Request Latency 99th Quantile
   type: timeseries
 - datasource:

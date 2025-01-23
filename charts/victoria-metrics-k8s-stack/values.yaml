@@ -248,18 +248,22 @@ additionalVictoriaMetricsMap:
 #       - record: my_record
 #         expr: 100 * my_record
 
-# -- External VM read and write URLs
-externalVM:
-  read:
-    url: ""
-    # bearerTokenSecret:
-    #   name: dbaas-read-access-token
-    #   key: bearerToken
-  write:
-    url: ""
-    # bearerTokenSecret:
-    #   name: dbaas-read-access-token
-    #   key: bearerToken
+external:
+  # -- External Grafana host
+  grafana:
+    host: grafana.external.host
+  # -- External VM read and write URLs
+  vm:
+    read:
+      url: ""
+      # bearerTokenSecret:
+      #   name: dbaas-read-access-token
+      #   key: bearerToken
+    write:
+      url: ""
+      # bearerTokenSecret:
+      #   name: dbaas-read-access-token
+      #   key: bearerToken
 
 # Configures vmsingle params
 vmsingle:
@@ -732,8 +736,8 @@ vmauth:
   annotations: {}
   # -- (object) Full spec for VMAuth CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
   # It's possible to use given below predefined variables in spec:
-  # * `{{ .vm.read }}` - parsed vmselect, vmsingle or externalVM.read URL
-  # * `{{ .vm.write }}` - parsed vminsert, vmsingle or externalVM.write URL
+  # * `{{ .vm.read }}` - parsed vmselect, vmsingle or external.vm.read URL
+  # * `{{ .vm.write }}` - parsed vminsert, vmsingle or external.vm.write URL
   spec:
     port: "8427"
     unauthorizedUserAccessSpec:
@@ -809,7 +813,7 @@ defaultDatasources:
         isDefault: true
       - name: VictoriaMetrics (DS)
         isDefault: false
-        type: victoriametrics-datasource
+        type: victoriametrics-metrics-datasource
   # -- List of alertmanager datasources.
   # Alertmanager generated `url` will be added to each datasource in template if alertmanager is enabled
   alertmanager:
@@ -861,11 +865,11 @@ grafana:
   # Note that Grafana will need internet access to install the datasource plugin.
   # Uncomment the block below, if you want to enable VictoriaMetrics Datasource in Grafana:
   #plugins:
-  #  - "https://github.com/VictoriaMetrics/victoriametrics-datasource/releases/download/v0.10.1/victoriametrics-datasource-v0.10.1.zip;victoriametrics-datasource"
+  #  - "https://github.com/VictoriaMetrics/victoriametrics-datasource/releases/download/v0.12.0/victoriametrics-metrics-datasource-v0.12.0.zip;victoriametrics-metrics-datasource"
   #grafana.ini:
   #  plugins:
   #    # Why VictoriaMetrics datasource is unsigned: https://github.com/VictoriaMetrics/grafana-datasource/blob/main/README.md#why-victoriametrics-datasource-is-unsigned
-  #    allow_loading_unsigned_plugins: victoriametrics-datasource
+  #    allow_loading_unsigned_plugins: victoriametrics-metrics-datasource
 
   ingress:
     enabled: false

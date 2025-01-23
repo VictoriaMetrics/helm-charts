@@ -1,7 +1,7 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- $host := index (($Values.grafana).ingress).hosts 0 }}
+{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ ($Values.kubeApiServer).enabled }}'
 interval: 3m
 name: kube-apiserver-availability.rules
@@ -38,7 +38,7 @@ rules:
         # write too slow
         sum by ({{ $clusterLabel }}) (cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase30d{verb=~"POST|PUT|PATCH|DELETE"})
         -
-        sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"POST|PUT|PATCH|DELETE",le="1"})
+        sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"POST|PUT|PATCH|DELETE",le=~"1(\\.0)?"})
       ) +
       (
         # read too slow
@@ -46,14 +46,14 @@ rules:
         -
         (
           (
-            sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope=~"resource|",le="1"})
+            sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope=~"resource|",le=~"1(\\.0)?"})
             or
             vector(0)
           )
           +
-          sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="namespace",le="5"})
+          sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="namespace",le=~"5(\\.0)?"})
           +
-          sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="cluster",le="30"})
+          sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="cluster",le=~"30(\\.0)?"})
         )
       ) +
       # errors
@@ -72,14 +72,14 @@ rules:
       (
         # too slow
         (
-          sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope=~"resource|",le="1"})
+          sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope=~"resource|",le=~"1(\\.0)?"})
           or
           vector(0)
         )
         +
-        sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="namespace",le="5"})
+        sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="namespace",le=~"5(\\.0)?"})
         +
-        sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="cluster",le="30"})
+        sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="cluster",le=~"30(\\.0)?"})
       )
       +
       # errors
@@ -97,7 +97,7 @@ rules:
         # too slow
         sum by ({{ $clusterLabel }}) (cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase30d{verb=~"POST|PUT|PATCH|DELETE"})
         -
-        sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"POST|PUT|PATCH|DELETE",le="1"})
+        sum by ({{ $clusterLabel }}) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase30d{verb=~"POST|PUT|PATCH|DELETE",le=~"1(\\.0)?"})
       )
       +
       # errors

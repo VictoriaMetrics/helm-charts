@@ -1,7 +1,7 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- $host := index (($Values.grafana).ingress).hosts 0 }}
+{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: k8s.rules.container_memory_cache
 rules:
