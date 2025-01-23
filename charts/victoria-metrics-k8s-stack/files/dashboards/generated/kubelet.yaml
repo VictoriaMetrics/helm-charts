@@ -722,8 +722,8 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, verb, url, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}verb{{`}}`}} {{`{{`}}url{{`}}`}}'
+    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, verb, le))
+    legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}verb{{`}}`}}'
   title: Request duration 99th quantile
   type: timeseries
 - datasource:

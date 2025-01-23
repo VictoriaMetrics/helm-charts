@@ -1,7 +1,7 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- $host := index (($Values.grafana).ingress).hosts 0 }}
+{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: kubernetes-resources
 rules:
@@ -61,7 +61,7 @@ rules:
     severity: warning
 - alert: KubeQuotaAlmostFull
   annotations:
-    description: 'Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota.'
+    description: 'Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubequotaalmostfull'
     summary: 'Namespace quota is going to be full.'
   condition: '{{ true }}'
@@ -75,7 +75,7 @@ rules:
     severity: info
 - alert: KubeQuotaFullyUsed
   annotations:
-    description: 'Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota.'
+    description: 'Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubequotafullyused'
     summary: 'Namespace quota is fully used.'
   condition: '{{ true }}'
@@ -89,7 +89,7 @@ rules:
     severity: info
 - alert: KubeQuotaExceeded
   annotations:
-    description: 'Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota.'
+    description: 'Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubequotaexceeded'
     summary: 'Namespace quota has exceeded the limits.'
   condition: '{{ true }}'
@@ -103,7 +103,7 @@ rules:
     severity: warning
 - alert: CPUThrottlingHigh
   annotations:
-    description: '{{`{{`}} $value | humanizePercentage {{`}}`}} throttling of CPU in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}}.'
+    description: '{{`{{`}} $value | humanizePercentage {{`}}`}} throttling of CPU in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}} on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/cputhrottlinghigh'
     summary: 'Processes experience elevated CPU throttling.'
   condition: '{{ true }}'

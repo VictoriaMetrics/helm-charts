@@ -4,12 +4,13 @@
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $domain := ((.Values.global).cluster).dnsDomain }}
 {{- $ns := include "vm.namespace" $ctx }}
+{{- $certManager := .Values.admissionWebhooks.certManager }}
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name:  {{ $fullname }}-admission
-  {{- if .Values.admissionWebhooks.certManager.enabled }}
+  {{- if $certManager.enabled }}
   annotations:
     certmanager.k8s.io/inject-ca-from: {{ printf "%s/%s-validation" $ns $fullname | quote }}
     cert-manager.io/inject-ca-from: {{ printf "%s/%s-validation" $ns $fullname | quote }}
@@ -24,7 +25,7 @@ webhooks:
         name: {{ $fullname }}
         path: /validate-operator-victoriametrics-com-v1beta1-{{ $name }}
         port: {{ $.Values.service.webhookPort }}
-      {{- if not $.Values.admissionWebhooks.certManager.enabled }}
+      {{- if not $certManager.enabled }}
       caBundle: {{ $tls.caCert }}
       {{- end }}
     failurePolicy: {{ $.Values.admissionWebhooks.policy }}
@@ -48,8 +49,8 @@ webhooks:
           - {{ $name }}{{ ternary "" "s" (hasSuffix "s" $name) }}
 {{- end }}
 {{- end }}
-{{- if .Values.admissionWebhooks.certManager.enabled }}
-{{- if not .Values.admissionWebhooks.certManager.issuer }}
+{{- if $certManager.enabled }}
+{{- if not $certManager.issuer }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
@@ -66,10 +67,10 @@ metadata:
   namespace: {{ $ns }}
 spec:
   secretName: {{ $fullname }}-root-ca
-  duration: {{ .Values.admissionWebhooks.certManager.ca.duration }}
+  duration: {{ $certManager.ca.duration }}
   issuerRef:
     name: {{ $fullname }}-root
-  commonName: {{ .Values.admissionWebhooks.certManager.ca.commonName }}
+  commonName: {{ $certManager.ca.commonName }}
   isCA: true
 ---
 apiVersion: cert-manager.io/v1
@@ -90,8 +91,11 @@ metadata:
   namespace: {{ $ns }}
 spec:
   secretName: {{ $fullname }}-validation
-  duration: {{ .Values.admissionWebhooks.certManager.cert.duration }}
-  {{- $issuerRef := .Values.admissionWebhooks.certManager.issuer | default dict }}
+  duration: {{ $certManager.cert.duration }}
+  {{- with $certManager.cert.commonName }}
+  commonName: {{ . }}
+  {{- end }}
+  {{- $issuerRef := $certManager.issuer | default dict }}
   {{- if empty $issuerRef }}
     {{- $_ := set $issuerRef "name" (printf "%s-issuer" $fullname) }}
   {{- end }}

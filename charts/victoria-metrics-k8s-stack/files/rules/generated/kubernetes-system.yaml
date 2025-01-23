@@ -1,13 +1,13 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- $host := index (($Values.grafana).ingress).hosts 0 }}
+{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: kubernetes-system
 rules:
 - alert: KubeVersionMismatch
   annotations:
-    description: 'There are {{`{{`}} $value {{`}}`}} different semantic versions of Kubernetes components running.'
+    description: 'There are {{`{{`}} $value {{`}}`}} different semantic versions of Kubernetes components running on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeversionmismatch'
     summary: 'Different semantic versions of Kubernetes components running.'
   condition: '{{ true }}'
@@ -17,7 +17,7 @@ rules:
     severity: warning
 - alert: KubeClientErrors
   annotations:
-    description: 'Kubernetes API server client ''{{`{{`}} $labels.job {{`}}`}}/{{`{{`}} $labels.instance {{`}}`}}'' is experiencing {{`{{`}} $value | humanizePercentage {{`}}`}} errors.'''
+    description: 'Kubernetes API server client ''{{`{{`}} $labels.job {{`}}`}}/{{`{{`}} $labels.instance {{`}}`}}'' is experiencing {{`{{`}} $value | humanizePercentage {{`}}`}} errors on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeclienterrors'
     summary: 'Kubernetes API server client is experiencing errors.'
   condition: '{{ true }}'

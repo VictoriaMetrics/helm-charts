@@ -1,13 +1,13 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- $host := index (($Values.grafana).ingress).hosts 0 }}
+{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: kubernetes-apps
 rules:
 - alert: KubePodCrashLooping
   annotations:
-    description: 'Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} ({{`{{`}} $labels.container {{`}}`}}) is in waiting state (reason: "CrashLoopBackOff").'
+    description: 'Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} ({{`{{`}} $labels.container {{`}}`}}) is in waiting state (reason: "CrashLoopBackOff") on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubepodcrashlooping'
     summary: 'Pod is crash looping.'
   condition: '{{ true }}'
@@ -17,7 +17,7 @@ rules:
     severity: warning
 - alert: KubePodNotReady
   annotations:
-    description: 'Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} has been in a non-ready state for longer than 15 minutes.'
+    description: 'Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} has been in a non-ready state for longer than 15 minutes on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubepodnotready'
     summary: 'Pod has been in a non-ready state for more than 15 minutes.'
   condition: '{{ true }}'
@@ -34,7 +34,7 @@ rules:
     severity: warning
 - alert: KubeDeploymentGenerationMismatch
   annotations:
-    description: 'Deployment generation for {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} does not match, this indicates that the Deployment has failed but has not been rolled back.'
+    description: 'Deployment generation for {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} does not match, this indicates that the Deployment has failed but has not been rolled back on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubedeploymentgenerationmismatch'
     summary: 'Deployment generation mismatch due to possible roll-back'
   condition: '{{ true }}'
@@ -47,7 +47,7 @@ rules:
     severity: warning
 - alert: KubeDeploymentReplicasMismatch
   annotations:
-    description: 'Deployment {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} has not matched the expected number of replicas for longer than 15 minutes.'
+    description: 'Deployment {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} has not matched the expected number of replicas for longer than 15 minutes on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubedeploymentreplicasmismatch'
     summary: 'Deployment has not matched the expected number of replicas.'
   condition: '{{ true }}'
@@ -66,7 +66,7 @@ rules:
     severity: warning
 - alert: KubeDeploymentRolloutStuck
   annotations:
-    description: 'Rollout of deployment {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} is not progressing for longer than 15 minutes.'
+    description: 'Rollout of deployment {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} is not progressing for longer than 15 minutes on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubedeploymentrolloutstuck'
     summary: 'Deployment rollout is not progressing.'
   condition: '{{ true }}'
@@ -78,7 +78,7 @@ rules:
     severity: warning
 - alert: KubeStatefulSetReplicasMismatch
   annotations:
-    description: 'StatefulSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.statefulset {{`}}`}} has not matched the expected number of replicas for longer than 15 minutes.'
+    description: 'StatefulSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.statefulset {{`}}`}} has not matched the expected number of replicas for longer than 15 minutes on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubestatefulsetreplicasmismatch'
     summary: 'StatefulSet has not matched the expected number of replicas.'
   condition: '{{ true }}'
@@ -97,7 +97,7 @@ rules:
     severity: warning
 - alert: KubeStatefulSetGenerationMismatch
   annotations:
-    description: 'StatefulSet generation for {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.statefulset {{`}}`}} does not match, this indicates that the StatefulSet has failed but has not been rolled back.'
+    description: 'StatefulSet generation for {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.statefulset {{`}}`}} does not match, this indicates that the StatefulSet has failed but has not been rolled back on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubestatefulsetgenerationmismatch'
     summary: 'StatefulSet generation mismatch due to possible roll-back'
   condition: '{{ true }}'
@@ -110,7 +110,7 @@ rules:
     severity: warning
 - alert: KubeStatefulSetUpdateNotRolledOut
   annotations:
-    description: 'StatefulSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.statefulset {{`}}`}} update has not been rolled out.'
+    description: 'StatefulSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.statefulset {{`}}`}} update has not been rolled out on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubestatefulsetupdatenotrolledout'
     summary: 'StatefulSet update has not been rolled out.'
   condition: '{{ true }}'
@@ -137,7 +137,7 @@ rules:
     severity: warning
 - alert: KubeDaemonSetRolloutStuck
   annotations:
-    description: 'DaemonSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.daemonset {{`}}`}} has not finished or progressed for at least 15m.'
+    description: 'DaemonSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.daemonset {{`}}`}} has not finished or progressed for at least 15m on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubedaemonsetrolloutstuck'
     summary: 'DaemonSet rollout is stuck.'
   condition: '{{ true }}'
@@ -170,7 +170,7 @@ rules:
     severity: warning
 - alert: KubeContainerWaiting
   annotations:
-    description: 'pod/{{`{{`}} $labels.pod {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} on container {{`{{`}} $labels.container{{`}}`}} has been in waiting state for longer than 1 hour. (reason: "{{`{{`}} $labels.reason {{`}}`}}").'
+    description: 'pod/{{`{{`}} $labels.pod {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} on container {{`{{`}} $labels.container{{`}}`}} has been in waiting state for longer than 1 hour. (reason: "{{`{{`}} $labels.reason {{`}}`}}") on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubecontainerwaiting'
     summary: 'Pod container waiting longer than 1 hour'
   condition: '{{ true }}'
@@ -180,7 +180,7 @@ rules:
     severity: warning
 - alert: KubeDaemonSetNotScheduled
   annotations:
-    description: '{{`{{`}} $value {{`}}`}} Pods of DaemonSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.daemonset {{`}}`}} are not scheduled.'
+    description: '{{`{{`}} $value {{`}}`}} Pods of DaemonSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.daemonset {{`}}`}} are not scheduled on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubedaemonsetnotscheduled'
     summary: 'DaemonSet pods are not scheduled.'
   condition: '{{ true }}'
@@ -193,7 +193,7 @@ rules:
     severity: warning
 - alert: KubeDaemonSetMisScheduled
   annotations:
-    description: '{{`{{`}} $value {{`}}`}} Pods of DaemonSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.daemonset {{`}}`}} are running where they are not supposed to run.'
+    description: '{{`{{`}} $value {{`}}`}} Pods of DaemonSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.daemonset {{`}}`}} are running where they are not supposed to run on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubedaemonsetmisscheduled'
     summary: 'DaemonSet pods are misscheduled.'
   condition: '{{ true }}'
@@ -203,7 +203,7 @@ rules:
     severity: warning
 - alert: KubeJobNotCompleted
   annotations:
-    description: 'Job {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.job_name {{`}}`}} is taking more than {{`{{`}} "43200" | humanizeDuration {{`}}`}} to complete.'
+    description: 'Job {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.job_name {{`}}`}} is taking more than {{`{{`}} "43200" | humanizeDuration {{`}}`}} to complete on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubejobnotcompleted'
     summary: 'Job did not complete in time'
   condition: '{{ true }}'
@@ -215,7 +215,7 @@ rules:
     severity: warning
 - alert: KubeJobFailed
   annotations:
-    description: 'Job {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.job_name {{`}}`}} failed to complete. Removing failed job after investigation should clear this alert.'
+    description: 'Job {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.job_name {{`}}`}} failed to complete. Removing failed job after investigation should clear this alert on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubejobfailed'
     summary: 'Job failed to complete.'
   condition: '{{ true }}'
@@ -225,7 +225,7 @@ rules:
     severity: warning
 - alert: KubeHpaReplicasMismatch
   annotations:
-    description: 'HPA {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.horizontalpodautoscaler  {{`}}`}} has not matched the desired number of replicas for longer than 15 minutes.'
+    description: 'HPA {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.horizontalpodautoscaler  {{`}}`}} has not matched the desired number of replicas for longer than 15 minutes on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubehpareplicasmismatch'
     summary: 'HPA has not matched desired number of replicas.'
   condition: '{{ true }}'
@@ -248,7 +248,7 @@ rules:
     severity: warning
 - alert: KubeHpaMaxedOut
   annotations:
-    description: 'HPA {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.horizontalpodautoscaler  {{`}}`}} has been running at max replicas for longer than 15 minutes.'
+    description: 'HPA {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.horizontalpodautoscaler  {{`}}`}} has been running at max replicas for longer than 15 minutes on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubehpamaxedout'
     summary: 'HPA is running at max replicas'
   condition: '{{ true }}'
