@@ -4,6 +4,7 @@
 
 - add `.Values.external.grafana.host` to configure grafana host for alerts, when `.Values.grafana.enabled: false`
 - rename `.Values.externalVM` to `.Values.external.vm` for consistency
+- bump version of VM components to [v1.110.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.110.0)
 
 ## 0.34.0
 
