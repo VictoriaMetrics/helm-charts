@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `defaultDashboards.annotations` to `GrafanaDashboard`s resources.
 
 ## 0.35.0
 
