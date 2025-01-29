@@ -55,6 +55,12 @@ metadata:
   namespace: {{ include "vm.namespace" $ }}
   name: {{ printf "%s-%s" (include "vm.fullname" $ctx) $dashboardName | replace "_" "" }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with $.Values.defaultDashboards.annotations }}
+  annotations:
+    {{- range $key, $val := . }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+  {{- end }}
 spec:
   json: | {{ $dashboardResult | nindent 4 }}
   {{- toYaml $.Values.defaultDashboards.grafanaOperator.spec | nindent 2 }}
