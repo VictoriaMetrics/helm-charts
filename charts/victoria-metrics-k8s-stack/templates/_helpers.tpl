@@ -253,21 +253,14 @@
 
 {{- define "vm.data.source.enabled" -}}
   {{- $Values := (.helm).Values | default .Values -}}
+  {{- $grafana := $Values.grafana -}}
+  {{- $installed := list "prometheus" "alertmanager" }}
+  {{- range $plugin := ($grafana.plugins | default list) -}}
+    {{- $plugin = splitList ";" $plugin | reverse | first }}
+    {{- $installed = append $installed $plugin }}
+  {{- end -}}
   {{- $ds := .ds -}}
-  {{- if hasPrefix "victoria" $ds.type -}}
-    {{- $grafana := $Values.grafana -}}
-    {{- $isEnabled := false -}}
-    {{- if $grafana.plugins -}}
-      {{- range $value := $grafana.plugins -}}
-        {{- if contains $ds.type $value -}}
-          {{- $isEnabled = true -}}
-        {{- end }}
-      {{- end }}
-    {{- end }}
-    {{- ternary "true" "" $isEnabled -}}
-  {{- else -}}
-    {{ "true" }}
-  {{- end }}
+  {{- toString (has $ds.type $installed) -}}
 {{- end -}}
 
 {{- /* Datasources */ -}}
@@ -280,8 +273,7 @@
     {{- $defaultDatasources := default list -}}
     {{- range $ds := $Values.defaultDatasources.victoriametrics.datasources }}
       {{- $_ := set $ctx "ds" $ds }}
-      {{- $allowedDatasource := ternary false true (empty (include "vm.data.source.enabled" $ctx)) -}}
-      {{- if $allowedDatasource -}}
+      {{- if eq (include "vm.data.source.enabled" $ctx) "true" -}}
         {{- $_ := set $ds "url" $readEndpoint.url -}}
         {{- $defaultDatasources = append $defaultDatasources $ds -}}
       {{- end -}}
