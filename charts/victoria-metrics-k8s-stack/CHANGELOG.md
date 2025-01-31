@@ -1,6 +1,7 @@
 ## Next release
 
 - Grafana datasource: do not verify allow_loading_unsigned_plugins in k8s-stack
+- Fixed configmap rendering for vmalert.templateFiles
 
 ## 0.35.1
 

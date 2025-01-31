@@ -115,8 +115,8 @@
     {{- $ruleTmpl := printf "/etc/vm/configs/%s-extra-tpl/*.tmpl" $fullname -}}
     {{- $_ := set $extraArgs "rule.templates" $ruleTmpl -}}
   {{- end -}}
-  {{- $vmAlertRemotes := include "vm.alert.remotes" . | fromYaml -}}
   {{- $vmAlertTemplates := include "vm.alert.templates" . | fromYaml -}}
+  {{- $vmAlertRemotes := include "vm.alert.remotes" . | fromYaml -}}
   {{- $spec := dict "extraArgs" $extraArgs "image" (dict "tag" $Chart.AppVersion) -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
