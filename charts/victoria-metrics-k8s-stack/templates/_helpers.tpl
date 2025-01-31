@@ -264,9 +264,7 @@
         {{- end }}
       {{- end }}
     {{- end }}
-    {{- $unsignedPlugins := ((index $grafana "grafana.ini").plugins).allow_loading_unsigned_plugins | default "" -}}
-    {{- $allowUnsigned := contains "victoriametrics-metrics-datasource" $unsignedPlugins -}}
-    {{- ternary "true" "" (and $isEnabled $allowUnsigned) -}}
+    {{- ternary "true" "" $isEnabled -}}
   {{- else -}}
     {{ "true" }}
   {{- end }}

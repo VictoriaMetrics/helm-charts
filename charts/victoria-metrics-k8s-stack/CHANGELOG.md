@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Grafana datasource: do not verify allow_loading_unsigned_plugins in k8s-stack
 
 ## 0.35.1
 
