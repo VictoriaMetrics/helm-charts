@@ -1,6 +1,10 @@
 ## Next release
 
 - add `.Values.defaultDatasources.grafanaOperator` section to manage datasources using Grafana operator. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1964) for details.
+- grafana chart 8.6.x -> 8.9.x
+- prometheus CRDs chart 16.x -> 17.x
+- kube-state-metrics chart 5.27.x -> 5.29.x
+- prometheus-node-exporter chart 4.42.x -> 4.43.x
 
 ## 0.35.3
 
