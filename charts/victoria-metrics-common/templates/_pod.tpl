@@ -24,16 +24,13 @@ Usage:
 {{- include "vm.securityContext" (dict "securityContext" .Values.containerSecurityContext "helm" .) -}}
 */ -}}
 {{- define "vm.securityContext" -}}
-  {{- $securityContext := .securityContext -}}
+  {{- $securityContext := omit .securityContext "enabled" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $adaptMode := (((($Values).global).compatibility).openshift).adaptSecurityContext | default "" -}}
   {{- if or (eq $adaptMode "force") (and (eq $adaptMode "auto") (include "vm.isOpenshift" .)) -}}
-    {{- $securityContext = omit $securityContext "fsGroup" "runAsUser" "runAsGroup" -}}
-    {{- if not $securityContext.seLinuxOptions -}}
-      {{- $securityContext = omit $securityContext "seLinuxOptions" -}}
-    {{- end -}}
+    {{- $securityContext = omit $securityContext "fsGroup" "runAsUser" "runAsGroup" "seLinuxOptions" -}}
   {{- end -}}
-  {{- omit $securityContext "enabled" | toYaml -}}
+  {{- toYaml $securityContext -}}
 {{- end -}}
 
 {{- /*

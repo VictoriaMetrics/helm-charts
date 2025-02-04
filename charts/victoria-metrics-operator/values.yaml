@@ -92,10 +92,18 @@ annotations: {}
 # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
 podSecurityContext:
   enabled: true
+  fsGroup: 2000
+  runAsNonRoot: true
+  runAsUser: 1000
 
 # -- Security context to be added to server pods
 securityContext:
   enabled: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
 
 operator:
   # -- By default, operator converts prometheus-operator objects.

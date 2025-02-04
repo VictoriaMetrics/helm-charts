@@ -304,7 +304,7 @@
       {{- $datasources = append $datasources $ds -}}
     {{- end }}
   {{- end -}}
-  {{- toYaml $datasources -}}
+  {{- toYaml (dict "datasources" $datasources) -}}
 {{- end }}
 
 {{- /* VMRule name */ -}}
