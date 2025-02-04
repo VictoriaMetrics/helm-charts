@@ -837,6 +837,47 @@ perReplica: false
 </td>
     </tr>
     <tr>
+      <td>defaultDatasources.grafanaOperator.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>defaultDatasources.grafanaOperator.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td><p>Create datasources as CRDs (requires grafana-operator to be installed)</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultDatasources.grafanaOperator.spec.allowCrossNamespaceImport</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>defaultDatasources.grafanaOperator.spec.instanceSelector.matchLabels.dashboards</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">grafana
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
       <td>defaultDatasources.victoriametrics.datasources</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
