@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `access` property to all default datasources
 
 ## 0.35.4
 
