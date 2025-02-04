@@ -1,6 +1,6 @@
 
 
-![Version](https://img.shields.io/badge/0.35.4-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-k8s-stack%2Fchangelog%2F%230354)
+![Version](https://img.shields.io/badge/0.35.5-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-k8s-stack%2Fchangelog%2F%230355)
 ![ArtifactHub](https://img.shields.io/badge/ArtifactHub-informational?logoColor=white&color=417598&logo=artifacthub&link=https%3A%2F%2Fartifacthub.io%2Fpackages%2Fhelm%2Fvictoriametrics%2Fvictoria-metrics-k8s-stack)
 ![License](https://img.shields.io/github/license/VictoriaMetrics/helm-charts?labelColor=green&label=&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Fhelm-charts%2Fblob%2Fmaster%2FLICENSE)
 ![Slack](https://img.shields.io/badge/Join-4A154B?logo=slack&link=https%3A%2F%2Fslack.victoriametrics.com)
@@ -881,10 +881,12 @@ perReplica: false
       <td>defaultDatasources.victoriametrics.datasources</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">- isDefault: true
+<code class="language-yaml">- access: proxy
+  isDefault: true
   name: VictoriaMetrics
   type: prometheus
-- isDefault: false
+- access: proxy
+  isDefault: false
   name: VictoriaMetrics (DS)
   type: victoriametrics-metrics-datasource
 </code>
