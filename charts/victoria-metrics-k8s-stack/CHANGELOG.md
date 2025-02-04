@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `.Values.defaultDatasources.grafanaOperator` section to manage datasources using Grafana operator. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1964) for details.
 
 ## 0.35.3
 

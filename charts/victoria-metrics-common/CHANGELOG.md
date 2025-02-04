@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Fixed minor securityContext template typo
 
 ## 0.0.37
 

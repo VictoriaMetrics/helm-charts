@@ -1,7 +1,29 @@
 {{- if or (and .Values.grafana.enabled .Values.grafana.sidecar.datasources.enabled ) .Values.grafana.forceDeployDatasource }}
 {{- $ctx := dict "helm" . }}
+{{- $grafanaOperator := .Values.defaultDatasources.grafanaOperator }}
 {{- $fullname := include "vm.fullname" $ctx }}
-{{- with (include "vm.data.sources" .) }}
+{{- $output := include "vm.data.sources" . | fromYaml }}
+{{- if $grafanaOperator.enabled }}
+{{- range $ds := $output.datasources }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  namespace: {{ include "vm.namespace" $ }}
+  name: {{ $fullname }}-{{ lower $ds.name }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with $grafanaOperator.annotations }}
+  annotations:
+    {{- range $key, $val := . }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  datasource: {{ toYaml $ds | nindent 4 }}
+  {{- toYaml $grafanaOperator.spec | nindent 2 }}
+{{- end }}
+{{- else }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -18,6 +40,6 @@ metadata:
 data:
   datasource.yaml: |-
     apiVersion: 1
-    datasources: {{ . | nindent 6 }}
+    datasources: {{ toYaml $output.datasources | nindent 6 }}
 {{- end }}
 {{- end }}

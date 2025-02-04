@@ -802,6 +802,15 @@ vmagent:
     #      - vmagent.domain.com
 
 defaultDatasources:
+  grafanaOperator:
+    # -- Create datasources as CRDs (requires grafana-operator to be installed)
+    enabled: false
+    annotations: {}
+    spec:
+      instanceSelector:
+        matchLabels:
+          dashboards: grafana
+      allowCrossNamespaceImport: false
   victoriametrics:
     # -- Create per replica prometheus compatible datasource
     perReplica: false
@@ -834,7 +843,7 @@ defaultDatasources:
     #   basicAuthUser: daco
     #   editable: false
     #   jsonData:
-    #       tlsSkipVerify: true
+    #     tlsSkipVerify: true
     #   orgId: 1
     #   type: prometheus
     #   url: https://{{ printf "%s-prometheus.svc" .Release.Name }}:9090
