@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Use .Values.global.clusterLabel in rules annotations instead of `$labels.cluster`
 
 ## 0.35.2
 

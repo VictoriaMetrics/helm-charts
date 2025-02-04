@@ -146,17 +146,19 @@
 {{- end -}}
 
 {{- define "vmselect.ports" -}}
+{{- $service := .service }}
+{{- $extraArgs := .extraArgs }}
 - name: http
-  port: {{ .service.servicePort }}
+  port: {{ $service.servicePort }}
   protocol: TCP
-  targetPort: {{ .service.targetPort }}
-{{- range .service.extraPorts }}
+  targetPort: {{ $service.targetPort }}
+{{- range $service.extraPorts }}
 - name: {{ .name }}
   port: {{ .port }}
   protocol: TCP
   targetPort: {{ .targetPort }}
 {{- end }}
-{{- with .extraArgs.clusternativeListenAddr }}
+{{- with $extraArgs.clusternativeListenAddr }}
 - name: cluster-tcp
   protocol: TCP
   port: {{ include "vm.port.from.flag" (dict "flag" .) }}
@@ -165,23 +167,25 @@
 {{- end -}}
 
 {{- define "vminsert.ports" -}}
+{{- $service := .service }}
+{{- $extraArgs := .extraArgs }}
 - name: http
-  port: {{ .service.servicePort }}
+  port: {{ $service.servicePort }}
   protocol: TCP
-  targetPort: {{ .service.targetPort }}
-{{- range .service.extraPorts }}
+  targetPort: {{ $service.targetPort }}
+{{- range $service.extraPorts }}
 - name: {{ .name }}
   port: {{ .port }}
   protocol: TCP
   targetPort: {{ .targetPort }}
 {{- end }}
-{{- with .extraArgs.clusternativeListenAddr }}
+{{- with $extraArgs.clusternativeListenAddr }}
 - name: cluster-tcp
   protocol: TCP
   port: {{ include "vm.port.from.flag" (dict "flag" .) }}
   targetPort: cluster-tcp
 {{- end }}
-{{- with .extraArgs.graphiteListenAddr }}
+{{- with $extraArgs.graphiteListenAddr }}
 - name: graphite-tcp
   protocol: TCP
   port: {{ include "vm.port.from.flag" (dict "flag" .) }}
@@ -191,7 +195,7 @@
   port: {{ include "vm.port.from.flag" (dict "flag" .) }}
   targetPort: graphite-udp
 {{- end }}
-{{- with .extraArgs.influxListenAddr }}
+{{- with $extraArgs.influxListenAddr }}
 - name: influx-tcp
   protocol: TCP
   port: {{ include "vm.port.from.flag" (dict "flag" .) }}
@@ -201,13 +205,13 @@
   port: {{ include "vm.port.from.flag" (dict "flag" .) }}
   targetPort: influx-udp
 {{- end }}
-{{- with .extraArgs.opentsdbHTTPListenAddr }}
+{{- with $extraArgs.opentsdbHTTPListenAddr }}
 - name: opentsdbhttp
   port: {{ include "vm.port.from.flag" (dict "flag" .) }}
   targetPort: opentsdbhttp
 {{- end }}
-{{- with .extraArgs.opentsdbListenAddr }}
-{{- if or .service.udp (ne .service.type "LoadBalancer") }}
+{{- with $extraArgs.opentsdbListenAddr }}
+{{- if or $service.udp (ne $service.type "LoadBalancer") }}
 - name: opentsdb-udp
   protocol: UDP
   port: {{ include "vm.port.from.flag" (dict "flag" .) }}
@@ -221,19 +225,20 @@
 {{- end -}}
 
 {{- define "vmstorage.ports" -}}
-- port: {{ .service.servicePort }}
+{{- $service := .service }}
+- port: {{ $service.servicePort }}
   targetPort: http
   protocol: TCP
   name: http
-- port: {{ .service.vmselectPort }}
+- port: {{ $service.vmselectPort }}
   targetPort: vmselect
   protocol: TCP
   name: vmselect
-- port: {{ .service.vminsertPort }}
+- port: {{ $service.vminsertPort }}
   targetPort: vminsert
   protocol: TCP
   name: vminsert
-{{- range .service.extraPorts }}
+{{- range $service.extraPorts }}
 - name: {{ .name }}
   port: {{ .port }}
   protocol: TCP
@@ -241,12 +246,13 @@
 {{- end }}
 {{- end -}}
 
-{{- define "vmauth.ports" -}} 
-- port: {{ .service.servicePort }}
+{{- define "vmauth.ports" -}}
+{{- $service := .service }}
+- port: {{ $service.servicePort }}
   targetPort: http
   protocol: TCP 
   name: http 
-{{- range .service.extraPorts }}
+{{- range $service.extraPorts }}
 - name: {{ .name }}
   port: {{ .port }}
   protocol: TCP

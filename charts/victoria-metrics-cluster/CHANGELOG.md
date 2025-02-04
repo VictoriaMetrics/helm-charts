@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed service templates ports rendering when opentsdbListenAddr flag is set. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1961) for details.
 
 ## 0.17.3
 

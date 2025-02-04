@@ -191,6 +191,9 @@ replacement_map = {
     "(by|on)\\s*\\(([\\w\\s,]*)\\)": {
         "replacement": cluster_label_var,
     },
+    "\\$labels.cluster": {
+        "replacement": "$labels.[[ $clusterLabel ]]",
+    },
 }
 
 

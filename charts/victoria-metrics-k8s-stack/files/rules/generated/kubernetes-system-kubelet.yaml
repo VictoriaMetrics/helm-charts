@@ -7,17 +7,20 @@ name: kubernetes-system-kubelet
 rules:
 - alert: KubeNodeNotReady
   annotations:
-    description: '{{`{{`}} $labels.node {{`}}`}} has been unready for more than 15 minutes on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: '{{`{{`}} $labels.node {{`}}`}} has been unready for more than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubenodenotready'
     summary: 'Node is not ready.'
   condition: '{{ true }}'
-  expr: kube_node_status_condition{job="kube-state-metrics",condition="Ready",status="true"} == 0
+  expr: |-
+    kube_node_status_condition{job="kube-state-metrics",condition="Ready",status="true"} == 0
+    and on (node,{{ $clusterLabel }})
+    kube_node_spec_unschedulable{job="kube-state-metrics"} == 0
   for: 15m
   labels:
     severity: warning
 - alert: KubeNodeUnreachable
   annotations:
-    description: '{{`{{`}} $labels.node {{`}}`}} is unreachable and some workloads may be rescheduled on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: '{{`{{`}} $labels.node {{`}}`}} is unreachable and some workloads may be rescheduled on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubenodeunreachable'
     summary: 'Node is unreachable.'
   condition: '{{ true }}'
@@ -27,7 +30,7 @@ rules:
     severity: warning
 - alert: KubeletTooManyPods
   annotations:
-    description: 'Kubelet ''{{`{{`}} $labels.node {{`}}`}}'' is running at {{`{{`}} $value | humanizePercentage {{`}}`}} of its Pod capacity on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'Kubelet ''{{`{{`}} $labels.node {{`}}`}}'' is running at {{`{{`}} $value | humanizePercentage {{`}}`}} of its Pod capacity on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubelettoomanypods'
     summary: 'Kubelet is running at capacity.'
   condition: '{{ true }}'
@@ -48,17 +51,20 @@ rules:
     severity: info
 - alert: KubeNodeReadinessFlapping
   annotations:
-    description: 'The readiness status of node {{`{{`}} $labels.node {{`}}`}} has changed {{`{{`}} $value {{`}}`}} times in the last 15 minutes on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'The readiness status of node {{`{{`}} $labels.node {{`}}`}} has changed {{`{{`}} $value {{`}}`}} times in the last 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubenodereadinessflapping'
     summary: 'Node readiness status is flapping.'
   condition: '{{ true }}'
-  expr: sum(changes(kube_node_status_condition{job="kube-state-metrics",status="true",condition="Ready"}[15m])) by (node,{{ $clusterLabel }}) > 2
+  expr: |-
+    sum(changes(kube_node_status_condition{job="kube-state-metrics",status="true",condition="Ready"}[15m])) by (node,{{ $clusterLabel }}) > 2
+    and on (node,{{ $clusterLabel }})
+    kube_node_spec_unschedulable{job="kube-state-metrics"} == 0
   for: 15m
   labels:
     severity: warning
 - alert: KubeletPlegDurationHigh
   annotations:
-    description: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{`{{`}} $value {{`}}`}} seconds on node {{`{{`}} $labels.node {{`}}`}} on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{`{{`}} $value {{`}}`}} seconds on node {{`{{`}} $labels.node {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeletplegdurationhigh'
     summary: 'Kubelet Pod Lifecycle Event Generator is taking too long to relist.'
   condition: '{{ true }}'
@@ -68,7 +74,7 @@ rules:
     severity: warning
 - alert: KubeletPodStartUpLatencyHigh
   annotations:
-    description: 'Kubelet Pod startup 99th percentile latency is {{`{{`}} $value {{`}}`}} seconds on node {{`{{`}} $labels.node {{`}}`}} on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'Kubelet Pod startup 99th percentile latency is {{`{{`}} $value {{`}}`}} seconds on node {{`{{`}} $labels.node {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeletpodstartuplatencyhigh'
     summary: 'Kubelet Pod startup latency is too high.'
   condition: '{{ true }}'
@@ -78,7 +84,7 @@ rules:
     severity: warning
 - alert: KubeletClientCertificateExpiration
   annotations:
-    description: 'Client certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'Client certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeletclientcertificateexpiration'
     summary: 'Kubelet client certificate is about to expire.'
   condition: '{{ true }}'
@@ -87,7 +93,7 @@ rules:
     severity: warning
 - alert: KubeletClientCertificateExpiration
   annotations:
-    description: 'Client certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'Client certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeletclientcertificateexpiration'
     summary: 'Kubelet client certificate is about to expire.'
   condition: '{{ true }}'
@@ -96,7 +102,7 @@ rules:
     severity: critical
 - alert: KubeletServerCertificateExpiration
   annotations:
-    description: 'Server certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'Server certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeletservercertificateexpiration'
     summary: 'Kubelet server certificate is about to expire.'
   condition: '{{ true }}'
@@ -105,7 +111,7 @@ rules:
     severity: warning
 - alert: KubeletServerCertificateExpiration
   annotations:
-    description: 'Server certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'Server certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeletservercertificateexpiration'
     summary: 'Kubelet server certificate is about to expire.'
   condition: '{{ true }}'
@@ -114,7 +120,7 @@ rules:
     severity: critical
 - alert: KubeletClientCertificateRenewalErrors
   annotations:
-    description: 'Kubelet on node {{`{{`}} $labels.node {{`}}`}} has failed to renew its client certificate ({{`{{`}} $value | humanize {{`}}`}} errors in the last 5 minutes) on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'Kubelet on node {{`{{`}} $labels.node {{`}}`}} has failed to renew its client certificate ({{`{{`}} $value | humanize {{`}}`}} errors in the last 5 minutes) on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeletclientcertificaterenewalerrors'
     summary: 'Kubelet has failed to renew its client certificate.'
   condition: '{{ true }}'
@@ -124,7 +130,7 @@ rules:
     severity: warning
 - alert: KubeletServerCertificateRenewalErrors
   annotations:
-    description: 'Kubelet on node {{`{{`}} $labels.node {{`}}`}} has failed to renew its server certificate ({{`{{`}} $value | humanize {{`}}`}} errors in the last 5 minutes) on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'Kubelet on node {{`{{`}} $labels.node {{`}}`}} has failed to renew its server certificate ({{`{{`}} $value | humanize {{`}}`}} errors in the last 5 minutes) on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeletservercertificaterenewalerrors'
     summary: 'Kubelet has failed to renew its server certificate.'
   condition: '{{ true }}'

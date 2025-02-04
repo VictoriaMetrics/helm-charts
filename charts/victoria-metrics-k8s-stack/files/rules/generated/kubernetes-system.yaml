@@ -7,7 +7,7 @@ name: kubernetes-system
 rules:
 - alert: KubeVersionMismatch
   annotations:
-    description: 'There are {{`{{`}} $value {{`}}`}} different semantic versions of Kubernetes components running on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'There are {{`{{`}} $value {{`}}`}} different semantic versions of Kubernetes components running on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeversionmismatch'
     summary: 'Different semantic versions of Kubernetes components running.'
   condition: '{{ true }}'
@@ -17,7 +17,7 @@ rules:
     severity: warning
 - alert: KubeClientErrors
   annotations:
-    description: 'Kubernetes API server client ''{{`{{`}} $labels.job {{`}}`}}/{{`{{`}} $labels.instance {{`}}`}}'' is experiencing {{`{{`}} $value | humanizePercentage {{`}}`}} errors on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: 'Kubernetes API server client ''{{`{{`}} $labels.job {{`}}`}}/{{`{{`}} $labels.instance {{`}}`}}'' is experiencing {{`{{`}} $value | humanizePercentage {{`}}`}} errors on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeclienterrors'
     summary: 'Kubernetes API server client is experiencing errors.'
   condition: '{{ true }}'
