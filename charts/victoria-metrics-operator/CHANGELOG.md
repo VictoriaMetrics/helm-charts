@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `.Values.allowedMetricsEndpoints`
 
 ## 0.41.1
 
