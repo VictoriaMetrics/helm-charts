@@ -7,6 +7,9 @@ global:
   image:
     # -- Image registry, that can be shared across multiple helm charts
     registry: ""
+    vm:
+      # -- Image tag for all vm charts
+      tag: ""
   # -- Openshift security context compatibility configuration
   compatibility:
     openshift:
@@ -18,8 +21,13 @@ global:
 # -- Print information after deployment
 printNotes: true
 
-# use SRV discovery for storageNode and selectNode flags for enterprise version
+# -- use SRV discovery for storageNode and selectNode flags for enterprise version
 autoDiscovery: false
+
+common:
+  # -- common for all components image configuration
+  image:
+    tag: ""
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -220,7 +228,7 @@ vmselect:
     # -- Service labels
     labels: {}
     # -- Service ClusterIP
-    clusterIP: ""
+    clusterIP: None
     # -- Service external IPs. Details are [here](https://kubernetes.io/docs/user-guide/services/#external-ips)
     externalIPs: []
     # -- Extra service ports
