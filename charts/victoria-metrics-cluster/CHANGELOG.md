@@ -2,6 +2,7 @@
 
 - added ability to override default headless service `.Values.vmselect.service.clusterIP` with empty value
 - added `.Values.common.image.tag` to set the same tag for all cluster components.
+- updated common dependency 0.0.37 -> 0.0.39
 
 ## 0.17.4
 

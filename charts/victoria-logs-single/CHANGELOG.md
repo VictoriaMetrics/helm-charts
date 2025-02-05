@@ -2,6 +2,7 @@
 
 - added ability to override default headless service .Values.server.service.clusterIP with empty value
 - vector chart 0.37.x -> 0.40.x
+- updated common dependency 0.0.37 -> 0.0.39
 
 ## 0.8.14
 
