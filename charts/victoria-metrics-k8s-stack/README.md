@@ -515,8 +515,6 @@ Change the values according to the need of the environment in ``victoria-metrics
     - name: blackhole
 route:
     receiver: blackhole
-templates:
-    - /etc/vm/configs/**/*.tmpl
 </code>
 </pre>
 </td>
@@ -613,6 +611,17 @@ selectAllByDefault: true
 </pre>
 </td>
       <td><p>Extra alert templates</p>
+</td>
+    </tr>
+    <tr>
+      <td>alertmanager.useManagedConfig</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td><p>enable storing .Values.alertmanager.config in VMAlertmanagerConfig instead of k8s Secret</p>
 </td>
     </tr>
     <tr>

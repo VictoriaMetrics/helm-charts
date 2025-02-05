@@ -190,7 +190,7 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $fullname := include "vm.managed.fullname" . -}}
   {{- $spec := $Values.alertmanager.spec -}}
-  {{- if and (not $Values.alertmanager.spec.configRawYaml) (not $Values.alertmanager.spec.configSecret) -}}
+  {{- if and (not $spec.configRawYaml) (not $spec.configSecret) (not $Values.alertmanager.useManagedConfig) -}}
     {{- $_ := set $spec "configSecret" $fullname -}}
   {{- end -}}
   {{- $templates := default list -}}

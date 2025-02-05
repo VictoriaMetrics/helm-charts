@@ -514,33 +514,33 @@ alertmanager:
 
     # -- (string) If this one defined, it will be used for alertmanager configuration and config parameter will be ignored
     configSecret: ""
+  # -- enable storing .Values.alertmanager.config in VMAlertmanagerConfig instead of k8s Secret
+  useManagedConfig: false
   # -- (object) Alertmanager configuration
   config:
-    templates:
-      - "/etc/vm/configs/**/*.tmpl"
     route:
-      # group_by: ["alertgroup", "job"]
-      # group_wait: 30s
-      # group_interval: 5m
-      # repeat_interval: 12h
       receiver: "blackhole"
-      ## routes:
-        ###################################################
-        ## Duplicate code_owner routes to teams
-        ## These will send alerts to team channels but continue
-        ## processing through the rest of the tree to handled by on-call
-        # - matchers:
-        #     - code_owner_channel!=""
-        #     - severity=~"info|warning|critical"
-        #   group_by: ["code_owner_channel", "alertgroup", "job"]
-        #   receiver: slack-code-owners
-        # ###################################################
-        # ## Standard on-call routes
-        # - matchers:
-        #     - severity=~"info|warning|critical"
-        #   receiver: slack-monitoring
-        #   continue: true
-
+    #   group_by: ["alertgroup", "job"]
+    #   group_wait: 30s
+    #   group_interval: 5m
+    #   repeat_interval: 12h
+    #   routes:
+    #
+    #     # Duplicate code_owner routes to teams
+    #     # These will send alerts to team channels but continue
+    #     # processing through the rest of the tree to handled by on-call
+    #     - matchers:
+    #         - code_owner_channel!=""
+    #         - severity=~"info|warning|critical"
+    #       group_by: ["code_owner_channel", "alertgroup", "job"]
+    #       receiver: slack-code-owners
+    #
+    #     # Standard on-call routes
+    #     - matchers:
+    #         - severity=~"info|warning|critical"
+    #       receiver: slack-monitoring
+    #       continue: true
+    #
     # inhibit_rules:
     #   - target_matchers:
     #       - severity=~"warning|info"
@@ -568,55 +568,55 @@ alertmanager:
 
     receivers:
       - name: blackhole
-      # - name: "slack-monitoring"
-      #   slack_configs:
-      #     - channel: "#channel"
-      #       send_resolved: true
-      #       title: '{{ template "slack.monzo.title" . }}'
-      #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
-      #       color: '{{ template "slack.monzo.color" . }}'
-      #       text: '{{ template "slack.monzo.text" . }}'
-      #       actions:
-      #         - type: button
-      #           text: "Runbook :green_book:"
-      #           url: "{{ (index .Alerts 0).Annotations.runbook_url }}"
-      #         - type: button
-      #           text: "Query :mag:"
-      #           url: "{{ (index .Alerts 0).GeneratorURL }}"
-      #         - type: button
-      #           text: "Dashboard :grafana:"
-      #           url: "{{ (index .Alerts 0).Annotations.dashboard }}"
-      #         - type: button
-      #           text: "Silence :no_bell:"
-      #           url: '{{ template "__alert_silence_link" . }}'
-      #         - type: button
-      #           text: '{{ template "slack.monzo.link_button_text" . }}'
-      #           url: "{{ .CommonAnnotations.link_url }}"
-      # - name: slack-code-owners
-      #   slack_configs:
-      #     - channel: "#{{ .CommonLabels.code_owner_channel }}"
-      #       send_resolved: true
-      #       title: '{{ template "slack.monzo.title" . }}'
-      #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
-      #       color: '{{ template "slack.monzo.color" . }}'
-      #       text: '{{ template "slack.monzo.text" . }}'
-      #       actions:
-      #         - type: button
-      #           text: "Runbook :green_book:"
-      #           url: "{{ (index .Alerts 0).Annotations.runbook }}"
-      #         - type: button
-      #           text: "Query :mag:"
-      #           url: "{{ (index .Alerts 0).GeneratorURL }}"
-      #         - type: button
-      #           text: "Dashboard :grafana:"
-      #           url: "{{ (index .Alerts 0).Annotations.dashboard }}"
-      #         - type: button
-      #           text: "Silence :no_bell:"
-      #           url: '{{ template "__alert_silence_link" . }}'
-      #         - type: button
-      #           text: '{{ template "slack.monzo.link_button_text" . }}'
-      #           url: "{{ .CommonAnnotations.link_url }}"
-      #
+    # - name: "slack-monitoring"
+    #   slack_configs:
+    #     - channel: "#channel"
+    #       send_resolved: true
+    #       title: '{{ template "slack.monzo.title" . }}'
+    #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
+    #       color: '{{ template "slack.monzo.color" . }}'
+    #       text: '{{ template "slack.monzo.text" . }}'
+    #       actions:
+    #         - type: button
+    #           text: "Runbook :green_book:"
+    #           url: "{{ (index .Alerts 0).Annotations.runbook_url }}"
+    #         - type: button
+    #           text: "Query :mag:"
+    #           url: "{{ (index .Alerts 0).GeneratorURL }}"
+    #         - type: button
+    #           text: "Dashboard :grafana:"
+    #           url: "{{ (index .Alerts 0).Annotations.dashboard }}"
+    #         - type: button
+    #           text: "Silence :no_bell:"
+    #           url: '{{ template "__alert_silence_link" . }}'
+    #         - type: button
+    #           text: '{{ template "slack.monzo.link_button_text" . }}'
+    #           url: "{{ .CommonAnnotations.link_url }}"
+    # - name: slack-code-owners
+    #   slack_configs:
+    #     - channel: "#{{ .CommonLabels.code_owner_channel }}"
+    #       send_resolved: true
+    #       title: '{{ template "slack.monzo.title" . }}'
+    #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
+    #       color: '{{ template "slack.monzo.color" . }}'
+    #       text: '{{ template "slack.monzo.text" . }}'
+    #       actions:
+    #         - type: button
+    #           text: "Runbook :green_book:"
+    #           url: "{{ (index .Alerts 0).Annotations.runbook }}"
+    #         - type: button
+    #           text: "Query :mag:"
+    #           url: "{{ (index .Alerts 0).GeneratorURL }}"
+    #         - type: button
+    #           text: "Dashboard :grafana:"
+    #           url: "{{ (index .Alerts 0).Annotations.dashboard }}"
+    #         - type: button
+    #           text: "Silence :no_bell:"
+    #           url: '{{ template "__alert_silence_link" . }}'
+    #         - type: button
+    #           text: '{{ template "slack.monzo.link_button_text" . }}'
+    #           url: "{{ .CommonAnnotations.link_url }}"
+    #
   # -- Better alert templates for [slack source](https://gist.github.com/milesbxf/e2744fc90e9c41b47aa47925f8ff6512)
   monzoTemplate:
     enabled: true

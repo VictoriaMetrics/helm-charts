@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added .Values.alertmanager.useManagedConfig to switch storing Alertmanager config in VMAlertmanagerConfig CR instead of k8s Secret. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1968).
 
 ## 0.35.6
 
