@@ -21,12 +21,10 @@ spec:
     {{- $type = "ClusterIP" }}
   {{- end }}
   type: {{ $type }}
-  {{- $clusterIP := $service.clusterIP }}
-  {{- if and (not $clusterIP) (eq $type "ClusterIP") $app.statefulSet.enabled }}
-    {{- $clusterIP = "None" }}
-  {{- end }}
-  {{- with $clusterIP }}
+  {{- if eq $type "ClusterIP" }}
+  {{- with $service.clusterIP }}
   clusterIP: {{ . }}
+  {{- end }}
   {{- end }}
   {{- with $service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}

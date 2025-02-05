@@ -50,9 +50,12 @@ Victoria Metrics Image
     {{- end -}}
   {{- end -}}
   {{- $image := ternary $ctx.image $values.image (hasKey $ctx "image") -}}
-  {{- if and (not $image.registry) (hasKey $image "registry") -}}
-    {{- $_ := unset $image "registry" -}}
+  {{- if not $image.registry }}
+    {{- if (($Values.global).image).registry -}}
+      {{- $_ := set $image "registry" (($Values.global).image).registry -}}
+    {{- else if hasKey $image "registry" -}}
+      {{- $_ := unset $image "registry" -}}
+    {{- end -}}
   {{- end -}}
-  {{- $image = mergeOverwrite (deepCopy (($Values.global).image | default dict)) ($image | default dict) -}}
   {{- toYaml (dict "image" $image) -}}
 {{- end -}}

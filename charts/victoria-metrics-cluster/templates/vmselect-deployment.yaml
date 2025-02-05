@@ -1,4 +1,5 @@
-{{- $app := .Values.vmselect -}}
+{{- $app := merge (deepCopy .Values.vmselect) (deepCopy .Values.common) -}}
+{{- $_ := set .Values "vmselect" $app }}
 {{- if and $app.enabled (not $app.statefulSet.enabled) -}}
 {{- $ctx := dict "helm" . "appKey" "vmselect" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
