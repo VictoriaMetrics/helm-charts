@@ -39,7 +39,7 @@ rules:
   - nodes/proxy
   - nodes/metrics
   verbs: ["get", "list", "watch"]
-- nonResourceURLs: ["/metrics"]
+- nonResourceURLs: {{ toYaml .Values.allowedMetricsEndpoints | nindent 2 }}
   verbs: ["get"]
 {{- end }}
 {{- end -}}
