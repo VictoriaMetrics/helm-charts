@@ -1,6 +1,6 @@
 
 
-![Version](https://img.shields.io/badge/0.17.5-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-cluster%2Fchangelog%2F%230175)
+![Version](https://img.shields.io/badge/0.17.6-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-cluster%2Fchangelog%2F%230176)
 ![ArtifactHub](https://img.shields.io/badge/ArtifactHub-informational?logoColor=white&color=417598&logo=artifacthub&link=https%3A%2F%2Fartifacthub.io%2Fpackages%2Fhelm%2Fvictoriametrics%2Fvictoria-metrics-cluster)
 ![License](https://img.shields.io/github/license/VictoriaMetrics/helm-charts?labelColor=green&label=&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Fhelm-charts%2Fblob%2Fmaster%2FLICENSE)
 ![Slack](https://img.shields.io/badge/Join-4A154B?logo=slack&link=https%3A%2F%2Fslack.victoriametrics.com)
@@ -705,6 +705,17 @@ loggerFormat: json
 </pre>
 </td>
       <td><p>Init containers for vmauth</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmauth.lifecycle</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Specify pod lifecycle</p>
 </td>
     </tr>
     <tr>
@@ -1512,6 +1523,17 @@ loggerFormat: json
 </pre>
 </td>
       <td><p>Init containers for vminsert</p>
+</td>
+    </tr>
+    <tr>
+      <td>vminsert.lifecycle</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Specify pod lifecycle</p>
 </td>
     </tr>
     <tr>
@@ -2367,6 +2389,17 @@ loggerFormat: json
 </td>
     </tr>
     <tr>
+      <td>vmselect.lifecycle</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Specify pod lifecycle</p>
+</td>
+    </tr>
+    <tr>
       <td>vmselect.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
@@ -2655,7 +2688,7 @@ timeoutSeconds: 5
       <td>vmselect.service.clusterIP</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">None
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
@@ -3236,6 +3269,17 @@ loggerFormat: json
 </pre>
 </td>
       <td><p>Init containers for vmstorage</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmstorage.lifecycle</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Specify pod lifecycle</p>
 </td>
     </tr>
     <tr>
