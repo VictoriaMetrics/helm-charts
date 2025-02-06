@@ -1116,6 +1116,82 @@ readOnlyRootFilesystem: true
 </td>
     </tr>
     <tr>
+      <td>server.vmServiceScrape.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td><p>Enable deployment of VMServiceScrape for server component. This is VM Operator object</p>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>VMServiceScrape annotations</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.basicAuth</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Basic auth params for VMServiceScrape</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.extraLabels</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>VMServiceScrape labels</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.metricRelabelings</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td><p>VMServiceScrape metricRelabelings</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.relabelings</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td><p>VMServiceScrape relabelings</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.targetPort</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">http
+</code>
+</pre>
+</td>
+      <td><p>VMServiceScrape target port</p>
+</td>
+    </tr>
+    <tr>
       <td>server.statefulSet.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
