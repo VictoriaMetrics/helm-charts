@@ -46,6 +46,9 @@ spec:
           workingDir: {{ .Values.containerWorkingDir }}
           args: {{ include "vmauth.args" $ctx | nindent 12 }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.lifecycle }}
+          lifecycle: {{ . | toYaml | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .Values.extraArgs.httpListenAddr "default" "8427") }}
