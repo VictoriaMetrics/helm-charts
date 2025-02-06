@@ -91,6 +91,9 @@ spec:
           {{- if $app.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
+          {{- with $app.lifecycle }}
+          lifecycle: {{ . | toYaml | nindent 12 }}
+          {{- end }}
           args: {{ include "vmstorage.args" $ctx | nindent 12 }}
           ports:
             - name: {{ $app.ports.name | default "http" }}

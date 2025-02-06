@@ -47,6 +47,9 @@ spec:
         - name: vmselect
           image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
+          {{- with $app.lifecycle }}
+          lifecycle: {{ . | toYaml | nindent 12 }}
+          {{- end }}
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
           {{- end }}
