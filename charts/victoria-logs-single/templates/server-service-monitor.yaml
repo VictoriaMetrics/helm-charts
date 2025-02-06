@@ -1,20 +1,21 @@
 {{- $app := .Values.server }}
-{{- if and $app.enabled $app.serviceMonitor.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "server" }}
-{{- $serviceMonitor := $app.serviceMonitor -}}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
+
+{{- if and $app.enabled $app.serviceMonitor.enabled }}
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  {{- with $serviceMonitor.annotations }}
+  {{- with $app.serviceMonitor.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $_ := set $ctx "extraLabels" $serviceMonitor.extraLabels }}
+  {{- $_ := set $ctx "extraLabels" $app.serviceMonitor.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
   name: {{ $fullname }}
-  {{- with $serviceMonitor.namespace }}
+  {{- with $app.serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
 spec:
@@ -25,30 +26,81 @@ spec:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   endpoints:
     -
-      {{- with $serviceMonitor.targetPort }}
+      {{- with $app.serviceMonitor.targetPort }}
       targetPort: {{ . }}
       {{- else }}
       port: http
       {{- end }}
-      {{- with $serviceMonitor.basicAuth }}
+      {{- with $app.serviceMonitor.basicAuth }}
       basicAuth: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $serviceMonitor.scheme }}
+      {{- with $app.serviceMonitor.scheme }}
       scheme: {{ . }}
       {{- end }}
-      {{- with $serviceMonitor.interval }}
+      {{- with $app.serviceMonitor.interval }}
       interval: {{ . }}
       {{- end }}
-      {{- with $serviceMonitor.scrapeTimeout }}
+      {{- with $app.serviceMonitor.scrapeTimeout }}
       scrapeTimeout: {{ . }}
       {{- end }}
-      {{- with $serviceMonitor.tlsConfig }}
+      {{- with $app.serviceMonitor.tlsConfig }}
       tlsConfig: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $serviceMonitor.relabelings }}
+      {{- with $app.serviceMonitor.relabelings }}
       relabelings: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $serviceMonitor.metricRelabelings }}
+      {{- with $app.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{ toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+{{- if and $app.enabled $app.vmServiceScrape.enabled }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  {{- with $app.vmServiceScrape.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $_ := set $ctx "extraLabels" $app.vmServiceScrape.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
+  {{- with $app.vmServiceScrape.namespace }}
+  namespace: {{ . }}
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ $ns }}
+  selector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+  endpoints:
+    -
+      {{- with $app.vmServiceScrape.targetPort }}
+      targetPort: {{ . }}
+      {{- else }}
+      port: http
+      {{- end }}
+      {{- with $app.vmServiceScrape.basicAuth }}
+      basicAuth: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.vmServiceScrape.scheme }}
+      scheme: {{ . }}
+      {{- end }}
+      {{- with $app.vmServiceScrape.interval }}
+      interval: {{ . }}
+      {{- end }}
+      {{- with $app.vmServiceScrape.scrapeTimeout }}
+      scrapeTimeout: {{ . }}
+      {{- end }}
+      {{- with $app.vmServiceScrape.tlsConfig }}
+      tlsConfig: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.vmServiceScrape.relabelings }}
+      relabelings: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.vmServiceScrape.metricRelabelings }}
       metricRelabelings: {{ toYaml . | nindent 8 }}
       {{- end }}
 {{- end }}
