@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Reverted enabling headless service for vmselect by default.
 
 ## 0.17.5
 
