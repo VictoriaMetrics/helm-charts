@@ -1,6 +1,6 @@
 
 
-![Version](https://img.shields.io/badge/0.8.15-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-logs-single%2Fchangelog%2F%230815)
+![Version](https://img.shields.io/badge/0.8.16-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-logs-single%2Fchangelog%2F%230816)
 ![ArtifactHub](https://img.shields.io/badge/ArtifactHub-informational?logoColor=white&color=417598&logo=artifacthub&link=https%3A%2F%2Fartifacthub.io%2Fpackages%2Fhelm%2Fvictoriametrics%2Fvictoria-logs-single)
 ![License](https://img.shields.io/github/license/VictoriaMetrics/helm-charts?labelColor=green&label=&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Fhelm-charts%2Fblob%2Fmaster%2FLICENSE)
 ![Slack](https://img.shields.io/badge/Join-4A154B?logo=slack&link=https%3A%2F%2Fslack.victoriametrics.com)
@@ -1116,82 +1116,6 @@ readOnlyRootFilesystem: true
 </td>
     </tr>
     <tr>
-      <td>server.vmServiceScrape.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enable deployment of VMServiceScrape for server component. This is VM Operator object</p>
-    </tr>
-    <tr>
-      <td>server.vmServiceScrape.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VMServiceScrape annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>server.vmServiceScrape.basicAuth</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Basic auth params for VMServiceScrape</p>
-</td>
-    </tr>
-    <tr>
-      <td>server.vmServiceScrape.extraLabels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VMServiceScrape labels</p>
-</td>
-    </tr>
-    <tr>
-      <td>server.vmServiceScrape.metricRelabelings</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>VMServiceScrape metricRelabelings</p>
-</td>
-    </tr>
-    <tr>
-      <td>server.vmServiceScrape.relabelings</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>VMServiceScrape relabelings</p>
-</td>
-    </tr>
-    <tr>
-      <td>server.vmServiceScrape.targetPort</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">http
-</code>
-</pre>
-</td>
-      <td><p>VMServiceScrape target port</p>
-</td>
-    </tr>
-    <tr>
       <td>server.statefulSet.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
@@ -1255,6 +1179,69 @@ readOnlyRootFilesystem: true
 </pre>
 </td>
       <td><p>Pod topologySpreadConstraints</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td><p>Enable deployment of VMServiceScrape for server component. This is Victoria Metrics operator object</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.extraLabels</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.metricRelabelings</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.relabelings</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td><p>Commented. TLS configuration to use when scraping the endpoint    tlsConfig:      insecureSkipVerify: true</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.targetPort</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">http
+</code>
+</pre>
+</td>
+      <td><p>target port</p>
 </td>
     </tr>
     <tr>
