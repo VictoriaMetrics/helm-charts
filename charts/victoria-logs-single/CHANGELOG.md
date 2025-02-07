@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `.Values.server.vmServiceScrape` for [VMOperator](https://docs.victoriametrics.com/operator/) [VMServiceScrape](https://docs.victoriametrics.com/operator/api/#vmservicescrape) resource
 
 ## 0.8.15
 
