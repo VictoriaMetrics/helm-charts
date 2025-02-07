@@ -1,6 +1,7 @@
 ## Next release
 
 - add `.Values.server.vmServiceScrape` for [VMOperator](https://docs.victoriametrics.com/operator/) [VMServiceScrape](https://docs.victoriametrics.com/operator/api/#vmservicescrape) resource
+- update victorialogs version to [v1.8.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.8.0-victorialogs)
 
 ## 0.8.15
 
