@@ -1182,6 +1182,69 @@ readOnlyRootFilesystem: true
 </td>
     </tr>
     <tr>
+      <td>server.vmServiceScrape.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td><p>Enable deployment of VMServiceScrape for server component. This is Victoria Metrics operator object</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.extraLabels</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.metricRelabelings</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.relabelings</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td><p>Commented. TLS configuration to use when scraping the endpoint    tlsConfig:      insecureSkipVerify: true</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.vmServiceScrape.targetPort</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">http
+</code>
+</pre>
+</td>
+      <td><p>target port</p>
+</td>
+    </tr>
+    <tr>
       <td>vector</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
