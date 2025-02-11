@@ -20,16 +20,18 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check out VM code
+      - name: Checkout charts repo
         uses: actions/checkout@v4
         with:
-          repository: VictoriaMetrics/VictoriaMetrics
-          ref: master
+          path: __vm-helm-charts
+
+      - name: Checkout docs repo
+        uses: actions/checkout@v4
+        with:
+          repository: VictoriaMetrics/vmdocs
+          ref: main
           token: ${{ secrets.VM_BOT_GH_TOKEN }}
-          path: __vm-repo
+          path: __vm-docs
 
       - name: Import GPG key for VM repo
         id: import-gpg
@@ -53,9 +55,8 @@ jobs:
             --include="*.webp" \
             --include="*.md" \
             --exclude="*" \
-            charts/ __vm-repo/docs/helm/
-          cp *.md __vm-repo/docs/helm/
-          echo "BUILDTIME=$(date +%s)" >> $GITHUB_OUTPUT
+            charts/ ../__vm-docs/content/helm/
+          cp *.md __vm-docs/content/helm/
           echo "SHORT_SHA=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
           cp -f README.md ${{ runner.temp }}/README.md
           for readme in $(find charts/*/README.md)
@@ -63,24 +64,27 @@ jobs:
             mkdir -p $(dirname ${{ runner.temp }}/$readme)
             cp -f $readme ${{ runner.temp }}/$readme
           done
+        working-directory: __vm-helm-charts
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          add-paths: docs/helm
-          commit-message: Automatic update helm docs from ${{ github.repository }}@${{ steps.update.outputs.SHORT_SHA }}
-          signoff: true
-          committer: "Github Actions <${{ steps.import-gpg.outputs.email }}>"
-          path: __vm-repo
-          branch: helm-docs-update-${{ steps.update.outputs.BUILDTIME }}
-          token: ${{ secrets.VM_BOT_GH_TOKEN }}
-          delete-branch: true
-          title: Automatic update helm docs from ${{ github.repository }}@${{ steps.update.outputs.SHORT_SHA }}
+      - name: Push to vmdocs
+        run: |
+          git config --global user.name "${{ steps.import-gpg.outputs.email }}"
+          git config --global user.email "${{ steps.import-gpg.outputs.email }}"
+          if [[ -n $(git status --porcelain --untracked-files=no) ]]; then
+            git add content/helm
+            git commit -S -m "sync docs with VictoriaMetrics/helm-docs commit: ${{ steps.update.outputs.SHORT_SHA }}"
+            git push
+          fi
+        working-directory: __vm-docs
+        env:
+          GH_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
 
       - name: Checkout to pages
         uses: actions/checkout@v4
         with:
           ref: gh-pages
+          path: __vm-helm-charts
 
       - name: Synchronize docs
         run: |
@@ -92,6 +96,7 @@ jobs:
             git commit -S -m "Synchronize docs"
             git push origin gh-pages
           fi
+        working-directory: __vm-helm-charts
         env:
           GH_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
           GITHUB_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
