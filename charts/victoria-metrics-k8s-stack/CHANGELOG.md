@@ -98,7 +98,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.109.1](https://img.shields.io/badge/v1.109.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11091)
 
-- updates operator to [v0.52.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.52.) version
+- updates operator to [v0.52.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.52.0) version
 
 ## 0.33.5
 
