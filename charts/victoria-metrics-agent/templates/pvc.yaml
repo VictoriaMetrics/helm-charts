@@ -1,5 +1,5 @@
 {{- $persistence := .Values.persistence }}
-{{- if and $persistence.enabled (not $persistence.existingClaim) .Values.deployment.enabled }}
+{{- if and $persistence.enabled (not $persistence.existingClaim) (eq .Values.mode "deployment") }}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}

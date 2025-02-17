@@ -18,26 +18,34 @@ global:
 # -- Replica count     
 replicaCount: 1
 
+# -- VMAgent mode: daemonSet, deployment, statefulSet
+mode: deployment
+
+# -- [K8s Daemonset](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) specific variables
+daemonSet:
+  spec: {}
+
 # -- [K8s Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) specific variables
 deployment:
-  # -- Deployment strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) for details
-  strategy: {}
-   # rollingUpdate:
-   #  maxSurge: 25%
-   #  maxUnavailable: 25%
-   # type: RollingUpdate
+  spec:
+    # -- Deployment strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) for details
+    strategy: {}
+     # rollingUpdate:
+     #  maxSurge: 25%
+     #  maxUnavailable: 25%
+     # type: RollingUpdate
 
 # -- [K8s StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) specific variables
 statefulSet:
-  enabled: false
   # -- create cluster of vmagents. Check [here](https://docs.victoriametrics.com/vmagent#scraping-big-number-of-targets)
   # available since [v1.77.2](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.77.2)
   clusterMode: false
   # -- replication factor for vmagent in cluster mode
   replicationFactor: 1
-  # -- StatefulSet update strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies) for details.
-  updateStrategy: {}
-    # type: RollingUpdate
+  spec:
+    # -- StatefulSet update strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies) for details.
+    updateStrategy: {}
+      # type: RollingUpdate
 
 image:
   # -- Image registry

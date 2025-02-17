@@ -1,6 +1,10 @@
 ## Next release
 
-- TODO
+**Update note 1**: `.Values.statefulSet.updateStrategy` was changed to `.Values.statefulSet.spec.updateStrategy`
+**Update note 2**: `.Values.deployment.strategy` was changed to `.Values.deployment.spec.strategy`
+**Update note 3**: `.Values.statefulSet.enabled` was replaced by `.Values.mode`, which accepts `deployment`, `statefulSet` or `daemonSet` values
+
+- Add ability to configure VMAgent as a DaemonSet. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1995).
 
 ## 0.15.8
 
