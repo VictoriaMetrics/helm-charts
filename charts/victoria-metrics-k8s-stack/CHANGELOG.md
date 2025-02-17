@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- set default VMAlertManager `spec.disableNamespaceMatcher: true` when `alertmanager.userManagedConfig: true`. See [this issue](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/8285).
+- grafana chart 8.9.0 -> 8.9.1
 
 ## 0.36.1
 

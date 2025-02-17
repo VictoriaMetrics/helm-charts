@@ -189,7 +189,8 @@
 {{- define "vm.alertmanager.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $fullname := include "vm.managed.fullname" . -}}
-  {{- $spec := $Values.alertmanager.spec -}}
+  {{- $app := $Values.alertmanager }}
+  {{- $spec := $app.spec -}}
   {{- if and (not $spec.configRawYaml) (not $spec.configSecret) (not $Values.alertmanager.useManagedConfig) -}}
     {{- $_ := set $spec "configSecret" $fullname -}}
   {{- end -}}
@@ -202,6 +203,9 @@
   {{- range $key, $value := $Values.alertmanager.templateFiles | default dict -}}
     {{- $templates = append $templates (dict "name" $configMap "key" $key) -}}
   {{- end -}}
+  {{- if and ($app.useManagedConfig) (not (hasKey $spec "disableNamespaceMatcher")) }}
+    {{- $_ := set $spec "disableNamespaceMatcher" true }}
+  {{- end }}
   {{- $_ := set $spec "templates" $templates -}}
   {{- toYaml $spec -}}
 {{- end -}}
