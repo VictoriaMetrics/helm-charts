@@ -621,7 +621,7 @@ selectAllByDefault: true
 </code>
 </pre>
 </td>
-      <td><p>enable storing .Values.alertmanager.config in VMAlertmanagerConfig instead of k8s Secret</p>
+      <td><p>enable storing .Values.alertmanager.config in VMAlertmanagerConfig instead of k8s Secret. Note: VMAlertmanagerConfig and plain Alertmanager config structures are not equal. If you&rsquo;re migrating existing config, please make sure that <code>.Values.alertmanager.config</code>: - with <code>useManagedConfig: false</code> has structure described <a href="https://prometheus.io/docs/alerting/latest/configuration/" target="_blank">here</a>. - with <code>useManagedConfig: true</code> has structure described <a href="https://docs.victoriametrics.com/operator/api/#vmalertmanagerconfig" target="_blank">here</a>.</p>
 </td>
     </tr>
     <tr>
