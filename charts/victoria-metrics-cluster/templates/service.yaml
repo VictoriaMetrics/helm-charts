@@ -18,7 +18,7 @@ metadata:
   namespace: {{ include "vm.namespace" $ }}
 spec:
   {{- $type := $service.type }}
-  {{- if and (not $type) ($app.statefulSet).enabled }}
+  {{- if and (not $type) (eq $app.mode "statefulSet") }}
     {{- $type = "ClusterIP" }}
   {{- end }}
   type: {{ $type }}

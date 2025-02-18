@@ -74,6 +74,8 @@ server:
     pullPolicy: IfNotPresent
   # -- Image pull secrets
   imagePullSecrets: []
+  # -- Specify pod lifecycle
+  lifecycle: {}
   # -- Number of victoriametrics single replicas
   replicaCount: 1
   # -- Name of Priority Class
@@ -160,7 +162,7 @@ server:
   containerWorkingDir: ""
 
   # -- Use an alternate scheduler, e.g. "stork". Check [here](https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/) for more details
-  # schedulerName:
+  schedulerName: ""
 
   emptyDir: {}
   persistentVolume:
@@ -198,8 +200,6 @@ server:
   podLabels: {}
   # -- Pod's annotations
   podAnnotations: {}
-  # -- Pod's management policy
-  podManagementPolicy: OrderedReady
 
   # -- Resource object. Details are [here](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
@@ -374,11 +374,26 @@ server:
     ipFamilyPolicy: ""
     # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilies: []
+
+  # -- VictoriaMetrics mode: deployment, statefulSet
+  mode: deployment
+
+  # -- [K8s Daemonset](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) specific variables
+  deployment:
+    spec:
+      strategy:
+        # Must be "Recreate" when we have a persistent volume
+        type: Recreate
+
+  # -- [K8s Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) specific variables
   statefulSet:
-    # -- Creates statefulset instead of deployment, useful when you want to keep the cache
-    enabled: true
-    # -- Deploy order policy for StatefulSet pods
-    podManagementPolicy: OrderedReady
+    spec:
+      # -- Deploy order policy for StatefulSet pods
+      podManagementPolicy: OrderedReady
+      # -- StatefulSet update strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies) for details.
+      updateStrategy: {}
+        # type: RollingUpdate
+
   # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60
   serviceMonitor:

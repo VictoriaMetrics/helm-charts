@@ -19,6 +19,7 @@ deployment should match snapshot:
           app: vmselect
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-metrics-cluster
+      strategy: {}
       template:
         metadata:
           labels:
@@ -65,6 +66,7 @@ deployment should match snapshot:
                   name: cache-volume
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-cluster
+          terminationGracePeriodSeconds: 60
           volumes:
             - emptyDir: {}
               name: cache-volume
@@ -90,6 +92,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
           app: select
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-metrics-cluster
+      strategy: {}
       template:
         metadata:
           labels:
@@ -137,6 +140,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
                   name: cache-volume
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-cluster
+          terminationGracePeriodSeconds: 60
           volumes:
             - emptyDir: {}
               name: cache-volume
@@ -162,7 +166,6 @@ statefulset should match snapshot:
           app: vmselect
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-metrics-cluster
-      serviceName: RELEASE-NAME-victoria-metrics-cluster-vmselect
       template:
         metadata:
           labels:
@@ -211,6 +214,7 @@ statefulset should match snapshot:
                   name: cache-volume
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-cluster
+          terminationGracePeriodSeconds: 60
           volumes:
             - emptyDir: {}
               name: cache-volume
@@ -237,7 +241,6 @@ statefulset should match snapshot with fullnameOverride, extraLabels and podLabe
           app: select
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-metrics-cluster
-      serviceName: vmselect-node
       template:
         metadata:
           labels:
@@ -287,6 +290,7 @@ statefulset should match snapshot with fullnameOverride, extraLabels and podLabe
                   name: cache-volume
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-cluster
+          terminationGracePeriodSeconds: 60
           volumes:
             - emptyDir: {}
               name: cache-volume

@@ -75,7 +75,8 @@
     {{- end }}
     {{- $_ := set $args "storageNode" (concat ($args.storageNode | default list) $storageNodes) }}
   {{- end }}
-  {{- if and $app.statefulSet.enabled $app.enabled $app.replicaCount }}
+  {{- $mode := $app.mode }}
+  {{- if and $mode (eq $mode "statefulSet") $app.enabled $app.replicaCount }}
     {{- $selectNodes := default list }}
     {{- $_ := set . "appKey" "vmselect" }}
     {{- $fqdn := include "vm.fqdn" . }}

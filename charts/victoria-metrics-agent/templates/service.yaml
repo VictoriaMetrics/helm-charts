@@ -1,8 +1,10 @@
-{{- $service := .Values.service }}
+{{- $app := .Values }}
+{{- $service := $app.service }}
 {{- if $service.enabled -}}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
+---
 apiVersion: v1
 kind: Service
 metadata:

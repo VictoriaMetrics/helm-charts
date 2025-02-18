@@ -1,21 +1,25 @@
 {{- $app := .Values.server }}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $mode := $app.mode }}
 {{- $service := $app.service }}
-{{- if $app.enabled -}}
+{{- if and $app.enabled $service.enabled -}}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ include "vm.namespace" . }}
   {{- with $service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
   {{- $_ := set $ctx "extraLabels" $app.service.labels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
-  name: {{ include "vm.plain.fullname" $ctx }}
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
 spec:
   {{- $type := $service.type }}
-  {{- if and (not $type) $app.statefulSet.enabled }}
+  {{- if and (not $type) (eq $mode "statefulSet") }}
     {{- $type = "ClusterIP" }}
   {{- end }}
   type: {{ $type }}
