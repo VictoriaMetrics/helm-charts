@@ -1,41 +1,52 @@
 {{- $app := .Values.server }}
-{{- if and $app.enabled (not $app.statefulSet.enabled) -}}
+{{- $mode := $app.mode }}
+{{- if and $mode $app.enabled (hasKey $app $mode) }}
+{{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
-kind: Deployment
+kind: {{ title $mode }}
 metadata:
-  {{- with $app.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
-  {{- end }}
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
   {{- $_ := set $ctx "extraLabels" $app.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
-  name: {{ $fullname }}
-  namespace: {{ $ns }}
+  {{- with $app.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
 spec:
+  {{- with $modeOpts.spec }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  replicas: {{ $app.replicaCount }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
-  replicas: {{ $app.replicaCount }}
-  {{- if $app.persistentVolume.enabled }}
-  strategy:
-    # Must be "Recreate" when we have a persistent volume
-    type: Recreate
-  {{- end }}
   template:
     metadata:
+      {{- $_ := set $ctx "extraLabels" $app.podLabels }}
+      labels: {{ include "vm.labels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
       {{- with $app.podAnnotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- $_ := set $ctx "extraLabels" $app.podLabels }}
-      labels: {{ include "vm.labels" $ctx | nindent 8 }}
     spec:
       {{- with $app.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
       {{- with $app.schedulerName }}
       schedulerName: {{ . }}
+      {{- end }}
+      {{- if or ($app.serviceAccount).name ($app.serviceAccount).create }}
+      serviceAccountName: {{ ($app.serviceAccount).name | default $fullname }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
+      {{- end }}
+      {{- if $app.podSecurityContext.enabled }}
+      securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
+      {{- end }}
+      {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- $manager := $app.vmbackupmanager }}
       {{- if or $app.initContainers $manager.restore.onStart.enabled }}
@@ -77,9 +88,6 @@ spec:
           subPath: {{ .subPath }}
         {{- end }}
       {{- end }}
-      {{- end }}
-      {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
-      imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: vmsingle
@@ -237,15 +245,11 @@ spec:
       {{- with $app.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- if $app.podSecurityContext.enabled }}
-      securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
-      {{- end }}
-      {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
-      serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
-      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
-      {{- end }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with $app.affinity }}
       affinity: {{ toYaml . | nindent 8 }}
@@ -265,12 +269,38 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- if or (eq $mode "deployment") (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
         - name: server-volume
-          {{- if $app.persistentVolume.enabled }}
+          {{- if and (eq $mode "deployment") $app.persistentVolume.enabled }}
           persistentVolumeClaim:
             claimName: {{ $app.persistentVolume.existingClaim | default $app.persistentVolume.name | default $fullname }}
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
+        {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
+  {{- if and (eq $mode "statefulSet") $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: server-volume
+        {{- with $app.persistentVolume.annotations }}
+        annotations: {{ toYaml . | nindent 10 }}
+        {{- end }}
+      spec:
+        {{- with $app.persistentVolume.accessModes }}
+        accessModes: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ $app.persistentVolume.size }}
+        {{- with $app.persistentVolume.storageClassName }}
+        storageClassName: {{ ternary "" . (eq "-" .) }}
+        {{- end }}
+        {{- with $app.persistentVolume.matchLabels }}
+        selector:
+          matchLabels: {{ toYaml . | nindent 12 }}
+        {{- end }}
+  {{- end }}
 {{- end }}

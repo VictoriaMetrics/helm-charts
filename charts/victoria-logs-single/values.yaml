@@ -21,6 +21,23 @@ nameOverride: ""
 # -- Print chart notes
 printNotes: true
 
+serviceAccount:
+  # -- Create service account.
+  create: true
+
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+  # -- ServiceAccount labels
+  extraLabels: {}
+
+  # -- ServiceAccount annotations
+  annotations: {}
+
+  # -- Mount API token to pod directly
+  automountToken: true
+
 # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
 podDisruptionBudget:
   enabled: false
@@ -59,6 +76,9 @@ server:
     envflag.prefix: VM_
     loggerFormat: json
     httpListenAddr: :9428
+
+  # -- Specify pod lifecycle
+  lifecycle: {}
 
   # -- Additional hostPath mounts
   extraHostPathMounts:
@@ -122,8 +142,7 @@ server:
   containerWorkingDir: ""
 
   # -- Use an alternate scheduler, e.g. "stork". Check details [here](https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/)
-  #
-  # schedulerName:
+  schedulerName: ""
 
   emptyDir: {}
   persistentVolume:
@@ -161,8 +180,6 @@ server:
   podLabels: {}
   # -- Pod's annotations
   podAnnotations: {}
-  # -- Pod's management policy
-  podManagementPolicy: OrderedReady
 
   # -- Resource object. Details are [here](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
@@ -276,14 +293,24 @@ server:
     # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilies: []
 
+  # -- VictoriaLogs mode: deployment, statefulSet
+  mode: statefulSet
+
+  # -- [K8s Daemonset](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) specific variables
+  deployment:
+    spec:
+      strategy:
+        # Must be "Recreate" when we have a persistent volume
+        type: Recreate
+
+  # -- [K8s Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) specific variables
   statefulSet:
-    # -- Creates statefulset instead of deployment, useful when you want to keep the cache
-    enabled: true
-    # -- Deploy order policy for StatefulSet pods
-    podManagementPolicy: OrderedReady
-    # -- StatefulSet update strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies) for details.
-    updateStrategy: {}
-      # type: RollingUpdate
+    spec:
+      # -- Deploy order policy for StatefulSet pods
+      podManagementPolicy: OrderedReady
+      # -- StatefulSet update strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies) for details.
+      updateStrategy: {}
+        # type: RollingUpdate
 
   # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60

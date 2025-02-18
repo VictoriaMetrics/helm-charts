@@ -31,14 +31,13 @@
   {{- $ctx := . -}}
   {{- $path := .path -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $port := int $Values.server.service.servicePort -}}
+  {{- $app := $Values.server }}
+  {{- $port := int $app.service.servicePort -}}
   {{- $fullname := include "vm.plain.fullname" $ctx }}
   {{- $urls := default list }}
-  {{- if $Values.server.statefulSet.enabled }}
-    {{- range $i := until (int $Values.server.replicaCount) }}
-      {{- if $Values.server.statefulSet.enabled }}
-        {{- $_ := set $ctx "appIdx" $i }}
-      {{- end }}
+  {{- if (eq $app.mode "statefulSet") }}
+    {{- range $i := until (int $app.replicaCount) }}
+      {{- $_ := set $ctx "appIdx" $i }}
       {{- $urls = append $urls (printf "%s%s" (include "vm.url" $ctx) $path) }}
     {{- end }}
   {{- else }}

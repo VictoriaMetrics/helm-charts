@@ -2064,6 +2064,17 @@ timeoutSeconds: 5
 </td>
     </tr>
     <tr>
+      <td>vmselect.deployment.spec.strategy</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>VMSelect strategy</p>
+</td>
+    </tr>
+    <tr>
       <td>vmselect.emptyDir</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
@@ -2398,6 +2409,16 @@ loggerFormat: json
 </td>
       <td><p>Specify pod lifecycle</p>
 </td>
+    </tr>
+    <tr>
+      <td>vmselect.mode</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">deployment
+</code>
+</pre>
+</td>
+      <td></td>
     </tr>
     <tr>
       <td>vmselect.name</td>
@@ -2916,18 +2937,7 @@ timeoutSeconds: 5
 </td>
     </tr>
     <tr>
-      <td>vmselect.statefulSet.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Deploy StatefulSet instead of Deployment for vmselect. Useful if you want to keep cache data.</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmselect.statefulSet.podManagementPolicy</td>
+      <td>vmselect.statefulSet.spec.podManagementPolicy</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
 <code class="language-yaml">OrderedReady
@@ -2935,17 +2945,6 @@ timeoutSeconds: 5
 </pre>
 </td>
       <td><p>Deploy order policy for StatefulSet pods</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmselect.strategy</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VMSelect strategy</p>
 </td>
     </tr>
     <tr>
@@ -2957,6 +2956,17 @@ timeoutSeconds: 5
 </pre>
 </td>
       <td><p>Suppress rendering <code>--storageNode</code> FQDNs based on <code>vmstorage.replicaCount</code> value. If true suppress rendering <code>--storageNodes</code>, they can be re-defined in extraArgs</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmselect.terminationGracePeriodSeconds</td>
+      <td>int</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">60
+</code>
+</pre>
+</td>
+      <td><p>Pod&rsquo;s termination grace period in seconds</p>
 </td>
     </tr>
     <tr>

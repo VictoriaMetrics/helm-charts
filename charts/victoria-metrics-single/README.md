@@ -343,6 +343,19 @@ extraLabels: {}
 </td>
     </tr>
     <tr>
+      <td>server.deployment</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">spec:
+    strategy:
+        type: Recreate
+</code>
+</pre>
+</td>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/" target="_blank">K8s Daemonset</a> specific variables</p>
+</td>
+    </tr>
+    <tr>
       <td>server.emptyDir</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
@@ -350,8 +363,7 @@ extraLabels: {}
 </code>
 </pre>
 </td>
-      <td><p>Use an alternate scheduler, e.g. &ldquo;stork&rdquo;. Check <a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/" target="_blank">here</a> for more details schedulerName:</p>
-</td>
+      <td></td>
     </tr>
     <tr>
       <td>server.enabled</td>
@@ -609,6 +621,28 @@ loggerFormat: json
 </td>
     </tr>
     <tr>
+      <td>server.lifecycle</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Specify pod lifecycle</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.mode</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">deployment
+</code>
+</pre>
+</td>
+      <td><p>VictoriaMetrics mode: deployment, statefulSet</p>
+</td>
+    </tr>
+    <tr>
       <td>server.name</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
@@ -763,17 +797,6 @@ loggerFormat: json
 </td>
     </tr>
     <tr>
-      <td>server.podManagementPolicy</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">OrderedReady
-</code>
-</pre>
-</td>
-      <td><p>Pod&rsquo;s management policy</p>
-</td>
-    </tr>
-    <tr>
       <td>server.podSecurityContext</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
@@ -914,6 +937,17 @@ enabled: false
 </pre>
 </td>
       <td><p>Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these <a href="https://docs.victoriametrics.com/single-server-victoriametrics/#retention" target="_blank">docs</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>server.schedulerName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Use an alternate scheduler, e.g. &ldquo;stork&rdquo;. Check <a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/" target="_blank">here</a> for more details</p>
 </td>
     </tr>
     <tr>
@@ -1412,18 +1446,20 @@ scrape_configs:
 </td>
     </tr>
     <tr>
-      <td>server.statefulSet.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
+      <td>server.statefulSet</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">spec:
+    podManagementPolicy: OrderedReady
+    updateStrategy: {}
 </code>
 </pre>
 </td>
-      <td><p>Creates statefulset instead of deployment, useful when you want to keep the cache</p>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">K8s Deployment</a> specific variables</p>
 </td>
     </tr>
     <tr>
-      <td>server.statefulSet.podManagementPolicy</td>
+      <td>server.statefulSet.spec.podManagementPolicy</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
 <code class="language-yaml">OrderedReady
@@ -1431,6 +1467,17 @@ scrape_configs:
 </pre>
 </td>
       <td><p>Deploy order policy for StatefulSet pods</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.statefulSet.spec.updateStrategy</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>StatefulSet update strategy. Check <a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies" target="_blank">here</a> for details.</p>
 </td>
     </tr>
     <tr>

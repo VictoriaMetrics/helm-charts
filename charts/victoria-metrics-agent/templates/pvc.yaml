@@ -1,5 +1,6 @@
-{{- $persistence := .Values.persistence }}
-{{- if and $persistence.enabled (not $persistence.existingClaim) (eq .Values.mode "deployment") }}
+{{- $app := .Values }}
+{{- $pvc := $app.persistentVolume }}
+{{- if and $pvc.enabled (not $pvc.existingClaim) (eq $app.mode "deployment") }}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
@@ -7,25 +8,25 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ $fullname }}
+  name: {{ $pvc.name | default $fullname }}
   namespace: {{ $ns }}
-  {{- $_ := set $ctx "extraLabels" $persistence.extraLabels }}
+  {{- $_ := set $ctx "extraLabels" $pvc.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
-  {{- with $persistence.annotations  }}
+  {{- with $pvc.annotations  }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- with $persistence.accessModes }}
+  {{- with $pvc.accessModes }}
   accessModes: {{ toYaml . | nindent 4 }}
   {{- end }}
   resources:
     requests:
-      storage: {{ $persistence.size }}
-  {{- with $persistence.storageClassName }}
+      storage: {{ $pvc.size }}
+  {{- with $pvc.storageClassName }}
   storageClassName: {{ . }}
   {{- end -}}
-  {{- with $persistence.matchLabels }}
+  {{- with $pvc.matchLabels }}
   selector:
     matchLabels: {{ toYaml . | nindent 6 }}
   {{- end }}

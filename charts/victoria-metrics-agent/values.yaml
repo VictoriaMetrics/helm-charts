@@ -18,6 +18,12 @@ global:
 # -- Replica count     
 replicaCount: 1
 
+# -- Specify pod lifecycle
+lifecycle: {}
+
+# -- Use an alternate scheduler, e.g. "stork". Check details [here](https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/)
+schedulerName: ""
+
 # -- VMAgent mode: daemonSet, deployment, statefulSet
 mode: deployment
 
@@ -93,6 +99,8 @@ serviceAccount:
   # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+  # -- mount API token to pod directly
+  automountToken: true
 
 # -- See `kubectl explain poddisruptionbudget.spec` for more or check [official documentation](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
 podDisruptionBudget:
@@ -326,7 +334,7 @@ serviceMonitor:
 # -- Empty dir configuration for a case, when persistence is disabled
 emptyDir: {}
 
-persistence:
+persistentVolume:
   # -- Create/use Persistent Volume Claim for server component. Empty dir if false
   enabled: false
 

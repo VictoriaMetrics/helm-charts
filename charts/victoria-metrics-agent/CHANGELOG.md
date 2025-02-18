@@ -1,8 +1,10 @@
 ## Next release
 
 **Update note 1**: `.Values.statefulSet.updateStrategy` was changed to `.Values.statefulSet.spec.updateStrategy`
-**Update note 2**: `.Values.deployment.strategy` was changed to `.Values.deployment.spec.strategy`
-**Update note 3**: `.Values.statefulSet.enabled` was replaced by `.Values.mode`, which accepts `deployment`, `statefulSet` or `daemonSet` values
+**Update node 2**: `.Values.statefulSet.podManagementPolicy` was changed to `.Values.statefulSet.spec.podManagementPolicy`
+**Update note 3**: `.Values.deployment.strategy` was changed to `.Values.deployment.spec.strategy`
+**Update note 4**: `.Values.statefulSet.enabled` was replaced by `.Values.mode`, which accepts `deployment`, `statefulSet` or `daemonSet` values
+**Update note 5**: `.Values.persistence` was changed to `.Values.persistentVolume`
 
 - Add ability to configure VMAgent as a DaemonSet. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1995).
 
