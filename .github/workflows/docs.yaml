@@ -33,7 +33,7 @@ jobs:
           token: ${{ secrets.VM_BOT_GH_TOKEN }}
           path: __vm-docs
 
-      - name: Import GPG key for VM repo
+      - name: Import GPG key
         id: import-gpg
         uses: crazy-max/ghaction-import-gpg@v6
         with:
@@ -71,7 +71,7 @@ jobs:
         run: |
           git config --global user.name "${{ steps.import-gpg.outputs.email }}"
           git config --global user.email "${{ steps.import-gpg.outputs.email }}"
-          if [[ -n $(git status --porcelain --untracked-files=no) ]]; then
+          if [[ -n $(git status --porcelain) ]]; then
             git add content/helm
             git commit -S -m "sync docs with VictoriaMetrics/helm-docs commit: ${{ steps.update.outputs.SHORT_SHA }}"
             git push
