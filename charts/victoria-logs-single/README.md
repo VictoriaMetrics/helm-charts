@@ -346,6 +346,19 @@ extraLabels: {}
 </td>
     </tr>
     <tr>
+      <td>server.deployment</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">spec:
+    strategy:
+        type: Recreate
+</code>
+</pre>
+</td>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/" target="_blank">K8s Daemonset</a> specific variables</p>
+</td>
+    </tr>
+    <tr>
       <td>server.emptyDir</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
@@ -353,8 +366,7 @@ extraLabels: {}
 </code>
 </pre>
 </td>
-      <td><p>Use an alternate scheduler, e.g. &ldquo;stork&rdquo;. Check details <a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/" target="_blank">here</a>  schedulerName:</p>
-</td>
+      <td></td>
     </tr>
     <tr>
       <td>server.enabled</td>
@@ -616,6 +628,28 @@ loggerFormat: json
 </td>
     </tr>
     <tr>
+      <td>server.lifecycle</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Specify pod lifecycle</p>
+</td>
+    </tr>
+    <tr>
+      <td>server.mode</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">statefulSet
+</code>
+</pre>
+</td>
+      <td><p>VictoriaLogs mode: deployment, statefulSet</p>
+</td>
+    </tr>
+    <tr>
       <td>server.nodeSelector</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
@@ -759,17 +793,6 @@ loggerFormat: json
 </td>
     </tr>
     <tr>
-      <td>server.podManagementPolicy</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">OrderedReady
-</code>
-</pre>
-</td>
-      <td><p>Pod&rsquo;s management policy</p>
-</td>
-    </tr>
-    <tr>
       <td>server.podSecurityContext</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
@@ -877,6 +900,17 @@ timeoutSeconds: 5
 </pre>
 </td>
       <td><p>Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these <a href="https://docs.victoriametrics.com/victorialogs/#retention" target="_blank">docs</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>server.schedulerName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Use an alternate scheduler, e.g. &ldquo;stork&rdquo;. Check details <a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>
@@ -1116,18 +1150,20 @@ readOnlyRootFilesystem: true
 </td>
     </tr>
     <tr>
-      <td>server.statefulSet.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
+      <td>server.statefulSet</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">spec:
+    podManagementPolicy: OrderedReady
+    updateStrategy: {}
 </code>
 </pre>
 </td>
-      <td><p>Creates statefulset instead of deployment, useful when you want to keep the cache</p>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">K8s Deployment</a> specific variables</p>
 </td>
     </tr>
     <tr>
-      <td>server.statefulSet.podManagementPolicy</td>
+      <td>server.statefulSet.spec.podManagementPolicy</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
 <code class="language-yaml">OrderedReady
@@ -1138,7 +1174,7 @@ readOnlyRootFilesystem: true
 </td>
     </tr>
     <tr>
-      <td>server.statefulSet.updateStrategy</td>
+      <td>server.statefulSet.spec.updateStrategy</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">{}
@@ -1242,6 +1278,61 @@ readOnlyRootFilesystem: true
 </pre>
 </td>
       <td><p>target port</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.annotations</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>ServiceAccount annotations</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.automountToken</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Mount API token to pod directly</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.create</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td><p>Create service account.</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.extraLabels</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>ServiceAccount labels</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceAccount.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">null
+</code>
+</pre>
+</td>
+      <td><p>The name of the service account to use. If not set and create is true, a name is generated using the fullname template</p>
 </td>
     </tr>
     <tr>
