@@ -24,7 +24,7 @@ spec:
       labels: {{ include "vm.labels" $ctx | nindent 8 }}
     spec:
       serviceAccountName: {{ $fullname }}-cleanup-hook
-      {{- with .Values.imagePullSecrets }}
+      {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
