@@ -1,23 +1,25 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
+{{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: node.rules
 rules:
 - condition: '{{ true }}'
   expr: |-
-    topk by (namespace,pod,{{ $clusterLabel }}) (1,
-      max by (node,namespace,pod,{{ $clusterLabel }}) (
+    topk by (namespace,pod,{{ $groupLabels }}) (1,
+      max by (node,namespace,pod,{{ $groupLabels }}) (
         label_replace(kube_pod_info{job="kube-state-metrics",node!=""}, "pod", "$1", "pod", "(.*)")
     ))
   record: 'node_namespace_pod:kube_pod_info:'
 - condition: '{{ true }}'
   expr: |-
-    count by (node,{{ $clusterLabel }}) (
+    count by (node,{{ $groupLabels }}) (
       node_cpu_seconds_total{mode="idle",job="node-exporter"}
-      * on (namespace,pod,{{ $clusterLabel }}) group_left(node)
-      topk by (namespace,pod,{{ $clusterLabel }}) (1, node_namespace_pod:kube_pod_info:)
+      * on (namespace,pod,{{ $groupLabels }}) group_left(node)
+      topk by (namespace,pod,{{ $groupLabels }}) (1, node_namespace_pod:kube_pod_info:)
     )
   record: node:node_num_cpu:sum
 - condition: '{{ true }}'
@@ -30,11 +32,11 @@ rules:
         node_memory_MemFree_bytes{job="node-exporter"} +
         node_memory_Slab_bytes{job="node-exporter"}
       )
-    ) by ({{ $clusterLabel }})
+    ) by ({{ $groupLabels }})
   record: :node_memory_MemAvailable_bytes:sum
 - condition: '{{ true }}'
   expr: |-
-    avg by (node,{{ $clusterLabel }}) (
+    avg by (node,{{ $groupLabels }}) (
       sum without (mode) (
         rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal",job="node-exporter"}[5m])
       )
@@ -42,7 +44,7 @@ rules:
   record: node:node_cpu_utilization:ratio_rate5m
 - condition: '{{ true }}'
   expr: |-
-    avg by ({{ $clusterLabel }}) (
+    avg by ({{ $groupLabels }}) (
       node:node_cpu_utilization:ratio_rate5m
     )
   record: cluster:node_cpu:ratio_rate5m

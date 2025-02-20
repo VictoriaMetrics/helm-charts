@@ -1,6 +1,8 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
+{{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: vmoperator
@@ -18,7 +20,7 @@ rules:
           level="error",job=~".*((victoria.*)|vm)-?operator"
         }[5m]
       )
-    ) by ({{ $clusterLabel }}) > 0
+    ) by ({{ $groupLabels }}) > 0
   for: 15m
   labels:
     severity: warning
@@ -36,7 +38,7 @@ rules:
           job=~".*((victoria.*)|vm)-?operator"
         }[5m]
       )
-    ) by ({{ $clusterLabel }}) > 0
+    ) by ({{ $groupLabels }}) > 0
   for: 10m
   labels:
     severity: warning
@@ -53,7 +55,7 @@ rules:
         job=~".*((victoria.*)|vm)-?operator",
         name=~"(vmagent|vmalert|vmalertmanager|vmauth|vmcluster|vmnodescrape|vmpodscrape|vmprobe|vmrule|vmservicescrape|vmsingle|vmstaticscrape)"
       }
-    ) by (name,{{ $clusterLabel }}) > 10
+    ) by (name,{{ $groupLabels }}) > 10
   for: 15m
   labels:
     severity: warning
@@ -67,7 +69,7 @@ rules:
   expr: |-
     sum(
       operator_controller_bad_objects_count{job=~".*((victoria.*)|vm)-?operator"}
-    ) by (controller,{{ $clusterLabel }}) > 0
+    ) by (controller,{{ $groupLabels }}) > 0
   for: 15m
   labels:
     severity: warning

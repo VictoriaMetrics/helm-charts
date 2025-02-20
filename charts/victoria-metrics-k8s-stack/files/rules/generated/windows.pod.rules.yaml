@@ -1,0 +1,51 @@
+{{- $Values := (.helm).Values | default .Values }}
+{{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
+{{- $groupLabels := join "," $additionalGroupByLabels }}
+{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
+condition: '{{ true }}'
+name: windows.pod.rules
+rules:
+- condition: '{{ true }}'
+  expr: windows_container_available{job="kubernetes-windows-exporter", container_id != ""} * on (container_id,{{ $groupLabels }}) group_left(container, pod, namespace) max(kube_pod_container_info{job="kube-state-metrics", container_id != ""}) by (container,container_id,pod,namespace,{{ $groupLabels }})
+  record: windows_pod_container_available
+- condition: '{{ true }}'
+  expr: windows_container_cpu_usage_seconds_total{job="kubernetes-windows-exporter", container_id != ""} * on (container_id,{{ $groupLabels }}) group_left(container, pod, namespace) max(kube_pod_container_info{job="kube-state-metrics", container_id != ""}) by (container,container_id,pod,namespace,{{ $groupLabels }})
+  record: windows_container_total_runtime
+- condition: '{{ true }}'
+  expr: windows_container_memory_usage_commit_bytes{job="kubernetes-windows-exporter", container_id != ""} * on (container_id,{{ $groupLabels }}) group_left(container, pod, namespace) max(kube_pod_container_info{job="kube-state-metrics", container_id != ""}) by (container,container_id,pod,namespace,{{ $groupLabels }})
+  record: windows_container_memory_usage
+- condition: '{{ true }}'
+  expr: windows_container_memory_usage_private_working_set_bytes{job="kubernetes-windows-exporter", container_id != ""} * on (container_id,{{ $groupLabels }}) group_left(container, pod, namespace) max(kube_pod_container_info{job="kube-state-metrics", container_id != ""}) by (container,container_id,pod,namespace,{{ $groupLabels }})
+  record: windows_container_private_working_set_usage
+- condition: '{{ true }}'
+  expr: windows_container_network_receive_bytes_total{job="kubernetes-windows-exporter", container_id != ""} * on (container_id,{{ $groupLabels }}) group_left(container, pod, namespace) max(kube_pod_container_info{job="kube-state-metrics", container_id != ""}) by (container,container_id,pod,namespace,{{ $groupLabels }})
+  record: windows_container_network_received_bytes_total
+- condition: '{{ true }}'
+  expr: windows_container_network_transmit_bytes_total{job="kubernetes-windows-exporter", container_id != ""} * on (container_id,{{ $groupLabels }}) group_left(container, pod, namespace) max(kube_pod_container_info{job="kube-state-metrics", container_id != ""}) by (container,container_id,pod,namespace,{{ $groupLabels }})
+  record: windows_container_network_transmitted_bytes_total
+- condition: '{{ true }}'
+  expr: |-
+    max by (namespace,pod,container,{{ $groupLabels }}) (
+      kube_pod_container_resource_requests{resource="memory",job="kube-state-metrics"}
+    ) * on (container,pod,namespace,{{ $groupLabels }}) (windows_pod_container_available)
+  record: kube_pod_windows_container_resource_memory_request
+- condition: '{{ true }}'
+  expr: kube_pod_container_resource_limits{resource="memory",job="kube-state-metrics"} * on (container,pod,namespace,{{ $groupLabels }}) (windows_pod_container_available)
+  record: kube_pod_windows_container_resource_memory_limit
+- condition: '{{ true }}'
+  expr: |-
+    max by (namespace,pod,container,{{ $groupLabels }}) (
+      kube_pod_container_resource_requests{resource="cpu",job="kube-state-metrics"}
+    ) * on (container,pod,namespace,{{ $groupLabels }}) (windows_pod_container_available)
+  record: kube_pod_windows_container_resource_cpu_cores_request
+- condition: '{{ true }}'
+  expr: kube_pod_container_resource_limits{resource="cpu",job="kube-state-metrics"} * on (container,pod,namespace,{{ $groupLabels }}) (windows_pod_container_available)
+  record: kube_pod_windows_container_resource_cpu_cores_limit
+- condition: '{{ true }}'
+  expr: |-
+    sum by (namespace,pod,container,{{ $groupLabels }}) (
+      rate(windows_container_total_runtime{}[5m])
+    )
+  record: namespace_pod_container:windows_container_cpu_usage_seconds_total:sum_rate

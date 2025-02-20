@@ -1,6 +1,8 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
+{{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: kubernetes-system-apiserver
@@ -14,7 +16,7 @@ rules:
   expr: |-
     histogram_quantile(0.01, sum without (namespace, service, endpoint) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 604800
     and
-    on (job,instance,{{ $clusterLabel }}) apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0
+    on (job,instance,{{ $groupLabels }}) apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0
   for: 5m
   labels:
     severity: warning
@@ -27,7 +29,7 @@ rules:
   expr: |-
     histogram_quantile(0.01, sum without (namespace, service, endpoint) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 86400
     and
-    on (job,instance,{{ $clusterLabel }}) apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0
+    on (job,instance,{{ $groupLabels }}) apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0
   for: 5m
   labels:
     severity: critical
@@ -37,7 +39,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeaggregatedapierrors'
     summary: 'Kubernetes aggregated API has reported errors.'
   condition: '{{ true }}'
-  expr: sum by (instance,name,reason,{{ $clusterLabel }})(increase(aggregator_unavailable_apiservice_total{job="apiserver"}[1m])) > 0
+  expr: sum by (instance,name,reason,{{ $groupLabels }})(increase(aggregator_unavailable_apiservice_total{job="apiserver"}[1m])) > 0
   for: 10m
   labels:
     severity: warning
@@ -47,7 +49,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeaggregatedapidown'
     summary: 'Kubernetes aggregated API is down.'
   condition: '{{ true }}'
-  expr: (1 - max by (name,namespace,{{ $clusterLabel }})(avg_over_time(aggregator_unavailable_apiservice{job="apiserver"}[10m]))) * 100 < 85
+  expr: (1 - max by (name,namespace,{{ $groupLabels }})(avg_over_time(aggregator_unavailable_apiservice{job="apiserver"}[10m]))) * 100 < 85
   for: 5m
   labels:
     severity: warning
@@ -67,7 +69,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeapiterminatedrequests'
     summary: 'The kubernetes apiserver has terminated {{`{{`}} $value | humanizePercentage {{`}}`}} of its incoming requests.'
   condition: '{{ true }}'
-  expr: sum by ({{ $clusterLabel }}) (rate(apiserver_request_terminations_total{job="apiserver"}[10m])) / ( sum by ({{ $clusterLabel }}) (rate(apiserver_request_total{job="apiserver"}[10m])) + sum by ({{ $clusterLabel }}) (rate(apiserver_request_terminations_total{job="apiserver"}[10m])) ) > 0.20
+  expr: sum by ({{ $groupLabels }}) (rate(apiserver_request_terminations_total{job="apiserver"}[10m])) / ( sum by ({{ $groupLabels }}) (rate(apiserver_request_total{job="apiserver"}[10m])) + sum by ({{ $groupLabels }}) (rate(apiserver_request_terminations_total{job="apiserver"}[10m])) ) > 0.20
   for: 5m
   labels:
     severity: warning

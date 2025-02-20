@@ -152,7 +152,7 @@ skip_list = []
 
 
 def cluster_label_var(mo):
-    labels = ["[[ $clusterLabel ]]"]
+    labels = ["[[ $groupLabels ]]"]
     labelsStr = mo.group(2).strip()
     group = mo.group(1)
     if len(labelsStr) > 0:
@@ -278,6 +278,8 @@ def write_group_to_file(group, url, charts):
             content += "{{- $Values := (.helm).Values | default .Values }}\n"
             content += '{{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}\n'
             content += '{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}\n'
+            content += "{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}\n"
+            content += '{{- $groupLabels := join "," $additionalGroupByLabels }}\n'
             content += "{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}\n"
             content += escape(lines)
             f.write(content)
