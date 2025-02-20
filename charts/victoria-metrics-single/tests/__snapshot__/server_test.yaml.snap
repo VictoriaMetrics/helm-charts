@@ -1,0 +1,292 @@
+deployment should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: server
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-single
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-single-0.1.1
+      name: RELEASE-NAME-victoria-metrics-single-server
+      namespace: NAMESPACE
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: server
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-metrics-single
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-single
+            app.kubernetes.io/version: 0.1.0
+            helm.sh/chart: victoria-metrics-single-0.1.1
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --httpListenAddr=:8428
+                - --loggerFormat=json
+                - --retentionPeriod=1
+                - --storageDataPath=/storage
+              image: victoriametrics/victoria-metrics:0.1.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 10
+                initialDelaySeconds: 30
+                periodSeconds: 30
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmsingle
+              ports:
+                - containerPort: 8428
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /storage
+                  name: server-volume
+          securityContext: {}
+          terminationGracePeriodSeconds: 60
+          volumes:
+            - name: server-volume
+              persistentVolumeClaim:
+                claimName: RELEASE-NAME-victoria-metrics-single-server
+deployment with volume should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: server
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-single
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-single-0.1.1
+      name: RELEASE-NAME-victoria-metrics-single-server
+      namespace: NAMESPACE
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: server
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-metrics-single
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-single
+            app.kubernetes.io/version: 0.1.0
+            helm.sh/chart: victoria-metrics-single-0.1.1
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --httpListenAddr=:8428
+                - --loggerFormat=json
+                - --retentionPeriod=1
+                - --storageDataPath=/storage
+              image: victoriametrics/victoria-metrics:0.1.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 10
+                initialDelaySeconds: 30
+                periodSeconds: 30
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmsingle
+              ports:
+                - containerPort: 8428
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /storage
+                  name: server-volume
+          securityContext: {}
+          terminationGracePeriodSeconds: 60
+          volumes:
+            - name: server-volume
+              persistentVolumeClaim:
+                claimName: RELEASE-NAME-victoria-metrics-single-server
+statefulset should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: server
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-single
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-single-0.1.1
+      name: RELEASE-NAME-victoria-metrics-single-server
+      namespace: NAMESPACE
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: server
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-metrics-single
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-single
+            app.kubernetes.io/version: 0.1.0
+            helm.sh/chart: victoria-metrics-single-0.1.1
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --httpListenAddr=:8428
+                - --loggerFormat=json
+                - --retentionPeriod=1
+                - --storageDataPath=/storage
+              image: victoriametrics/victoria-metrics:0.1.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 10
+                initialDelaySeconds: 30
+                periodSeconds: 30
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmsingle
+              ports:
+                - containerPort: 8428
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /storage
+                  name: server-volume
+          securityContext: {}
+          terminationGracePeriodSeconds: 60
+          volumes:
+            - name: server-volume
+              persistentVolumeClaim:
+                claimName: RELEASE-NAME-victoria-metrics-single-server
+statefulset with volume should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: server
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-metrics-single
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-metrics-single-0.1.1
+      name: RELEASE-NAME-victoria-metrics-single-server
+      namespace: NAMESPACE
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: server
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-metrics-single
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-single
+            app.kubernetes.io/version: 0.1.0
+            helm.sh/chart: victoria-metrics-single-0.1.1
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --httpListenAddr=:8428
+                - --loggerFormat=json
+                - --retentionPeriod=1
+                - --storageDataPath=/storage
+              image: victoriametrics/victoria-metrics:0.1.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 10
+                initialDelaySeconds: 30
+                periodSeconds: 30
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmsingle
+              ports:
+                - containerPort: 8428
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /storage
+                  name: server-volume
+          securityContext: {}
+          terminationGracePeriodSeconds: 60
+          volumes:
+            - name: server-volume
+              persistentVolumeClaim:
+                claimName: RELEASE-NAME-victoria-metrics-single-server

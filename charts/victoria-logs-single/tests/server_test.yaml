@@ -1,0 +1,41 @@
+suite: server templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - server.yaml
+tests:
+  - it: deployment should match snapshot
+    asserts:
+      - matchSnapshot: {}
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+  - it: deployment with volume should match snapshot
+    asserts:
+      - matchSnapshot: {}
+    set:
+      persistentVolume:
+        enabled: true
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+  - it: statefulset should match snapshot
+    set:
+      statefulSet:
+        enabled: true
+      mode: statefulSet
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+    asserts:
+      - matchSnapshot: {}
+  - it: statefulset with volume should match snapshot
+    set:
+      statefulSet:
+        enabled: true
+      persistentVolume:
+        enabled: true
+      mode: statefulSet
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+    asserts:
+      - matchSnapshot: {}
