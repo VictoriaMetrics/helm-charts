@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `.Values.defaultRules.additionalGroupByLabels`, which are added to all by expression labels list. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2000).
 
 ## 0.36.2
 

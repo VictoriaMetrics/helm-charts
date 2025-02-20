@@ -54,6 +54,32 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
+  - datasource:
+      type: datasource
+      uid: grafana
+    enable: true
+    hide: false
+    iconColor: '#5c4ee5'
+    name: terraform
+    target:
+      limit: 100
+      matchAny: false
+      tags:
+      - terraform
+      type: tags
+  - datasource:
+      type: datasource
+      uid: grafana
+    enable: true
+    hide: false
+    iconColor: red
+    name: oncall
+    target:
+      limit: 100
+      matchAny: false
+      tags:
+      - oncall
+      type: tags
 condition: {{ ($Values.kubelet).enabled }}
 description: 'This is a modern ''Nodes View'' dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
 editable: false
@@ -240,7 +266,7 @@ panels:
       links:
       - targetBlank: true
         title: Pod details
-        url: /d/k8s_views_pods/kubernetes-views-pods?${datasource:queryparam}&var-namespace=${__data.fields.namespace}&var-pod=${__data.fields.pod}&${resolution:queryparam}&${__url_time_range}
+        url: /d/k8s_views_pods/kubernetes-views-pods?${datasource:queryparam}&var-namespace=${__data.fields.namespace}&${cluster:queryparam}&var-pod=${__data.fields.pod}&${resolution:queryparam}&${__url_time_range}
       mappings: []
       thresholds:
         mode: absolute
@@ -2936,5 +2962,5 @@ timepicker: {}
 timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
 title: Kubernetes / Views / Nodes
 uid: k8s_views_nodes
-version: 32
+version: 34
 weekStart: ''

@@ -1,6 +1,8 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
+{{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: kubernetes-resources
@@ -12,9 +14,9 @@ rules:
     summary: 'Cluster has overcommitted CPU resource requests.'
   condition: '{{ true }}'
   expr: |-
-    sum(namespace_cpu:kube_pod_container_resource_requests:sum{}) by ({{ $clusterLabel }}) - (sum(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $clusterLabel }}) - max(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $clusterLabel }})) > 0
+    sum(namespace_cpu:kube_pod_container_resource_requests:sum{}) by ({{ $groupLabels }}) - (sum(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $groupLabels }}) - max(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $groupLabels }})) > 0
     and
-    (sum(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $clusterLabel }}) - max(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $clusterLabel }})) > 0
+    (sum(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $groupLabels }}) - max(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $groupLabels }})) > 0
   for: 10m
   labels:
     severity: warning
@@ -25,9 +27,9 @@ rules:
     summary: 'Cluster has overcommitted memory resource requests.'
   condition: '{{ true }}'
   expr: |-
-    sum(namespace_memory:kube_pod_container_resource_requests:sum{}) by ({{ $clusterLabel }}) - (sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $clusterLabel }}) - max(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $clusterLabel }})) > 0
+    sum(namespace_memory:kube_pod_container_resource_requests:sum{}) by ({{ $groupLabels }}) - (sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $groupLabels }}) - max(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $groupLabels }})) > 0
     and
-    (sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $clusterLabel }}) - max(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $clusterLabel }})) > 0
+    (sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $groupLabels }}) - max(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $groupLabels }})) > 0
   for: 10m
   labels:
     severity: warning
@@ -38,9 +40,9 @@ rules:
     summary: 'Cluster has overcommitted CPU resource requests.'
   condition: '{{ true }}'
   expr: |-
-    sum(min without(resource) (kube_resourcequota{job="kube-state-metrics", type="hard", resource=~"(cpu|requests.cpu)"})) by ({{ $clusterLabel }})
+    sum(min without(resource) (kube_resourcequota{job="kube-state-metrics", type="hard", resource=~"(cpu|requests.cpu)"})) by ({{ $groupLabels }})
       /
-    sum(kube_node_status_allocatable{resource="cpu", job="kube-state-metrics"}) by ({{ $clusterLabel }})
+    sum(kube_node_status_allocatable{resource="cpu", job="kube-state-metrics"}) by ({{ $groupLabels }})
       > 1.5
   for: 5m
   labels:
@@ -52,9 +54,9 @@ rules:
     summary: 'Cluster has overcommitted memory resource requests.'
   condition: '{{ true }}'
   expr: |-
-    sum(min without(resource) (kube_resourcequota{job="kube-state-metrics", type="hard", resource=~"(memory|requests.memory)"})) by ({{ $clusterLabel }})
+    sum(min without(resource) (kube_resourcequota{job="kube-state-metrics", type="hard", resource=~"(memory|requests.memory)"})) by ({{ $groupLabels }})
       /
-    sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $clusterLabel }})
+    sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $groupLabels }})
       > 1.5
   for: 5m
   labels:

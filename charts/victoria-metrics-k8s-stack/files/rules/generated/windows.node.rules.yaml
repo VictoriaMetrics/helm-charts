@@ -1,0 +1,115 @@
+{{- $Values := (.helm).Values | default .Values }}
+{{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
+{{- $groupLabels := join "," $additionalGroupByLabels }}
+{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
+condition: '{{ true }}'
+name: windows.node.rules
+rules:
+- condition: '{{ true }}'
+  expr: |-
+    count by ({{ $groupLabels }}) (
+      windows_system_system_up_time{job="kubernetes-windows-exporter"}
+    )
+  record: node:windows_node:sum
+- condition: '{{ true }}'
+  expr: |-
+    count by (instance,{{ $groupLabels }}) (sum by (instance,core,{{ $groupLabels }}) (
+      windows_cpu_time_total{job="kubernetes-windows-exporter"}
+    ))
+  record: node:windows_node_num_cpu:sum
+- condition: '{{ true }}'
+  expr: 1 - avg by ({{ $groupLabels }}) (rate(windows_cpu_time_total{job="kubernetes-windows-exporter",mode="idle"}[1m]))
+  record: :windows_node_cpu_utilisation:avg1m
+- condition: '{{ true }}'
+  expr: |-
+    1 - avg by (instance,{{ $groupLabels }}) (
+      rate(windows_cpu_time_total{job="kubernetes-windows-exporter",mode="idle"}[1m])
+    )
+  record: node:windows_node_cpu_utilisation:avg1m
+- condition: '{{ true }}'
+  expr: |-
+    1 -
+    sum by ({{ $groupLabels }}) (windows_memory_available_bytes{job="kubernetes-windows-exporter"})
+    /
+    sum by ({{ $groupLabels }}) (windows_os_visible_memory_bytes{job="kubernetes-windows-exporter"})
+  record: ':windows_node_memory_utilisation:'
+- condition: '{{ true }}'
+  expr: sum by ({{ $groupLabels }}) (windows_memory_available_bytes{job="kubernetes-windows-exporter"} + windows_memory_cache_bytes{job="kubernetes-windows-exporter"})
+  record: :windows_node_memory_MemFreeCached_bytes:sum
+- condition: '{{ true }}'
+  expr: (windows_memory_cache_bytes{job="kubernetes-windows-exporter"} + windows_memory_modified_page_list_bytes{job="kubernetes-windows-exporter"} + windows_memory_standby_cache_core_bytes{job="kubernetes-windows-exporter"} + windows_memory_standby_cache_normal_priority_bytes{job="kubernetes-windows-exporter"} + windows_memory_standby_cache_reserve_bytes{job="kubernetes-windows-exporter"})
+  record: node:windows_node_memory_totalCached_bytes:sum
+- condition: '{{ true }}'
+  expr: sum by ({{ $groupLabels }}) (windows_os_visible_memory_bytes{job="kubernetes-windows-exporter"})
+  record: :windows_node_memory_MemTotal_bytes:sum
+- condition: '{{ true }}'
+  expr: |-
+    sum by (instance,{{ $groupLabels }}) (
+      (windows_memory_available_bytes{job="kubernetes-windows-exporter"})
+    )
+  record: node:windows_node_memory_bytes_available:sum
+- condition: '{{ true }}'
+  expr: |-
+    sum by (instance,{{ $groupLabels }}) (
+      windows_os_visible_memory_bytes{job="kubernetes-windows-exporter"}
+    )
+  record: node:windows_node_memory_bytes_total:sum
+- condition: '{{ true }}'
+  expr: |-
+    (node:windows_node_memory_bytes_total:sum - node:windows_node_memory_bytes_available:sum)
+    /
+    scalar(sum(node:windows_node_memory_bytes_total:sum))
+  record: node:windows_node_memory_utilisation:ratio
+- condition: '{{ true }}'
+  expr: 1 - (node:windows_node_memory_bytes_available:sum / node:windows_node_memory_bytes_total:sum)
+  record: 'node:windows_node_memory_utilisation:'
+- condition: '{{ true }}'
+  expr: irate(windows_memory_swap_page_operations_total{job="kubernetes-windows-exporter"}[5m])
+  record: node:windows_node_memory_swap_io_pages:irate
+- condition: '{{ true }}'
+  expr: |-
+    avg by ({{ $groupLabels }}) (irate(windows_logical_disk_read_seconds_total{job="kubernetes-windows-exporter"}[1m]) +
+        irate(windows_logical_disk_write_seconds_total{job="kubernetes-windows-exporter"}[1m])
+      )
+  record: :windows_node_disk_utilisation:avg_irate
+- condition: '{{ true }}'
+  expr: |-
+    avg by (instance,{{ $groupLabels }}) (
+      (irate(windows_logical_disk_read_seconds_total{job="kubernetes-windows-exporter"}[1m]) +
+       irate(windows_logical_disk_write_seconds_total{job="kubernetes-windows-exporter"}[1m]))
+    )
+  record: node:windows_node_disk_utilisation:avg_irate
+- condition: '{{ true }}'
+  expr: |-
+    max by (instance,volume,{{ $groupLabels }})(
+      (windows_logical_disk_size_bytes{job="kubernetes-windows-exporter"}
+    - windows_logical_disk_free_bytes{job="kubernetes-windows-exporter"})
+    / windows_logical_disk_size_bytes{job="kubernetes-windows-exporter"}
+    )
+  record: 'node:windows_node_filesystem_usage:'
+- condition: '{{ true }}'
+  expr: max by (instance,volume,{{ $groupLabels }}) (windows_logical_disk_free_bytes{job="kubernetes-windows-exporter"} / windows_logical_disk_size_bytes{job="kubernetes-windows-exporter"})
+  record: 'node:windows_node_filesystem_avail:'
+- condition: '{{ true }}'
+  expr: sum by ({{ $groupLabels }}) (irate(windows_net_bytes_total{job="kubernetes-windows-exporter"}[1m]))
+  record: :windows_node_net_utilisation:sum_irate
+- condition: '{{ true }}'
+  expr: |-
+    sum by (instance,{{ $groupLabels }}) (
+      (irate(windows_net_bytes_total{job="kubernetes-windows-exporter"}[1m]))
+    )
+  record: node:windows_node_net_utilisation:sum_irate
+- condition: '{{ true }}'
+  expr: |-
+    sum by ({{ $groupLabels }}) (irate(windows_net_packets_received_discarded_total{job="kubernetes-windows-exporter"}[1m])) +
+    sum by ({{ $groupLabels }}) (irate(windows_net_packets_outbound_discarded_total{job="kubernetes-windows-exporter"}[1m]))
+  record: :windows_node_net_saturation:sum_irate
+- condition: '{{ true }}'
+  expr: |-
+    sum by (instance,{{ $groupLabels }}) (
+      (irate(windows_net_packets_received_discarded_total{job="kubernetes-windows-exporter"}[1m]) +
+      irate(windows_net_packets_outbound_discarded_total{job="kubernetes-windows-exporter"}[1m]))
+    )
+  record: node:windows_node_net_saturation:sum_irate

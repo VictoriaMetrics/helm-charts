@@ -1,6 +1,8 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
+{{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: kubernetes-system-kubelet
@@ -13,7 +15,7 @@ rules:
   condition: '{{ true }}'
   expr: |-
     kube_node_status_condition{job="kube-state-metrics",condition="Ready",status="true"} == 0
-    and on (node,{{ $clusterLabel }})
+    and on (node,{{ $groupLabels }})
     kube_node_spec_unschedulable{job="kube-state-metrics"} == 0
   for: 15m
   labels:
@@ -35,15 +37,17 @@ rules:
     summary: 'Kubelet is running at capacity.'
   condition: '{{ true }}'
   expr: |-
-    count by (node,{{ $clusterLabel }}) (
-      (kube_pod_status_phase{job="kube-state-metrics", phase="Running"} == 1)
-      * on (namespace,pod,{{ $clusterLabel }}) group_left (node)
-      group by (namespace,pod,node,{{ $clusterLabel }}) (
-        kube_pod_info{job="kube-state-metrics"}
+    (
+      max by (instance,{{ $groupLabels }}) (
+        kubelet_running_pods{job="kubelet", metrics_path="/metrics"} > 1
+      )
+      * on (instance,{{ $groupLabels }}) group_left(node)
+      max by (instance,node,{{ $groupLabels }}) (
+        kubelet_node_name{job="kubelet", metrics_path="/metrics"}
       )
     )
-    /
-    max by (node,{{ $clusterLabel }}) (
+    / on (node,{{ $groupLabels }}) group_left()
+    max by (node,{{ $groupLabels }}) (
       kube_node_status_capacity{job="kube-state-metrics", resource="pods"} != 1
     ) > 0.95
   for: 15m
@@ -56,8 +60,8 @@ rules:
     summary: 'Node readiness status is flapping.'
   condition: '{{ true }}'
   expr: |-
-    sum(changes(kube_node_status_condition{job="kube-state-metrics",status="true",condition="Ready"}[15m])) by (node,{{ $clusterLabel }}) > 2
-    and on (node,{{ $clusterLabel }})
+    sum(changes(kube_node_status_condition{job="kube-state-metrics",status="true",condition="Ready"}[15m])) by (node,{{ $groupLabels }}) > 2
+    and on (node,{{ $groupLabels }})
     kube_node_spec_unschedulable{job="kube-state-metrics"} == 0
   for: 15m
   labels:
@@ -78,7 +82,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeletpodstartuplatencyhigh'
     summary: 'Kubelet Pod startup latency is too high.'
   condition: '{{ true }}'
-  expr: histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{job="kubelet", metrics_path="/metrics"}[5m])) by (instance,le,{{ $clusterLabel }})) * on (instance,{{ $clusterLabel }}) group_left(node) kubelet_node_name{job="kubelet", metrics_path="/metrics"} > 60
+  expr: histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{job="kubelet", metrics_path="/metrics"}[5m])) by (instance,le,{{ $groupLabels }})) * on (instance,{{ $groupLabels }}) group_left(node) kubelet_node_name{job="kubelet", metrics_path="/metrics"} > 60
   for: 15m
   labels:
     severity: warning

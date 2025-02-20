@@ -46,6 +46,32 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
+  - datasource:
+      type: datasource
+      uid: grafana
+    enable: true
+    hide: false
+    iconColor: '#5c4ee5'
+    name: terraform
+    target:
+      limit: 100
+      matchAny: false
+      tags:
+      - terraform
+      type: tags
+  - datasource:
+      type: datasource
+      uid: grafana
+    enable: true
+    hide: false
+    iconColor: red
+    name: oncall
+    target:
+      limit: 100
+      matchAny: false
+      tags:
+      - oncall
+      type: tags
 condition: {{ ($Values.coreDns).enabled }}
 description: 'This is a modern CoreDNS dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
 editable: false
@@ -1159,5 +1185,5 @@ timepicker: {}
 timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
 title: Kubernetes / System / CoreDNS
 uid: k8s_system_coredns
-version: 19
+version: 20
 weekStart: ''

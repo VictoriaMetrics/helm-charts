@@ -1,6 +1,8 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
+{{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: kubernetes-apps
@@ -22,11 +24,11 @@ rules:
     summary: 'Pod has been in a non-ready state for more than 15 minutes.'
   condition: '{{ true }}'
   expr: |-
-    sum by (namespace,pod,{{ $clusterLabel }}) (
-      max by (namespace,pod,{{ $clusterLabel }}) (
+    sum by (namespace,pod,{{ $groupLabels }}) (
+      max by (namespace,pod,{{ $groupLabels }}) (
         kube_pod_status_phase{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}", phase=~"Pending|Unknown|Failed"}
-      ) * on (namespace,pod,{{ $clusterLabel }}) group_left(owner_kind) topk by (namespace,pod,{{ $clusterLabel }}) (
-        1, max by (namespace,pod,owner_kind,{{ $clusterLabel }}) (kube_pod_owner{owner_kind!="Job"})
+      ) * on (namespace,pod,{{ $groupLabels }}) group_left(owner_kind) topk by (namespace,pod,{{ $groupLabels }}) (
+        1, max by (namespace,pod,owner_kind,{{ $groupLabels }}) (kube_pod_owner{owner_kind!="Job"})
       )
     ) > 0
   for: 15m
@@ -116,7 +118,7 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      max by (namespace,statefulset,job,{{ $clusterLabel }}) (
+      max by (namespace,statefulset,job,{{ $groupLabels }}) (
         kube_statefulset_status_current_revision{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
           unless
         kube_statefulset_status_update_revision{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
@@ -208,7 +210,7 @@ rules:
     summary: 'Job did not complete in time'
   condition: '{{ true }}'
   expr: |-
-    time() - max by (namespace,job_name,{{ $clusterLabel }}) (kube_job_status_start_time{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
+    time() - max by (namespace,job_name,{{ $groupLabels }}) (kube_job_status_start_time{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
       and
     kube_job_status_active{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"} > 0) > 43200
   labels:

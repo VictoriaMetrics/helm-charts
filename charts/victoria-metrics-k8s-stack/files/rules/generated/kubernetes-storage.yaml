@@ -1,6 +1,8 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
+{{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
 condition: '{{ true }}'
 name: kubernetes-storage
@@ -19,9 +21,9 @@ rules:
     ) < 0.03
     and
     kubelet_volume_stats_used_bytes{job="kubelet", namespace=~"{{ .targetNamespace }}", metrics_path="/metrics"} > 0
-    unless on (namespace,persistentvolumeclaim,{{ $clusterLabel }})
+    unless on (namespace,persistentvolumeclaim,{{ $groupLabels }})
     kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
-    unless on (namespace,persistentvolumeclaim,{{ $clusterLabel }})
+    unless on (namespace,persistentvolumeclaim,{{ $groupLabels }})
     kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
   for: 1m
   labels:
@@ -42,9 +44,9 @@ rules:
     kubelet_volume_stats_used_bytes{job="kubelet", namespace=~"{{ .targetNamespace }}", metrics_path="/metrics"} > 0
     and
     predict_linear(kubelet_volume_stats_available_bytes{job="kubelet", namespace=~"{{ .targetNamespace }}", metrics_path="/metrics"}[6h], 4 * 24 * 3600) < 0
-    unless on (namespace,persistentvolumeclaim,{{ $clusterLabel }})
+    unless on (namespace,persistentvolumeclaim,{{ $groupLabels }})
     kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
-    unless on (namespace,persistentvolumeclaim,{{ $clusterLabel }})
+    unless on (namespace,persistentvolumeclaim,{{ $groupLabels }})
     kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
   for: 1h
   labels:
@@ -63,9 +65,9 @@ rules:
     ) < 0.03
     and
     kubelet_volume_stats_inodes_used{job="kubelet", namespace=~"{{ .targetNamespace }}", metrics_path="/metrics"} > 0
-    unless on (namespace,persistentvolumeclaim,{{ $clusterLabel }})
+    unless on (namespace,persistentvolumeclaim,{{ $groupLabels }})
     kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
-    unless on (namespace,persistentvolumeclaim,{{ $clusterLabel }})
+    unless on (namespace,persistentvolumeclaim,{{ $groupLabels }})
     kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
   for: 1m
   labels:
@@ -86,9 +88,9 @@ rules:
     kubelet_volume_stats_inodes_used{job="kubelet", namespace=~"{{ .targetNamespace }}", metrics_path="/metrics"} > 0
     and
     predict_linear(kubelet_volume_stats_inodes_free{job="kubelet", namespace=~"{{ .targetNamespace }}", metrics_path="/metrics"}[6h], 4 * 24 * 3600) < 0
-    unless on (namespace,persistentvolumeclaim,{{ $clusterLabel }})
+    unless on (namespace,persistentvolumeclaim,{{ $groupLabels }})
     kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
-    unless on (namespace,persistentvolumeclaim,{{ $clusterLabel }})
+    unless on (namespace,persistentvolumeclaim,{{ $groupLabels }})
     kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
   for: 1h
   labels:
