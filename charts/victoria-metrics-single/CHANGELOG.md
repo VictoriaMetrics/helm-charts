@@ -1,6 +1,9 @@
 ## Next release
 
-- TODO
+**Update note 1**: `.Values.server.statefulSet.updateStrategy` was changed to `.Values.server.statefulSet.spec.updateStrategy`
+**Update node 2**: `.Values.server.podManagementPolicy` was changed to `.Values.server.statefulSet.spec.podManagementPolicy`
+**Update note 3**: `.Values.server.deployment.strategy` was changed to `.Values.server.deployment.spec.strategy`
+**Update note 4**: `.Values.server.statefulSet.enabled` was replaced by `.Values.server.mode`, which accepts `deployment`, `statefulSet` values
 
 ## 0.13.10
 

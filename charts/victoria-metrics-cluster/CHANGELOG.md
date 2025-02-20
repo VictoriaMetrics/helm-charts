@@ -1,6 +1,9 @@
 ## Next release
 
-- TODO
+**Update note 1**: `.Values.vmselect.statefulSet.updateStrategy` was changed to `.Values.vmselect.statefulSet.spec.updateStrategy`
+**Update node 2**: `.Values.vmselect.podManagementPolicy` was changed to `.Values.vmselect.statefulSet.spec.podManagementPolicy`
+**Update note 3**: `.Values.vmselect.deployment.strategy` was changed to `.Values.vmselect.deployment.spec.strategy`
+**Update note 4**: `.Values.vmselect.statefulSet.enabled` was replaced by `.Values.vmselect.mode`, which accepts `deployment`, `statefulSet` values
 
 ## 0.17.7
 

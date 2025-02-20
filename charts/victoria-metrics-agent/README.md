@@ -460,10 +460,22 @@ scrape_configs:
 </td>
     </tr>
     <tr>
+      <td>daemonSet</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">spec: {}
+</code>
+</pre>
+</td>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/" target="_blank">K8s Daemonset</a> specific variables</p>
+</td>
+    </tr>
+    <tr>
       <td>deployment</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">strategy: {}
+<code class="language-yaml">spec:
+    strategy: {}
 </code>
 </pre>
 </td>
@@ -471,7 +483,7 @@ scrape_configs:
 </td>
     </tr>
     <tr>
-      <td>deployment.strategy</td>
+      <td>deployment.spec.strategy</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">{}
@@ -936,6 +948,28 @@ name: ""
 </td>
     </tr>
     <tr>
+      <td>lifecycle</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">{}
+</code>
+</pre>
+</td>
+      <td><p>Specify pod lifecycle</p>
+</td>
+    </tr>
+    <tr>
+      <td>mode</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">deployment
+</code>
+</pre>
+</td>
+      <td><p>VMAgent mode: daemonSet, deployment, statefulSet</p>
+</td>
+    </tr>
+    <tr>
       <td>nameOverride</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
@@ -958,7 +992,7 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>persistence.accessModes</td>
+      <td>persistentVolume.accessModes</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">- ReadWriteOnce
@@ -969,7 +1003,7 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>persistence.annotations</td>
+      <td>persistentVolume.annotations</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">{}
@@ -980,7 +1014,7 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>persistence.enabled</td>
+      <td>persistentVolume.enabled</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
 <code class="language-yaml">false
@@ -991,7 +1025,7 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>persistence.existingClaim</td>
+      <td>persistentVolume.existingClaim</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
 <code class="language-yaml">""
@@ -1002,7 +1036,7 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>persistence.extraLabels</td>
+      <td>persistentVolume.extraLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">{}
@@ -1013,7 +1047,7 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>persistence.matchLabels</td>
+      <td>persistentVolume.matchLabels</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">{}
@@ -1024,7 +1058,7 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>persistence.size</td>
+      <td>persistentVolume.size</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
 <code class="language-yaml">10Gi
@@ -1035,7 +1069,7 @@ name: ""
 </td>
     </tr>
     <tr>
-      <td>persistence.storageClassName</td>
+      <td>persistentVolume.storageClassName</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
 <code class="language-yaml">""
@@ -1217,6 +1251,17 @@ periodSeconds: 15
 </td>
     </tr>
     <tr>
+      <td>schedulerName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Use an alternate scheduler, e.g. &ldquo;stork&rdquo;. Check details <a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
       <td>securityContext</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
@@ -1393,6 +1438,17 @@ periodSeconds: 15
 </td>
     </tr>
     <tr>
+      <td>serviceAccount.automountToken</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>mount API token to pod directly</p>
+</td>
+    </tr>
+    <tr>
       <td>serviceAccount.create</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
@@ -1496,9 +1552,9 @@ periodSeconds: 15
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">clusterMode: false
-enabled: false
 replicationFactor: 1
-updateStrategy: {}
+spec:
+    updateStrategy: {}
 </code>
 </pre>
 </td>
@@ -1528,7 +1584,7 @@ updateStrategy: {}
 </td>
     </tr>
     <tr>
-      <td>statefulSet.updateStrategy</td>
+      <td>statefulSet.spec.updateStrategy</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">{}
