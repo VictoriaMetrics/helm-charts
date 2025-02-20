@@ -175,6 +175,30 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td></td>
     </tr>
     <tr>
+      <td>daemonSet</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">spec: {}
+</code>
+</pre>
+</td>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/" target="_blank">K8s DaemonSet</a> specific variables</p>
+</td>
+    </tr>
+    <tr>
+      <td>deployment</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">spec:
+    strategy:
+        type: Recreate
+</code>
+</pre>
+</td>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">K8s Deployment</a> specific variables</p>
+</td>
+    </tr>
+    <tr>
       <td>env</td>
       <td>list</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
@@ -637,6 +661,17 @@ name: ""
 </pre>
 </td>
       <td><p>Specify pod lifecycle</p>
+</td>
+    </tr>
+    <tr>
+      <td>mode</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">deployment
+</code>
+</pre>
+</td>
+      <td><p>vmauth mode: deployment, daemonSet</p>
 </td>
     </tr>
     <tr>

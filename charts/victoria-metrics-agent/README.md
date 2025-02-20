@@ -467,7 +467,7 @@ scrape_configs:
 </code>
 </pre>
 </td>
-      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/" target="_blank">K8s Daemonset</a> specific variables</p>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/" target="_blank">K8s DaemonSet</a> specific variables</p>
 </td>
     </tr>
     <tr>

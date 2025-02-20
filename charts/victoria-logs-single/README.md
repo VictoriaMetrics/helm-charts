@@ -355,7 +355,7 @@ extraLabels: {}
 </code>
 </pre>
 </td>
-      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/" target="_blank">K8s Daemonset</a> specific variables</p>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">K8s Deployment</a> specific variables</p>
 </td>
     </tr>
     <tr>
@@ -1159,7 +1159,7 @@ readOnlyRootFilesystem: true
 </code>
 </pre>
 </td>
-      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">K8s Deployment</a> specific variables</p>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/" target="_blank">K8s StatefulSet</a> specific variables</p>
 </td>
     </tr>
     <tr>
@@ -1306,7 +1306,7 @@ readOnlyRootFilesystem: true
       <td>serviceAccount.create</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
+<code class="language-yaml">false
 </code>
 </pre>
 </td>

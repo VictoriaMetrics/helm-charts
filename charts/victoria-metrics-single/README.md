@@ -352,7 +352,7 @@ extraLabels: {}
 </code>
 </pre>
 </td>
-      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/" target="_blank">K8s Daemonset</a> specific variables</p>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">K8s Deployment</a> specific variables</p>
 </td>
     </tr>
     <tr>
@@ -1455,7 +1455,7 @@ scrape_configs:
 </code>
 </pre>
 </td>
-      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">K8s Deployment</a> specific variables</p>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/" target="_blank">K8s StatefulSet</a> specific variables</p>
 </td>
     </tr>
     <tr>

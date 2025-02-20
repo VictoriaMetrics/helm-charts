@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Support daemonset mode. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1995).
 
 ## 0.8.7
 

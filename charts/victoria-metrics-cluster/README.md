@@ -2064,6 +2064,18 @@ timeoutSeconds: 5
 </td>
     </tr>
     <tr>
+      <td>vmselect.deployment</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">spec:
+    strategy: {}
+</code>
+</pre>
+</td>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">K8s Deployment</a> specific variables</p>
+</td>
+    </tr>
+    <tr>
       <td>vmselect.deployment.spec.strategy</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
@@ -2418,7 +2430,8 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td></td>
+      <td><p>vmselect mode: deployment, daemonSet</p>
+</td>
     </tr>
     <tr>
       <td>vmselect.name</td>
@@ -2934,6 +2947,18 @@ timeoutSeconds: 5
 </pre>
 </td>
       <td><p>Service Monitor relabelings</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmselect.statefulSet</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">spec:
+    podManagementPolicy: OrderedReady
+</code>
+</pre>
+</td>
+      <td><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/" target="_blank">K8s StatefulSet</a> specific variables</p>
 </td>
     </tr>
     <tr>

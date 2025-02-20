@@ -1,6 +1,6 @@
 
 
-![Version](https://img.shields.io/badge/0.36.2-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-k8s-stack%2Fchangelog%2F%230362)
+![Version](https://img.shields.io/badge/0.37.0-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-k8s-stack%2Fchangelog%2F%230370)
 ![ArtifactHub](https://img.shields.io/badge/ArtifactHub-informational?logoColor=white&color=417598&logo=artifacthub&link=https%3A%2F%2Fartifacthub.io%2Fpackages%2Fhelm%2Fvictoriametrics%2Fvictoria-metrics-k8s-stack)
 ![License](https://img.shields.io/github/license/VictoriaMetrics/helm-charts?labelColor=green&label=&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Fhelm-charts%2Fblob%2Fmaster%2FLICENSE)
 ![Slack](https://img.shields.io/badge/Join-4A154B?logo=slack&link=https%3A%2F%2Fslack.victoriametrics.com)
@@ -919,7 +919,8 @@ perReplica: false
       <td>defaultRules</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">alerting:
+<code class="language-yaml">additionalGroupByLabels: []
+alerting:
     spec:
         annotations: {}
         labels: {}
@@ -1063,6 +1064,17 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
 </pre>
 </td>
       <td><p>Create default rules for monitoring the cluster</p>
+</td>
+    </tr>
+    <tr>
+      <td>defaultRules.additionalGroupByLabels</td>
+      <td>list</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">[]
+</code>
+</pre>
+</td>
+      <td><p>Labels, which are used for groupping results of the queries. Note that these labels are joined with <code>.Values.global.clusterLabel</code></p>
 </td>
     </tr>
     <tr>

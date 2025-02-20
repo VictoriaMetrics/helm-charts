@@ -244,6 +244,20 @@ tolerations: []
 # -- Affinity configurations
 affinity: {}
 
+# -- vmauth mode: deployment, daemonSet
+mode: deployment
+
+# -- [K8s DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) specific variables
+daemonSet:
+  spec: {}
+
+# -- [K8s Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) specific variables
+deployment:
+  spec:
+    strategy:
+      # Must be "Recreate" when we have a persistent volume
+      type: Recreate
+
 serviceMonitor:
   # -- Enable deployment of Service Monitor for server component. This is Prometheus operator object
   enabled: false
