@@ -1,6 +1,9 @@
 {{- $app := .Values }}
 {{- $ingress := $app.ingress }}
 {{- if $ingress.enabled }}
+{{- if not $app.service.enabled }}
+  {{- fail "It's required to set .Values.service.enabled: true when .Values.ingress.enabled: true"}}
+{{- end }}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}

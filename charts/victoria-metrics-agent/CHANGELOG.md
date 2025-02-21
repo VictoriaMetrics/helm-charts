@@ -6,6 +6,7 @@
 **Update note 4**: `.Values.statefulSet.enabled` was replaced by `.Values.mode`, which accepts `deployment`, `statefulSet` or `daemonSet` values
 **Update note 5**: `.Values.persistence` was changed to `.Values.persistentVolume`
 
+- Force enabling service, when ingress in enabled. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2007).
 - Add ability to configure VMAgent as a DaemonSet. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1995).
 
 ## 0.15.8
