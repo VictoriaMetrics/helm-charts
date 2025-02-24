@@ -8,6 +8,7 @@
 
 - Force enabling service, when ingress in enabled. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2007).
 - Add ability to configure VMAgent as a DaemonSet. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1995).
+- bump version of VM components to [v1.112.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.112.0)
 
 ## 0.15.8
 

@@ -5,6 +5,8 @@
 **Update note 3**: `.Values.server.deployment.strategy` was changed to `.Values.server.deployment.spec.strategy`
 **Update note 4**: `.Values.server.statefulSet.enabled` was replaced by `.Values.server.mode`, which accepts `deployment`, `statefulSet` values
 
+- bump version of VM components to [v1.112.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.112.0)
+
 ## 0.13.10
 
 **Release date:** 10 Feb 2025

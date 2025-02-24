@@ -1,6 +1,7 @@
 ## Next release
 
 - add `.Values.defaultRules.additionalGroupByLabels`, which are added to all by expression labels list. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2000).
+- bump version of VM components to [v1.112.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.112.0)
 
 ## 0.36.2
 
