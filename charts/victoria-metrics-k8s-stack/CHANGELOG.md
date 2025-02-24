@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.38.0
+
+**Release date:** 24 Feb 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.112.0](https://img.shields.io/badge/v1.112.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11120)
+
 - add `.Values.defaultRules.additionalGroupByLabels`, which are added to all by expression labels list. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2000).
 - bump version of VM components to [v1.112.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.112.0)
 
