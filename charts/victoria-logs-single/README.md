@@ -1306,7 +1306,7 @@ readOnlyRootFilesystem: true
       <td>serviceAccount.create</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
+<code class="language-yaml">false
 </code>
 </pre>
 </td>
