@@ -20,7 +20,7 @@ spec:
   {{- with $modeOpts.spec }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
-  {{- if not $app.horizontalPodAutoscaling.enabled }}
+  {{- if and (not $app.horizontalPodAutoscaling.enabled) (ne $mode "daemonSet") }}
   replicas: {{ $app.replicaCount }}
   {{- end }}
   selector:

@@ -40,7 +40,7 @@ spec:
       {{- end }}
       {{- if or ($app.serviceAccount).name ($app.serviceAccount).create }}
       serviceAccountName: {{ ($app.serviceAccount).name | default $fullname }}
-      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
+      automountServiceAccountToken: {{ $app.serviceAccount.automountToken }}
       {{- end }}
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
