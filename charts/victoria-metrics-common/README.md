@@ -30,20 +30,13 @@ The following table lists the template functions of the chart and description.
 <table class="helm-vars">
   <thead>
     <th class="helm-vars-key">Key</th>
-    <th class="helm-vars-type">Type</th>
-    <th class="helm-vars-default">Default</th>
     <th class="helm-vars-description">Description</th>
   </thead>
   <tbody>
-    <tr>
-      <td>unitTest</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td></td>
+    <tr id="unittest">
+      <td><a href="#unittest"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">unitTest</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em></td>
     </tr>
   </tbody>
 </table>

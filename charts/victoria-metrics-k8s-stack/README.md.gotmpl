@@ -234,7 +234,7 @@ victoria-metrics-operator:
 
 * Add dependency chart repositories
 
-```console
+```shell
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
@@ -260,13 +260,13 @@ To run VictoriaMetrics stack locally it's possible to use [Minikube](https://git
 
 Run Minikube cluster
 
-```
+```shell
 minikube start --container-runtime=containerd --extra-config=scheduler.bind-address=0.0.0.0 --extra-config=controller-manager.bind-address=0.0.0.0 --extra-config=etcd.listen-metrics-urls=http://0.0.0.0:2381
 ```
 
 Install helm chart
 
-```
+```shell
 helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -f values.minikube.yaml -n NAMESPACE --debug --dry-run
 ```
 
@@ -274,7 +274,7 @@ helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -f valu
 
 CRDs created by this chart are not removed by default and should be manually cleaned up:
 
-```console
+```shell
 kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl delete crd {}
 ```
 
@@ -283,12 +283,12 @@ kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubect
 - If you cannot install helm chart with error `configmap already exist`. It could happen because of name collisions, if you set too long release name.
   Kubernetes by default, allows only 63 symbols at resource names and all resource names are trimmed by helm to 63 symbols.
   To mitigate it, use shorter name for helm chart release name, like:
-```bash
+```shell
 # stack - is short enough
 helm upgrade -i stack vm/victoria-metrics-k8s-stack
 ```
   Or use override for helm chart release name:
-```bash
+```shell
 helm upgrade -i some-very-long-name vm/victoria-metrics-k8s-stack --set fullnameOverride=stack
 ```
 
@@ -297,14 +297,14 @@ helm upgrade -i some-very-long-name vm/victoria-metrics-k8s-stack --set fullname
 
 Usually, helm upgrade doesn't requires manual actions. Just execute command:
 
-```console
+```shell
 $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
 
 But release with CRD update can only be patched manually with kubectl.
 Since helm does not perform a CRD update, we recommend that you always perform this when updating the helm-charts version:
 
-```console
+```shell
 # 1. check the changes in CRD
 $ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl diff -f -
 
@@ -321,7 +321,7 @@ Also `.vm.write` and `.vm.read` variables are available in `vmauth.spec`, which 
 
 If your configuration in version < 0.29.0 looked like below:
 
-```
+```yaml
 vmcluster:
   vmauth:
     vmselect:
@@ -338,7 +338,7 @@ vmcluster:
 
 In 0.29.0 it should look like:
 
-```
+```yaml
 vmauth:
   spec:
     unauthorizedAccessConfig:
@@ -357,7 +357,7 @@ vmauth:
 
 - node-exporter starting from version 4.0.0 is using the Kubernetes recommended labels. Therefore you have to delete the daemonset before you upgrade.
 
-```bash
+```shell
 kubectl delete daemonset -l app=prometheus-node-exporter
 ```
 - scrape configuration for kubernetes components was moved from `vmServiceScrape.spec` section to `spec` section. If you previously modified scrape configuration you need to update your `values.yaml`
@@ -370,7 +370,7 @@ kubectl delete daemonset -l app=prometheus-node-exporter
 
  All `CRD` must be update to the latest version with command:
 
-```bash
+```shell
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/master/charts/victoria-metrics-k8s-stack/crds/crd.yaml
 
 ```
@@ -379,7 +379,7 @@ kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/m
 
  All `CRD` must be update to `v1` version with command:
 
-```bash
+```shell
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/master/charts/victoria-metrics-k8s-stack/crds/crd.yaml
 
 ```
@@ -389,7 +389,7 @@ kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/m
  Update `VMAgent` crd
 
 command:
-```bash
+```shell
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.16.0/config/crd/bases/operator.victoriametrics.com_vmagents.yaml
 ```
 
@@ -397,7 +397,7 @@ kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.1
 
 New CRD added to operator - `VMUser` and `VMAuth`, new fields added to exist crd.
 Manual commands:
-```bash
+```shell
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.15.0/config/crd/bases/operator.victoriametrics.com_vmusers.yaml
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.15.0/config/crd/bases/operator.victoriametrics.com_vmauths.yaml
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.15.0/config/crd/bases/operator.victoriametrics.com_vmalerts.yaml

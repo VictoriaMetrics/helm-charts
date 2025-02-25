@@ -128,20 +128,13 @@ Change the values according to the need of the environment in ``victoria-metrics
 <table class="helm-vars">
   <thead>
     <th class="helm-vars-key">Key</th>
-    <th class="helm-vars-type">Type</th>
-    <th class="helm-vars-default">Default</th>
     <th class="helm-vars-description">Description</th>
   </thead>
   <tbody>
-    <tr>
-      <td>annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VM operator CRD annotations</p>
+    <tr id="annotations">
+      <td><a href="#annotations"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">annotations</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>VM operator CRD annotations</p>
 </td>
     </tr>
   </tbody>
