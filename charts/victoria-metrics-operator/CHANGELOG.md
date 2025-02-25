@@ -1,6 +1,7 @@
 ## Next release
 
 - updated common dependency 0.0.37 -> 0.0.39
+- added fullname prefix for victoriametrics:admin and victoriametrics:view roles to avoid collision during while deploying more than one operator. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2012).
 
 ## 0.42.0
 

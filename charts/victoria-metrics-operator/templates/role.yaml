@@ -199,7 +199,7 @@ rules: {{ toYaml $rules.admin | nindent 2 }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: victoriametrics:admin
+  name: {{ $fullname }}-victoriametrics-admin
   labels:
     {{- include "vm.labels" $ctx | nindent 4 }}
     {{- .Values.rbac.aggregatedClusterRoles.labels.admin | toYaml | nindent 4 }}
@@ -208,7 +208,7 @@ rules: {{ toYaml ($rules.admin | default list) | nindent 2 }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: victoriametrics:view
+  name: {{ $fullname }}-victoriametrics-view
   labels:
     {{- include "vm.labels" $ctx | nindent 4 }}
     {{- .Values.rbac.aggregatedClusterRoles.labels.view | toYaml | nindent 4 }}
