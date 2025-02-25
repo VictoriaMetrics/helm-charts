@@ -302,543 +302,339 @@ The following tables lists the configurable parameters of the chart and their de
 
 Change the values according to the need of the environment in ``victoria-metrics-distributed`/values.yaml`` file.
 
-<table class="helm-vars">
-  <thead>
-    <th class="helm-vars-key">Key</th>
-    <th class="helm-vars-type">Type</th>
-    <th class="helm-vars-default">Default</th>
-    <th class="helm-vars-description">Description</th>
-  </thead>
-  <tbody>
-    <tr>
-      <td>availabilityZones</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">- name: zone-eu-1
-- name: zone-us-1
-</code>
-</pre>
-</td>
-      <td><p>Config for all availability zones. Each element represents custom zone config, which overrides a default one from <code>zoneTpl</code></p>
-</td>
-    </tr>
-    <tr>
-      <td>availabilityZones[0].name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">zone-eu-1
-</code>
-</pre>
-</td>
-      <td><p>Availability zone name</p>
-</td>
-    </tr>
-    <tr>
-      <td>availabilityZones[1].name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">zone-us-1
-</code>
-</pre>
-</td>
-      <td><p>Availability zone name</p>
-</td>
-    </tr>
-    <tr>
-      <td>common.vmagent.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">port: "8429"
-</code>
-</pre>
-</td>
-      <td><p>Common VMAgent spec, which can be overridden by each VMAgent configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmagentspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>common.vmauth.spec.port</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">"8427"
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>common.vmcluster.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">vminsert:
-    port: "8480"
-    serviceSpec:
-        spec:
-            clusterIP: None
-            type: ClusterIP
-vmselect:
-    port: "8481"
-</code>
-</pre>
-</td>
-      <td><p>Common VMCluster spec, which can be overridden by each VMCluster configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmclusterspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>enableMultitenancy</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enable multitenancy mode see <a href="https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>extra</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">vmagent:
-    enabled: true
-    name: test-vmagent
-    spec:
-        selectAllByDefault: true
-</code>
-</pre>
-</td>
-      <td><p>Set up an extra vmagent to scrape all the scrape objects by default, and write data to above write-global endpoint.</p>
-</td>
-    </tr>
-    <tr>
-      <td>fullnameOverride</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Overrides the chart&rsquo;s computed fullname.</p>
-</td>
-    </tr>
-    <tr>
-      <td>global</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">cluster:
-    dnsDomain: cluster.local.
-</code>
-</pre>
-</td>
-      <td><p>Global chart properties</p>
-</td>
-    </tr>
-    <tr>
-      <td>global.cluster.dnsDomain</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">cluster.local.
-</code>
-</pre>
-</td>
-      <td><p>K8s cluster domain suffix, uses for building storage pods&rsquo; FQDN. Details are <a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>nameOverride</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vm-distributed
-</code>
-</pre>
-</td>
-      <td><p>Overrides the chart&rsquo;s name</p>
-</td>
-    </tr>
-    <tr>
-      <td>read.global.vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create vmauth as the global read entrypoint</p>
-</td>
-    </tr>
-    <tr>
-      <td>read.global.vmauth.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmauth-global-read-{{ .fullname }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmauth object</p>
-</td>
-    </tr>
-    <tr>
-      <td>read.global.vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>victoria-metrics-k8s-stack</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">alertmanager:
-    enabled: false
-enabled: true
-grafana:
-    enabled: true
-victoria-metrics-operator:
-    enabled: true
-vmagent:
-    enabled: false
-vmalert:
-    enabled: false
-vmcluster:
-    enabled: false
-vmsingle:
-    enabled: false
-</code>
-</pre>
-</td>
-      <td><p>Set up vm operator and other resources like vmalert, grafana if needed</p>
-</td>
-    </tr>
-    <tr>
-      <td>write.global.vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create a vmauth as the global write entrypoint</p>
-</td>
-    </tr>
-    <tr>
-      <td>write.global.vmauth.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmauth-global-write-{{ .fullname }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmauth object</p>
-</td>
-    </tr>
-    <tr>
-      <td>write.global.vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">common:
-    spec:
-        affinity: {}
-        nodeSelector:
-            topology.kubernetes.io/zone: '{{ (.zone).name }}'
-        topologySpreadConstraints:
-            - maxSkew: 1
-              topologyKey: kubernetes.io/hostname
-              whenUnsatisfiable: ScheduleAnyway
-read:
-    allow: true
-    crossZone:
-        vmauth:
-            enabled: true
-            name: vmauth-read-proxy-{{ (.zone).name }}
-            spec: {}
-    perZone:
-        vmauth:
-            enabled: true
-            name: vmauth-read-balancer-{{ (.zone).name }}
-            spec:
-                extraArgs:
-                    discoverBackendIPs: "true"
-vmagent:
-    annotations: {}
-    enabled: true
-    name: vmagent-{{ (.zone).name }}
-    spec: {}
-vmcluster:
-    enabled: true
-    name: vmcluster-{{ (.zone).name }}
-    spec:
-        replicationFactor: 2
-        retentionPeriod: "14"
-        vminsert:
-            extraArgs: {}
-            replicaCount: 2
-            resources: {}
-        vmselect:
-            extraArgs: {}
-            replicaCount: 2
-            resources: {}
-        vmstorage:
-            replicaCount: 2
-            resources: {}
-            storageDataPath: /vm-data
-write:
-    allow: true
-    vmauth:
-        enabled: true
-        name: vmauth-write-balancer-{{ (.zone).name }}
-        spec:
-            extraArgs:
-                discoverBackendIPs: "true"
-</code>
-</pre>
-</td>
-      <td><p>Default config for each availability zone components, including vmagent, vmcluster, vmauth etc. Defines a template for each availability zone, which can be overridden for each availability zone at <code>availabilityZones[*]</code></p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.common.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">affinity: {}
-nodeSelector:
-    topology.kubernetes.io/zone: '{{ (.zone).name }}'
-topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: kubernetes.io/hostname
-      whenUnsatisfiable: ScheduleAnyway
-</code>
-</pre>
-</td>
-      <td><p>Common for <a href="https://docs.victoriametrics.com/operator/api/#vmagentspec" target="_blank">VMAgent</a>, <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">VMAuth</a>, <a href="https://docs.victoriametrics.com/operator/api/#vmclusterspec" target="_blank">VMCluster</a> spec params, like nodeSelector, affinity, topologySpreadConstraint, etc</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.read.allow</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Allow data query from this zone through global query endpoint</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.read.crossZone.vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create a vmauth with all the zone with <code>allow: true</code> as query backends</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.read.crossZone.vmauth.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmauth-read-proxy-{{ (.zone).name }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmauth object</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.read.crossZone.vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.read.perZone.vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create vmauth as a local read endpoint</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.read.perZone.vmauth.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmauth-read-balancer-{{ (.zone).name }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmauth object</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.read.perZone.vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">extraArgs:
-    discoverBackendIPs: "true"
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.vmagent.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VMAgent remote write proxy annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.vmagent.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create VMAgent remote write proxy</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.vmagent.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmagent-{{ (.zone).name }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmagent object</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.vmagent.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAgent CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmagentspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.vmcluster.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create VMCluster</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.vmcluster.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmcluster-{{ (.zone).name }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmcluster, by default is <zoneName></p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.vmcluster.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">replicationFactor: 2
-retentionPeriod: "14"
-vminsert:
-    extraArgs: {}
-    replicaCount: 2
-    resources: {}
-vmselect:
-    extraArgs: {}
-    replicaCount: 2
-    resources: {}
-vmstorage:
-    replicaCount: 2
-    resources: {}
-    storageDataPath: /vm-data
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMCluster CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmclusterspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.write.allow</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Allow data ingestion to this zone</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.write.vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create vmauth as a local write endpoint</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.write.vmauth.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmauth-write-balancer-{{ (.zone).name }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmauth object</p>
-</td>
-    </tr>
-    <tr>
-      <td>zoneTpl.write.vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">extraArgs:
-    discoverBackendIPs: "true"
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
-</td>
-    </tr>
-  </tbody>
-</table>
+<a id="helm-value-availabilityzones" href="#helm-value-availabilityzones" aria-hidden="true" tabindex="-1"></a>
+[`availabilityZones`](#helm-value-availabilityzones)`(list)`: Config for all availability zones. Each element represents custom zone config, which overrides a default one from `zoneTpl`
+  ```helm-default
+  - name: zone-eu-1
+  - name: zone-us-1
+  ```
+   
+<a id="helm-value-availabilityzones-0--name" href="#helm-value-availabilityzones-0--name" aria-hidden="true" tabindex="-1"></a>
+[`availabilityZones[0].name`](#helm-value-availabilityzones-0--name)`(string)`: Availability zone name
+  ```helm-default
+  zone-eu-1
+  ```
+   
+<a id="helm-value-availabilityzones-1--name" href="#helm-value-availabilityzones-1--name" aria-hidden="true" tabindex="-1"></a>
+[`availabilityZones[1].name`](#helm-value-availabilityzones-1--name)`(string)`: Availability zone name
+  ```helm-default
+  zone-us-1
+  ```
+   
+<a id="helm-value-common-vmagent-spec" href="#helm-value-common-vmagent-spec" aria-hidden="true" tabindex="-1"></a>
+[`common.vmagent.spec`](#helm-value-common-vmagent-spec)`(object)`: Common VMAgent spec, which can be overridden by each VMAgent configuration. Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/index.html#vmagentspec)
+  ```helm-default
+  port: "8429"
+  ```
+   
+<a id="helm-value-common-vmauth-spec-port" href="#helm-value-common-vmauth-spec-port" aria-hidden="true" tabindex="-1"></a>
+[`common.vmauth.spec.port`](#helm-value-common-vmauth-spec-port)`(string)`:
+  ```helm-default
+  "8427"
+  ```
+   
+<a id="helm-value-common-vmcluster-spec" href="#helm-value-common-vmcluster-spec" aria-hidden="true" tabindex="-1"></a>
+[`common.vmcluster.spec`](#helm-value-common-vmcluster-spec)`(object)`: Common VMCluster spec, which can be overridden by each VMCluster configuration. Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/index.html#vmclusterspec)
+  ```helm-default
+  vminsert:
+      port: "8480"
+      serviceSpec:
+          spec:
+              clusterIP: None
+              type: ClusterIP
+  vmselect:
+      port: "8481"
+  ```
+   
+<a id="helm-value-enablemultitenancy" href="#helm-value-enablemultitenancy" aria-hidden="true" tabindex="-1"></a>
+[`enableMultitenancy`](#helm-value-enablemultitenancy)`(bool)`: Enable multitenancy mode see [here](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy)
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-extra" href="#helm-value-extra" aria-hidden="true" tabindex="-1"></a>
+[`extra`](#helm-value-extra)`(object)`: Set up an extra vmagent to scrape all the scrape objects by default, and write data to above write-global endpoint.
+  ```helm-default
+  vmagent:
+      enabled: true
+      name: test-vmagent
+      spec:
+          selectAllByDefault: true
+  ```
+   
+<a id="helm-value-fullnameoverride" href="#helm-value-fullnameoverride" aria-hidden="true" tabindex="-1"></a>
+[`fullnameOverride`](#helm-value-fullnameoverride)`(string)`: Overrides the chart's computed fullname.
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-global" href="#helm-value-global" aria-hidden="true" tabindex="-1"></a>
+[`global`](#helm-value-global)`(object)`: Global chart properties
+  ```helm-default
+  cluster:
+      dnsDomain: cluster.local.
+  ```
+   
+<a id="helm-value-global-cluster-dnsdomain" href="#helm-value-global-cluster-dnsdomain" aria-hidden="true" tabindex="-1"></a>
+[`global.cluster.dnsDomain`](#helm-value-global-cluster-dnsdomain)`(string)`: K8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
+  ```helm-default
+  cluster.local.
+  ```
+   
+<a id="helm-value-nameoverride" href="#helm-value-nameoverride" aria-hidden="true" tabindex="-1"></a>
+[`nameOverride`](#helm-value-nameoverride)`(string)`: Overrides the chart's name
+  ```helm-default
+  vm-distributed
+  ```
+   
+<a id="helm-value-read-global-vmauth-enabled" href="#helm-value-read-global-vmauth-enabled" aria-hidden="true" tabindex="-1"></a>
+[`read.global.vmauth.enabled`](#helm-value-read-global-vmauth-enabled)`(bool)`: Create vmauth as the global read entrypoint
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-read-global-vmauth-name" href="#helm-value-read-global-vmauth-name" aria-hidden="true" tabindex="-1"></a>
+[`read.global.vmauth.name`](#helm-value-read-global-vmauth-name)`(string)`: Override the name of the vmauth object
+  ```helm-default
+  vmauth-global-read-{{ .fullname }}
+  ```
+   
+<a id="helm-value-read-global-vmauth-spec" href="#helm-value-read-global-vmauth-spec" aria-hidden="true" tabindex="-1"></a>
+[`read.global.vmauth.spec`](#helm-value-read-global-vmauth-spec)`(object)`: Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-victoria-metrics-k8s-stack" href="#helm-value-victoria-metrics-k8s-stack" aria-hidden="true" tabindex="-1"></a>
+[`victoria-metrics-k8s-stack`](#helm-value-victoria-metrics-k8s-stack)`(object)`: Set up vm operator and other resources like vmalert, grafana if needed
+  ```helm-default
+  alertmanager:
+      enabled: false
+  enabled: true
+  grafana:
+      enabled: true
+  victoria-metrics-operator:
+      enabled: true
+  vmagent:
+      enabled: false
+  vmalert:
+      enabled: false
+  vmcluster:
+      enabled: false
+  vmsingle:
+      enabled: false
+  ```
+   
+<a id="helm-value-write-global-vmauth-enabled" href="#helm-value-write-global-vmauth-enabled" aria-hidden="true" tabindex="-1"></a>
+[`write.global.vmauth.enabled`](#helm-value-write-global-vmauth-enabled)`(bool)`: Create a vmauth as the global write entrypoint
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-write-global-vmauth-name" href="#helm-value-write-global-vmauth-name" aria-hidden="true" tabindex="-1"></a>
+[`write.global.vmauth.name`](#helm-value-write-global-vmauth-name)`(string)`: Override the name of the vmauth object
+  ```helm-default
+  vmauth-global-write-{{ .fullname }}
+  ```
+   
+<a id="helm-value-write-global-vmauth-spec" href="#helm-value-write-global-vmauth-spec" aria-hidden="true" tabindex="-1"></a>
+[`write.global.vmauth.spec`](#helm-value-write-global-vmauth-spec)`(object)`: Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-zonetpl" href="#helm-value-zonetpl" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl`](#helm-value-zonetpl)`(object)`: Default config for each availability zone components, including vmagent, vmcluster, vmauth etc. Defines a template for each availability zone, which can be overridden for each availability zone at `availabilityZones[*]`
+  ```helm-default
+  common:
+      spec:
+          affinity: {}
+          nodeSelector:
+              topology.kubernetes.io/zone: '{{ (.zone).name }}'
+          topologySpreadConstraints:
+              - maxSkew: 1
+                topologyKey: kubernetes.io/hostname
+                whenUnsatisfiable: ScheduleAnyway
+  read:
+      allow: true
+      crossZone:
+          vmauth:
+              enabled: true
+              name: vmauth-read-proxy-{{ (.zone).name }}
+              spec: {}
+      perZone:
+          vmauth:
+              enabled: true
+              name: vmauth-read-balancer-{{ (.zone).name }}
+              spec:
+                  extraArgs:
+                      discoverBackendIPs: "true"
+  vmagent:
+      annotations: {}
+      enabled: true
+      name: vmagent-{{ (.zone).name }}
+      spec: {}
+  vmcluster:
+      enabled: true
+      name: vmcluster-{{ (.zone).name }}
+      spec:
+          replicationFactor: 2
+          retentionPeriod: "14"
+          vminsert:
+              extraArgs: {}
+              replicaCount: 2
+              resources: {}
+          vmselect:
+              extraArgs: {}
+              replicaCount: 2
+              resources: {}
+          vmstorage:
+              replicaCount: 2
+              resources: {}
+              storageDataPath: /vm-data
+  write:
+      allow: true
+      vmauth:
+          enabled: true
+          name: vmauth-write-balancer-{{ (.zone).name }}
+          spec:
+              extraArgs:
+                  discoverBackendIPs: "true"
+  ```
+   
+<a id="helm-value-zonetpl-common-spec" href="#helm-value-zonetpl-common-spec" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.common.spec`](#helm-value-zonetpl-common-spec)`(object)`: Common for [VMAgent](https://docs.victoriametrics.com/operator/api/#vmagentspec), [VMAuth](https://docs.victoriametrics.com/operator/api/#vmauthspec), [VMCluster](https://docs.victoriametrics.com/operator/api/#vmclusterspec) spec params, like nodeSelector, affinity, topologySpreadConstraint, etc
+  ```helm-default
+  affinity: {}
+  nodeSelector:
+      topology.kubernetes.io/zone: '{{ (.zone).name }}'
+  topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+  ```
+   
+<a id="helm-value-zonetpl-read-allow" href="#helm-value-zonetpl-read-allow" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.read.allow`](#helm-value-zonetpl-read-allow)`(bool)`: Allow data query from this zone through global query endpoint
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-zonetpl-read-crosszone-vmauth-enabled" href="#helm-value-zonetpl-read-crosszone-vmauth-enabled" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.read.crossZone.vmauth.enabled`](#helm-value-zonetpl-read-crosszone-vmauth-enabled)`(bool)`: Create a vmauth with all the zone with `allow: true` as query backends
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-zonetpl-read-crosszone-vmauth-name" href="#helm-value-zonetpl-read-crosszone-vmauth-name" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.read.crossZone.vmauth.name`](#helm-value-zonetpl-read-crosszone-vmauth-name)`(string)`: Override the name of the vmauth object
+  ```helm-default
+  vmauth-read-proxy-{{ (.zone).name }}
+  ```
+   
+<a id="helm-value-zonetpl-read-crosszone-vmauth-spec" href="#helm-value-zonetpl-read-crosszone-vmauth-spec" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.read.crossZone.vmauth.spec`](#helm-value-zonetpl-read-crosszone-vmauth-spec)`(object)`: Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-zonetpl-read-perzone-vmauth-enabled" href="#helm-value-zonetpl-read-perzone-vmauth-enabled" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.read.perZone.vmauth.enabled`](#helm-value-zonetpl-read-perzone-vmauth-enabled)`(bool)`: Create vmauth as a local read endpoint
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-zonetpl-read-perzone-vmauth-name" href="#helm-value-zonetpl-read-perzone-vmauth-name" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.read.perZone.vmauth.name`](#helm-value-zonetpl-read-perzone-vmauth-name)`(string)`: Override the name of the vmauth object
+  ```helm-default
+  vmauth-read-balancer-{{ (.zone).name }}
+  ```
+   
+<a id="helm-value-zonetpl-read-perzone-vmauth-spec" href="#helm-value-zonetpl-read-perzone-vmauth-spec" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.read.perZone.vmauth.spec`](#helm-value-zonetpl-read-perzone-vmauth-spec)`(object)`: Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+  ```helm-default
+  extraArgs:
+      discoverBackendIPs: "true"
+  ```
+   
+<a id="helm-value-zonetpl-vmagent-annotations" href="#helm-value-zonetpl-vmagent-annotations" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.vmagent.annotations`](#helm-value-zonetpl-vmagent-annotations)`(object)`: VMAgent remote write proxy annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-zonetpl-vmagent-enabled" href="#helm-value-zonetpl-vmagent-enabled" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.vmagent.enabled`](#helm-value-zonetpl-vmagent-enabled)`(bool)`: Create VMAgent remote write proxy
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-zonetpl-vmagent-name" href="#helm-value-zonetpl-vmagent-name" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.vmagent.name`](#helm-value-zonetpl-vmagent-name)`(string)`: Override the name of the vmagent object
+  ```helm-default
+  vmagent-{{ (.zone).name }}
+  ```
+   
+<a id="helm-value-zonetpl-vmagent-spec" href="#helm-value-zonetpl-vmagent-spec" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.vmagent.spec`](#helm-value-zonetpl-vmagent-spec)`(object)`: Spec for VMAgent CRD, see [here](https://docs.victoriametrics.com/operator/api#vmagentspec)
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-zonetpl-vmcluster-enabled" href="#helm-value-zonetpl-vmcluster-enabled" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.vmcluster.enabled`](#helm-value-zonetpl-vmcluster-enabled)`(bool)`: Create VMCluster
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-zonetpl-vmcluster-name" href="#helm-value-zonetpl-vmcluster-name" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.vmcluster.name`](#helm-value-zonetpl-vmcluster-name)`(string)`: Override the name of the vmcluster, by default is <zoneName>
+  ```helm-default
+  vmcluster-{{ (.zone).name }}
+  ```
+   
+<a id="helm-value-zonetpl-vmcluster-spec" href="#helm-value-zonetpl-vmcluster-spec" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.vmcluster.spec`](#helm-value-zonetpl-vmcluster-spec)`(object)`: Spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
+  ```helm-default
+  replicationFactor: 2
+  retentionPeriod: "14"
+  vminsert:
+      extraArgs: {}
+      replicaCount: 2
+      resources: {}
+  vmselect:
+      extraArgs: {}
+      replicaCount: 2
+      resources: {}
+  vmstorage:
+      replicaCount: 2
+      resources: {}
+      storageDataPath: /vm-data
+  ```
+   
+<a id="helm-value-zonetpl-write-allow" href="#helm-value-zonetpl-write-allow" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.write.allow`](#helm-value-zonetpl-write-allow)`(bool)`: Allow data ingestion to this zone
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-zonetpl-write-vmauth-enabled" href="#helm-value-zonetpl-write-vmauth-enabled" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.write.vmauth.enabled`](#helm-value-zonetpl-write-vmauth-enabled)`(bool)`: Create vmauth as a local write endpoint
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-zonetpl-write-vmauth-name" href="#helm-value-zonetpl-write-vmauth-name" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.write.vmauth.name`](#helm-value-zonetpl-write-vmauth-name)`(string)`: Override the name of the vmauth object
+  ```helm-default
+  vmauth-write-balancer-{{ (.zone).name }}
+  ```
+   
+<a id="helm-value-zonetpl-write-vmauth-spec" href="#helm-value-zonetpl-write-vmauth-spec" aria-hidden="true" tabindex="-1"></a>
+[`zoneTpl.write.vmauth.spec`](#helm-value-zonetpl-write-vmauth-spec)`(object)`: Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+  ```helm-default
+  extraArgs:
+      discoverBackendIPs: "true"
+  ```
+   
 
