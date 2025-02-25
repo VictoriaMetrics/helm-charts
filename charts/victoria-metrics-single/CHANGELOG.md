@@ -1,9 +1,19 @@
 ## Next release
 
+- TODO
+
+## 0.14.0
+
+**Release date:** 24 Feb 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.112.0](https://img.shields.io/badge/v1.112.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%23v11120)
+
 **Update note 1**: `.Values.server.statefulSet.updateStrategy` was changed to `.Values.server.statefulSet.spec.updateStrategy`
 **Update node 2**: `.Values.server.podManagementPolicy` was changed to `.Values.server.statefulSet.spec.podManagementPolicy`
 **Update note 3**: `.Values.server.deployment.strategy` was changed to `.Values.server.deployment.spec.strategy`
 **Update note 4**: `.Values.server.statefulSet.enabled` was replaced by `.Values.server.mode`, which accepts `deployment`, `statefulSet` values
+
+- bump version of VM components to [v1.112.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.112.0)
 
 ## 0.13.10
 

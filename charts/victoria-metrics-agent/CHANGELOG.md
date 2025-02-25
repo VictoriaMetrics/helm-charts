@@ -1,12 +1,22 @@
 ## Next release
 
+- TODO
+
+## 0.16.0
+
+**Release date:** 24 Feb 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.112.0](https://img.shields.io/badge/v1.112.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11120)
+
 **Update note 1**: `.Values.statefulSet.updateStrategy` was changed to `.Values.statefulSet.spec.updateStrategy`
 **Update node 2**: `.Values.statefulSet.podManagementPolicy` was changed to `.Values.statefulSet.spec.podManagementPolicy`
 **Update note 3**: `.Values.deployment.strategy` was changed to `.Values.deployment.spec.strategy`
 **Update note 4**: `.Values.statefulSet.enabled` was replaced by `.Values.mode`, which accepts `deployment`, `statefulSet` or `daemonSet` values
 **Update note 5**: `.Values.persistence` was changed to `.Values.persistentVolume`
 
+- Force enabling service, when ingress in enabled. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2007).
 - Add ability to configure VMAgent as a DaemonSet. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1995).
+- bump version of VM components to [v1.112.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.112.0)
 
 ## 0.15.8
 
