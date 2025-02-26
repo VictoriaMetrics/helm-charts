@@ -203,7 +203,7 @@ defaultDashboards:
 
 * Add dependency chart repositories
 
-```console
+```shell
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
@@ -309,13 +309,13 @@ To run VictoriaMetrics stack locally it's possible to use [Minikube](https://git
 
 Run Minikube cluster
 
-```
+```shell
 minikube start --container-runtime=containerd --extra-config=scheduler.bind-address=0.0.0.0 --extra-config=controller-manager.bind-address=0.0.0.0 --extra-config=etcd.listen-metrics-urls=http://0.0.0.0:2381
 ```
 
 Install helm chart
 
-```
+```shell
 helm install [RELEASE_NAME] vm/victoria-metrics-k8s-stack -f values.yaml -f values.minikube.yaml -n NAMESPACE --debug --dry-run
 ```
 
@@ -329,7 +329,7 @@ helm uninstall vmks -n NAMESPACE
 
 CRDs created by this chart are not removed by default and should be manually cleaned up:
 
-```console
+```shell
 kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl delete crd {}
 ```
 
@@ -338,12 +338,12 @@ kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubect
 - If you cannot install helm chart with error `configmap already exist`. It could happen because of name collisions, if you set too long release name.
   Kubernetes by default, allows only 63 symbols at resource names and all resource names are trimmed by helm to 63 symbols.
   To mitigate it, use shorter name for helm chart release name, like:
-```bash
+```shell
 # stack - is short enough
 helm upgrade -i stack vm/victoria-metrics-k8s-stack
 ```
   Or use override for helm chart release name:
-```bash
+```shell
 helm upgrade -i some-very-long-name vm/victoria-metrics-k8s-stack --set fullnameOverride=stack
 ```
 
@@ -351,14 +351,14 @@ helm upgrade -i some-very-long-name vm/victoria-metrics-k8s-stack --set fullname
 
 Usually, helm upgrade doesn't requires manual actions. Just execute command:
 
-```console
+```shell
 $ helm upgrade [RELEASE_NAME] vm/victoria-metrics-k8s-stack
 ```
 
 But release with CRD update can only be patched manually with kubectl.
 Since helm does not perform a CRD update, we recommend that you always perform this when updating the helm-charts version:
 
-```console
+```shell
 # 1. check the changes in CRD
 $ helm show crds vm/victoria-metrics-k8s-stack --version [YOUR_CHART_VERSION] | kubectl diff -f -
 
@@ -375,7 +375,7 @@ Also `.vm.write` and `.vm.read` variables are available in `vmauth.spec`, which 
 
 If your configuration in version < 0.29.0 looked like below:
 
-```
+```yaml
 vmcluster:
   vmauth:
     vmselect:
@@ -392,7 +392,7 @@ vmcluster:
 
 In 0.29.0 it should look like:
 
-```
+```yaml
 vmauth:
   spec:
     unauthorizedAccessConfig:
@@ -410,7 +410,7 @@ vmauth:
 
 - node-exporter starting from version 4.0.0 is using the Kubernetes recommended labels. Therefore you have to delete the daemonset before you upgrade.
 
-```bash
+```shell
 kubectl delete daemonset -l app=prometheus-node-exporter
 ```
 - scrape configuration for kubernetes components was moved from `vmServiceScrape.spec` section to `spec` section. If you previously modified scrape configuration you need to update your `values.yaml`
@@ -421,7 +421,7 @@ kubectl delete daemonset -l app=prometheus-node-exporter
 
  All `CRD` must be update to the lastest version with command:
 
-```bash
+```shell
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/master/charts/victoria-metrics-k8s-stack/crds/crd.yaml
 
 ```
@@ -430,7 +430,7 @@ kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/m
 
  All `CRD` must be update to `v1` version with command:
 
-```bash
+```shell
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/master/charts/victoria-metrics-k8s-stack/crds/crd.yaml
 
 ```
@@ -440,7 +440,7 @@ kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/m
  Update `VMAgent` crd
 
 command:
-```bash
+```shell
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.16.0/config/crd/bases/operator.victoriametrics.com_vmagents.yaml
 ```
 
@@ -448,7 +448,7 @@ kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.1
 
 New CRD added to operator - `VMUser` and `VMAuth`, new fields added to exist crd.
 Manual commands:
-```bash
+```shell
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.15.0/config/crd/bases/operator.victoriametrics.com_vmusers.yaml
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.15.0/config/crd/bases/operator.victoriametrics.com_vmauths.yaml
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/operator/v0.15.0/config/crd/bases/operator.victoriametrics.com_vmalerts.yaml
@@ -477,2603 +477,1721 @@ The following tables lists the configurable parameters of the chart and their de
 
 Change the values according to the need of the environment in ``victoria-metrics-k8s-stack/values.yaml`` file.
 
-<table class="helm-vars">
-  <thead>
-    <th class="helm-vars-key">Key</th>
-    <th class="helm-vars-type">Type</th>
-    <th class="helm-vars-default">Default</th>
-    <th class="helm-vars-description">Description</th>
-  </thead>
-  <tbody>
-    <tr>
-      <td>additionalVictoriaMetricsMap</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">null
-</code>
-</pre>
-</td>
-      <td><p>Provide custom recording or alerting rules to be deployed into the cluster.</p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Alertmanager annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.config</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">receivers:
-    - name: blackhole
-route:
-    receiver: blackhole
-</code>
-</pre>
-</td>
-      <td><p>Alertmanager configuration</p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create VMAlertmanager CR</p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.ingress</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">annotations: {}
-enabled: false
-extraPaths: []
-hosts:
-    - alertmanager.domain.com
-labels: {}
-path: '{{ .Values.alertmanager.spec.routePrefix | default "/" }}'
-pathType: Prefix
-tls: []
-</code>
-</pre>
-</td>
-      <td><p>Alertmanager ingress configuration</p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.ingress.extraPaths</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.monzoTemplate</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-</code>
-</pre>
-</td>
-      <td><p>Better alert templates for <a href="https://gist.github.com/milesbxf/e2744fc90e9c41b47aa47925f8ff6512" target="_blank">slack source</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">configSecret: ""
-externalURL: ""
-image:
-    tag: v0.27.0
-port: "9093"
-replicaCount: 1
-routePrefix: /
-selectAllByDefault: true
-</code>
-</pre>
-</td>
-      <td><p>Full spec for VMAlertmanager CRD. Allowed values described <a href="https://docs.victoriametrics.com/operator/api#vmalertmanagerspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.spec.configSecret</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>If this one defined, it will be used for alertmanager configuration and config parameter will be ignored</p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.templateFiles</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Extra alert templates</p>
-</td>
-    </tr>
-    <tr>
-      <td>alertmanager.useManagedConfig</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>enable storing .Values.alertmanager.config in VMAlertmanagerConfig instead of k8s Secret. Note: VMAlertmanagerConfig and plain Alertmanager config structures are not equal. If you&rsquo;re migrating existing config, please make sure that <code>.Values.alertmanager.config</code>: - with <code>useManagedConfig: false</code> has structure described <a href="https://prometheus.io/docs/alerting/latest/configuration/" target="_blank">here</a>. - with <code>useManagedConfig: true</code> has structure described <a href="https://docs.victoriametrics.com/operator/api/#vmalertmanagerconfig" target="_blank">here</a>.</p>
-</td>
-    </tr>
-    <tr>
-      <td>argocdReleaseOverride</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>If this chart is used in &ldquo;Argocd&rdquo; with &ldquo;releaseName&rdquo; field then VMServiceScrapes couldn&rsquo;t select the proper services. For correct working need set value &lsquo;argocdReleaseOverride=$ARGOCD_APP_NAME&rsquo;</p>
-</td>
-    </tr>
-    <tr>
-      <td>coreDns.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Enabled CoreDNS metrics scraping</p>
-</td>
-    </tr>
-    <tr>
-      <td>coreDns.service.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create service for CoreDNS metrics</p>
-</td>
-    </tr>
-    <tr>
-      <td>coreDns.service.port</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">9153
-</code>
-</pre>
-</td>
-      <td><p>CoreDNS service port</p>
-</td>
-    </tr>
-    <tr>
-      <td>coreDns.service.selector</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">k8s-app: kube-dns
-</code>
-</pre>
-</td>
-      <td><p>CoreDNS service pod selector</p>
-</td>
-    </tr>
-    <tr>
-      <td>coreDns.service.targetPort</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">9153
-</code>
-</pre>
-</td>
-      <td><p>CoreDNS service target port</p>
-</td>
-    </tr>
-    <tr>
-      <td>coreDns.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          port: http-metrics
-    jobLabel: jobLabel
-    namespaceSelector:
-        matchNames:
-            - kube-system
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMServiceScrape CRD is <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultDashboards.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>defaultDashboards.dashboards</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">node-exporter-full:
-    enabled: true
-victoriametrics-operator:
-    enabled: true
-victoriametrics-vmalert:
-    enabled: true
-</code>
-</pre>
-</td>
-      <td><p>Create dashboards as ConfigMap despite dependency it requires is not installed</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultDashboards.dashboards.node-exporter-full</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-</code>
-</pre>
-</td>
-      <td><p>In ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply See <a href="https://github.com/VictoriaMetrics/helm-charts/tree/disable-node-exporter-dashboard-by-default/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards" target="_blank">this issue</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultDashboards.defaultTimezone</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">utc
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>defaultDashboards.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Enable custom dashboards installation</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultDashboards.grafanaOperator.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Create dashboards as CRDs (requires grafana-operator to be installed)</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultDashboards.grafanaOperator.spec.allowCrossNamespaceImport</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>defaultDashboards.grafanaOperator.spec.instanceSelector.matchLabels.dashboards</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">grafana
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>defaultDashboards.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>defaultDatasources.alertmanager</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">datasources:
-    - access: proxy
-      jsonData:
-        implementation: prometheus
-      name: Alertmanager
-perReplica: false
-</code>
-</pre>
-</td>
-      <td><p>List of alertmanager datasources. Alertmanager generated <code>url</code> will be added to each datasource in template if alertmanager is enabled</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultDatasources.alertmanager.perReplica</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Create per replica alertmanager compatible datasource</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultDatasources.extra</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Configure additional grafana datasources (passed through tpl). Check <a href="http://docs.grafana.org/administration/provisioning/#datasources" target="_blank">here</a> for details</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultDatasources.grafanaOperator.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>defaultDatasources.grafanaOperator.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Create datasources as CRDs (requires grafana-operator to be installed)</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultDatasources.grafanaOperator.spec.allowCrossNamespaceImport</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>defaultDatasources.grafanaOperator.spec.instanceSelector.matchLabels.dashboards</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">grafana
-</code>
-</pre>
-</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>defaultDatasources.victoriametrics.datasources</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">- access: proxy
-  isDefault: true
-  name: VictoriaMetrics
-  type: prometheus
-- access: proxy
-  isDefault: false
-  name: VictoriaMetrics (DS)
-  type: victoriametrics-metrics-datasource
-</code>
-</pre>
-</td>
-      <td><p>List of prometheus compatible datasource configurations. VM <code>url</code> will be added to each of them in templates.</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultDatasources.victoriametrics.perReplica</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Create per replica prometheus compatible datasource</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">additionalGroupByLabels: []
-alerting:
-    spec:
-        annotations: {}
-        labels: {}
-annotations: {}
-create: true
-group:
-    spec:
-        params: {}
-groups:
-    alertmanager:
-        create: true
-        rules: {}
-    etcd:
-        create: true
-        rules: {}
-    general:
-        create: true
-        rules: {}
-    k8sContainerCpuLimits:
-        create: true
-        rules: {}
-    k8sContainerCpuRequests:
-        create: true
-        rules: {}
-    k8sContainerCpuUsageSecondsTotal:
-        create: true
-        rules: {}
-    k8sContainerMemoryCache:
-        create: true
-        rules: {}
-    k8sContainerMemoryLimits:
-        create: true
-        rules: {}
-    k8sContainerMemoryRequests:
-        create: true
-        rules: {}
-    k8sContainerMemoryRss:
-        create: true
-        rules: {}
-    k8sContainerMemorySwap:
-        create: true
-        rules: {}
-    k8sContainerMemoryWorkingSetBytes:
-        create: true
-        rules: {}
-    k8sContainerResource:
-        create: true
-        rules: {}
-    k8sPodOwner:
-        create: true
-        rules: {}
-    kubeApiserver:
-        create: true
-        rules: {}
-    kubeApiserverAvailability:
-        create: true
-        rules: {}
-    kubeApiserverBurnrate:
-        create: true
-        rules: {}
-    kubeApiserverHistogram:
-        create: true
-        rules: {}
-    kubeApiserverSlos:
-        create: true
-        rules: {}
-    kubePrometheusGeneral:
-        create: true
-        rules: {}
-    kubePrometheusNodeRecording:
-        create: true
-        rules: {}
-    kubeScheduler:
-        create: true
-        rules: {}
-    kubeStateMetrics:
-        create: true
-        rules: {}
-    kubelet:
-        create: true
-        rules: {}
-    kubernetesApps:
-        create: true
-        rules: {}
-        targetNamespace: .*
-    kubernetesResources:
-        create: true
-        rules: {}
-    kubernetesStorage:
-        create: true
-        rules: {}
-        targetNamespace: .*
-    kubernetesSystem:
-        create: true
-        rules: {}
-    kubernetesSystemApiserver:
-        create: true
-        rules: {}
-    kubernetesSystemControllerManager:
-        create: true
-        rules: {}
-    kubernetesSystemKubelet:
-        create: true
-        rules: {}
-    kubernetesSystemScheduler:
-        create: true
-        rules: {}
-    node:
-        create: true
-        rules: {}
-    nodeNetwork:
-        create: true
-        rules: {}
-    vmHealth:
-        create: true
-        rules: {}
-    vmagent:
-        create: true
-        rules: {}
-    vmcluster:
-        create: true
-        rules: {}
-    vmoperator:
-        create: true
-        rules: {}
-    vmsingle:
-        create: true
-        rules: {}
-labels: {}
-recording:
-    spec:
-        annotations: {}
-        labels: {}
-rule:
-    spec:
-        annotations: {}
-        labels: {}
-rules: {}
-runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
-</code>
-</pre>
-</td>
-      <td><p>Create default rules for monitoring the cluster</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.additionalGroupByLabels</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Labels, which are used for groupping results of the queries. Note that these labels are joined with <code>.Values.global.clusterLabel</code></p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.alerting</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    annotations: {}
-    labels: {}
-</code>
-</pre>
-</td>
-      <td><p>Common properties for VMRules alerts</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.alerting.spec.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Additional annotations for VMRule alerts</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.alerting.spec.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Additional labels for VMRule alerts</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Annotations for default rules</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.group</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    params: {}
-</code>
-</pre>
-</td>
-      <td><p>Common properties for VMRule groups</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.group.spec.params</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Optional HTTP URL parameters added to each rule request</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.groups</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">alertmanager:
-    create: true
-    rules: {}
-etcd:
-    create: true
-    rules: {}
-general:
-    create: true
-    rules: {}
-k8sContainerCpuLimits:
-    create: true
-    rules: {}
-k8sContainerCpuRequests:
-    create: true
-    rules: {}
-k8sContainerCpuUsageSecondsTotal:
-    create: true
-    rules: {}
-k8sContainerMemoryCache:
-    create: true
-    rules: {}
-k8sContainerMemoryLimits:
-    create: true
-    rules: {}
-k8sContainerMemoryRequests:
-    create: true
-    rules: {}
-k8sContainerMemoryRss:
-    create: true
-    rules: {}
-k8sContainerMemorySwap:
-    create: true
-    rules: {}
-k8sContainerMemoryWorkingSetBytes:
-    create: true
-    rules: {}
-k8sContainerResource:
-    create: true
-    rules: {}
-k8sPodOwner:
-    create: true
-    rules: {}
-kubeApiserver:
-    create: true
-    rules: {}
-kubeApiserverAvailability:
-    create: true
-    rules: {}
-kubeApiserverBurnrate:
-    create: true
-    rules: {}
-kubeApiserverHistogram:
-    create: true
-    rules: {}
-kubeApiserverSlos:
-    create: true
-    rules: {}
-kubePrometheusGeneral:
-    create: true
-    rules: {}
-kubePrometheusNodeRecording:
-    create: true
-    rules: {}
-kubeScheduler:
-    create: true
-    rules: {}
-kubeStateMetrics:
-    create: true
-    rules: {}
-kubelet:
-    create: true
-    rules: {}
-kubernetesApps:
-    create: true
-    rules: {}
-    targetNamespace: .*
-kubernetesResources:
-    create: true
-    rules: {}
-kubernetesStorage:
-    create: true
-    rules: {}
-    targetNamespace: .*
-kubernetesSystem:
-    create: true
-    rules: {}
-kubernetesSystemApiserver:
-    create: true
-    rules: {}
-kubernetesSystemControllerManager:
-    create: true
-    rules: {}
-kubernetesSystemKubelet:
-    create: true
-    rules: {}
-kubernetesSystemScheduler:
-    create: true
-    rules: {}
-node:
-    create: true
-    rules: {}
-nodeNetwork:
-    create: true
-    rules: {}
-vmHealth:
-    create: true
-    rules: {}
-vmagent:
-    create: true
-    rules: {}
-vmcluster:
-    create: true
-    rules: {}
-vmoperator:
-    create: true
-    rules: {}
-vmsingle:
-    create: true
-    rules: {}
-</code>
-</pre>
-</td>
-      <td><p>Rule group properties</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.groups.etcd.rules</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Common properties for all rules in a group</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Labels for default rules</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.recording</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    annotations: {}
-    labels: {}
-</code>
-</pre>
-</td>
-      <td><p>Common properties for VMRules recording rules</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.recording.spec.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Additional annotations for VMRule recording rules</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.recording.spec.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Additional labels for VMRule recording rules</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.rule</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    annotations: {}
-    labels: {}
-</code>
-</pre>
-</td>
-      <td><p>Common properties for all VMRules</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.rule.spec.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Additional annotations for all VMRules</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.rule.spec.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Additional labels for all VMRules</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.rules</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Per rule properties</p>
-</td>
-    </tr>
-    <tr>
-      <td>defaultRules.runbookUrl</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">https://runbooks.prometheus-operator.dev/runbooks
-</code>
-</pre>
-</td>
-      <td><p>Runbook url prefix for default rules</p>
-</td>
-    </tr>
-    <tr>
-      <td>external.grafana</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">host: grafana.external.host
-</code>
-</pre>
-</td>
-      <td><p>External Grafana host</p>
-</td>
-    </tr>
-    <tr>
-      <td>external.vm</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">read:
-    url: ""
-write:
-    url: ""
-</code>
-</pre>
-</td>
-      <td><p>External VM read and write URLs</p>
-</td>
-    </tr>
-    <tr>
-      <td>extraObjects</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Add extra objects dynamically to this chart</p>
-</td>
-    </tr>
-    <tr>
-      <td>fullnameOverride</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Resource full name override</p>
-</td>
-    </tr>
-    <tr>
-      <td>global.cluster.dnsDomain</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">cluster.local.
-</code>
-</pre>
-</td>
-      <td><p>K8s cluster domain suffix, uses for building storage pods&rsquo; FQDN. Details are <a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>global.clusterLabel</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">cluster
-</code>
-</pre>
-</td>
-      <td><p>Cluster label to use for dashboards and rules</p>
-</td>
-    </tr>
-    <tr>
-      <td>global.license</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">key: ""
-keyRef: {}
-</code>
-</pre>
-</td>
-      <td><p>Global license configuration</p>
-</td>
-    </tr>
-    <tr>
-      <td>grafana</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-forceDeployDatasource: false
-ingress:
-    annotations: {}
-    enabled: false
-    extraPaths: []
-    hosts:
-        - grafana.domain.com
-    labels: {}
-    path: /
-    pathType: Prefix
-    tls: []
-sidecar:
-    dashboards:
-        defaultFolderName: default
-        enabled: true
-        folder: /var/lib/grafana/dashboards
-        multicluster: false
-        provider:
-            name: default
-            orgid: 1
-    datasources:
-        enabled: true
-        initDatasources: true
-        label: grafana_datasource
-vmScrape:
-    enabled: true
-    spec:
-        endpoints:
-            - port: '{{ .Values.grafana.service.portName }}'
-        selector:
-            matchLabels:
-                app.kubernetes.io/name: '{{ include "grafana.name" .Subcharts.grafana }}'
-</code>
-</pre>
-</td>
-      <td><p>Grafana dependency chart configuration. For possible values refer <a href="https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>grafana.forceDeployDatasource</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Create datasource configmap even if grafana deployment has been disabled</p>
-</td>
-    </tr>
-    <tr>
-      <td>grafana.ingress.extraPaths</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
-</td>
-    </tr>
-    <tr>
-      <td>grafana.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-spec:
-    endpoints:
-        - port: '{{ .Values.grafana.service.portName }}'
-    selector:
-        matchLabels:
-            app.kubernetes.io/name: '{{ include "grafana.name" .Subcharts.grafana }}'
-</code>
-</pre>
-</td>
-      <td><p>Grafana VM scrape config</p>
-</td>
-    </tr>
-    <tr>
-      <td>grafana.vmScrape.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">endpoints:
-    - port: '{{ .Values.grafana.service.portName }}'
-selector:
-    matchLabels:
-        app.kubernetes.io/name: '{{ include "grafana.name" .Subcharts.grafana }}'
-</code>
-</pre>
-</td>
-      <td><p><a href="https://docs.victoriametrics.com/operator/api#vmservicescrapespec" target="_blank">Scrape configuration</a> for Grafana</p>
-</td>
-    </tr>
-    <tr>
-      <td>kube-state-metrics</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-vmScrape:
-    enabled: true
-    spec:
-        endpoints:
-            - honorLabels: true
-              metricRelabelConfigs:
-                - action: labeldrop
-                  regex: (uid|container_id|image_id)
-              port: http
-        jobLabel: app.kubernetes.io/name
-        selector:
-            matchLabels:
-                app.kubernetes.io/instance: '{{ include "vm.release" . }}'
-                app.kubernetes.io/name: '{{ include "kube-state-metrics.name" (index .Subcharts "kube-state-metrics") }}'
-</code>
-</pre>
-</td>
-      <td><p>kube-state-metrics dependency chart configuration. For possible values check <a href="https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-state-metrics/values.yaml" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>kube-state-metrics.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-spec:
-    endpoints:
-        - honorLabels: true
+<a id="helm-value-additionalvictoriametricsmap" href="#helm-value-additionalvictoriametricsmap" aria-hidden="true" tabindex="-1"></a>
+[`additionalVictoriaMetricsMap`](#helm-value-additionalvictoriametricsmap)`(string)`: Provide custom recording or alerting rules to be deployed into the cluster.
+  ```helm-default
+  null
+  ```
+   
+<a id="helm-value-alertmanager-annotations" href="#helm-value-alertmanager-annotations" aria-hidden="true" tabindex="-1"></a>
+[`alertmanager.annotations`](#helm-value-alertmanager-annotations)`(object)`: Alertmanager annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-alertmanager-config" href="#helm-value-alertmanager-config" aria-hidden="true" tabindex="-1"></a>
+[`alertmanager.config`](#helm-value-alertmanager-config)`(object)`: Alertmanager configuration
+  ```helm-default
+  receivers:
+      - name: blackhole
+  route:
+      receiver: blackhole
+  ```
+   
+<a id="helm-value-alertmanager-enabled" href="#helm-value-alertmanager-enabled" aria-hidden="true" tabindex="-1"></a>
+[`alertmanager.enabled`](#helm-value-alertmanager-enabled)`(bool)`: Create VMAlertmanager CR
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-alertmanager-ingress" href="#helm-value-alertmanager-ingress" aria-hidden="true" tabindex="-1"></a>
+[`alertmanager.ingress`](#helm-value-alertmanager-ingress)`(object)`: Alertmanager ingress configuration
+  ```helm-default
+  annotations: {}
+  enabled: false
+  extraPaths: []
+  hosts:
+      - alertmanager.domain.com
+  labels: {}
+  path: '{{ .Values.alertmanager.spec.routePrefix | default "/" }}'
+  pathType: Prefix
+  tls: []
+  ```
+   
+<a id="helm-value-alertmanager-ingress-extrapaths" href="#helm-value-alertmanager-ingress-extrapaths" aria-hidden="true" tabindex="-1"></a>
+[`alertmanager.ingress.extraPaths`](#helm-value-alertmanager-ingress-extrapaths)`(list)`: Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-alertmanager-monzotemplate" href="#helm-value-alertmanager-monzotemplate" aria-hidden="true" tabindex="-1"></a>
+[`alertmanager.monzoTemplate`](#helm-value-alertmanager-monzotemplate)`(object)`: Better alert templates for [slack source](https://gist.github.com/milesbxf/e2744fc90e9c41b47aa47925f8ff6512)
+  ```helm-default
+  enabled: true
+  ```
+   
+<a id="helm-value-alertmanager-spec" href="#helm-value-alertmanager-spec" aria-hidden="true" tabindex="-1"></a>
+[`alertmanager.spec`](#helm-value-alertmanager-spec)`(object)`: Full spec for VMAlertmanager CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmalertmanagerspec)
+  ```helm-default
+  configSecret: ""
+  externalURL: ""
+  image:
+      tag: v0.27.0
+  port: "9093"
+  replicaCount: 1
+  routePrefix: /
+  selectAllByDefault: true
+  ```
+   
+<a id="helm-value-alertmanager-spec-configsecret" href="#helm-value-alertmanager-spec-configsecret" aria-hidden="true" tabindex="-1"></a>
+[`alertmanager.spec.configSecret`](#helm-value-alertmanager-spec-configsecret)`(string)`: If this one defined, it will be used for alertmanager configuration and config parameter will be ignored
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-alertmanager-templatefiles" href="#helm-value-alertmanager-templatefiles" aria-hidden="true" tabindex="-1"></a>
+[`alertmanager.templateFiles`](#helm-value-alertmanager-templatefiles)`(object)`: Extra alert templates
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-alertmanager-usemanagedconfig" href="#helm-value-alertmanager-usemanagedconfig" aria-hidden="true" tabindex="-1"></a>
+[`alertmanager.useManagedConfig`](#helm-value-alertmanager-usemanagedconfig)`(bool)`:
+enable storing .Values.alertmanager.config in VMAlertmanagerConfig instead of k8s Secret.
+Note: VMAlertmanagerConfig and plain Alertmanager config structures are not equal.
+If you're migrating existing config, please make sure that `.Values.alertmanager.config`:
+- with `useManagedConfig: false` has structure described [here](https://prometheus.io/docs/alerting/latest/configuration/).
+- with `useManagedConfig: true` has structure described [here](https://docs.victoriametrics.com/operator/api/#vmalertmanagerconfig).
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-argocdreleaseoverride" href="#helm-value-argocdreleaseoverride" aria-hidden="true" tabindex="-1"></a>
+[`argocdReleaseOverride`](#helm-value-argocdreleaseoverride)`(string)`: If this chart is used in "Argocd" with "releaseName" field then VMServiceScrapes couldn't select the proper services. For correct working need set value 'argocdReleaseOverride=$ARGOCD_APP_NAME'
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-coredns-enabled" href="#helm-value-coredns-enabled" aria-hidden="true" tabindex="-1"></a>
+[`coreDns.enabled`](#helm-value-coredns-enabled)`(bool)`: Enabled CoreDNS metrics scraping
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-coredns-service-enabled" href="#helm-value-coredns-service-enabled" aria-hidden="true" tabindex="-1"></a>
+[`coreDns.service.enabled`](#helm-value-coredns-service-enabled)`(bool)`: Create service for CoreDNS metrics
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-coredns-service-port" href="#helm-value-coredns-service-port" aria-hidden="true" tabindex="-1"></a>
+[`coreDns.service.port`](#helm-value-coredns-service-port)`(int)`: CoreDNS service port
+  ```helm-default
+  9153
+  ```
+   
+<a id="helm-value-coredns-service-selector" href="#helm-value-coredns-service-selector" aria-hidden="true" tabindex="-1"></a>
+[`coreDns.service.selector`](#helm-value-coredns-service-selector)`(object)`: CoreDNS service pod selector
+  ```helm-default
+  k8s-app: kube-dns
+  ```
+   
+<a id="helm-value-coredns-service-targetport" href="#helm-value-coredns-service-targetport" aria-hidden="true" tabindex="-1"></a>
+[`coreDns.service.targetPort`](#helm-value-coredns-service-targetport)`(int)`: CoreDNS service target port
+  ```helm-default
+  9153
+  ```
+   
+<a id="helm-value-coredns-vmscrape" href="#helm-value-coredns-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`coreDns.vmScrape`](#helm-value-coredns-vmscrape)`(object)`: Spec for VMServiceScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec)
+  ```helm-default
+  spec:
+      endpoints:
+          - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+            port: http-metrics
+      jobLabel: jobLabel
+      namespaceSelector:
+          matchNames:
+              - kube-system
+  ```
+   
+<a id="helm-value-defaultdashboards-annotations" href="#helm-value-defaultdashboards-annotations" aria-hidden="true" tabindex="-1"></a>
+[`defaultDashboards.annotations`](#helm-value-defaultdashboards-annotations)`(object)`:
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultdashboards-dashboards" href="#helm-value-defaultdashboards-dashboards" aria-hidden="true" tabindex="-1"></a>
+[`defaultDashboards.dashboards`](#helm-value-defaultdashboards-dashboards)`(object)`: Create dashboards as ConfigMap despite dependency it requires is not installed
+  ```helm-default
+  node-exporter-full:
+      enabled: true
+  victoriametrics-operator:
+      enabled: true
+  victoriametrics-vmalert:
+      enabled: true
+  ```
+   
+<a id="helm-value-defaultdashboards-dashboards-node-exporter-full" href="#helm-value-defaultdashboards-dashboards-node-exporter-full" aria-hidden="true" tabindex="-1"></a>
+[`defaultDashboards.dashboards.node-exporter-full`](#helm-value-defaultdashboards-dashboards-node-exporter-full)`(object)`: In ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply See [this issue](https://github.com/VictoriaMetrics/helm-charts/tree/disable-node-exporter-dashboard-by-default/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards)
+  ```helm-default
+  enabled: true
+  ```
+   
+<a id="helm-value-defaultdashboards-defaulttimezone" href="#helm-value-defaultdashboards-defaulttimezone" aria-hidden="true" tabindex="-1"></a>
+[`defaultDashboards.defaultTimezone`](#helm-value-defaultdashboards-defaulttimezone)`(string)`:
+  ```helm-default
+  utc
+  ```
+   
+<a id="helm-value-defaultdashboards-enabled" href="#helm-value-defaultdashboards-enabled" aria-hidden="true" tabindex="-1"></a>
+[`defaultDashboards.enabled`](#helm-value-defaultdashboards-enabled)`(bool)`: Enable custom dashboards installation
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-defaultdashboards-grafanaoperator-enabled" href="#helm-value-defaultdashboards-grafanaoperator-enabled" aria-hidden="true" tabindex="-1"></a>
+[`defaultDashboards.grafanaOperator.enabled`](#helm-value-defaultdashboards-grafanaoperator-enabled)`(bool)`: Create dashboards as CRDs (requires grafana-operator to be installed)
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-defaultdashboards-grafanaoperator-spec-allowcrossnamespaceimport" href="#helm-value-defaultdashboards-grafanaoperator-spec-allowcrossnamespaceimport" aria-hidden="true" tabindex="-1"></a>
+[`defaultDashboards.grafanaOperator.spec.allowCrossNamespaceImport`](#helm-value-defaultdashboards-grafanaoperator-spec-allowcrossnamespaceimport)`(bool)`:
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-defaultdashboards-grafanaoperator-spec-instanceselector-matchlabels-dashboards" href="#helm-value-defaultdashboards-grafanaoperator-spec-instanceselector-matchlabels-dashboards" aria-hidden="true" tabindex="-1"></a>
+[`defaultDashboards.grafanaOperator.spec.instanceSelector.matchLabels.dashboards`](#helm-value-defaultdashboards-grafanaoperator-spec-instanceselector-matchlabels-dashboards)`(string)`:
+  ```helm-default
+  grafana
+  ```
+   
+<a id="helm-value-defaultdashboards-labels" href="#helm-value-defaultdashboards-labels" aria-hidden="true" tabindex="-1"></a>
+[`defaultDashboards.labels`](#helm-value-defaultdashboards-labels)`(object)`:
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultdatasources-alertmanager" href="#helm-value-defaultdatasources-alertmanager" aria-hidden="true" tabindex="-1"></a>
+[`defaultDatasources.alertmanager`](#helm-value-defaultdatasources-alertmanager)`(object)`: List of alertmanager datasources. Alertmanager generated `url` will be added to each datasource in template if alertmanager is enabled
+  ```helm-default
+  datasources:
+      - access: proxy
+        jsonData:
+          implementation: prometheus
+        name: Alertmanager
+  perReplica: false
+  ```
+   
+<a id="helm-value-defaultdatasources-alertmanager-perreplica" href="#helm-value-defaultdatasources-alertmanager-perreplica" aria-hidden="true" tabindex="-1"></a>
+[`defaultDatasources.alertmanager.perReplica`](#helm-value-defaultdatasources-alertmanager-perreplica)`(bool)`: Create per replica alertmanager compatible datasource
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-defaultdatasources-extra" href="#helm-value-defaultdatasources-extra" aria-hidden="true" tabindex="-1"></a>
+[`defaultDatasources.extra`](#helm-value-defaultdatasources-extra)`(list)`: Configure additional grafana datasources (passed through tpl). Check [here](http://docs.grafana.org/administration/provisioning/#datasources) for details
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-defaultdatasources-grafanaoperator-annotations" href="#helm-value-defaultdatasources-grafanaoperator-annotations" aria-hidden="true" tabindex="-1"></a>
+[`defaultDatasources.grafanaOperator.annotations`](#helm-value-defaultdatasources-grafanaoperator-annotations)`(object)`:
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultdatasources-grafanaoperator-enabled" href="#helm-value-defaultdatasources-grafanaoperator-enabled" aria-hidden="true" tabindex="-1"></a>
+[`defaultDatasources.grafanaOperator.enabled`](#helm-value-defaultdatasources-grafanaoperator-enabled)`(bool)`: Create datasources as CRDs (requires grafana-operator to be installed)
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-defaultdatasources-grafanaoperator-spec-allowcrossnamespaceimport" href="#helm-value-defaultdatasources-grafanaoperator-spec-allowcrossnamespaceimport" aria-hidden="true" tabindex="-1"></a>
+[`defaultDatasources.grafanaOperator.spec.allowCrossNamespaceImport`](#helm-value-defaultdatasources-grafanaoperator-spec-allowcrossnamespaceimport)`(bool)`:
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-defaultdatasources-grafanaoperator-spec-instanceselector-matchlabels-dashboards" href="#helm-value-defaultdatasources-grafanaoperator-spec-instanceselector-matchlabels-dashboards" aria-hidden="true" tabindex="-1"></a>
+[`defaultDatasources.grafanaOperator.spec.instanceSelector.matchLabels.dashboards`](#helm-value-defaultdatasources-grafanaoperator-spec-instanceselector-matchlabels-dashboards)`(string)`:
+  ```helm-default
+  grafana
+  ```
+   
+<a id="helm-value-defaultdatasources-victoriametrics-datasources" href="#helm-value-defaultdatasources-victoriametrics-datasources" aria-hidden="true" tabindex="-1"></a>
+[`defaultDatasources.victoriametrics.datasources`](#helm-value-defaultdatasources-victoriametrics-datasources)`(list)`: List of prometheus compatible datasource configurations. VM `url` will be added to each of them in templates.
+  ```helm-default
+  - access: proxy
+    isDefault: true
+    name: VictoriaMetrics
+    type: prometheus
+  - access: proxy
+    isDefault: false
+    name: VictoriaMetrics (DS)
+    type: victoriametrics-metrics-datasource
+  ```
+   
+<a id="helm-value-defaultdatasources-victoriametrics-perreplica" href="#helm-value-defaultdatasources-victoriametrics-perreplica" aria-hidden="true" tabindex="-1"></a>
+[`defaultDatasources.victoriametrics.perReplica`](#helm-value-defaultdatasources-victoriametrics-perreplica)`(bool)`: Create per replica prometheus compatible datasource
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-defaultrules" href="#helm-value-defaultrules" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules`](#helm-value-defaultrules)`(object)`: Create default rules for monitoring the cluster
+  ```helm-default
+  additionalGroupByLabels: []
+  alerting:
+      spec:
+          annotations: {}
+          labels: {}
+  annotations: {}
+  create: true
+  group:
+      spec:
+          params: {}
+  groups:
+      alertmanager:
+          create: true
+          rules: {}
+      etcd:
+          create: true
+          rules: {}
+      general:
+          create: true
+          rules: {}
+      k8sContainerCpuLimits:
+          create: true
+          rules: {}
+      k8sContainerCpuRequests:
+          create: true
+          rules: {}
+      k8sContainerCpuUsageSecondsTotal:
+          create: true
+          rules: {}
+      k8sContainerMemoryCache:
+          create: true
+          rules: {}
+      k8sContainerMemoryLimits:
+          create: true
+          rules: {}
+      k8sContainerMemoryRequests:
+          create: true
+          rules: {}
+      k8sContainerMemoryRss:
+          create: true
+          rules: {}
+      k8sContainerMemorySwap:
+          create: true
+          rules: {}
+      k8sContainerMemoryWorkingSetBytes:
+          create: true
+          rules: {}
+      k8sContainerResource:
+          create: true
+          rules: {}
+      k8sPodOwner:
+          create: true
+          rules: {}
+      kubeApiserver:
+          create: true
+          rules: {}
+      kubeApiserverAvailability:
+          create: true
+          rules: {}
+      kubeApiserverBurnrate:
+          create: true
+          rules: {}
+      kubeApiserverHistogram:
+          create: true
+          rules: {}
+      kubeApiserverSlos:
+          create: true
+          rules: {}
+      kubePrometheusGeneral:
+          create: true
+          rules: {}
+      kubePrometheusNodeRecording:
+          create: true
+          rules: {}
+      kubeScheduler:
+          create: true
+          rules: {}
+      kubeStateMetrics:
+          create: true
+          rules: {}
+      kubelet:
+          create: true
+          rules: {}
+      kubernetesApps:
+          create: true
+          rules: {}
+          targetNamespace: .*
+      kubernetesResources:
+          create: true
+          rules: {}
+      kubernetesStorage:
+          create: true
+          rules: {}
+          targetNamespace: .*
+      kubernetesSystem:
+          create: true
+          rules: {}
+      kubernetesSystemApiserver:
+          create: true
+          rules: {}
+      kubernetesSystemControllerManager:
+          create: true
+          rules: {}
+      kubernetesSystemKubelet:
+          create: true
+          rules: {}
+      kubernetesSystemScheduler:
+          create: true
+          rules: {}
+      node:
+          create: true
+          rules: {}
+      nodeNetwork:
+          create: true
+          rules: {}
+      vmHealth:
+          create: true
+          rules: {}
+      vmagent:
+          create: true
+          rules: {}
+      vmcluster:
+          create: true
+          rules: {}
+      vmoperator:
+          create: true
+          rules: {}
+      vmsingle:
+          create: true
+          rules: {}
+  labels: {}
+  recording:
+      spec:
+          annotations: {}
+          labels: {}
+  rule:
+      spec:
+          annotations: {}
+          labels: {}
+  rules: {}
+  runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
+  ```
+   
+<a id="helm-value-defaultrules-additionalgroupbylabels" href="#helm-value-defaultrules-additionalgroupbylabels" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.additionalGroupByLabels`](#helm-value-defaultrules-additionalgroupbylabels)`(list)`: Labels, which are used for groupping results of the queries. Note that these labels are joined with `.Values.global.clusterLabel`
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-defaultrules-alerting" href="#helm-value-defaultrules-alerting" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.alerting`](#helm-value-defaultrules-alerting)`(object)`: Common properties for VMRules alerts
+  ```helm-default
+  spec:
+      annotations: {}
+      labels: {}
+  ```
+   
+<a id="helm-value-defaultrules-alerting-spec-annotations" href="#helm-value-defaultrules-alerting-spec-annotations" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.alerting.spec.annotations`](#helm-value-defaultrules-alerting-spec-annotations)`(object)`: Additional annotations for VMRule alerts
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-alerting-spec-labels" href="#helm-value-defaultrules-alerting-spec-labels" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.alerting.spec.labels`](#helm-value-defaultrules-alerting-spec-labels)`(object)`: Additional labels for VMRule alerts
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-annotations" href="#helm-value-defaultrules-annotations" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.annotations`](#helm-value-defaultrules-annotations)`(object)`: Annotations for default rules
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-group" href="#helm-value-defaultrules-group" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.group`](#helm-value-defaultrules-group)`(object)`: Common properties for VMRule groups
+  ```helm-default
+  spec:
+      params: {}
+  ```
+   
+<a id="helm-value-defaultrules-group-spec-params" href="#helm-value-defaultrules-group-spec-params" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.group.spec.params`](#helm-value-defaultrules-group-spec-params)`(object)`: Optional HTTP URL parameters added to each rule request
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-groups" href="#helm-value-defaultrules-groups" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.groups`](#helm-value-defaultrules-groups)`(object)`: Rule group properties
+  ```helm-default
+  alertmanager:
+      create: true
+      rules: {}
+  etcd:
+      create: true
+      rules: {}
+  general:
+      create: true
+      rules: {}
+  k8sContainerCpuLimits:
+      create: true
+      rules: {}
+  k8sContainerCpuRequests:
+      create: true
+      rules: {}
+  k8sContainerCpuUsageSecondsTotal:
+      create: true
+      rules: {}
+  k8sContainerMemoryCache:
+      create: true
+      rules: {}
+  k8sContainerMemoryLimits:
+      create: true
+      rules: {}
+  k8sContainerMemoryRequests:
+      create: true
+      rules: {}
+  k8sContainerMemoryRss:
+      create: true
+      rules: {}
+  k8sContainerMemorySwap:
+      create: true
+      rules: {}
+  k8sContainerMemoryWorkingSetBytes:
+      create: true
+      rules: {}
+  k8sContainerResource:
+      create: true
+      rules: {}
+  k8sPodOwner:
+      create: true
+      rules: {}
+  kubeApiserver:
+      create: true
+      rules: {}
+  kubeApiserverAvailability:
+      create: true
+      rules: {}
+  kubeApiserverBurnrate:
+      create: true
+      rules: {}
+  kubeApiserverHistogram:
+      create: true
+      rules: {}
+  kubeApiserverSlos:
+      create: true
+      rules: {}
+  kubePrometheusGeneral:
+      create: true
+      rules: {}
+  kubePrometheusNodeRecording:
+      create: true
+      rules: {}
+  kubeScheduler:
+      create: true
+      rules: {}
+  kubeStateMetrics:
+      create: true
+      rules: {}
+  kubelet:
+      create: true
+      rules: {}
+  kubernetesApps:
+      create: true
+      rules: {}
+      targetNamespace: .*
+  kubernetesResources:
+      create: true
+      rules: {}
+  kubernetesStorage:
+      create: true
+      rules: {}
+      targetNamespace: .*
+  kubernetesSystem:
+      create: true
+      rules: {}
+  kubernetesSystemApiserver:
+      create: true
+      rules: {}
+  kubernetesSystemControllerManager:
+      create: true
+      rules: {}
+  kubernetesSystemKubelet:
+      create: true
+      rules: {}
+  kubernetesSystemScheduler:
+      create: true
+      rules: {}
+  node:
+      create: true
+      rules: {}
+  nodeNetwork:
+      create: true
+      rules: {}
+  vmHealth:
+      create: true
+      rules: {}
+  vmagent:
+      create: true
+      rules: {}
+  vmcluster:
+      create: true
+      rules: {}
+  vmoperator:
+      create: true
+      rules: {}
+  vmsingle:
+      create: true
+      rules: {}
+  ```
+   
+<a id="helm-value-defaultrules-groups-etcd-rules" href="#helm-value-defaultrules-groups-etcd-rules" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.groups.etcd.rules`](#helm-value-defaultrules-groups-etcd-rules)`(object)`: Common properties for all rules in a group
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-labels" href="#helm-value-defaultrules-labels" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.labels`](#helm-value-defaultrules-labels)`(object)`: Labels for default rules
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-recording" href="#helm-value-defaultrules-recording" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.recording`](#helm-value-defaultrules-recording)`(object)`: Common properties for VMRules recording rules
+  ```helm-default
+  spec:
+      annotations: {}
+      labels: {}
+  ```
+   
+<a id="helm-value-defaultrules-recording-spec-annotations" href="#helm-value-defaultrules-recording-spec-annotations" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.recording.spec.annotations`](#helm-value-defaultrules-recording-spec-annotations)`(object)`: Additional annotations for VMRule recording rules
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-recording-spec-labels" href="#helm-value-defaultrules-recording-spec-labels" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.recording.spec.labels`](#helm-value-defaultrules-recording-spec-labels)`(object)`: Additional labels for VMRule recording rules
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-rule" href="#helm-value-defaultrules-rule" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.rule`](#helm-value-defaultrules-rule)`(object)`: Common properties for all VMRules
+  ```helm-default
+  spec:
+      annotations: {}
+      labels: {}
+  ```
+   
+<a id="helm-value-defaultrules-rule-spec-annotations" href="#helm-value-defaultrules-rule-spec-annotations" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.rule.spec.annotations`](#helm-value-defaultrules-rule-spec-annotations)`(object)`: Additional annotations for all VMRules
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-rule-spec-labels" href="#helm-value-defaultrules-rule-spec-labels" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.rule.spec.labels`](#helm-value-defaultrules-rule-spec-labels)`(object)`: Additional labels for all VMRules
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-rules" href="#helm-value-defaultrules-rules" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.rules`](#helm-value-defaultrules-rules)`(object)`: Per rule properties
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-defaultrules-runbookurl" href="#helm-value-defaultrules-runbookurl" aria-hidden="true" tabindex="-1"></a>
+[`defaultRules.runbookUrl`](#helm-value-defaultrules-runbookurl)`(string)`: Runbook url prefix for default rules
+  ```helm-default
+  https://runbooks.prometheus-operator.dev/runbooks
+  ```
+   
+<a id="helm-value-external-grafana" href="#helm-value-external-grafana" aria-hidden="true" tabindex="-1"></a>
+[`external.grafana`](#helm-value-external-grafana)`(object)`: External Grafana host
+  ```helm-default
+  host: grafana.external.host
+  ```
+   
+<a id="helm-value-external-vm" href="#helm-value-external-vm" aria-hidden="true" tabindex="-1"></a>
+[`external.vm`](#helm-value-external-vm)`(object)`: External VM read and write URLs
+  ```helm-default
+  read:
+      url: ""
+  write:
+      url: ""
+  ```
+   
+<a id="helm-value-extraobjects" href="#helm-value-extraobjects" aria-hidden="true" tabindex="-1"></a>
+[`extraObjects`](#helm-value-extraobjects)`(list)`: Add extra objects dynamically to this chart
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-fullnameoverride" href="#helm-value-fullnameoverride" aria-hidden="true" tabindex="-1"></a>
+[`fullnameOverride`](#helm-value-fullnameoverride)`(string)`: Resource full name override
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-global-cluster-dnsdomain" href="#helm-value-global-cluster-dnsdomain" aria-hidden="true" tabindex="-1"></a>
+[`global.cluster.dnsDomain`](#helm-value-global-cluster-dnsdomain)`(string)`: K8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
+  ```helm-default
+  cluster.local.
+  ```
+   
+<a id="helm-value-global-clusterlabel" href="#helm-value-global-clusterlabel" aria-hidden="true" tabindex="-1"></a>
+[`global.clusterLabel`](#helm-value-global-clusterlabel)`(string)`: Cluster label to use for dashboards and rules
+  ```helm-default
+  cluster
+  ```
+   
+<a id="helm-value-global-license" href="#helm-value-global-license" aria-hidden="true" tabindex="-1"></a>
+[`global.license`](#helm-value-global-license)`(object)`: Global license configuration
+  ```helm-default
+  key: ""
+  keyRef: {}
+  ```
+   
+<a id="helm-value-grafana" href="#helm-value-grafana" aria-hidden="true" tabindex="-1"></a>
+[`grafana`](#helm-value-grafana)`(object)`: Grafana dependency chart configuration. For possible values refer [here](https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration)
+  ```helm-default
+  enabled: true
+  forceDeployDatasource: false
+  ingress:
+      annotations: {}
+      enabled: false
+      extraPaths: []
+      hosts:
+          - grafana.domain.com
+      labels: {}
+      path: /
+      pathType: Prefix
+      tls: []
+  sidecar:
+      dashboards:
+          defaultFolderName: default
+          enabled: true
+          folder: /var/lib/grafana/dashboards
+          multicluster: false
+          provider:
+              name: default
+              orgid: 1
+      datasources:
+          enabled: true
+          initDatasources: true
+          label: grafana_datasource
+  vmScrape:
+      enabled: true
+      spec:
+          endpoints:
+              - port: '{{ .Values.grafana.service.portName }}'
+          selector:
+              matchLabels:
+                  app.kubernetes.io/name: '{{ include "grafana.name" .Subcharts.grafana }}'
+  ```
+   
+<a id="helm-value-grafana-forcedeploydatasource" href="#helm-value-grafana-forcedeploydatasource" aria-hidden="true" tabindex="-1"></a>
+[`grafana.forceDeployDatasource`](#helm-value-grafana-forcedeploydatasource)`(bool)`: Create datasource configmap even if grafana deployment has been disabled
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-grafana-ingress-extrapaths" href="#helm-value-grafana-ingress-extrapaths" aria-hidden="true" tabindex="-1"></a>
+[`grafana.ingress.extraPaths`](#helm-value-grafana-ingress-extrapaths)`(list)`: Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-grafana-vmscrape" href="#helm-value-grafana-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`grafana.vmScrape`](#helm-value-grafana-vmscrape)`(object)`: Grafana VM scrape config
+  ```helm-default
+  enabled: true
+  spec:
+      endpoints:
+          - port: '{{ .Values.grafana.service.portName }}'
+      selector:
+          matchLabels:
+              app.kubernetes.io/name: '{{ include "grafana.name" .Subcharts.grafana }}'
+  ```
+   
+<a id="helm-value-grafana-vmscrape-spec" href="#helm-value-grafana-vmscrape-spec" aria-hidden="true" tabindex="-1"></a>
+[`grafana.vmScrape.spec`](#helm-value-grafana-vmscrape-spec)`(object)`: [Scrape configuration](https://docs.victoriametrics.com/operator/api#vmservicescrapespec) for Grafana
+  ```helm-default
+  endpoints:
+      - port: '{{ .Values.grafana.service.portName }}'
+  selector:
+      matchLabels:
+          app.kubernetes.io/name: '{{ include "grafana.name" .Subcharts.grafana }}'
+  ```
+   
+<a id="helm-value-kube-state-metrics" href="#helm-value-kube-state-metrics" aria-hidden="true" tabindex="-1"></a>
+[`kube-state-metrics`](#helm-value-kube-state-metrics)`(object)`: kube-state-metrics dependency chart configuration. For possible values check [here](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-state-metrics/values.yaml)
+  ```helm-default
+  enabled: true
+  vmScrape:
+      enabled: true
+      spec:
+          endpoints:
+              - honorLabels: true
+                metricRelabelConfigs:
+                  - action: labeldrop
+                    regex: (uid|container_id|image_id)
+                port: http
+          jobLabel: app.kubernetes.io/name
+          selector:
+              matchLabels:
+                  app.kubernetes.io/instance: '{{ include "vm.release" . }}'
+                  app.kubernetes.io/name: '{{ include "kube-state-metrics.name" (index .Subcharts "kube-state-metrics") }}'
+  ```
+   
+<a id="helm-value-kube-state-metrics-vmscrape" href="#helm-value-kube-state-metrics-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`kube-state-metrics.vmScrape`](#helm-value-kube-state-metrics-vmscrape)`(object)`: [Scrape configuration](https://docs.victoriametrics.com/operator/api#vmservicescrapespec) for Kube State Metrics
+  ```helm-default
+  enabled: true
+  spec:
+      endpoints:
+          - honorLabels: true
+            metricRelabelConfigs:
+              - action: labeldrop
+                regex: (uid|container_id|image_id)
+            port: http
+      jobLabel: app.kubernetes.io/name
+      selector:
+          matchLabels:
+              app.kubernetes.io/instance: '{{ include "vm.release" . }}'
+              app.kubernetes.io/name: '{{ include "kube-state-metrics.name" (index .Subcharts "kube-state-metrics") }}'
+  ```
+   
+<a id="helm-value-kubeapiserver-enabled" href="#helm-value-kubeapiserver-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeApiServer.enabled`](#helm-value-kubeapiserver-enabled)`(bool)`: Enable Kube Api Server metrics scraping
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-kubeapiserver-vmscrape" href="#helm-value-kubeapiserver-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`kubeApiServer.vmScrape`](#helm-value-kubeapiserver-vmscrape)`(object)`: Spec for VMServiceScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec)
+  ```helm-default
+  spec:
+      endpoints:
+          - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+            port: https
+            scheme: https
+            tlsConfig:
+              caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              serverName: kubernetes
+      jobLabel: component
+      namespaceSelector:
+          matchNames:
+              - default
+      selector:
+          matchLabels:
+              component: apiserver
+              provider: kubernetes
+  ```
+   
+<a id="helm-value-kubecontrollermanager-enabled" href="#helm-value-kubecontrollermanager-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeControllerManager.enabled`](#helm-value-kubecontrollermanager-enabled)`(bool)`: Enable kube controller manager metrics scraping
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-kubecontrollermanager-endpoints" href="#helm-value-kubecontrollermanager-endpoints" aria-hidden="true" tabindex="-1"></a>
+[`kubeControllerManager.endpoints`](#helm-value-kubecontrollermanager-endpoints)`(list)`: If your kube controller manager is not deployed as a pod, specify IPs it can be found on
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-kubecontrollermanager-service-enabled" href="#helm-value-kubecontrollermanager-service-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeControllerManager.service.enabled`](#helm-value-kubecontrollermanager-service-enabled)`(bool)`: Create service for kube controller manager metrics scraping
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-kubecontrollermanager-service-port" href="#helm-value-kubecontrollermanager-service-port" aria-hidden="true" tabindex="-1"></a>
+[`kubeControllerManager.service.port`](#helm-value-kubecontrollermanager-service-port)`(int)`: Kube controller manager service port
+  ```helm-default
+  10257
+  ```
+   
+<a id="helm-value-kubecontrollermanager-service-selector" href="#helm-value-kubecontrollermanager-service-selector" aria-hidden="true" tabindex="-1"></a>
+[`kubeControllerManager.service.selector`](#helm-value-kubecontrollermanager-service-selector)`(object)`: Kube controller manager service pod selector
+  ```helm-default
+  component: kube-controller-manager
+  ```
+   
+<a id="helm-value-kubecontrollermanager-service-targetport" href="#helm-value-kubecontrollermanager-service-targetport" aria-hidden="true" tabindex="-1"></a>
+[`kubeControllerManager.service.targetPort`](#helm-value-kubecontrollermanager-service-targetport)`(int)`: Kube controller manager service target port
+  ```helm-default
+  10257
+  ```
+   
+<a id="helm-value-kubecontrollermanager-vmscrape" href="#helm-value-kubecontrollermanager-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`kubeControllerManager.vmScrape`](#helm-value-kubecontrollermanager-vmscrape)`(object)`: Spec for VMServiceScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec)
+  ```helm-default
+  spec:
+      endpoints:
+          - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+            port: http-metrics
+            scheme: https
+            tlsConfig:
+              caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              serverName: kubernetes
+      jobLabel: jobLabel
+      namespaceSelector:
+          matchNames:
+              - kube-system
+  ```
+   
+<a id="helm-value-kubedns-enabled" href="#helm-value-kubedns-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeDns.enabled`](#helm-value-kubedns-enabled)`(bool)`: Enabled KubeDNS metrics scraping
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-kubedns-service-enabled" href="#helm-value-kubedns-service-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeDns.service.enabled`](#helm-value-kubedns-service-enabled)`(bool)`: Create Service for KubeDNS metrics
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-kubedns-service-ports" href="#helm-value-kubedns-service-ports" aria-hidden="true" tabindex="-1"></a>
+[`kubeDns.service.ports`](#helm-value-kubedns-service-ports)`(object)`: KubeDNS service ports
+  ```helm-default
+  dnsmasq:
+      port: 10054
+      targetPort: 10054
+  skydns:
+      port: 10055
+      targetPort: 10055
+  ```
+   
+<a id="helm-value-kubedns-service-selector" href="#helm-value-kubedns-service-selector" aria-hidden="true" tabindex="-1"></a>
+[`kubeDns.service.selector`](#helm-value-kubedns-service-selector)`(object)`: KubeDNS service pods selector
+  ```helm-default
+  k8s-app: kube-dns
+  ```
+   
+<a id="helm-value-kubedns-vmscrape" href="#helm-value-kubedns-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`kubeDns.vmScrape`](#helm-value-kubedns-vmscrape)`(object)`: Spec for VMServiceScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec)
+  ```helm-default
+  spec:
+      endpoints:
+          - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+            port: http-metrics-dnsmasq
+          - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+            port: http-metrics-skydns
+      jobLabel: jobLabel
+      namespaceSelector:
+          matchNames:
+              - kube-system
+  ```
+   
+<a id="helm-value-kubeetcd-enabled" href="#helm-value-kubeetcd-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeEtcd.enabled`](#helm-value-kubeetcd-enabled)`(bool)`: Enabled KubeETCD metrics scraping
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-kubeetcd-endpoints" href="#helm-value-kubeetcd-endpoints" aria-hidden="true" tabindex="-1"></a>
+[`kubeEtcd.endpoints`](#helm-value-kubeetcd-endpoints)`(list)`: If your etcd is not deployed as a pod, specify IPs it can be found on
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-kubeetcd-service-enabled" href="#helm-value-kubeetcd-service-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeEtcd.service.enabled`](#helm-value-kubeetcd-service-enabled)`(bool)`: Enable service for ETCD metrics scraping
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-kubeetcd-service-port" href="#helm-value-kubeetcd-service-port" aria-hidden="true" tabindex="-1"></a>
+[`kubeEtcd.service.port`](#helm-value-kubeetcd-service-port)`(int)`: ETCD service port
+  ```helm-default
+  2379
+  ```
+   
+<a id="helm-value-kubeetcd-service-selector" href="#helm-value-kubeetcd-service-selector" aria-hidden="true" tabindex="-1"></a>
+[`kubeEtcd.service.selector`](#helm-value-kubeetcd-service-selector)`(object)`: ETCD service pods selector
+  ```helm-default
+  component: etcd
+  ```
+   
+<a id="helm-value-kubeetcd-service-targetport" href="#helm-value-kubeetcd-service-targetport" aria-hidden="true" tabindex="-1"></a>
+[`kubeEtcd.service.targetPort`](#helm-value-kubeetcd-service-targetport)`(int)`: ETCD service target port
+  ```helm-default
+  2379
+  ```
+   
+<a id="helm-value-kubeetcd-vmscrape" href="#helm-value-kubeetcd-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`kubeEtcd.vmScrape`](#helm-value-kubeetcd-vmscrape)`(object)`: Spec for VMServiceScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec)
+  ```helm-default
+  spec:
+      endpoints:
+          - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+            port: http-metrics
+            scheme: https
+            tlsConfig:
+              caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      jobLabel: jobLabel
+      namespaceSelector:
+          matchNames:
+              - kube-system
+  ```
+   
+<a id="helm-value-kubeproxy-enabled" href="#helm-value-kubeproxy-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeProxy.enabled`](#helm-value-kubeproxy-enabled)`(bool)`: Enable kube proxy metrics scraping
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-kubeproxy-endpoints" href="#helm-value-kubeproxy-endpoints" aria-hidden="true" tabindex="-1"></a>
+[`kubeProxy.endpoints`](#helm-value-kubeproxy-endpoints)`(list)`: If your kube proxy is not deployed as a pod, specify IPs it can be found on
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-kubeproxy-service-enabled" href="#helm-value-kubeproxy-service-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeProxy.service.enabled`](#helm-value-kubeproxy-service-enabled)`(bool)`: Enable service for kube proxy metrics scraping
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-kubeproxy-service-port" href="#helm-value-kubeproxy-service-port" aria-hidden="true" tabindex="-1"></a>
+[`kubeProxy.service.port`](#helm-value-kubeproxy-service-port)`(int)`: Kube proxy service port
+  ```helm-default
+  10249
+  ```
+   
+<a id="helm-value-kubeproxy-service-selector" href="#helm-value-kubeproxy-service-selector" aria-hidden="true" tabindex="-1"></a>
+[`kubeProxy.service.selector`](#helm-value-kubeproxy-service-selector)`(object)`: Kube proxy service pod selector
+  ```helm-default
+  k8s-app: kube-proxy
+  ```
+   
+<a id="helm-value-kubeproxy-service-targetport" href="#helm-value-kubeproxy-service-targetport" aria-hidden="true" tabindex="-1"></a>
+[`kubeProxy.service.targetPort`](#helm-value-kubeproxy-service-targetport)`(int)`: Kube proxy service target port
+  ```helm-default
+  10249
+  ```
+   
+<a id="helm-value-kubeproxy-vmscrape" href="#helm-value-kubeproxy-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`kubeProxy.vmScrape`](#helm-value-kubeproxy-vmscrape)`(object)`: Spec for VMServiceScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec)
+  ```helm-default
+  spec:
+      endpoints:
+          - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+            port: http-metrics
+            scheme: https
+            tlsConfig:
+              caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      jobLabel: jobLabel
+      namespaceSelector:
+          matchNames:
+              - kube-system
+  ```
+   
+<a id="helm-value-kubescheduler-enabled" href="#helm-value-kubescheduler-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeScheduler.enabled`](#helm-value-kubescheduler-enabled)`(bool)`: Enable KubeScheduler metrics scraping
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-kubescheduler-endpoints" href="#helm-value-kubescheduler-endpoints" aria-hidden="true" tabindex="-1"></a>
+[`kubeScheduler.endpoints`](#helm-value-kubescheduler-endpoints)`(list)`: If your kube scheduler is not deployed as a pod, specify IPs it can be found on
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-kubescheduler-service-enabled" href="#helm-value-kubescheduler-service-enabled" aria-hidden="true" tabindex="-1"></a>
+[`kubeScheduler.service.enabled`](#helm-value-kubescheduler-service-enabled)`(bool)`: Enable service for KubeScheduler metrics scrape
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-kubescheduler-service-port" href="#helm-value-kubescheduler-service-port" aria-hidden="true" tabindex="-1"></a>
+[`kubeScheduler.service.port`](#helm-value-kubescheduler-service-port)`(int)`: KubeScheduler service port
+  ```helm-default
+  10259
+  ```
+   
+<a id="helm-value-kubescheduler-service-selector" href="#helm-value-kubescheduler-service-selector" aria-hidden="true" tabindex="-1"></a>
+[`kubeScheduler.service.selector`](#helm-value-kubescheduler-service-selector)`(object)`: KubeScheduler service pod selector
+  ```helm-default
+  component: kube-scheduler
+  ```
+   
+<a id="helm-value-kubescheduler-service-targetport" href="#helm-value-kubescheduler-service-targetport" aria-hidden="true" tabindex="-1"></a>
+[`kubeScheduler.service.targetPort`](#helm-value-kubescheduler-service-targetport)`(int)`: KubeScheduler service target port
+  ```helm-default
+  10259
+  ```
+   
+<a id="helm-value-kubescheduler-vmscrape" href="#helm-value-kubescheduler-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`kubeScheduler.vmScrape`](#helm-value-kubescheduler-vmscrape)`(object)`: Spec for VMServiceScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec)
+  ```helm-default
+  spec:
+      endpoints:
+          - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+            port: http-metrics
+            scheme: https
+            tlsConfig:
+              caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      jobLabel: jobLabel
+      namespaceSelector:
+          matchNames:
+              - kube-system
+  ```
+   
+<a id="helm-value-kubelet" href="#helm-value-kubelet" aria-hidden="true" tabindex="-1"></a>
+[`kubelet`](#helm-value-kubelet)`(object)`: Component scraping the kubelets
+  ```helm-default
+  enabled: true
+  vmScrape:
+      kind: VMNodeScrape
+      spec:
+          bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          honorLabels: true
+          honorTimestamps: false
+          interval: 30s
           metricRelabelConfigs:
-            - action: labeldrop
-              regex: (uid|container_id|image_id)
-          port: http
-    jobLabel: app.kubernetes.io/name
-    selector:
-        matchLabels:
-            app.kubernetes.io/instance: '{{ include "vm.release" . }}'
-            app.kubernetes.io/name: '{{ include "kube-state-metrics.name" (index .Subcharts "kube-state-metrics") }}'
-</code>
-</pre>
-</td>
-      <td><p><a href="https://docs.victoriametrics.com/operator/api#vmservicescrapespec" target="_blank">Scrape configuration</a> for Kube State Metrics</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeApiServer.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Enable Kube Api Server metrics scraping</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeApiServer.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          port: https
+              - action: labeldrop
+                regex: (uid)
+              - action: labeldrop
+                regex: (id|name)
+              - action: drop
+                regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
+                source_labels:
+                  - __name__
+          relabelConfigs:
+              - action: labelmap
+                regex: __meta_kubernetes_node_label_(.+)
+              - sourceLabels:
+                  - __metrics_path__
+                targetLabel: metrics_path
+              - replacement: kubelet
+                targetLabel: job
           scheme: https
+          scrapeTimeout: 5s
           tlsConfig:
-            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            serverName: kubernetes
-    jobLabel: component
-    namespaceSelector:
-        matchNames:
-            - default
-    selector:
-        matchLabels:
-            component: apiserver
-            provider: kubernetes
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMServiceScrape CRD is <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeControllerManager.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Enable kube controller manager metrics scraping</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeControllerManager.endpoints</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>If your kube controller manager is not deployed as a pod, specify IPs it can be found on</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeControllerManager.service.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create service for kube controller manager metrics scraping</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeControllerManager.service.port</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">10257
-</code>
-</pre>
-</td>
-      <td><p>Kube controller manager service port</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeControllerManager.service.selector</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">component: kube-controller-manager
-</code>
-</pre>
-</td>
-      <td><p>Kube controller manager service pod selector</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeControllerManager.service.targetPort</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">10257
-</code>
-</pre>
-</td>
-      <td><p>Kube controller manager service target port</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeControllerManager.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          port: http-metrics
-          scheme: https
-          tlsConfig:
-            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            serverName: kubernetes
-    jobLabel: jobLabel
-    namespaceSelector:
-        matchNames:
-            - kube-system
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMServiceScrape CRD is <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeDns.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enabled KubeDNS metrics scraping</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeDns.service.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Create Service for KubeDNS metrics</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeDns.service.ports</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">dnsmasq:
-    port: 10054
-    targetPort: 10054
-skydns:
-    port: 10055
-    targetPort: 10055
-</code>
-</pre>
-</td>
-      <td><p>KubeDNS service ports</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeDns.service.selector</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">k8s-app: kube-dns
-</code>
-</pre>
-</td>
-      <td><p>KubeDNS service pods selector</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeDns.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          port: http-metrics-dnsmasq
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          port: http-metrics-skydns
-    jobLabel: jobLabel
-    namespaceSelector:
-        matchNames:
-            - kube-system
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMServiceScrape CRD is <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeEtcd.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Enabled KubeETCD metrics scraping</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeEtcd.endpoints</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>If your etcd is not deployed as a pod, specify IPs it can be found on</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeEtcd.service.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Enable service for ETCD metrics scraping</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeEtcd.service.port</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">2379
-</code>
-</pre>
-</td>
-      <td><p>ETCD service port</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeEtcd.service.selector</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">component: etcd
-</code>
-</pre>
-</td>
-      <td><p>ETCD service pods selector</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeEtcd.service.targetPort</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">2379
-</code>
-</pre>
-</td>
-      <td><p>ETCD service target port</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeEtcd.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          port: http-metrics
-          scheme: https
-          tlsConfig:
-            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    jobLabel: jobLabel
-    namespaceSelector:
-        matchNames:
-            - kube-system
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMServiceScrape CRD is <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeProxy.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enable kube proxy metrics scraping</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeProxy.endpoints</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>If your kube proxy is not deployed as a pod, specify IPs it can be found on</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeProxy.service.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Enable service for kube proxy metrics scraping</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeProxy.service.port</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">10249
-</code>
-</pre>
-</td>
-      <td><p>Kube proxy service port</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeProxy.service.selector</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">k8s-app: kube-proxy
-</code>
-</pre>
-</td>
-      <td><p>Kube proxy service pod selector</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeProxy.service.targetPort</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">10249
-</code>
-</pre>
-</td>
-      <td><p>Kube proxy service target port</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeProxy.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          port: http-metrics
-          scheme: https
-          tlsConfig:
-            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    jobLabel: jobLabel
-    namespaceSelector:
-        matchNames:
-            - kube-system
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMServiceScrape CRD is <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeScheduler.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Enable KubeScheduler metrics scraping</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeScheduler.endpoints</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>If your kube scheduler is not deployed as a pod, specify IPs it can be found on</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeScheduler.service.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Enable service for KubeScheduler metrics scrape</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeScheduler.service.port</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">10259
-</code>
-</pre>
-</td>
-      <td><p>KubeScheduler service port</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeScheduler.service.selector</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">component: kube-scheduler
-</code>
-</pre>
-</td>
-      <td><p>KubeScheduler service pod selector</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeScheduler.service.targetPort</td>
-      <td>int</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">10259
-</code>
-</pre>
-</td>
-      <td><p>KubeScheduler service target port</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubeScheduler.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">spec:
-    endpoints:
-        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-          port: http-metrics
-          scheme: https
-          tlsConfig:
-            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    jobLabel: jobLabel
-    namespaceSelector:
-        matchNames:
-            - kube-system
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMServiceScrape CRD is <a href="https://docs.victoriametrics.com/operator/api.html#vmservicescrapespec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>kubelet</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-vmScrape:
-    kind: VMNodeScrape
-    spec:
-        bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-        honorLabels: true
-        honorTimestamps: false
-        interval: 30s
-        metricRelabelConfigs:
-            - action: labeldrop
-              regex: (uid)
-            - action: labeldrop
-              regex: (id|name)
-            - action: drop
-              regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
-              source_labels:
-                - __name__
-        relabelConfigs:
-            - action: labelmap
-              regex: __meta_kubernetes_node_label_(.+)
-            - sourceLabels:
-                - __metrics_path__
-              targetLabel: metrics_path
-            - replacement: kubelet
-              targetLabel: job
-        scheme: https
-        scrapeTimeout: 5s
-        tlsConfig:
-            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            insecureSkipVerify: true
-vmScrapes:
-    cadvisor:
-        enabled: true
-        spec:
-            path: /metrics/cadvisor
-    kubelet:
-        spec: {}
-    probes:
-        enabled: true
-        spec:
-            path: /metrics/probes
-    resources:
-        enabled: true
-        spec:
-            path: /metrics/resource
-</code>
-</pre>
-</td>
-      <td><p>Component scraping the kubelets</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubelet.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">kind: VMNodeScrape
-spec:
-    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-    honorLabels: true
-    honorTimestamps: false
-    interval: 30s
-    metricRelabelConfigs:
-        - action: labeldrop
-          regex: (uid)
-        - action: labeldrop
-          regex: (id|name)
-        - action: drop
-          regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
-          source_labels:
-            - __name__
-    relabelConfigs:
-        - action: labelmap
-          regex: __meta_kubernetes_node_label_(.+)
-        - sourceLabels:
-            - __metrics_path__
-          targetLabel: metrics_path
-        - replacement: kubelet
-          targetLabel: job
-    scheme: https
-    scrapeTimeout: 5s
-    tlsConfig:
-        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecureSkipVerify: true
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMNodeScrape CRD is <a href="https://docs.victoriametrics.com/operator/api.html#vmnodescrapespec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>kubelet.vmScrapes.cadvisor</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-spec:
-    path: /metrics/cadvisor
-</code>
-</pre>
-</td>
-      <td><p>Enable scraping /metrics/cadvisor from kubelet&rsquo;s service</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubelet.vmScrapes.probes</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-spec:
-    path: /metrics/probes
-</code>
-</pre>
-</td>
-      <td><p>Enable scraping /metrics/probes from kubelet&rsquo;s service</p>
-</td>
-    </tr>
-    <tr>
-      <td>kubelet.vmScrapes.resources</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-spec:
-    path: /metrics/resource
-</code>
-</pre>
-</td>
-      <td><p>Enabled scraping /metrics/resource from kubelet&rsquo;s service</p>
-</td>
-    </tr>
-    <tr>
-      <td>nameOverride</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Override chart name</p>
-</td>
-    </tr>
-    <tr>
-      <td>prometheus-node-exporter</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-extraArgs:
-    - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
-    - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
-service:
-    labels:
-        jobLabel: node-exporter
-vmScrape:
-    enabled: true
-    spec:
-        endpoints:
-            - metricRelabelConfigs:
-                - action: drop
-                  regex: /var/lib/kubelet/pods.+
-                  source_labels:
-                    - mountpoint
-              port: metrics
-        jobLabel: jobLabel
-        selector:
-            matchLabels:
-                app.kubernetes.io/name: '{{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}'
-</code>
-</pre>
-</td>
-      <td><p>prometheus-node-exporter dependency chart configuration. For possible values check <a href="https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/values.yaml" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>prometheus-node-exporter.vmScrape</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: true
-spec:
-    endpoints:
-        - metricRelabelConfigs:
-            - action: drop
-              regex: /var/lib/kubelet/pods.+
-              source_labels:
-                - mountpoint
-          port: metrics
-    jobLabel: jobLabel
-    selector:
-        matchLabels:
-            app.kubernetes.io/name: '{{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}'
-</code>
-</pre>
-</td>
-      <td><p>Node Exporter VM scrape config</p>
-</td>
-    </tr>
-    <tr>
-      <td>prometheus-node-exporter.vmScrape.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">endpoints:
-    - metricRelabelConfigs:
-        - action: drop
-          regex: /var/lib/kubelet/pods.+
-          source_labels:
-            - mountpoint
-      port: metrics
-jobLabel: jobLabel
-selector:
-    matchLabels:
-        app.kubernetes.io/name: '{{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}'
-</code>
-</pre>
-</td>
-      <td><p><a href="https://docs.victoriametrics.com/operator/api#vmservicescrapespec" target="_blank">Scrape configuration</a> for Node Exporter</p>
-</td>
-    </tr>
-    <tr>
-      <td>prometheus-operator-crds</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: false
-</code>
-</pre>
-</td>
-      <td><p>Install prometheus operator CRDs</p>
-</td>
-    </tr>
-    <tr>
-      <td>tenant</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">"0"
-</code>
-</pre>
-</td>
-      <td><p>Tenant to use for Grafana datasources and remote write</p>
-</td>
-    </tr>
-    <tr>
-      <td>victoria-metrics-operator</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">crds:
-    cleanup:
-        enabled: true
-        image:
-            pullPolicy: IfNotPresent
-            repository: bitnami/kubectl
-    plain: true
-enabled: true
-operator:
-    disable_prometheus_converter: false
-serviceMonitor:
-    enabled: true
-</code>
-</pre>
-</td>
-      <td><p>VictoriaMetrics Operator dependency chart configuration. More values can be found <a href="https://docs.victoriametrics.com/helm/victoriametrics-operator#parameters" target="_blank">here</a>. Also checkout <a href="https://docs.victoriametrics.com/operator/vars" target="_blank">here</a> possible ENV variables to configure operator behaviour</p>
-</td>
-    </tr>
-    <tr>
-      <td>victoria-metrics-operator.operator.disable_prometheus_converter</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>By default, operator converts prometheus-operator objects.</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmagent.additionalRemoteWrites</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Remote write configuration of VMAgent, allowed parameters defined in a <a href="https://docs.victoriametrics.com/operator/api#vmagentremotewritespec" target="_blank">spec</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>vmagent.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VMAgent annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmagent.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create VMAgent CR</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmagent.ingress</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">annotations: {}
-enabled: false
-extraPaths: []
-hosts:
-    - vmagent.domain.com
-labels: {}
-path: ""
-pathType: Prefix
-tls: []
-</code>
-</pre>
-</td>
-      <td><p>VMAgent ingress configuration</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmagent.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">externalLabels: {}
-extraArgs:
-    promscrape.dropOriginalLabels: "true"
-    promscrape.streamParse: "true"
-port: "8429"
-scrapeInterval: 20s
-selectAllByDefault: true
-</code>
-</pre>
-</td>
-      <td><p>Full spec for VMAgent CRD. Allowed values described <a href="https://docs.victoriametrics.com/operator/api#vmagentspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>vmalert.additionalNotifierConfigs</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Allows to configure static notifiers, discover notifiers via Consul and DNS, see specification <a href="https://docs.victoriametrics.com/vmalert/#notifier-configuration-file" target="_blank">here</a>. This configuration will be created as separate secret and mounted to VMAlert pod.</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmalert.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VMAlert annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmalert.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create VMAlert CR</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmalert.ingress</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">annotations: {}
-enabled: false
-extraPaths: []
-hosts:
-    - vmalert.domain.com
-labels: {}
-path: ""
-pathType: Prefix
-tls: []
-</code>
-</pre>
-</td>
-      <td><p>VMAlert ingress config</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmalert.ingress.extraPaths</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmalert.remoteWriteVMAgent</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Controls whether VMAlert should use VMAgent or VMInsert as a target for remotewrite</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmalert.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">evaluationInterval: 20s
-externalLabels: {}
-extraArgs:
-    http.pathPrefix: /
-port: "8080"
-selectAllByDefault: true
-</code>
-</pre>
-</td>
-      <td><p>Full spec for VMAlert CRD. Allowed values described <a href="https://docs.victoriametrics.com/operator/api#vmalertspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>vmalert.templateFiles</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Extra VMAlert annotation templates</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmauth.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VMAuth annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enable VMAuth CR</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">port: "8427"
-unauthorizedUserAccessSpec:
-    discover_backend_ips: true
-    url_map:
-        - src_paths:
-            - '{{ .vm.read.path }}/.*'
-          url_prefix:
-            - '{{ urlJoin (omit .vm.read "path") }}/'
-</code>
-</pre>
-</td>
-      <td><p>Full spec for VMAuth CRD. Allowed values described <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a> It&rsquo;s possible to use given below predefined variables in spec: * <code>{{ .vm.read }}</code> - parsed vmselect, vmsingle or external.vm.read URL * <code>{{ .vm.write }}</code> - parsed vminsert, vmsingle or external.vm.write URL</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VMCluster annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Create VMCluster CR</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.insert.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Ingress annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.insert.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enable deployment of ingress for server component</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.insert.extraPaths</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.insert.hosts</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Array of host objects</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.insert.ingressClassName</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Ingress controller class name</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.insert.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Ingress extra labels</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.insert.path</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">'{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vminsert }}'
-</code>
-</pre>
-</td>
-      <td><p>Ingress default path</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.insert.pathType</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">Prefix
-</code>
-</pre>
-</td>
-      <td><p>Ingress path type</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.insert.tls</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Array of TLS objects</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.select.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Ingress annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.select.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enable deployment of ingress for server component</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.select.extraPaths</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.select.hosts</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Array of host objects</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.select.ingressClassName</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Ingress controller class name</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.select.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Ingress extra labels</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.select.path</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">'{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vmselect }}'
-</code>
-</pre>
-</td>
-      <td><p>Ingress default path</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.select.pathType</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">Prefix
-</code>
-</pre>
-</td>
-      <td><p>Ingress path type</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.select.tls</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Array of TLS objects</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.storage.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Ingress annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.storage.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enable deployment of ingress for server component</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.storage.extraPaths</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.storage.hosts</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Array of host objects</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.storage.ingressClassName</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Ingress controller class name</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.storage.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Ingress extra labels</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.storage.path</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Ingress default path</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.storage.pathType</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">Prefix
-</code>
-</pre>
-</td>
-      <td><p>Ingress path type</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.ingress.storage.tls</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Array of TLS objects</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">replicationFactor: 2
-retentionPeriod: "1"
-vminsert:
-    extraArgs: {}
-    port: "8480"
-    replicaCount: 2
-    resources: {}
-vmselect:
-    cacheMountPath: /select-cache
-    extraArgs: {}
-    port: "8481"
-    replicaCount: 2
-    resources: {}
-    storage:
-        volumeClaimTemplate:
-            spec:
-                resources:
-                    requests:
-                        storage: 2Gi
-vmstorage:
-    replicaCount: 2
-    resources: {}
-    storage:
-        volumeClaimTemplate:
-            spec:
-                resources:
-                    requests:
-                        storage: 10Gi
-    storageDataPath: /vm-data
-</code>
-</pre>
-</td>
-      <td><p>Full spec for VMCluster CRD. Allowed values described <a href="https://docs.victoriametrics.com/operator/api#vmclusterspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>vmcluster.spec.retentionPeriod</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">"1"
-</code>
-</pre>
-</td>
-      <td><p>Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these <a href="https://docs.victoriametrics.com/single-server-victoriametrics/#retention" target="_blank">docs</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VMSingle annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create VMSingle CR</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.ingress.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Ingress annotations</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.ingress.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enable deployment of ingress for server component</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.ingress.extraPaths</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Extra paths to prepend to every host configuration. This is useful when working with annotation based services.</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.ingress.hosts</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Array of host objects</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.ingress.ingressClassName</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Ingress controller class name</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.ingress.labels</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Ingress extra labels</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.ingress.path</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Ingress default path</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.ingress.pathType</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">Prefix
-</code>
-</pre>
-</td>
-      <td><p>Ingress path type</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.ingress.tls</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">[]
-</code>
-</pre>
-</td>
-      <td><p>Array of TLS objects</p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">extraArgs: {}
-port: "8429"
-replicaCount: 1
-retentionPeriod: "1"
-storage:
-    accessModes:
-        - ReadWriteOnce
-    resources:
-        requests:
-            storage: 20Gi
-</code>
-</pre>
-</td>
-      <td><p>Full spec for VMSingle CRD. Allowed values describe <a href="https://docs.victoriametrics.com/operator/api#vmsinglespec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr>
-      <td>vmsingle.spec.retentionPeriod</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">"1"
-</code>
-</pre>
-</td>
-      <td><p>Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these <a href="https://docs.victoriametrics.com/single-server-victoriametrics/#retention" target="_blank">docs</a></p>
-</td>
-    </tr>
-  </tbody>
-</table>
+              caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              insecureSkipVerify: true
+  vmScrapes:
+      cadvisor:
+          enabled: true
+          spec:
+              path: /metrics/cadvisor
+      kubelet:
+          spec: {}
+      probes:
+          enabled: true
+          spec:
+              path: /metrics/probes
+      resources:
+          enabled: true
+          spec:
+              path: /metrics/resource
+  ```
+   
+<a id="helm-value-kubelet-vmscrape" href="#helm-value-kubelet-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`kubelet.vmScrape`](#helm-value-kubelet-vmscrape)`(object)`: Spec for VMNodeScrape CRD is [here](https://docs.victoriametrics.com/operator/api.html#vmnodescrapespec)
+  ```helm-default
+  kind: VMNodeScrape
+  spec:
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+      honorLabels: true
+      honorTimestamps: false
+      interval: 30s
+      metricRelabelConfigs:
+          - action: labeldrop
+            regex: (uid)
+          - action: labeldrop
+            regex: (id|name)
+          - action: drop
+            regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
+            source_labels:
+              - __name__
+      relabelConfigs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - sourceLabels:
+              - __metrics_path__
+            targetLabel: metrics_path
+          - replacement: kubelet
+            targetLabel: job
+      scheme: https
+      scrapeTimeout: 5s
+      tlsConfig:
+          caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecureSkipVerify: true
+  ```
+   
+<a id="helm-value-kubelet-vmscrapes-cadvisor" href="#helm-value-kubelet-vmscrapes-cadvisor" aria-hidden="true" tabindex="-1"></a>
+[`kubelet.vmScrapes.cadvisor`](#helm-value-kubelet-vmscrapes-cadvisor)`(object)`: Enable scraping /metrics/cadvisor from kubelet's service
+  ```helm-default
+  enabled: true
+  spec:
+      path: /metrics/cadvisor
+  ```
+   
+<a id="helm-value-kubelet-vmscrapes-probes" href="#helm-value-kubelet-vmscrapes-probes" aria-hidden="true" tabindex="-1"></a>
+[`kubelet.vmScrapes.probes`](#helm-value-kubelet-vmscrapes-probes)`(object)`: Enable scraping /metrics/probes from kubelet's service
+  ```helm-default
+  enabled: true
+  spec:
+      path: /metrics/probes
+  ```
+   
+<a id="helm-value-kubelet-vmscrapes-resources" href="#helm-value-kubelet-vmscrapes-resources" aria-hidden="true" tabindex="-1"></a>
+[`kubelet.vmScrapes.resources`](#helm-value-kubelet-vmscrapes-resources)`(object)`: Enabled scraping /metrics/resource from kubelet's service
+  ```helm-default
+  enabled: true
+  spec:
+      path: /metrics/resource
+  ```
+   
+<a id="helm-value-nameoverride" href="#helm-value-nameoverride" aria-hidden="true" tabindex="-1"></a>
+[`nameOverride`](#helm-value-nameoverride)`(string)`: Override chart name
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-prometheus-node-exporter" href="#helm-value-prometheus-node-exporter" aria-hidden="true" tabindex="-1"></a>
+[`prometheus-node-exporter`](#helm-value-prometheus-node-exporter)`(object)`: prometheus-node-exporter dependency chart configuration. For possible values check [here](https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/values.yaml)
+  ```helm-default
+  enabled: true
+  extraArgs:
+      - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+      - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+  service:
+      labels:
+          jobLabel: node-exporter
+  vmScrape:
+      enabled: true
+      spec:
+          endpoints:
+              - metricRelabelConfigs:
+                  - action: drop
+                    regex: /var/lib/kubelet/pods.+
+                    source_labels:
+                      - mountpoint
+                port: metrics
+          jobLabel: jobLabel
+          selector:
+              matchLabels:
+                  app.kubernetes.io/name: '{{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}'
+  ```
+   
+<a id="helm-value-prometheus-node-exporter-vmscrape" href="#helm-value-prometheus-node-exporter-vmscrape" aria-hidden="true" tabindex="-1"></a>
+[`prometheus-node-exporter.vmScrape`](#helm-value-prometheus-node-exporter-vmscrape)`(object)`: Node Exporter VM scrape config
+  ```helm-default
+  enabled: true
+  spec:
+      endpoints:
+          - metricRelabelConfigs:
+              - action: drop
+                regex: /var/lib/kubelet/pods.+
+                source_labels:
+                  - mountpoint
+            port: metrics
+      jobLabel: jobLabel
+      selector:
+          matchLabels:
+              app.kubernetes.io/name: '{{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}'
+  ```
+   
+<a id="helm-value-prometheus-node-exporter-vmscrape-spec" href="#helm-value-prometheus-node-exporter-vmscrape-spec" aria-hidden="true" tabindex="-1"></a>
+[`prometheus-node-exporter.vmScrape.spec`](#helm-value-prometheus-node-exporter-vmscrape-spec)`(object)`: [Scrape configuration](https://docs.victoriametrics.com/operator/api#vmservicescrapespec) for Node Exporter
+  ```helm-default
+  endpoints:
+      - metricRelabelConfigs:
+          - action: drop
+            regex: /var/lib/kubelet/pods.+
+            source_labels:
+              - mountpoint
+        port: metrics
+  jobLabel: jobLabel
+  selector:
+      matchLabels:
+          app.kubernetes.io/name: '{{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}'
+  ```
+   
+<a id="helm-value-prometheus-operator-crds" href="#helm-value-prometheus-operator-crds" aria-hidden="true" tabindex="-1"></a>
+[`prometheus-operator-crds`](#helm-value-prometheus-operator-crds)`(object)`: Install prometheus operator CRDs
+  ```helm-default
+  enabled: false
+  ```
+   
+<a id="helm-value-tenant" href="#helm-value-tenant" aria-hidden="true" tabindex="-1"></a>
+[`tenant`](#helm-value-tenant)`(string)`: Tenant to use for Grafana datasources and remote write
+  ```helm-default
+  "0"
+  ```
+   
+<a id="helm-value-victoria-metrics-operator" href="#helm-value-victoria-metrics-operator" aria-hidden="true" tabindex="-1"></a>
+[`victoria-metrics-operator`](#helm-value-victoria-metrics-operator)`(object)`: VictoriaMetrics Operator dependency chart configuration. More values can be found [here](https://docs.victoriametrics.com/helm/victoriametrics-operator#parameters). Also checkout [here](https://docs.victoriametrics.com/operator/vars) possible ENV variables to configure operator behaviour
+  ```helm-default
+  crds:
+      cleanup:
+          enabled: true
+          image:
+              pullPolicy: IfNotPresent
+              repository: bitnami/kubectl
+      plain: true
+  enabled: true
+  operator:
+      disable_prometheus_converter: false
+  serviceMonitor:
+      enabled: true
+  ```
+   
+<a id="helm-value-victoria-metrics-operator-operator-disable-prometheus-converter" href="#helm-value-victoria-metrics-operator-operator-disable-prometheus-converter" aria-hidden="true" tabindex="-1"></a>
+[`victoria-metrics-operator.operator.disable_prometheus_converter`](#helm-value-victoria-metrics-operator-operator-disable-prometheus-converter)`(bool)`: By default, operator converts prometheus-operator objects.
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-vmagent-additionalremotewrites" href="#helm-value-vmagent-additionalremotewrites" aria-hidden="true" tabindex="-1"></a>
+[`vmagent.additionalRemoteWrites`](#helm-value-vmagent-additionalremotewrites)`(list)`: Remote write configuration of VMAgent, allowed parameters defined in a [spec](https://docs.victoriametrics.com/operator/api#vmagentremotewritespec)
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmagent-annotations" href="#helm-value-vmagent-annotations" aria-hidden="true" tabindex="-1"></a>
+[`vmagent.annotations`](#helm-value-vmagent-annotations)`(object)`: VMAgent annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmagent-enabled" href="#helm-value-vmagent-enabled" aria-hidden="true" tabindex="-1"></a>
+[`vmagent.enabled`](#helm-value-vmagent-enabled)`(bool)`: Create VMAgent CR
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-vmagent-ingress" href="#helm-value-vmagent-ingress" aria-hidden="true" tabindex="-1"></a>
+[`vmagent.ingress`](#helm-value-vmagent-ingress)`(object)`: VMAgent ingress configuration
+  ```helm-default
+  annotations: {}
+  enabled: false
+  extraPaths: []
+  hosts:
+      - vmagent.domain.com
+  labels: {}
+  path: ""
+  pathType: Prefix
+  tls: []
+  ```
+   
+<a id="helm-value-vmagent-spec" href="#helm-value-vmagent-spec" aria-hidden="true" tabindex="-1"></a>
+[`vmagent.spec`](#helm-value-vmagent-spec)`(object)`: Full spec for VMAgent CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmagentspec)
+  ```helm-default
+  externalLabels: {}
+  extraArgs:
+      promscrape.dropOriginalLabels: "true"
+      promscrape.streamParse: "true"
+  port: "8429"
+  scrapeInterval: 20s
+  selectAllByDefault: true
+  ```
+   
+<a id="helm-value-vmalert-additionalnotifierconfigs" href="#helm-value-vmalert-additionalnotifierconfigs" aria-hidden="true" tabindex="-1"></a>
+[`vmalert.additionalNotifierConfigs`](#helm-value-vmalert-additionalnotifierconfigs)`(object)`: Allows to configure static notifiers, discover notifiers via Consul and DNS, see specification [here](https://docs.victoriametrics.com/vmalert/#notifier-configuration-file). This configuration will be created as separate secret and mounted to VMAlert pod.
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmalert-annotations" href="#helm-value-vmalert-annotations" aria-hidden="true" tabindex="-1"></a>
+[`vmalert.annotations`](#helm-value-vmalert-annotations)`(object)`: VMAlert annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmalert-enabled" href="#helm-value-vmalert-enabled" aria-hidden="true" tabindex="-1"></a>
+[`vmalert.enabled`](#helm-value-vmalert-enabled)`(bool)`: Create VMAlert CR
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-vmalert-ingress" href="#helm-value-vmalert-ingress" aria-hidden="true" tabindex="-1"></a>
+[`vmalert.ingress`](#helm-value-vmalert-ingress)`(object)`: VMAlert ingress config
+  ```helm-default
+  annotations: {}
+  enabled: false
+  extraPaths: []
+  hosts:
+      - vmalert.domain.com
+  labels: {}
+  path: ""
+  pathType: Prefix
+  tls: []
+  ```
+   
+<a id="helm-value-vmalert-ingress-extrapaths" href="#helm-value-vmalert-ingress-extrapaths" aria-hidden="true" tabindex="-1"></a>
+[`vmalert.ingress.extraPaths`](#helm-value-vmalert-ingress-extrapaths)`(list)`: Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmalert-remotewritevmagent" href="#helm-value-vmalert-remotewritevmagent" aria-hidden="true" tabindex="-1"></a>
+[`vmalert.remoteWriteVMAgent`](#helm-value-vmalert-remotewritevmagent)`(bool)`: Controls whether VMAlert should use VMAgent or VMInsert as a target for remotewrite
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-vmalert-spec" href="#helm-value-vmalert-spec" aria-hidden="true" tabindex="-1"></a>
+[`vmalert.spec`](#helm-value-vmalert-spec)`(object)`: Full spec for VMAlert CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmalertspec)
+  ```helm-default
+  evaluationInterval: 20s
+  externalLabels: {}
+  extraArgs:
+      http.pathPrefix: /
+  port: "8080"
+  selectAllByDefault: true
+  ```
+   
+<a id="helm-value-vmalert-templatefiles" href="#helm-value-vmalert-templatefiles" aria-hidden="true" tabindex="-1"></a>
+[`vmalert.templateFiles`](#helm-value-vmalert-templatefiles)`(object)`: Extra VMAlert annotation templates
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmauth-annotations" href="#helm-value-vmauth-annotations" aria-hidden="true" tabindex="-1"></a>
+[`vmauth.annotations`](#helm-value-vmauth-annotations)`(object)`: VMAuth annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmauth-enabled" href="#helm-value-vmauth-enabled" aria-hidden="true" tabindex="-1"></a>
+[`vmauth.enabled`](#helm-value-vmauth-enabled)`(bool)`: Enable VMAuth CR
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-vmauth-spec" href="#helm-value-vmauth-spec" aria-hidden="true" tabindex="-1"></a>
+[`vmauth.spec`](#helm-value-vmauth-spec)`(object)`: Full spec for VMAuth CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmauthspec) It's possible to use given below predefined variables in spec: * `{{ .vm.read }}` - parsed vmselect, vmsingle or external.vm.read URL * `{{ .vm.write }}` - parsed vminsert, vmsingle or external.vm.write URL
+  ```helm-default
+  port: "8427"
+  unauthorizedUserAccessSpec:
+      discover_backend_ips: true
+      url_map:
+          - src_paths:
+              - '{{ .vm.read.path }}/.*'
+            url_prefix:
+              - '{{ urlJoin (omit .vm.read "path") }}/'
+  ```
+   
+<a id="helm-value-vmcluster-annotations" href="#helm-value-vmcluster-annotations" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.annotations`](#helm-value-vmcluster-annotations)`(object)`: VMCluster annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmcluster-enabled" href="#helm-value-vmcluster-enabled" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.enabled`](#helm-value-vmcluster-enabled)`(bool)`: Create VMCluster CR
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-vmcluster-ingress-insert-annotations" href="#helm-value-vmcluster-ingress-insert-annotations" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.insert.annotations`](#helm-value-vmcluster-ingress-insert-annotations)`(object)`: Ingress annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmcluster-ingress-insert-enabled" href="#helm-value-vmcluster-ingress-insert-enabled" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.insert.enabled`](#helm-value-vmcluster-ingress-insert-enabled)`(bool)`: Enable deployment of ingress for server component
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-vmcluster-ingress-insert-extrapaths" href="#helm-value-vmcluster-ingress-insert-extrapaths" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.insert.extraPaths`](#helm-value-vmcluster-ingress-insert-extrapaths)`(list)`: Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmcluster-ingress-insert-hosts" href="#helm-value-vmcluster-ingress-insert-hosts" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.insert.hosts`](#helm-value-vmcluster-ingress-insert-hosts)`(list)`: Array of host objects
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmcluster-ingress-insert-ingressclassname" href="#helm-value-vmcluster-ingress-insert-ingressclassname" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.insert.ingressClassName`](#helm-value-vmcluster-ingress-insert-ingressclassname)`(string)`: Ingress controller class name
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-vmcluster-ingress-insert-labels" href="#helm-value-vmcluster-ingress-insert-labels" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.insert.labels`](#helm-value-vmcluster-ingress-insert-labels)`(object)`: Ingress extra labels
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmcluster-ingress-insert-path" href="#helm-value-vmcluster-ingress-insert-path" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.insert.path`](#helm-value-vmcluster-ingress-insert-path)`(string)`: Ingress default path
+  ```helm-default
+  '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vminsert }}'
+  ```
+   
+<a id="helm-value-vmcluster-ingress-insert-pathtype" href="#helm-value-vmcluster-ingress-insert-pathtype" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.insert.pathType`](#helm-value-vmcluster-ingress-insert-pathtype)`(string)`: Ingress path type
+  ```helm-default
+  Prefix
+  ```
+   
+<a id="helm-value-vmcluster-ingress-insert-tls" href="#helm-value-vmcluster-ingress-insert-tls" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.insert.tls`](#helm-value-vmcluster-ingress-insert-tls)`(list)`: Array of TLS objects
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmcluster-ingress-select-annotations" href="#helm-value-vmcluster-ingress-select-annotations" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.select.annotations`](#helm-value-vmcluster-ingress-select-annotations)`(object)`: Ingress annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmcluster-ingress-select-enabled" href="#helm-value-vmcluster-ingress-select-enabled" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.select.enabled`](#helm-value-vmcluster-ingress-select-enabled)`(bool)`: Enable deployment of ingress for server component
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-vmcluster-ingress-select-extrapaths" href="#helm-value-vmcluster-ingress-select-extrapaths" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.select.extraPaths`](#helm-value-vmcluster-ingress-select-extrapaths)`(list)`: Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmcluster-ingress-select-hosts" href="#helm-value-vmcluster-ingress-select-hosts" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.select.hosts`](#helm-value-vmcluster-ingress-select-hosts)`(list)`: Array of host objects
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmcluster-ingress-select-ingressclassname" href="#helm-value-vmcluster-ingress-select-ingressclassname" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.select.ingressClassName`](#helm-value-vmcluster-ingress-select-ingressclassname)`(string)`: Ingress controller class name
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-vmcluster-ingress-select-labels" href="#helm-value-vmcluster-ingress-select-labels" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.select.labels`](#helm-value-vmcluster-ingress-select-labels)`(object)`: Ingress extra labels
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmcluster-ingress-select-path" href="#helm-value-vmcluster-ingress-select-path" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.select.path`](#helm-value-vmcluster-ingress-select-path)`(string)`: Ingress default path
+  ```helm-default
+  '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vmselect }}'
+  ```
+   
+<a id="helm-value-vmcluster-ingress-select-pathtype" href="#helm-value-vmcluster-ingress-select-pathtype" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.select.pathType`](#helm-value-vmcluster-ingress-select-pathtype)`(string)`: Ingress path type
+  ```helm-default
+  Prefix
+  ```
+   
+<a id="helm-value-vmcluster-ingress-select-tls" href="#helm-value-vmcluster-ingress-select-tls" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.select.tls`](#helm-value-vmcluster-ingress-select-tls)`(list)`: Array of TLS objects
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmcluster-ingress-storage-annotations" href="#helm-value-vmcluster-ingress-storage-annotations" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.storage.annotations`](#helm-value-vmcluster-ingress-storage-annotations)`(object)`: Ingress annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmcluster-ingress-storage-enabled" href="#helm-value-vmcluster-ingress-storage-enabled" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.storage.enabled`](#helm-value-vmcluster-ingress-storage-enabled)`(bool)`: Enable deployment of ingress for server component
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-vmcluster-ingress-storage-extrapaths" href="#helm-value-vmcluster-ingress-storage-extrapaths" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.storage.extraPaths`](#helm-value-vmcluster-ingress-storage-extrapaths)`(list)`: Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmcluster-ingress-storage-hosts" href="#helm-value-vmcluster-ingress-storage-hosts" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.storage.hosts`](#helm-value-vmcluster-ingress-storage-hosts)`(list)`: Array of host objects
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmcluster-ingress-storage-ingressclassname" href="#helm-value-vmcluster-ingress-storage-ingressclassname" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.storage.ingressClassName`](#helm-value-vmcluster-ingress-storage-ingressclassname)`(string)`: Ingress controller class name
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-vmcluster-ingress-storage-labels" href="#helm-value-vmcluster-ingress-storage-labels" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.storage.labels`](#helm-value-vmcluster-ingress-storage-labels)`(object)`: Ingress extra labels
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmcluster-ingress-storage-path" href="#helm-value-vmcluster-ingress-storage-path" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.storage.path`](#helm-value-vmcluster-ingress-storage-path)`(string)`: Ingress default path
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-vmcluster-ingress-storage-pathtype" href="#helm-value-vmcluster-ingress-storage-pathtype" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.storage.pathType`](#helm-value-vmcluster-ingress-storage-pathtype)`(string)`: Ingress path type
+  ```helm-default
+  Prefix
+  ```
+   
+<a id="helm-value-vmcluster-ingress-storage-tls" href="#helm-value-vmcluster-ingress-storage-tls" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.ingress.storage.tls`](#helm-value-vmcluster-ingress-storage-tls)`(list)`: Array of TLS objects
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmcluster-spec" href="#helm-value-vmcluster-spec" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.spec`](#helm-value-vmcluster-spec)`(object)`: Full spec for VMCluster CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
+  ```helm-default
+  replicationFactor: 2
+  retentionPeriod: "1"
+  vminsert:
+      extraArgs: {}
+      port: "8480"
+      replicaCount: 2
+      resources: {}
+  vmselect:
+      cacheMountPath: /select-cache
+      extraArgs: {}
+      port: "8481"
+      replicaCount: 2
+      resources: {}
+      storage:
+          volumeClaimTemplate:
+              spec:
+                  resources:
+                      requests:
+                          storage: 2Gi
+  vmstorage:
+      replicaCount: 2
+      resources: {}
+      storage:
+          volumeClaimTemplate:
+              spec:
+                  resources:
+                      requests:
+                          storage: 10Gi
+      storageDataPath: /vm-data
+  ```
+   
+<a id="helm-value-vmcluster-spec-retentionperiod" href="#helm-value-vmcluster-spec-retentionperiod" aria-hidden="true" tabindex="-1"></a>
+[`vmcluster.spec.retentionPeriod`](#helm-value-vmcluster-spec-retentionperiod)`(string)`: Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
+  ```helm-default
+  "1"
+  ```
+   
+<a id="helm-value-vmsingle-annotations" href="#helm-value-vmsingle-annotations" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.annotations`](#helm-value-vmsingle-annotations)`(object)`: VMSingle annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmsingle-enabled" href="#helm-value-vmsingle-enabled" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.enabled`](#helm-value-vmsingle-enabled)`(bool)`: Create VMSingle CR
+  ```helm-default
+  true
+  ```
+   
+<a id="helm-value-vmsingle-ingress-annotations" href="#helm-value-vmsingle-ingress-annotations" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.ingress.annotations`](#helm-value-vmsingle-ingress-annotations)`(object)`: Ingress annotations
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmsingle-ingress-enabled" href="#helm-value-vmsingle-ingress-enabled" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.ingress.enabled`](#helm-value-vmsingle-ingress-enabled)`(bool)`: Enable deployment of ingress for server component
+  ```helm-default
+  false
+  ```
+   
+<a id="helm-value-vmsingle-ingress-extrapaths" href="#helm-value-vmsingle-ingress-extrapaths" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.ingress.extraPaths`](#helm-value-vmsingle-ingress-extrapaths)`(list)`: Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmsingle-ingress-hosts" href="#helm-value-vmsingle-ingress-hosts" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.ingress.hosts`](#helm-value-vmsingle-ingress-hosts)`(list)`: Array of host objects
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmsingle-ingress-ingressclassname" href="#helm-value-vmsingle-ingress-ingressclassname" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.ingress.ingressClassName`](#helm-value-vmsingle-ingress-ingressclassname)`(string)`: Ingress controller class name
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-vmsingle-ingress-labels" href="#helm-value-vmsingle-ingress-labels" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.ingress.labels`](#helm-value-vmsingle-ingress-labels)`(object)`: Ingress extra labels
+  ```helm-default
+  {}
+  ```
+   
+<a id="helm-value-vmsingle-ingress-path" href="#helm-value-vmsingle-ingress-path" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.ingress.path`](#helm-value-vmsingle-ingress-path)`(string)`: Ingress default path
+  ```helm-default
+  ""
+  ```
+   
+<a id="helm-value-vmsingle-ingress-pathtype" href="#helm-value-vmsingle-ingress-pathtype" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.ingress.pathType`](#helm-value-vmsingle-ingress-pathtype)`(string)`: Ingress path type
+  ```helm-default
+  Prefix
+  ```
+   
+<a id="helm-value-vmsingle-ingress-tls" href="#helm-value-vmsingle-ingress-tls" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.ingress.tls`](#helm-value-vmsingle-ingress-tls)`(list)`: Array of TLS objects
+  ```helm-default
+  []
+  ```
+   
+<a id="helm-value-vmsingle-spec" href="#helm-value-vmsingle-spec" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.spec`](#helm-value-vmsingle-spec)`(object)`: Full spec for VMSingle CRD. Allowed values describe [here](https://docs.victoriametrics.com/operator/api#vmsinglespec)
+  ```helm-default
+  extraArgs: {}
+  port: "8429"
+  replicaCount: 1
+  retentionPeriod: "1"
+  storage:
+      accessModes:
+          - ReadWriteOnce
+      resources:
+          requests:
+              storage: 20Gi
+  ```
+   
+<a id="helm-value-vmsingle-spec-retentionperiod" href="#helm-value-vmsingle-spec-retentionperiod" aria-hidden="true" tabindex="-1"></a>
+[`vmsingle.spec.retentionPeriod`](#helm-value-vmsingle-spec-retentionperiod)`(string)`: Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
+  ```helm-default
+  "1"
+  ```
+   
 
