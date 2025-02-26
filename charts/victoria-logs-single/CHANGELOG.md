@@ -5,6 +5,8 @@
 **Update note 3**: `.Values.server.deployment.strategy` was changed to `.Values.server.deployment.spec.strategy`
 **Update note 4**: `.Values.server.statefulSet.enabled` was replaced by `.Values.server.mode`, which accepts `deployment`, `statefulSet` values
 
+- Upgrade VictoriaLogs 1.8.0 -> 1.14.0
+
 ## 0.8.16
 
 **Release date:** 07 Feb 2025

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed serviceAccount variable typo in server templates. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2014).
 
 ## 0.9.1
 

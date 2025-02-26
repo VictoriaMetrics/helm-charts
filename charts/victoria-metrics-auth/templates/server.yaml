@@ -39,9 +39,9 @@ spec:
       {{- with $app.schedulerName }}
       schedulerName: {{ . }}
       {{- end }}
-      {{- if or ($app.serviceAccount).name ($app.serviceAccount).create }}
-      serviceAccountName: {{ ($app.serviceAccount).name | default $fullname }}
-      automountServiceAccountToken: {{ $app.serviceAccount.automountToken }}
+      {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
+      serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- end }}
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
