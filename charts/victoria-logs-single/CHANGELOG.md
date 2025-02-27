@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix service not being deployed with default `.Values` configuration.
 
 ## 0.9.0
 
