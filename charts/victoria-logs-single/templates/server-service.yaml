@@ -1,7 +1,7 @@
 {{- $app := .Values.server }}
 {{- $mode := $app.mode }}
 {{- $service := $app.service }}
-{{- if and $app.enabled $service.enabled -}}
+{{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
