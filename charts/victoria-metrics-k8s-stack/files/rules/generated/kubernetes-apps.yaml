@@ -88,7 +88,7 @@ rules:
     (
       kube_statefulset_status_replicas_ready{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
         !=
-      kube_statefulset_status_replicas{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
+      kube_statefulset_replicas{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
     ) and (
       changes(kube_statefulset_status_replicas_updated{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}[10m])
         ==

@@ -5,33 +5,6 @@
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-__elements: {}
-__inputs: []
-__requires:
-- id: grafana
-  name: Grafana
-  type: grafana
-  version: 10.4.2
-- id: prometheus
-  name: Prometheus
-  type: datasource
-  version: 1.0.0
-- id: stat
-  name: Stat
-  type: panel
-  version: ''
-- id: table
-  name: Table
-  type: panel
-  version: ''
-- id: text
-  name: Text
-  type: panel
-  version: ''
-- id: timeseries
-  name: Time series
-  type: panel
-  version: ''
 annotations:
   list:
   - builtIn: 1
@@ -53,6 +26,7 @@ annotations:
       uid: $ds
     enable: true
     expr: sum(ALERTS{job=~"$job", instance=~"$instance", alertgroup="vmsingle",alertstate="firing",show_at="dashboard"}) by(alertname)
+    hide: false
     iconColor: red
     name: alerts
     titleFormat: '{{`{{`}}alertname{{`}}`}}'
@@ -67,12 +41,11 @@ annotations:
     textFormat: '{{`{{`}}version{{`}}`}}'
     titleFormat: Version change
 condition: {{ ($Values.vmsingle).enabled }}
-description: Overview for single-node VictoriaMetrics v1.83.0 or higher
+description: Overview for single-node VictoriaMetrics v1.102.0 or higher
 editable: false
 fiscalYearStartMonth: 0
-gnetId: 10229
 graphTooltip: 1
-id: null
+id: 1
 links:
 - icon: doc
   tags: []
@@ -93,12 +66,8 @@ links:
   tooltip: ''
   type: link
   url: https://github.com/VictoriaMetrics/VictoriaMetrics/releases
-liveNow: false
 panels:
 - collapsed: false
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: $ds
   gridPos:
     h: 1
     w: 24
@@ -106,17 +75,12 @@ panels:
     'y': 0
   id: 6
   panels: []
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    refId: A
   title: Stats
   type: row
-- datasource:
-    type: {{ $defaultDatasource }}
-    uid: $ds
-  description: ''
+- description: ''
+  fieldConfig:
+    defaults: {}
+    overrides: []
   gridPos:
     h: 2
     w: 4
@@ -130,12 +94,7 @@ panels:
       showMiniMap: false
     content: '<div style="text-align: center;">$version</div>'
     mode: markdown
-  pluginVersion: 10.4.2
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    refId: A
+  pluginVersion: 11.5.0
   title: Version
   type: text
 - datasource:
@@ -166,6 +125,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: horizontal
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -175,7 +135,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -219,6 +179,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: horizontal
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -228,7 +189,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -272,6 +233,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: horizontal
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -281,7 +243,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -327,6 +289,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: horizontal
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -336,7 +299,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -379,6 +342,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -388,7 +352,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -430,6 +394,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: horizontal
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -439,7 +404,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -483,6 +448,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: horizontal
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -492,7 +458,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -536,6 +502,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: horizontal
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -545,7 +512,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -589,6 +556,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: horizontal
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -598,7 +566,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       uid: $ds
@@ -613,9 +581,6 @@ panels:
   title: Available memory
   type: stat
 - collapsed: false
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: $ds
   gridPos:
     h: 1
     w: 24
@@ -623,11 +588,6 @@ panels:
     'y': 5
   id: 24
   panels: []
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    refId: A
   title: Overview
   type: row
 - datasource:
@@ -645,6 +605,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -694,9 +655,10 @@ panels:
       sortBy: Last *
       sortDesc: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 9.1.0
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       uid: $ds
@@ -737,6 +699,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 0
         gradientMode: none
@@ -787,9 +750,10 @@ panels:
       sortBy: Last *
       sortDesc: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 9.1.0
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -819,6 +783,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -871,9 +836,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 9.1.0
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -916,6 +882,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -966,9 +933,10 @@ panels:
       sortBy: Last *
       sortDesc: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 9.1.0
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -1009,6 +977,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -1056,9 +1025,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 9.1.0
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -1089,6 +1059,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: bars
         fillOpacity: 100
         gradientMode: none
@@ -1136,8 +1107,10 @@ panels:
       sortBy: Last *
       sortDesc: true
     tooltip:
+      hideZeros: false
       mode: single
       sort: none
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -1151,9 +1124,6 @@ panels:
   title: Logging rate
   type: timeseries
 - collapsed: true
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: $ds
   gridPos:
     h: 1
     w: 24
@@ -1219,9 +1189,8 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 11
+      'y': 233
     id: 112
-    links: []
     options:
       legend:
         calcs:
@@ -1306,7 +1275,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 11
+      'y': 233
     id: 44
     options:
       legend:
@@ -1440,9 +1409,8 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 19
+      'y': 241
     id: 123
-    links: []
     options:
       legend:
         calcs:
@@ -1526,7 +1494,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 19
+      'y': 241
     id: 114
     options:
       legend:
@@ -1627,7 +1595,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 27
+      'y': 249
     id: 75
     options:
       legend:
@@ -1720,7 +1688,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 27
+      'y': 249
     id: 57
     options:
       legend:
@@ -1814,7 +1782,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 35
+      'y': 313
     id: 47
     options:
       legend:
@@ -1899,7 +1867,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 35
+      'y': 313
     id: 76
     options:
       legend:
@@ -1993,7 +1961,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 43
+      'y': 321
     id: 48
     options:
       legend:
@@ -2078,7 +2046,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 43
+      'y': 321
     id: 124
     options:
       legend:
@@ -2172,7 +2140,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 51
+      'y': 329
     id: 49
     options:
       legend:
@@ -2253,7 +2221,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 51
+      'y': 329
     id: 37
     options:
       legend:
@@ -2343,7 +2311,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 59
+      'y': 337
     id: 127
     options:
       legend:
@@ -2442,7 +2410,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 59
+      'y': 337
     id: 125
     options:
       legend:
@@ -2522,7 +2490,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 67
+      'y': 345
     id: 128
     options:
       legend:
@@ -2551,17 +2519,9 @@ panels:
       refId: A
     title: Go scheduling latency
     type: timeseries
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    refId: A
   title: Resource usage
   type: row
 - collapsed: true
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: $ds
   gridPos:
     h: 1
     w: 24
@@ -2597,6 +2557,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -2633,7 +2594,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 32
+      'y': 129
     id: 66
     options:
       legend:
@@ -2647,9 +2608,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -2686,6 +2648,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 10
           gradientMode: none
@@ -2723,7 +2686,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 32
+      'y': 129
     id: 68
     options:
       legend:
@@ -2737,9 +2700,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -2770,6 +2734,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: bars
           fillOpacity: 100
           gradientMode: none
@@ -2806,7 +2771,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 40
+      'y': 137
     id: 116
     options:
       legend:
@@ -2818,9 +2783,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -2851,6 +2817,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 10
           gradientMode: none
@@ -2887,7 +2854,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 40
+      'y': 137
     id: 60
     options:
       legend:
@@ -2901,9 +2868,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -2933,6 +2901,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -2967,7 +2936,7 @@ panels:
       h: 9
       w: 12
       x: 0
-      'y': 48
+      'y': 145
     id: 90
     options:
       legend:
@@ -2981,9 +2950,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3012,6 +2982,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -3049,7 +3020,7 @@ panels:
       h: 9
       w: 12
       x: 12
-      'y': 48
+      'y': 145
     id: 118
     options:
       legend:
@@ -3063,9 +3034,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3086,6 +3058,206 @@ panels:
       range: true
       refId: A
     title: Cache miss ratio
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: 'Shows how many samples were ignored or dropped on insertion due to various reasons:
+
+      * timestamp out of retention period or timestamp in future;
+
+      * invalid metric name;
+
+      * exceeding limit for labels length or number;
+
+      * dropped by [relabeling configuration](https://docs.victoriametrics.com/#relabeling).'
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      'y': 154
+    id: 131
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      exemplar: true
+      expr: sum(increase(vm_rows_ignored_total{job=~"$job", instance=~"$instance"}[1h])) by (instance, reason)
+      hide: false
+      interval: ''
+      legendFormat: '{{`{{`}}instance{{`}}`}} - {{`{{`}}reason{{`}}`}}'
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(increase(vm_relabel_metrics_dropped_total{job=~"$job", instance=~"$instance"}[1h])) by(instance)
+      hide: false
+      instant: false
+      legendFormat: '{{`{{`}}instance{{`}}`}} - relabeling'
+      range: true
+      refId: B
+    title: Samples dropped for last 1h
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: 'Shows rate of deduplicated samples during [deduplication](https://docs.victoriametrics.com/#deduplication) or [downsampling](https://docs.victoriametrics.com/#downsampling), according to the configured `-dedup.minScrapeInterval` or `-downsampling.period`.
+
+
+      Should be empty if `-dedup.minScrapeInterval` and `-downsampling.period` isn''t set.
+
+
+      Deduplication happens in two places:
+
+      * `type="merge"` - during [background merges](https://docs.victoriametrics.com/#storage). Deduplication during merges is permanent.
+
+      * `type="select"` - during [read queries](https://docs.victoriametrics.com/keyconcepts/#query-data). Deduplication happens in-flight and has no permanent effect.
+
+
+      The more samples need to be deduplicated, the higher will be resource usage.'
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 10
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      'y': 154
+    id: 132
+    links:
+    - targetBlank: true
+      title: Readonly mode
+      url: https://docs.victoriametrics.com/cluster-victoriametrics/#readonly-mode
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      exemplar: true
+      expr: sum(rate(vm_deduplicated_samples_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(instance, type) > 0
+      format: time_series
+      interval: ''
+      intervalFactor: 1
+      legendFormat: __auto
+      range: true
+      refId: A
+    title: Deduplication rate
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
@@ -3131,7 +3303,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 57
+      'y': 162
     id: 126
     options:
       cellHeight: sm
@@ -3142,7 +3314,7 @@ panels:
         - sum
         show: false
       showHeader: true
-    pluginVersion: 10.4.2
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3173,6 +3345,7 @@ panels:
           axisPlacement: auto
           axisSoftMin: 0
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -3208,8 +3381,8 @@ panels:
     gridPos:
       h: 8
       w: 12
-      x: 0
-      'y': 65
+      x: 12
+      'y': 162
     id: 129
     options:
       legend:
@@ -3221,9 +3394,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3236,17 +3410,9 @@ panels:
       refId: A
     title: Restarts ($job)
     type: timeseries
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    refId: A
   title: Troubleshooting
   type: row
 - collapsed: true
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: $ds
   gridPos:
     h: 1
     w: 24
@@ -3269,6 +3435,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 10
           gradientMode: none
@@ -3296,18 +3463,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 13
+      'y': 227
     id: 10
-    links: []
     options:
       legend:
         calcs:
@@ -3320,9 +3486,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3361,6 +3528,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -3388,18 +3556,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: s
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 13
+      'y': 227
     id: 73
-    links: []
     options:
       legend:
         calcs:
@@ -3412,9 +3579,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3445,6 +3613,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -3472,18 +3641,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: bytes
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 21
+      'y': 235
     id: 53
-    links: []
     options:
       legend:
         calcs:
@@ -3496,9 +3664,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3550,6 +3719,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 10
           gradientMode: none
@@ -3577,10 +3747,10 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides:
       - matcher:
           id: byName
@@ -3594,9 +3764,8 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 21
+      'y': 235
     id: 34
-    links: []
     options:
       legend:
         calcs:
@@ -3609,9 +3778,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3650,6 +3820,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -3677,10 +3848,10 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides:
       - matcher:
           id: byName
@@ -3694,9 +3865,8 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 29
+      'y': 243
     id: 30
-    links: []
     options:
       legend:
         calcs:
@@ -3709,9 +3879,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3741,15 +3912,15 @@ panels:
     type: timeseries
   - datasource:
       uid: $ds
-    description: 'Data parts of LSM tree.
+    description: 'The max number of data parts of LSM tree across all storage nodes in the last [partition](https://docs.victoriametrics.com/#storage).
 
-      High number of parts could be an evidence of slow merge performance - check the resource utilization.
+      Increase in number of parts (the hard limit is 512) is an evidence of slow merge performance - check the resource utilization.
 
       * `indexdb` - inverted index
 
-      * `storage/small` - recently added parts of data ingested into storage(hot data)
+      * `storage/small` - recently added parts of data ingested into storage (hot data)
 
-      * `storage/big` -  small parts gradually merged into big parts (cold data)'
+      * `storage/big` -  small parts gradually merged into bigger parts (cold data)'
     fieldConfig:
       defaults:
         color:
@@ -3761,6 +3932,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -3788,18 +3960,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 29
+      'y': 243
     id: 36
-    links: []
     options:
       legend:
         calcs:
@@ -3812,21 +3983,33 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      expr: sum(vm_parts{job=~"$job", instance=~"$instance"}) by (instance, type)
+      expr: sum(vm_parts{job=~"$job", instance=~"$instance", type=~"indexdb.*"}) by (instance, type)
       format: time_series
       intervalFactor: 1
       legendFormat: '{{`{{`}}instance{{`}}`}} - {{`{{`}}type{{`}}`}}'
       range: true
       refId: A
-    title: LSM parts
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: max(vm_last_partition_parts{job=~"$job", instance=~"$instance"}) by(instance, type)
+      format: time_series
+      hide: false
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}instance{{`}}`}} - {{`{{`}}type{{`}}`}}'
+      range: true
+      refId: B
+    title: LSM parts max by type
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
@@ -3843,6 +4026,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 10
           gradientMode: none
@@ -3870,18 +4054,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 37
+      'y': 251
     id: 58
-    links: []
     options:
       legend:
         calcs:
@@ -3892,9 +4075,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3926,6 +4110,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -3954,16 +4139,16 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 37
+      'y': 251
     id: 62
     options:
       legend:
@@ -3975,9 +4160,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -4004,6 +4190,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -4032,10 +4219,10 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides:
       - matcher:
           id: byName
@@ -4049,9 +4236,8 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 45
+      'y': 259
     id: 59
-    links: []
     options:
       legend:
         calcs:
@@ -4061,9 +4247,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -4103,6 +4290,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -4131,16 +4319,16 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 45
+      'y': 259
     id: 64
     options:
       legend:
@@ -4154,9 +4342,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -4183,6 +4372,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -4211,18 +4401,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 53
+      'y': 267
     id: 99
-    links: []
     options:
       legend:
         calcs:
@@ -4235,9 +4424,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -4267,6 +4457,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -4295,18 +4486,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 53
+      'y': 267
     id: 103
-    links: []
     options:
       legend:
         calcs:
@@ -4319,9 +4509,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -4351,6 +4542,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -4379,18 +4571,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 61
+      'y': 275
     id: 122
-    links: []
     options:
       legend:
         calcs:
@@ -4403,9 +4594,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -4438,6 +4630,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -4466,18 +4659,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 61
+      'y': 275
     id: 105
-    links: []
     options:
       legend:
         calcs:
@@ -4490,9 +4682,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -4507,15 +4700,94 @@ panels:
       refId: A
     title: Datapoints scanned per query
     type: timeseries
-  targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    refId: A
+    description: 'Shows number of existing [snapshots](https://docs.victoriametrics.com/#how-to-work-with-snapshots).
+
+
+      Recently made snapshots do not occupy disk space. But with time, as snapshots become older, they start to occupy more and more disk space.
+
+
+      It is recommended deleting old snapshots when they are no longer needed to free up disk space.'
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      'y': 283
+    id: 130
+    links: []
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      exemplar: true
+      expr: vm_snapshots{job=~"$job", instance=~"$instance"}
+      interval: ''
+      legendFormat: '{{`{{`}}instance{{`}}`}}'
+      range: true
+      refId: A
+    title: Number of snapshots
+    type: timeseries
   title: Storage
   type: row
+preload: false
 refresh: ''
-schemaVersion: 39
+schemaVersion: 40
 tags:
 - victoriametrics
 - vmsingle
@@ -4523,28 +4795,21 @@ tags:
 templating:
   list:
   - current:
-      selected: false
       text: VictoriaMetrics
       value: P4169E866C3094E38
-    hide: 0
     includeAll: false
-    multi: false
     name: ds
     options: []
     query: {{ $defaultDatasource }}
-    queryValue: ''
     refresh: 1
     regex: ''
-    skipUrlSync: false
     type: datasource
   - current: {}
     datasource:
       type: prometheus
       uid: $ds
     definition: label_values(vm_app_version{version=~"victoria-metrics-.*"}, job)
-    hide: 0
     includeAll: false
-    multi: false
     name: job
     options: []
     query:
@@ -4552,12 +4817,7 @@ templating:
       refId: VictoriaMetrics-job-Variable-Query
     refresh: 1
     regex: ''
-    skipUrlSync: false
-    sort: 0
-    tagValuesQuery: ''
-    tagsQuery: ''
     type: query
-    useTags: false
   - current: {}
     datasource:
       type: prometheus
@@ -4565,7 +4825,6 @@ templating:
     definition: label_values(vm_app_version{job=~"$job", instance=~"$instance"},  version)
     hide: 2
     includeAll: false
-    multi: false
     name: version
     options: []
     query:
@@ -4573,19 +4832,14 @@ templating:
       refId: VictoriaMetrics-version-Variable-Query
     refresh: 1
     regex: /.*-(?:tags|heads)-(.*)-(?:0|dirty)-.*/
-    skipUrlSync: false
     sort: 2
-    tagValuesQuery: ''
-    tagsQuery: ''
     type: query
-    useTags: false
   - allValue: .*
     current: {}
     datasource:
       type: prometheus
       uid: $ds
     definition: label_values(vm_app_version{job=~"$job"}, instance)
-    hide: 0
     includeAll: true
     multi: true
     name: instance
@@ -4595,19 +4849,13 @@ templating:
       refId: VictoriaMetrics-instance-Variable-Query
     refresh: 1
     regex: ''
-    skipUrlSync: false
-    sort: 0
-    tagValuesQuery: ''
-    tagsQuery: ''
     type: query
-    useTags: false
-  - datasource:
+  - baseFilters: []
+    datasource:
       type: prometheus
       uid: $ds
     filters: []
-    hide: 0
     name: adhoc
-    skipUrlSync: false
     type: adhoc
 time:
   from: now-3h
@@ -4623,16 +4871,6 @@ timepicker:
   - 1h
   - 2h
   - 1d
-  time_options:
-  - 5m
-  - 15m
-  - 1h
-  - 6h
-  - 12h
-  - 24h
-  - 2d
-  - 7d
-  - 30d
 timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
 title: VictoriaMetrics - single-node
 uid: wNf0q_kZk

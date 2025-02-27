@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Upgraded dashboard
 
 ## 0.9.2
 

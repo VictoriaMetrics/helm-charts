@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Upgraded dashboard and rules
 
 ## 0.38.0
 
