@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Reverted serviceName removal, which was done in 0.14.0 release
 
 ## 0.14.1
 
