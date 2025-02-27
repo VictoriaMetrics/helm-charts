@@ -25,6 +25,9 @@ spec:
   {{- if not $app.horizontalPodAutoscaler.enabled }}
   replicas: {{ $app.replicaCount }}
   {{- end }}
+  {{- if eq $mode "statefulSet" }}
+  serviceName: {{ $fullname }}
+  {{- end }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:

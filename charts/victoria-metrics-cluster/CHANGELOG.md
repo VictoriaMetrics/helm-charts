@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Reverted serviceName removal for vmselect in statefulset mode, which was done in 0.18.0 release
 
 ## 0.18.0
 
