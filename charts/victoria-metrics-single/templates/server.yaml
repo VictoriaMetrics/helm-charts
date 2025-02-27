@@ -21,6 +21,9 @@ spec:
   {{- toYaml . | nindent 2 }}
   {{- end }}
   replicas: {{ $app.replicaCount }}
+  {{- if eq $mode "statefulSet" }}
+  serviceName: {{ $fullname }}
+  {{- end }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
