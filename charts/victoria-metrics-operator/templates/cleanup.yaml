@@ -6,7 +6,7 @@
 {{- else if not (kindIs "string" ($app.image).tag) }}
   {{- fail "`crd.cleanup.image.tag` is not string, most probably you need to enquote provided value" -}}
 {{- end }}
-{{- $ctx := dict "helm" . }}
+{{- $ctx := dict "helm" . "noEnterprise" true }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 ---
