@@ -109,6 +109,7 @@
 {{- define "vm.alert.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
+  {{- $image := dict "tag" (include "vm.image.tag" .) }}
   {{- $extraArgs := dict "remoteWrite.disablePathAppend" "true" -}}
   {{- $fullname := include "vm.managed.fullname" . }}
   {{- if $Values.vmalert.templateFiles -}}
@@ -117,7 +118,7 @@
   {{- end -}}
   {{- $vmAlertTemplates := include "vm.alert.templates" . | fromYaml -}}
   {{- $vmAlertRemotes := include "vm.alert.remotes" . | fromYaml -}}
-  {{- $spec := dict "extraArgs" $extraArgs "image" (dict "tag" $Chart.AppVersion) -}}
+  {{- $spec := dict "extraArgs" $extraArgs "image" $image -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
@@ -149,13 +150,15 @@
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- $_ := set $spec "image" (dict "tag" $Chart.AppVersion) -}}
+  {{- $image := dict "tag" (include "vm.image.tag" .) }}
+  {{- $_ := set $spec "image" $image -}}
   {{- tpl (deepCopy $Values.vmagent.spec | mergeOverwrite $spec | toYaml) . -}}
 {{- end }}
 
 {{- /* VMAuth spec */ -}}
 {{- define "vm.auth.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
+  {{- $image := dict "tag" (include "vm.image.tag" .) }}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
@@ -179,6 +182,7 @@
     {{- end -}}
   {{- end -}}
   {{- $spec := $Values.vmauth.spec }}
+  {{- $_ := set $spec "image" $image -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
@@ -220,7 +224,8 @@
     {{- $_ := set . "appKey" (list "vmalert" "spec") }}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" .) -}}
   {{- end -}}
-  {{- $spec := dict "extraArgs" $extraArgs "image" (dict "tag" $Chart.AppVersion) -}}
+  {{- $image := dict "tag" (include "vm.image.tag" .) }}
+  {{- $spec := dict "extraArgs" $extraArgs "image" $image -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
@@ -237,7 +242,8 @@
     {{- $_ := set . "appKey" (list "vmalert" "spec") -}}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" .) -}}
   {{- end -}}
-  {{- $spec := dict "extraArgs" $extraArgs "image" (dict "tag" (printf "%s-cluster" $Chart.AppVersion)) -}}
+  {{- $image := dict "tag" (printf "%s-cluster" (include "vm.image.tag" .)) }}
+  {{- $spec := dict "extraArgs" $extraArgs "image" $image -}}
   {{- toYaml $spec -}}
 {{- end -}}
 
@@ -246,9 +252,9 @@
   {{- $Chart := (.helm).Chart | default .Chart }}
   {{- $spec := include "vm.select.spec" . | fromYaml -}}
   {{- $clusterSpec := deepCopy $Values.vmcluster.spec -}}
-  {{- $imageSpec := dict "image" (dict "tag" (printf "%s-cluster" $Chart.AppVersion)) -}}
-  {{- $clusterSpec = mergeOverwrite (dict "vminsert" (deepCopy $imageSpec)) $clusterSpec -}}
-  {{- $clusterSpec = mergeOverwrite (dict "vmstorage" (deepCopy $imageSpec)) $clusterSpec -}}
+  {{- $image := dict "tag" (printf "%s-cluster" (include "vm.image.tag" .)) }}
+  {{- $clusterSpec = mergeOverwrite (dict "vminsert" (deepCopy $image)) $clusterSpec -}}
+  {{- $clusterSpec = mergeOverwrite (dict "vmstorage" (deepCopy $image)) $clusterSpec -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
   {{- end -}}

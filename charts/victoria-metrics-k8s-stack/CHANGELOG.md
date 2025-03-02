@@ -1,6 +1,9 @@
 ## Next release
 
 - Upgraded dashboard and rules
+- Use enterprise images for VM components if license is set. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2023).
+- updated common dependency 0.0.39 -> 0.0.41
+
 
 ## 0.38.0
 
