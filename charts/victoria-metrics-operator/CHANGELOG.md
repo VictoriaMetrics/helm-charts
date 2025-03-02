@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.42.2
+
+**Release date:** 02 Mar 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.53.0](https://img.shields.io/badge/v0.53.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%23v0530)
+
 - added webhook certificates configureble subject and secretTemplate. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2022).
 
 ## 0.42.1
