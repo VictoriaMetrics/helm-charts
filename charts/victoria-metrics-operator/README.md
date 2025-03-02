@@ -1,6 +1,6 @@
 
 
-![Version](https://img.shields.io/badge/0.42.1-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230421)
+![Version](https://img.shields.io/badge/0.42.2-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230422)
 ![ArtifactHub](https://img.shields.io/badge/ArtifactHub-informational?logoColor=white&color=417598&logo=artifacthub&link=https%3A%2F%2Fartifacthub.io%2Fpackages%2Fhelm%2Fvictoriametrics%2Fvictoria-metrics-operator)
 ![License](https://img.shields.io/github/license/VictoriaMetrics/helm-charts?labelColor=green&label=&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Fhelm-charts%2Fblob%2Fmaster%2FLICENSE)
 ![Slack](https://img.shields.io/badge/Join-4A154B?logo=slack&link=https%3A%2F%2Fslack.victoriametrics.com)
@@ -258,9 +258,13 @@ Change the values according to the need of the environment in ``victoria-metrics
     ca:
         commonName: ca.validation.victoriametrics
         duration: 63800h0m0s
+        secretTemplate: {}
+        subject: {}
     cert:
         commonName: ""
         duration: 45800h0m0s
+        secretTemplate: {}
+        subject: {}
     enabled: false
     issuer: {}
 enabled: true
@@ -294,9 +298,13 @@ tls:
 <code class="language-yaml">ca:
     commonName: ca.validation.victoriametrics
     duration: 63800h0m0s
+    secretTemplate: {}
+    subject: {}
 cert:
     commonName: ""
     duration: 45800h0m0s
+    secretTemplate: {}
+    subject: {}
 enabled: false
 issuer: {}
 </code>
@@ -311,6 +319,8 @@ issuer: {}
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">commonName: ca.validation.victoriametrics
 duration: 63800h0m0s
+secretTemplate: {}
+subject: {}
 </code>
 </pre>
 </td>
@@ -323,6 +333,8 @@ duration: 63800h0m0s
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">commonName: ""
 duration: 45800h0m0s
+secretTemplate: {}
+subject: {}
 </code>
 </pre>
 </td>
