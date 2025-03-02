@@ -68,6 +68,12 @@ metadata:
 spec:
   secretName: {{ $fullname }}-root-ca
   duration: {{ $certManager.ca.duration }}
+  {{- with $certManager.ca.secretTemplate }}
+  secretTemplate: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $certManager.ca.subject }}
+  subject: {{ toYaml . | nindent 4 }}
+  {{- end }}
   issuerRef:
     name: {{ $fullname }}-root
   commonName: {{ $certManager.ca.commonName }}
@@ -92,8 +98,14 @@ metadata:
 spec:
   secretName: {{ $fullname }}-validation
   duration: {{ $certManager.cert.duration }}
+  {{- with $certManager.cert.secretTemplate }}
+  secretTemplate: {{ toYaml . | nindent 4 }}
+  {{- end }}
   {{- with $certManager.cert.commonName }}
   commonName: {{ . }}
+  {{- end }}
+  {{- with $certManager.cert.subject }}
+  subject: {{ toYaml . | nindent 4 }}
   {{- end }}
   {{- $issuerRef := $certManager.issuer | default dict }}
   {{- if empty $issuerRef }}

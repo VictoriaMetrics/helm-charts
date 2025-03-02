@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added webhook certificates configureble subject and secretTemplate. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2022).
 
 ## 0.42.1
 
