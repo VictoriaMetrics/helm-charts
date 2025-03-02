@@ -29,7 +29,7 @@
   {{- $licenseKey := (include "vm.license.key" .) -}}
   {{- $licenseSecretKey := (include "vm.license.secret.key" .) -}}
   {{- $licenseSecretName := (include "vm.license.secret.name" .) -}}
-  {{- and (empty $licenseKey) (and (empty $licenseSecretName) (empty $licenseSecretKey)) -}}
+  {{- or .noEnterprise (and (empty $licenseKey) (and (empty $licenseSecretName) (empty $licenseSecretKey))) -}}
 {{- end -}}
 
 {{- define "vm.enterprise.only" -}}

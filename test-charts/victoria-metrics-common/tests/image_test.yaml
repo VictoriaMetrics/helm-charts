@@ -120,3 +120,26 @@ tests:
       - equal:
           path: vm.image.tag
           value: 0.0.0-enterprise
+  - it: no enterprise suffix when noEnterprise is set
+    set:
+      ctx:
+        noEnterprise: true
+        appKey:
+          - app
+        app:
+          image: 
+            repository: vmagent
+      global:
+        license:
+          keyRef:
+            name: test
+            key: key
+        image:
+          registry: localhost:8080
+    asserts:
+      - equal:
+          path: vm.image.name
+          value: localhost:8080/vmagent:0.0.0
+      - equal:
+          path: vm.image.tag
+          value: 0.0.0
