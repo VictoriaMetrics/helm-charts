@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- add noEnterprise flag to disable `-enterprise` image suffix
 
 ## 0.0.40
 
