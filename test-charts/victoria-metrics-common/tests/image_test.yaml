@@ -76,3 +76,47 @@ tests:
       - equal:
           path: vm.image.tag
           value: 0.0.0
+  - it: enterprise suffix for plain license secret
+    set:
+      ctx:
+        appKey:
+          - app
+        app:
+          image:
+            repository: vmagent
+      global:
+        license:
+          secret:
+            name: test
+            key: key
+        image:
+          registry: localhost:8080
+    asserts:
+      - equal:
+          path: vm.image.name
+          value: localhost:8080/vmagent:0.0.0-enterprise
+      - equal:
+          path: vm.image.tag
+          value: 0.0.0-enterprise
+  - it: enterprise suffix for managed license secret
+    set:
+      ctx:
+        appKey:
+          - app
+        app:
+          image: 
+            repository: vmagent
+      global:
+        license:
+          keyRef:
+            name: test
+            key: key
+        image:
+          registry: localhost:8080
+    asserts:
+      - equal:
+          path: vm.image.name
+          value: localhost:8080/vmagent:0.0.0-enterprise
+      - equal:
+          path: vm.image.tag
+          value: 0.0.0-enterprise

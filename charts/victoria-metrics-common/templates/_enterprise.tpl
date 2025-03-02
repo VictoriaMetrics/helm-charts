@@ -1,11 +1,23 @@
 {{- define "vm.license.secret.key" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- (($Values.license).secret).key | default ((($Values.global).license).secret).key | default "" -}}
+  {{- $plain := (($Values.license).secret).key | default ((($Values.global).license).secret).key -}}
+  {{- $managed := (($Values.license).keyRef).key | default ((($Values.global).license).keyRef).key }}
+  {{- if $plain -}}
+    {{- $plain -}}
+  {{- else if $managed -}}
+    {{- $managed -}}
+  {{- end -}}
 {{- end -}}
 
 {{- define "vm.license.secret.name" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- (($Values.license).secret).name | default ((($Values.global).license).secret).name | default "" -}}
+  {{- $plain := (($Values.license).secret).name | default ((($Values.global).license).secret).name -}}
+  {{- $managed := (($Values.license).keyRef).name | default ((($Values.global).license).keyRef).name -}}
+  {{- if $plain -}}
+    {{- $plain -}}
+  {{- else if $managed -}}
+    {{- $managed -}}
+  {{- end -}}
 {{- end -}}
 
 {{- define "vm.license.key" -}}

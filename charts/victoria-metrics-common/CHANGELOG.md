@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Support managed components license path for proper enterprise images rendering
 
 ## 0.0.39
 
