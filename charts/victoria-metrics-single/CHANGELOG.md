@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Set default mode back to statefulSet. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2037).
 
 ## 0.14.2
 
