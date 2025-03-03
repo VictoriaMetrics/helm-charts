@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix image tags for VMCluster components. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2034).
 
 ## 0.38.2
 
