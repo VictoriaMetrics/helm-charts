@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `.Values.vmauth.unauthorizedUserAccessSpec.disabled` flag to generate VMAuth without unauthorized user section. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1981).
 
 ## 0.38.1
 

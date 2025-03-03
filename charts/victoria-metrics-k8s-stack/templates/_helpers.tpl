@@ -182,6 +182,13 @@
     {{- end -}}
   {{- end -}}
   {{- $spec := $Values.vmauth.spec }}
+  {{- if $spec.unauthorizedUserAccessSpec }}
+    {{- if $spec.unauthorizedUserAccessSpec.disabled }}
+      {{- $_ := unset $spec "unauthorizedUserAccessSpec" }}
+    {{- else -}}
+      {{- $_ := unset $spec.unauthorizedUserAccessSpec "disabled" }}
+    {{- end -}}
+  {{- end -}}
   {{- $_ := set $spec "image" $image -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
