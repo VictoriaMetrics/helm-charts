@@ -259,7 +259,7 @@
   {{- $Chart := (.helm).Chart | default .Chart }}
   {{- $spec := include "vm.select.spec" . | fromYaml -}}
   {{- $clusterSpec := deepCopy $Values.vmcluster.spec -}}
-  {{- $image := dict "tag" (printf "%s-cluster" (include "vm.image.tag" .)) }}
+  {{- $image := dict "image" (dict "tag" (printf "%s-cluster" (include "vm.image.tag" .))) }}
   {{- $clusterSpec = mergeOverwrite (dict "vminsert" (deepCopy $image)) $clusterSpec -}}
   {{- $clusterSpec = mergeOverwrite (dict "vmstorage" (deepCopy $image)) $clusterSpec -}}
   {{- with (include "vm.license.global" .) -}}
