@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add support for ServiceScrape `proxyURL`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2029).
 
 ## 0.42.3
 
