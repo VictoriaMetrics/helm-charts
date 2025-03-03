@@ -2,6 +2,14 @@
 
 - TODO
 
+## 0.9.3
+
+**Release date:** 03 Mar 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.112.0](https://img.shields.io/badge/v1.112.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11120)
+
+- TODO
+
 ## 0.9.2
 
 **Release date:** 26 Feb 2025
