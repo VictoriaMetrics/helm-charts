@@ -39,6 +39,9 @@ spec:
       {{- with $serviceMonitor.basicAuth }}
       basicAuth: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $serviceMonitor.proxyURL }}
+      proxyURL: {{ . }}
+      {{- end }}
   namespaceSelector:
     matchNames:
       - {{ $ns }}
