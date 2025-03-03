@@ -296,6 +296,17 @@ name: ""
 </td>
     </tr>
     <tr>
+      <td>nameOverride</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Override chart name</p>
+</td>
+    </tr>
+    <tr>
       <td>printNotes</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
