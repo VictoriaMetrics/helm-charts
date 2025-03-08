@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+**Update note**: This release contains breaking change. Chart no longer includes `prometheus-operator-crds` subchart. Consider installing this chart independently.
+
+- Removed `prometheus-operator-crds`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2042).
 
 ## 0.38.3
 
