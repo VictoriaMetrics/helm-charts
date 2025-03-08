@@ -2324,17 +2324,6 @@ selector:
 </td>
     </tr>
     <tr>
-      <td>prometheus-operator-crds</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">enabled: false
-</code>
-</pre>
-</td>
-      <td><p>Install prometheus operator CRDs</p>
-</td>
-    </tr>
-    <tr>
       <td>tenant</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
