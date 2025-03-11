@@ -1172,10 +1172,22 @@ relabelings: []
 scheme: ""
 scrapeTimeout: ""
 tlsConfig: {}
+vm: true
 </code>
 </pre>
 </td>
-      <td><p>Configures monitoring with serviceScrape. VMServiceScrape must be pre-installed</p>
+      <td><p>Configures monitoring with serviceScrape using either <code>VMServiceScrape</code> or <code>ServiceMonitor</code>. For latter <a href="https://artifacthub.io/packages/helm/prometheus-community/prometheus-operator-crds" target="_blank">Prometheus Operator CRDs</a> should be preinstalled</p>
+</td>
+    </tr>
+    <tr>
+      <td>serviceMonitor.vm</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Creates <code>VMServiceScrape</code> if <code>true</code> and <code>ServiceMonitor</code> otherwise. Make sure <a href="https://artifacthub.io/packages/helm/prometheus-community/prometheus-operator-crds" target="_blank">Prometheus Operator CRDs</a> are installed if it&rsquo;s set to <code>false</code></p>
 </td>
     </tr>
     <tr>
