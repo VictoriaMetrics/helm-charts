@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Add `.Values.serviceMonitor.vm` toggle, which allows to switch from `VMServiceScrape` to `ServiceMonitor` for operator monitoring.
 
 ## 0.42.4
 

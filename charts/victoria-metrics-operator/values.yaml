@@ -289,9 +289,11 @@ admissionWebhooks:
     cert:
     key:
 
-# -- Configures monitoring with serviceScrape. VMServiceScrape must be pre-installed
+# -- Configures monitoring with serviceScrape using either `VMServiceScrape` or `ServiceMonitor`. For latter [Prometheus Operator CRDs](https://artifacthub.io/packages/helm/prometheus-community/prometheus-operator-crds) should be preinstalled
 serviceMonitor:
   enabled: false
+  # -- Creates `VMServiceScrape` if `true` and `ServiceMonitor` otherwise. Make sure [Prometheus Operator CRDs](https://artifacthub.io/packages/helm/prometheus-community/prometheus-operator-crds) are installed if it's set to `false`
+  vm: true
   extraLabels: {}
   annotations: {}
   relabelings: []
