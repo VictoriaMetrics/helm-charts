@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vlogs.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -72,6 +72,14 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              disableAutomountServiceAccountToken:
+                description: |-
+                  DisableAutomountServiceAccountToken whether to disable serviceAccount auto mount by Kubernetes (available from v0.54.0).
+                  Operator will conditionally create volumes and volumeMounts for containers if it requires k8s API access.
+                  For example, vmagent and vm-config-reloader requires k8s API access.
+                  Operator creates volumes with name: "kube-api-access", which can be used as volumeMount for extraContainers if needed.
+                  And also adds VolumeMounts at /var/run/secrets/kubernetes.io/serviceaccount.
+                type: boolean
               disableSelfServiceScrape:
                 description: |-
                   DisableSelfServiceScrape controls creation of VMServiceScrape by operator
@@ -106,9 +114,12 @@ spec:
                         of a pod.
                       properties:
                         name:
-                          description: Required.
+                          description: |-
+                            Name is this DNS resolver option's name.
+                            Required.
                           type: string
                         value:
+                          description: Value is this DNS resolver option's value.
                           type: string
                       type: object
                     type: array
@@ -951,10 +962,6 @@ spec:
           status:
             description: VLogsStatus defines the observed state of VLogs
             properties:
-              availableReplicas:
-                description: deprecated and will be removed at v0.52.0
-                format: int32
-                type: integer
               conditions:
                 description: 'Known .status.conditions.type are: "Available", "Progressing",
                   and "Degraded"'
@@ -1027,20 +1034,9 @@ spec:
               reason:
                 description: Reason defines human readable error reason
                 type: string
-              replicas:
-                description: deprecated and will be removed at v0.52.0
-                format: int32
-                type: integer
-              unavailableReplicas:
-                description: deprecated and will be removed at v0.52.0
-                format: int32
-                type: integer
               updateStatus:
                 description: UpdateStatus defines a status for update rollout
                 type: string
-              updatedReplicas:
-                format: int32
-                type: integer
             type: object
         type: object
     served: true
@@ -1052,7 +1048,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmagents.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -1107,6 +1103,49 @@ spec:
             description: VMAgentSpec defines the desired state of VMAgent
             properties:
               aPIServerConfig:
+                description: |-
+                  APIServerConfig allows specifying a host and auth methods to access apiserver.
+                  If left empty, VMAgent is assumed to run inside of the cluster
+                  and will discover API servers automatically and use the pod's CA certificate
+                  and bearer token file at /var/run/secrets/kubernetes.io/serviceaccount/.
+                  aPIServerConfig is deprecated use apiServerConfig instead
+                required:
+                - host
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              additionalScrapeConfigs:
+                description: |-
+                  AdditionalScrapeConfigs As scrape configs are appended, the user is responsible to make sure it
+                  is valid. Note that using this feature may expose the possibility to
+                  break upgrades of VMAgent. It is advised to review VMAgent release
+                  notes to ensure that no incompatible scrape configs are going to break
+                  VMAgent after the upgrade.
+                properties:
+                  key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
+                    type: string
+                  name:
+                    default: ""
+                    description: |-
+                      Name of the referent.
+                      This field is effectively required, but due to backwards compatibility is
+                      allowed to be empty. Instances of this type with an empty value here are
+                      almost certainly wrong.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                  optional:
+                    description: Specify whether the Secret or its key must be defined
+                    type: boolean
+                required:
+                - key
+                type: object
+                x-kubernetes-map-type: atomic
+              affinity:
+                description: Affinity If specified, the pod's scheduling constraints.
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              apiServerConfig:
                 description: |-
                   APIServerConfig allows specifying a host and auth methods to access apiserver.
                   If left empty, VMAgent is assumed to run inside of the cluster
@@ -1375,38 +1414,6 @@ spec:
                 required:
                 - host
                 type: object
-              additionalScrapeConfigs:
-                description: |-
-                  AdditionalScrapeConfigs As scrape configs are appended, the user is responsible to make sure it
-                  is valid. Note that using this feature may expose the possibility to
-                  break upgrades of VMAgent. It is advised to review VMAgent release
-                  notes to ensure that no incompatible scrape configs are going to break
-                  VMAgent after the upgrade.
-                properties:
-                  key:
-                    description: The key of the secret to select from.  Must be a
-                      valid secret key.
-                    type: string
-                  name:
-                    default: ""
-                    description: |-
-                      Name of the referent.
-                      This field is effectively required, but due to backwards compatibility is
-                      allowed to be empty. Instances of this type with an empty value here are
-                      almost certainly wrong.
-                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                    type: string
-                  optional:
-                    description: Specify whether the Secret or its key must be defined
-                    type: boolean
-                required:
-                - key
-                type: object
-                x-kubernetes-map-type: atomic
-              affinity:
-                description: Affinity If specified, the pod's scheduling constraints.
-                type: object
-                x-kubernetes-preserve-unknown-fields: true
               arbitraryFSAccessThroughSMs:
                 description: |-
                   ArbitraryFSAccessThroughSMs configures whether configuration
@@ -1772,18 +1779,15 @@ spec:
                                   persistent volume is being resized.
                                 type: string
                               status:
+                                description: |-
+                                  Status is the status of the condition.
+                                  Can be True, False, Unknown.
+                                  More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
                                 type: string
                               type:
                                 description: |-
-                                  PersistentVolumeClaimConditionType defines the condition of PV claim.
-                                  Valid values are:
-                                    - "Resizing", "FileSystemResizePending"
-
-                                  If RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:
-                                    - "ControllerResizeError", "NodeResizeError"
-
-                                  If VolumeAttributesClass feature gate is enabled, then following additional values can be expected:
-                                    - "ModifyVolumeError", "ModifyingVolume"
+                                  Type is the type of the condition.
+                                  More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
                                 type: string
                             required:
                             - status
@@ -1925,6 +1929,14 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              disableAutomountServiceAccountToken:
+                description: |-
+                  DisableAutomountServiceAccountToken whether to disable serviceAccount auto mount by Kubernetes (available from v0.54.0).
+                  Operator will conditionally create volumes and volumeMounts for containers if it requires k8s API access.
+                  For example, vmagent and vm-config-reloader requires k8s API access.
+                  Operator creates volumes with name: "kube-api-access", which can be used as volumeMount for extraContainers if needed.
+                  And also adds VolumeMounts at /var/run/secrets/kubernetes.io/serviceaccount.
+                type: boolean
               disableSelfServiceScrape:
                 description: |-
                   DisableSelfServiceScrape controls creation of VMServiceScrape by operator
@@ -1959,9 +1971,12 @@ spec:
                         of a pod.
                       properties:
                         name:
-                          description: Required.
+                          description: |-
+                            Name is this DNS resolver option's name.
+                            Required.
                           type: string
                         value:
+                          description: Value is this DNS resolver option's value.
                           type: string
                       type: object
                     type: array
@@ -3360,6 +3375,10 @@ spec:
                           items:
                             type: string
                           type: array
+                        enableWindows:
+                          description: EnableWindows enables aggregating data in separate
+                            windows ( available from v0.54.0).
+                          type: boolean
                         ignoreFirstIntervals:
                           description: IgnoreFirstIntervals instructs to ignore first
                             interval
@@ -3400,6 +3419,10 @@ spec:
                                 items:
                                   type: string
                                 type: array
+                              enable_windows:
+                                description: EnableWindows enables aggregating data
+                                  in separate windows
+                                type: boolean
                               flush_on_shutdown:
                                 description: |-
                                   FlushOnShutdown defines whether to flush the aggregation state on process termination
@@ -4866,18 +4889,15 @@ spec:
                                     persistent volume is being resized.
                                   type: string
                                 status:
+                                  description: |-
+                                    Status is the status of the condition.
+                                    Can be True, False, Unknown.
+                                    More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
                                   type: string
                                 type:
                                   description: |-
-                                    PersistentVolumeClaimConditionType defines the condition of PV claim.
-                                    Valid values are:
-                                      - "Resizing", "FileSystemResizePending"
-
-                                    If RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:
-                                      - "ControllerResizeError", "NodeResizeError"
-
-                                    If VolumeAttributesClass feature gate is enabled, then following additional values can be expected:
-                                      - "ModifyVolumeError", "ModifyingVolume"
+                                    Type is the type of the condition.
+                                    More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
                                   type: string
                               required:
                               - status
@@ -5147,6 +5167,10 @@ spec:
                     items:
                       type: string
                     type: array
+                  enableWindows:
+                    description: EnableWindows enables aggregating data in separate
+                      windows ( available from v0.54.0).
+                    type: boolean
                   ignoreFirstIntervals:
                     description: IgnoreFirstIntervals instructs to ignore first interval
                     type: integer
@@ -5185,6 +5209,10 @@ spec:
                           items:
                             type: string
                           type: array
+                        enable_windows:
+                          description: EnableWindows enables aggregating data in separate
+                            windows
+                          type: boolean
                         flush_on_shutdown:
                           description: |-
                             FlushOnShutdown defines whether to flush the aggregation state on process termination
@@ -5597,10 +5625,6 @@ spec:
           status:
             description: VMAgentStatus defines the observed state of VMAgent
             properties:
-              availableReplicas:
-                description: deprecated and will be removed at v0.52.0
-                format: int32
-                type: integer
               conditions:
                 description: 'Known .status.conditions.type are: "Available", "Progressing",
                   and "Degraded"'
@@ -5685,17 +5709,9 @@ spec:
                   with uniq scrape targets
                 format: int32
                 type: integer
-              unavailableReplicas:
-                description: deprecated and will be removed at v0.52.0
-                format: int32
-                type: integer
               updateStatus:
                 description: UpdateStatus defines a status for update rollout
                 type: string
-              updatedReplicas:
-                description: deprecated and will be removed at v0.52.0
-                format: int32
-                type: integer
             type: object
         type: object
     served: true
@@ -5711,7 +5727,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmalertmanagerconfigs.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -9692,7 +9708,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmalertmanagers.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -10110,18 +10126,15 @@ spec:
                                   persistent volume is being resized.
                                 type: string
                               status:
+                                description: |-
+                                  Status is the status of the condition.
+                                  Can be True, False, Unknown.
+                                  More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
                                 type: string
                               type:
                                 description: |-
-                                  PersistentVolumeClaimConditionType defines the condition of PV claim.
-                                  Valid values are:
-                                    - "Resizing", "FileSystemResizePending"
-
-                                  If RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:
-                                    - "ControllerResizeError", "NodeResizeError"
-
-                                  If VolumeAttributesClass feature gate is enabled, then following additional values can be expected:
-                                    - "ModifyVolumeError", "ModifyingVolume"
+                                  Type is the type of the condition.
+                                  More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
                                 type: string
                             required:
                             - status
@@ -10392,6 +10405,14 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              disableAutomountServiceAccountToken:
+                description: |-
+                  DisableAutomountServiceAccountToken whether to disable serviceAccount auto mount by Kubernetes (available from v0.54.0).
+                  Operator will conditionally create volumes and volumeMounts for containers if it requires k8s API access.
+                  For example, vmagent and vm-config-reloader requires k8s API access.
+                  Operator creates volumes with name: "kube-api-access", which can be used as volumeMount for extraContainers if needed.
+                  And also adds VolumeMounts at /var/run/secrets/kubernetes.io/serviceaccount.
+                type: boolean
               disableNamespaceMatcher:
                 description: |-
                   DisableNamespaceMatcher disables top route namespace label matcher for VMAlertmanagerConfig
@@ -10435,9 +10456,12 @@ spec:
                         of a pod.
                       properties:
                         name:
-                          description: Required.
+                          description: |-
+                            Name is this DNS resolver option's name.
+                            Required.
                           type: string
                         value:
+                          description: Value is this DNS resolver option's value.
                           type: string
                       type: object
                     type: array
@@ -11622,18 +11646,15 @@ spec:
                                     persistent volume is being resized.
                                   type: string
                                 status:
+                                  description: |-
+                                    Status is the status of the condition.
+                                    Can be True, False, Unknown.
+                                    More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
                                   type: string
                                 type:
                                   description: |-
-                                    PersistentVolumeClaimConditionType defines the condition of PV claim.
-                                    Valid values are:
-                                      - "Resizing", "FileSystemResizePending"
-
-                                    If RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:
-                                      - "ControllerResizeError", "NodeResizeError"
-
-                                    If VolumeAttributesClass feature gate is enabled, then following additional values can be expected:
-                                      - "ModifyVolumeError", "ModifyingVolume"
+                                    Type is the type of the condition.
+                                    More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
                                   type: string
                               required:
                               - status
@@ -12133,7 +12154,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmalerts.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -12399,6 +12420,14 @@ spec:
                 required:
                 - url
                 type: object
+              disableAutomountServiceAccountToken:
+                description: |-
+                  DisableAutomountServiceAccountToken whether to disable serviceAccount auto mount by Kubernetes (available from v0.54.0).
+                  Operator will conditionally create volumes and volumeMounts for containers if it requires k8s API access.
+                  For example, vmagent and vm-config-reloader requires k8s API access.
+                  Operator creates volumes with name: "kube-api-access", which can be used as volumeMount for extraContainers if needed.
+                  And also adds VolumeMounts at /var/run/secrets/kubernetes.io/serviceaccount.
+                type: boolean
               disableSelfServiceScrape:
                 description: |-
                   DisableSelfServiceScrape controls creation of VMServiceScrape by operator
@@ -12433,9 +12462,12 @@ spec:
                         of a pod.
                       properties:
                         name:
-                          description: Required.
+                          description: |-
+                            Name is this DNS resolver option's name.
+                            Required.
                           type: string
                         value:
+                          description: Value is this DNS resolver option's value.
                           type: string
                       type: object
                     type: array
@@ -13969,10 +14001,6 @@ spec:
           status:
             description: VMAlertStatus defines the observed state of VMAlert
             properties:
-              availableReplicas:
-                description: Deprecated
-                format: int32
-                type: integer
               conditions:
                 description: 'Known .status.conditions.type are: "Available", "Progressing",
                   and "Degraded"'
@@ -14045,21 +14073,9 @@ spec:
               reason:
                 description: Reason defines human readable error reason
                 type: string
-              replicas:
-                description: Deprecated
-                format: int32
-                type: integer
-              unavailableReplicas:
-                description: Deprecated
-                format: int32
-                type: integer
               updateStatus:
                 description: UpdateStatus defines a status for update rollout
                 type: string
-              updatedReplicas:
-                description: Deprecated
-                format: int32
-                type: integer
             type: object
         type: object
     served: true
@@ -14071,7 +14087,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmauths.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -14224,6 +14240,14 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              disableAutomountServiceAccountToken:
+                description: |-
+                  DisableAutomountServiceAccountToken whether to disable serviceAccount auto mount by Kubernetes (available from v0.54.0).
+                  Operator will conditionally create volumes and volumeMounts for containers if it requires k8s API access.
+                  For example, vmagent and vm-config-reloader requires k8s API access.
+                  Operator creates volumes with name: "kube-api-access", which can be used as volumeMount for extraContainers if needed.
+                  And also adds VolumeMounts at /var/run/secrets/kubernetes.io/serviceaccount.
+                type: boolean
               disableSelfServiceScrape:
                 description: |-
                   DisableSelfServiceScrape controls creation of VMServiceScrape by operator
@@ -14258,9 +14282,12 @@ spec:
                         of a pod.
                       properties:
                         name:
-                          description: Required.
+                          description: |-
+                            Name is this DNS resolver option's name.
+                            Required.
                           type: string
                         value:
+                          description: Value is this DNS resolver option's value.
                           type: string
                       type: object
                     type: array
@@ -15720,7 +15747,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmclusters.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -15959,6 +15986,14 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  disableAutomountServiceAccountToken:
+                    description: |-
+                      DisableAutomountServiceAccountToken whether to disable serviceAccount auto mount by Kubernetes (available from v0.54.0).
+                      Operator will conditionally create volumes and volumeMounts for containers if it requires k8s API access.
+                      For example, vmagent and vm-config-reloader requires k8s API access.
+                      Operator creates volumes with name: "kube-api-access", which can be used as volumeMount for extraContainers if needed.
+                      And also adds VolumeMounts at /var/run/secrets/kubernetes.io/serviceaccount.
+                    type: boolean
                   disableSelfServiceScrape:
                     description: |-
                       DisableSelfServiceScrape controls creation of VMServiceScrape by operator
@@ -15993,9 +16028,12 @@ spec:
                             of a pod.
                           properties:
                             name:
-                              description: Required.
+                              description: |-
+                                Name is this DNS resolver option's name.
+                                Required.
                               type: string
                             value:
+                              description: Value is this DNS resolver option's value.
                               type: string
                           type: object
                         type: array
@@ -17026,18 +17064,15 @@ spec:
                                       persistent volume is being resized.
                                     type: string
                                   status:
+                                    description: |-
+                                      Status is the status of the condition.
+                                      Can be True, False, Unknown.
+                                      More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
                                     type: string
                                   type:
                                     description: |-
-                                      PersistentVolumeClaimConditionType defines the condition of PV claim.
-                                      Valid values are:
-                                        - "Resizing", "FileSystemResizePending"
-
-                                      If RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:
-                                        - "ControllerResizeError", "NodeResizeError"
-
-                                      If VolumeAttributesClass feature gate is enabled, then following additional values can be expected:
-                                        - "ModifyVolumeError", "ModifyingVolume"
+                                      Type is the type of the condition.
+                                      More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
                                     type: string
                                 required:
                                 - status
@@ -17113,6 +17148,14 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  disableAutomountServiceAccountToken:
+                    description: |-
+                      DisableAutomountServiceAccountToken whether to disable serviceAccount auto mount by Kubernetes (available from v0.54.0).
+                      Operator will conditionally create volumes and volumeMounts for containers if it requires k8s API access.
+                      For example, vmagent and vm-config-reloader requires k8s API access.
+                      Operator creates volumes with name: "kube-api-access", which can be used as volumeMount for extraContainers if needed.
+                      And also adds VolumeMounts at /var/run/secrets/kubernetes.io/serviceaccount.
+                    type: boolean
                   disableSelfServiceScrape:
                     description: |-
                       DisableSelfServiceScrape controls creation of VMServiceScrape by operator
@@ -17147,9 +17190,12 @@ spec:
                             of a pod.
                           properties:
                             name:
-                              description: Required.
+                              description: |-
+                                Name is this DNS resolver option's name.
+                                Required.
                               type: string
                             value:
+                              description: Value is this DNS resolver option's value.
                               type: string
                           type: object
                         type: array
@@ -18067,18 +18113,15 @@ spec:
                                         persistent volume is being resized.
                                       type: string
                                     status:
+                                      description: |-
+                                        Status is the status of the condition.
+                                        Can be True, False, Unknown.
+                                        More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
                                       type: string
                                     type:
                                       description: |-
-                                        PersistentVolumeClaimConditionType defines the condition of PV claim.
-                                        Valid values are:
-                                          - "Resizing", "FileSystemResizePending"
-
-                                        If RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:
-                                          - "ControllerResizeError", "NodeResizeError"
-
-                                        If VolumeAttributesClass feature gate is enabled, then following additional values can be expected:
-                                          - "ModifyVolumeError", "ModifyingVolume"
+                                        Type is the type of the condition.
+                                        More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
                                       type: string
                                   required:
                                   - status
@@ -18653,18 +18696,15 @@ spec:
                                       persistent volume is being resized.
                                     type: string
                                   status:
+                                    description: |-
+                                      Status is the status of the condition.
+                                      Can be True, False, Unknown.
+                                      More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
                                     type: string
                                   type:
                                     description: |-
-                                      PersistentVolumeClaimConditionType defines the condition of PV claim.
-                                      Valid values are:
-                                        - "Resizing", "FileSystemResizePending"
-
-                                      If RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:
-                                        - "ControllerResizeError", "NodeResizeError"
-
-                                      If VolumeAttributesClass feature gate is enabled, then following additional values can be expected:
-                                        - "ModifyVolumeError", "ModifyingVolume"
+                                      Type is the type of the condition.
+                                      More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
                                     type: string
                                 required:
                                 - status
@@ -18735,6 +18775,14 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
+                  disableAutomountServiceAccountToken:
+                    description: |-
+                      DisableAutomountServiceAccountToken whether to disable serviceAccount auto mount by Kubernetes (available from v0.54.0).
+                      Operator will conditionally create volumes and volumeMounts for containers if it requires k8s API access.
+                      For example, vmagent and vm-config-reloader requires k8s API access.
+                      Operator creates volumes with name: "kube-api-access", which can be used as volumeMount for extraContainers if needed.
+                      And also adds VolumeMounts at /var/run/secrets/kubernetes.io/serviceaccount.
+                    type: boolean
                   disableSelfServiceScrape:
                     description: |-
                       DisableSelfServiceScrape controls creation of VMServiceScrape by operator
@@ -18769,9 +18817,12 @@ spec:
                             of a pod.
                           properties:
                             name:
-                              description: Required.
+                              description: |-
+                                Name is this DNS resolver option's name.
+                                Required.
                               type: string
                             value:
+                              description: Value is this DNS resolver option's value.
                               type: string
                           type: object
                         type: array
@@ -19881,9 +19932,6 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              lastSync:
-                description: Deprecated.
-                type: string
               observedGeneration:
                 description: |-
                   ObservedGeneration defines current generation picked by operator for the
@@ -19893,14 +19941,9 @@ spec:
               reason:
                 description: Reason defines human readable error reason
                 type: string
-              updateFailCount:
-                description: Deprecated.
-                type: integer
               updateStatus:
                 description: UpdateStatus defines a status for update rollout
                 type: string
-            required:
-            - updateFailCount
             type: object
         required:
         - spec
@@ -19914,7 +19957,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmnodescrapes.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -20978,7 +21021,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmpodscrapes.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -21414,6 +21457,13 @@ spec:
                     port:
                       description: Name of the port exposed at Pod.
                       type: string
+                    portNumber:
+                      description: PortNumber defines the `Pod` port number which
+                        exposes the endpoint.
+                      format: int32
+                      maximum: 65535
+                      minimum: 1
+                      type: integer
                     proxyURL:
                       description: ProxyURL eg http://proxyserver:2195 Directs scrapes
                         to proxy through this endpoint.
@@ -21527,8 +21577,8 @@ spec:
                       - type: integer
                       - type: string
                       description: |-
-                        TargetPort
-                        Name or number of the pod port this endpoint refers to. Mutually exclusive with port.
+                        TargetPort defines name or number of the pod port this endpoint refers to.
+                        Mutually exclusive with Port and PortNumber.
                       x-kubernetes-int-or-string: true
                     tlsConfig:
                       description: TLSConfig configuration to use when scraping the
@@ -22125,7 +22175,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmprobes.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -23335,7 +23385,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmrules.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -23625,7 +23675,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmscrapeconfigs.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -27655,7 +27705,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmservicescrapes.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -28817,7 +28867,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmsingles.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -28885,6 +28935,14 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
+              disableAutomountServiceAccountToken:
+                description: |-
+                  DisableAutomountServiceAccountToken whether to disable serviceAccount auto mount by Kubernetes (available from v0.54.0).
+                  Operator will conditionally create volumes and volumeMounts for containers if it requires k8s API access.
+                  For example, vmagent and vm-config-reloader requires k8s API access.
+                  Operator creates volumes with name: "kube-api-access", which can be used as volumeMount for extraContainers if needed.
+                  And also adds VolumeMounts at /var/run/secrets/kubernetes.io/serviceaccount.
+                type: boolean
               disableSelfServiceScrape:
                 description: |-
                   DisableSelfServiceScrape controls creation of VMServiceScrape by operator
@@ -28919,9 +28977,12 @@ spec:
                         of a pod.
                       properties:
                         name:
-                          description: Required.
+                          description: |-
+                            Name is this DNS resolver option's name.
+                            Required.
                           type: string
                         value:
+                          description: Value is this DNS resolver option's value.
                           type: string
                       type: object
                     type: array
@@ -29700,6 +29761,10 @@ spec:
                     items:
                       type: string
                     type: array
+                  enableWindows:
+                    description: EnableWindows enables aggregating data in separate
+                      windows ( available from v0.54.0).
+                    type: boolean
                   ignoreFirstIntervals:
                     description: IgnoreFirstIntervals instructs to ignore first interval
                     type: integer
@@ -29738,6 +29803,10 @@ spec:
                           items:
                             type: string
                           type: array
+                        enable_windows:
+                          description: EnableWindows enables aggregating data in separate
+                            windows
+                          type: boolean
                         flush_on_shutdown:
                           description: |-
                             FlushOnShutdown defines whether to flush the aggregation state on process termination
@@ -30502,10 +30571,6 @@ spec:
           status:
             description: VMSingleStatus defines the observed state of VMSingle
             properties:
-              availableReplicas:
-                description: deprecated and will be removed at v0.52.0
-                format: int32
-                type: integer
               conditions:
                 description: 'Known .status.conditions.type are: "Available", "Progressing",
                   and "Degraded"'
@@ -30578,25 +30643,13 @@ spec:
               reason:
                 description: Reason defines human readable error reason
                 type: string
-              replicas:
-                description: deprecated and will be removed at v0.52.0
-                format: int32
-                type: integer
               singleStatus:
                 description: LegacyStatus is deprecated and will be removed at v0.52.0
                   version
                 type: string
-              unavailableReplicas:
-                description: deprecated and will be removed at v0.52.0
-                format: int32
-                type: integer
               updateStatus:
                 description: UpdateStatus defines a status for update rollout
                 type: string
-              updatedReplicas:
-                description: deprecated and will be removed at v0.52.0
-                format: int32
-                type: integer
             type: object
         type: object
     served: true
@@ -30608,7 +30661,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmstaticscrapes.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
@@ -31660,7 +31713,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: vmusers.operator.victoriametrics.com
 spec:
   group: operator.victoriametrics.com
