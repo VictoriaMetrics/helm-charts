@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Add vminsert relabel configuration support
 
 ## 0.18.1
 
