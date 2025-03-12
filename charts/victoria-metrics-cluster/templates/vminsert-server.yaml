@@ -3,6 +3,7 @@
 {{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "vminsert" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $relabelConfig := include "vminsert.relabel.config.name" $ctx }}
 {{- $sa := include "vm.fullname" . }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
@@ -108,8 +109,12 @@ spec:
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "startup"))) }}
           startupProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or $app.extraVolumeMounts (include "vm.license.mount" .) }}
+          {{- if or $app.extraVolumeMounts (include "vm.license.mount" .) $app.relabel.enabled }}
           volumeMounts:
+            {{- if $app.relabel.enabled }}
+            - name: relabelconfig
+              mountPath: /relabelconfig
+            {{- end }}
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -140,8 +145,13 @@ spec:
       {{- with $app.topologySpreadConstraints }}
       topologySpreadConstraints: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or (and (include "vm.license.secret.key" .) (include "vm.license.secret.name" .)) $app.extraVolumes }}
+      {{- if or (and (include "vm.license.secret.key" .) (include "vm.license.secret.name" .)) $app.extraVolumes $app.relabel.enabled }}
       volumes:
+        {{- if $app.relabel.enabled }}
+        - name: relabelconfig
+          configMap:
+            name: {{ $relabelConfig }}
+        {{- end }}
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

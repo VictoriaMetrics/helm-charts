@@ -1,0 +1,13 @@
+{{- $app := .Values.vminsert }}
+{{- if and $app.relabel.enabled (empty $app.relabel.configMap) }}
+{{- $ctx := dict "helm" . "appKey" "vminsert" }}
+{{- $ns := include "vm.namespace" $ctx }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vminsert.relabel.config.name" $ctx }}
+  namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+data:
+  relabel.yml: |{{ toYaml $app.relabel.config | nindent 4 }}
+{{- end }}

@@ -1,3 +1,10 @@
+{{- define "vminsert.relabel.config.name" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $app := $Values.vminsert }}
+  {{- $fullname := include "vm.plain.fullname" . -}}
+  {{- $app.relabel.configMap | default (printf "%s-relabelconfig" $fullname) -}}
+{{- end -}}
+
 {{- define "vminsert.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vminsert -}}
@@ -28,6 +35,9 @@
       {{- $_ := unset $ "appIdx" }}
     {{- end }}
     {{- $_ := set $args "storageNode" (concat ($args.storageNode | default list) $storageNodes) }}
+  {{- end -}}
+  {{- if $app.relabel.enabled -}}
+    {{- $_ := set $args "relabelConfig" "/relabelconfig/relabel.yml" -}}
   {{- end -}}
   {{- if empty $args.storageNode }}
     {{- fail "no storageNodes found. Either set vmstorage.enabled to true or add nodes to vminsert.extraArgs.storageNode"}}
