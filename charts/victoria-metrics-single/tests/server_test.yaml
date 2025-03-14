@@ -8,30 +8,25 @@ tests:
   - it: statefulSet should match snapshot
     asserts:
       - matchSnapshot: {}
-    set:
-      remoteWrite:
-        - url: http://vm-insert:8480/insert/0/prometheus
+    set: {}
   - it: statefulSet with volume should match snapshot
     asserts:
       - matchSnapshot: {}
     set:
-      persistentVolume:
-        enabled: true
-      remoteWrite:
-        - url: http://vm-insert:8480/insert/0/prometheus
+      server:
+        persistentVolume:
+          enabled: true
   - it: deployment should match snapshot
     set:
-      mode: deployment
-      remoteWrite:
-        - url: http://vm-insert:8480/insert/0/prometheus
+      server:
+        mode: deployment
     asserts:
       - matchSnapshot: {}
   - it: deployment with volume should match snapshot
     set:
-      mode: statefulSet
-      persistentVolume:
-        enabled: true
-      remoteWrite:
-        - url: http://vm-insert:8480/insert/0/prometheus
+      server:
+        mode: statefulSet
+        persistentVolume:
+          enabled: true
     asserts:
       - matchSnapshot: {}

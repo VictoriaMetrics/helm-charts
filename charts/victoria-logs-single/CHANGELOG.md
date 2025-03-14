@@ -1,6 +1,7 @@
 ## Next release
 
 - Upgraded dashboard
+- fixed usage of existingClaim in statefulSet mode. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2056).
 
 ## 0.9.2
 
