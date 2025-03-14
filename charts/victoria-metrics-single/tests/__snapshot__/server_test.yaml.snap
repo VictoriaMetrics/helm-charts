@@ -1,7 +1,7 @@
 deployment should match snapshot:
   1: |
     apiVersion: apps/v1
-    kind: StatefulSet
+    kind: Deployment
     metadata:
       labels:
         app: server
@@ -13,14 +13,14 @@ deployment should match snapshot:
       name: RELEASE-NAME-victoria-metrics-single-server
       namespace: NAMESPACE
     spec:
-      podManagementPolicy: OrderedReady
       replicas: 1
       selector:
         matchLabels:
           app: server
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-metrics-single
-      serviceName: RELEASE-NAME-victoria-metrics-single-server
+      strategy:
+        type: Recreate
       template:
         metadata:
           labels:
@@ -69,19 +69,10 @@ deployment should match snapshot:
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-single-server
           terminationGracePeriodSeconds: 60
-          volumes: null
-      updateStrategy: {}
-      volumeClaimTemplates:
-        - apiVersion: v1
-          kind: PersistentVolumeClaim
-          metadata:
-            name: server-volume
-          spec:
-            accessModes:
-              - ReadWriteOnce
-            resources:
-              requests:
-                storage: 16Gi
+          volumes:
+            - name: server-volume
+              persistentVolumeClaim:
+                claimName: RELEASE-NAME-victoria-metrics-single-server
 deployment with volume should match snapshot:
   1: |
     apiVersion: apps/v1

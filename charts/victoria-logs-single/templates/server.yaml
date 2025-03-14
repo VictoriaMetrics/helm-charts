@@ -155,7 +155,7 @@ spec:
         {{- end }}
         {{- if or (eq $mode "deployment") (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
         - name: server-volume
-          {{- if and (eq $mode "deployment") $app.persistentVolume.enabled }}
+          {{- if or (and (eq $mode "deployment") $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
           persistentVolumeClaim:
             claimName: {{ $app.persistentVolume.existingClaim | default $app.persistentVolume.name | default $fullname }}
           {{- else }}

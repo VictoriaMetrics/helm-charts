@@ -137,7 +137,7 @@ spec:
         {{- end }}
         {{- if or (eq $mode "deployment") (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
         - name: cache-volume
-          {{- if and (eq $mode "deployment") $app.persistentVolume.enabled }}
+          {{- if or (and (eq $mode "deployment") $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
           persistentVolumeClaim:
             claimName: {{ $app.persistentVolume.existingClaim | default $fullname }}
           {{- else }}

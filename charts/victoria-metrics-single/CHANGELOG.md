@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed usage of existingClaim in statefulSet mode. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2056).
 
 ## 0.15.0
 
