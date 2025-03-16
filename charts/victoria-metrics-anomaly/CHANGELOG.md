@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.20.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1201).
 
 ## 1.8.0
 
