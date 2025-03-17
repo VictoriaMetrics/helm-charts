@@ -1,5 +1,5 @@
 {{/*
-Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstraints to all the componets
+Creates vmclusterSpec map, insert zone's nodeselector and topologySpreadConstraints to all the components
 */}}
 {{- define "per-zone-vmcluster.vmclusterSpec" -}}
   {{- $ctx := (.helm) | default . }}

@@ -60,7 +60,7 @@
 
 - updated common dependency 0.0.35 -> 0.0.37
 - fixed typo useMultitenantMode -> useMultiTenantMode in remotewrite settings
-- allow passing additional remotewrite setings
+- allow passing additional remotewrite settings
 
 ## 0.7.0
 

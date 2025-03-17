@@ -1010,7 +1010,7 @@ name: ""
 </code>
 </pre>
 </td>
-      <td><p>Persistant volume annotations</p>
+      <td><p>Persistent volume annotations</p>
 </td>
     </tr>
     <tr>
@@ -1043,7 +1043,7 @@ name: ""
 </code>
 </pre>
 </td>
-      <td><p>Persistant volume additional labels</p>
+      <td><p>Persistent volume additional labels</p>
 </td>
     </tr>
     <tr>

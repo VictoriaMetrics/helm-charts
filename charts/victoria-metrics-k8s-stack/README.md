@@ -454,7 +454,7 @@ kubectl delete daemonset -l app=prometheus-node-exporter
 
 ### Upgrade to 0.6.0
 
- All `CRD` must be update to the lastest version with command:
+ All `CRD` must be update to the latest version with command:
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/VictoriaMetrics/helm-charts/master/charts/victoria-metrics-k8s-stack/crds/crd.yaml
@@ -1109,7 +1109,7 @@ runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
 </code>
 </pre>
 </td>
-      <td><p>Labels, which are used for groupping results of the queries. Note that these labels are joined with <code>.Values.global.clusterLabel</code></p>
+      <td><p>Labels, which are used for grouping results of the queries. Note that these labels are joined with <code>.Values.global.clusterLabel</code></p>
 </td>
     </tr>
     <tr>

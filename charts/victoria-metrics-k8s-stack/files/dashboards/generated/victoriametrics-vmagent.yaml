@@ -5,33 +5,6 @@
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-__elements: {}
-__inputs: []
-__requires:
-- id: grafana
-  name: Grafana
-  type: grafana
-  version: 11.5.0
-- id: prometheus
-  name: Prometheus
-  type: datasource
-  version: 1.0.0
-- id: stat
-  name: Stat
-  type: panel
-  version: ''
-- id: table
-  name: Table
-  type: panel
-  version: ''
-- id: text
-  name: Text
-  type: panel
-  version: ''
-- id: timeseries
-  name: Time series
-  type: panel
-  version: ''
 annotations:
   list:
   - builtIn: 1
@@ -72,7 +45,7 @@ description: Overview for VictoriaMetrics vmagent v1.102.0 or higher
 editable: false
 fiscalYearStartMonth: 0
 graphTooltip: 1
-id: null
+id: 2
 links:
 - icon: doc
   tags: []
@@ -214,7 +187,7 @@ panels:
 - datasource:
     type: {{ $defaultDatasource }}
     uid: $ds
-  description: Shows number of generated  error messages in  logs over last 30m. Non-zero value may be a sign of connectivity or missconfiguration errors.
+  description: Shows number of generated  error messages in  logs over last 30m. Non-zero value may be a sign of connectivity or misconfiguration errors.
   fieldConfig:
     defaults:
       mappings: []
@@ -600,6 +573,7 @@ panels:
     instant: true
     range: false
     refId: A
+  title: ''
   type: table
 - datasource:
     type: {{ $defaultDatasource }}
@@ -1275,6 +1249,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1305,6 +1280,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1313,7 +1289,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 3
+      'y': 38
     id: 109
     options:
       legend:
@@ -1327,9 +1303,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1372,6 +1349,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1402,6 +1380,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1410,7 +1389,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 3
+      'y': 38
     id: 111
     options:
       legend:
@@ -1424,9 +1403,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1463,6 +1443,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1492,6 +1473,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: bytes
@@ -1506,7 +1488,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 11
+      'y': 46
     id: 81
     options:
       legend:
@@ -1520,9 +1502,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1567,6 +1550,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1593,6 +1577,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: bps
@@ -1607,7 +1592,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 11
+      'y': 46
     id: 7
     options:
       legend:
@@ -1621,9 +1606,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1665,6 +1651,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1693,6 +1680,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1701,7 +1689,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 325
+      'y': 54
     id: 83
     options:
       legend:
@@ -1713,9 +1701,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1749,6 +1738,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1777,6 +1767,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -1785,7 +1776,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 325
+      'y': 54
     id: 39
     options:
       legend:
@@ -1797,9 +1788,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1835,6 +1827,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1863,6 +1856,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1871,7 +1865,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 333
+      'y': 62
     id: 135
     options:
       legend:
@@ -1883,9 +1877,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1915,6 +1910,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1943,6 +1939,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 0.1
         unit: s
@@ -1951,7 +1948,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 333
+      'y': 62
     id: 149
     options:
       legend:
@@ -1963,9 +1960,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1983,6 +1981,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
+    description: Shows the rate of allocations in memory. Sudden increase in allocations would mean increased pressure on Go Garbage Collector and can saturate CPU resources of the application.
     fieldConfig:
       defaults:
         color:
@@ -1994,6 +1993,87 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: line
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: bytes
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      'y': 70
+    id: 154
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(go_memstats_alloc_bytes_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      interval: ''
+      intervalFactor: 2
+      legendFormat: __auto
+      range: true
+      refId: A
+    title: Memory allocations rate
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -2022,6 +2102,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2030,7 +2111,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 341
+      'y': 70
     id: 41
     options:
       legend:
@@ -2042,9 +2123,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -2117,7 +2199,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 39
+      'y': 1152
     id: 92
     options:
       legend:
@@ -2197,7 +2279,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 39
+      'y': 1152
     id: 95
     options:
       legend:
@@ -2280,7 +2362,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 47
+      'y': 1160
     id: 98
     options:
       legend:
@@ -2363,7 +2445,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 47
+      'y': 1160
     id: 99
     options:
       legend:
@@ -2448,7 +2530,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 55
+      'y': 1168
     id: 79
     options:
       legend:
@@ -2530,7 +2612,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 55
+      'y': 1168
     id: 18
     links:
     - targetBlank: true
@@ -2615,7 +2697,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 63
+      'y': 1176
     id: 127
     options:
       legend:
@@ -2695,7 +2777,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 63
+      'y': 1176
     id: 50
     options:
       legend:
@@ -2760,7 +2842,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 71
+      'y': 1184
     id: 129
     options:
       cellHeight: sm
@@ -2856,7 +2938,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 71
+      'y': 1184
     id: 150
     options:
       legend:
@@ -2887,7 +2969,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: Shows how many samples were ignored on insertion due to various resons. See the reason of rejection application logs.
+    description: Shows how many samples were ignored on insertion due to various reasons. See the reason of rejection application logs.
     fieldConfig:
       defaults:
         color:
@@ -2933,7 +3015,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 78
+      'y': 1191
     id: 151
     options:
       legend:
@@ -3024,7 +3106,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 284
+      'y': 1397
     id: 48
     options:
       legend:
@@ -3106,7 +3188,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 284
+      'y': 1397
     id: 76
     options:
       legend:
@@ -3186,7 +3268,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 291
+      'y': 1404
     id: 132
     options:
       legend:
@@ -3268,7 +3350,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 291
+      'y': 1404
     id: 133
     options:
       legend:
@@ -3349,7 +3431,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 298
+      'y': 1411
     id: 20
     options:
       legend:
@@ -3429,7 +3511,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 298
+      'y': 1411
     id: 126
     options:
       legend:
@@ -3508,7 +3590,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 306
+      'y': 1419
     id: 46
     options:
       legend:
@@ -3587,7 +3669,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 306
+      'y': 1419
     id: 148
     options:
       legend:
@@ -3666,7 +3748,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 314
+      'y': 1427
     id: 31
     options:
       legend:
@@ -3791,7 +3873,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 6
+      'y': 1119
     id: 73
     options:
       legend:
@@ -3879,7 +3961,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 6
+      'y': 1119
     id: 131
     options:
       legend:
@@ -3957,7 +4039,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 282
+      'y': 1395
     id: 130
     options:
       legend:
@@ -4045,7 +4127,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 282
+      'y': 1395
     id: 77
     options:
       legend:
@@ -4137,7 +4219,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 329
+      'y': 1442
     id: 146
     options:
       legend:
@@ -4213,7 +4295,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 329
+      'y': 1442
     id: 143
     options:
       legend:
@@ -4284,7 +4366,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 337
+      'y': 1450
     id: 147
     options:
       legend:
@@ -4361,7 +4443,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 337
+      'y': 1450
     id: 139
     options:
       legend:
@@ -4453,7 +4535,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 345
+      'y': 1458
     id: 142
     options:
       legend:
@@ -4525,7 +4607,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 345
+      'y': 1458
     id: 137
     options:
       legend:
@@ -4610,7 +4692,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 385
+      'y': 1498
     id: 141
     options:
       legend:
@@ -4712,7 +4794,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 287
+      'y': 1400
     id: 60
     options:
       legend:
@@ -4792,7 +4874,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 287
+      'y': 1400
     id: 66
     options:
       legend:
@@ -4878,7 +4960,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 295
+      'y': 1408
     id: 61
     options:
       legend:
@@ -4961,7 +5043,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 295
+      'y': 1408
     id: 65
     options:
       legend:
@@ -5043,7 +5125,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 303
+      'y': 1416
     id: 88
     options:
       legend:
@@ -5120,7 +5202,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 303
+      'y': 1416
     id: 84
     options:
       legend:
@@ -5207,7 +5289,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 311
+      'y': 1424
     id: 90
     options:
       legend:
@@ -5250,7 +5332,7 @@ panels:
       h: 2
       w: 24
       x: 0
-      'y': 339
+      'y': 1452
     id: 115
     options:
       code:
@@ -5311,7 +5393,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 341
+      'y': 1454
     id: 119
     options:
       legend:
@@ -5393,7 +5475,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 341
+      'y': 1454
     id: 117
     options:
       legend:
@@ -5473,7 +5555,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 381
+      'y': 1494
     id: 125
     links:
     - title: Troubleshooting
@@ -5559,7 +5641,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 381
+      'y': 1494
     id: 123
     options:
       legend:
@@ -5655,7 +5737,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 389
+      'y': 1502
     id: 121
     options:
       legend:
@@ -5701,6 +5783,7 @@ panels:
     type: timeseries
   title: Drilldown
   type: row
+preload: false
 refresh: ''
 schemaVersion: 40
 tags:

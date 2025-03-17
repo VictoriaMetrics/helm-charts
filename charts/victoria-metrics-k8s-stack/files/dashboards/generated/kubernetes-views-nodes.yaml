@@ -2941,14 +2941,14 @@ templating:
     datasource:
       type: prometheus
       uid: ${datasource}
-    definition: label_values(node_uname_info{nodename=~"(?i:($node))"}, instance)
+    definition: label_values(node_uname_info{nodename=~"(?i:($node)(\.[a-z0-9.]+)?)"}, instance)
     hide: 2
     includeAll: false
     multi: false
     name: instance
     options: []
     query:
-      query: label_values(node_uname_info{nodename=~"(?i:($node))"}, instance)
+      query: label_values(node_uname_info{nodename=~"(?i:($node)(\.[a-z0-9.]+)?)"}, instance)
       refId: StandardVariableQuery
     refresh: 2
     regex: ''
@@ -2962,5 +2962,5 @@ timepicker: {}
 timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
 title: Kubernetes / Views / Nodes
 uid: k8s_views_nodes
-version: 34
+version: 35
 weekStart: ''

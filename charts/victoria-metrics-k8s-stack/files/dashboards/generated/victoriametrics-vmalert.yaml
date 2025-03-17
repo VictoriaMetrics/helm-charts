@@ -5,29 +5,6 @@
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-__elements: {}
-__inputs: []
-__requires:
-- id: grafana
-  name: Grafana
-  type: grafana
-  version: 10.4.2
-- id: prometheus
-  name: Prometheus
-  type: datasource
-  version: 1.0.0
-- id: stat
-  name: Stat
-  type: panel
-  version: ''
-- id: table
-  name: Table
-  type: panel
-  version: ''
-- id: timeseries
-  name: Time series
-  type: panel
-  version: ''
 annotations:
   list:
   - builtIn: 1
@@ -59,6 +36,7 @@ annotations:
       uid: $ds
     enable: true
     expr: sum(changes(vm_app_start_timestamp{job=~"$job", instance=~"$instance"}[$__interval])) by(job, instance)
+    hide: false
     iconColor: dark-yellow
     name: restarts
     textFormat: '{{`{{`}}job{{`}}`}}:{{`{{`}}instance{{`}}`}} restarted'
@@ -67,7 +45,7 @@ description: Overview for VictoriaMetrics vmalert v1.102.0 or higher
 editable: false
 fiscalYearStartMonth: 0
 graphTooltip: 1
-id: null
+id: 3
 links:
 - asDropdown: false
   icon: external link
@@ -99,7 +77,6 @@ links:
   tooltip: ''
   type: link
   url: ' https://github.com/VictoriaMetrics/VictoriaMetrics/releases'
-liveNow: false
 panels:
 - collapsed: false
   gridPos:
@@ -149,6 +126,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - last
@@ -158,7 +136,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -195,6 +173,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - last
@@ -204,7 +183,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -241,6 +220,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - last
@@ -250,7 +230,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -289,6 +269,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - last
@@ -298,7 +279,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -337,6 +318,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - last
@@ -346,7 +328,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -409,7 +391,7 @@ panels:
       - sum
       show: false
     showHeader: true
-  pluginVersion: 10.4.2
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -421,6 +403,7 @@ panels:
     instant: true
     range: false
     refId: A
+  title: ''
   type: table
 - datasource:
     type: {{ $defaultDatasource }}
@@ -436,6 +419,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 0
         gradientMode: none
@@ -485,9 +469,10 @@ panels:
       sortBy: Last *
       sortDesc: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: asc
-  pluginVersion: 9.2.6
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -503,9 +488,6 @@ panels:
   title: Uptime
   type: timeseries
 - collapsed: false
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: grafana
   gridPos:
     h: 1
     w: 24
@@ -513,11 +495,6 @@ panels:
     'y': 8
   id: 11
   panels: []
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: grafana
-    refId: A
   title: Overview ($instance)
   type: row
 - datasource:
@@ -535,6 +512,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 0
         gradientMode: none
@@ -583,9 +561,10 @@ panels:
       sortBy: Last *
       sortDesc: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 9.2.6
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -617,6 +596,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 0
         gradientMode: none
@@ -665,9 +645,10 @@ panels:
       sortBy: Last *
       sortDesc: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 9.2.6
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -696,6 +677,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 0
         gradientMode: none
@@ -721,6 +703,7 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: null
         - color: red
           value: 80
       unit: short
@@ -741,9 +724,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 9.2.6
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -772,6 +756,7 @@ panels:
         axisLabel: ''
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -797,6 +782,7 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: null
         - color: red
           value: 80
       unit: short
@@ -817,9 +803,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 9.2.6
+  pluginVersion: 11.5.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
@@ -834,9 +821,6 @@ panels:
   title: Rules execution errors ($instance)
   type: timeseries
 - collapsed: true
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: grafana
   gridPos:
     h: 1
     w: 24
@@ -847,7 +831,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: 'The precentage of used RSS memory
+    description: 'The percentage of used RSS memory
 
 
       If you think that usage is abnormal or unexpected, please file an issue and attach memory profile if possible.'
@@ -862,6 +846,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -889,16 +874,16 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 11
+      'y': 90
     id: 37
     links:
     - targetBlank: true
@@ -916,9 +901,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -955,6 +941,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -982,6 +969,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: bytes
@@ -990,7 +978,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 11
+      'y': 90
     id: 57
     links:
     - targetBlank: true
@@ -1008,9 +996,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1042,6 +1031,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1069,16 +1059,16 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 19
+      'y': 98
     id: 35
     links:
     - targetBlank: true
@@ -1096,9 +1086,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1129,6 +1120,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1156,16 +1148,16 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 19
+      'y': 98
     id: 56
     links:
     - targetBlank: true
@@ -1183,9 +1175,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1234,6 +1227,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1262,18 +1256,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 27
+      'y': 106
     id: 39
-    links: []
     options:
       legend:
         calcs:
@@ -1284,9 +1277,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1321,6 +1315,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1349,18 +1344,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 27
+      'y': 106
     id: 41
-    links: []
     options:
       legend:
         calcs:
@@ -1371,9 +1365,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1409,6 +1404,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1437,18 +1433,17 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
-        unitScale: true
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 35
+      'y': 114
     id: 59
-    links: []
     options:
       legend:
         calcs:
@@ -1459,9 +1454,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1491,6 +1487,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -1519,6 +1516,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 0.1
         unit: s
@@ -1527,7 +1525,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 35
+      'y': 114
     id: 61
     options:
       legend:
@@ -1539,9 +1537,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -1556,11 +1555,87 @@ panels:
       refId: A
     title: Go scheduling latency
     type: timeseries
-  targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: grafana
-    refId: A
+      uid: $ds
+    description: Shows the rate of allocations in memory. Sudden increase in allocations would mean increased pressure on Go Garbage Collector and can saturate CPU resources of the application.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: line
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: bytes
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      'y': 122
+    id: 64
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(go_memstats_alloc_bytes_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      interval: ''
+      intervalFactor: 2
+      legendFormat: __auto
+      range: true
+      refId: A
+    title: Memory allocations rate
+    type: timeseries
   title: Resource usage
   type: row
 - collapsed: true
@@ -1607,7 +1682,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 27
+      'y': 146
     id: 50
     options:
       cellHeight: sm
@@ -1701,7 +1776,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 27
+      'y': 146
     id: 58
     options:
       legend:
@@ -1780,7 +1855,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 34
+      'y': 153
     id: 63
     options:
       legend:
@@ -1810,9 +1885,6 @@ panels:
   title: Troubleshooting
   type: row
 - collapsed: true
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: grafana
   gridPos:
     h: 1
     w: 24
@@ -1869,7 +1941,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 52
+      'y': 171
     id: 14
     options:
       legend:
@@ -1945,7 +2017,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 52
+      'y': 171
     id: 13
     options:
       legend:
@@ -2023,7 +2095,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 60
+      'y': 179
     id: 20
     options:
       legend:
@@ -2100,7 +2172,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 60
+      'y': 179
     id: 32
     options:
       legend:
@@ -2173,7 +2245,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 68
+      'y': 187
     id: 26
     options:
       legend:
@@ -2201,17 +2273,9 @@ panels:
       refId: A
     title: Requests rate to Alertmanager by job ($group)
     type: timeseries
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: grafana
-    refId: A
   title: Alerting rules ($instance)
   type: row
 - collapsed: true
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: grafana
   gridPos:
     h: 1
     w: 24
@@ -2268,7 +2332,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 67
+      'y': 186
     id: 31
     options:
       legend:
@@ -2346,7 +2410,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 67
+      'y': 186
     id: 33
     options:
       legend:
@@ -2421,7 +2485,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 75
+      'y': 194
     id: 30
     options:
       legend:
@@ -2449,11 +2513,6 @@ panels:
       refId: A
     title: Errors ($group)
     type: timeseries
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: grafana
-    refId: A
   title: Recording rules ($instance)
   type: row
 - collapsed: true
@@ -2508,7 +2567,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 33
+      'y': 152
     id: 52
     options:
       legend:
@@ -2575,7 +2634,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 33
+      'y': 152
     id: 53
     options:
       legend:
@@ -2650,7 +2709,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 60
+      'y': 179
     id: 54
     options:
       legend:
@@ -2727,7 +2786,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 60
+      'y': 179
     id: 60
     options:
       legend:
@@ -2756,8 +2815,9 @@ panels:
     type: timeseries
   title: Remote write
   type: row
+preload: false
 refresh: ''
-schemaVersion: 39
+schemaVersion: 40
 tags:
 - victoriametrics
 - vmalert
@@ -2765,26 +2825,20 @@ tags:
 templating:
   list:
   - current:
-      selected: false
       text: VictoriaMetrics - cluster
       value: PAF93674D0B4E9963
-    hide: 0
     includeAll: false
-    multi: false
     name: ds
     options: []
     query: {{ $defaultDatasource }}
-    queryValue: ''
     refresh: 1
     regex: ''
-    skipUrlSync: false
     type: datasource
   - current: {}
     datasource:
       type: prometheus
       uid: $ds
     definition: label_values(vm_app_version{version=~"^vmalert.*"}, job)
-    hide: 0
     includeAll: true
     multi: true
     name: job
@@ -2794,8 +2848,6 @@ templating:
       refId: StandardVariableQuery
     refresh: 1
     regex: ''
-    skipUrlSync: false
-    sort: 0
     type: query
   - allValue: .*
     current: {}
@@ -2803,7 +2855,6 @@ templating:
       type: prometheus
       uid: $ds
     definition: label_values(vm_app_version{job=~"$job"}, instance)
-    hide: 0
     includeAll: true
     multi: true
     name: instance
@@ -2813,8 +2864,6 @@ templating:
       refId: StandardVariableQuery
     refresh: 1
     regex: ''
-    skipUrlSync: false
-    sort: 0
     type: query
   - allValue: .*
     current: {}
@@ -2822,7 +2871,6 @@ templating:
       type: prometheus
       uid: $ds
     definition: label_values(vmalert_iteration_total{job=~"$job", instance=~"$instance"},file)
-    hide: 0
     includeAll: true
     multi: true
     name: file
@@ -2832,8 +2880,6 @@ templating:
       refId: PrometheusVariableQueryEditor-VariableQuery
     refresh: 1
     regex: ''
-    skipUrlSync: false
-    sort: 0
     type: query
   - allValue: .*
     current: {}
@@ -2841,7 +2887,6 @@ templating:
       type: prometheus
       uid: $ds
     definition: label_values(vmalert_iteration_total{job=~"$job", instance=~"$instance"}, group)
-    hide: 0
     includeAll: true
     multi: true
     name: group
@@ -2851,16 +2896,11 @@ templating:
       refId: StandardVariableQuery
     refresh: 1
     regex: ''
-    skipUrlSync: false
-    sort: 0
     type: query
   - current:
-      selected: false
       text: '5'
       value: '5'
-    hide: 0
     includeAll: false
-    multi: false
     name: topk
     options:
     - selected: true
@@ -2882,16 +2922,13 @@ templating:
       text: '50'
       value: '50'
     query: 5, 10, 20, 30, 40, 50
-    queryValue: ''
-    skipUrlSync: false
     type: custom
-  - datasource:
+  - baseFilters: []
+    datasource:
       type: prometheus
       uid: $ds
     filters: []
-    hide: 0
     name: adhoc
-    skipUrlSync: false
     type: adhoc
 time:
   from: now-3h

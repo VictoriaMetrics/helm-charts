@@ -8,6 +8,7 @@ REPODIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 WORKDIR := $(REPODIR)/..
 
 include $(shell find hack -name Makefile)
+include codespell/Makefile
 
 ifeq ($(CONTAINER_TOOL),docker)
     CONTAINER_USER_OPTION = --user $(shell id -u):$(shell id -g)
