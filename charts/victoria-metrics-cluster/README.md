@@ -3479,7 +3479,7 @@ loggerFormat: json
 </code>
 </pre>
 </td>
-      <td><p>Storage class name. Will be empty if not setted</p>
+      <td><p>Storage class name. Will be empty if not set</p>
 </td>
     </tr>
     <tr>
