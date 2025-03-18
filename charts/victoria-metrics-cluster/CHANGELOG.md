@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+- create vmauth config `unauthorized_user` section only if config is empty or if it has empty `url_map` section. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1981)
+- introduced `{{ .vm.read }}` and `{{ .vm.write }}` parsed urls for vmauth config templating.
+- fixed vmauth config template bug. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2063).
 
 ## 0.19.1
 

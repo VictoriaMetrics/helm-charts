@@ -110,7 +110,7 @@ spec:
       volumes:
         - name: config
           secret:
-            secretName: {{ ternary $fullname .Values.configSecretName (empty .Values.configSecretName) }}
+            secretName: {{ ternary $fullname $app.configSecretName (empty $app.configSecretName) }}
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

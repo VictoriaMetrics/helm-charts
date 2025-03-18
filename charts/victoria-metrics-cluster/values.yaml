@@ -615,8 +615,19 @@ vmauth:
   # -- VMAuth configuration secret name
   configSecretName: ""
   # -- VMAuth configuration object
-  config:
-    unauthorized_user: {}
+  # It's possible to use given below predefined variables in config:
+  # * `{{ .vm.read }}` - parsed vmselect URL
+  # * `{{ .vm.write }}` - parsed vminsert URL
+  #
+  # Example
+  # config:
+  #   unauthorized_user:
+  #     url_map:
+  #      - src_paths:
+  #          - '{{ .vm.read.path }}/.*'
+  #        url_prefix:
+  #          - '{{ urlJoin (omit .vm.read "path") }}/'
+  config: {}
   # -- VMAuth Deployment strategy
   strategy: {}
    # rollingUpdate:
