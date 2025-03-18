@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.19.2
+
+**Release date:** 18 Mar 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.113.0](https://img.shields.io/badge/v1.113.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11130)
+
 - create vmauth config `unauthorized_user` section only if config is empty or if it has empty `url_map` section. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1981)
 - introduced `{{ .vm.read }}` and `{{ .vm.write }}` parsed urls for vmauth config templating.
 - fixed vmauth config template bug. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2063).
