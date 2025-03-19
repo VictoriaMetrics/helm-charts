@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- Support custom case for list empty argument.
 
 ## 0.0.41
 

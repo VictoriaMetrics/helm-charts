@@ -13,16 +13,13 @@
     {{- range $rwKey, $rwValue := $rw -}}
       {{- $key := printf "remoteWrite.%s" $rwKey -}}
       {{- $param := index $args $key | default list -}}
-      {{- $val := default list }}
       {{- range until (int (sub $i (len $param))) }}
-        {{- $val = append $val "" }}
+        {{- $param = append $param "" }}
       {{- end }}
       {{- if or (kindIs "slice" $rwValue) (kindIs "map" $rwValue) -}}
-        {{- $val = append $val (printf "/config/rw/%d-%s.yaml" $i $rwKey) }}
-        {{- $param = append $param (join "," $val) -}}
+        {{- $param = append $param (printf "/config/rw/%d-%s.yaml" $i $rwKey) }}
       {{- else -}}
-        {{- $val = append $val $rwValue }}
-        {{- $param = append $param (join "," $val) -}}
+        {{- $param = append $param $rwValue }}
       {{- end -}}
       {{- $_ := set $args $key $param -}}
     {{- end -}}
