@@ -14,7 +14,7 @@ global:
   cluster:
     # -- K8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
     dnsDomain: cluster.local.
-      
+
 image:
   # -- Victoria Metrics anomaly Docker registry
   registry: ""
@@ -28,7 +28,7 @@ image:
 # -- Image pull secrets
 imagePullSecrets: []
 # -- Override chart name
-nameOverride: "" 
+nameOverride: ""
 # -- Override resources fullname
 fullnameOverride: ""
 # -- Override chart name
@@ -182,6 +182,11 @@ config:
     datasource_url: ""
     # -- For VictoriaMetrics Cluster version only, tenants are identified by accountID or accountID:projectID. See VictoriaMetrics Cluster multitenancy docs
     tenant_id: ""
+
+# -- Total number of shards. Must be greater than 0. Details are [here](https://docs.victoriametrics.com/anomaly-detection/faq/index.html#scaling-vmanomaly)
+shardsCount: 1
+# -- Number of replicas for sharding. Must be greater than 0. Details are [here](https://docs.victoriametrics.com/anomaly-detection/faq/index.html#scaling-vmanomaly)
+replicationFactor: 1
 
 # -- Empty dir configuration when persistence is disabled
 emptyDir: {}
