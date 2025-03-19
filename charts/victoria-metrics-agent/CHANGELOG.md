@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Add empty values to list args for remoteWrite. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2065).
 
 ## 0.17.1
 
