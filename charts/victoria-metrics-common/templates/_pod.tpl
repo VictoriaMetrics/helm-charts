@@ -87,7 +87,7 @@ Net probe port
 {{- end -}}
 
 {{- define "vm.arg" -}}
-  {{- if and (empty .value) (kindIs "string" .value) }}
+  {{- if and (empty .value) (kindIs "string" .value) (ne (toString .list) "true") }}
     {{- .key -}}
   {{- else if eq (toString .value) "true" -}}
     -{{ ternary "" "-" (eq (len .key) 1) }}{{ .key }}
@@ -107,7 +107,7 @@ command line arguments
     {{- end -}}
     {{- if kindIs "slice" $value -}}
       {{- range $v := $value -}}
-        {{- $args = append $args (include "vm.arg" (dict "key" $key "value" $v)) -}}
+        {{- $args = append $args (include "vm.arg" (dict "key" $key "value" $v "list" true)) -}}
       {{- end -}}
     {{- else -}}
       {{- $args = append $args (include "vm.arg" (dict "key" $key "value" $value)) -}}
