@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.42
+
+**Release date:** 19 Mar 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - Support custom case for list empty argument.
 
 ## 0.0.41
