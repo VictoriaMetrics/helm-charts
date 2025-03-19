@@ -1,6 +1,7 @@
 ## Next release
 
 - Updated dashboards and rules
+- updated common dependency 0.0.39 -> 0.0.42
 
 ## 0.39.0
 
