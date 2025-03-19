@@ -15,14 +15,17 @@
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
+{{- $shardingEnabled := gt (int .Values.shardsCount) 1 }}
+{{- $useSts := or .Values.persistentVolume.enabled $shardingEnabled }}
 ---
 apiVersion: apps/v1
-kind: {{ ternary "StatefulSet" "Deployment" .Values.persistentVolume.enabled }}
+kind: {{ ternary "StatefulSet" "Deployment" $useSts }}
 metadata:
   namespace: {{ $ns }}
   name: {{ $fullname }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
+  replicas: {{ .Values.shardsCount }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
@@ -61,6 +64,11 @@ spec:
           {{- end }}
           {{- if and .Values.persistentVolume.enabled .Values.persistentVolume.dumpData }}
           {{- $env = append $env (dict "name" "VMANOMALY_DATA_DUMPS_DIR" "value" "/tmp/vmanomaly-storage/data") }}
+          {{- end }}
+          {{- if $shardingEnabled }}
+          {{- $env = append $env (dict "name" "VMANOMALY_MEMBER_NUM" "valueFrom" (dict "fieldRef" (dict "fieldPath" "metadata.name")))}}
+          {{- $env = append $env (dict "name" "VMANOMALY_MEMBERS_COUNT" "value" (toString .Values.shardsCount)) }}
+          {{- $env = append $env (dict "name" "VMANOMALY_REPLICATION_FACTOR" "value" (toString .Values.replicationFactor)) }}
           {{- end }}
           {{- with (concat $env (.Values.env | default list)) }}
           env: {{ toYaml . | nindent 12 }}

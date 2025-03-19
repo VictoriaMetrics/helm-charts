@@ -1,5 +1,7 @@
 ## Next release
 
+- Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.21.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1210).
+- Add support of sharding and replication via `.Values.shardsCount` and `.Values.replicationFactor`. See [these docs](https://docs.victoriametrics.com/anomaly-detection/faq/index.html#scaling-vmanomaly) for the details
 - updated common dependency 0.0.39 -> 0.0.42
 
 ## 1.8.1
