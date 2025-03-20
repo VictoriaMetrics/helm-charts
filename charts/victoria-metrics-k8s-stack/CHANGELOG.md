@@ -1,7 +1,9 @@
 ## Next release
 
-- Updated dashboards and rules
-- updated common dependency 0.0.39 -> 0.0.42
+- update dashboards and rules
+- update common dependency 0.0.39 -> 0.0.42
+- set default vmalertmanager image to 0.28.1
+- add .Values.vmcluster.spec.vmselect.enabled and .Values.vmcluster.spec.vminsert.enabled flags to disable vmselect or vminsert. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2059).
 
 ## 0.39.0
 
