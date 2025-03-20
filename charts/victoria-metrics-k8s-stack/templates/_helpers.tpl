@@ -5,7 +5,7 @@
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
     {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
-  {{- else if $Values.vmcluster.enabled -}}
+  {{- else if and $Values.vmcluster.enabled $Values.vmcluster.spec.vmselect.enabled -}}
     {{- if $Values.vmauth.enabled -}}
       {{- $_ := set . "appKey" (list "vmauth" "spec") -}}
     {{- else -}}
@@ -17,7 +17,9 @@
   {{- else if $Values.external.vm.read.url -}}
     {{- $endpoint = $Values.external.vm.read -}}
   {{- end -}}
-  {{- toYaml $endpoint -}}
+  {{- with $endpoint -}}
+    {{- toYaml . -}}
+  {{- end -}}
 {{- end }}
 
 {{- define "vm.write.endpoint" -}}
@@ -28,7 +30,7 @@
     {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
     {{- $baseURL := include "vm.url" . -}}
     {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
-  {{- else if $Values.vmcluster.enabled -}}
+  {{- else if and $Values.vmcluster.enabled $Values.vmcluster.spec.vminsert.enabled -}}
     {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
     {{- $baseURL := include "vm.url" . -}}
     {{- $tenant := $Values.tenant | default 0 -}}
@@ -47,15 +49,22 @@
   {{- $fullname := include "vm.managed.fullname" . -}}
   {{- $_ := set $ctx "style" "managed" -}}
   {{- $remoteWrite := include "vm.write.endpoint" $ctx | fromYaml -}}
-  {{- if $Values.vmalert.remoteWriteVMAgent -}}
+  {{- if and $Values.vmalert.remoteWriteVMAgent $Values.vmagent.enabled -}}
     {{- $_ := set $ctx "appKey" (list "vmagent" "spec") -}}
     {{- $remoteWrite = dict "url" (printf "%s/api/v1/write" (include "vm.url" $ctx)) -}}
     {{- $_ := unset $ctx "appKey" -}}
+    {{- $_ := set $remotes "remoteWrite" $remoteWrite -}}
+  {{- else -}}
+    {{- $_ := set $remotes "remoteWrite" $remoteWrite -}}
   {{- end -}}
-  {{- $remoteRead := fromYaml (include "vm.read.endpoint" $ctx) -}}
-  {{- $_ := set $remotes "remoteWrite" $remoteWrite -}}
-  {{- $_ := set $remotes "remoteRead" $remoteRead -}}
-  {{- $_ := set $remotes "datasource" $remoteRead -}}
+  {{- $readEndpoint := include "vm.read.endpoint" $ctx -}}
+  {{- if $readEndpoint }}
+    {{- $remoteRead := fromYaml $readEndpoint -}}
+    {{- $_ := set $remotes "remoteRead" $remoteRead -}}
+    {{- $_ := set $remotes "datasource" $remoteRead -}}
+  {{- else if or (not $Values.vmalert.spec.datasource) (not $Values.vmalert.spec.remoteRead) -}}
+    {{- fail "VM read source required! Either set `vmalert.enabled: false` or provide `vmalert.spec.remoteRead.url` and `vmalert.spec.datasource.url`" -}}
+  {{- end -}}
   {{- if $Values.vmalert.additionalNotifierConfigs }}
     {{- $configName := printf "%s-additional-notifier" $fullname -}}
     {{- $notifierConfigRef := dict "name" $configName "key" "notifier-configs.yaml" -}}
@@ -136,8 +145,8 @@
 {{- define "vm.agent.remote.write" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $remoteWrites := $Values.vmagent.additionalRemoteWrites | default list -}}
-  {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled $Values.external.vm.write.url -}}
-    {{- $remoteWrites = append $remoteWrites (fromYaml (include "vm.write.endpoint" .)) -}}
+  {{- with include "vm.write.endpoint" . -}}
+    {{- $remoteWrites = append $remoteWrites (fromYaml .) -}}
   {{- end -}}
   {{- toYaml (dict "remoteWrite" $remoteWrites) -}}
 {{- end -}}
@@ -160,27 +169,39 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $image := dict "tag" (include "vm.image.tag" .) }}
   {{- $_ := set . "style" "managed" -}}
+  {{- $vm := default dict -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
     {{- $url := urlParse (include "vm.url" .) -}}
-    {{- $_ := set . "vm" (dict "read" $url "write" $url) }}
+    {{- $_ := set $vm "read" $url -}}
+    {{- $_ := set $vm "write" $url -}}
   {{- else if $Values.vmcluster.enabled -}}
-    {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
-    {{- $writeURL := urlParse (include "vm.url" .) -}}
-    {{- $_ := set $writeURL "path" (printf "%s/insert" $writeURL.path) -}}
-    {{- $_ := set . "appKey" (list "vmcluster" "spec" "vmselect") -}}
-    {{- $readURL := urlParse (include "vm.url" .) -}}
-    {{- $_ := set $readURL "path" (printf "%s/select" $readURL.path) -}}
-    {{- $_ := set . "vm" (dict "read" $readURL "write" $writeURL) -}}
+    {{- if $Values.vmcluster.spec.vminsert.enabled -}}
+      {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
+      {{- $writeURL := urlParse (include "vm.url" .) -}}
+      {{- $_ := set $writeURL "path" (printf "%s/insert" $writeURL.path) -}}
+      {{- $_ := set $vm "write" $writeURL }}
+    {{- else if $Values.external.vm.write.url -}}
+      {{- $_ := set $vm (urlParse $Values.external.vm.write.url) -}}
+    {{- end -}}
+    {{- if $Values.vmcluster.spec.vmselect.enabled -}}
+      {{- $_ := set . "appKey" (list "vmcluster" "spec" "vmselect") -}}
+      {{- $readURL := urlParse (include "vm.url" .) -}}
+      {{- $_ := set $readURL "path" (printf "%s/select" $readURL.path) -}}
+      {{- $_ := set $vm "read" $readURL }}
+    {{- else if $Values.external.vm.read.url -}}
+      {{- $_ := set $vm (urlParse $Values.external.vm.read.url) -}}
+    {{- end -}}
+    {{- $_ := set . "vm" $vm -}}
   {{- else if or $Values.external.vm.read.url $Values.external.vm.write.url -}}
-    {{- $_ := set . "vm" (default dict) -}}
     {{- with $Values.external.vm.read.url -}}
-      {{- $_ := set $.vm "read" (urlParse .) -}}
+      {{- $_ := set $vm "read" (urlParse .) -}}
     {{- end -}}
     {{- with $Values.external.vm.write.url -}}
-      {{- $_ := set $.vm "write" (urlParse .) -}}
+      {{- $_ := set $vm "write" (urlParse .) -}}
     {{- end -}}
   {{- end -}}
+  {{- $_ := set . "vm" $vm -}}
   {{- $spec := $Values.vmauth.spec }}
   {{- if $spec.unauthorizedUserAccessSpec }}
     {{- if $spec.unauthorizedUserAccessSpec.disabled }}
@@ -257,7 +278,7 @@
 {{- define "vm.cluster.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
-  {{- $spec := include "vm.select.spec" . | fromYaml -}}
+  {{- $selectSpec := include "vm.select.spec" . | fromYaml -}}
   {{- $clusterSpec := deepCopy $Values.vmcluster.spec -}}
   {{- $image := dict "image" (dict "tag" (printf "%s-cluster" (include "vm.image.tag" .))) }}
   {{- $clusterSpec = mergeOverwrite (dict "vminsert" (deepCopy $image)) $clusterSpec -}}
@@ -265,7 +286,18 @@
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- tpl ($clusterSpec | mergeOverwrite (dict "vmselect" $spec) | toYaml) . -}}
+  {{- $clusterSpec = mergeOverwrite (dict "vmselect" $selectSpec) $clusterSpec }}
+  {{- if not $clusterSpec.vmselect.enabled -}}
+    {{- $_ := unset $clusterSpec "vmselect" -}}
+  {{- else -}}
+    {{- $_ := unset $clusterSpec.vmselect "enabled" -}}
+  {{- end -}}
+  {{- if not $clusterSpec.vminsert.enabled -}}
+    {{- $_ := unset $clusterSpec "vminsert" -}}
+  {{- else -}}
+    {{- $_ := unset $clusterSpec.vminsert "enabled" -}}
+  {{- end -}}
+  {{- tpl (toYaml $clusterSpec) . -}}
 {{- end -}}
 
 {{- define "vm.data.source.enabled" -}}
@@ -285,8 +317,9 @@
   {{- $ctx := . }}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $datasources := $Values.defaultDatasources.extra | default list -}}
-  {{- if or $Values.vmsingle.enabled $Values.vmcluster.enabled $Values.external.vm.read -}}
-    {{- $readEndpoint:= include "vm.read.endpoint" $ctx | fromYaml -}}
+  {{- $readURL := include "vm.read.endpoint" $ctx -}}
+  {{- if $readURL -}}
+    {{- $readEndpoint := fromYaml $readURL -}}
     {{- $defaultDatasources := default list -}}
     {{- range $ds := $Values.defaultDatasources.victoriametrics.datasources }}
       {{- $_ := set $ctx "ds" $ds }}
