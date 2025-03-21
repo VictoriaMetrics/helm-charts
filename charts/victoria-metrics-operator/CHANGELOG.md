@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.43.1
+
+**Release date:** 21 Mar 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.54.1](https://img.shields.io/badge/v0.54.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%23v0541)
+
 - updated common dependency 0.0.39 -> 0.0.42
 - add `.Values.crds.annotations` when `.Values.crds.plain: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2073).
 
