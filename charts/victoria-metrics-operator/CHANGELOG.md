@@ -1,6 +1,7 @@
 ## Next release
 
 - updated common dependency 0.0.39 -> 0.0.42
+- add `.Values.crds.annotations` when `.Values.crds.plain: false`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2073).
 
 ## 0.43.0
 
