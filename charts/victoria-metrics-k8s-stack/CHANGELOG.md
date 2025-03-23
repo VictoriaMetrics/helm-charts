@@ -1,7 +1,8 @@
 ## Next release
 
-- Updated dashboards and rules
+- updated dashboards and rules
 - updated common dependency 0.0.39 -> 0.0.42
+- fixed additional notifier config rendering. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2075).
 
 ## 0.39.0
 

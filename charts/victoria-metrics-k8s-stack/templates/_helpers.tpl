@@ -44,7 +44,7 @@
   {{- $ctx := . -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $remotes := default dict -}}
-  {{- $fullname := include "vm.fullname" . -}}
+  {{- $fullname := include "vm.managed.fullname" . -}}
   {{- $_ := set $ctx "style" "managed" -}}
   {{- $remoteWrite := include "vm.write.endpoint" $ctx | fromYaml -}}
   {{- if $Values.vmalert.remoteWriteVMAgent -}}
