@@ -145,6 +145,7 @@ spec:
       {{- with $app.topologySpreadConstraints }}
       topologySpreadConstraints: {{ toYaml . | nindent 8 }}
       {{- end }}
+      terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
       {{- if or (and (include "vm.license.secret.key" .) (include "vm.license.secret.name" .)) $app.extraVolumes $app.relabel.enabled }}
       volumes:
         {{- if $app.relabel.enabled }}
