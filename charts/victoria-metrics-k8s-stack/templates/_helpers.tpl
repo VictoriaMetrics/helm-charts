@@ -139,9 +139,15 @@
     {{- fail "Neither `notifier`, `notifiers` nor `notifierConfigRef` is set for vmalert. If it's intentionally please consider setting `.vmalert.spec.extraArgs.['notifier.blackhole']` to `'true'`"}}
   {{- end }}
   {{- $output := deepCopy (omit $Values.vmalert.spec "notifiers") | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec -}}
-  {{- if and $Values.grafana.enabled (not (index $output.extraArgs "external.alert.source")) -}}
-    {{- $alertSource := `{"datasource":"VictoriaMetrics","queries":[{"expr":{{"{{"}} .Expr|jsonEscape|queryEscape {{"}}"}},"refId":"A"}],"range":{"from":"{{"{{"}} .ActiveAt.UnixMilli {{"}}"}}","to":"now"}}` -}}
-    {{- $_ := set $output.extraArgs "external.alert.source" (printf "explore?left=%s" $alertSource) -}}
+  {{- if or $Values.grafana.enabled $Values.external.grafana.host }}
+    {{- if not (index $output.extraArgs "external.alert.source") -}}
+      {{- $alertSource := `{"datasource":"VictoriaMetrics","queries":[{"expr":{{"{{"}} .Expr|jsonEscape|queryEscape {{"}}"}},"refId":"A"}],"range":{"from":"{{"{{"}} .ActiveAt.UnixMilli {{"}}"}}","to":"now"}}` -}}
+      {{- $_ := set $output.extraArgs "external.alert.source" (printf "explore?left=%s" $alertSource) -}}
+    {{- end -}}
+    {{- if not (index $output.extraArgs "external.url") -}}
+      {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
+      {{- $_ := set $output.extraArgs "external.url" (printf "http://%s" $grafanaHost) -}}
+    {{- end -}}
   {{- end -}}
   {{- tpl ($output | toYaml) . -}}
 {{- end -}}

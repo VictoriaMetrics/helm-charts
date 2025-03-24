@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add external.alert.source and external.url vmalert args when either built-in grafana is enabled or `.Values.external.grafana.host` is set. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1994).
 
 ## 0.39.1
 
