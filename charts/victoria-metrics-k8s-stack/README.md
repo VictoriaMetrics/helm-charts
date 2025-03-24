@@ -615,7 +615,7 @@ tls: []
 <code class="language-yaml">configSecret: ""
 externalURL: ""
 image:
-    tag: v0.27.0
+    tag: v0.28.1
 port: "9093"
 replicaCount: 1
 routePrefix: /
@@ -2915,12 +2915,14 @@ unauthorizedUserAccessSpec:
 <code class="language-yaml">replicationFactor: 2
 retentionPeriod: "1"
 vminsert:
+    enabled: true
     extraArgs: {}
     port: "8480"
     replicaCount: 2
     resources: {}
 vmselect:
     cacheMountPath: /select-cache
+    enabled: true
     extraArgs: {}
     port: "8481"
     replicaCount: 2
@@ -2956,6 +2958,28 @@ vmstorage:
 </pre>
 </td>
       <td><p>Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these <a href="https://docs.victoriametrics.com/single-server-victoriametrics/#retention" target="_blank">docs</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>vmcluster.spec.vminsert.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Set this value to false to disable VMInsert</p>
+</td>
+    </tr>
+    <tr>
+      <td>vmcluster.spec.vmselect.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">true
+</code>
+</pre>
+</td>
+      <td><p>Set this value to false to disable VMSelect</p>
 </td>
     </tr>
     <tr>
