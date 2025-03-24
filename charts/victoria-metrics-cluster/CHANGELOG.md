@@ -1,6 +1,7 @@
 ## Next release
 
 - updated common dependency 0.0.39 -> 0.0.42
+- add `.vminsert.terminationGracePeriodSeconds` to support changing the terminationGracePeriodSeconds for vminsert deployment
 
 ## 0.19.2
 
