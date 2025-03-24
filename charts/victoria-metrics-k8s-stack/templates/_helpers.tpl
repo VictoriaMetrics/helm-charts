@@ -138,8 +138,13 @@
   {{- if not (or (hasKey $spec "notifier") (hasKey $spec "notifiers") (hasKey $spec "notifierConfigRef") (hasKey $spec.extraArgs "notifier.blackhole")) }}
     {{- fail "Neither `notifier`, `notifiers` nor `notifierConfigRef` is set for vmalert. If it's intentionally please consider setting `.vmalert.spec.extraArgs.['notifier.blackhole']` to `'true'`"}}
   {{- end }}
-  {{- tpl (deepCopy (omit $Values.vmalert.spec "notifiers") | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec | toYaml) . -}}
-{{- end }}
+  {{- $output := deepCopy (omit $Values.vmalert.spec "notifiers") | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec -}}
+  {{- if and $Values.grafana.enabled (not (index $output.extraArgs "external.alert.source")) -}}
+    {{- $alertSource := `{"datasource":"VictoriaMetrics","queries":[{"expr":{{"{{"}} .Expr|jsonEscape|queryEscape {{"}}"}},"refId":"A"}],"range":{"from":"{{"{{"}} .ActiveAt.UnixMilli {{"}}"}}","to":"now"}}` -}}
+    {{- $_ := set $output.extraArgs "external.alert.source" (printf "explore?left=%s" $alertSource) -}}
+  {{- end -}}
+  {{- tpl ($output | toYaml) . -}}
+{{- end -}}
 
 {{- /* VM Agent remoteWrites */ -}}
 {{- define "vm.agent.remote.write" -}}
