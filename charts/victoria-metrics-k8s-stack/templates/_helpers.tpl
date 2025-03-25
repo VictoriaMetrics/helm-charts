@@ -38,7 +38,9 @@
   {{- else if $Values.external.vm.write.url -}}
     {{- $endpoint = $Values.external.vm.write -}}
   {{- end -}}
-  {{- toYaml $endpoint -}}
+  {{- with $endpoint -}}
+    {{- toYaml . -}}
+  {{- end -}}
 {{- end -}}
 
 {{- /* VMAlert remotes */ -}}

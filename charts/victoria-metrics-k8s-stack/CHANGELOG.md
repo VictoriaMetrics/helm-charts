@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed `vm.write.endpoint` template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2083).
 
 ## 0.39.2
 
