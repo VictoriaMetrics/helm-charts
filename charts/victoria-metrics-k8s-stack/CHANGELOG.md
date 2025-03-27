@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump kube-state-metrics chart 5.29.x -> 5.31.x
 
 ## 0.39.4
 
