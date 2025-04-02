@@ -384,6 +384,17 @@ vmselect:
 </td>
     </tr>
     <tr>
+      <td>common.vmsingle.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">port: "8428"
+</code>
+</pre>
+</td>
+      <td><p>Common VMSingle spec, which can be overridden by each VMSingle configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmsinglespec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
       <td>enableMultitenancy</td>
       <td>bool</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
@@ -595,6 +606,14 @@ vmcluster:
             replicaCount: 2
             resources: {}
             storageDataPath: /vm-data
+vmsingle:
+    enabled: false
+    name: '{{ (.zone).name }}'
+    spec:
+        extraArgs: {}
+        replicaCount: 1
+        resources: {}
+        retentionPeriod: "14"
 write:
     allow: true
     vmauth:
@@ -606,7 +625,7 @@ write:
 </code>
 </pre>
 </td>
-      <td><p>Default config for each availability zone components, including vmagent, vmcluster, vmauth etc. Defines a template for each availability zone, which can be overridden for each availability zone at <code>availabilityZones[*]</code></p>
+      <td><p>Default config for each availability zone components, including vmagent, vmcluster, vmsingle, vmauth etc. Defines a template for each availability zone, which can be overridden for each availability zone at <code>availabilityZones[*]</code></p>
 </td>
     </tr>
     <tr>
@@ -792,6 +811,42 @@ vmstorage:
 </pre>
 </td>
       <td><p>Spec for VMCluster CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmclusterspec" target="_blank">here</a></p>
+</td>
+    </tr>
+    <tr>
+      <td>zoneTpl.vmsingle.enabled</td>
+      <td>bool</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">false
+</code>
+</pre>
+</td>
+      <td><p>Create VMSingle</p>
+</td>
+    </tr>
+    <tr>
+      <td>zoneTpl.vmsingle.name</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">'{{ (.zone).name }}'
+</code>
+</pre>
+</td>
+      <td><p>Override the name of the vmsingle, by default is <zoneName></p>
+</td>
+    </tr>
+    <tr>
+      <td>zoneTpl.vmsingle.spec</td>
+      <td>object</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
+<code class="language-yaml">extraArgs: {}
+replicaCount: 1
+resources: {}
+retentionPeriod: "14"
+</code>
+</pre>
+</td>
+      <td><p>Spec for VMSingle CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmsinglespec" target="_blank">here</a></p>
 </td>
     </tr>
     <tr>

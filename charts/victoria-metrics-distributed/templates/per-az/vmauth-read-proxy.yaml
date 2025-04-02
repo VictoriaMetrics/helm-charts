@@ -1,8 +1,8 @@
 {{- $ns := include "vm.namespace" . }}
 {{- $ctx := dict "helm" . }}
 {{- range $i, $z := .Values.availabilityZones }}
-{{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
-{{- if and $zone.read.crossZone.vmauth.enabled $zone.read.perZone.vmauth.enabled }}
+  {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
+  {{- if $zone.read.crossZone.vmauth.enabled }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
@@ -36,9 +36,9 @@ spec: {{ tpl (toYaml (omit $spec "unauthorizedUserAccessSpec")) $ctx | nindent 2
         {{- end }}
         {{- range $j, $c := $.Values.availabilityZones }}
           {{- $cross := mergeOverwrite (deepCopy $.Values.zoneTpl) $c }}
-          {{- if and (ne $j $i) $cross.read.allow }}
+          {{- if and (ne $j $i) $cross.read.allow ((($cross.read).perZone).vmauth).enabled }}
             {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
-            {{- if (($cross.read).perZone).vmauth }}
+            {{- if $cross.read.perZone.vmauth }}
               {{- $urlSpec := $cross.read.perZone.vmauth.spec | default dict }}
               {{- $_ := set $cross.read.perZone.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) $urlSpec) }}
             {{- end }}
@@ -51,5 +51,5 @@ spec: {{ tpl (toYaml (omit $spec "unauthorizedUserAccessSpec")) $ctx | nindent 2
         {{- end }}
         url_prefix: {{ toYaml $urls | nindent 10 }}
         {{- $_ := unset $ctx "style" }}
-{{- end }}
+  {{- end }}
 {{- end }}
