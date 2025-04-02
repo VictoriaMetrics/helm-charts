@@ -1425,10 +1425,21 @@ vmsingle:
 </td>
     </tr>
     <tr>
-      <td>external.grafana</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">host: ""
+      <td>external.grafana.datasource</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">VictoriaMetrics
+</code>
+</pre>
+</td>
+      <td><p>External Grafana datasource name</p>
+</td>
+    </tr>
+    <tr>
+      <td>external.grafana.host</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
