@@ -1,8 +1,8 @@
-{{- $zonesMap := include "vm.per-zone.cluster.spec" . | fromYaml -}}
+{{- $zonesMap := include "vm.per-zone.single.spec" . | fromYaml -}}
 {{- range $name, $rolloutZone := $zonesMap }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMCluster
+kind: VMSingle
 metadata:
   {{- with $rolloutZone.annotations }}
   annotations: {{ toYaml . | nindent 4 }}

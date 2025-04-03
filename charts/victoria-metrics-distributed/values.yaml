@@ -31,6 +31,11 @@ common:
           spec:
             clusterIP: None
             type: ClusterIP
+  vmsingle:
+    # -- Common VMSingle spec, which can be overridden by each VMSingle configuration.
+    # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/index.html#vmsinglespec)
+    spec:
+      port: "8428"
 
 write:
   global:
@@ -52,7 +57,7 @@ read:
       # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
       spec: {}
 
-# -- Default config for each availability zone components, including vmagent, vmcluster, vmauth etc.
+# -- Default config for each availability zone components, including vmagent, vmcluster, vmsingle, vmauth etc.
 # Defines a template for each availability zone, which can be overridden for each availability zone at `availabilityZones[*]`
 zoneTpl:
   common:
@@ -144,6 +149,17 @@ zoneTpl:
         replicaCount: 2
         extraArgs: {}
         resources: {}
+  vmsingle:
+    # --Create VMSingle
+    enabled: false
+    # -- Override the name of the vmsingle, by default is <zoneName>
+    name: "{{ (.zone).name }}"
+    # -- Spec for VMSingle CRD, see [here](https://docs.victoriametrics.com/operator/api#vmsinglespec)
+    spec:
+      replicaCount: 1
+      retentionPeriod: "14"
+      resources: {}
+      extraArgs: {}
 
 # -- Config for all availability zones. Each element represents custom zone config, which overrides a default one from `zoneTpl`
 availabilityZones:
