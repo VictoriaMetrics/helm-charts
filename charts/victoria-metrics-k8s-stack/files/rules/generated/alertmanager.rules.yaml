@@ -43,9 +43,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      rate(alertmanager_notifications_failed_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[5m])
+      rate(alertmanager_notifications_failed_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[15m])
     /
-      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[5m])
+      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}"}[15m])
     )
     > 0.01
   for: 5m
@@ -59,9 +59,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     min by (namespace,service,integration,{{ $groupLabels }}) (
-      rate(alertmanager_notifications_failed_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration=~`.*`}[5m])
+      rate(alertmanager_notifications_failed_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration=~`.*`}[15m])
     /
-      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration=~`.*`}[5m])
+      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration=~`.*`}[15m])
     )
     > 0.01
   for: 5m
@@ -75,9 +75,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     min by (namespace,service,integration,{{ $groupLabels }}) (
-      rate(alertmanager_notifications_failed_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration!~`.*`}[5m])
+      rate(alertmanager_notifications_failed_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration!~`.*`}[15m])
     /
-      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration!~`.*`}[5m])
+      ignoring (reason) group_left rate(alertmanager_notifications_total{job="{{ include "vm-k8s-stack.alertmanager.name" . }}",namespace="{{ include "vm.namespace" . }}", integration!~`.*`}[15m])
     )
     > 0.01
   for: 5m
