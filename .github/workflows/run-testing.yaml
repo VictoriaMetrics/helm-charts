@@ -44,7 +44,7 @@ jobs:
       - name: Build charts diff
         id: charts-diff
         run: |
-          charts=$(echo "${{ steps.changed-charts.outputs.all_modified_files }}" | sed 's/ /\n/g' | grep -v 'common' | awk -F/ '{print $2}' | sort | uniq | jq -ncR '[inputs]')
+          charts=$(echo "${{ steps.changed-charts.outputs.all_modified_files }}" | sed 's/ /\n/g' | grep -vE 'common|crds' | awk -F/ '{print $2}' | sort | uniq | jq -ncR '[inputs]')
           echo "charts=$charts" >> $GITHUB_OUTPUT
 
   install-chart:
