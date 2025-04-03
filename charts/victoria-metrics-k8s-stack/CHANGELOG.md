@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- proxy requests from VMAgent to VMInsert through VMAuth, when it's enabled. Related [issue](https://github.com/VictoriaMetrics/helm-charts/issues/2024).
 
 ## 0.41.1
 
