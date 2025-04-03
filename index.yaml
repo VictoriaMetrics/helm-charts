@@ -20246,6 +20246,54 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - add VMSingle support. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2090).
+        - bump version of K8s stack to 0.41.0
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com
+        - name: Changelog
+          url: https://docs.victoriametrics.com/changelog
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: v1.114.0
+    created: "2025-04-03T16:53:15.192055124Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    - condition: victoria-metrics-k8s-stack.enabled
+      name: victoria-metrics-k8s-stack
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.41.*
+    description: A Helm chart for Running VMCluster on Multiple Availability Zones
+    digest: 3626faa9771513db03c4777973ba29fdb6d8dc0b5e967d2391ba6d437e1711e6
+    home: https://github.com/VictoriaMetrics/helm-charts
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-distributed
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-distributed-0.11.0/victoria-metrics-distributed-0.11.0.tgz
+    version: 0.11.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - updated common dependency 0.0.39 -> 0.0.42
         - bump version of VM components to [v1.114.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.114.0)
       artifacthub.io/license: Apache-2.0
@@ -42752,4 +42800,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2025-04-03T14:32:03.472771504Z"
+generated: "2025-04-03T16:53:15.351353748Z"
