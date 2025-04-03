@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- override external grafana datasource name. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2092).
 
 ## 0.41.0
 

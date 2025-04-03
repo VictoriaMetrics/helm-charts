@@ -143,7 +143,13 @@
   {{- $output := deepCopy (omit $Values.vmalert.spec "notifiers") | mergeOverwrite $vmAlertRemotes | mergeOverwrite $vmAlertTemplates | mergeOverwrite $spec -}}
   {{- if or $Values.grafana.enabled $Values.external.grafana.host }}
     {{- if not (index $output.extraArgs "external.alert.source") -}}
-      {{- $alertSource := `{"datasource":"VictoriaMetrics","queries":[{"expr":{{"{{"}} .Expr|jsonEscape|queryEscape {{"}}"}},"refId":"A"}],"range":{"from":"{{"{{"}} .ActiveAt.UnixMilli {{"}}"}}","to":"now"}}` -}}
+      {{- $alertSourceTpl := `{"datasource":%q,"queries":[{"expr":{{"{{"}} .Expr|jsonEscape|queryEscape {{"}}"}},"refId":"A"}],"range":{"from":"{{"{{"}} .ActiveAt.UnixMilli {{"}}"}}","to":"now"}}` -}}
+      {{- $alertSource := "" -}}
+      {{- if $Values.external.grafana.host -}}
+        {{- $alertSource = printf $alertSourceTpl $Values.external.grafana.datasource -}}
+      {{- else -}}
+        {{- $alertSource = printf $alertSourceTpl (index $Values.defaultDatasources.victoriametrics.datasources 0 "name") -}}
+      {{- end -}}
       {{- $_ := set $output.extraArgs "external.alert.source" (printf "explore?left=%s" $alertSource) -}}
     {{- end -}}
     {{- if not (index $output.extraArgs "external.url") -}}
