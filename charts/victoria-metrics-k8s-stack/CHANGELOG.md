@@ -1,6 +1,7 @@
 ## Next release
 
 - override external grafana datasource name. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2092).
+- sync rules and dashboards
 
 ## 0.41.0
 
