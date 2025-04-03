@@ -17,7 +17,7 @@ metadata:
   {{- $_ := set $ctx "extraLabels" $ingress.labels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $ingress.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
 spec:
   {{- with $ingress.ingressClassName }}

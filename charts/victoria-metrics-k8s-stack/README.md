@@ -1,6 +1,5 @@
 
-
-![Version](https://img.shields.io/badge/0.40.0-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-k8s-stack%2Fchangelog%2F%230400)
+![Version](https://img.shields.io/badge/0.41.0-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-k8s-stack%2Fchangelog%2F%230410)
 ![ArtifactHub](https://img.shields.io/badge/ArtifactHub-informational?logoColor=white&color=417598&logo=artifacthub&link=https%3A%2F%2Fartifacthub.io%2Fpackages%2Fhelm%2Fvictoriametrics%2Fvictoria-metrics-k8s-stack)
 ![License](https://img.shields.io/github/license/VictoriaMetrics/helm-charts?labelColor=green&label=&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Fhelm-charts%2Fblob%2Fmaster%2FLICENSE)
 ![Slack](https://img.shields.io/badge/Join-4A154B?logo=slack&link=https%3A%2F%2Fslack.victoriametrics.com)
@@ -1425,10 +1424,21 @@ vmsingle:
 </td>
     </tr>
     <tr>
-      <td>external.grafana</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">host: ""
+      <td>external.grafana.datasource</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">VictoriaMetrics
+</code>
+</pre>
+</td>
+      <td><p>External Grafana datasource name</p>
+</td>
+    </tr>
+    <tr>
+      <td>external.grafana.host</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
