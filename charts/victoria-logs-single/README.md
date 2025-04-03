@@ -474,7 +474,7 @@ loggerFormat: json
       <td>server.fullnameOverride</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">null
+<code class="language-yaml">""
 </code>
 </pre>
 </td>
