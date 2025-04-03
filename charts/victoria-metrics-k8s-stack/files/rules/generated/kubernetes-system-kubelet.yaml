@@ -20,6 +20,19 @@ rules:
   for: 15m
   labels:
     severity: warning
+- alert: KubeNodePressure
+  annotations:
+    description: '{{`{{`}} $labels.node {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}} has active Condition {{`{{`}} $labels.condition {{`}}`}}. This is caused by resource usage exceeding eviction thresholds.'
+    runbook_url: '{{ $runbookUrl }}/kubernetes/kubenodepressure'
+    summary: 'Node has as active Condition.'
+  condition: '{{ true }}'
+  expr: |-
+    kube_node_status_condition{job="kube-state-metrics",condition=~"(MemoryPressure|DiskPressure|PIDPressure)",status="true"} == 1
+    and on (node,{{ $groupLabels }})
+    kube_node_spec_unschedulable{job="kube-state-metrics"} == 0
+  for: 10m
+  labels:
+    severity: info
 - alert: KubeNodeUnreachable
   annotations:
     description: '{{`{{`}} $labels.node {{`}}`}} is unreachable and some workloads may be rescheduled on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
@@ -66,6 +79,22 @@ rules:
   for: 15m
   labels:
     severity: warning
+- alert: KubeNodeEviction
+  annotations:
+    description: 'Node {{`{{`}} $labels.node {{`}}`}} on {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}} is evicting Pods due to {{`{{`}} $labels.eviction_signal {{`}}`}}.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.'
+    runbook_url: '{{ $runbookUrl }}/kubernetes/kubenodeeviction'
+    summary: 'Node is evicting pods.'
+  condition: '{{ true }}'
+  expr: |-
+    sum(rate(kubelet_evictions{job="kubelet", metrics_path="/metrics"}[15m])) by (eviction_signal,instance,{{ $groupLabels }})
+    * on (instance,{{ $groupLabels }}) group_left(node)
+    max by (instance,node,{{ $groupLabels }}) (
+      kubelet_node_name{job="kubelet", metrics_path="/metrics"}
+    )
+    > 0
+  for: 0s
+  labels:
+    severity: info
 - alert: KubeletPlegDurationHigh
   annotations:
     description: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{`{{`}} $value {{`}}`}} seconds on node {{`{{`}} $labels.node {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
