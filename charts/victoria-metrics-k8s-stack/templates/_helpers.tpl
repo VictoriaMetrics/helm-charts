@@ -31,7 +31,11 @@
     {{- $baseURL := include "vm.url" . -}}
     {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
   {{- else if and $Values.vmcluster.enabled $Values.vmcluster.spec.vminsert.enabled -}}
-    {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
+    {{- if $Values.vmauth.enabled -}}
+      {{- $_ := set . "appKey" (list "vmauth" "spec") -}}
+    {{- else -}}
+      {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
+    {{- end -}}
     {{- $baseURL := include "vm.url" . -}}
     {{- $tenant := $Values.tenant | default 0 -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
