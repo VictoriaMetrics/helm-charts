@@ -471,6 +471,17 @@ loggerFormat: json
 </td>
     </tr>
     <tr>
+      <td>server.fullnameOverride</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">null
+</code>
+</pre>
+</td>
+      <td><p>Overrides the full name of server component</p>
+</td>
+    </tr>
+    <tr>
       <td>server.image.pullPolicy</td>
       <td>string</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="">
