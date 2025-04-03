@@ -30,11 +30,13 @@ spec:
         {{- $urls := default list }}
         {{- range $i, $z := $.Values.availabilityZones }}
           {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
-          {{- $authSpec := ((($zone.read).crossZone).vmauth).spec | default dict }}
-          {{- $_ := set $zone.read.crossZone.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $authSpec) }}
-          {{- $_ := set $ctx "zone" $zone }}
-          {{- $_ := set $ctx "appKey" (list "zone" "read" "crossZone" "vmauth" "spec") }}
-          {{- $urls = append $urls (include "vm.url" $ctx) }}
+          {{- if $zone.read.crossZone.vmauth.enabled -}}
+            {{- $authSpec := ((($zone.read).crossZone).vmauth).spec | default dict }}
+            {{- $_ := set $zone.read.crossZone.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $authSpec) }}
+            {{- $_ := set $ctx "zone" $zone }}
+            {{- $_ := set $ctx "appKey" (list "zone" "read" "crossZone" "vmauth" "spec") }}
+            {{- $urls = append $urls (include "vm.url" $ctx) }}
+          {{- end -}}
         {{- end }}
         {{- $_ := unset $ctx "style" }}
         {{- if empty $urls }}

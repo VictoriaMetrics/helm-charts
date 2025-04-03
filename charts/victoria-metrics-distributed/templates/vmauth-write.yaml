@@ -34,11 +34,13 @@ spec:
         {{- $commonAgentSpec := (((.Values).common).vmagent).spec | default dict }}
         {{- range $i, $z := $.Values.availabilityZones }}
           {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
-          {{- $agentSpec := $zone.vmagent.spec | default dict }}
-          {{- $_ := set $zone.vmagent "spec" (mergeOverwrite (deepCopy $commonAgentSpec) $agentSpec) }}
-          {{- $_ := set $ctx "zone" $zone }}
-          {{- $_ := set $ctx "appKey" (list "zone" "vmagent" "spec") }}
-          {{- $urls = append $urls (include "vm.url" $ctx) }}
+          {{- if $zone.vmagent.enabled -}}
+            {{- $agentSpec := $zone.vmagent.spec | default dict }}
+            {{- $_ := set $zone.vmagent "spec" (mergeOverwrite (deepCopy $commonAgentSpec) $agentSpec) }}
+            {{- $_ := set $ctx "zone" $zone }}
+            {{- $_ := set $ctx "appKey" (list "zone" "vmagent" "spec") }}
+            {{- $urls = append $urls (include "vm.url" $ctx) }}
+          {{- end -}}
         {{- end }}
         {{- $_ := unset $ctx "style" }}
         {{- if empty $urls }}

@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- add VMSingle support. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2090).
+- bump version of K8s stack to 0.41.0
 
 ## 0.10.0
 

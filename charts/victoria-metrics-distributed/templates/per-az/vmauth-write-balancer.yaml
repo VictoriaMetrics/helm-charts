@@ -1,7 +1,7 @@
 {{- $ctx := dict "helm" . }}
 {{- range $i, $z := .Values.availabilityZones }}
   {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
-  {{- if (($zone.write).vmauth).enabled }}
+  {{- if and (($zone.write).vmauth).enabled ($zone.vmcluster).enabled -}}
     {{- $commonAuthSpec := ((($.Values).common).vmauth).spec | default dict }}
     {{- $commonClusterSpec := ((($.Values).common).vmcluster).spec | default dict }}
     {{- $commonSpec := ($zone.common).spec | default dict }}
