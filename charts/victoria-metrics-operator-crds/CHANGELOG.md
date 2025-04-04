@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fix OCI package publishing. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2108).
 
 ## 0.0.1
 
