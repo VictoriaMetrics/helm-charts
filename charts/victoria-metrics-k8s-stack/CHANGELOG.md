@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Do not override alertmanager templates defined in `.Values.alertmanager.spec.templates`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2101).
 
 ## 0.41.2
 
