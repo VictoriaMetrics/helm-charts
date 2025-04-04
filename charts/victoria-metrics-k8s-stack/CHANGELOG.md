@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.41.3
+
+**Release date:** 04 Apr 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.114.0](https://img.shields.io/badge/v1.114.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11140)
+
 - Do not override alertmanager templates defined in `.Values.alertmanager.spec.templates`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2101).
 
 ## 0.41.2
