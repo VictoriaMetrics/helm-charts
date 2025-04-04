@@ -249,7 +249,7 @@
   {{- if and (not $spec.configRawYaml) (not $spec.configSecret) (not $Values.alertmanager.useManagedConfig) -}}
     {{- $_ := set $spec "configSecret" $fullname -}}
   {{- end -}}
-  {{- $templates := default list -}}
+  {{- $templates := $spec.templates | default list -}}
   {{- if $Values.alertmanager.monzoTemplate.enabled -}}
     {{- $configMap := printf "%s-monzo-tpl" $fullname -}}
     {{- $templates = append $templates (dict "name" $configMap "key" "monzo.tmpl") -}}
