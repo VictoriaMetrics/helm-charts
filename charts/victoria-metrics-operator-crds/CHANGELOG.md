@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fixed CRD duplication. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2112).
 
 ## 0.0.2
 
