@@ -158,7 +158,7 @@
 
 {{- define "vmselect.ports" -}}
 {{- $service := .service }}
-{{- $extraArgs := .extraArgs }}
+{{- $extraArgs := .extraArgs -}}
 - name: http
   port: {{ $service.servicePort }}
   protocol: TCP
@@ -179,7 +179,7 @@
 
 {{- define "vminsert.ports" -}}
 {{- $service := .service }}
-{{- $extraArgs := .extraArgs }}
+{{- $extraArgs := .extraArgs -}}
 - name: http
   port: {{ $service.servicePort }}
   protocol: TCP
@@ -187,7 +187,7 @@
 {{- range $service.extraPorts }}
 - name: {{ .name }}
   port: {{ .port }}
-  protocol: TCP
+  protocol: {{ .protocol | default "TCP" }}
   targetPort: {{ .targetPort }}
 {{- end }}
 {{- with $extraArgs.clusternativeListenAddr }}
@@ -236,7 +236,7 @@
 {{- end -}}
 
 {{- define "vmstorage.ports" -}}
-{{- $service := .service }}
+{{- $service := .service -}}
 - port: {{ $service.servicePort }}
   targetPort: http
   protocol: TCP
@@ -258,7 +258,7 @@
 {{- end -}}
 
 {{- define "vmauth.ports" -}}
-{{- $service := .service }}
+{{- $service := .service -}}
 - port: {{ $service.servicePort }}
   targetPort: http
   protocol: TCP 
