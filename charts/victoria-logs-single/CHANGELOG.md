@@ -1,6 +1,7 @@
 ## Next release
 
 - updated common dependency 0.0.39 -> 0.0.42
+- add .Values.service.extraPorts. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2111).
 
 ## 0.9.3
 

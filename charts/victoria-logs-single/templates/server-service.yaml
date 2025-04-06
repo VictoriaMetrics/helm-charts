@@ -58,5 +58,11 @@ spec:
       {{- with $service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
+    {{- range $service.extraPorts }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      protocol: {{ .protocol | default "TCP" }}
+      targetPort: {{ .targetPort }}
+    {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}
