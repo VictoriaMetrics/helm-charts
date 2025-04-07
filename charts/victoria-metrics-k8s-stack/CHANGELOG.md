@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Set default image tag requestsLoadBalancer
 
 ## 0.41.3
 
