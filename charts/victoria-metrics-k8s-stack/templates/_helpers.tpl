@@ -309,6 +309,10 @@
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
   {{- end -}}
+  {{- if ($clusterSpec.requestsLoadBalancer).enabled }}
+    {{- $balancerSpec := $clusterSpec.requestsLoadBalancer.spec | default dict }}
+    {{- $_ := set $clusterSpec.requestsLoadBalancer "spec" (mergeOverwrite $image $balancerSpec) }}
+  {{- end }}
   {{- $clusterSpec = mergeOverwrite (dict "vmselect" $selectSpec) $clusterSpec }}
   {{- if not $clusterSpec.vmselect.enabled -}}
     {{- $_ := unset $clusterSpec "vmselect" -}}
