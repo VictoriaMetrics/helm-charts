@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- use `.Values.vmcluster.spec.clusterVersion` for `app.kubernetes.io/version` label value. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2120).
 
 ## 0.42.0
 

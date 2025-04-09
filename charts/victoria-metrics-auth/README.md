@@ -753,6 +753,17 @@ labels: {}
 </td>
     </tr>
     <tr>
+      <td>priorityClassName</td>
+      <td>string</td>
+      <td><pre class="helm-vars-default-value language-yaml" lang="">
+<code class="language-yaml">""
+</code>
+</pre>
+</td>
+      <td><p>Name of Priority Class</p>
+</td>
+    </tr>
+    <tr>
       <td>probe.liveness</td>
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
