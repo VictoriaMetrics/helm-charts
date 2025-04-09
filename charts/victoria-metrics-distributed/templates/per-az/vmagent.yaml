@@ -25,7 +25,7 @@ metadata:
 {{- $remoteWrites := default list }}
 {{- range $rwz := $.Values.availabilityZones }}
   {{- $rwZone := mergeOverwrite (deepCopy $.Values.zoneTpl) $rwz }}
-  {{- if $rwZone.write.allow }}
+  {{- if and $rwZone.write.allow $rwZone.write.vmauth.enabled }}
     {{- if ($rwZone.write).vmauth }}
       {{- $urlSpec := $rwZone.write.vmauth.spec | default dict }}
       {{- $_ := set $rwZone.write.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) $urlSpec) }}
@@ -51,7 +51,11 @@ metadata:
     {{- $_ := unset $ctx "style" }}
   {{- end }}
 {{- end }}
-{{- $_ := set $zone.vmagent.spec "remoteWrite" (concat $remoteWrites ($zone.vmagent.spec.remoteWrites | default list)) }}
+{{- $rw := concat $remoteWrites ($zone.vmagent.spec.remoteWrites | default list) -}}
+{{- if eq (len $rw) 0 -}}
+  {{- fail (printf "VMAgent in %q zone has no remote writes. Please disable it" $zone.name) }}
+{{- end -}}
+{{- $_ := set $zone.vmagent.spec "remoteWrite" $rw }}
 {{- if $isMultitenant }}
   {{- $remoteWriteSettings := (dict "useMultiTenantMode" true) }}
   {{- $_ := set $zone.vmagent.spec "remoteWriteSettings" (mergeOverwrite (deepCopy ($zone.vmagent.spec.remoteWriteSettings | default dict)) $remoteWriteSettings) }}

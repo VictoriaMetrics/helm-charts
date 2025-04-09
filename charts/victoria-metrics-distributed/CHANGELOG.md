@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fail chart if VMAgent has no remote writes defined.
 
 ## 0.12.0
 
