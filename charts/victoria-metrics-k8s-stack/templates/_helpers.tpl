@@ -269,13 +269,13 @@
 {{- define "vm.single.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
+  {{- $image := dict "tag" (include "vm.image.tag" .) }}
   {{- $extraArgs := default dict -}}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmalert.enabled }}
     {{- $_ := set . "appKey" (list "vmalert" "spec") }}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" .) -}}
   {{- end -}}
-  {{- $image := dict "tag" (include "vm.image.tag" .) }}
   {{- $spec := dict "extraArgs" $extraArgs "image" $image -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
