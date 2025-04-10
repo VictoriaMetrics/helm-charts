@@ -311,7 +311,8 @@
   {{- end -}}
   {{- if ($clusterSpec.requestsLoadBalancer).enabled }}
     {{- $balancerSpec := $clusterSpec.requestsLoadBalancer.spec | default dict }}
-    {{- $_ := set $clusterSpec.requestsLoadBalancer "spec" (mergeOverwrite $image $balancerSpec) }}
+    {{- $authImage := dict "image" (dict "tag" (include "vm.image.tag" .)) }}
+    {{- $_ := set $clusterSpec.requestsLoadBalancer "spec" (mergeOverwrite $authImage $balancerSpec) }}
   {{- end }}
   {{- $clusterSpec = mergeOverwrite (dict "vmselect" $selectSpec) $clusterSpec }}
   {{- if not $clusterSpec.vmselect.enabled -}}
