@@ -1,6 +1,7 @@
 ## Next release
 
 - use `.Values.vmcluster.spec.clusterVersion` for `app.kubernetes.io/version` label value. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2120).
+- fix VMSingle image tag, when custom VMAlert image tag set.
 
 ## 0.42.0
 
