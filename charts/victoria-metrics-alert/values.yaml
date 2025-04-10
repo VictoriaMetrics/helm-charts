@@ -401,17 +401,17 @@ alertmanager:
     # -- Readiness probe
     readiness:
       httpGet:
-        path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready'
+        path: '{{ ternary "" .app.baseURLPrefix (empty .app.baseURLPrefix) }}/-/ready'
         port: web
     # -- Liveness probe
     liveness:
       httpGet:
-        path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/healthy'
+        path: '{{ ternary "" .app.baseURLPrefix (empty .app.baseURLPrefix) }}/-/healthy'
         port: web
     # -- Startup probe
     startup:
       httpGet:
-        path: '{{ ternary "" .baseURLPrefix (empty .baseURLPrefix) }}/-/ready'
+        path: '{{ ternary "" .app.baseURLPrefix (empty .app.baseURLPrefix) }}/-/ready'
         port: web
 
   # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
