@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix probes, when baseURLPrefix is set. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2122).
 
 ## 0.17.0
 
