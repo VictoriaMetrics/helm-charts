@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- rename .Values.podDisruptionBudget.extraLabels to .Values.podDisruptionBudget.labels for consistency
 
 ## 0.17.0
 

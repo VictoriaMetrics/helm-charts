@@ -8,7 +8,7 @@ kind: PodDisruptionBudget
 metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
-  {{- $_ := set $ctx "extraLabels" $pdb.extraLabels }}
+  {{- $_ := set $ctx "extraLabels" $pdb.labels }}
   labels: {{ include "vm.metaLabels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
 spec:

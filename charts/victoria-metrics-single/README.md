@@ -258,7 +258,7 @@ name: ""
       <td>object</td>
       <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
 <code class="language-yaml">enabled: false
-extraLabels: {}
+labels: {}
 </code>
 </pre>
 </td>
