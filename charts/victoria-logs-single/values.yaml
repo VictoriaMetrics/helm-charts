@@ -38,17 +38,25 @@ serviceAccount:
   # -- Mount API token to pod directly
   automountToken: true
 
-# -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
-podDisruptionBudget:
-  enabled: false
-  #  minAvailable: 1
-  #  maxUnavailable: 1
-  # -- PodDisruptionBudget extra labels
-  extraLabels: {}
+# -- Servers defines roles and custom configuration for VictoriaLogs server roles.
+# Each section overrides default configuration defined at .Values.server
+servers:
+  select:
+    enabled: false
+    role: select
+  insert:
+    enabled: false
+    role: insert
+  server:
+    enabled: true
 
+# -- Common VictoriaLogs servers configuration
 server:
-  # -- Enable deployment of server component. Deployed as StatefulSet
-  enabled: true
+  # VictoriaLogs server role. Possible values are:
+  # - 'select' - disables internal insert endpoints
+  # - 'insert' - disables internal select endpoints
+  # - 'storage' - allows all endpoints
+  role: storage
   image:
     # -- Image registry
     registry: ""
@@ -362,6 +370,14 @@ server:
     metricRelabelings: []
     # -- target port
     targetPort: http
+
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+  podDisruptionBudget:
+    enabled: true
+    #  minAvailable: 1
+    #  maxUnavailable: 1
+    # -- PodDisruptionBudget extra labels
+    labels: {}
 
 # -- Values for [vector helm chart](https://github.com/vectordotdev/helm-charts/tree/develop/charts/vector)
 vector:

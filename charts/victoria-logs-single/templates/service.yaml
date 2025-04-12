@@ -1,8 +1,10 @@
-{{- $app := .Values.server }}
+{{- $common := .Values.server }}
+{{- range $name, $server := .Values.servers }}
+{{- $app := mergeOverwrite (deepCopy $common) (deepCopy $server) }}
 {{- $mode := $app.mode }}
 {{- $service := $app.service }}
 {{- if $app.enabled -}}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $ctx := dict "helm" $ "appKey" $name $name $app }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 ---
@@ -65,4 +67,5 @@ spec:
       targetPort: {{ .targetPort }}
     {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
+{{- end }}
 {{- end }}

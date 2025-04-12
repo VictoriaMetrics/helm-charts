@@ -1,5 +1,7 @@
-{{- $app := .Values.server }}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $common := .Values.server }}
+{{- range $name, $server := .Values.servers }}
+{{- $app := mergeOverwrite (deepCopy $common) (deepCopy $server) }}
+{{- $ctx := dict "helm" $ "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 
@@ -103,4 +105,5 @@ spec:
       {{- with $app.vmServiceScrape.metricRelabelings }}
       metricRelabelings: {{ toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}
 {{- end }}

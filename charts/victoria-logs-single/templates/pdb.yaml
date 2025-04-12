@@ -1,14 +1,18 @@
-{{- $pdb := .Values.podDisruptionBudget }}
-{{- if $pdb.enabled }}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $common := .Values.server }}
+{{- range $name, $server := .Values.servers }}
+{{- $app := mergeOverwrite (deepCopy $common) (deepCopy $server) }}
+{{- $pdb := $app.podDisruptionBudget }}
+{{- if and $app.enabled $pdb.enabled }}
+{{- $ctx := dict "helm" $ "appKey" $name $name $app }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
+---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
-  {{- $_ := set $ctx "extraLabels" .Values.podDisruptionBudget.labels }}
+  {{- $_ := set $ctx "extraLabels" $pdb.labels }}
   labels: {{ include "vm.metaLabels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
 spec:
@@ -20,4 +24,5 @@ spec:
   {{- end }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+{{- end }}
 {{- end }}
