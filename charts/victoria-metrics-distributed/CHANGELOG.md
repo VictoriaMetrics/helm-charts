@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Support ability to substitute VMAuth load balancers with k8s Service for setups, which support custom load balancing.
 
 ## 0.13.0
 

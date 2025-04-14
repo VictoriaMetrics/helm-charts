@@ -1,13 +1,32 @@
 {{- $ctx := dict "helm" . }}
 {{- $urlCtx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" . }}
+{{- $_ := set $ctx "fullname" $fullname }}
+{{- $commonAuth := dict "spec" ((((.Values).common).vmauth).spec | default dict) }}
+{{- $auth := mergeOverwrite (deepCopy $commonAuth) (deepCopy ((((.Values).write).global).vmauth | default dict)) }}
+
+{{- $_ := set $ctx "style" "managed" }}
+{{- $urls := default list }}
+{{- $components := default list }}
+{{- $commonAgentSpec := (((.Values).common).vmagent).spec | default dict }}
+{{- range $i, $z := $.Values.availabilityZones }}
+  {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
+  {{- if $zone.vmagent.enabled -}}
+    {{- $agentSpec := $zone.vmagent.spec | default dict }}
+    {{- $components = append $components (printf "vmagent-%s" (tpl $zone.vmagent.name (dict "zone" $z))) }}
+    {{- $_ := set $zone.vmagent "spec" (mergeOverwrite (deepCopy $commonAgentSpec) $agentSpec) }}
+    {{- $_ := set $ctx "zone" $zone }}
+    {{- $_ := set $ctx "appKey" (list "zone" "vmagent" "spec") }}
+    {{- $urls = append $urls (include "vm.url" $ctx) }}
+  {{- end -}}
+{{- end }}
+{{- $_ := unset $ctx "style" }}
+
+{{- $_ := set $ctx "appKey" (list "vmauth" "spec") }}
+{{- $_ := set $ctx "fullname" $fullname }}
+{{- $_ := set $ctx "vmauth" $auth }}
+
 {{- if ((((.Values).write).global).vmauth).enabled }}
-  {{- $commonAuth := dict "spec" ((((.Values).common).vmauth).spec | default dict) }}
-  {{- $auth := .Values.write.global.vmauth | default dict }}
-  {{- $auth = mergeOverwrite (deepCopy $commonAuth) (deepCopy $auth) }}
-  {{- $_ := set $ctx "appKey" (list "vmauth" "spec") }}
-  {{- $_ := set $ctx "fullname" $fullname }}
-  {{- $_ := set $ctx "vmauth" $auth }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
@@ -45,4 +64,24 @@ metadata:
   {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
 spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
+{{- else -}}
+{{- if empty $components }}
+  {{- fail "Failed to setup global service. No clusters enabled" -}}
+{{- end }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vm.cr.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+spec:
+  selector:
+    matchExpressions:
+      - key: app.kubernetes.io/component
+        operator: In
+        values: {{ toJson $components }}
+  ports:
+    - protocol: TCP
+      port: {{ $auth.spec.port }}
+      targetPort: http
 {{- end }}
