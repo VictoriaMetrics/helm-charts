@@ -305,593 +305,389 @@ Change the values according to the need of the environment in ``victoria-metrics
 <table class="helm-vars">
   <thead>
     <th class="helm-vars-key">Key</th>
-    <th class="helm-vars-type">Type</th>
-    <th class="helm-vars-default">Default</th>
     <th class="helm-vars-description">Description</th>
   </thead>
   <tbody>
-    <tr>
-      <td>availabilityZones</td>
-      <td>list</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">- name: zone-eu-1
-- name: zone-us-1
-</code>
-</pre>
-</td>
-      <td><p>Config for all availability zones. Each element represents custom zone config, which overrides a default one from <code>zoneTpl</code></p>
+    <tr id="availabilityzones">
+      <td><a href="#availabilityzones"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">availabilityZones</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">zone-eu-1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">zone-us-1</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(list)</code></em><p>Config for all availability zones. Each element represents custom zone config, which overrides a default one from <code>zoneTpl</code></p>
 </td>
     </tr>
-    <tr>
-      <td>availabilityZones[0].name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">zone-eu-1
-</code>
-</pre>
-</td>
-      <td><p>Availability zone name</p>
+    <tr id="availabilityzones[0]-name">
+      <td><a href="#availabilityzones[0]-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">availabilityZones[0].name</span><span class="p">:</span><span class="w"> </span><span class="l">zone-eu-1</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Availability zone name</p>
 </td>
     </tr>
-    <tr>
-      <td>availabilityZones[1].name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">zone-us-1
-</code>
-</pre>
-</td>
-      <td><p>Availability zone name</p>
+    <tr id="availabilityzones[1]-name">
+      <td><a href="#availabilityzones[1]-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">availabilityZones[1].name</span><span class="p">:</span><span class="w"> </span><span class="l">zone-us-1</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Availability zone name</p>
 </td>
     </tr>
-    <tr>
-      <td>common.vmagent.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">port: "8429"
-</code>
-</pre>
-</td>
-      <td><p>Common VMAgent spec, which can be overridden by each VMAgent configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmagentspec" target="_blank">here</a></p>
+    <tr id="common-vmagent-spec">
+      <td><a href="#common-vmagent-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">common.vmagent.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;8429&#34;</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Common VMAgent spec, which can be overridden by each VMAgent configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmagentspec" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>common.vmauth.spec.port</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">"8427"
-</code>
-</pre>
-</td>
-      <td></td>
+    <tr id="common-vmauth-spec-port">
+      <td><a href="#common-vmauth-spec-port"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">common.vmauth.spec.port</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;8427&#34;</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em></td>
     </tr>
-    <tr>
-      <td>common.vmcluster.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">vminsert:
-    port: "8480"
-    serviceSpec:
-        spec:
-            clusterIP: None
-            type: ClusterIP
-vmselect:
-    port: "8481"
-</code>
-</pre>
-</td>
-      <td><p>Common VMCluster spec, which can be overridden by each VMCluster configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmclusterspec" target="_blank">here</a></p>
+    <tr id="common-vmcluster-spec">
+      <td><a href="#common-vmcluster-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">common.vmcluster.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vminsert</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;8480&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">serviceSpec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">clusterIP</span><span class="p">:</span><span class="w"> </span><span class="l">None</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterIP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmselect</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;8481&#34;</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Common VMCluster spec, which can be overridden by each VMCluster configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmclusterspec" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>common.vmsingle.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">port: "8428"
-</code>
-</pre>
-</td>
-      <td><p>Common VMSingle spec, which can be overridden by each VMSingle configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmsinglespec" target="_blank">here</a></p>
+    <tr id="common-vmsingle-spec">
+      <td><a href="#common-vmsingle-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">common.vmsingle.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;8428&#34;</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Common VMSingle spec, which can be overridden by each VMSingle configuration. Available parameters can be found <a href="https://docs.victoriametrics.com/operator/api/index.html#vmsinglespec" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>enableMultitenancy</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Enable multitenancy mode see <a href="https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy" target="_blank">here</a></p>
+    <tr id="enablemultitenancy">
+      <td><a href="#enablemultitenancy"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">enableMultitenancy</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Enable multitenancy mode see <a href="https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed#how-to-use-multitenancy" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>extra</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">vmagent:
-    enabled: true
-    name: test-vmagent
-    spec:
-        selectAllByDefault: true
-</code>
-</pre>
-</td>
-      <td><p>Set up an extra vmagent to scrape all the scrape objects by default, and write data to above write-global endpoint.</p>
+    <tr id="extra">
+      <td><a href="#extra"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">extra</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmagent</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">test-vmagent</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">selectAllByDefault</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Set up an extra vmagent to scrape all the scrape objects by default, and write data to above write-global endpoint.</p>
 </td>
     </tr>
-    <tr>
-      <td>fullnameOverride</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">""
-</code>
-</pre>
-</td>
-      <td><p>Overrides the chart&rsquo;s computed fullname.</p>
+    <tr id="fullnameoverride">
+      <td><a href="#fullnameoverride"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">fullnameOverride</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&#34;</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Overrides the chart&rsquo;s computed fullname.</p>
 </td>
     </tr>
-    <tr>
-      <td>global</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">cluster:
-    dnsDomain: cluster.local.
-</code>
-</pre>
-</td>
-      <td><p>Global chart properties</p>
+    <tr id="global">
+      <td><a href="#global"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">global</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">cluster</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">dnsDomain</span><span class="p">:</span><span class="w"> </span><span class="l">cluster.local.</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Global chart properties</p>
 </td>
     </tr>
-    <tr>
-      <td>global.cluster.dnsDomain</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">cluster.local.
-</code>
-</pre>
-</td>
-      <td><p>K8s cluster domain suffix, uses for building storage pods&rsquo; FQDN. Details are <a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/" target="_blank">here</a></p>
+    <tr id="global-cluster-dnsdomain">
+      <td><a href="#global-cluster-dnsdomain"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">global.cluster.dnsDomain</span><span class="p">:</span><span class="w"> </span><span class="l">cluster.local.</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>K8s cluster domain suffix, uses for building storage pods&rsquo; FQDN. Details are <a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>nameOverride</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vm-distributed
-</code>
-</pre>
-</td>
-      <td><p>Overrides the chart&rsquo;s name</p>
+    <tr id="nameoverride">
+      <td><a href="#nameoverride"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">nameOverride</span><span class="p">:</span><span class="w"> </span><span class="l">vm-distributed</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Overrides the chart&rsquo;s name</p>
 </td>
     </tr>
-    <tr>
-      <td>read.global.vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create vmauth as the global read entrypoint</p>
+    <tr id="read-global-vmauth-enabled">
+      <td><a href="#read-global-vmauth-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">read.global.vmauth.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create vmauth as the global read entrypoint</p>
 </td>
     </tr>
-    <tr>
-      <td>read.global.vmauth.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmauth-global-read-{{ .fullname }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmauth object</p>
+    <tr id="read-global-vmauth-name">
+      <td><a href="#read-global-vmauth-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">read.global.vmauth.name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-global-read-{{ .fullname }}</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Override the name of the vmauth object</p>
 </td>
     </tr>
-    <tr>
-      <td>read.global.vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
+    <tr id="read-global-vmauth-spec">
+      <td><a href="#read-global-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">read.global.vmauth.spec</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>victoria-metrics-k8s-stack</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">alertmanager:
-    enabled: false
-enabled: true
-grafana:
-    enabled: true
-victoria-metrics-operator:
-    enabled: true
-vmagent:
-    enabled: false
-vmalert:
-    enabled: false
-vmcluster:
-    enabled: false
-vmsingle:
-    enabled: false
-</code>
-</pre>
-</td>
-      <td><p>Set up vm operator and other resources like vmalert, grafana if needed</p>
+    <tr id="victoria-metrics-k8s-stack">
+      <td><a href="#victoria-metrics-k8s-stack"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">victoria-metrics-k8s-stack</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">alertmanager</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">grafana</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">victoria-metrics-operator</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmagent</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmalert</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmcluster</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmsingle</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Set up vm operator and other resources like vmalert, grafana if needed</p>
 </td>
     </tr>
-    <tr>
-      <td>write.global.vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create a vmauth as the global write entrypoint</p>
+    <tr id="write-global-vmauth-enabled">
+      <td><a href="#write-global-vmauth-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">write.global.vmauth.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create a vmauth as the global write entrypoint</p>
 </td>
     </tr>
-    <tr>
-      <td>write.global.vmauth.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmauth-global-write-{{ .fullname }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmauth object</p>
+    <tr id="write-global-vmauth-name">
+      <td><a href="#write-global-vmauth-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">write.global.vmauth.name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-global-write-{{ .fullname }}</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Override the name of the vmauth object</p>
 </td>
     </tr>
-    <tr>
-      <td>write.global.vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
+    <tr id="write-global-vmauth-spec">
+      <td><a href="#write-global-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">write.global.vmauth.spec</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">common:
-    spec:
-        affinity: {}
-        nodeSelector:
-            topology.kubernetes.io/zone: '{{ (.zone).name }}'
-        topologySpreadConstraints:
-            - maxSkew: 1
-              topologyKey: kubernetes.io/hostname
-              whenUnsatisfiable: ScheduleAnyway
-read:
-    allow: true
-    crossZone:
-        vmauth:
-            enabled: true
-            name: vmauth-read-proxy-{{ (.zone).name }}
-            spec: {}
-    perZone:
-        vmauth:
-            enabled: true
-            name: vmauth-read-balancer-{{ (.zone).name }}
-            spec:
-                extraArgs:
-                    discoverBackendIPs: "true"
-vmagent:
-    annotations: {}
-    enabled: true
-    name: vmagent-{{ (.zone).name }}
-    spec: {}
-vmcluster:
-    enabled: true
-    name: vmcluster-{{ (.zone).name }}
-    spec:
-        replicationFactor: 2
-        retentionPeriod: "14"
-        vminsert:
-            extraArgs: {}
-            replicaCount: 2
-            resources: {}
-        vmselect:
-            extraArgs: {}
-            replicaCount: 2
-            resources: {}
-        vmstorage:
-            replicaCount: 2
-            resources: {}
-            storageDataPath: /vm-data
-vmsingle:
-    enabled: false
-    name: '{{ (.zone).name }}'
-    spec:
-        extraArgs: {}
-        replicaCount: 1
-        resources: {}
-        retentionPeriod: "14"
-write:
-    allow: true
-    vmauth:
-        enabled: true
-        name: vmauth-write-balancer-{{ (.zone).name }}
-        spec:
-            extraArgs:
-                discoverBackendIPs: "true"
-</code>
-</pre>
-</td>
-      <td><p>Default config for each availability zone components, including vmagent, vmcluster, vmsingle, vmauth etc. Defines a template for each availability zone, which can be overridden for each availability zone at <code>availabilityZones[*]</code></p>
+    <tr id="zonetpl">
+      <td><a href="#zonetpl"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">common</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">nodeSelector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">topology.kubernetes.io/zone</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;{{ (.zone).name }}&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">topologySpreadConstraints</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="nt">maxSkew</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                  </span><span class="nt">topologyKey</span><span class="p">:</span><span class="w"> </span><span class="l">kubernetes.io/hostname</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                  </span><span class="nt">whenUnsatisfiable</span><span class="p">:</span><span class="w"> </span><span class="l">ScheduleAnyway</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">read</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">allow</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">crossZone</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">vmauth</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-read-proxy-{{ (.zone).name }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">spec</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">perZone</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">vmauth</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-read-balancer-{{ (.zone).name }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                        </span><span class="nt">discoverBackendIPs</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmagent</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">annotations</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vmagent-{{ (.zone).name }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">spec</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmcluster</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vmcluster-{{ (.zone).name }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">replicationFactor</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">retentionPeriod</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;14&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">vminsert</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">vmselect</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">vmstorage</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">storageDataPath</span><span class="p">:</span><span class="w"> </span><span class="l">/vm-data</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmsingle</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;{{ (.zone).name }}&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">retentionPeriod</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;14&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">write</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">allow</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">vmauth</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-write-balancer-{{ (.zone).name }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="nt">discoverBackendIPs</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Default config for each availability zone components, including vmagent, vmcluster, vmsingle, vmauth etc. Defines a template for each availability zone, which can be overridden for each availability zone at <code>availabilityZones[*]</code></p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.common.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">affinity: {}
-nodeSelector:
-    topology.kubernetes.io/zone: '{{ (.zone).name }}'
-topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: kubernetes.io/hostname
-      whenUnsatisfiable: ScheduleAnyway
-</code>
-</pre>
-</td>
-      <td><p>Common for <a href="https://docs.victoriametrics.com/operator/api/#vmagentspec" target="_blank">VMAgent</a>, <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">VMAuth</a>, <a href="https://docs.victoriametrics.com/operator/api/#vmclusterspec" target="_blank">VMCluster</a> spec params, like nodeSelector, affinity, topologySpreadConstraint, etc</p>
+    <tr id="zonetpl-common-spec">
+      <td><a href="#zonetpl-common-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.common.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">nodeSelector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">topology.kubernetes.io/zone</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;{{ (.zone).name }}&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">topologySpreadConstraints</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">maxSkew</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">topologyKey</span><span class="p">:</span><span class="w"> </span><span class="l">kubernetes.io/hostname</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">whenUnsatisfiable</span><span class="p">:</span><span class="w"> </span><span class="l">ScheduleAnyway</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Common for <a href="https://docs.victoriametrics.com/operator/api/#vmagentspec" target="_blank">VMAgent</a>, <a href="https://docs.victoriametrics.com/operator/api/#vmauthspec" target="_blank">VMAuth</a>, <a href="https://docs.victoriametrics.com/operator/api/#vmclusterspec" target="_blank">VMCluster</a> spec params, like nodeSelector, affinity, topologySpreadConstraint, etc</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.read.allow</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Allow data query from this zone through global query endpoint</p>
+    <tr id="zonetpl-read-allow">
+      <td><a href="#zonetpl-read-allow"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.allow</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Allow data query from this zone through global query endpoint</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.read.crossZone.vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create a vmauth with all the zone with <code>allow: true</code> as query backends</p>
+    <tr id="zonetpl-read-crosszone-vmauth-enabled">
+      <td><a href="#zonetpl-read-crosszone-vmauth-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.crossZone.vmauth.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create a vmauth with all the zone with <code>allow: true</code> as query backends</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.read.crossZone.vmauth.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmauth-read-proxy-{{ (.zone).name }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmauth object</p>
+    <tr id="zonetpl-read-crosszone-vmauth-name">
+      <td><a href="#zonetpl-read-crosszone-vmauth-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.crossZone.vmauth.name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-read-proxy-{{ (.zone).name }}</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Override the name of the vmauth object</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.read.crossZone.vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
+    <tr id="zonetpl-read-crosszone-vmauth-spec">
+      <td><a href="#zonetpl-read-crosszone-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.crossZone.vmauth.spec</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.read.perZone.vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create vmauth as a local read endpoint</p>
+    <tr id="zonetpl-read-perzone-vmauth-enabled">
+      <td><a href="#zonetpl-read-perzone-vmauth-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.perZone.vmauth.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create vmauth as a local read endpoint</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.read.perZone.vmauth.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmauth-read-balancer-{{ (.zone).name }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmauth object</p>
+    <tr id="zonetpl-read-perzone-vmauth-name">
+      <td><a href="#zonetpl-read-perzone-vmauth-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.perZone.vmauth.name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-read-balancer-{{ (.zone).name }}</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Override the name of the vmauth object</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.read.perZone.vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">extraArgs:
-    discoverBackendIPs: "true"
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
+    <tr id="zonetpl-read-perzone-vmauth-spec">
+      <td><a href="#zonetpl-read-perzone-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.perZone.vmauth.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">discoverBackendIPs</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.vmagent.annotations</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>VMAgent remote write proxy annotations</p>
+    <tr id="zonetpl-vmagent-annotations">
+      <td><a href="#zonetpl-vmagent-annotations"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.vmagent.annotations</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>VMAgent remote write proxy annotations</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.vmagent.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create VMAgent remote write proxy</p>
+    <tr id="zonetpl-vmagent-enabled">
+      <td><a href="#zonetpl-vmagent-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.vmagent.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create VMAgent remote write proxy</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.vmagent.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmagent-{{ (.zone).name }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmagent object</p>
+    <tr id="zonetpl-vmagent-name">
+      <td><a href="#zonetpl-vmagent-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.vmagent.name</span><span class="p">:</span><span class="w"> </span><span class="l">vmagent-{{ (.zone).name }}</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Override the name of the vmagent object</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.vmagent.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">{}
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAgent CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmagentspec" target="_blank">here</a></p>
+    <tr id="zonetpl-vmagent-spec">
+      <td><a href="#zonetpl-vmagent-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.vmagent.spec</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Spec for VMAgent CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmagentspec" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.vmcluster.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create VMCluster</p>
+    <tr id="zonetpl-vmcluster-enabled">
+      <td><a href="#zonetpl-vmcluster-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.vmcluster.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create VMCluster</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.vmcluster.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmcluster-{{ (.zone).name }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmcluster, by default is <zoneName></p>
+    <tr id="zonetpl-vmcluster-name">
+      <td><a href="#zonetpl-vmcluster-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.vmcluster.name</span><span class="p">:</span><span class="w"> </span><span class="l">vmcluster-{{ (.zone).name }}</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Override the name of the vmcluster, by default is <zoneName></p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.vmcluster.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">replicationFactor: 2
-retentionPeriod: "14"
-vminsert:
-    extraArgs: {}
-    replicaCount: 2
-    resources: {}
-vmselect:
-    extraArgs: {}
-    replicaCount: 2
-    resources: {}
-vmstorage:
-    replicaCount: 2
-    resources: {}
-    storageDataPath: /vm-data
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMCluster CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmclusterspec" target="_blank">here</a></p>
+    <tr id="zonetpl-vmcluster-spec">
+      <td><a href="#zonetpl-vmcluster-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.vmcluster.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">replicationFactor</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">retentionPeriod</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;14&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vminsert</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmselect</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmstorage</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">storageDataPath</span><span class="p">:</span><span class="w"> </span><span class="l">/vm-data</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Spec for VMCluster CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmclusterspec" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.vmsingle.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">false
-</code>
-</pre>
-</td>
-      <td><p>Create VMSingle</p>
+    <tr id="zonetpl-vmsingle-enabled">
+      <td><a href="#zonetpl-vmsingle-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.vmsingle.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create VMSingle</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.vmsingle.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">'{{ (.zone).name }}'
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmsingle, by default is <zoneName></p>
+    <tr id="zonetpl-vmsingle-name">
+      <td><a href="#zonetpl-vmsingle-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.vmsingle.name</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;{{ (.zone).name }}&#39;</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Override the name of the vmsingle, by default is <zoneName></p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.vmsingle.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">extraArgs: {}
-replicaCount: 1
-resources: {}
-retentionPeriod: "14"
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMSingle CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmsinglespec" target="_blank">here</a></p>
+    <tr id="zonetpl-vmsingle-spec">
+      <td><a href="#zonetpl-vmsingle-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.vmsingle.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">retentionPeriod</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;14&#34;</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Spec for VMSingle CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmsinglespec" target="_blank">here</a></p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.write.allow</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Allow data ingestion to this zone</p>
+    <tr id="zonetpl-write-allow">
+      <td><a href="#zonetpl-write-allow"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.write.allow</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Allow data ingestion to this zone</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.write.vmauth.enabled</td>
-      <td>bool</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">true
-</code>
-</pre>
-</td>
-      <td><p>Create vmauth as a local write endpoint</p>
+    <tr id="zonetpl-write-vmauth-enabled">
+      <td><a href="#zonetpl-write-vmauth-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.write.vmauth.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create vmauth as a local write endpoint</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.write.vmauth.name</td>
-      <td>string</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="">
-<code class="language-yaml">vmauth-write-balancer-{{ (.zone).name }}
-</code>
-</pre>
-</td>
-      <td><p>Override the name of the vmauth object</p>
+    <tr id="zonetpl-write-vmauth-name">
+      <td><a href="#zonetpl-write-vmauth-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.write.vmauth.name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-write-balancer-{{ (.zone).name }}</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(string)</code></em><p>Override the name of the vmauth object</p>
 </td>
     </tr>
-    <tr>
-      <td>zoneTpl.write.vmauth.spec</td>
-      <td>object</td>
-      <td><pre class="helm-vars-default-value language-yaml" lang="plaintext">
-<code class="language-yaml">extraArgs:
-    discoverBackendIPs: "true"
-</code>
-</pre>
-</td>
-      <td><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
+    <tr id="zonetpl-write-vmauth-spec">
+      <td><a href="#zonetpl-write-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.write.vmauth.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">discoverBackendIPs</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
     </tr>
   </tbody>
