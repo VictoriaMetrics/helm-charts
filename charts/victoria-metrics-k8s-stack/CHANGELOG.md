@@ -3,6 +3,7 @@
 - use `.Values.vmcluster.spec.clusterVersion` for `app.kubernetes.io/version` label value. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2120).
 - fix VMSingle image tag, when custom VMAlert image tag set.
 - upgrade Grafana chart 8.9.x -> 8.11.x
+- updates operator to [v0.56.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.56.0) version
 
 ## 0.42.0
 
