@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Updated CRDs
 
 ## 0.0.3
 

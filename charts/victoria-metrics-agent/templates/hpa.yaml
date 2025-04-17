@@ -16,7 +16,7 @@ spec:
   minReplicas: {{ $hpa.minReplicas }}
   scaleTargetRef:
     apiVersion: apps/v1
-    kind: {{ title $mode }}
+    kind: {{ title .Values.mode }}
     name: {{ $fullname }}
   metrics: {{ toYaml $hpa.metrics | nindent 4 }}
   {{- with $hpa.behavior }}
