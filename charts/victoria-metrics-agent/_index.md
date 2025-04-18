@@ -9,5 +9,6 @@ menu:
 url: /helm/victoriametrics-agent
 aliases:
   - /helm/victoriametrics-agent/index.html
+  - /helm/victoria-metrics-agent/index.html
 ---
 {{% content "README.md" %}}

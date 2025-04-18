@@ -9,5 +9,6 @@ menu:
 url: /helm/victoriametrics-gateway
 aliases:
   - /helm/victoriametrics-gateway/index.html
+  - /helm/victoria-metrics-gateway/index.html
 ---
 {{% content "README.md" %}}

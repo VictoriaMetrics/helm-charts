@@ -9,5 +9,6 @@ menu:
 url: /helm/victoriametrics-k8s-stack
 aliases:
   - /helm/victoriametrics-k8s-stack/index.html
+  - /helm/victoria-metrics-k8s-stack/index.html
 ---
 {{% content "README.md" %}}
