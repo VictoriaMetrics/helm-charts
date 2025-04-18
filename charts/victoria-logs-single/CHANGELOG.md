@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- Removed duplicated dashboards. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2143).
+- Bumped VictoriaLogs version to v1.19.0
 
 ## 0.9.5
 

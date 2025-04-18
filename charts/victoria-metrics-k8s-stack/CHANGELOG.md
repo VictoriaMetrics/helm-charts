@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Synced dashboards and rules
 
 ## 0.43.0
 
