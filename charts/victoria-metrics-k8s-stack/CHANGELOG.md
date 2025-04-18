@@ -1,6 +1,7 @@
 ## Next release
 
 - Synced dashboards and rules
+- Support wildcard in ingress hostname. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2134).
 
 ## 0.43.0
 

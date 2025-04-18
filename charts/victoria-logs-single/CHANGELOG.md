@@ -1,7 +1,8 @@
 ## Next release
 
 - Removed duplicated dashboards. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2143).
-- Bumped VictoriaLogs version to v1.19.0
+- Bumped VictoriaLogs version to v1.19.0.
+- Support wildcard in ingress hostname. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2134).
 
 ## 0.9.5
 
