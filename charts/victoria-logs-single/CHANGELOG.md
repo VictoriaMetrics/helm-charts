@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.9.6
+
+**Release date:** 18 Apr 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.19.0](https://img.shields.io/badge/v1.19.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%23v1190)
+
 - Removed duplicated dashboards. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2143).
 - Bumped VictoriaLogs version to v1.19.0.
 - Support wildcard in ingress hostname. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2134).
