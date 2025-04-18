@@ -27,7 +27,7 @@ spec:
   rules:
     {{- range $host := $ingress.hosts }}
     {{- $paths := ternary (list $host.path) $host.path (kindIs "string" $host.path) }}
-    - host: {{ tpl $host.name $ }}
+    - host: {{ tpl $host.name $ | quote }}
       http:
         paths:
           {{- range $path := $paths }}
