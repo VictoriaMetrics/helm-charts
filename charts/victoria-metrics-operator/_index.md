@@ -9,5 +9,6 @@ menu:
 url: /helm/victoriametrics-operator
 aliases:
   - /helm/victoriametrics-operator/index.html
+  - /helm/victoria-metrics-operator/index.html
 ---
 {{% content "README.md" %}}

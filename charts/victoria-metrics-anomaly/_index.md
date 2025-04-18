@@ -9,5 +9,6 @@ menu:
 url: /helm/victoriametrics-anomaly
 aliases:
   - /helm/victoriametrics-anomaly/index.html
+  - /helm/victoria-metrics-anomaly/index.html
 ---
 {{% content "README.md" %}}

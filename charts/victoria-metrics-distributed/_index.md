@@ -9,5 +9,6 @@ menu:
 url: /helm/victoriametrics-distributed
 aliases:
   - /helm/victoriametrics-distributed/index.html
+  - /helm/victoria-metrics-distributed/index.html
 ---
 {{% content "README.md" %}}

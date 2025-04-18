@@ -9,5 +9,6 @@ menu:
 url: /helm/victorialogs-single
 aliases:
   - /helm/victorialogs-single/index.html
+  - /helm/victoria-logs-single/index.html
 ---
 {{% content "README.md" %}}

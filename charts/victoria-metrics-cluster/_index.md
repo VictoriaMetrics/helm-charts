@@ -9,5 +9,6 @@ menu:
 url: /helm/victoriametrics-cluster
 aliases:
   - /helm/victoriametrics-cluster/index.html
+  - /helm/victoria-metrics-cluster/index.html
 ---
 {{% content "README.md" %}}
