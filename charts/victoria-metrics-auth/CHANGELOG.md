@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Support wildcard in ingress hostname. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2134).
 
 ## 0.12.0
 

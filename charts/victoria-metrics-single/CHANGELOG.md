@@ -1,6 +1,7 @@
 ## Next release
 
 - rename .Values.podDisruptionBudget.extraLabels to .Values.podDisruptionBudget.labels for consistency
+- Support wildcard in ingress hostname. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2134).
 
 ## 0.17.0
 
