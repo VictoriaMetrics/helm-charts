@@ -25,7 +25,8 @@ spec: {{ tpl (toYaml (omit $spec "unauthorizedUserAccessSpec")) $ctx | nindent 2
     url_map:
       - src_paths:
           - "/select/.+"
-        load_balancing_policy: first_available
+        {{- $url_map := ($spec.unauthorizedUserAccessSpec).url_map }}
+        load_balancing_policy: {{ if $url_map }}{{ $url_map | first | dig "load_balancing_policy" "first_available" }}{{ else }}first_available{{ end }}
         retry_status_codes:
           - 503
         {{- $_ := set $ctx "style" "managed" }}

@@ -25,7 +25,8 @@ spec:
     url_map:
       - src_paths:
           - "/select/.+"
-        load_balancing_policy: first_available
+        {{- $url_map := (($auth.spec).unauthorizedUserAccessSpec).url_map }}
+        load_balancing_policy: {{ if $url_map }}{{ $url_map | first | dig "load_balancing_policy" "first_available" }}{{ else }}first_available{{ end }}
         {{- $_ := set $ctx "style" "managed" }}
         {{- $urls := default list }}
         {{- range $i, $z := $.Values.availabilityZones }}
