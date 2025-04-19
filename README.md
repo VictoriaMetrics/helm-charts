@@ -137,4 +137,5 @@ helm charts tested at kubernetes versions from 1.28 to 1.30.
 - [VictoriaMetrics Distributed](https://docs.victoriametrics.com/helm/victoriametrics-distributed)
 - [VictoriaMetrics K8s Stack](https://docs.victoriametrics.com/helm/victoriametrics-k8s-stack)
 - [VictoriaMetrics Operator](https://docs.victoriametrics.com/helm/victoriametrics-operator)
+- [VictoriaMetrics Operator CRDs](https://docs.victoriametrics.com/helm/victoriametrics-operator-crds)
 - [VictoriaMetrics Single](https://docs.victoriametrics.com/helm/victoriametrics-single)
