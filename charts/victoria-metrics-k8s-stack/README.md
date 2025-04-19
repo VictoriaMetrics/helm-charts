@@ -685,7 +685,7 @@ If you&rsquo;re migrating existing config, please make sure that <code>.Values.a
       <td><a href="#defaultdashboards-dashboards-node-exporter-full"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">defaultDashboards.dashboards.node-exporter-full</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(object)</code></em><p>In ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply See <a href="https://github.com/VictoriaMetrics/helm-charts/tree/disable-node-exporter-dashboard-by-default/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards" target="_blank">this issue</a></p>
+      <td><em><code>(object)</code></em><p>In ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply See <a href="https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards" target="_blank">this issue</a></p>
 </td>
     </tr>
     <tr id="defaultdashboards-defaulttimezone">
