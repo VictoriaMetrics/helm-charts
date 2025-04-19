@@ -125,8 +125,10 @@ jobs:
           mkdir -p .cr-release-packages
           for chart in charts/*; do
             if [ ! -f $chart/RELEASE_NOTES ]; then
+              export CHART_FILE="${chart}/Chart.yaml"
+              export CHART_VERSION="$(yq -M '.version' $CHART_FILE)"
               echo "no release notes for chart $chart. removing it from uploading..."
-              rm -rf .cr-release-packages/$(basename $chart)*
+              rm -rf .cr-release-packages/$(basename $chart)-${CHART_VERSION}.tgz
             fi
           done
           find .cr-release-packages -name "*.tgz" -exec helm push {} oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts \;
