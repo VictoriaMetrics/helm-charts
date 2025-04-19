@@ -478,7 +478,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="vmauth-nodeselector">
       <td><a href="#vmauth-nodeselector"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmauth.nodeSelector</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
 </a></td>
-      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
+      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="vmauth-podannotations">
@@ -588,7 +588,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="vmauth-service-externalips">
       <td><a href="#vmauth-service-externalips"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmauth.service.externalIPs</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>Service External IPs. Details are <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a></p>
+      <td><em><code>(list)</code></em><p>Service External IPs. Details are <a href="https://kubernetes.io/docs/concepts/services-networking/service/#external-ips" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="vmauth-service-externaltrafficpolicy">
@@ -938,7 +938,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="vminsert-nodeselector">
       <td><a href="#vminsert-nodeselector"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vminsert.nodeSelector</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
 </a></td>
-      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
+      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="vminsert-podannotations">
@@ -1082,7 +1082,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="vminsert-service-externalips">
       <td><a href="#vminsert-service-externalips"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vminsert.service.externalIPs</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>Service external IPs. Details are <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a></p>
+      <td><em><code>(list)</code></em><p>Service external IPs. Details are <a href="https://kubernetes.io/docs/concepts/services-networking/service/#external-ips" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="vminsert-service-externaltrafficpolicy">
@@ -1469,14 +1469,14 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="vmselect-nodeselector">
       <td><a href="#vmselect-nodeselector"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmselect.nodeSelector</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
 </a></td>
-      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
+      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="vmselect-persistentvolume-accessmodes">
       <td><a href="#vmselect-persistentvolume-accessmodes"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmselect.persistentVolume.accessModes</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">ReadWriteOnce</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>Array of access mode. Must match those of existing PV or dynamic provisioner. Details are <a href="http://kubernetes.io/docs/user-guide/persistent-volumes/" target="_blank">here</a></p>
+      <td><em><code>(list)</code></em><p>Array of access mode. Must match those of existing PV or dynamic provisioner. Details are <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="vmselect-persistentvolume-annotations">
@@ -1647,7 +1647,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="vmselect-service-externalips">
       <td><a href="#vmselect-service-externalips"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmselect.service.externalIPs</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>Service external IPs. Details are <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a></p>
+      <td><em><code>(list)</code></em><p>Service external IPs. Details are <a href="https://kubernetes.io/docs/concepts/services-networking/service/#external-ips" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="vmselect-service-externaltrafficpolicy">
@@ -1978,14 +1978,14 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="vmstorage-nodeselector">
       <td><a href="#vmstorage-nodeselector"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmstorage.nodeSelector</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
 </a></td>
-      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
+      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="vmstorage-persistentvolume-accessmodes">
       <td><a href="#vmstorage-persistentvolume-accessmodes"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmstorage.persistentVolume.accessModes</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">ReadWriteOnce</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>Array of access modes. Must match those of existing PV or dynamic provisioner. Details are <a href="http://kubernetes.io/docs/user-guide/persistent-volumes/" target="_blank">here</a></p>
+      <td><em><code>(list)</code></em><p>Array of access modes. Must match those of existing PV or dynamic provisioner. Details are <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="vmstorage-persistentvolume-annotations">

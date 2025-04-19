@@ -301,14 +301,14 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="alertmanager-nodeselector">
       <td><a href="#alertmanager-nodeselector"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">alertmanager.nodeSelector</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
 </a></td>
-      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
+      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="alertmanager-persistentvolume-accessmodes">
       <td><a href="#alertmanager-persistentvolume-accessmodes"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">alertmanager.persistentVolume.accessModes</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">ReadWriteOnce</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>Array of access modes. Must match those of existing PV or dynamic provisioner. Details are <a href="http://kubernetes.io/docs/user-guide/persistent-volumes/" target="_blank">here</a></p>
+      <td><em><code>(list)</code></em><p>Array of access modes. Must match those of existing PV or dynamic provisioner. Details are <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="alertmanager-persistentvolume-annotations">
@@ -408,7 +408,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="alertmanager-resources">
       <td><a href="#alertmanager-resources"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">alertmanager.resources</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
 </a></td>
-      <td><em><code>(object)</code></em><p>Resource object. Details are <a href="http://kubernetes.io/docs/user-guide/compute-resources/" target="_blank">here</a></p>
+      <td><em><code>(object)</code></em><p>Resource object. Details are <a href="https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="alertmanager-retention">
@@ -439,7 +439,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="alertmanager-service-externalips">
       <td><a href="#alertmanager-service-externalips"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">alertmanager.service.externalIPs</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>Service external IPs. Check <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a> for details</p>
+      <td><em><code>(list)</code></em><p>Service external IPs. Check <a href="https://kubernetes.io/docs/concepts/services-networking/service/#external-ips" target="_blank">here</a> for details</p>
 </td>
     </tr>
     <tr id="alertmanager-service-externaltrafficpolicy">
@@ -791,7 +791,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="server-nodeselector">
       <td><a href="#server-nodeselector"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">server.nodeSelector</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
 </a></td>
-      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a></p>
+      <td><em><code>(object)</code></em><p>Pod&rsquo;s node selector. Details are <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="server-notifier">
@@ -972,7 +972,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="server-resources">
       <td><a href="#server-resources"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">server.resources</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
 </a></td>
-      <td><em><code>(object)</code></em><p>Resource object. Details are <a href="http://kubernetes.io/docs/user-guide/compute-resources/" target="_blank">here</a></p>
+      <td><em><code>(object)</code></em><p>Resource object. Details are <a href="https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/" target="_blank">here</a></p>
 </td>
     </tr>
     <tr id="server-securitycontext">
@@ -997,7 +997,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="server-service-externalips">
       <td><a href="#server-service-externalips"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">server.service.externalIPs</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>Service external IPs. Check <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a> for details</p>
+      <td><em><code>(list)</code></em><p>Service external IPs. Check <a href="https://kubernetes.io/docs/concepts/services-networking/service/#external-ips" target="_blank">here</a> for details</p>
 </td>
     </tr>
     <tr id="server-service-externaltrafficpolicy">
