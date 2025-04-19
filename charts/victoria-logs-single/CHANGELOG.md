@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+- moved `.Values.podDisruptionBudget` to `.Values.servers.<groupName>.podDisruptionBudget` and `.Values.server.podDisruptionBudget`.
+- added `.Values.servers` map to support multiple VictoriaLogs cluster roles: `select`, `insert` and `storage`. Now `.Values.server` is a common configuration for all node types, which can be overriden at `.Values.servers.<groupName>`.
+- added VictoriaLogs cluster mode support. Existing single node setups can be migrated to cluster by setting `.Values.servers.select.enabled` and `.Values.servers.insert.enabled` to `true`.
 
 ## 0.9.6
 

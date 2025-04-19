@@ -1,13 +1,24 @@
-{{- $app := .Values.server }}
+{{- $common := .Values.server }}
+{{- $sa := .Values.serviceAccount }}
+{{- $ctx := dict "helm" . -}}
+{{- $_ := set $ctx "storages" (fromYaml (include "vlogs.storage.nodes" $ctx)).storages }}
+{{- range $name, $server := .Values.servers }}
+{{- $app := mergeOverwrite (deepCopy $common) (deepCopy $server) }}
+{{- if and (not $ctx.storages) (not $app.extraArgs.storageNode) -}}
+  {{- fail (printf "Servers %q with role %q have no storage nodes defined! Either add entry with `role: storage` to .Values.servers or set .Values.servers.%s.extraArgs.storageNode" $name $server.role $name) -}}
+{{- end -}}
 {{- $mode := $app.mode }}
 {{- if and $mode $app.enabled (hasKey $app $mode) }}
 {{- $modeOpts := index $app $mode }}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $_ := set $ctx "appKey" $name }}
+{{- $_ := set $ctx $name $app }}
+{{- $_ := set $ctx "app" $app }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- if and (ne $mode "statefulSet") (gt (int $app.replicaCount) 1) }}
   {{- fail "VictoriaLogs HA mode is not supported for Deployment. Consider switching to statefulset instead using `server.mode: statefulSet: true`" -}}
 {{- end }}
+---
 apiVersion: apps/v1
 kind: {{ title $mode }}
 metadata:
@@ -44,17 +55,17 @@ spec:
       {{- with $app.schedulerName }}
       schedulerName: {{ . }}
       {{- end }}
-      {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
-      serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
-      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
+      {{- if or $sa.name $sa.create }}
+      serviceAccountName: {{ $sa.name | default $fullname }}
+      automountServiceAccountToken: {{ $sa.automountToken }}
       {{- end }}
       {{- if $app.podSecurityContext.enabled }}
-      securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
+      securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" $) | nindent 8 }}
       {{- end }}
       {{- with $app.initContainers }}
       initContainers: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      {{- with ($app.imagePullSecrets | default $.Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
@@ -186,4 +197,5 @@ spec:
           matchLabels: {{ toYaml . | nindent 12 }}
         {{- end }}
   {{- end }}
+{{- end }}
 {{- end }}
