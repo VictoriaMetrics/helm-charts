@@ -1,4 +1,5 @@
 {{- $ctx := dict "helm" . }}
+{{- $urlCtx := dict "helm" . }}
 {{- range $i, $z := .Values.availabilityZones }}
   {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
   {{- if and ((($zone.read).perZone).vmauth).enabled }}
@@ -11,6 +12,7 @@
     {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
     {{- $_ := set $zone.read.perZone.vmauth "spec" $authSpec }}
     {{- $_ := set $ctx "zone" $zone }}
+    {{- $_ := set $urlCtx "zone" $zone }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
@@ -21,29 +23,30 @@ metadata:
   {{- with $zone.read.perZone.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-spec: {{ tpl (toYaml (omit $zone.read.perZone.vmauth.spec "unauthorizedUserAccessSpec")) $ctx | nindent 2 }}
-  {{- $_ := set $ctx "style" "managed" }}
-  {{- $dropParts := "0" -}}
+
+  {{- $spec := deepCopy $zone.read.perZone.vmauth.spec }}
+  {{- $_ := set $urlCtx "style" "managed" }}
+  {{- $dropParts := 0 -}}
   {{- if $zone.vmcluster.enabled -}}
     {{- $clusterSpec := ($zone.vmcluster).spec | default dict }}
-    {{- $_ := set $ctx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
+    {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
     {{- $_ := set $zone.vmcluster "spec" (mergeOverwrite (deepCopy $commonClusterSpec) (deepCopy $commonSpec) (deepCopy $clusterSpec)) }}
   {{- else if $zone.vmsingle.enabled -}}
-    {{- $dropParts = "2" -}}
+    {{- $dropParts = 2 -}}
     {{- $singleSpec := ($zone.vmsingle).spec | default dict }}
-    {{- $_ := set $ctx "appKey" (list "zone" "vmsingle" "spec") }}
+    {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
     {{- $_ := set $zone.vmsingle "spec" (mergeOverwrite (deepCopy $commonSingleSpec) (deepCopy $commonSpec) (deepCopy $singleSpec)) }}
   {{- else -}}
     {{- fail (printf "Enable VMCluster or VMSingle in %q zone or disable VMAuth read balancer" $zone.name) -}}
   {{- end }}
-  unauthorizedUserAccessSpec:
-    url_map:
-      - src_paths:
-          - "/select/.+"
-        url_prefix:
-          - {{ include "vm.url" $ctx }}
-        drop_src_path_prefix_parts: {{ $dropParts }}
-  {{- $_ := unset $ctx "style" }}
+  {{- $defaultUrlMapItem := dict "src_paths" (list "/select/.+") "url_prefix" (list (include "vm.url" $urlCtx)) "drop_src_path_prefix_parts" $dropParts }}
+  {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
+  {{- $urlMap := $accessSpec.url_map | default (list (default dict))  }}
+  {{- $firstUrlMapItem := mergeOverwrite (deepCopy (index $urlMap 0)) $defaultUrlMapItem }}
+  {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
+  {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
+  {{- $_ := unset $urlCtx "style" }}
+spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
 {{- end }}
 {{- end }}
 

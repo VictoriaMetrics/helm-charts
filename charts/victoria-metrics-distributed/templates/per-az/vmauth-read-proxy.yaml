@@ -1,5 +1,6 @@
 {{- $ns := include "vm.namespace" . }}
 {{- $ctx := dict "helm" . }}
+{{- $urlCtx := dict "helm" . }}
 {{- range $i, $z := .Values.availabilityZones }}
   {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
   {{- if $zone.read.crossZone.vmauth.enabled }}
@@ -13,43 +14,43 @@ metadata:
     {{- $_ := set $zone.read.perZone.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) $urlSpec) }}
   {{- end }}
   {{- $_ := set $ctx "zone" $zone }}
+  {{- $_ := set $urlCtx "zone" $zone }}
   name: {{ include "vm.cr.fullname" $ctx }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $zone.read.crossZone.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
-{{- $spec := mergeOverwrite (deepCopy $.Values.common.vmauth.spec) (deepCopy (($zone.common).spec)) (deepCopy (((($zone.read).crossZone).vmauth).spec)) }}
-spec: {{ tpl (toYaml (omit $spec "unauthorizedUserAccessSpec")) $ctx | nindent 2 }}
-  unauthorizedUserAccessSpec:
-    url_map:
-      - src_paths:
-          - "/select/.+"
-        load_balancing_policy: first_available
-        retry_status_codes:
-          - 503
-        {{- $_ := set $ctx "style" "managed" }}
-        {{- $urls := default list }}
-        {{- if $zone.read.allow }}
-          {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
-          {{- $urls = append $urls (include "vm.url" $ctx) }}
-        {{- end }}
-        {{- range $j, $c := $.Values.availabilityZones }}
-          {{- $cross := mergeOverwrite (deepCopy $.Values.zoneTpl) $c }}
-          {{- if and (ne $j $i) $cross.read.allow ((($cross.read).perZone).vmauth).enabled }}
-            {{- $_ := set $ctx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
-            {{- if $cross.read.perZone.vmauth }}
-              {{- $urlSpec := $cross.read.perZone.vmauth.spec | default dict }}
-              {{- $_ := set $cross.read.perZone.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) $urlSpec) }}
-            {{- end }}
-            {{- $_ := set $ctx "zone" $cross }}
-            {{- $urls = append $urls (include "vm.url" $ctx)}}
-          {{- end }}
-        {{- end }}
-        {{- if empty $urls }}
-          {{- fail (printf "No read backend urls defined for vmauth in AZ %s" $zone.name) -}}
-        {{- end }}
-        url_prefix: {{ toYaml $urls | nindent 10 }}
-        {{- $_ := unset $ctx "style" }}
+
+  {{- $spec := mergeOverwrite (deepCopy $.Values.common.vmauth.spec) (deepCopy (($zone.common).spec)) (deepCopy (((($zone.read).crossZone).vmauth).spec)) }}
+  {{- $_ := set $urlCtx "style" "managed" }}
+  {{- $urls := default list }}
+  {{- if $zone.read.allow }}
+    {{- $_ := set $urlCtx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
+    {{- $urls = append $urls (include "vm.url" $urlCtx) }}
+  {{- end }}
+  {{- range $j, $c := $.Values.availabilityZones }}
+    {{- $cross := mergeOverwrite (deepCopy $.Values.zoneTpl) $c }}
+    {{- if and (ne $j $i) $cross.read.allow ((($cross.read).perZone).vmauth).enabled }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "read" "perZone" "vmauth" "spec") }}
+      {{- if $cross.read.perZone.vmauth }}
+        {{- $urlSpec := $cross.read.perZone.vmauth.spec | default dict }}
+        {{- $_ := set $cross.read.perZone.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) (deepCopy $urlSpec)) }}
+      {{- end }}
+      {{- $_ := set $urlCtx "zone" $cross }}
+      {{- $urls = append $urls (include "vm.url" $urlCtx)}}
+    {{- end }}
+  {{- end }}
+  {{- $_ := unset $urlCtx "style" }}
+  {{- if empty $urls }}
+    {{- fail (printf "No read backend urls defined for vmauth in AZ %s" $zone.name) -}}
+  {{- end }}
+  {{- $defaultUrlMapItem := dict "src_paths" (list "/select/.+") "url_prefix" $urls }}
+  {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
+  {{- $urlMap := $accessSpec.url_map | default (list (default dict))  }}
+  {{- $firstUrlMapItem := mergeOverwrite (deepCopy (index $urlMap 0)) (deepCopy $defaultUrlMapItem) }}
+  {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
+  {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
+spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
   {{- end }}
 {{- end }}
