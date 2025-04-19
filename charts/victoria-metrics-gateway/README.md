@@ -160,7 +160,7 @@ extraArgs:
   auth.publicKeyFiles: "/key1/key,/key2/key"
 ```
 Note that in this configuration all secret keys will be mounted and accessible to pod.
-Please, refer to [this](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#secretvolumesource-v1-core) doc to see all available secret source options.
+Please, refer to [this](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#secretvolumesource-v1-core) doc to see all available secret source options.
 
 ## How to uninstall
 
@@ -462,7 +462,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="nodeselector">
       <td><a href="#nodeselector"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">nodeSelector</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
 </a></td>
-      <td><em><code>(object)</code></em><p>NodeSelector configurations. Check <a href="https://kubernetes.io/docs/user-guide/node-selection/" target="_blank">here</a> for details</p>
+      <td><em><code>(object)</code></em><p>NodeSelector configurations. Check <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector" target="_blank">here</a> for details</p>
 </td>
     </tr>
     <tr id="podannotations">
@@ -588,7 +588,7 @@ Change the values according to the need of the environment in ``victoria-metrics
     <tr id="service-externalips">
       <td><a href="#service-externalips"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">service.externalIPs</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>Service external IPs. Check <a href="https://kubernetes.io/docs/user-guide/services/#external-ips" target="_blank">here</a> for details</p>
+      <td><em><code>(list)</code></em><p>Service external IPs. Check <a href="https://kubernetes.io/docs/concepts/services-networking/service/#external-ips" target="_blank">here</a> for details</p>
 </td>
     </tr>
     <tr id="service-externaltrafficpolicy">
