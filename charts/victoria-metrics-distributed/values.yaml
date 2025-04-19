@@ -55,7 +55,10 @@ read:
       # -- Override the name of the vmauth object
       name: "vmauth-global-read-{{ .fullname }}"
       # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
-      spec: {}
+      spec:
+        unauthorizedUserAccessSpec:
+          url_map:
+            - load_balancing_policy: first_available
 
 # -- Default config for each availability zone components, including vmagent, vmcluster, vmsingle, vmauth etc.
 # Defines a template for each availability zone, which can be overridden for each availability zone at `availabilityZones[*]`
@@ -116,7 +119,12 @@ zoneTpl:
         # -- Override the name of the vmauth object
         name: "vmauth-read-proxy-{{ (.zone).name }}"
         # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
-        spec: {}
+        spec:
+          unauthorizedUserAccessSpec:
+            url_map:
+              - load_balancing_policy: first_available
+                retry_status_codes:
+                  - 503
   # vmagent here only meant to proxy write requests to each az,
   # doesn't support customized other remote write address.
   vmagent:

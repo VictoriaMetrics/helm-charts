@@ -1,4 +1,5 @@
 {{- $ctx := dict "helm" . }}
+{{- $urlCtx := dict "helm" . }}
 {{- range $i, $z := .Values.availabilityZones }}
   {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
   {{- if and (($zone.write).vmauth).enabled ($zone.vmcluster).enabled -}}
@@ -9,6 +10,7 @@
     {{- $_ := set $ctx "appKey" (list "zone" "write" "vmauth" "spec") }}
     {{- $_ := set $zone.write.vmauth "spec" (mergeOverwrite (deepCopy $commonAuthSpec) (deepCopy $commonSpec) (deepCopy $spec)) }}
     {{- $_ := set $ctx "zone" $zone }}
+    {{- $_ := set $urlCtx "zone" $zone }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
@@ -19,17 +21,19 @@ metadata:
   {{- with $zone.write.vmauth.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end  }}
-spec: {{ tpl (toYaml (omit $zone.write.vmauth.spec "unauthorizedUserAccessSpec")) $ctx | nindent 2 }}
-  {{- $_ := set $ctx "style" "managed" }}
+
+  {{- $spec := deepCopy $zone.write.vmauth.spec }}
+  {{- $_ := set $urlCtx "style" "managed" }}
   {{- $clusterSpec := ($zone.vmcluster).spec | default dict }}
   {{- $_ := set $zone.vmcluster "spec" (mergeOverwrite (deepCopy $commonClusterSpec) (deepCopy $commonSpec) (deepCopy $clusterSpec)) }}
-  {{- $_ := set $ctx "appKey" (list "zone" "vmcluster" "spec" "vminsert") }}
-  unauthorizedUserAccessSpec:
-    url_map:
-      - src_paths:
-          - "/insert/.+"
-        url_prefix:
-          - {{ include "vm.url" $ctx }}
-  {{- $_ := unset $ctx "style" }}
+  {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vminsert") }}
+  {{- $defaultUrlMapItem := dict "src_paths" (list "/insert/.+") "url_prefix" (list (include "vm.url" $urlCtx)) }}
+  {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
+  {{- $urlMap := $accessSpec.url_map | default (list (default dict))  }}
+  {{- $firstUrlMapItem := mergeOverwrite (deepCopy (index $urlMap 0)) $defaultUrlMapItem }}
+  {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
+  {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
+  {{- $_ := unset $urlCtx "style" }}
+spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
 {{- end }}
 {{- end }}

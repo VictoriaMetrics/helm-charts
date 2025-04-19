@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- allow overriding vmauth unauthorizedUserAccessSpec options
 
 ## 0.12.1
 
