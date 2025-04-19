@@ -42,6 +42,13 @@ See changelog for `victoria-metrics-cluster` helm chart
 * [In documentation](https://docs.victoriametrics.com/helm/victoriametrics-cluster/changelog/)
 * [In repository](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-cluster/CHANGELOG.md)
 
+* ## `victoria-metrics-distributed`
+
+See changelog for `victoria-metrics-distributed` helm chart
+
+* [In documentation](https://docs.victoriametrics.com/helm/victoriametrics-distributed/changelog/)
+* [In repository](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-distributed/CHANGELOG.md)
+
 ## `victoria-metrics-gateway`
 
 See changelog for `victoria-metrics-gateway` helm chart
@@ -62,6 +69,13 @@ See changelog for `victoria-metrics-operator` helm chart
 
 * [In documentation](https://docs.victoriametrics.com/helm/victoriametrics-operator/changelog/)
 * [In repository](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-operator/CHANGELOG.md)
+
+* ## `victoria-metrics-operator-crds`
+
+See changelog for `victoria-metrics-operator-crds` helm chart
+
+* [In documentation](https://docs.victoriametrics.com/helm/victoriametrics-operator-crds/changelog/)
+* [In repository](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-operator-crds/CHANGELOG.md)
 
 ## `victoria-metrics-operator`
 
