@@ -208,6 +208,15 @@ First, performing update on availability zone `zone-eu-1`:
 
 Then, perform update on availability zone `zone-us-1` with the same steps1~4.
 
+### Upgrade to 0.13.0
+
+Introduction of VMCluster's [`requestsLoadBalancer`](https://docs.victoriametrics.com/operator/resources/vmcluster/#requests-load-balancing) allowed to simplify distributed chart setup by removing VMAuth CRs for read and write load balancing. Some parameters are not needed anymore:
+
+- removed `availabilityZones[*].write.vmauth`
+- removed `availabilityZones[*].read.perZone.vmauth`
+- removed `zoneTpl.write.vmauth`
+- removed `zoneTpl.read.perZone.vmauth`
+
 ### Upgrade to 0.5.0
 
 This release was refactored, names of the parameters was changed:
@@ -342,12 +351,12 @@ Change the values according to the need of the environment in ``victoria-metrics
     </tr>
     <tr id="common-vmcluster-spec">
       <td><a href="#common-vmcluster-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">common.vmcluster.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">requestsLoadBalancer</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vminsert</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;8480&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">serviceSpec</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">spec</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">clusterIP</span><span class="p">:</span><span class="w"> </span><span class="l">None</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterIP</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmselect</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;8481&#34;</span></span></span></code></pre>
 </a></td>
@@ -417,7 +426,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 </td>
     </tr>
     <tr id="read-global-vmauth-spec">
-      <td><a href="#read-global-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">read.global.vmauth.spec</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
+      <td><a href="#read-global-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">read.global.vmauth.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">unauthorizedUserAccessSpec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">url_map</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="nt">load_balancing_policy</span><span class="p">:</span><span class="w"> </span><span class="l">first_available</span></span></span></code></pre>
 </a></td>
       <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
@@ -478,14 +490,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 </span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">vmauth</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-read-proxy-{{ (.zone).name }}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">spec</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">perZone</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">vmauth</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-read-balancer-{{ (.zone).name }}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">spec</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                        </span><span class="nt">discoverBackendIPs</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="nt">unauthorizedUserAccessSpec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                        </span><span class="nt">url_map</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                            </span>- <span class="nt">load_balancing_policy</span><span class="p">:</span><span class="w"> </span><span class="l">first_available</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                              </span><span class="nt">retry_status_codes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                </span>- <span class="m">503</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmagent</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">annotations</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
@@ -518,13 +528,7 @@ Change the values according to the need of the environment in ``victoria-metrics
 </span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">retentionPeriod</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;14&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">write</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">allow</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">vmauth</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-write-balancer-{{ (.zone).name }}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">spec</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="nt">discoverBackendIPs</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span></span></span></code></pre>
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">allow</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
 </a></td>
       <td><em><code>(object)</code></em><p>Default config for each availability zone components, including vmagent, vmcluster, vmsingle, vmauth etc. Defines a template for each availability zone, which can be overridden for each availability zone at <code>availabilityZones[*]</code></p>
 </td>
@@ -561,27 +565,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 </td>
     </tr>
     <tr id="zonetpl-read-crosszone-vmauth-spec">
-      <td><a href="#zonetpl-read-crosszone-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.crossZone.vmauth.spec</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
-</a></td>
-      <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
-</td>
-    </tr>
-    <tr id="zonetpl-read-perzone-vmauth-enabled">
-      <td><a href="#zonetpl-read-perzone-vmauth-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.perZone.vmauth.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
-</a></td>
-      <td><em><code>(bool)</code></em><p>Create vmauth as a local read endpoint</p>
-</td>
-    </tr>
-    <tr id="zonetpl-read-perzone-vmauth-name">
-      <td><a href="#zonetpl-read-perzone-vmauth-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.perZone.vmauth.name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-read-balancer-{{ (.zone).name }}</span></span></span></code></pre>
-</a></td>
-      <td><em><code>(string)</code></em><p>Override the name of the vmauth object</p>
-</td>
-    </tr>
-    <tr id="zonetpl-read-perzone-vmauth-spec">
-      <td><a href="#zonetpl-read-perzone-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.perZone.vmauth.spec</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">discoverBackendIPs</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span></span></span></code></pre>
+      <td><a href="#zonetpl-read-crosszone-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.crossZone.vmauth.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">unauthorizedUserAccessSpec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">url_map</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="nt">load_balancing_policy</span><span class="p">:</span><span class="w"> </span><span class="l">first_available</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="nt">retry_status_codes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="m">503</span></span></span></code></pre>
 </a></td>
       <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
@@ -668,26 +657,6 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td><a href="#zonetpl-write-allow"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.write.allow</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
 </a></td>
       <td><em><code>(bool)</code></em><p>Allow data ingestion to this zone</p>
-</td>
-    </tr>
-    <tr id="zonetpl-write-vmauth-enabled">
-      <td><a href="#zonetpl-write-vmauth-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.write.vmauth.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
-</a></td>
-      <td><em><code>(bool)</code></em><p>Create vmauth as a local write endpoint</p>
-</td>
-    </tr>
-    <tr id="zonetpl-write-vmauth-name">
-      <td><a href="#zonetpl-write-vmauth-name"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.write.vmauth.name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-write-balancer-{{ (.zone).name }}</span></span></span></code></pre>
-</a></td>
-      <td><em><code>(string)</code></em><p>Override the name of the vmauth object</p>
-</td>
-    </tr>
-    <tr id="zonetpl-write-vmauth-spec">
-      <td><a href="#zonetpl-write-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.write.vmauth.spec</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">extraArgs</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">discoverBackendIPs</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span></span></span></code></pre>
-</a></td>
-      <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
     </tr>
   </tbody>
