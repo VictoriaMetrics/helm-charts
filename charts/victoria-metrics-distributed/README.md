@@ -417,7 +417,10 @@ Change the values according to the need of the environment in ``victoria-metrics
 </td>
     </tr>
     <tr id="read-global-vmauth-spec">
-      <td><a href="#read-global-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">read.global.vmauth.spec</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
+      <td><a href="#read-global-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">read.global.vmauth.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">unauthorizedUserAccessSpec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">url_map</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="nt">load_balancing_policy</span><span class="p">:</span><span class="w"> </span><span class="l">first_available</span></span></span></code></pre>
 </a></td>
       <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
@@ -478,7 +481,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 </span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">vmauth</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vmauth-read-proxy-{{ (.zone).name }}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">spec</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="nt">unauthorizedUserAccessSpec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                        </span><span class="nt">url_map</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                            </span>- <span class="nt">load_balancing_policy</span><span class="p">:</span><span class="w"> </span><span class="l">first_available</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                              </span><span class="nt">retry_status_codes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                </span>- <span class="m">503</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">perZone</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">vmauth</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
@@ -561,7 +569,12 @@ Change the values according to the need of the environment in ``victoria-metrics
 </td>
     </tr>
     <tr id="zonetpl-read-crosszone-vmauth-spec">
-      <td><a href="#zonetpl-read-crosszone-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.crossZone.vmauth.spec</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
+      <td><a href="#zonetpl-read-crosszone-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">zoneTpl.read.crossZone.vmauth.spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">unauthorizedUserAccessSpec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">url_map</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="nt">load_balancing_policy</span><span class="p">:</span><span class="w"> </span><span class="l">first_available</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="nt">retry_status_codes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="m">503</span></span></span></code></pre>
 </a></td>
       <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
