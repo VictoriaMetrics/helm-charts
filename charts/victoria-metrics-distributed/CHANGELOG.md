@@ -1,6 +1,7 @@
 ## Next release
 
 - allow overriding vmauth unauthorizedUserAccessSpec options
+- fix read vmauth retry status codes, to cover more cases
 
 ## 0.12.1
 
