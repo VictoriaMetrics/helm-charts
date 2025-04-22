@@ -2,6 +2,7 @@
 
 - Synced dashboards and rules
 - Support wildcard in ingress hostname. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2134).
+- Do not replace VMCluster URL with VMAuth one, when it's enabled, for VMAlert, Grafana datasources and VMAgent write endpoint. Consider using [`vmcluster.requestsLoadBalancer`](https://docs.victoriametrics.com/operator/resources/vmcluster/#requests-load-balancing) for balancing read and write requests to VMCluster. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2136).
 
 ## 0.43.0
 
