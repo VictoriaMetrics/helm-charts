@@ -4,72 +4,6 @@ vmauth should match snapshot:
     kind: VMAuth
     metadata:
       labels:
-        app: vmauth-read-balancer-zone-eu-1
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: vm-distributed
-        app.kubernetes.io/version: v1.0.4
-        helm.sh/chart: victoria-metrics-distributed-0.1.1
-      name: vmauth-read-balancer-zone-eu-1
-      namespace: NAMESPACE
-    spec:
-      affinity: {}
-      extraArgs:
-        discoverBackendIPs: "true"
-      image:
-        tag: v1.0.4
-      nodeSelector:
-        topology.kubernetes.io/zone: zone-eu-1
-      port: "8427"
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: ScheduleAnyway
-      unauthorizedUserAccessSpec:
-        url_map:
-          - drop_src_path_prefix_parts: 0
-            src_paths:
-              - /select/.+
-            url_prefix:
-              - http://vmselect-vmcluster-zone-eu-1.NAMESPACE.svc.cluster.local.:8481
-  2: |
-    apiVersion: operator.victoriametrics.com/v1beta1
-    kind: VMAuth
-    metadata:
-      labels:
-        app: vmauth-read-balancer-zone-us-1
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: vm-distributed
-        app.kubernetes.io/version: v1.0.4
-        helm.sh/chart: victoria-metrics-distributed-0.1.1
-      name: vmauth-read-balancer-zone-us-1
-      namespace: NAMESPACE
-    spec:
-      affinity: {}
-      extraArgs:
-        discoverBackendIPs: "true"
-      image:
-        tag: v1.0.4
-      nodeSelector:
-        topology.kubernetes.io/zone: zone-us-1
-      port: "8427"
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: ScheduleAnyway
-      unauthorizedUserAccessSpec:
-        url_map:
-          - drop_src_path_prefix_parts: 0
-            src_paths:
-              - /select/.+
-            url_prefix:
-              - http://vmselect-vmcluster-zone-us-1.NAMESPACE.svc.cluster.local.:8481
-  3: |
-    apiVersion: operator.victoriametrics.com/v1beta1
-    kind: VMAuth
-    metadata:
-      labels:
         app: vmauth-read-proxy-zone-eu-1
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
@@ -99,9 +33,9 @@ vmauth should match snapshot:
             src_paths:
               - /select/.+
             url_prefix:
-              - http://vmauth-vmauth-read-balancer-zone-eu-1.NAMESPACE.svc.cluster.local.:8427
-              - http://vmauth-vmauth-read-balancer-zone-us-1.NAMESPACE.svc.cluster.local.:8427
-  4: |
+              - http://vmselect-vmcluster-zone-eu-1.NAMESPACE.svc.cluster.local.:8481
+              - http://vmselect-vmcluster-zone-us-1.NAMESPACE.svc.cluster.local.:8481
+  2: |
     apiVersion: operator.victoriametrics.com/v1beta1
     kind: VMAuth
     metadata:
@@ -135,73 +69,9 @@ vmauth should match snapshot:
             src_paths:
               - /select/.+
             url_prefix:
-              - http://vmauth-vmauth-read-balancer-zone-us-1.NAMESPACE.svc.cluster.local.:8427
-              - http://vmauth-vmauth-read-balancer-zone-eu-1.NAMESPACE.svc.cluster.local.:8427
-  5: |
-    apiVersion: operator.victoriametrics.com/v1beta1
-    kind: VMAuth
-    metadata:
-      labels:
-        app: vmauth-write-balancer-zone-eu-1
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: vm-distributed
-        app.kubernetes.io/version: v1.0.6
-        helm.sh/chart: victoria-metrics-distributed-0.1.1
-      name: vmauth-write-balancer-zone-eu-1
-      namespace: NAMESPACE
-    spec:
-      affinity: {}
-      extraArgs:
-        discoverBackendIPs: "true"
-      image:
-        tag: v1.0.6
-      nodeSelector:
-        topology.kubernetes.io/zone: zone-eu-1
-      port: "8427"
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: ScheduleAnyway
-      unauthorizedUserAccessSpec:
-        url_map:
-          - src_paths:
-              - /insert/.+
-            url_prefix:
-              - http://vminsert-vmcluster-zone-eu-1.NAMESPACE.svc.cluster.local.:8480
-  6: |
-    apiVersion: operator.victoriametrics.com/v1beta1
-    kind: VMAuth
-    metadata:
-      labels:
-        app: vmauth-write-balancer-zone-us-1
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: vm-distributed
-        app.kubernetes.io/version: v1.0.6
-        helm.sh/chart: victoria-metrics-distributed-0.1.1
-      name: vmauth-write-balancer-zone-us-1
-      namespace: NAMESPACE
-    spec:
-      affinity: {}
-      extraArgs:
-        discoverBackendIPs: "true"
-      image:
-        tag: v1.0.6
-      nodeSelector:
-        topology.kubernetes.io/zone: zone-us-1
-      port: "8427"
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: ScheduleAnyway
-      unauthorizedUserAccessSpec:
-        url_map:
-          - src_paths:
-              - /insert/.+
-            url_prefix:
-              - http://vminsert-vmcluster-zone-us-1.NAMESPACE.svc.cluster.local.:8480
-  7: |
+              - http://vmselect-vmcluster-zone-us-1.NAMESPACE.svc.cluster.local.:8481
+              - http://vmselect-vmcluster-zone-eu-1.NAMESPACE.svc.cluster.local.:8481
+  3: |
     apiVersion: operator.victoriametrics.com/v1beta1
     kind: VMAuth
     metadata:
@@ -230,7 +100,7 @@ vmauth should match snapshot:
             url_prefix:
               - http://vmauth-vmauth-read-proxy-zone-eu-1.NAMESPACE.svc.cluster.local.:8427
               - http://vmauth-vmauth-read-proxy-zone-us-1.NAMESPACE.svc.cluster.local.:8427
-  8: |
+  4: |
     apiVersion: operator.victoriametrics.com/v1beta1
     kind: VMAuth
     metadata:
