@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- point global VMAuth to VMSingle or VMCluster, when cross zone VMAuth is disabled (`zoneTpl.read.vmauth.enabled: false`).
 
 ## 0.13.1
 
