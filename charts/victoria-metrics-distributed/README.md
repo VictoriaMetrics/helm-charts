@@ -1,6 +1,6 @@
 
 
-![Version](https://img.shields.io/badge/0.13.0-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-distributed%2Fchangelog%2F%230130)
+![Version](https://img.shields.io/badge/0.12.1-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-distributed%2Fchangelog%2F%230121)
 ![ArtifactHub](https://img.shields.io/badge/ArtifactHub-informational?logoColor=white&color=417598&logo=artifacthub&link=https%3A%2F%2Fartifacthub.io%2Fpackages%2Fhelm%2Fvictoriametrics%2Fvictoria-metrics-distributed)
 ![License](https://img.shields.io/github/license/VictoriaMetrics/helm-charts?labelColor=green&label=&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Fhelm-charts%2Fblob%2Fmaster%2FLICENSE)
 ![Slack](https://img.shields.io/badge/Join-4A154B?logo=slack&link=https%3A%2F%2Fslack.victoriametrics.com)
@@ -431,7 +431,11 @@ Change the values according to the need of the environment in ``victoria-metrics
       <td><a href="#read-global-vmauth-spec"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">read.global.vmauth.spec</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">unauthorizedUserAccessSpec</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">url_map</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="nt">load_balancing_policy</span><span class="p">:</span><span class="w"> </span><span class="l">first_available</span></span></span></code></pre>
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="nt">load_balancing_policy</span><span class="p">:</span><span class="w"> </span><span class="l">first_available</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="nt">retry_status_codes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="m">500</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="m">502</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="m">503</span></span></span></code></pre>
 </a></td>
       <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
 </td>
@@ -496,6 +500,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="nt">url_map</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                        </span>- <span class="nt">load_balancing_policy</span><span class="p">:</span><span class="w"> </span><span class="l">first_available</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                          </span><span class="nt">retry_status_codes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                            </span>- <span class="m">500</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                            </span>- <span class="m">502</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                            </span>- <span class="m">503</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">vmagent</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">annotations</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
@@ -571,6 +577,8 @@ Change the values according to the need of the environment in ``victoria-metrics
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">url_map</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="nt">load_balancing_policy</span><span class="p">:</span><span class="w"> </span><span class="l">first_available</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="nt">retry_status_codes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="m">500</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="m">502</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="m">503</span></span></span></code></pre>
 </a></td>
       <td><em><code>(object)</code></em><p>Spec for VMAuth CRD, see <a href="https://docs.victoriametrics.com/operator/api#vmauthspec" target="_blank">here</a></p>
