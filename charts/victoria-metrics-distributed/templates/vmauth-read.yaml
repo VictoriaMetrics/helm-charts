@@ -1,8 +1,10 @@
 {{- $ctx := dict "helm" . }}
+{{- $zoneTpl := .Values.zoneTpl }}
+{{- $common := .Values.common | default dict }}
 {{- $urlCtx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" . }}
 {{- if ((((.Values).read).global).vmauth).enabled }}
-  {{- $commonAuth := dict "spec" ((((.Values).common).vmauth).spec | default dict) }}
+  {{- $commonAuth := dict "spec" (($common.vmauth).spec | default dict) }}
   {{- $auth := .Values.read.global.vmauth | default dict }}
   {{- $auth = mergeOverwrite (deepCopy $commonAuth) (deepCopy $auth) }}
   {{- $_ := set $ctx "appKey" (list "vmauth" "spec") }}
@@ -21,8 +23,8 @@ metadata:
 
   {{- $_ := set $urlCtx "style" "managed" }}
   {{- $urls := default list }}
-  {{- range $i, $z := $.Values.availabilityZones }}
-    {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
+  {{- range $i, $z := .Values.availabilityZones }}
+    {{- $zone := mergeOverwrite (deepCopy $zoneTpl) $z }}
     {{- if $zone.read.vmauth.enabled -}}
       {{- $urlSpec := (($zone.read).vmauth).spec | default dict }}
       {{- $_ := set $zone.read.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $urlSpec) }}
@@ -30,13 +32,13 @@ metadata:
       {{- $_ := set $urlCtx "appKey" (list "zone" "read" "vmauth" "spec") }}
       {{- $urls = append $urls (include "vm.url" $urlCtx) }}
     {{- else if $zone.vmcluster.enabled -}}
-      {{- $urlSpec := mergeOverwrite (deepCopy ((((.Values).common).vmcluster).spec | default dict)) (deepCopy ($zone.vmcluster).spec | default dict) }}
+      {{- $urlSpec := mergeOverwrite (deepCopy ((($common.vmcluster).spec | default dict))) (deepCopy ($zone.vmcluster).spec | default dict) }}
       {{- $_ := set $zone.vmcluster "spec" $urlSpec }}
       {{- $_ := set $urlCtx "zone" $zone }}
       {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
       {{- $urls = append $urls (include "vm.url" $urlCtx) }}
     {{- else if $zone.vmsingle.enabled -}}
-      {{- $urlSpec := mergeOverwrite (deepCopy ((((.Values).common).vmsingle).spec | default dict)) (deepCopy ($zone.vmsingle).spec | default dict) }}
+      {{- $urlSpec := mergeOverwrite (deepCopy ((($common.vmsingle).spec | default dict))) (deepCopy ($zone.vmsingle).spec | default dict) }}
       {{- $_ := set $zone.vmsingle "spec" $urlSpec }}
       {{- $_ := set $urlCtx "zone" $zone }}
       {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle") }}
