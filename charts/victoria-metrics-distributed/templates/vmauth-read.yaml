@@ -24,10 +24,22 @@ metadata:
   {{- range $i, $z := $.Values.availabilityZones }}
     {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
     {{- if $zone.read.vmauth.enabled -}}
-      {{- $authSpec := (($zone.read).vmauth).spec | default dict }}
-      {{- $_ := set $zone.read.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $authSpec) }}
+      {{- $urlSpec := (($zone.read).vmauth).spec | default dict }}
+      {{- $_ := set $zone.read.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $urlSpec) }}
       {{- $_ := set $urlCtx "zone" $zone }}
       {{- $_ := set $urlCtx "appKey" (list "zone" "read" "vmauth" "spec") }}
+      {{- $urls = append $urls (include "vm.url" $urlCtx) }}
+    {{- else if $zone.vmcluster.enabled -}}
+      {{- $urlSpec := mergeOverwrite (deepCopy ((((.Values).common).vmcluster).spec | default dict)) (deepCopy ($zone.vmcluster).spec | default dict) }}
+      {{- $_ := set $zone.vmcluster "spec" $urlSpec }}
+      {{- $_ := set $urlCtx "zone" $zone }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster") }}
+      {{- $urls = append $urls (include "vm.url" $urlCtx) }}
+    {{- else if $zone.vmsingle.enabled -}}
+      {{- $urlSpec := mergeOverwrite (deepCopy ((((.Values).common).vmsingle).spec | default dict)) (deepCopy ($zone.vmsingle).spec | default dict) }}
+      {{- $_ := set $zone.vmsingle "spec" $urlSpec }}
+      {{- $_ := set $urlCtx "zone" $zone }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle") }}
       {{- $urls = append $urls (include "vm.url" $urlCtx) }}
     {{- end -}}
   {{- end }}
