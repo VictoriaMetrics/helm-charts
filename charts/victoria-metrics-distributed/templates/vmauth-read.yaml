@@ -23,11 +23,11 @@ metadata:
   {{- $urls := default list }}
   {{- range $i, $z := $.Values.availabilityZones }}
     {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
-    {{- if $zone.read.crossZone.vmauth.enabled -}}
-      {{- $authSpec := ((($zone.read).crossZone).vmauth).spec | default dict }}
-      {{- $_ := set $zone.read.crossZone.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $authSpec) }}
+    {{- if $zone.read.vmauth.enabled -}}
+      {{- $authSpec := (($zone.read).vmauth).spec | default dict }}
+      {{- $_ := set $zone.read.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $authSpec) }}
       {{- $_ := set $urlCtx "zone" $zone }}
-      {{- $_ := set $urlCtx "appKey" (list "zone" "read" "crossZone" "vmauth" "spec") }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "read" "vmauth" "spec") }}
       {{- $urls = append $urls (include "vm.url" $urlCtx) }}
     {{- end -}}
   {{- end }}

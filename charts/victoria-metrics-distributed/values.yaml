@@ -23,14 +23,14 @@ common:
     # -- Common VMCluster spec, which can be overridden by each VMCluster configuration.
     # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/index.html#vmclusterspec)
     spec:
+      requestsLoadBalancer:
+        enabled: true
+        spec:
+          replicaCount: 2
       vmselect:
         port: "8481"
       vminsert:
         port: "8480"
-        serviceSpec:
-          spec:
-            clusterIP: None
-            type: ClusterIP
   vmsingle:
     # -- Common VMSingle spec, which can be overridden by each VMSingle configuration.
     # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/index.html#vmsinglespec)
@@ -88,43 +88,20 @@ zoneTpl:
   write:
     # -- Allow data ingestion to this zone
     allow: true
-    vmauth:
-      # -- Create vmauth as a local write endpoint
-      enabled: true
-      # -- Override the name of the vmauth object
-      name: "vmauth-write-balancer-{{ (.zone).name }}"
-      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
-      spec:
-        extraArgs:
-          # vmauth discovers backend IPs via periodic DNS queries,
-          # and performs load balancing between vminsert instances
-          # check https://docs.victoriametrics.com/vmauth/#discovering-backend-ips
-          discoverBackendIPs: "true"
   read:
     # -- Allow data query from this zone through global query endpoint
     allow: true
-    perZone:
-      vmauth:
-        # -- Create vmauth as a local read endpoint
-        enabled: true
-        # -- Override the name of the vmauth object
-        name: "vmauth-read-balancer-{{ (.zone).name }}"
-        # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
-        spec:
-          extraArgs:
-            discoverBackendIPs: "true"
-    crossZone:
-      vmauth:
-        # -- Create a vmauth with all the zone with `allow: true` as query backends
-        enabled: true
-        # -- Override the name of the vmauth object
-        name: "vmauth-read-proxy-{{ (.zone).name }}"
-        # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
-        spec:
-          unauthorizedUserAccessSpec:
-            url_map:
-              - load_balancing_policy: first_available
-                retry_status_codes: [500, 502, 503]
+    vmauth:
+      # -- Create a vmauth with all the zone with `allow: true` as query backends
+      enabled: true
+      # -- Override the name of the vmauth object
+      name: "vmauth-read-proxy-{{ (.zone).name }}"
+      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+      spec:
+        unauthorizedUserAccessSpec:
+          url_map:
+            - load_balancing_policy: first_available
+              retry_status_codes: [500, 502, 503]
   # vmagent here only meant to proxy write requests to each az,
   # doesn't support customized other remote write address.
   vmagent:
@@ -190,8 +167,6 @@ availabilityZones:
     #       - us-central1-b
     # write:
     #   allow: false
-    #   vmauth:
-    #     name: custom-write-balancer-name
   - 
     # -- Availability zone name
     name: zone-us-1
@@ -211,8 +186,6 @@ availabilityZones:
     #       - us-central1-b
     # write:
     #   allow: false
-    #   vmauth:
-    #     name: custom-write-balancer-name
 
 
 # -- Set up an extra vmagent to scrape all the scrape objects by default,

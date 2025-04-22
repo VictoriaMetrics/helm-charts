@@ -25,15 +25,12 @@ metadata:
 {{- $remoteWrites := default list }}
 {{- range $rwz := $.Values.availabilityZones }}
   {{- $rwZone := mergeOverwrite (deepCopy $.Values.zoneTpl) $rwz }}
-  {{- if and $rwZone.write.allow $rwZone.write.vmauth.enabled }}
-    {{- if ($rwZone.write).vmauth }}
-      {{- $urlSpec := $rwZone.write.vmauth.spec | default dict }}
-      {{- $_ := set $rwZone.write.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) $urlSpec) }}
-    {{- end }}
+  {{- if $rwZone.write.allow }}
     {{- $_ := set $ctx "style" "managed" }}
     {{- $_ := set $ctx "zone" $rwZone }}
     {{- if ($rwZone.vmcluster).enabled -}}
-      {{- $_ := set $ctx "appKey" (list "zone" "write" "vmauth" "spec") }}
+      {{- $_ := set $rwZone.vmcluster "spec" (mergeOverwrite (deepCopy $.Values.common.vmcluster.spec) (deepCopy ($rwZone.common).spec) (deepCopy ($rwZone.vmcluster.spec))) -}}
+      {{- $_ := set $ctx "appKey" (list "zone" "vmcluster" "spec" "vminsert") }}
       {{- $remoteWrite := printf "%s/insert/%s/prometheus/api/v1/write" (include "vm.url" $ctx) $tenant -}}
       {{- $remoteWrites = append $remoteWrites (dict "url" $remoteWrite) -}}
     {{- else if ($rwZone.vmsingle).enabled -}}
@@ -45,8 +42,6 @@ metadata:
         {{- $remoteWrite := printf "%s/prometheus/api/v1/write" (include "vm.url" $ctx) -}}
         {{- $remoteWrites = append $remoteWrites (dict "url" $remoteWrite) -}}
       {{- end -}}
-    {{- else -}}
-      {{- fail (printf "Either enable VMCluster or VMSingle or disable write VMAuth balancer in %q zone" $az.name) -}}
     {{- end -}}
     {{- $_ := unset $ctx "style" }}
   {{- end }}

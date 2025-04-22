@@ -121,6 +121,16 @@ First, performing update on availability zone `zone-eu-1`:
 
 Then, perform update on availability zone `zone-us-1` with the same steps1~4.
 
+### Upgrade to 0.13.0
+
+Introduction of VMCluster's [`requestsLoadBalancer`](https://docs.victoriametrics.com/operator/resources/vmcluster/#requests-load-balancing) allowed to simplify distributed chart setup by removing VMAuth CRs for read and write load balancing. Some parameters are not needed anymore:
+
+- removed `availabilityZones[*].write.vmauth`
+- removed `availabilityZones[*].read.perZone.vmauth`
+- removed `zoneTpl.write.vmauth`
+- removed `zoneTpl.read.perZone.vmauth`
+- moved `zoneTpl.read.crossZone.vmauth` to `zoneTpl.read.vmauth`
+- moved `availabilityZones[*].read.perZone.vmauth` to `availabilityZones[*].read.vmauth`
 
 ### Upgrade to 0.5.0
 
