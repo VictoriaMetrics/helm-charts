@@ -20883,6 +20883,56 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '**Update note**: This release contains breaking changes. Please follow [upgrade guide](./#upgrade-to-0130)'
+        - allow overriding vmauth unauthorizedUserAccessSpec options
+        - fix read vmauth retry status codes, to cover more cases
+        - replaced read and write VMAuth balancers managed by `.Values.zoneTpl.read.perZone.vmauth` and `.Values.zoneTpl.write.vmauth` with built-in VMCluster's [`requestsLoadBalancer`](https://docs.victoriametrics.com/operator/resources/vmcluster/#requests-load-balancing).
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com
+        - name: Changelog
+          url: https://docs.victoriametrics.com/changelog
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: v1.115.0
+    created: "2025-04-22T09:48:46.757236805Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    - condition: victoria-metrics-k8s-stack.enabled
+      name: victoria-metrics-k8s-stack
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.44.*
+    description: A Helm chart for Running VMCluster on Multiple Availability Zones
+    digest: 8762ad707716f3c9bcdc34d3cf9836ac2c12b84660703df0ff5be30e2462fcf2
+    home: https://github.com/VictoriaMetrics/helm-charts
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-distributed
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-distributed-0.13.0/victoria-metrics-distributed-0.13.0.tgz
+    version: 0.13.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - Fail chart if VMAgent has no remote writes defined.
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -44194,4 +44244,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2025-04-22T09:40:51.602637663Z"
+generated: "2025-04-22T09:48:46.919617776Z"
