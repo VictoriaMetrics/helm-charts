@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Update VictoriaLogs version to [v1.20.0](https://docs.victoriametrics.com/victorialogs/changelog/#v1200).
 
 ## 0.9.6
 
