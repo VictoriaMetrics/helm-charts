@@ -6,6 +6,9 @@ CT?=ct-docker
 CONTAINER_TOOL ?= docker
 REPODIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 WORKDIR := $(REPODIR)/..
+UID := "$(shell id -u)"
+PLATFORM := $(shell uname -m)
+DOCKER_PLATFORM := "linux/$(if $(findstring $(PLATFORM),arm64),arm64,amd64)"
 
 include $(shell find hack -name Makefile)
 include codespell/Makefile
@@ -126,6 +129,8 @@ docs-image:
 	git pull origin main && \
 	cd $(REPODIR) && \
 	$(CONTAINER_TOOL) build \
+		--build-arg UID=$(UID) \
+		--platform $(DOCKER_PLATFORM) \
 		-t vmdocs \
 		$(WORKDIR)/vmdocs
 
@@ -133,6 +138,7 @@ docs-debug: gen-docs docs-image
 	$(CONTAINER_TOOL) run \
 		--rm \
 		--name vmdocs \
+		--platform $(DOCKER_PLATFORM) \
 		-p 1313:1313 \
 		-v ./:/opt/docs/content/helm \
 		$(foreach chart,$(wildcard charts/*), -v ./$(chart):/opt/docs/content/helm/$(basename $(chart))) \
@@ -142,6 +148,7 @@ docs-images-to-webp: docs-image
 	$(CONTAINER_TOOL) run \
 		--rm \
 		--entrypoint /usr/bin/find \
+		--platform $(DOCKER_PLATFORM) \
 		--name vmdocs \
 		-v ./:/opt/docs/content/helm \
                 $(foreach chart,$(wildcard charts/*), -v ./$(chart):/opt/docs/content/helm/$(basename $(chart))) \
