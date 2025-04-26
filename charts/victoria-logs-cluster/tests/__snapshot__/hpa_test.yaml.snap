@@ -1,0 +1,184 @@
+hpa should match snapshot:
+  1: |
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      labels:
+        app: vlinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        extraLabelName: insertExtraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlinsert
+      namespace: NAMESPACE
+    spec:
+      maxReplicas: 10
+      metrics: []
+      minReplicas: 2
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: RELEASE-NAME-victoria-logs-cluster-vlinsert
+  2: |
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      labels:
+        app: vlselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        extraLabelName: selectExtraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlselect
+      namespace: NAMESPACE
+    spec:
+      maxReplicas: 10
+      metrics: []
+      minReplicas: 2
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: RELEASE-NAME-victoria-logs-cluster-vlselect
+  3: |
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      labels:
+        app: vlstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        extraLabelName: storageExtraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlstorage
+      namespace: NAMESPACE
+    spec:
+      behavior:
+        scaleDown:
+          selectPolicy: Disabled
+      maxReplicas: 10
+      metrics: []
+      minReplicas: 2
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: StatefulSet
+        name: RELEASE-NAME-victoria-logs-cluster-vlstorage
+  4: |
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0
+        extraLabelName: authExtraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vmauth
+      namespace: NAMESPACE
+    spec:
+      maxReplicas: 10
+      metrics: []
+      minReplicas: 2
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: RELEASE-NAME-victoria-logs-cluster-vmauth
+hpa should match snapshot with fullnameOverride and extraLabels:
+  1: |
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      labels:
+        app: insert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        extraLabelName: insertExtraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: vlinsert-node
+      namespace: NAMESPACE
+    spec:
+      maxReplicas: 10
+      metrics: []
+      minReplicas: 2
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: vlinsert-node
+  2: |
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      labels:
+        app: select
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        extraLabelName: selectExtraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: vlselect-node
+      namespace: NAMESPACE
+    spec:
+      maxReplicas: 10
+      metrics: []
+      minReplicas: 2
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: vlselect-node
+  3: |
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      labels:
+        app: storage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        extraLabelName: storageExtraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: vlstorage-node
+      namespace: NAMESPACE
+    spec:
+      behavior:
+        scaleDown:
+          selectPolicy: Disabled
+      maxReplicas: 10
+      metrics: []
+      minReplicas: 2
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: StatefulSet
+        name: vlstorage-node
+  4: |
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      labels:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0
+        extraLabelName: authExtraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: vmauth-node
+      namespace: NAMESPACE
+    spec:
+      maxReplicas: 10
+      metrics: []
+      minReplicas: 2
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: vmauth-node

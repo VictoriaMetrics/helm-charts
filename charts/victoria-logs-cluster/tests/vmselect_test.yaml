@@ -1,0 +1,39 @@
+suite: vlselect templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - vlselect-server.yaml
+tests:
+  - it: deployment should match snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: statefulset should match snapshot
+    set:
+      vlselect:
+        mode: statefulSet
+    asserts:
+      - matchSnapshot: {}
+  - it: deployment should match snapshot with fullnameOverride, extraLabels and podLabels
+    set:
+      vlselect:
+        name: select
+        fullnameOverride: vlselect-node
+        extraLabels:
+          extraLabelName: extraLabelValue
+        podLabels:
+          podLabelName: podLabelValue
+    asserts:
+      - matchSnapshot: {}
+  - it: statefulset should match snapshot with fullnameOverride, extraLabels and podLabels
+    set:
+      vlselect:
+        name: select
+        fullnameOverride: vlselect-node
+        mode: statefulSet
+        extraLabels:
+          extraLabelName: extraLabelValue
+        podLabels:
+          podLabelName: podLabelValue
+    asserts:
+      - matchSnapshot: {}

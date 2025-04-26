@@ -1,0 +1,1110 @@
+# Default values for victoria-logs.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  # -- Image pull secrets, that can be shared across multiple helm charts
+  imagePullSecrets: []
+  image:
+    # -- Image registry, that can be shared across multiple helm charts
+    repository: victoriametrics/victoria-logs
+    vm:
+      # -- Image tag for all vm charts
+      tag: ""
+  # -- Openshift security context compatibility configuration
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+  # -- k8s cluster domain suffix, uses for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
+  cluster:
+    dnsDomain: cluster.local.
+
+# -- Print information after deployment
+printNotes: true
+
+# -- use SRV discovery for storageNode and selectNode flags for enterprise version
+autoDiscovery: false
+
+common:
+  # -- common for all components image configuration
+  image:
+    tag: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+  # -- Service account labels
+  extraLabels: {}
+
+  # -- Service account annotations
+  annotations: {}
+
+  # -- mount API token to pod directly
+  automountToken: true
+
+# -- Override chart name
+nameOverride: ""
+
+extraSecrets:
+  []
+  # - name: secret-remote-storage-keys
+  #   annotations: []
+  #   labels: []
+  #   data: |
+  #     credentials: b64_encoded_str
+
+# -- Add extra specs dynamically to this chart
+extraObjects: []
+
+vlselect:
+  # -- Enable deployment of vlselect component. Can be deployed as Deployment(default) or StatefulSet
+  enabled: true
+  # -- Override default `app` label name
+  name: ""
+  image:
+    # -- Image registry
+    registry: ""
+    # -- Image repository
+    repository: victoriametrics/victoria-logs
+    # -- Image tag
+    # override Chart.AppVersion
+    tag: ""
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+    # -- Variant of the image to use.
+    # e.g. cluster, enterprise-cluster
+    variant: victorialogs
+  # -- Specify pod lifecycle
+  lifecycle: {}
+  ports: 
+    # -- VMSelect http port name
+    name: "http"
+  # -- Name of Priority Class
+  priorityClassName: ""
+  # -- Overrides the full name of vlselect component
+  fullnameOverride: ""
+  # -- Suppress rendering `--storageNode` FQDNs based on `vlstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs
+  suppressStorageFQDNsRender: false
+  # -- Pod's termination grace period in seconds
+  terminationGracePeriodSeconds: 60
+  # -- Extra command line arguments for vlselect component
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    loggerFormat: json
+    httpListenAddr: :9471
+  # -- StatefulSet/Deployment annotations
+  annotations: {}
+  # -- StatefulSet/Deployment additional labels
+  extraLabels: {}
+  # -- Pod’s additional labels
+  podLabels: {}
+
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details.
+  env: []
+
+  # -- Specify alternative source for env variables
+  envFrom: []
+    #- configMapRef:
+    #    name: special-config
+
+  # -- Readiness & Liveness probes
+  probe:
+    # -- VLSelect readiness probe
+    readiness:
+      httpGet: {}
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 5
+      failureThreshold: 10
+    # -- VLSelect liveness probe
+    liveness:
+      tcpSocket: {}
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
+    # -- VMSelect startup probe
+    startup: {}
+
+  horizontalPodAutoscaler:
+    # -- Use HPA for vlselect component
+    enabled: false
+    # -- Maximum replicas for HPA to use to to scale the vlselect component
+    maxReplicas: 10
+    # -- Minimum replicas for HPA to use to scale the vlselect component
+    minReplicas: 2
+    # -- Metric for HPA to use to scale the vlselect component
+    metrics: []
+    # -- Behavior settings for scaling by the HPA
+    behavior: {}
+
+  # -- Additional hostPath mounts
+  extraHostPathMounts:
+    []
+    # - name: certs-dir
+    #   mountPath: /etc/kubernetes/certs
+    #   subPath: ""
+    #   hostPath: /etc/kubernetes/certs
+    #   readOnly: true
+
+  # -- Extra Volumes for the pod
+  extraVolumes:
+    []
+    # - name: example
+    #   configMap:
+    #     name: example
+
+  # -- Extra Volume Mounts for the container
+  extraVolumeMounts:
+    []
+    # - name: example
+    #   mountPath: /example
+
+  # -- Extra containers to run in a pod with vlselect
+  extraContainers:
+    []
+    # - name: config-reloader
+    #   image: reloader-image
+
+  # -- Init containers for vlselect
+  initContainers:
+    []
+    # - name: example
+    #   image: example-image
+
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+  podDisruptionBudget:
+    # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
+
+  # -- Array of tolerations object. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+  tolerations: []
+    # - key: "key"
+    #   operator: "Equal|Exists"
+    #   value: "value"
+    #   effect: "NoSchedule|PreferNoSchedule"
+
+  # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  nodeSelector: {}
+  # -- Pod affinity
+  affinity: {}
+  # -- Pod topologySpreadConstraints
+  topologySpreadConstraints: []
+  # -- Pod's annotations
+  podAnnotations: {}
+  # -- Count of vlselect pods
+  replicaCount: 2
+  # -- Container workdir
+  containerWorkingDir: ""
+  # -- Resource object. Details are [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  resources: {}
+    # limits:
+    #   cpu: 50m
+    #   memory: 64Mi
+    # requests:
+    #   cpu: 50m
+    #   memory: 64Mi
+
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  securityContext:
+    enabled: true
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  podSecurityContext:
+    enabled: true
+  # -- Cache root folder
+  cacheMountPath: /cache
+  service:
+    # -- Create VMSelect service
+    enabled: true
+    # -- Service annotations
+    annotations: {}
+    # -- Service labels
+    labels: {}
+    # -- Service ClusterIP
+    clusterIP: ""
+    # -- Service external IPs. Details are [here](https://kubernetes.io/docs/concepts/services-networking/service/#external-ips)
+    externalIPs: []
+    # -- Extra service ports
+    extraPorts: []
+    # -- Service load balancer IP
+    loadBalancerIP: ""
+    # -- Load balancer source range
+    loadBalancerSourceRanges: []
+    # -- Service port
+    servicePort: 8481
+    # -- Target port
+    targetPort: http
+    # -- Service type
+    type: ClusterIP
+    # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+    healthCheckNodePort: ""
+    # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+    externalTrafficPolicy: ""
+    # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+    ipFamilyPolicy: ""
+    # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+    ipFamilies: []
+  ingress:
+    # -- Enable deployment of ingress for vlselect component
+    enabled: false
+
+    # -- Ingress annotations
+    annotations: {}
+    #   kubernetes.io/ingress.class: nginx
+    #   kubernetes.io/tls-acme: 'true'
+
+    # -- Ingress extra labels
+    extraLabels: {}
+
+    # -- Array of host objects
+    hosts:
+      - name: vlselect.local
+        path:
+          - /select
+        port: http
+
+    # -- Array of TLS objects
+    tls: []
+    #   - secretName: vlselect-ingress-tls
+    #     hosts:
+    #       - vlselect.local
+
+    # -- Ingress controller class name
+    ingressClassName: ""
+
+    # -- Ingress path type
+    pathType: Prefix
+
+  # -- vlselect mode: deployment, daemonSet
+  mode: deployment
+
+  # -- [K8s Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) specific variables
+  deployment:
+    spec:
+      # -- VMSelect strategy
+      strategy: {}
+        # rollingUpdate:
+        #  maxSurge: 25%
+        #  maxUnavailable: 25%
+        # type: RollingUpdate
+
+  # -- [K8s StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) specific variables
+  statefulSet:
+    spec:
+      # -- Deploy order policy for StatefulSet pods
+      podManagementPolicy: OrderedReady
+  
+  # -- Empty dir configuration if persistence is disabled
+  emptyDir: {}
+  persistentVolume:
+    # -- Create/use Persistent Volume Claim for vlselect component. Empty dir if false. If true, vlselect will create/use a Persistent Volume Claim
+    enabled: false
+
+    # -- Array of access mode. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
+    accessModes:
+      - ReadWriteOnce
+    # -- Persistent volume annotations
+    annotations: {}
+
+    # -- Persistent volume labels
+    labels: {}
+
+    # -- Existing Claim name. Requires vlselect.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound
+    existingClaim: ""
+
+    # -- Size of the volume. Better to set the same as resource limit memory property
+    size: 2Gi
+    # -- Mount subpath
+    subPath: ""
+  serviceMonitor:
+    # -- Enable deployment of Service Monitor for vlselect component. This is Prometheus operator object
+    enabled: false
+    # -- Target namespace of ServiceMonitor manifest
+    namespace: ""
+    # -- Service Monitor labels
+    extraLabels: {}
+    # -- Service Monitor annotations
+    annotations: {}
+    # -- Basic auth params for Service Monitor
+    basicAuth: {}
+    # Commented. Prometheus scare interval for vlselect component
+#    interval: 15s
+    # Commented. Prometheus pre-scrape timeout for vlselect component
+#    scrapeTimeout: 5s
+    # -- Commented. HTTP scheme to use for scraping.
+#    scheme: https
+    # -- Commented. TLS configuration to use when scraping the endpoint
+#    tlsConfig:
+#      insecureSkipVerify: true
+    # -- Service Monitor relabelings
+    relabelings: []
+    # -- Service Monitor metricRelabelings
+    metricRelabelings: []
+
+vlinsert:
+  # -- Enable deployment of vlinsert component. Deployment is used
+  enabled: true
+  # -- IDs of vlstorage nodes to exclude from writing
+  excludeStorageIDs: []
+  # -- Override default `app` label name
+  name: ""
+  # -- VMInsert strategy
+  strategy: {}
+   # rollingUpdate:
+   #  maxSurge: 25%
+   #  maxUnavailable: 25%
+   # type: RollingUpdate
+  image:
+    # -- Image registry
+    registry: ""
+    # -- Image repository
+    repository: victoriametrics/victoria-logs
+    # -- Image tag
+    # override Chart.AppVersion    
+    tag: ""
+    # -- Variant of the image to use.
+    # e.g. cluster, enterprise-cluster
+    variant: victorialogs
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+  # -- Specify pod lifecycle
+  lifecycle: {}
+  ports:
+    # -- VMInsert http port name
+    name: "http"
+  # -- Name of Priority Class
+  priorityClassName: ""
+  # -- Overrides the full name of vlinsert component
+  fullnameOverride: ""
+  # -- Extra command line arguments for vlinsert component
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    loggerFormat: json
+    httpListenAddr: :9481
+  # -- StatefulSet/Deployment annotations
+  annotations: {}
+  # -- StatefulSet/Deployment additional labels
+  extraLabels: {}
+  # -- Pod’s additional labels
+  podLabels: {}
+  terminationGracePeriodSeconds: 30
+
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details.
+  env: []
+
+  # -- Specify alternative source for env variables
+  envFrom: []
+    #- configMapRef:
+    #    name: special-config
+
+  # -- Suppress rendering `--storageNode` FQDNs based on `vlstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs
+  suppressStorageFQDNsRender: false
+
+  # -- Readiness & Liveness probes
+  probe:
+    # -- VMInsert readiness probe
+    readiness:
+      httpGet: {}
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 5
+      failureThreshold: 10
+    # -- VMInsert liveness probe
+    liveness:
+      tcpSocket: {}
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
+    # -- VMInsert startup probe
+    startup: {}
+
+  # -- Relabel configuration
+  relabel:
+    enabled: false
+    config: []
+    # -- Use existing configmap if specified
+    # otherwise .config values will be used. Relabel config **should** reside under `relabel.yml` key
+    configMap: ""
+
+# Horizontal Pod Autoscaling
+  horizontalPodAutoscaler:
+    # -- Use HPA for vlinsert component
+    enabled: false
+    # -- Maximum replicas for HPA to use to to scale the vlinsert component
+    maxReplicas: 10
+    # -- Minimum replicas for HPA to use to scale the vlinsert component
+    minReplicas: 2
+    # -- Metric for HPA to use to scale the vlinsert component
+    metrics: []
+    # -- Behavior settings for scaling by the HPA
+    behavior: {}
+
+  # -- Extra Volumes for the pod
+  extraVolumes:
+    []
+    # - name: example
+    #   configMap:
+    #     name: example
+
+  # -- Extra Volume Mounts for the container
+  extraVolumeMounts:
+    []
+    # - name: example
+    #   mountPath: /example
+
+  # -- Extra containers to run in a pod with vlinsert
+  extraContainers:
+    []
+    # - name: config-reloader
+    #   image: reloader-image
+
+  # -- Init containers for vlinsert
+  initContainers:
+    []
+    # - name: example
+    #   image: example-image
+
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
+
+  # -- Array of tolerations object. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+  tolerations: []
+    # - key: "key"
+    #   operator: "Equal|Exists"
+    #   value: "value"
+    #   effect: "NoSchedule|PreferNoSchedule"
+
+  # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  nodeSelector: {}
+  # -- Pod affinity
+  affinity: {}
+  # -- Pod topologySpreadConstraints
+  topologySpreadConstraints: []
+  # -- Pod's annotations
+  podAnnotations: {}
+  # -- Count of vlinsert pods
+  replicaCount: 2
+  # -- Container workdir
+  containerWorkingDir: ""
+  # -- Resource object. Details are [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  resources: {}
+    # limits:
+    #   cpu: 50m
+    #   memory: 64Mi
+    # requests:
+    #   cpu: 50m
+    #   memory: 64Mi
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  securityContext:
+    enabled: false
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  podSecurityContext:
+    enabled: false
+  service:
+    # -- Create VMInsert service
+    enabled: true
+    # -- Service annotations
+    annotations: {}
+    # -- Service labels
+    labels: {}
+    # -- Service ClusterIP
+    clusterIP: ""
+    # -- Service external IPs. Details are [here]( https://kubernetes.io/docs/concepts/services-networking/service/#external-ips)
+    externalIPs: []
+    # -- Extra service ports
+    extraPorts: []
+    # -- Service load balancer IP
+    loadBalancerIP: ""
+    # -- Load balancer source range
+    loadBalancerSourceRanges: []
+    # -- Service port
+    servicePort: 8480
+    # -- Target port
+    targetPort: http
+    # -- Service type
+    type: ClusterIP
+    # -- Enable UDP port. used if you have `spec.opentsdbListenAddr` specified
+    # Make sure that service is not type `LoadBalancer`, as it requires `MixedProtocolLBService` feature gate. Check [here](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/) for details
+    udp: false
+    # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+    healthCheckNodePort: ""
+    # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+    externalTrafficPolicy: ""
+    # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+    ipFamilyPolicy: ""
+    # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+    ipFamilies: []
+
+
+
+
+  ingress:
+    # -- Enable deployment of ingress for vlinsert component
+    enabled: false
+
+    # -- Ingress annotations
+    annotations: {}
+    #   kubernetes.io/ingress.class: nginx
+    #   kubernetes.io/tls-acme: 'true'
+
+    # -- Ingress extra labels
+    extraLabels: {}
+
+    # -- Array of host objects
+    hosts:
+      - name: vlinsert.local
+        path:
+          - /insert
+        port: http
+
+    # -- Array of TLS objects
+    tls: []
+    #   - secretName: vlinsert-ingress-tls
+    #     hosts:
+    #       - vlinsert.local
+
+    # -- Ingress controller class name
+    ingressClassName: ""
+
+    # -- Ingress path type
+    pathType: Prefix
+  serviceMonitor:
+    # -- Enable deployment of Service Monitor for vlinsert component. This is Prometheus operator object
+    enabled: false
+    # -- Target namespace of ServiceMonitor manifest
+    namespace: ""
+    # -- Service Monitor labels
+    extraLabels: {}
+    # -- Service Monitor annotations
+    annotations: {}
+    # -- Basic auth params for Service Monitor
+    basicAuth: {}
+    # Commented. Prometheus scare interval for vlinsert component
+#    interval: 15s
+    # Commented. Prometheus pre-scrape timeout for vlinsert component
+#    scrapeTimeout: 5s
+    # -- Commented. HTTP scheme to use for scraping.
+#    scheme: https
+    # -- Commented. TLS configuration to use when scraping the endpoint
+#    tlsConfig:
+#      insecureSkipVerify: true
+    # -- Service Monitor relabelings
+    relabelings: []
+    # -- Service Monitor metricRelabelings
+    metricRelabelings: []
+
+vmauth:
+  # -- Enable deployment of vmauth component.
+  # With vmauth enabled please set `service.clusterIP: None` and `service.type: ClusterIP` for `vlinsert` and `vlselect` to use vmauth balancing benefits.
+  enabled: false
+  # -- Override default `app` label name
+  name: ""
+  # -- VMAuth configuration secret name
+  configSecretName: ""
+  # -- VMAuth configuration object.
+  #
+  # It's possible to use given below predefined variables in config:
+  # * `{{ .vm.read }}` - parsed vlselect URL
+  # * `{{ .vm.write }}` - parsed vlinsert URL
+  #
+  # Example
+  # config:
+  #   unauthorized_user:
+  #     url_map:
+  #      - src_paths:
+  #          - '{{ .vm.read.path }}/.*'
+  #        url_prefix:
+  #          - '{{ urlJoin (omit .vm.read "path") }}/'
+  config: {}
+  # -- VMAuth Deployment strategy
+  strategy: {}
+   # rollingUpdate:
+   #  maxSurge: 25%
+   #  maxUnavailable: 25%
+   # type: RollingUpdate
+  image:
+    # -- Image registry
+    registry: ""
+    # -- Image repository
+    repository: victoriametrics/vmauth
+    # -- Image tag
+    # override Chart.AppVersion
+    tag: ""
+    # -- Variant of the image to use.
+    # e.g. cluster, enterprise-cluster
+    variant: ""
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+  # -- Specify pod lifecycle
+  lifecycle: {}
+  ports:
+    # -- VMAuth http port name
+    name: "http"
+  # -- Name of Priority Class
+  priorityClassName: ""
+  # -- Overrides the full name of vmauth component
+  fullnameOverride: ""
+  # -- Extra command line arguments for vmauth component
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    loggerFormat: json
+    httpListenAddr: :8427
+  # -- VMAuth annotations
+  annotations: {}
+  # -- VMAuth additional labels
+  extraLabels: {}
+  # -- VMAuth pod labels
+  podLabels: {}
+
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details
+  env: []
+
+  # -- Specify alternative source for env variables
+  envFrom: []
+    #- configMapRef:
+    #    name: special-config
+
+  # -- Suppress rendering `--storageNode` FQDNs based on `vlstorage.replicaCount` value. If true suppress rendering `--storageNodes`, they can be re-defined in extraArgs
+  suppressStorageFQDNsRender: false
+  # Readiness & Liveness probes
+  probe:
+    # -- VMAuth readiness probe
+    readiness:
+      httpGet: {}
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 5
+      failureThreshold: 10
+    # -- VMAuth liveness probe
+    liveness:
+      tcpSocket: {}
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
+    # -- VMAuth startup probe
+    startup: {}
+
+# Horizontal Pod Autoscaling
+  horizontalPodAutoscaler:
+    # -- Use HPA for vmauth component
+    enabled: false
+    # -- Maximum replicas for HPA to use to to scale the vmauth component
+    maxReplicas: 10
+    # -- Minimum replicas for HPA to use to scale the vmauth component
+    minReplicas: 2
+    # -- Metric for HPA to use to scale the vmauth component
+    metrics: []
+    # -- Behavior settings for scaling by the HPA
+    behavior: {}
+
+  # -- Extra Volumes for the pod
+  extraVolumes:
+    []
+    # - name: example
+    #   configMap:
+    #     name: example
+
+  # -- Extra Volume Mounts for the container
+  extraVolumeMounts:
+    []
+    # - name: example
+    #   mountPath: /example
+
+
+  # -- Extra containers to run in a pod with vmauth
+  extraContainers:
+    []
+    # - name: config-reloader
+    #   image: reloader-image
+
+  # -- Init containers for vmauth
+  initContainers:
+    []
+    # - name: example
+    #   image: example-image
+
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
+
+  # -- Array of tolerations object. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+  tolerations: []
+    # - key: "key"
+    #   operator: "Equal|Exists"
+    #   value: "value"
+    #   effect: "NoSchedule|PreferNoSchedule"
+
+  # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  nodeSelector: {}
+  # -- Pod affinity
+  affinity: {}
+  # -- Pod topologySpreadConstraints
+  topologySpreadConstraints: []
+  # -- Pod's annotations
+  podAnnotations: {}
+  # -- Count of vmauth pods
+  replicaCount: 2
+  # -- Container workdir
+  containerWorkingDir: ""
+  # -- Resource object
+  resources: {}
+    # limits:
+    #   cpu: 50m
+    #   memory: 64Mi
+    # requests:
+    #   cpu: 50m
+    #   memory: 64Mi
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  securityContext:
+    enabled: false
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  podSecurityContext:
+    enabled: false
+  service:
+    # -- Create VMAuth service
+    enabled: true
+    # -- Service annotations
+    annotations: {}
+    # -- Service labels
+    labels: {}
+    # -- Service ClusterIP
+    clusterIP: ""
+    # -- Service External IPs. Details are [here]( https://kubernetes.io/docs/concepts/services-networking/service/#external-ips)
+    externalIPs: []
+    # -- Extra service ports
+    extraPorts: []
+    # -- Service load balancer IP
+    loadBalancerIP: ""
+    # -- Load balancer source range
+    loadBalancerSourceRanges: []
+    # -- Service port
+    servicePort: 8427
+    # -- Target port
+    targetPort: http
+    # -- Service type
+    type: ClusterIP
+    # -- Enable UDP port. used if you have `spec.opentsdbListenAddr` specified
+    # Make sure that service is not type `LoadBalancer`, as it requires `MixedProtocolLBService` feature gate.
+    # Check [here](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/)
+    udp: false
+    # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+    healthCheckNodePort: ""
+    # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+    externalTrafficPolicy: ""
+    # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+    ipFamilyPolicy: ""
+    # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+    ipFamilies: []
+  ingress:
+    # -- Enable deployment of ingress for vmauth component
+    enabled: false
+    # -- Ingress annotations
+    annotations: {}
+    #   kubernetes.io/ingress.class: nginx
+    #   kubernetes.io/tls-acme: 'true'
+    extraLabels: {}
+    # -- Array of host objects
+    hosts:
+      - name: vmauth.local
+        path:
+          - /insert
+        port: http
+    # -- Array of TLS objects
+    tls: []
+    #   - secretName: vmauth-ingress-tls
+    #     hosts:
+    #       - vmauth.local
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    # ingressClassName: nginx
+    # -- pathType is only for k8s >= 1.1=
+    pathType: Prefix
+  serviceMonitor:
+    # -- Enable deployment of Service Monitor for vmauth component. This is Prometheus operator object
+    enabled: false
+    # -- Target namespace of ServiceMonitor manifest
+    namespace: ""
+    # -- Service Monitor labels
+    extraLabels: {}
+    # -- Service Monitor annotations
+    annotations: {}
+    # -- Basic auth params for Service Monitor
+    basicAuth: {}
+    # Commented. Prometheus scare interval for vmauth component
+#    interval: 15s
+    # Commented. Prometheus pre-scrape timeout for vmauth component
+#    scrapeTimeout: 5s
+    # -- Commented. HTTP scheme to use for scraping.
+#    scheme: https
+    # -- Commented. TLS configuration to use when scraping the endpoint
+#    tlsConfig:
+#      insecureSkipVerify: true
+    # -- Service Monitor relabelings
+    relabelings: []
+    # -- Service Monitor metricRelabelings
+    metricRelabelings: []
+
+vlstorage:
+  # -- Enable deployment of vlstorage component. StatefulSet is used
+  enabled: true
+  # -- Override default `app` label name
+  name: ""
+  image:
+    # -- Image registry
+    registry: ""
+    # -- Image repository
+    repository: victoriametrics/victoria-logs
+    # -- Image tag
+    # override Chart.AppVersion
+    tag: ""
+    # -- Variant of the image to use.
+    # e.g. cluster, enterprise-cluster
+    variant: victorialogs
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+  # -- Specify pod lifecycle
+  lifecycle: {}
+  ports: 
+    # -- VMStorage http port name
+    name: "http"
+  # -- Name of Priority Class
+  priorityClassName: ""
+  # -- Overrides the full name of vlstorage component
+  fullnameOverride:
+
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/#environment-variables) for details
+  env: []
+
+  # -- Specify alternative source for env variables
+  envFrom: []
+    #- configMapRef:
+    #    name: special-config
+
+  # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
+  retentionPeriod: 1
+  # -- Additional vlstorage container arguments. Extra command line arguments for vlstorage component
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    loggerFormat: json
+    httpListenAddr: :9491
+
+  # -- Additional hostPath mounts
+  extraHostPathMounts:
+    []
+    # - name: certs-dir
+    #   mountPath: /etc/kubernetes/certs
+    #   subPath: ""
+    #   hostPath: /etc/kubernetes/certs
+    #   readOnly: true
+
+  # -- Extra Volumes for the pod
+  extraVolumes:
+    []
+    # - name: example
+    #   configMap:
+    #     name: example
+
+  # -- Extra Volume Mounts for the container
+  extraVolumeMounts:
+    []
+    # - name: example
+    #   mountPath: /example
+
+  # -- Extra containers to run in a pod with vlstorage
+  extraContainers:
+    []
+    # - name: config-reloader
+    #   image: reloader-image
+  
+  # -- Extra secret mounts for vlstorage
+  extraSecretMounts:
+    []
+    # - name: secret
+    #  mountPath: /etc/credentials
+    #  subPath: ""
+    #  readOnly: true
+
+  # -- Init containers for vlstorage
+  initContainers:
+    []
+    # - name: vmrestore
+    #   image: victoriametrics/vmrestore:latest
+    #   volumeMounts:
+    #   - mountPath: /storage
+    #     name: vlstorage-volume
+    #   - mountPath: /etc/vm/creds
+    #     name: secret-remote-storage-keys
+    #     readOnly: true
+    #   args:
+    #   - -storageDataPath=/storage
+    #   - -src=s3://your_bucket/folder/latest
+    #   - -credsFilePath=/etc/vm/creds/credentials
+
+  # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+    labels: {}
+
+  # -- Array of tolerations object. Node tolerations for server scheduling to nodes with taints. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+  tolerations:
+    []
+    # - key: "key"
+    #   operator: "Equal|Exists"
+    #   value: "value"
+    #   effect: "NoSchedule|PreferNoSchedule"
+
+  # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  nodeSelector: {}
+
+  # -- Pod affinity
+  affinity: {}
+    # -- Pod topologySpreadConstraints
+  topologySpreadConstraints: []
+
+
+  # -- Use an alternate scheduler, e.g. "stork". Check [here](https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/) for details
+  schedulerName: ""
+
+  # -- Empty dir configuration if persistence is disabled
+  emptyDir: {}
+  persistentVolume:
+    # -- Create/use Persistent Volume Claim for vlstorage component. Empty dir if false. If true,  vlstorage will create/use a Persistent Volume Claim
+    enabled: true
+    name: vlstorage-volume
+
+    # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
+    accessModes:
+      - ReadWriteOnce
+    # -- Persistent volume annotations
+    annotations: {}
+    # -- Persistent volume labels
+    labels: {}
+    # -- Storage class name. Will be empty if not set
+    storageClassName: ""
+    # --  Existing Claim name. Requires vlstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound
+    existingClaim: ""
+
+    # -- Data root path. Vmstorage data Persistent Volume mount root path
+    mountPath: /storage
+    # -- Size of the volume.
+    size: 8Gi
+    # -- Mount subpath
+    subPath: ""
+
+  # -- Pod's annotations
+  podAnnotations: {}
+  # -- StatefulSet/Deployment annotations
+  annotations: {}
+  # -- StatefulSet/Deployment additional labels
+  extraLabels: {}
+  # -- Pod’s additional labels
+  podLabels: {}
+  # -- Count of vlstorage pods
+  replicaCount: 2
+  # -- Container workdir
+  containerWorkingDir: ""
+  # -- Deploy order policy for StatefulSet pods
+  podManagementPolicy: OrderedReady
+  # -- Resource object. Details are [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 500m
+    #   memory: 512Mi
+
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  securityContext:
+    enabled: false
+  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  podSecurityContext:
+    enabled: false
+  service:
+    enabled: true
+    # -- Service annotations
+    annotations: {}
+    # -- Service ClusterIP
+    clusterIP: None
+    # -- Service type
+    type: ClusterIP
+    # -- Service labels
+    labels: {}
+    # -- Service port
+    servicePort: 9491
+    # -- Extra service ports
+    extraPorts: []
+    # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+    healthCheckNodePort: ""
+    # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+    externalTrafficPolicy: ""
+    # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+    ipFamilyPolicy: ""
+    # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+    ipFamilies: []
+  # -- Pod's termination grace period in seconds
+  terminationGracePeriodSeconds: 60
+  minReadySeconds: 5
+  # -- Readiness probes
+  probe:
+    # -- VMStorage readiness probe
+    readiness:
+      httpGet: {}
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 5
+      failureThreshold: 10
+    # -- VMStorage startup probe
+    startup: {}
+
+  horizontalPodAutoscaler:
+    # -- Use HPA for vlstorage component
+    enabled: false
+    # -- Maximum replicas for HPA to use to to scale the vlstorage component
+    maxReplicas: 10
+    # -- Minimum replicas for HPA to use to scale the vlstorage component
+    minReplicas: 2
+    # -- Metric for HPA to use to scale the vlstorage component
+    metrics: []
+    # -- Behavior settings for scaling by the HPA
+    behavior:
+      scaleDown:
+        selectPolicy: Disabled
+
+# -- Enterprise license key configuration for VictoriaMetrics enterprise.
+# Required only for VictoriaMetrics enterprise. Check docs [here](https://docs.victoriametrics.com/enterprise),
+# for more information, visit [site](https://victoriametrics.com/products/enterprise/).
+# Request a trial license [here](https://victoriametrics.com/products/enterprise/trial/)
+# Supported starting from VictoriaMetrics v1.94.0
+license:
+  # -- License key
+  key: ""
+
+  # -- Use existing secret with license key
+  secret:
+    # -- Existing secret name
+    name: ""
+    # -- Key in secret with license key
+    key: ""
