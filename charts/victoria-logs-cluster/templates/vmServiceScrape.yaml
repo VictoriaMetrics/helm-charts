@@ -1,0 +1,51 @@
+{{- $ctx := dict "helm" . }}
+{{- range $name, $app := .Values }}
+{{- if and (kindIs "map" $app) $app.enabled ($app.vmServiceScrape).enabled }}
+{{- $vmServiceScrape := $app.vmServiceScrape }}
+{{- $_ := set $ctx "extraLabels" $vmServiceScrape.extraLabels }}
+{{- $_ := set $ctx "appKey" $name }}
+{{ $fullname := include "vm.plain.fullname" $ctx }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  {{- with $vmServiceScrape.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
+  {{- with $vmServiceScrape.namespace }}
+  namespace: {{ . }}
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ include "vm.namespace" $ }}
+  selector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+  endpoints:
+    - port: http
+      {{- with $vmServiceScrape.basicAuth }}
+      basicAuth: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $vmServiceScrape.scheme }}
+      scheme: {{ . }}
+      {{- end }}
+      {{- with $vmServiceScrape.interval }}
+      interval: {{ . }}
+      {{- end }}
+      {{- with $vmServiceScrape.scrapeTimeout }}
+      scrapeTimeout: {{ . }}
+      {{- end }}
+      {{- with $vmServiceScrape.tlsConfig }}
+      tlsConfig: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $vmServiceScrape.relabelings }}
+      relabelings: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $vmServiceScrape.metricRelabelings }}
+      metricRelabelings: {{ toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,15 @@
+{{- if and (or (.Values.vector).enabled (.Values.vector).customConfigNamespace) (.Values.vector).existingConfigMaps }}
+{{- $ctx := dict "helm" . "style" "plain" }}
+{{- $ns := include "vm.namespace" $ctx }}
+{{- $ns = ternary $ns ((.Values.vector).customConfigNamespace | default $ns) .Values.vector.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ index (.Values.vector).existingConfigMaps 0 }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  namespace: {{ $ns }}
+data:
+  {{- $tpl := toYaml (.Values.vector).customConfig | replace "<<" "{{" | replace ">>" "}}" }}
+  {{ include "vm.fullname" $ctx }}-vector.yaml: |{{ tpl $tpl $ctx | nindent 4 }}
+{{- end }}

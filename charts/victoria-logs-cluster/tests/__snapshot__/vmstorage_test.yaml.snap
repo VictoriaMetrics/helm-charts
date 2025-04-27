@@ -1,0 +1,154 @@
+statefulset should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      labels:
+        app: vlstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-cluster
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlstorage
+      namespace: NAMESPACE
+    spec:
+      minReadySeconds: 5
+      podManagementPolicy: OrderedReady
+      replicas: 2
+      selector:
+        matchLabels:
+          app: vlstorage
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-cluster
+      serviceName: RELEASE-NAME-victoria-logs-cluster-vlstorage
+      template:
+        metadata:
+          labels:
+            app: vlstorage
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-cluster
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --httpListenAddr=:8482
+                - --loggerFormat=json
+                - --retentionPeriod=1
+                - --storageDataPath=/storage
+              image: victoriametrics/vlstorage:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              name: vlstorage
+              ports:
+                - containerPort: 8482
+                  name: http
+                - containerPort: 8400
+                  name: vminsert
+                - containerPort: 8401
+                  name: vmselect
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              volumeMounts:
+                - mountPath: /storage
+                  name: vlstorage-volume
+          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+          terminationGracePeriodSeconds: 60
+      volumeClaimTemplates:
+        - apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: vlstorage-volume
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 8Gi
+statefulset should match snapshot with fullnameOverride, extraLabels and podLabels:
+  1: |
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      labels:
+        app: storage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-cluster
+        extraLabelName: extraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: vlstorage-node
+      namespace: NAMESPACE
+    spec:
+      minReadySeconds: 5
+      podManagementPolicy: OrderedReady
+      replicas: 2
+      selector:
+        matchLabels:
+          app: storage
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-cluster
+      serviceName: vlstorage-node
+      template:
+        metadata:
+          labels:
+            app: storage
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-cluster
+            podLabelName: podLabelValue
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --httpListenAddr=:8482
+                - --loggerFormat=json
+                - --retentionPeriod=1
+                - --storageDataPath=/storage
+              image: victoriametrics/vlstorage:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              name: vlstorage
+              ports:
+                - containerPort: 8482
+                  name: http
+                - containerPort: 8400
+                  name: vminsert
+                - containerPort: 8401
+                  name: vmselect
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              volumeMounts:
+                - mountPath: /storage
+                  name: vlstorage-volume
+          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+          terminationGracePeriodSeconds: 60
+      volumeClaimTemplates:
+        - apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: vlstorage-volume
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 8Gi
