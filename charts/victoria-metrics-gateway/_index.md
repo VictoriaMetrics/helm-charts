@@ -1,10 +1,10 @@
 ---
-weight: 8
+weight: 9
 title: VictoriaMetrics Gateway
 menu:
   docs:
     parent: helm
-    weight: 8
+    weight: 9
     identifier: helm-victoriametrics-gateway
 url: /helm/victoriametrics-gateway
 aliases:

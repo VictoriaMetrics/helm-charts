@@ -1,10 +1,10 @@
 ---
-weight: 6
+weight: 7
 title: VictoriaMetrics Cluster
 menu:
   docs:
     parent: helm
-    weight: 6
+    weight: 7
     identifier: helm-victoriametrics-cluster
 url: /helm/victoriametrics-cluster
 aliases:

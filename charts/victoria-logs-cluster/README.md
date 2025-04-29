@@ -284,7 +284,7 @@ Change the values according to the need of the environment in ``victoria-logs-cl
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">dataDir</span><span class="p">:</span><span class="w"> </span><span class="l">/vector-data-dir</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">existingConfigMaps</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="l">vl-config</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="l">vector-vl-config</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l">Agent</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">service</span><span class="p">:</span><span class="w">
@@ -746,12 +746,6 @@ Change the values according to the need of the environment in ``victoria-logs-cl
       <td><em><code>(object)</code></em><p>VMServiceScrape annotations</p>
 </td>
     </tr>
-    <tr id="vlinsert-vmservicescrape-basicauth">
-      <td><a href="#vlinsert-vmservicescrape-basicauth"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlinsert.vmServiceScrape.basicAuth</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
-</a></td>
-      <td><em><code>(object)</code></em><p>Basic auth params for VMServiceScrape</p>
-</td>
-    </tr>
     <tr id="vlinsert-vmservicescrape-enabled">
       <td><a href="#vlinsert-vmservicescrape-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlinsert.vmServiceScrape.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
 </a></td>
@@ -764,22 +758,21 @@ Change the values according to the need of the environment in ``victoria-logs-cl
       <td><em><code>(object)</code></em><p>VMServiceScrape labels</p>
 </td>
     </tr>
-    <tr id="vlinsert-vmservicescrape-metricrelabelings">
-      <td><a href="#vlinsert-vmservicescrape-metricrelabelings"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlinsert.vmServiceScrape.metricRelabelings</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
-</a></td>
-      <td><em><code>(list)</code></em><p>vmServiceScrape metricRelabelings</p>
-</td>
-    </tr>
     <tr id="vlinsert-vmservicescrape-namespace">
       <td><a href="#vlinsert-vmservicescrape-namespace"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlinsert.vmServiceScrape.namespace</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&#34;</span></span></span></code></pre>
 </a></td>
       <td><em><code>(string)</code></em><p>Target namespace of VMServiceScrape manifest</p>
 </td>
     </tr>
-    <tr id="vlinsert-vmservicescrape-relabelings">
-      <td><a href="#vlinsert-vmservicescrape-relabelings"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlinsert.vmServiceScrape.relabelings</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
+    <tr id="vlinsert-vmservicescrape-spec-endpoints[0]-port">
+      <td><a href="#vlinsert-vmservicescrape-spec-endpoints[0]-port"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlinsert.vmServiceScrape.spec.endpoints[0].port</span><span class="p">:</span><span class="w"> </span><span class="l">http</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>vmServiceScrape relabelings</p>
+      <td><em><code>(string)</code></em></td>
+    </tr>
+    <tr id="vlinsert-vmservicescrape-useservicemonitor">
+      <td><a href="#vlinsert-vmservicescrape-useservicemonitor"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlinsert.vmServiceScrape.useServiceMonitor</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create ServiceMonitor instead of VMServiceScrape, which is managed by <a href="https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor" target="_blank">prometheus-operator</a></p>
 </td>
     </tr>
     <tr id="vlselect-affinity">
@@ -1223,12 +1216,6 @@ Change the values according to the need of the environment in ``victoria-logs-cl
       <td><em><code>(object)</code></em><p>VMServiceScrape annotations</p>
 </td>
     </tr>
-    <tr id="vlselect-vmservicescrape-basicauth">
-      <td><a href="#vlselect-vmservicescrape-basicauth"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlselect.vmServiceScrape.basicAuth</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
-</a></td>
-      <td><em><code>(object)</code></em><p>Basic auth params for VMServiceScrape</p>
-</td>
-    </tr>
     <tr id="vlselect-vmservicescrape-enabled">
       <td><a href="#vlselect-vmservicescrape-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlselect.vmServiceScrape.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
 </a></td>
@@ -1241,22 +1228,21 @@ Change the values according to the need of the environment in ``victoria-logs-cl
       <td><em><code>(object)</code></em><p>VMServiceScrape labels</p>
 </td>
     </tr>
-    <tr id="vlselect-vmservicescrape-metricrelabelings">
-      <td><a href="#vlselect-vmservicescrape-metricrelabelings"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlselect.vmServiceScrape.metricRelabelings</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
-</a></td>
-      <td><em><code>(list)</code></em><p>vmServiceScrape metricRelabelings</p>
-</td>
-    </tr>
     <tr id="vlselect-vmservicescrape-namespace">
       <td><a href="#vlselect-vmservicescrape-namespace"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlselect.vmServiceScrape.namespace</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&#34;</span></span></span></code></pre>
 </a></td>
       <td><em><code>(string)</code></em><p>Target namespace of VMServiceScrape manifest</p>
 </td>
     </tr>
-    <tr id="vlselect-vmservicescrape-relabelings">
-      <td><a href="#vlselect-vmservicescrape-relabelings"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlselect.vmServiceScrape.relabelings</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
+    <tr id="vlselect-vmservicescrape-spec-endpoints[0]-port">
+      <td><a href="#vlselect-vmservicescrape-spec-endpoints[0]-port"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlselect.vmServiceScrape.spec.endpoints[0].port</span><span class="p">:</span><span class="w"> </span><span class="l">http</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>vmServiceScrape relabelings</p>
+      <td><em><code>(string)</code></em></td>
+    </tr>
+    <tr id="vlselect-vmservicescrape-useservicemonitor">
+      <td><a href="#vlselect-vmservicescrape-useservicemonitor"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlselect.vmServiceScrape.useServiceMonitor</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create ServiceMonitor instead of VMServiceScrape, which is managed by <a href="https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor" target="_blank">prometheus-operator</a></p>
 </td>
     </tr>
     <tr id="vlstorage-affinity">
@@ -1692,12 +1678,6 @@ Change the values according to the need of the environment in ``victoria-logs-cl
       <td><em><code>(object)</code></em><p>VMServiceScrape annotations</p>
 </td>
     </tr>
-    <tr id="vlstorage-vmservicescrape-basicauth">
-      <td><a href="#vlstorage-vmservicescrape-basicauth"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlstorage.vmServiceScrape.basicAuth</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
-</a></td>
-      <td><em><code>(object)</code></em><p>Basic auth params for VMServiceScrape</p>
-</td>
-    </tr>
     <tr id="vlstorage-vmservicescrape-enabled">
       <td><a href="#vlstorage-vmservicescrape-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlstorage.vmServiceScrape.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
 </a></td>
@@ -1710,22 +1690,21 @@ Change the values according to the need of the environment in ``victoria-logs-cl
       <td><em><code>(object)</code></em><p>VMServiceScrape labels</p>
 </td>
     </tr>
-    <tr id="vlstorage-vmservicescrape-metricrelabelings">
-      <td><a href="#vlstorage-vmservicescrape-metricrelabelings"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlstorage.vmServiceScrape.metricRelabelings</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
-</a></td>
-      <td><em><code>(list)</code></em><p>vmServiceScrape metricRelabelings</p>
-</td>
-    </tr>
     <tr id="vlstorage-vmservicescrape-namespace">
       <td><a href="#vlstorage-vmservicescrape-namespace"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlstorage.vmServiceScrape.namespace</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&#34;</span></span></span></code></pre>
 </a></td>
       <td><em><code>(string)</code></em><p>Target namespace of VMServiceScrape manifest</p>
 </td>
     </tr>
-    <tr id="vlstorage-vmservicescrape-relabelings">
-      <td><a href="#vlstorage-vmservicescrape-relabelings"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlstorage.vmServiceScrape.relabelings</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
+    <tr id="vlstorage-vmservicescrape-spec-endpoints[0]-port">
+      <td><a href="#vlstorage-vmservicescrape-spec-endpoints[0]-port"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlstorage.vmServiceScrape.spec.endpoints[0].port</span><span class="p">:</span><span class="w"> </span><span class="l">http</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>vmServiceScrape relabelings</p>
+      <td><em><code>(string)</code></em></td>
+    </tr>
+    <tr id="vlstorage-vmservicescrape-useservicemonitor">
+      <td><a href="#vlstorage-vmservicescrape-useservicemonitor"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vlstorage.vmServiceScrape.useServiceMonitor</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create ServiceMonitor instead of VMServiceScrape, which is managed by <a href="https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor" target="_blank">prometheus-operator</a></p>
 </td>
     </tr>
     <tr id="vmauth-affinity">
@@ -2131,12 +2110,6 @@ Change the values according to the need of the environment in ``victoria-logs-cl
       <td><em><code>(object)</code></em><p>VMServiceScrape annotations</p>
 </td>
     </tr>
-    <tr id="vmauth-vmservicescrape-basicauth">
-      <td><a href="#vmauth-vmservicescrape-basicauth"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmauth.vmServiceScrape.basicAuth</span><span class="p">:</span><span class="w"> </span>{}</span></span></code></pre>
-</a></td>
-      <td><em><code>(object)</code></em><p>Basic auth params for VMServiceScrape</p>
-</td>
-    </tr>
     <tr id="vmauth-vmservicescrape-enabled">
       <td><a href="#vmauth-vmservicescrape-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmauth.vmServiceScrape.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
 </a></td>
@@ -2149,22 +2122,21 @@ Change the values according to the need of the environment in ``victoria-logs-cl
       <td><em><code>(object)</code></em><p>VMServiceScrape labels</p>
 </td>
     </tr>
-    <tr id="vmauth-vmservicescrape-metricrelabelings">
-      <td><a href="#vmauth-vmservicescrape-metricrelabelings"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmauth.vmServiceScrape.metricRelabelings</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
-</a></td>
-      <td><em><code>(list)</code></em><p>vmServiceScrape metricRelabelings</p>
-</td>
-    </tr>
     <tr id="vmauth-vmservicescrape-namespace">
       <td><a href="#vmauth-vmservicescrape-namespace"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmauth.vmServiceScrape.namespace</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&#34;</span></span></span></code></pre>
 </a></td>
       <td><em><code>(string)</code></em><p>Target namespace of VMServiceScrape manifest</p>
 </td>
     </tr>
-    <tr id="vmauth-vmservicescrape-relabelings">
-      <td><a href="#vmauth-vmservicescrape-relabelings"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmauth.vmServiceScrape.relabelings</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span></span></span></code></pre>
+    <tr id="vmauth-vmservicescrape-spec-endpoints[0]-port">
+      <td><a href="#vmauth-vmservicescrape-spec-endpoints[0]-port"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmauth.vmServiceScrape.spec.endpoints[0].port</span><span class="p">:</span><span class="w"> </span><span class="l">http</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(list)</code></em><p>vmServiceScrape relabelings</p>
+      <td><em><code>(string)</code></em></td>
+    </tr>
+    <tr id="vmauth-vmservicescrape-useservicemonitor">
+      <td><a href="#vmauth-vmservicescrape-useservicemonitor"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">vmauth.vmServiceScrape.useServiceMonitor</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
+</a></td>
+      <td><em><code>(bool)</code></em><p>Create ServiceMonitor instead of VMServiceScrape, which is managed by <a href="https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor" target="_blank">prometheus-operator</a></p>
 </td>
     </tr>
   </tbody>
