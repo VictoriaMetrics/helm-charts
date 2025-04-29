@@ -1,8 +1,9 @@
 {{- $ctx := dict "helm" . }}
+{{- $urlCtx := dict "helm" . }}
 {{- $isMultitenant := .Values.enableMultitenancy }}
 {{- $tenant := ternary "multitenant" "0" $isMultitenant }}
 {{- range $i, $az := .Values.availabilityZones }}
-  {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $az }}
+  {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) (deepCopy $az) }}
   {{- if $zone.vmagent.enabled }}
     {{- if (($zone.vmagent).spec).remoteWrite }}
       {{- fail "Error: distributed vmagent doesn't support customized remoteWrite address" }}
@@ -26,24 +27,24 @@ metadata:
 {{- range $rwz := $.Values.availabilityZones }}
   {{- $rwZone := mergeOverwrite (deepCopy $.Values.zoneTpl) $rwz }}
   {{- if $rwZone.write.allow }}
-    {{- $_ := set $ctx "style" "managed" }}
-    {{- $_ := set $ctx "zone" $rwZone }}
+    {{- $_ := set $urlCtx "style" "managed" }}
+    {{- $_ := set $urlCtx "zone" $rwZone }}
     {{- if ($rwZone.vmcluster).enabled -}}
       {{- $_ := set $rwZone.vmcluster "spec" (mergeOverwrite (deepCopy $.Values.common.vmcluster.spec) (deepCopy ($rwZone.common).spec) (deepCopy ($rwZone.vmcluster.spec))) -}}
-      {{- $_ := set $ctx "appKey" (list "zone" "vmcluster" "spec" "vminsert") }}
-      {{- $remoteWrite := printf "%s/insert/%s/prometheus/api/v1/write" (include "vm.url" $ctx) $tenant -}}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vminsert") }}
+      {{- $remoteWrite := printf "%s/insert/%s/prometheus/api/v1/write" (include "vm.url" $urlCtx) $tenant -}}
       {{- $remoteWrites = append $remoteWrites (dict "url" $remoteWrite) -}}
     {{- else if ($rwZone.vmsingle).enabled -}}
       {{- $_ := set $rwZone.vmsingle "spec" (mergeOverwrite (deepCopy $.Values.common.vmsingle.spec) (deepCopy ($rwZone.common).spec) (deepCopy ($rwZone.vmsingle.spec))) -}}
-      {{- $_ := set $ctx "appKey" (list "zone" "vmsingle" "spec") }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
       {{- $replicas := (($rwZone.vmsingle).spec).replicaCount | default 1 }}
       {{- range $id := until (int $replicas) -}}
-        {{- $_ := set $ctx "appIdx" $id -}}
-        {{- $remoteWrite := printf "%s/prometheus/api/v1/write" (include "vm.url" $ctx) -}}
+        {{- $_ := set $urlCtx "appIdx" $id -}}
+        {{- $remoteWrite := printf "%s/prometheus/api/v1/write" (include "vm.url" $urlCtx) -}}
         {{- $remoteWrites = append $remoteWrites (dict "url" $remoteWrite) -}}
       {{- end -}}
     {{- end -}}
-    {{- $_ := unset $ctx "style" }}
+    {{- $_ := unset $urlCtx "style" }}
   {{- end }}
 {{- end }}
 {{- $rw := concat $remoteWrites ($zone.vmagent.spec.remoteWrites | default list) -}}

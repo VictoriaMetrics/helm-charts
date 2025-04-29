@@ -1,6 +1,7 @@
 ## Next release
 
 - bump version of VM components to [v1.116.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.116.0)
+- fixed vmagent spec template rendering. See [issue #2158](https://github.com/VictoriaMetrics/helm-charts/issues/2158) for details.
 
 ## 0.13.2
 
