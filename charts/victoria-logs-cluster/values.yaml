@@ -264,20 +264,25 @@ vlselect:
   vmServiceScrape:
     # -- Enable VMServiceScrape for vlselect component, which is managed by [vm-operator](https://docs.victoriametrics.com/operator/quick-start/).
     enabled: false
+    # -- Create ServiceMonitor instead of VMServiceScrape, which is managed by [prometheus-operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor)
+    useServiceMonitor: false
     # -- Target namespace of VMServiceScrape manifest
     namespace: ""
     # -- VMServiceScrape labels
     extraLabels: {}
     # -- VMServiceScrape annotations
     annotations: {}
-    # -- Basic auth params for VMServiceScrape
-    basicAuth: {}
-    # interval: 15s
-    # scrapeTimeout: 5s
-    # -- vmServiceScrape relabelings
-    relabelings: []
-    # -- vmServiceScrape metricRelabelings
-    metricRelabelings: []
+    spec:
+      endpoints:
+        - port: http
+          # -- Basic auth params for VMServiceScrape
+          # basicAuth: {}
+          # interval: 15s
+          # scrapeTimeout: 5s
+          # -- vmServiceScrape relabelings
+          # relabelings: []
+          # -- vmServiceScrape metricRelabelings
+          # metricRelabelings: []
 
 vlinsert:
   # -- Enable deployment of vlinsert component.
@@ -501,20 +506,25 @@ vlinsert:
   vmServiceScrape:
     # -- Enable VMServiceScrape for vlinsert component, which is managed by [vm-operator](https://docs.victoriametrics.com/operator/quick-start/).
     enabled: false
+    # -- Create ServiceMonitor instead of VMServiceScrape, which is managed by [prometheus-operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor)
+    useServiceMonitor: false
     # -- Target namespace of VMServiceScrape manifest
     namespace: ""
     # -- VMServiceScrape labels
     extraLabels: {}
     # -- VMServiceScrape annotations
     annotations: {}
-    # -- Basic auth params for VMServiceScrape
-    basicAuth: {}
-    # interval: 15s
-    # scrapeTimeout: 5s
-    # -- vmServiceScrape relabelings
-    relabelings: []
-    # -- vmServiceScrape metricRelabelings
-    metricRelabelings: []
+    spec:
+      endpoints:
+        - port: http
+          # -- Basic auth params for VMServiceScrape
+          # basicAuth: {}
+          # interval: 15s
+          # scrapeTimeout: 5s
+          # -- vmServiceScrape relabelings
+          # relabelings: []
+          # -- vmServiceScrape metricRelabelings
+          # metricRelabelings: []
 
 vlstorage:
   # -- Enable deployment of vlstorage component. StatefulSet is used
@@ -719,20 +729,25 @@ vlstorage:
   vmServiceScrape:
     # -- Enable VMServiceScrape for vlstorage component, which is managed by [vm-operator](https://docs.victoriametrics.com/operator/quick-start/).
     enabled: false
+    # -- Create ServiceMonitor instead of VMServiceScrape, which is managed by [prometheus-operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor)
+    useServiceMonitor: false
     # -- Target namespace of VMServiceScrape manifest
     namespace: ""
     # -- VMServiceScrape labels
     extraLabels: {}
     # -- VMServiceScrape annotations
     annotations: {}
-    # -- Basic auth params for VMServiceScrape
-    basicAuth: {}
-    # interval: 15s
-    # scrapeTimeout: 5s
-    # -- vmServiceScrape relabelings
-    relabelings: []
-    # -- vmServiceScrape metricRelabelings
-    metricRelabelings: []
+    spec:
+      endpoints:
+        - port: http
+          # -- Basic auth params for VMServiceScrape
+          # basicAuth: {}
+          # interval: 15s
+          # scrapeTimeout: 5s
+          # -- vmServiceScrape relabelings
+          # relabelings: []
+          # -- vmServiceScrape metricRelabelings
+          # metricRelabelings: []
 
 vmauth:
   # -- Enable deployment of vmauth component, to help better balance the read and write requests to vlinsert and vlselect components.
@@ -944,23 +959,29 @@ vmauth:
     # ingressClassName: nginx
     # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
+
   vmServiceScrape:
     # -- Enable VMServiceScrape for vmauth component, which is managed by [vm-operator](https://docs.victoriametrics.com/operator/quick-start/).
     enabled: false
+    # -- Create ServiceMonitor instead of VMServiceScrape, which is managed by [prometheus-operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor)
+    useServiceMonitor: false
     # -- Target namespace of VMServiceScrape manifest
     namespace: ""
     # -- VMServiceScrape labels
     extraLabels: {}
     # -- VMServiceScrape annotations
     annotations: {}
-    # -- Basic auth params for VMServiceScrape
-    basicAuth: {}
-    # interval: 15s
-    # scrapeTimeout: 5s
-    # -- vmServiceScrape relabelings
-    relabelings: []
-    # -- vmServiceScrape metricRelabelings
-    metricRelabelings: []
+    spec:
+      endpoints:
+        - port: http
+          # -- Basic auth params for VMServiceScrape
+          # basicAuth: {}
+          # interval: 15s
+          # scrapeTimeout: 5s
+          # -- vmServiceScrape relabelings
+          # relabelings: []
+          # -- vmServiceScrape metricRelabelings
+          # metricRelabelings: []
 
 # -- Values for [vector helm chart](https://github.com/vectordotdev/helm-charts/tree/develop/charts/vector)
 vector:

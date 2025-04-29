@@ -6,8 +6,13 @@
 {{- $_ := set $ctx "appKey" $name }}
 {{ $fullname := include "vm.plain.fullname" $ctx }}
 ---
+{{ if not $vmServiceScrape.useServiceMonitor }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
+{{ else }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+{{ end }}
 metadata:
   {{- with $vmServiceScrape.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
@@ -19,33 +24,21 @@ metadata:
   namespace: {{ . }}
   {{- end }}
 spec:
+  {{- with $vmServiceScrape.spec.namespaceSelector }}
+  namespaceSelector: {{ toYaml . | nindent 4 }}
+  {{- else }}
   namespaceSelector:
     matchNames:
       - {{ include "vm.namespace" $ }}
+  {{- end }}
+  {{- with $vmServiceScrape.spec.selector }}
+  selector: {{ toYaml . | nindent 4 }}
+  {{- else }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
-  endpoints:
-    - port: http
-      {{- with $vmServiceScrape.basicAuth }}
-      basicAuth: {{ toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with $vmServiceScrape.scheme }}
-      scheme: {{ . }}
-      {{- end }}
-      {{- with $vmServiceScrape.interval }}
-      interval: {{ . }}
-      {{- end }}
-      {{- with $vmServiceScrape.scrapeTimeout }}
-      scrapeTimeout: {{ . }}
-      {{- end }}
-      {{- with $vmServiceScrape.tlsConfig }}
-      tlsConfig: {{ toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with $vmServiceScrape.relabelings }}
-      relabelings: {{ toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with $vmServiceScrape.metricRelabelings }}
-      metricRelabelings: {{ toYaml . | nindent 8 }}
-      {{- end }}
+  {{- end }}
+  {{- with omit $app.vmServiceScrape.spec "selector" "namespaceSelector"}}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}  
 {{- end }}
 {{- end }}
