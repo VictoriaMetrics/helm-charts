@@ -25,7 +25,7 @@ common:
 
 serviceAccount:
   # -- Specifies whether a service account should be created
-  create: true
+  create: false
 
   # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
@@ -194,11 +194,17 @@ vlselect:
     #   memory: 200Mi
 
   # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  securityContext:
-    enabled: true
-  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext:
     enabled: true
+    fsGroup: 1000
+
+  # -- Check [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for details.
+  securityContext:
+    enabled: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+
   service:
     # -- Create vlselect service
     enabled: true
@@ -434,12 +440,19 @@ vlinsert:
     # requests:
     #   cpu: 100m
     #   memory: 200Mi
-  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  securityContext:
-    enabled: false
+
   # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext:
-    enabled: false
+    enabled: true
+    fsGroup: 1000
+
+  # -- Check [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for details.
+  securityContext:
+    enabled: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+
   service:
     # -- Create vlinsert service
     enabled: true
@@ -668,11 +681,17 @@ vlstorage:
     #   memory: 512Mi
 
   # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  securityContext:
-    enabled: false
-  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext:
-    enabled: false
+    enabled: true
+    fsGroup: 1000
+
+  # -- Check [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for details.
+  securityContext:
+    enabled: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+
   service:
     enabled: true
     # -- Service annotations
@@ -772,8 +791,8 @@ vmauth:
     # -- Image repository
     repository: victoriametrics/vmauth
     # -- Image tag
-    # override Chart.AppVersion
-    tag: "v1.115.0"
+    # override the default Chart.AppVersion, which is for vlogs components
+    tag: "v1.116.0"
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Specify pod lifecycle
@@ -899,11 +918,17 @@ vmauth:
     #   memory: 100Mi
 
   # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  securityContext:
-    enabled: false
-  # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext:
-    enabled: false
+    enabled: true
+    fsGroup: 1000
+
+  # -- Check [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for details.
+  securityContext:
+    enabled: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+
   service:
     # -- Create VMAuth service
     enabled: true
