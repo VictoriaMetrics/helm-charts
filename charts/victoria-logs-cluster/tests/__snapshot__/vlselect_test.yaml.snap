@@ -27,7 +27,6 @@ deployment should match snapshot:
             app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/name: victoria-logs-cluster
         spec:
-          automountServiceAccountToken: true
           containers:
             - args:
                 - --envflag.enable
@@ -57,9 +56,12 @@ deployment should match snapshot:
                 initialDelaySeconds: 5
                 periodSeconds: 5
                 timeoutSeconds: 5
-              securityContext: {}
-          securityContext: {}
-          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+          securityContext:
+            fsGroup: 1000
           terminationGracePeriodSeconds: 60
 deployment should match snapshot with fullnameOverride, extraLabels and podLabels:
   1: |
@@ -92,7 +94,6 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
             app.kubernetes.io/name: victoria-logs-cluster
             podLabelName: podLabelValue
         spec:
-          automountServiceAccountToken: true
           containers:
             - args:
                 - --envflag.enable
@@ -129,7 +130,10 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
                 requests:
                   cpu: 100m
                   memory: 200Mi
-              securityContext: {}
-          securityContext: {}
-          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+          securityContext:
+            fsGroup: 1000
           terminationGracePeriodSeconds: 60

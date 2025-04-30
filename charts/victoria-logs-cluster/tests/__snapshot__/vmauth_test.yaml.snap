@@ -8,7 +8,7 @@ deployment should match snapshot:
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-logs-cluster
-        app.kubernetes.io/version: v1.115.0
+        app.kubernetes.io/version: v1.116.0
         helm.sh/chart: victoria-logs-cluster-0.1.1
       name: RELEASE-NAME-victoria-logs-cluster-vmauth
       namespace: NAMESPACE
@@ -27,14 +27,13 @@ deployment should match snapshot:
             app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/name: victoria-logs-cluster
         spec:
-          automountServiceAccountToken: true
           containers:
             - args:
                 - --auth.config=/config/auth.yml
                 - --envflag.enable
                 - --httpListenAddr=:8427
                 - --loggerFormat=json
-              image: victoriametrics/vmauth:v1.115.0
+              image: victoriametrics/vmauth:v1.116.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
                 failureThreshold: 3
@@ -56,10 +55,15 @@ deployment should match snapshot:
                 initialDelaySeconds: 5
                 periodSeconds: 5
                 timeoutSeconds: 5
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
               volumeMounts:
                 - mountPath: /config
                   name: config
-          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+          securityContext:
+            fsGroup: 1000
           volumes:
             - name: config
               secret:
@@ -74,7 +78,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-logs-cluster
-        app.kubernetes.io/version: v1.115.0
+        app.kubernetes.io/version: v1.116.0
         extraLabelName: extraLabelValue
         helm.sh/chart: victoria-logs-cluster-0.1.1
       name: vmauth-node
@@ -95,14 +99,13 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
             app.kubernetes.io/name: victoria-logs-cluster
             podLabelName: podLabelValue
         spec:
-          automountServiceAccountToken: true
           containers:
             - args:
                 - --auth.config=/config/auth.yml
                 - --envflag.enable
                 - --httpListenAddr=:8427
                 - --loggerFormat=json
-              image: victoriametrics/vmauth:v1.115.0
+              image: victoriametrics/vmauth:v1.116.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
                 failureThreshold: 3
@@ -124,10 +127,15 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
                 initialDelaySeconds: 5
                 periodSeconds: 5
                 timeoutSeconds: 5
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
               volumeMounts:
                 - mountPath: /config
                   name: config
-          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+          securityContext:
+            fsGroup: 1000
           volumes:
             - name: config
               secret:

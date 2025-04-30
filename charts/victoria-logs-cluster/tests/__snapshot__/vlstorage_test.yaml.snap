@@ -30,7 +30,6 @@ statefulset should match snapshot:
             app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/name: victoria-logs-cluster
         spec:
-          automountServiceAccountToken: true
           containers:
             - args:
                 - --envflag.enable
@@ -53,10 +52,15 @@ statefulset should match snapshot:
                 initialDelaySeconds: 5
                 periodSeconds: 5
                 timeoutSeconds: 5
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
               volumeMounts:
                 - mountPath: /storage
                   name: vlstorage-volume
-          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+          securityContext:
+            fsGroup: 1000
           terminationGracePeriodSeconds: 60
       volumeClaimTemplates:
         - apiVersion: v1
@@ -103,7 +107,6 @@ statefulset should match snapshot with fullnameOverride, extraLabels and podLabe
             app.kubernetes.io/name: victoria-logs-cluster
             podLabelName: podLabelValue
         spec:
-          automountServiceAccountToken: true
           containers:
             - args:
                 - --envflag.enable
@@ -127,10 +130,15 @@ statefulset should match snapshot with fullnameOverride, extraLabels and podLabe
                 initialDelaySeconds: 5
                 periodSeconds: 5
                 timeoutSeconds: 5
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
               volumeMounts:
                 - mountPath: /storage
                   name: vlstorage-volume
-          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+          securityContext:
+            fsGroup: 1000
           terminationGracePeriodSeconds: 60
       volumeClaimTemplates:
         - apiVersion: v1
