@@ -1,0 +1,38 @@
+{{ template "chart.badges" . }}
+
+{{ template "chart.description" . }}
+
+## Prerequisites
+
+* Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](https://docs.victoriametrics.com/helm/requirements/).
+
+* PV support on underlying infrastructure.
+
+## Chart Details
+
+This chart will do the following:
+
+* Rollout [VictoriaLogs cluster](https://docs.victoriametrics.com/victorialogs/cluster/).
+* (optional) Rollout [vector](https://vector.dev/) to collect logs from pods.
+
+Chart allows to configure logs collection from Kubernetes pods to VictoriaLogs.
+In order to do that you need to enable vector:
+```yaml
+vector:
+  enabled: true
+```
+By default, vector will forward logs to VictoriaLogs installation deployed by this chart.
+
+{{ include "chart.installSection" . }}
+
+{{ include "chart.uninstallSection" . }}
+
+{{ include "chart.helmDocs" . }}
+
+## Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-logs-cluster/values.yaml`` file.
+
+{{ template "chart.valuesTableHtml" . }}

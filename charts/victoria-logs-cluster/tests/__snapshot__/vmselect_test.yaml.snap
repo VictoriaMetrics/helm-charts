@@ -1,0 +1,221 @@
+deployment should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: vlselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-cluster
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlselect
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: vlselect
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-cluster
+      strategy: {}
+      template:
+        metadata:
+          labels:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-cluster
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --cacheDataPath=/cache
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --httpListenAddr=:8481
+                - --loggerFormat=json
+                - --storageNode=RELEASE-NAME-victoria-logs-cluster-vmstorage-0.RELEASE-NAME-victoria-logs-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+                - --storageNode=RELEASE-NAME-victoria-logs-cluster-vmstorage-1.RELEASE-NAME-victoria-logs-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+              image: victoriametrics/vlselect:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vlselect
+              ports:
+                - containerPort: 8481
+                  name: http
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /cache
+                  name: cache-volume
+          securityContext: {}
+          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+          terminationGracePeriodSeconds: 60
+          volumes:
+            - emptyDir: {}
+              name: cache-volume
+deployment should match snapshot with fullnameOverride, extraLabels and podLabels:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: select
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-cluster
+        extraLabelName: extraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: vlselect-node
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: select
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-cluster
+      strategy: {}
+      template:
+        metadata:
+          labels:
+            app: select
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-cluster
+            podLabelName: podLabelValue
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --cacheDataPath=/cache
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --httpListenAddr=:8481
+                - --loggerFormat=json
+                - --storageNode=RELEASE-NAME-victoria-logs-cluster-vmstorage-0.RELEASE-NAME-victoria-logs-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+                - --storageNode=RELEASE-NAME-victoria-logs-cluster-vmstorage-1.RELEASE-NAME-victoria-logs-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+              image: victoriametrics/vlselect:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vlselect
+              ports:
+                - containerPort: 8481
+                  name: http
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /cache
+                  name: cache-volume
+          securityContext: {}
+          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+          terminationGracePeriodSeconds: 60
+          volumes:
+            - emptyDir: {}
+              name: cache-volume
+statefulset should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      labels:
+        app: vlselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-cluster
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlselect
+      namespace: NAMESPACE
+    spec:
+      podManagementPolicy: OrderedReady
+      replicas: 2
+      selector:
+        matchLabels:
+          app: vlselect
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-cluster
+      serviceName: RELEASE-NAME-victoria-logs-cluster-vlselect
+      template:
+        metadata:
+          labels:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-cluster
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --cacheDataPath=/cache
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --httpListenAddr=:8481
+                - --loggerFormat=json
+                - --selectNode=RELEASE-NAME-victoria-logs-cluster-vlselect-0.RELEASE-NAME-victoria-logs-cluster-vlselect.NAMESPACE.svc.cluster.local.:8481
+                - --selectNode=RELEASE-NAME-victoria-logs-cluster-vlselect-1.RELEASE-NAME-victoria-logs-cluster-vlselect.NAMESPACE.svc.cluster.local.:8481
+                - --storageNode=RELEASE-NAME-victoria-logs-cluster-vmstorage-0.RELEASE-NAME-victoria-logs-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+                - --storageNode=RELEASE-NAME-victoria-logs-cluster-vmstorage-1.RELEASE-NAME-victoria-logs-cluster-vmstorage.NAMESPACE.svc.cluster.local.:8401
+              image: victoriametrics/vlselect:0.1.0-cluster
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vlselect
+              ports:
+                - containerPort: 8481
+                  name: http
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /cache
+                  name: cache-volume
+          securityContext: {}
+          serviceAccountName: RELEASE-NAME-victoria-logs-cluster
+          terminationGracePeriodSeconds: 60
+          volumes:
+            - emptyDir: {}
+              name: cache-volume

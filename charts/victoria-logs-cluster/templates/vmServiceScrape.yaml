@@ -1,0 +1,44 @@
+{{- $ctx := dict "helm" . }}
+{{- range $name, $app := .Values }}
+{{- if and (kindIs "map" $app) $app.enabled ($app.vmServiceScrape).enabled }}
+{{- $vmServiceScrape := $app.vmServiceScrape }}
+{{- $_ := set $ctx "extraLabels" $vmServiceScrape.extraLabels }}
+{{- $_ := set $ctx "appKey" $name }}
+{{ $fullname := include "vm.plain.fullname" $ctx }}
+---
+{{ if not $vmServiceScrape.useServiceMonitor }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+{{ else }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+{{ end }}
+metadata:
+  {{- with $vmServiceScrape.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
+  {{- with $vmServiceScrape.namespace }}
+  namespace: {{ . }}
+  {{- end }}
+spec:
+  {{- with $vmServiceScrape.spec.namespaceSelector }}
+  namespaceSelector: {{ toYaml . | nindent 4 }}
+  {{- else }}
+  namespaceSelector:
+    matchNames:
+      - {{ include "vm.namespace" $ }}
+  {{- end }}
+  {{- with $vmServiceScrape.spec.selector }}
+  selector: {{ toYaml . | nindent 4 }}
+  {{- else }}
+  selector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+  {{- end }}
+  {{- with omit $app.vmServiceScrape.spec "selector" "namespaceSelector"}}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}  
+{{- end }}
+{{- end }}

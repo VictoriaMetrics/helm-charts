@@ -1,0 +1,33 @@
+{{- if .Values.printNotes }}
+{{- $ctx := dict "helm" . "style" "plain" }}
+{{- $ns := include "vm.namespace" $ctx }}
+{{- if .Values.vlinsert.enabled }}
+{{- if .Values.vmauth.enabled }}
+  {{- $_ := set $ctx "appKey" "vmauth" }}
+{{- else }}
+  {{- $_ := set $ctx "appKey" "vlinsert" }}
+{{- end }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+Write API:
+
+The VictoriaLogs ingest APIs can be accessed via port {{ .Values.vlinsert.service.servicePort }} with the following url:
+{{ include "vm.url" $ctx }}
+
+Check how to ingest data in https://docs.victoriametrics.com/victorialogs/data-ingestion/
+{{- end }}
+
+{{- if .Values.vlselect.enabled }}
+{{- if .Values.vmauth.enabled }}
+  {{- $_ := set $ctx "appKey" "vmauth" }}
+{{- else }}
+  {{- $_ := set $ctx "appKey" "vlselect" }}
+{{- end }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+Read API:
+
+The VictoriaLogs query APIs can be accessed via port {{ .Values.vlselect.service.servicePort }} with the following url:
+{{ include "vm.url" $ctx }}
+
+Check how to ingest data in https://docs.victoriametrics.com/victorialogs/querying/
+{{- end }}
+{{- end }}

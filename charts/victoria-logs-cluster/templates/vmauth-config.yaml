@@ -1,0 +1,37 @@
+{{- if and (empty .Values.vmauth.configSecretName) .Values.vmauth.enabled }}
+{{- $ctx := dict "helm" . "appKey" "vmauth" "style" "plain" }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "vm.plain.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+type: Opaque
+data:
+  {{- $config := .Values.vmauth.config }}
+  {{- $_ := set . "style" "plain" }}
+  {{- $_ := set . "appKey" "vlinsert" -}}
+  {{- $writeURL := urlParse (include "vm.url" .) -}}
+  {{- $_ := set $writeURL "path" (printf "%s/insert" $writeURL.path) -}}
+  {{- $_ := set . "appKey" "vlselect" -}}
+  {{- $readURL := urlParse (include "vm.url" .) -}}
+  {{- $_ := set $readURL "path" (printf "%s/select" $readURL.path) -}}
+  {{- $_ := set . "vm" (dict "read" $readURL "write" $writeURL) -}}
+  {{- if or (empty $config) $config.unauthorized_user }}
+    {{- $urlMap := ($config.unauthorized_user).url_map | default list }}
+    {{- if empty $urlMap }}
+      {{- if $.Values.vlselect.service.enabled }}
+        {{- $readPaths := list (printf "%s/.*" $readURL.path) }}
+        {{- $readPrefix := urlJoin (omit .vm.read "path") }}
+        {{- $urlMap = append $urlMap (dict "src_paths" $readPaths "url_prefix" $readPrefix "discover_backend_ips" true) }}
+      {{- end }}
+      {{- if $.Values.vlinsert.service.enabled }}
+        {{- $writePaths := list (printf "%s/.*" $writeURL.path) }}
+        {{- $writePrefix := urlJoin (omit .vm.write "path") }}
+        {{- $urlMap = append $urlMap (dict "src_paths" $writePaths "url_prefix" $writePrefix "discover_backend_ips" true) }}
+      {{- end }}
+      {{- $_ := set $config "unauthorized_user" (dict "url_map" $urlMap) }}
+    {{- end }}
+  {{- end }}
+  auth.yml: | {{ tpl (toYaml $config) . | b64enc | nindent 4 }}
+{{- end }}
