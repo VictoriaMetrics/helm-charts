@@ -1,0 +1,65 @@
+suite: hpa templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - hpa.yaml
+tests:
+  - it: hpa should match snapshot
+    set:
+      vmauth:
+        enabled: true
+        extraLabels:
+          extraLabelName: authExtraLabelValue
+        horizontalPodAutoscaler:
+          enabled: true
+      vminsert:
+        extraLabels:
+          extraLabelName: insertExtraLabelValue
+        horizontalPodAutoscaler:
+          enabled: true
+      vmselect:
+        extraLabels:
+          extraLabelName: selectExtraLabelValue
+        horizontalPodAutoscaler:
+          enabled: true
+      vmstorage:
+        extraLabels:
+          extraLabelName: storageExtraLabelValue
+        horizontalPodAutoscaler:
+          enabled: true
+    asserts:
+      - matchSnapshot: {}
+  - it: hpa should match snapshot with fullnameOverride and extraLabels
+    set:
+      vminsert:
+        name: insert
+        fullnameOverride: vminsert-node
+        extraLabels:
+          extraLabelName: insertExtraLabelValue
+        horizontalPodAutoscaler:
+          enabled: true
+      vmauth:
+        enabled: true
+        name: auth
+        fullnameOverride: vmauth-node
+        extraLabels:
+          extraLabelName: authExtraLabelValue
+        horizontalPodAutoscaler:
+          enabled: true
+      vmselect:
+        name: select
+        fullnameOverride: vmselect-node
+        extraLabels:
+          extraLabelName: selectExtraLabelValue
+        horizontalPodAutoscaler:
+          enabled: true
+      vmstorage:
+        name: storage
+        fullnameOverride: vmstorage-node
+        extraLabels:
+          extraLabelName: storageExtraLabelValue
+        horizontalPodAutoscaler:
+          enabled: true
+    asserts:
+      - matchSnapshot: {}

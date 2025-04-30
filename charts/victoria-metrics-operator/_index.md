@@ -1,10 +1,10 @@
 ---
-weight: 10
+weight: 11
 title: VictoriaMetrics Operator
 menu:
   docs:
     parent: helm
-    weight: 10
+    weight: 11
     identifier: helm-victoriametrics-operator
 url: /helm/victoriametrics-operator
 aliases:

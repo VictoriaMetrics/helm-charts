@@ -1,0 +1,28 @@
+{{- $ctx := dict "helm" . }}
+{{- range $name, $app := .Values }}
+{{- if and (kindIs "map" $app) $app.enabled ($app.horizontalPodAutoscaler).enabled }}
+{{- $isStatefulSet := eq $name "vlstorage" }}
+{{- $hpa := $app.horizontalPodAutoscaler }}
+{{- $_ := set $ctx "extraLabels" $app.extraLabels }}
+{{- $_ := set $ctx "appKey" $name }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  name: {{ $fullname }}
+  namespace: {{ include "vm.namespace" $ }}
+spec:
+  maxReplicas: {{ $hpa.maxReplicas }}
+  minReplicas: {{ $hpa.minReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: {{ ternary "StatefulSet" "Deployment" $isStatefulSet }}
+    name: {{ $fullname }}
+  metrics: {{ toYaml $hpa.metrics | nindent 4 }}
+  {{- with $hpa.behavior }}
+  behavior: {{ toYaml . | nindent 4 }}
+  {{- end -}}
+{{- end }}
+{{- end }}

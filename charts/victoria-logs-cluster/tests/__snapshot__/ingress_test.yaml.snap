@@ -1,0 +1,86 @@
+ingress should match snapshot:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: alb
+      labels:
+        app: vlinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlinsert
+      namespace: NAMESPACE
+    spec:
+      rules:
+        - host: vlinsert.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-victoria-logs-cluster-vlinsert
+                    port:
+                      name: http
+                path: /insert
+                pathType: Prefix
+      tls:
+        - hosts:
+            - insert.local
+          secretName: insert-ingress-tls
+  2: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: kong
+      labels:
+        app: vlselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlselect
+      namespace: NAMESPACE
+    spec:
+      rules:
+        - host: vlselect.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-victoria-logs-cluster-vlselect
+                    port:
+                      name: http
+                path: /select
+                pathType: Prefix
+  3: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vmauth
+      namespace: NAMESPACE
+    spec:
+      rules:
+        - host: vlselect.node.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-victoria-logs-cluster-vmauth
+                    port:
+                      name: http
+                path: /select/test
+                pathType: Prefix

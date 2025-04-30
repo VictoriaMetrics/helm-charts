@@ -1,0 +1,197 @@
+service should match snapshot:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vlinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlinsert
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 9481
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vlinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-logs-cluster
+      type: ClusterIP
+  2: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vlselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlselect
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 9471
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vlselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-logs-cluster
+      type: ClusterIP
+  3: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vlstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlstorage
+      namespace: NAMESPACE
+    spec:
+      clusterIP: None
+      ports:
+        - name: http
+          port: 9491
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vlstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-logs-cluster
+      type: ClusterIP
+  4: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vmauth
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 8427
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-logs-cluster
+      type: ClusterIP
+service should match snapshot with fullnameOverride and extraLabels:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vlinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlinsert
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 9481
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vlinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-logs-cluster
+      type: ClusterIP
+  2: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vlselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlselect
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 9471
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vlselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-logs-cluster
+      type: ClusterIP
+  3: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vlstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlstorage
+      namespace: NAMESPACE
+    spec:
+      clusterIP: None
+      ports:
+        - name: http
+          port: 9491
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vlstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-logs-cluster
+      type: ClusterIP
+  4: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: v1.116.0
+        extraServiceLabelName: authExtraServiceLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: vmauth-node
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 8427
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-logs-cluster
+      type: ClusterIP

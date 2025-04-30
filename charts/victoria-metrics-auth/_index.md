@@ -1,10 +1,10 @@
 ---
-weight: 5
+weight: 6
 title: VictoriaMetrics Auth
 menu:
   docs:
     parent: helm
-    weight: 5
+    weight: 6
     identifier: helm-victoriametrics-auth
 url: /helm/victoriametrics-auth
 aliases:

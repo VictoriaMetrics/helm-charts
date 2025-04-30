@@ -1,10 +1,10 @@
 ---
-weight: 4
+weight: 5
 title: VictoriaMetrics Anomaly
 menu:
   docs:
     parent: helm
-    weight: 4
+    weight: 5
     identifier: helm-victoriametrics-anomaly
 url: /helm/victoriametrics-anomaly
 aliases:
