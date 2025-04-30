@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Enable Persistent Volume Claim for VictoriaLogs by default to prevent data loss during restarts.
 
 ## 0.9.7
 
