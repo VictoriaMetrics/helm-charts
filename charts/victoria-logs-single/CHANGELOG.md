@@ -1,5 +1,8 @@
 ## Next release
 
+**Update note 1**: The default `.Values.server.persistentVolume.size` was increased from 3Gi to 10Gi, manual resizing may be needed if the underlying storage class doesn't support volume expansion.
+
+- Enable Persistent Volume Claim for VictoriaLogs by default to prevent data loss during restarts.
 - Bumped VictoriaLogs version to [v1.21.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.21.0-victorialogs).
 
 ## 0.9.7

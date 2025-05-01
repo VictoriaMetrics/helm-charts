@@ -74,8 +74,9 @@ deployment should match snapshot:
             runAsUser: 1000
           terminationGracePeriodSeconds: 60
           volumes:
-            - emptyDir: {}
-              name: server-volume
+            - name: server-volume
+              persistentVolumeClaim:
+                claimName: RELEASE-NAME-victoria-logs-single-server
 deployment with volume should match snapshot:
   1: |
     apiVersion: apps/v1
@@ -230,10 +231,19 @@ statefulset should match snapshot:
             runAsNonRoot: true
             runAsUser: 1000
           terminationGracePeriodSeconds: 60
-          volumes:
-            - emptyDir: {}
-              name: server-volume
+          volumes: null
       updateStrategy: {}
+      volumeClaimTemplates:
+        - apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: server-volume
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 10Gi
 statefulset with volume should match snapshot:
   1: |
     apiVersion: apps/v1
@@ -321,4 +331,4 @@ statefulset with volume should match snapshot:
               - ReadWriteOnce
             resources:
               requests:
-                storage: 3Gi
+                storage: 10Gi
