@@ -453,9 +453,9 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </td>
     </tr>
     <tr id="server-persistentvolume-enabled">
-      <td><a href="#server-persistentvolume-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">server.persistentVolume.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span></span></span></code></pre>
+      <td><a href="#server-persistentvolume-enabled"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">server.persistentVolume.enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre>
 </a></td>
-      <td><em><code>(bool)</code></em><p>Create/use Persistent Volume Claim for server component. Empty dir if false</p>
+      <td><em><code>(bool)</code></em><p>Create/use Persistent Volume Claim for server component. Use empty dir if set to false</p>
 </td>
     </tr>
     <tr id="server-persistentvolume-existingclaim">
@@ -483,7 +483,7 @@ Change the values according to the need of the environment in ``victoria-logs-si
 </td>
     </tr>
     <tr id="server-persistentvolume-size">
-      <td><a href="#server-persistentvolume-size"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">server.persistentVolume.size</span><span class="p">:</span><span class="w"> </span><span class="l">3Gi</span></span></span></code></pre>
+      <td><a href="#server-persistentvolume-size"><pre class="chroma"><code><span class="line"><span class="cl"><span class="nt">server.persistentVolume.size</span><span class="p">:</span><span class="w"> </span><span class="l">10Gi</span></span></span></code></pre>
 </a></td>
       <td><em><code>(string)</code></em><p>Size of the volume. Should be calculated based on the logs you send and retention policy you set.</p>
 </td>
