@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.9.8
+
+**Release date:** 01 May 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.21.0](https://img.shields.io/badge/v1.21.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%23v1210)
+
 **Update note 1**: The default `.Values.server.persistentVolume.size` was increased from 3Gi to 10Gi, manual resizing may be needed if the underlying storage class doesn't support volume expansion.
 
 - Enable Persistent Volume Claim for VictoriaLogs by default to prevent data loss during restarts.
