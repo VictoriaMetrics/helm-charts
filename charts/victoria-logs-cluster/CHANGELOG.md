@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- Disable vlinsert HPA by default.
+- Bump VictoriaLogs version to [v1.21.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.21.0-victorialogs).
 
 ## 0.0.1
 
