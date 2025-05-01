@@ -1,0 +1,116 @@
+{{- $app := merge (deepCopy .Values.vmauth) (deepCopy .Values.common) -}}
+{{- $_ := set .Values "vmauth" $app }}
+{{- if $app.enabled -}}
+{{- $ctx := dict "helm" . "appKey" "vmauth" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $sa := include "vm.fullname" . }}
+{{- $ns := include "vm.namespace" $ctx }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {{- with $app.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $_ := set $ctx "extraLabels" $app.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
+spec:
+  selector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+  {{- if not $app.horizontalPodAutoscaler.enabled }}
+  replicas: {{ $app.replicaCount }}
+  {{- end }}
+  {{- with $app.strategy }}
+  strategy: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      {{- with $app.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- $_ := set $ctx "extraLabels" $app.podLabels }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
+    spec:
+      {{- with $app.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
+      serviceAccountName: {{ (.Values.serviceAccount).name | default $sa }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
+      {{- end }}
+      {{- with $app.initContainers }}
+      initContainers: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: vmauth
+          image: {{ include "vm.image" $ctx }}
+          imagePullPolicy: {{ $app.image.pullPolicy }}
+          {{- with $app.lifecycle }}
+          lifecycle: {{ . | toYaml | nindent 12 }}
+          {{- end }}
+          {{- with $app.containerWorkingDir }}
+          workingDir: {{ . }}
+          {{- end }}
+          {{- if $app.securityContext.enabled }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
+          {{- end }}
+          args: {{ include "vmauth.args" $ctx | nindent 12 }}
+          {{- with $app.envFrom }}
+          envFrom: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $app.env }}
+          env: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: {{ $app.ports.name  | default "http" }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8427") }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
+          readinessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "liveness"))) }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "startup"))) }}
+          startupProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            {{- with $app.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with $app.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with $app.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with $app.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if $app.podSecurityContext.enabled }}
+      securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
+      {{- end }}
+      {{- with $app.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $app.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          secret:
+            secretName: {{ ternary $fullname $app.configSecretName (empty $app.configSecretName) }}
+        {{- with $app.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+{{- end }}

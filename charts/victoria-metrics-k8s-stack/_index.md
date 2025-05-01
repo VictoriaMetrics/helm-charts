@@ -1,10 +1,10 @@
 ---
-weight: 9
+weight: 10
 title: VictoriaMetrics K8s Stack
 menu:
   docs:
     parent: helm
-    weight: 9
+    weight: 10
     identifier: helm-victoriametrics-k8s-stack
 url: /helm/victoriametrics-k8s-stack
 aliases:

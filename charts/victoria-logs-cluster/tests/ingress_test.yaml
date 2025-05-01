@@ -1,0 +1,35 @@
+suite: ingress templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - ingress.yaml
+tests:
+  - it: ingress should match snapshot
+    set:
+      vmauth:
+        enabled: true
+        ingress:
+          enabled: true
+          annotations:
+            kubernetes.io/ingress.class: nginx
+          hosts:
+            - name: vlselect.node.local
+              path: /select/test
+              port: http
+      vlinsert:
+        ingress:
+          enabled: true
+          annotations: 
+            kubernetes.io/ingress.class: alb
+          tls:
+            - secretName: insert-ingress-tls
+              hosts:
+                - insert.local
+      vlselect:
+        ingress:
+          enabled: true
+          annotations: 
+            kubernetes.io/ingress.class: kong
+    asserts:
+      - matchSnapshot: {}

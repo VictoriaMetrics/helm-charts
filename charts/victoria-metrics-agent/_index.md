@@ -1,10 +1,10 @@
 ---
-weight: 2
+weight: 3
 title: VictoriaMetrics Agent
 menu:
   docs:
     parent: helm
-    weight: 2
+    weight: 3
     identifier: helm-victoriametrics-agent
 url: /helm/victoriametrics-agent
 aliases:

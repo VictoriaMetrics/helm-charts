@@ -1,0 +1,139 @@
+deployment should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: vlinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vlinsert
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: vlinsert
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-cluster
+      template:
+        metadata:
+          labels:
+            app: vlinsert
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-cluster
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --httpListenAddr=:9481
+                - --loggerFormat=json
+                - --storageNode=RELEASE-NAME-victoria-logs-cluster-vlstorage-0.RELEASE-NAME-victoria-logs-cluster-vlstorage.NAMESPACE.svc.cluster.local.:9491
+                - --storageNode=RELEASE-NAME-victoria-logs-cluster-vlstorage-1.RELEASE-NAME-victoria-logs-cluster-vlstorage.NAMESPACE.svc.cluster.local.:9491
+              image: victoriametrics/victoria-logs:0.1.0-victorialogs
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vlinsert
+              ports:
+                - containerPort: 9481
+                  name: http
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+          securityContext:
+            fsGroup: 1000
+          terminationGracePeriodSeconds: 30
+deployment should match snapshot with fullnameOverride, extraLabels and podLabels:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: insert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: 0.1.0-victorialogs
+        extraLabelName: extraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: vlinsert-node
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: insert
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-cluster
+      template:
+        metadata:
+          labels:
+            app: insert
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-cluster
+            podLabelName: podLabelValue
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --httpListenAddr=:9481
+                - --loggerFormat=json
+                - --storageNode=RELEASE-NAME-victoria-logs-cluster-vlstorage-0.RELEASE-NAME-victoria-logs-cluster-vlstorage.NAMESPACE.svc.cluster.local.:9492
+                - --storageNode=RELEASE-NAME-victoria-logs-cluster-vlstorage-1.RELEASE-NAME-victoria-logs-cluster-vlstorage.NAMESPACE.svc.cluster.local.:9492
+              image: victoriametrics/victoria-logs:0.1.0-victorialogs
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vlinsert
+              ports:
+                - containerPort: 9481
+                  name: http
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 200Mi
+                requests:
+                  cpu: 100m
+                  memory: 200Mi
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+          securityContext:
+            fsGroup: 1000
+          terminationGracePeriodSeconds: 30

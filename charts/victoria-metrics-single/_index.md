@@ -1,10 +1,10 @@
 ---
-weight: 11
+weight: 13
 title: VictoriaMetrics Single
 menu:
   docs:
     parent: helm
-    weight: 11
+    weight: 13
     identifier: helm-victoriametrics-single
 url: /helm/victoriametrics-single
 aliases:

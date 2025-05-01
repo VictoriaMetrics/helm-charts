@@ -1,0 +1,31 @@
+suite: vlinsert templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - vlinsert-server.yaml
+tests:
+  - it: deployment should match snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: deployment should match snapshot with fullnameOverride, extraLabels and podLabels
+    set:
+      vlinsert:
+        name: insert
+        fullnameOverride: vlinsert-node
+        extraLabels:
+          extraLabelName: extraLabelValue
+        podLabels:
+          podLabelName: podLabelValue
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+      vlstorage:
+        extraArgs:
+          httpListenAddr: :9492
+    asserts:
+      - matchSnapshot: {}

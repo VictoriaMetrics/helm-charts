@@ -1,0 +1,142 @@
+deployment should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vmauth
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: vmauth
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-cluster
+      template:
+        metadata:
+          labels:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-cluster
+        spec:
+          containers:
+            - args:
+                - --auth.config=/config/auth.yml
+                - --envflag.enable
+                - --httpListenAddr=:8427
+                - --loggerFormat=json
+              image: victoriametrics/vmauth:v1.116.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmauth
+              ports:
+                - containerPort: 8427
+                  name: http
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              volumeMounts:
+                - mountPath: /config
+                  name: config
+          securityContext:
+            fsGroup: 1000
+          volumes:
+            - name: config
+              secret:
+                secretName: RELEASE-NAME-victoria-logs-cluster-vmauth
+deployment should match snapshot with fullnameOverride, extraLabels and podLabels:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: v1.116.0
+        extraLabelName: extraLabelValue
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: vmauth-node
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: auth
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-cluster
+      template:
+        metadata:
+          labels:
+            app: auth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-cluster
+            podLabelName: podLabelValue
+        spec:
+          containers:
+            - args:
+                - --auth.config=/config/auth.yml
+                - --envflag.enable
+                - --httpListenAddr=:8427
+                - --loggerFormat=json
+              image: victoriametrics/vmauth:v1.116.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmauth
+              ports:
+                - containerPort: 8427
+                  name: http
+              readinessProbe:
+                failureThreshold: 10
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              volumeMounts:
+                - mountPath: /config
+                  name: config
+          securityContext:
+            fsGroup: 1000
+          volumes:
+            - name: config
+              secret:
+                secretName: vmauth-node
