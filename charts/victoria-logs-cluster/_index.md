@@ -1,6 +1,6 @@
 ---
 weight: 2
-title: VictoriaLogs cluster
+title: VictoriaLogs Cluster
 menu:
   docs:
     parent: helm
