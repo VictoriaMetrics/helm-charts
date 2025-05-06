@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Add plugins section to GrafanaDatasource CR. See [issue #2168](https://github.com/VictoriaMetrics/helm-charts/issues/2168) for details.
 
 ## 0.45.0
 

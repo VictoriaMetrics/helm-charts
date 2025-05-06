@@ -18,11 +18,22 @@ metadata:
     {{ $key }}: {{ $val | quote }}
     {{- end }}
   {{- end }}
-spec:
-  datasource: {{ toYaml $ds | nindent 4 }}
-  {{- toYaml $grafanaOperator.spec | nindent 2 }}
+  {{- $spec := deepCopy $grafanaOperator.spec }}
+  {{- $_ := set $spec "datasource" $ds }}
+  {{- $_ := set $ctx "ds" $ds }}
+  {{- if eq (include "vm.data.source.enabled" $ctx) "false" -}}
+    {{- $_ := set $spec "plugins" (list $ds.type) }}
+  {{- end }}
+spec: {{ toYaml $spec | nindent 2 }}
 {{- end }}
 {{- else }}
+  {{- $datasources := default list }}
+  {{- range $ds := $output.datasources }}
+    {{- $_ := set $ctx "ds" $ds }}
+    {{- if eq (include "vm.data.source.enabled" $ctx) "true" -}}
+      {{- $datasources = append $datasources $ds }}
+    {{- end -}}
+  {{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -40,6 +51,6 @@ metadata:
 data:
   datasource.yaml: |-
     apiVersion: 1
-    datasources: {{ toYaml $output.datasources | nindent 6 }}
+    datasources: {{ toYaml $datasources | nindent 6 }}
 {{- end }}
 {{- end }}
