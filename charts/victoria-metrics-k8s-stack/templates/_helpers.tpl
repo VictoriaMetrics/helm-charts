@@ -342,11 +342,8 @@
     {{- $readEndpoint := fromYaml $readURL -}}
     {{- $defaultDatasources := default list -}}
     {{- range $ds := $Values.defaultDatasources.victoriametrics.datasources }}
-      {{- $_ := set $ctx "ds" $ds }}
-      {{- if eq (include "vm.data.source.enabled" $ctx) "true" -}}
-        {{- $_ := set $ds "url" $readEndpoint.url -}}
-        {{- $defaultDatasources = append $defaultDatasources $ds -}}
-      {{- end -}}
+      {{- $_ := set $ds "url" $readEndpoint.url -}}
+      {{- $defaultDatasources = append $defaultDatasources $ds -}}
     {{- end }}
     {{- $datasources = concat $datasources $defaultDatasources -}}
     {{- if and $Values.defaultDatasources.victoriametrics.perReplica $defaultDatasources -}}
