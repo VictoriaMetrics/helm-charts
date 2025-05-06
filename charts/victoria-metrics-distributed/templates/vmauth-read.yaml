@@ -53,7 +53,7 @@ metadata:
   {{- $spec := deepCopy $auth.spec | default dict -}}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
   {{- $urlMap := $accessSpec.url_map | default (list (default dict))  }}
-  {{- $firstUrlMapItem := mergeOverwrite (index $urlMap 0) $defaultUrlMapItem }}
+  {{- $firstUrlMapItem := mergeOverwrite $defaultUrlMapItem (deepCopy (index $urlMap 0)) }}
   {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
 spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}

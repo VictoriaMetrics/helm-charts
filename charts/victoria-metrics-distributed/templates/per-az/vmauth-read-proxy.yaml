@@ -45,7 +45,7 @@ metadata:
   {{- $defaultUrlMapItem := dict "src_paths" (list "/select/.+") "url_prefix" $urls }}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
   {{- $urlMap := $accessSpec.url_map | default (list (default dict))  }}
-  {{- $firstUrlMapItem := mergeOverwrite (deepCopy (index $urlMap 0)) (deepCopy $defaultUrlMapItem) }}
+  {{- $firstUrlMapItem := mergeOverwrite (deepCopy $defaultUrlMapItem) (deepCopy (index $urlMap 0)) }}
   {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
 spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Allow overriding unauthorizedUserAccessSpec for all vmauth instances. See [issue #2167](https://github.com/VictoriaMetrics/helm-charts/issues/2167) for details.
 
 ## 0.14.0
 
