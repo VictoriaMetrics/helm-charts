@@ -77,7 +77,7 @@ And to avoid getting incomplete responses from `zone-eu-1` which gets recovered 
 By default, all the data that written to `vmauth-global-write` belong to tenant `0`. To write data to different tenants, set `.Values.enableMultitenancy=true` and create new tenant users for `vmauth-global-write`.
 For example, writing data to tenant `1088` with following steps:
 1. create tenant VMUser for vmauth `vmauth-global-write` to use:
-```
+```yaml
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMUser
 metadata:
@@ -102,7 +102,7 @@ spec:
 ```
 
 Add extra VMUser selector in vmauth `vmauth-global-write`
-```
+```yaml
 spec:
   userSelector:
     matchLabels:
@@ -111,7 +111,7 @@ spec:
 
 2. send data to `vmauth-global-write` using above token.
 Example command using vmagent:
-```
+```bash
 /path/to/vmagent -remoteWrite.url=http://vmauth-vmauth-global-write-$ReleaseName-vm-distributed:8427/prometheus/api/v1/write -remoteWrite.basicAuth.username=tenant-1088 -remoteWrite.basicAuth.password=secret
 ```
 
