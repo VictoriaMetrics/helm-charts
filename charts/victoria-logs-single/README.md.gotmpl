@@ -15,6 +15,13 @@ This chart will do the following:
 * Rollout Victoria Logs Single.
 * (optional) Rollout [vector](https://vector.dev/) to collect logs from pods.
 
+## Sending logs to external VictoriaLogs
+
+Chart provides an option to collect logs only and sending aggregated data to remote destination:
+* `.Values.server.enabled: false` disables VictoriaLogs installation
+* `.Values.vector.enabled: true` enables logs collection from K8s cluster, which is disable by default
+* `.Values.vector.customConfig.sinks.vlogs.endpoints: [<remote-endpoint-1>/insert/elasticsearch, <remote-endpoint-n>/insert/elasticsearch]` overrides destination endpoints to external VictoriaLogs single or cluster instances
+
 Chart allows to configure logs collection from Kubernetes pods to VictoriaLogs.
 In order to do that you need to enable vector:
 ```yaml
