@@ -1,6 +1,7 @@
 ## Next release
 
 - Add plugins section to GrafanaDatasource CR. See [issue #2168](https://github.com/VictoriaMetrics/helm-charts/issues/2168) for details.
+- updates operator to [v0.56.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.56.0) version
 
 ## 0.45.0
 
