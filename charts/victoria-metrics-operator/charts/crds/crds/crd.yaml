@@ -1893,6 +1893,32 @@ spec:
                 items:
                   type: string
                 type: array
+              configReloadAuthKeySecret:
+                description: |-
+                  ConfigReloadAuthKeySecret defines optional secret reference authKey for /-/reload API requests.
+                  Given secret reference will be added to the application and vm-config-reloader as volume
+                  available since v0.57.0 version
+                properties:
+                  key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
+                    type: string
+                  name:
+                    default: ""
+                    description: |-
+                      Name of the referent.
+                      This field is effectively required, but due to backwards compatibility is
+                      allowed to be empty. Instances of this type with an empty value here are
+                      almost certainly wrong.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                  optional:
+                    description: Specify whether the Secret or its key must be defined
+                    type: boolean
+                required:
+                - key
+                type: object
+                x-kubernetes-map-type: atomic
               configReloaderExtraArgs:
                 additionalProperties:
                   type: string
@@ -9428,6 +9454,12 @@ spec:
                             description: SendResolved controls notify about resolved
                               alerts.
                             type: boolean
+                          timeout:
+                            description: |-
+                              Timeout is the maximum time allowed to invoke the webhook
+                              available since v0.28.0 alertmanager version
+                            pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                            type: string
                           url:
                             description: |-
                               URL to send requests to,
@@ -10723,6 +10755,32 @@ spec:
                   it helps it to start without secret.
                   priority -> hardcoded ConfigRaw -> ConfigRaw, provided by user -> ConfigSecret.
                 type: string
+              configReloadAuthKeySecret:
+                description: |-
+                  ConfigReloadAuthKeySecret defines optional secret reference authKey for /-/reload API requests.
+                  Given secret reference will be added to the application and vm-config-reloader as volume
+                  available since v0.57.0 version
+                properties:
+                  key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
+                    type: string
+                  name:
+                    default: ""
+                    description: |-
+                      Name of the referent.
+                      This field is effectively required, but due to backwards compatibility is
+                      allowed to be empty. Instances of this type with an empty value here are
+                      almost certainly wrong.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                  optional:
+                    description: Specify whether the Secret or its key must be defined
+                    type: boolean
+                required:
+                - key
+                type: object
+                x-kubernetes-map-type: atomic
               configReloaderExtraArgs:
                 additionalProperties:
                   type: string
@@ -12724,6 +12782,32 @@ spec:
                 items:
                   type: string
                 type: array
+              configReloadAuthKeySecret:
+                description: |-
+                  ConfigReloadAuthKeySecret defines optional secret reference authKey for /-/reload API requests.
+                  Given secret reference will be added to the application and vm-config-reloader as volume
+                  available since v0.57.0 version
+                properties:
+                  key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
+                    type: string
+                  name:
+                    default: ""
+                    description: |-
+                      Name of the referent.
+                      This field is effectively required, but due to backwards compatibility is
+                      allowed to be empty. Instances of this type with an empty value here are
+                      almost certainly wrong.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                  optional:
+                    description: Specify whether the Secret or its key must be defined
+                    type: boolean
+                required:
+                - key
+                type: object
+                x-kubernetes-map-type: atomic
               configReloaderExtraArgs:
                 additionalProperties:
                   type: string
@@ -14703,6 +14787,32 @@ spec:
                 items:
                   type: string
                 type: array
+              configReloadAuthKeySecret:
+                description: |-
+                  ConfigReloadAuthKeySecret defines optional secret reference authKey for /-/reload API requests.
+                  Given secret reference will be added to the application and vm-config-reloader as volume
+                  available since v0.57.0 version
+                properties:
+                  key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
+                    type: string
+                  name:
+                    default: ""
+                    description: |-
+                      Name of the referent.
+                      This field is effectively required, but due to backwards compatibility is
+                      allowed to be empty. Instances of this type with an empty value here are
+                      almost certainly wrong.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                  optional:
+                    description: Specify whether the Secret or its key must be defined
+                    type: boolean
+                required:
+                - key
+                type: object
+                x-kubernetes-map-type: atomic
               configReloaderExtraArgs:
                 additionalProperties:
                   type: string
@@ -16554,11 +16664,11 @@ spec:
                 type: object
               retentionPeriod:
                 description: |-
-                  RetentionPeriod for the stored metrics
-                  Note VictoriaMetrics has data/ and indexdb/ folders
-                  metrics from data/ removed eventually as soon as partition leaves retention period
-                  reverse index data at indexdb rotates once at the half of configured
-                  [retention period](https://docs.victoriametrics.com/Single-server-VictoriaMetrics/#retention)
+                  RetentionPeriod defines how long to retain stored metrics, specified as a duration (e.g., "1d", "1w", "1m").
+                  Data with timestamps outside the RetentionPeriod is automatically deleted. The minimum allowed value is 1d, or 24h.
+                  The default value is 1 (one month).
+                  See [retention](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention) docs for details.
+                pattern: ^[0-9]+(h|d|y)?$
                 type: string
               serviceAccountName:
                 description: |-
@@ -20670,8 +20780,6 @@ spec:
                       x-kubernetes-preserve-unknown-fields: true
                     type: array
                 type: object
-            required:
-            - retentionPeriod
             type: object
           status:
             description: VMClusterStatus defines the observed state of VMCluster
@@ -24313,7 +24421,7 @@ spec:
                   properties:
                     allowStale:
                       description: |-
-                        Allow stale Consul results (see https://developer.hashicorp.com/consul/api-docs/features/consistency). Will reduce load on Consul.
+                        Allow stale Consul results (see https://developer.hashicorp.com/consul/api-docs/features/consistency ). Will reduce load on Consul.
                         If unset, use its default value.
                       type: boolean
                     authorization:
@@ -28953,10 +29061,11 @@ spec:
                 type: object
               retentionPeriod:
                 description: |-
-                  RetentionPeriod for the stored metrics
-                  Note VictoriaMetrics has data/ and indexdb/ folders
-                  metrics from data/ removed eventually as soon as partition leaves retention period
-                  reverse index data at indexdb rotates once at the half of configured [retention period](https://docs.victoriametrics.com/Single-server-VictoriaMetrics/#retention)
+                  RetentionPeriod defines how long to retain stored metrics, specified as a duration (e.g., "1d", "1w", "1m").
+                  Data with timestamps outside the RetentionPeriod is automatically deleted. The minimum allowed value is 1d, or 24h.
+                  The default value is 1 (one month).
+                  See [retention](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention) docs for details.
+                pattern: ^[0-9]+(h|d|y)?$
                 type: string
               revisionHistoryLimitCount:
                 description: |-
@@ -30182,8 +30291,6 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 type: array
-            required:
-            - retentionPeriod
             type: object
           status:
             description: VMSingleStatus defines the observed state of VMSingle
