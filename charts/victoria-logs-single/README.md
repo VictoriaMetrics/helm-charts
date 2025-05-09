@@ -24,9 +24,9 @@ This chart will do the following:
 
 ## Sending logs to external VictoriaLogs
 
-Chart provides an option to collect logs only and sending aggregated data to remote destination:
+Chart provides an option to install logs collection agents only and send logs to external VictoriaLogs:
 * `.Values.server.enabled: false` disables VictoriaLogs installation
-* `.Values.vector.enabled: true` enables logs collection from K8s cluster, which is disable by default
+* `.Values.vector.enabled: true` enables logs collection agents installation, which is disabled by default
 * `.Values.vector.customConfig.sinks.vlogs.endpoints: [<remote-endpoint-1>/insert/elasticsearch, <remote-endpoint-n>/insert/elasticsearch]` overrides destination endpoints to external VictoriaLogs single or cluster instances
 
 Chart allows to configure logs collection from Kubernetes pods to VictoriaLogs.
