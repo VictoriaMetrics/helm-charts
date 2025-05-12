@@ -22,7 +22,7 @@ metadata:
   {{- $_ := set $spec "datasource" $ds }}
   {{- $_ := set $ctx "ds" $ds }}
   {{- if eq (include "vm.data.source.enabled" $ctx) "false" -}}
-    {{- $_ := set $spec "plugins" (list $ds.type) }}
+    {{- $_ := set $spec "plugins" (list (dict "name" $ds.type "version" $ds.pluginVersion)) }}
   {{- end }}
 spec: {{ toYaml $spec | nindent 2 }}
 {{- end }}
