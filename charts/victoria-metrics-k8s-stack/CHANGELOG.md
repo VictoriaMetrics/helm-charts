@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add plugin version while using GrafanaDatasource CRD
 
 ## 0.47.0
 
