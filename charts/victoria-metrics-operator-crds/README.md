@@ -56,13 +56,13 @@ Test the installation with command:
   - For HTTPS repository
 
     ```console
-    helm install vmoc vm/victoria-metrics-operator-crds -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vmoc vm/victoria-metrics-operator-crds -f values.yaml -n NAMESPACE --debug
     ```
 
   - For OCI repository
 
     ```console
-    helm install vmoc oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-operator-crds -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vmoc oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-operator-crds -f values.yaml -n NAMESPACE --debug
     ```
 
 Install chart with command:

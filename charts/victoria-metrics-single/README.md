@@ -61,13 +61,13 @@ Test the installation with command:
   - For HTTPS repository
 
     ```console
-    helm install vms vm/victoria-metrics-single -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vms vm/victoria-metrics-single -f values.yaml -n NAMESPACE --debug
     ```
 
   - For OCI repository
 
     ```console
-    helm install vms oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-single -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vms oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-single -f values.yaml -n NAMESPACE --debug
     ```
 
 Install chart with command:
