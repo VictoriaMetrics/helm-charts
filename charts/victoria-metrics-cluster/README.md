@@ -60,13 +60,13 @@ Test the installation with command:
   - For HTTPS repository
 
     ```console
-    helm install vmc vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vmc vm/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug
     ```
 
   - For OCI repository
 
     ```console
-    helm install vmc oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vmc oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-cluster -f values.yaml -n NAMESPACE --debug
     ```
 
 Install chart with command:

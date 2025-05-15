@@ -121,13 +121,13 @@ Test the installation with command:
   - For HTTPS repository
 
     ```console
-    helm install vmo vm/victoria-metrics-operator -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vmo vm/victoria-metrics-operator -f values.yaml -n NAMESPACE --debug
     ```
 
   - For OCI repository
 
     ```console
-    helm install vmo oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-operator -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vmo oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-operator -f values.yaml -n NAMESPACE --debug
     ```
 
 Install chart with command:
