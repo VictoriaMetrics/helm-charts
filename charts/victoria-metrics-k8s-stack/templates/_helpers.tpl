@@ -323,13 +323,13 @@
 {{- define "vm.data.source.enabled" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $grafana := $Values.grafana -}}
-  {{- $installed := list "prometheus" "alertmanager" }}
+  {{- $installed := default list }}
   {{- range $plugin := ($grafana.plugins | default list) -}}
     {{- $plugin = splitList ";" $plugin | reverse | first }}
     {{- $installed = append $installed $plugin }}
   {{- end -}}
   {{- $ds := .ds -}}
-  {{- toString (has $ds.type $installed) -}}
+  {{- toString (or (not (hasKey $ds "version")) (has $ds.type $installed)) -}}
 {{- end -}}
 
 {{- /* Datasources */ -}}
