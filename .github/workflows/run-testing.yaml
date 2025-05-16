@@ -3,15 +3,15 @@ name: "Test charts"
 on:
   push:
     paths-ignore:
-      - 'packages/**'
-      - 'index.yaml'
+      - 'charts/victoria-metrics-common/**'
+      - 'charts/victoria-metrics-operator-crds/**'
       - '**.md'
     branches:
       - master
   pull_request:
     paths-ignore:
-      - 'packages/**'
-      - 'index.yaml'
+      - 'charts/victoria-metrics-common/**'
+      - 'charts/victoria-metrics-operator-crds/**'
       - '**.md'
     branches:
       - master
@@ -23,6 +23,8 @@ jobs:
   get-changed-charts:
     name: Get changed charts
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     outputs:
       charts: ${{ steps.charts-diff.outputs.charts }}
     steps:
@@ -43,8 +45,8 @@ jobs:
       # this bash pipeline extracts unique chart names from the list
       - name: Build charts diff
         id: charts-diff
-        run: |
-          charts=$(echo "${{ steps.changed-charts.outputs.all_modified_files }}" | sed 's/ /\n/g' | grep -vE 'common|crds' | awk -F/ '{print $2}' | sort | uniq | jq -ncR '[inputs]')
+        run: jq |
+          charts=$(echo "${{ steps.changed-charts.outputs.all_modified_files }}" | sed 's/ /\n/g' | awk -F/ '{print $2}' | sort | uniq | jq -ncR '[inputs]')
           echo "charts=$charts" >> $GITHUB_OUTPUT
 
   install-chart:
@@ -52,6 +54,8 @@ jobs:
     runs-on: ubuntu-24.04
     needs: get-changed-charts
     if: ${{ needs.get-changed-charts.outputs.charts != '[""]' }}
+    permissions:
+      contents: read
     strategy:
       matrix:
         chart: ${{ fromJSON(needs.get-changed-charts.outputs.charts) }}
