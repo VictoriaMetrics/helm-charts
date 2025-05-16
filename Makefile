@@ -68,22 +68,22 @@ helm-repo-update:
 
 # Run linter for helm chart
 lint: helm-repo-update
-	$(foreach values,$(wildcard hack/helm/*/lint/*.yaml), \
-		$(eval chart := $(word 3, $(subst /, ,$(values)))) \
+	$(foreach values,$(wildcard charts/*/lint/*.yaml), \
+		$(eval chart := $(word 2, $(subst /, ,$(values)))) \
 		CMD="dep build charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
 		CMD="lint charts/$(chart) -f $(values)" $(MAKE) $(HELM) || exit 1; \
 	)
 
 update: helm-repo-update
-	$(foreach values,$(wildcard hack/helm/*/lint/*.yaml), \
-		$(eval chart := $(word 3, $(subst /, ,$(values)))) \
+	$(foreach values,$(wildcard charts/*/lint/*.yaml), \
+		$(eval chart := $(word 2, $(subst /, ,$(values)))) \
 		CMD="dep update charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
         )
 
 # Run template for helm charts
 template: helm-repo-update
-	$(foreach values,$(wildcard hack/helm/*/lint/*.yaml), \
-		$(eval chart := $(word 3, $(subst /, ,$(values)))) \
+	$(foreach values,$(wildcard charts/*/lint/*.yaml), \
+		$(eval chart := $(word 2, $(subst /, ,$(values)))) \
 		CMD="dep build charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
 		CMD="template charts/$(chart) -f $(values)" $(MAKE) $(HELM) || exit 1; \
 	)
