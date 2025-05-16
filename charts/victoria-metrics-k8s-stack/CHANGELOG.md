@@ -1,6 +1,7 @@
 ## Next release
 
 - bump version of VM components to [v1.117.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.117.1)
+- consider datasource as built-in if it has no `version` set. See [#2185](https://github.com/VictoriaMetrics/helm-charts/issues/2185).
 
 ## 0.47.1
 
