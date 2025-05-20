@@ -22,8 +22,9 @@ metadata:
   {{- $_ := set $spec "datasource" $ds }}
   {{- $_ := set $ctx "ds" $ds }}
   {{- if eq (include "vm.data.source.enabled" $ctx) "false" -}}
-    {{- $_ := set $spec "plugins" (list $ds.type) }}
+    {{- $_ := set $spec "plugins" (list (dict "name" $ds.type "version" $ds.version)) }}
   {{- end }}
+  {{- $_ := unset $ds "version" }}
 spec: {{ toYaml $spec | nindent 2 }}
 {{- end }}
 {{- else }}
@@ -31,6 +32,7 @@ spec: {{ toYaml $spec | nindent 2 }}
   {{- range $ds := $output.datasources }}
     {{- $_ := set $ctx "ds" $ds }}
     {{- if eq (include "vm.data.source.enabled" $ctx) "true" -}}
+      {{- $_ := unset $ds "version" }}
       {{- $datasources = append $datasources $ds }}
     {{- end -}}
   {{- end }}

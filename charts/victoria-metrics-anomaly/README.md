@@ -62,13 +62,13 @@ Test the installation with command:
   - For HTTPS repository
 
     ```console
-    helm install vma vm/victoria-metrics-anomaly -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vma vm/victoria-metrics-anomaly -f values.yaml -n NAMESPACE --debug
     ```
 
   - For OCI repository
 
     ```console
-    helm install vma oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-anomaly -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vma oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-anomaly -f values.yaml -n NAMESPACE --debug
     ```
 
 Install chart with command:

@@ -1,6 +1,6 @@
 
 
-![Version](https://img.shields.io/badge/0.46.0-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-k8s-stack%2Fchangelog%2F%230460)
+![Version](https://img.shields.io/badge/0.48.1-gray?logo=Helm&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-k8s-stack%2Fchangelog%2F%230481)
 ![ArtifactHub](https://img.shields.io/badge/ArtifactHub-informational?logoColor=white&color=417598&logo=artifacthub&link=https%3A%2F%2Fartifacthub.io%2Fpackages%2Fhelm%2Fvictoriametrics%2Fvictoria-metrics-k8s-stack)
 ![License](https://img.shields.io/github/license/VictoriaMetrics/helm-charts?labelColor=green&label=&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Fhelm-charts%2Fblob%2Fmaster%2FLICENSE)
 ![Slack](https://img.shields.io/badge/Join-4A154B?logo=slack&link=https%3A%2F%2Fslack.victoriametrics.com)
@@ -287,13 +287,13 @@ Test the installation with command:
   - For HTTPS repository
 
     ```console
-    helm install vmks vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vmks vm/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE --debug
     ```
 
   - For OCI repository
 
     ```console
-    helm install vmks oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vmks oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack -f values.yaml -n NAMESPACE --debug
     ```
 
 Install chart with command:
@@ -774,7 +774,8 @@ If you&rsquo;re migrating existing config, please make sure that <code>.Values.a
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">access</span><span class="p">:</span><span class="w"> </span><span class="l">proxy</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">isDefault</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">VictoriaMetrics (DS)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">victoriametrics-metrics-datasource</span></span></span></code></pre>
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">victoriametrics-metrics-datasource</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="m">0.15.1</span></span></span></code></pre>
 </a></td>
       <td><em><code>(list)</code></em><p>List of prometheus compatible datasource configurations. VM <code>url</code> will be added to each of them in templates.</p>
 </td>

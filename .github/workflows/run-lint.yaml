@@ -2,17 +2,17 @@ name: "Lint charts"
 
 on:
   push:
-    paths-ignore:
-      - 'packages/**'
-      - 'index.yaml'
-      - '**.md'
+    paths:
+      - Makefile
+      - 'charts/*/lint/**'
+      - '.github/workflows/run-lint.yaml'
     branches:
       - master
   pull_request:
-    paths-ignore:
-      - 'packages/**'
-      - 'index.yaml'
-      - '**.md'
+    paths:
+      - Makefile
+      - 'charts/*/lint/**'
+      - '.github/workflows/run-lint.yaml'
     branches:
       - master
 
@@ -23,6 +23,8 @@ jobs:
   lint-charts:
     name: Lint Charts
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Code checkout
         uses: actions/checkout@v4

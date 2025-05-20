@@ -71,13 +71,13 @@ Test the installation with command:
   - For HTTPS repository
 
     ```console
-    helm install vlc vm/victoria-logs-cluster -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vlc vm/victoria-logs-cluster -f values.yaml -n NAMESPACE --debug
     ```
 
   - For OCI repository
 
     ```console
-    helm install vlc oci://ghcr.io/victoriametrics/helm-charts/victoria-logs-cluster -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install vlc oci://ghcr.io/victoriametrics/helm-charts/victoria-logs-cluster -f values.yaml -n NAMESPACE --debug
     ```
 
 Install chart with command:
