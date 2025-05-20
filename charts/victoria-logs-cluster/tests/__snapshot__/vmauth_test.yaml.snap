@@ -31,6 +31,7 @@ deployment should match snapshot:
             - args:
                 - --auth.config=/config/auth.yml
                 - --envflag.enable
+                - --http.shutdownDelay=15s
                 - --httpListenAddr=:8427
                 - --loggerFormat=json
               image: victoriametrics/vmauth:v1.116.0
@@ -47,7 +48,7 @@ deployment should match snapshot:
                 - containerPort: 8427
                   name: http
               readinessProbe:
-                failureThreshold: 10
+                failureThreshold: 3
                 httpGet:
                   path: /health
                   port: http
@@ -103,6 +104,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
             - args:
                 - --auth.config=/config/auth.yml
                 - --envflag.enable
+                - --http.shutdownDelay=15s
                 - --httpListenAddr=:8427
                 - --loggerFormat=json
               image: victoriametrics/vmauth:v1.116.0
@@ -119,7 +121,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
                 - containerPort: 8427
                   name: http
               readinessProbe:
-                failureThreshold: 10
+                failureThreshold: 3
                 httpGet:
                   path: /health
                   port: http

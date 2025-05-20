@@ -30,6 +30,7 @@ deployment should match snapshot:
           containers:
             - args:
                 - --envflag.enable
+                - --http.shutdownDelay=15s
                 - --httpListenAddr=:9481
                 - --loggerFormat=json
                 - --storageNode=RELEASE-NAME-victoria-logs-cluster-vlstorage-0.RELEASE-NAME-victoria-logs-cluster-vlstorage.NAMESPACE.svc.cluster.local.:9491
@@ -48,7 +49,7 @@ deployment should match snapshot:
                 - containerPort: 9481
                   name: http
               readinessProbe:
-                failureThreshold: 10
+                failureThreshold: 3
                 httpGet:
                   path: /health
                   port: http
@@ -97,6 +98,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
           containers:
             - args:
                 - --envflag.enable
+                - --http.shutdownDelay=15s
                 - --httpListenAddr=:9481
                 - --loggerFormat=json
                 - --storageNode=RELEASE-NAME-victoria-logs-cluster-vlstorage-0.RELEASE-NAME-victoria-logs-cluster-vlstorage.NAMESPACE.svc.cluster.local.:9492
@@ -115,7 +117,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
                 - containerPort: 9481
                   name: http
               readinessProbe:
-                failureThreshold: 10
+                failureThreshold: 3
                 httpGet:
                   path: /health
                   port: http
