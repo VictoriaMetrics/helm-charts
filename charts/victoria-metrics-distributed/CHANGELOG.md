@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fixed vmauth-read had incorrect ports in urls when using VMSingle.
 
 ## 0.14.1
 

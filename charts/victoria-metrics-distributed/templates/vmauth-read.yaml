@@ -41,7 +41,7 @@ metadata:
       {{- $urlSpec := mergeOverwrite (deepCopy ((($common.vmsingle).spec | default dict))) (deepCopy ($zone.vmsingle).spec | default dict) }}
       {{- $_ := set $zone.vmsingle "spec" $urlSpec }}
       {{- $_ := set $urlCtx "zone" $zone }}
-      {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle") }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
       {{- $urls = append $urls (include "vm.url" $urlCtx) }}
     {{- end -}}
   {{- end }}
