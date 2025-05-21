@@ -1,22 +1,3 @@
+# VictoriaMetrics K8s Stack Helm chart
 
-
-  # <no value>
-
- 
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
+Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoriametrics-k8s-stack/)

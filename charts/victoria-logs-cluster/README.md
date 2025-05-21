@@ -1,22 +1,3 @@
+# VictoriaLogs Cluster Helm chart
 
-
-  # <no value>
-
- 
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
+Chart documentation is available [here](https://docs.victoriametrics.com/helm/victorialogs-cluster/)

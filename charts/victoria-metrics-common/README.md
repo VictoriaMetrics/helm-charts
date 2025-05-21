@@ -1,22 +1,3 @@
+# VictoriaMetrics Common Helm chart
 
-
-  # <no value>
-
- 
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
+Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoriametrics-common/)
