@@ -14,7 +14,7 @@ rules:
       '
     summary: '{{`{{`}} $labels.job {{`}}`}} too many restarts (instance {{`{{`}} $labels.instance {{`}}`}})'
   condition: '{{ true }}'
-  expr: changes(process_start_time_seconds{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth).*"}[15m]) > 2
+  expr: changes(process_start_time_seconds{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth|victorialogs|vlstorage|vlselect|vlinsert).*"}[15m]) > 2
   labels:
     severity: critical
 - alert: ServiceDown
@@ -22,7 +22,7 @@ rules:
     description: '{{`{{`}} $labels.instance {{`}}`}} of job {{`{{`}} $labels.job {{`}}`}} has been down for more than 2 minutes.'
     summary: 'Service {{`{{`}} $labels.job {{`}}`}} is down on {{`{{`}} $labels.instance {{`}}`}}'
   condition: '{{ true }}'
-  expr: up{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth).*"} == 0
+  expr: up{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth|victorialogs|vlstorage|vlselect|vlinsert).*"} == 0
   for: 2m
   labels:
     severity: critical
@@ -144,7 +144,9 @@ rules:
 
       * adjust limits `-search.maxConcurrentRequests` and `-search.maxQueueDuration`.
 
-      See more at https://docs.victoriametrics.com/troubleshooting/#slow-queries.'
+      See more at https://docs.victoriametrics.com/victoriametrics/troubleshooting/#slow-queries.
+
+      '
     summary: 'Read queries fail with timeout for {{`{{`}} $labels.job {{`}}`}} on instance {{`{{`}} $labels.instance {{`}}`}}'
   condition: '{{ true }}'
   expr: increase(vm_concurrent_select_limit_timeout_total[5m]) > 0

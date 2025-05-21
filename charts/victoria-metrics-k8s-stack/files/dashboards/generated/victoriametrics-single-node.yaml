@@ -369,7 +369,7 @@ panels:
 - datasource:
     type: {{ $defaultDatasource }}
     uid: $ds
-  description: Shows the number of [active time series](https://docs.victoriametrics.com/faq/#what-is-an-active-time-series) with new data points inserted during the last hour. High value may result in ingestion slowdown.
+  description: Shows the number of [active time series](https://docs.victoriametrics.com/victoriametrics/faq/#what-is-an-active-time-series) with new data points inserted during the last hour. High value may result in ingestion slowdown.
   fieldConfig:
     defaults:
       color:
@@ -771,7 +771,7 @@ panels:
 - datasource:
     type: {{ $defaultDatasource }}
     uid: $ds
-  description: "Shows the number of [active time series](https://docs.victoriametrics.com/faq/#what-is-an-active-time-series) with new data points inserted during the last hour. High value may result in ingestion slowdown. \n\nSee following link for details:"
+  description: "Shows the number of [active time series](https://docs.victoriametrics.com/victoriametrics/faq/#what-is-an-active-time-series) with new data points inserted during the last hour. High value may result in ingestion slowdown. \n\nSee following link for details:"
   fieldConfig:
     defaults:
       color:
@@ -825,7 +825,7 @@ panels:
   links:
   - targetBlank: true
     title: troubleshooting
-    url: https://docs.victoriametrics.com/troubleshooting
+    url: https://docs.victoriametrics.com/victoriametrics/troubleshooting/
   options:
     legend:
       calcs:
@@ -2397,7 +2397,7 @@ panels:
       If % is high, then CPU usage can be decreased by changing GOGC to higher values. Increasing GOGC value will increase memory usage, and decrease CPU usage.
 
 
-      Try searching for keyword `GOGC` at https://docs.victoriametrics.com/troubleshooting/ '
+      Try searching for keyword `GOGC` at https://docs.victoriametrics.com/victoriametrics/troubleshooting/ '
     fieldConfig:
       defaults:
         color:
@@ -2657,7 +2657,7 @@ panels:
     description: 'Shows the rate and total number of new series created over last 24h.
 
 
-      High [churn rate](https://docs.victoriametrics.com/faq/#what-is-high-churn-rate) tightly connected with database performance and may result in unexpected OOM''s or slow queries. It is recommended to always keep an eye on this metric to avoid unexpected [cardinality](https://docs.victoriametrics.com/keyconcepts/#cardinality) "explosions".
+      High [churn rate](https://docs.victoriametrics.com/victoriametrics/faq/#what-is-high-churn-rate) tightly connected with database performance and may result in unexpected OOM''s or slow queries. It is recommended to always keep an eye on this metric to avoid unexpected [cardinality](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#cardinality) "explosions".
 
 
       The higher churn rate is, the more resources required to handle it. Consider to keep the churn rate as low as possible.
@@ -2757,7 +2757,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: 'The percentage of [slow inserts](https://docs.victoriametrics.com/faq/#what-is-a-slow-insert) compared to the total ingestion rate. \n\nThe lower the better. \n\nIn short, slow insert is a cache miss. There are following reasons for slow inserts to go up: \n* Ingestion of completely new, not seen before time series;\n* Not enough memory to maintain big enough caches for the current workload.\n\nIf percentage remains high (>10%) during extended periods of time, then it is likely more RAM is needed for optimal handling of the current number of [active time series](https://docs.victoriametrics.com/faq/#what-is-an-active-time-series). \n\nSee [this issue](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/3976#issuecomment-1476883183) for details.'
+    description: 'The percentage of [slow inserts](https://docs.victoriametrics.com/victoriametrics/faq/#what-is-a-slow-insert) compared to the total ingestion rate. \n\nThe lower the better. \n\nIn short, slow insert is a cache miss. There are following reasons for slow inserts to go up: \n* Ingestion of completely new, not seen before time series;\n* Not enough memory to maintain big enough caches for the current workload.\n\nIf percentage remains high (>10%) during extended periods of time, then it is likely more RAM is needed for optimal handling of the current number of [active time series](https://docs.victoriametrics.com/victoriametrics/faq/#what-is-an-active-time-series). \n\nSee [this issue](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/3976#issuecomment-1476883183) for details.'
     fieldConfig:
       defaults:
         color:
@@ -3186,7 +3186,7 @@ panels:
 
       * exceeding limit for labels length or number;
 
-      * dropped by [relabeling configuration](https://docs.victoriametrics.com/#relabeling).'
+      * dropped by [relabeling configuration](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#relabeling).'
     fieldConfig:
       defaults:
         color:
@@ -3277,7 +3277,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: 'Shows rate of deduplicated samples during [deduplication](https://docs.victoriametrics.com/#deduplication) or [downsampling](https://docs.victoriametrics.com/#downsampling), according to the configured `-dedup.minScrapeInterval` or `-downsampling.period`.
+    description: 'Shows rate of deduplicated samples during [deduplication](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#deduplication) or [downsampling](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#downsampling), according to the configured `-dedup.minScrapeInterval` or `-downsampling.period`.
 
 
       Should be empty if `-dedup.minScrapeInterval` and `-downsampling.period` isn''t set.
@@ -3285,9 +3285,9 @@ panels:
 
       Deduplication happens in two places:
 
-      * `type="merge"` - during [background merges](https://docs.victoriametrics.com/#storage). Deduplication during merges is permanent.
+      * `type="merge"` - during [background merges](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#storage). Deduplication during merges is permanent.
 
-      * `type="select"` - during [read queries](https://docs.victoriametrics.com/keyconcepts/#query-data). Deduplication happens in-flight and has no permanent effect.
+      * `type="select"` - during [read queries](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#query-data). Deduplication happens in-flight and has no permanent effect.
 
 
       The more samples need to be deduplicated, the higher will be resource usage.'
@@ -3343,7 +3343,7 @@ panels:
     links:
     - targetBlank: true
       title: Readonly mode
-      url: https://docs.victoriametrics.com/cluster-victoriametrics/#readonly-mode
+      url: https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#readonly-mode
     options:
       legend:
         calcs:
@@ -3619,6 +3619,97 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
+    description: 'Shows the approx time needed to reach 100% of disk capacity based on the following params:
+
+      * free disk space (after -storage.minFreeDiskSpaceBytes);
+
+      * row ingestion rate;
+
+      * compression.'
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: s
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      'y': 11
+    id: 73
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - min
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: "(vm_free_disk_space_bytes{job=~\"$job\", instance=~\"$instance\"}-vm_free_disk_space_limit_bytes{job=~\"$job\", instance=~\"$instance\"}) \n/ \nignoring(path) (\n    (rate(vm_rows_added_to_storage_total{job=~\"$job\", instance=~\"$instance\"}[1d]) - \n        sum(rate(vm_deduplicated_samples_total{job=~\"$job\", instance=~\"$instance\"}[1d])) without (type)) * \n    (\n        sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\", type!~\"indexdb.*\"}) without(type) /\n        sum(vm_rows{job=~\"$job\", instance=~\"$instance\", type!~\"indexdb.*\"}) without(type)\n    )\n    +\n    rate(vm_new_timeseries_created_total{job=~\"$job\", instance=~\"$instance\"}[1d]) * \n    (\n        sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\", type=\"indexdb/file\"}) /\n        sum(vm_rows{job=~\"$job\", instance=~\"$instance\", type=\"indexdb/file\"})\n    )\n) > 0"
+      format: time_series
+      hide: false
+      interval: ''
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}instance{{`}}`}}'
+      range: true
+      refId: A
+    title: Storage full ETA
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
     description: How many datapoints are in RAM queue waiting to be written into storage. The number of pending data points should be in the range from 0 to `3*<ingestion_rate>`, since VictoriaMetrics pushes pending data to persistent storage every two seconds.
     fieldConfig:
       defaults:
@@ -3825,7 +3916,7 @@ panels:
     type: timeseries
   - datasource:
       uid: $ds
-    description: 'The max number of data parts of LSM tree across all storage nodes in the last [partition](https://docs.victoriametrics.com/#storage).
+    description: 'The max number of data parts of LSM tree across all storage nodes in the last [partition](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#storage).
 
       Increase in number of parts (the hard limit is 512) is an evidence of slow merge performance - check the resource utilization.
 
@@ -4378,7 +4469,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: 99th percentile of number of [data samples](https://docs.victoriametrics.com/keyconcepts/#raw-samples) read per queried series.
+    description: 99th percentile of number of [data samples](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples) read per queried series.
     fieldConfig:
       defaults:
         color:
@@ -4548,10 +4639,10 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: '99th percentile of number of [data samples](https://docs.victoriametrics.com/keyconcepts/#raw-samples) scanner per query.
+    description: '99th percentile of number of [data samples](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples) scanner per query.
 
 
-      This number can exceed number of RowsReadPerQuery if `step` query arg passed to [/api/v1/query_range](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) is smaller than the lookbehind window set in square brackets of [rollup function](https://docs.victoriametrics.com/metricsql/#rollup-functions). For example, if `increase(some_metric[1h])` is executed with the `step=5m`, then the same [data samples](https://docs.victoriametrics.com/keyconcepts/#raw-samples) on a hour time range are scanned `1h/5m=12` times. See [this article](https://valyala.medium.com/how-to-optimize-promql-and-metricsql-queries-85a1b75bf986) for details.'
+      This number can exceed number of RowsReadPerQuery if `step` query arg passed to [/api/v1/query_range](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) is smaller than the lookbehind window set in square brackets of [rollup function](https://docs.victoriametrics.com/victoriametrics/metricsql/#rollup-functions). For example, if `increase(some_metric[1h])` is executed with the `step=5m`, then the same [data samples](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples) on a hour time range are scanned `1h/5m=12` times. See [this article](https://valyala.medium.com/how-to-optimize-promql-and-metricsql-queries-85a1b75bf986) for details.'
     fieldConfig:
       defaults:
         color:
@@ -4636,7 +4727,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: 99th percentile of number of [data samples](https://docs.victoriametrics.com/keyconcepts/#raw-samples) read per query.
+    description: 99th percentile of number of [data samples](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples) read per query.
     fieldConfig:
       defaults:
         color:
@@ -4721,7 +4812,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: 'Shows number of existing [snapshots](https://docs.victoriametrics.com/#how-to-work-with-snapshots).
+    description: 'Shows number of existing [snapshots](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-work-with-snapshots).
 
 
       Recently made snapshots do not occupy disk space. But with time, as snapshots become older, they start to occupy more and more disk space.
