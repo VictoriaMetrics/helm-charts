@@ -118,7 +118,9 @@ gen-docs:
                 --entrypoint /bin/helm-docs \
 		$(HELM_DOCS_IMAGE) \
 		-c charts \
-		-t hack/docs/template.tmpl -t README.md.gotmpl
+		-t hack/docs/template.tmpl \
+		-t _index.md.gotmpl \
+		-o _index.md
 
 docs-image:
 	if [ ! -d $(WORKDIR)/vmdocs ]; then \
