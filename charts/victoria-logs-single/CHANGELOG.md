@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- Updated alerting rules
+- VictoriaLogs upgrade 1.21.0 -> 1.22.2
 
 ## 0.9.8
 

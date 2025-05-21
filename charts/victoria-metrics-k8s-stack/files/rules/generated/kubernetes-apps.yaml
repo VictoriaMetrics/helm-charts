@@ -261,3 +261,19 @@ rules:
   for: 15m
   labels:
     severity: warning
+- alert: KubePdbNotEnoughHealthyPods
+  annotations:
+    description: 'PDB {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}/{{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.poddisruptionbudget {{`}}`}} expects {{`{{`}} $value {{`}}`}} more healthy pods. The desired number of healthy pods has not been met for at least 15m.'
+    runbook_url: '{{ $runbookUrl }}/kubernetes/kubepdbnotenoughhealthypods'
+    summary: 'PDB does not have enough healthy pods.'
+  condition: '{{ true }}'
+  expr: |-
+    (
+      kube_poddisruptionbudget_status_desired_healthy{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
+      -
+      kube_poddisruptionbudget_status_current_healthy{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
+    )
+    > 0
+  for: 15m
+  labels:
+    severity: warning
