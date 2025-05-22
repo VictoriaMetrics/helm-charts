@@ -41,7 +41,7 @@ annotations:
     name: restarts
     textFormat: '{{`{{`}}job{{`}}`}}:{{`{{`}}instance{{`}}`}} restarted'
 condition: {{ true }}
-description: Overview for VictoriaMetrics vmagent v1.102.0 or higher
+description: Overview for VictoriaMetrics vmagent v1.117.0 or higher
 editable: false
 fiscalYearStartMonth: 0
 graphTooltip: 1
@@ -1237,99 +1237,6 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: Click on the line and choose Drilldown to show CPU usage per instance
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ''
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: 'off'
-        links:
-        - targetBlank: true
-          title: Drilldown
-          url: /d/G7Z9GzMGz?viewPanel=119&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: null
-          - color: red
-            value: 80
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      'y': 38
-    id: 109
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 11.5.0
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      editorMode: code
-      exemplar: true
-      expr: |-
-        max(
-            rate(process_cpu_seconds_total{job=~"$job", instance=~"$instance"}[$__rate_interval])
-            /
-            process_cpu_cores_available{job=~"$job", instance=~"$instance"}
-        ) by(job)
-      format: time_series
-      interval: ''
-      intervalFactor: 1
-      legendFormat: __auto
-      range: true
-      refId: A
-    title: CPU ($instance)
-    type: timeseries
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
     description: 'Percentage of used RSS memory (resident).
 
       The RSS memory shows the amount of memory recently accessed by the application. It includes anonymous memory and data from recently accessed files (aka page cache).
@@ -1388,7 +1295,7 @@ panels:
     gridPos:
       h: 8
       w: 12
-      x: 12
+      x: 0
       'y': 38
     id: 111
     options:
@@ -1424,6 +1331,387 @@ panels:
       range: true
       refId: A
     title: RSS memory % usage ($instance)
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        links:
+        - targetBlank: true
+          title: Drilldown
+          url: /d/G7Z9GzMGz?viewPanel=119&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: percentunit
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      'y': 38
+    id: 157
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      exemplar: false
+      expr: |-
+        max(
+            rate(process_cpu_seconds_total{job=~"$job", instance=~"$instance"}[$__rate_interval])
+            /
+            process_cpu_cores_available{job=~"$job", instance=~"$instance"}
+        ) by(instance)
+      format: time_series
+      interval: ''
+      intervalFactor: 1
+      legendFormat: __auto
+      range: true
+      refId: A
+    title: CPU % usage
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: 'Share for memory allocated by the process itself. When memory usage reaches 100% it will be likely OOM-killed.
+
+      Safe memory usage % considered to be below 80%
+
+
+      Click on the line and choose Drilldown to show memory usage per instance'
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: percentunit
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      'y': 46
+    id: 155
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      exemplar: false
+      expr: |-
+        max(
+            max_over_time(process_resident_memory_anon_bytes{job=~"$job", instance=~"$instance"}[$__rate_interval])
+            /
+            vm_available_memory_bytes{job=~"$job", instance=~"$instance"}
+        ) by(instance)
+      interval: ''
+      legendFormat: __auto
+      range: true
+      refId: A
+    title: RSS anonymous memory % usage
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: 'Shows CPU pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html).
+
+
+      The lower the better.'
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: line
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: s
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      'y': 46
+    id: 158
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(process_pressure_cpu_waiting_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      interval: ''
+      intervalFactor: 2
+      legendFormat: '{{`{{`}}instance{{`}}`}} - waiting'
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(process_pressure_cpu_stalled_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      hide: false
+      interval: ''
+      intervalFactor: 2
+      legendFormat: '{{`{{`}}instance{{`}}`}} - stalled'
+      range: true
+      refId: B
+    title: CPU pressure
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: 'Shows memory pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html).
+
+
+      The lower the better.'
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: line
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: s
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      'y': 54
+    id: 156
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(process_pressure_memory_waiting_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      interval: ''
+      intervalFactor: 2
+      legendFormat: '{{`{{`}}instance{{`}}`}} - waiting'
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(process_pressure_memory_stalled_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      hide: false
+      interval: ''
+      intervalFactor: 2
+      legendFormat: '{{`{{`}}instance{{`}}`}} - stalled'
+      range: true
+      refId: B
+    title: Memory pressure
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
@@ -1487,8 +1775,8 @@ panels:
     gridPos:
       h: 8
       w: 12
-      x: 0
-      'y': 46
+      x: 12
+      'y': 54
     id: 81
     options:
       legend:
@@ -1511,7 +1799,7 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      expr: sum(rate(process_io_storage_read_bytes_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job) > 0
+      expr: sum(rate(process_io_storage_read_bytes_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
       format: time_series
       hide: false
       interval: ''
@@ -1523,7 +1811,7 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      expr: sum(rate(process_io_storage_written_bytes_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job) > 0
+      expr: sum(rate(process_io_storage_written_bytes_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
       format: time_series
       hide: false
       interval: ''
@@ -1532,6 +1820,267 @@ panels:
       range: true
       refId: B
     title: Disk writes/reads ($instance)
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      'y': 62
+    id: 39
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(max_over_time(go_goroutines{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
+      format: time_series
+      interval: ''
+      intervalFactor: 2
+      legendFormat: __auto
+      range: true
+      refId: A
+    title: Goroutines ($instance)
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: 'Shows IO pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html).
+
+
+      The lower the better.'
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: line
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: s
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      'y': 62
+    id: 159
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(process_pressure_io_waiting_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      interval: ''
+      intervalFactor: 2
+      legendFormat: '{{`{{`}}instance{{`}}`}} - waiting'
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(process_pressure_io_stalled_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      hide: false
+      interval: ''
+      intervalFactor: 2
+      legendFormat: '{{`{{`}}instance{{`}}`}} - stalled'
+      range: true
+      refId: B
+    title: IO pressure
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      'y': 70
+    id: 41
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(max_over_time(process_num_threads{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
+      format: time_series
+      intervalFactor: 2
+      legendFormat: __auto
+      range: true
+      refId: A
+    title: Threads ($instance)
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
@@ -1592,7 +2141,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 46
+      'y': 70
     id: 7
     options:
       legend:
@@ -1630,181 +2179,6 @@ panels:
       range: true
       refId: B
     title: Network  usage ($instance)
-    type: timeseries
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'Panel shows the percentage of open file descriptors in the OS per instance.
-
-      Reaching the limit of open files (100%) can cause various issues and must be prevented.
-
-
-      See how to change limits here https://medium.com/@muhammadtriwibowo/set-permanently-ulimit-n-open-files-in-ubuntu-4d61064429a'
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ''
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: 'off'
-        decimals: 5
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: null
-          - color: red
-            value: 80
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      'y': 54
-    id: 83
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 11.5.0
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      editorMode: code
-      expr: |-
-        max(
-            max_over_time(process_open_fds{job=~"$job", instance=~"$instance"}[$__rate_interval])
-            /
-            process_max_fds{job=~"$job", instance=~"$instance"}
-        ) by(job)
-      format: time_series
-      interval: ''
-      intervalFactor: 2
-      legendFormat: __auto
-      range: true
-      refId: A
-    title: Open FDs usage % ($instance)
-    type: timeseries
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ''
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: 'off'
-        decimals: 0
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: null
-          - color: red
-            value: 80
-        unit: short
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      'y': 54
-    id: 39
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 11.5.0
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      editorMode: code
-      expr: sum(max_over_time(go_goroutines{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
-      format: time_series
-      interval: ''
-      intervalFactor: 2
-      legendFormat: __auto
-      range: true
-      refId: A
-    title: Goroutines ($instance)
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
@@ -1865,7 +2239,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 62
+      'y': 78
     id: 135
     options:
       legend:
@@ -1948,7 +2322,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 62
+      'y': 78
     id: 149
     options:
       legend:
@@ -2029,7 +2403,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 70
+      'y': 86
     id: 154
     options:
       legend:
@@ -2062,6 +2436,12 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
+    description: 'Panel shows the percentage of open file descriptors in the OS per instance.
+
+      Reaching the limit of open files (100%) can cause various issues and must be prevented.
+
+
+      See how to change limits here https://medium.com/@muhammadtriwibowo/set-permanently-ulimit-n-open-files-in-ubuntu-4d61064429a'
     fieldConfig:
       defaults:
         color:
@@ -2094,7 +2474,7 @@ panels:
             mode: none
           thresholdsStyle:
             mode: 'off'
-        decimals: 0
+        decimals: 5
         links: []
         mappings: []
         min: 0
@@ -2105,14 +2485,14 @@ panels:
             value: null
           - color: red
             value: 80
-        unit: short
+        unit: percentunit
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 70
-    id: 41
+      'y': 86
+    id: 83
     options:
       legend:
         calcs:
@@ -2132,13 +2512,19 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      expr: sum(max_over_time(process_num_threads{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
+      expr: |-
+        max(
+            max_over_time(process_open_fds{job=~"$job", instance=~"$instance"}[$__rate_interval])
+            /
+            process_max_fds{job=~"$job", instance=~"$instance"}
+        ) by(job)
       format: time_series
+      interval: ''
       intervalFactor: 2
       legendFormat: __auto
       range: true
       refId: A
-    title: Threads ($instance)
+    title: Open FDs usage % ($instance)
     type: timeseries
   title: Resource usage
   type: row
@@ -2199,7 +2585,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1152
+      'y': 1580
     id: 92
     options:
       legend:
@@ -2279,7 +2665,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1152
+      'y': 1580
     id: 95
     options:
       legend:
@@ -2362,7 +2748,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1160
+      'y': 1588
     id: 98
     options:
       legend:
@@ -2445,7 +2831,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1160
+      'y': 1588
     id: 99
     options:
       legend:
@@ -2530,7 +2916,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1168
+      'y': 1596
     id: 79
     options:
       legend:
@@ -2612,12 +2998,12 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1168
+      'y': 1596
     id: 18
     links:
     - targetBlank: true
       title: Relabeling
-      url: https://docs.victoriametrics.com/victoriametrics/vmagent/#relabeling
+      url: https://docs.victoriametrics.com/victoriametrics/relabeling/
     options:
       legend:
         calcs:
@@ -2697,7 +3083,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1176
+      'y': 1604
     id: 127
     options:
       legend:
@@ -2777,7 +3163,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1176
+      'y': 1604
     id: 50
     options:
       legend:
@@ -2842,7 +3228,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 1184
+      'y': 1612
     id: 129
     options:
       cellHeight: sm
@@ -2938,7 +3324,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 1184
+      'y': 1612
     id: 150
     options:
       legend:
@@ -3015,7 +3401,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1191
+      'y': 1619
     id: 151
     options:
       legend:
@@ -3106,7 +3492,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 1397
+      'y': 1825
     id: 48
     options:
       legend:
@@ -3188,7 +3574,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 1397
+      'y': 1825
     id: 76
     options:
       legend:
@@ -3268,7 +3654,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 1404
+      'y': 1832
     id: 132
     options:
       legend:
@@ -3350,7 +3736,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 1404
+      'y': 1832
     id: 133
     options:
       legend:
@@ -3431,7 +3817,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1411
+      'y': 1839
     id: 20
     options:
       legend:
@@ -3511,7 +3897,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1411
+      'y': 1839
     id: 126
     options:
       legend:
@@ -3590,7 +3976,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1419
+      'y': 1847
     id: 46
     options:
       legend:
@@ -3669,7 +4055,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1419
+      'y': 1847
     id: 148
     options:
       legend:
@@ -3748,7 +4134,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1427
+      'y': 1855
     id: 31
     options:
       legend:
@@ -3873,7 +4259,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1119
+      'y': 1547
     id: 73
     options:
       legend:
@@ -3961,7 +4347,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1119
+      'y': 1547
     id: 131
     options:
       legend:
@@ -4039,7 +4425,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1395
+      'y': 1823
     id: 130
     options:
       legend:
@@ -4127,7 +4513,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1395
+      'y': 1823
     id: 77
     options:
       legend:
@@ -4219,7 +4605,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1442
+      'y': 1870
     id: 146
     options:
       legend:
@@ -4295,7 +4681,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1442
+      'y': 1870
     id: 143
     options:
       legend:
@@ -4366,7 +4752,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1450
+      'y': 1878
     id: 147
     options:
       legend:
@@ -4443,7 +4829,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1450
+      'y': 1878
     id: 139
     options:
       legend:
@@ -4535,7 +4921,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1458
+      'y': 1886
     id: 142
     options:
       legend:
@@ -4607,7 +4993,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1458
+      'y': 1886
     id: 137
     options:
       legend:
@@ -4692,7 +5078,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1498
+      'y': 1926
     id: 141
     options:
       legend:
@@ -4794,7 +5180,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1400
+      'y': 1828
     id: 60
     options:
       legend:
@@ -4874,7 +5260,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1400
+      'y': 1828
     id: 66
     options:
       legend:
@@ -4960,7 +5346,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1408
+      'y': 1836
     id: 61
     options:
       legend:
@@ -5043,7 +5429,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1408
+      'y': 1836
     id: 65
     options:
       legend:
@@ -5125,7 +5511,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1416
+      'y': 1844
     id: 88
     options:
       legend:
@@ -5202,7 +5588,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1416
+      'y': 1844
     id: 84
     options:
       legend:
@@ -5289,7 +5675,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1424
+      'y': 1852
     id: 90
     options:
       legend:
@@ -5332,7 +5718,7 @@ panels:
       h: 2
       w: 24
       x: 0
-      'y': 1452
+      'y': 100
     id: 115
     options:
       code:
@@ -5341,7 +5727,7 @@ panels:
         showMiniMap: false
       content: Drilldown row is used by other panels on the dashboard to show more detailed metrics per-instance.
       mode: markdown
-    pluginVersion: 10.4.2
+    pluginVersion: 11.5.0
     title: ''
     transparent: true
     type: text
@@ -5360,6 +5746,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -5387,13 +5774,14 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
         unit: short
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 1454
+      'y': 102
     id: 119
     options:
       legend:
@@ -5407,9 +5795,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -5442,6 +5831,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -5469,13 +5859,14 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
         unit: decbytes
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 1454
+      'y': 102
     id: 117
     options:
       legend:
@@ -5489,9 +5880,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -5520,6 +5912,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -5547,6 +5940,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: bytes
@@ -5555,7 +5949,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1494
+      'y': 110
     id: 125
     links:
     - title: Troubleshooting
@@ -5570,9 +5964,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -5601,6 +5996,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -5627,6 +6023,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -5641,7 +6038,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 1494
+      'y': 110
     id: 123
     options:
       legend:
@@ -5655,9 +6052,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -5697,6 +6095,7 @@ panels:
           axisLabel: ''
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -5723,6 +6122,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: bytes
@@ -5737,7 +6137,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 1502
+      'y': 118
     id: 121
     options:
       legend:
@@ -5751,9 +6151,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.2.6
+    pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}

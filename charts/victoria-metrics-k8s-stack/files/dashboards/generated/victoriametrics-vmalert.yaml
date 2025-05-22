@@ -41,7 +41,7 @@ annotations:
     name: restarts
     textFormat: '{{`{{`}}job{{`}}`}}:{{`{{`}}instance{{`}}`}} restarted'
 condition: {{ ($Values.vmalert).enabled }}
-description: Overview for VictoriaMetrics vmalert v1.102.0 or higher
+description: Overview for VictoriaMetrics vmalert v1.117.0 or higher
 editable: false
 fiscalYearStartMonth: 0
 graphTooltip: 1
@@ -883,7 +883,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 90
+      'y': 162
     id: 37
     links:
     - targetBlank: true
@@ -922,6 +922,287 @@ panels:
       range: true
       refId: A
     title: Memory usage % ($instance)
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: "Shows the CPU usage percentage per vmalert instance. \nIf you think that usage is abnormal or unexpected pls file an issue and attach CPU profile if possible."
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: percentunit
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      'y': 162
+    id: 35
+    links:
+    - targetBlank: true
+      title: Profiling
+      url: https://docs.victoriametrics.com/victoriametrics/vmagent/#profiling
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      exemplar: false
+      expr: "max(\n  rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]) \n  / \n  process_cpu_cores_available{job=~\"$job\", instance=~\"$instance\"}\n) by(job)"
+      format: time_series
+      interval: ''
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}job{{`}}`}}'
+      range: true
+      refId: A
+    title: CPU usage %($instance)
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: 'Share for memory allocated by the process itself. When memory usage reaches 100% it will be likely OOM-killed.
+
+      Safe memory usage % considered to be below 80%'
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: percentunit
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      'y': 170
+    id: 65
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      exemplar: false
+      expr: |-
+        max(
+            max_over_time(process_resident_memory_anon_bytes{job=~"$job", instance=~"$instance"}[$__rate_interval])
+            /
+            vm_available_memory_bytes{job=~"$job", instance=~"$instance"}
+        ) by(instance)
+      interval: ''
+      legendFormat: __auto
+      range: true
+      refId: A
+    title: RSS anonymous memory % usage
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: Shows the max number of CPU cores used  by a `job` and the corresponding limit.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: 'off'
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      'y': 170
+    id: 56
+    links:
+    - targetBlank: true
+      title: Profiling
+      url: https://docs.victoriametrics.com/victoriametrics/vmagent/#profiling
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      exemplar: false
+      expr: max(rate(process_cpu_seconds_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
+      format: time_series
+      interval: ''
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}job{{`}}`}}'
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      exemplar: false
+      expr: min(process_cpu_cores_available{job=~"$job", instance=~"$instance"}) by(job)
+      format: time_series
+      hide: false
+      interval: ''
+      intervalFactor: 1
+      legendFormat: limit ({{`{{`}}job{{`}}`}})
+      range: true
+      refId: B
+    title: CPU usage ($instance)
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
@@ -977,8 +1258,8 @@ panels:
     gridPos:
       h: 8
       w: 12
-      x: 12
-      'y': 90
+      x: 0
+      'y': 178
     id: 57
     links:
     - targetBlank: true
@@ -1019,7 +1300,10 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: "Shows the CPU usage percentage per vmalert instance. \nIf you think that usage is abnormal or unexpected pls file an issue and attach CPU profile if possible."
+    description: 'Shows CPU pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html).
+
+
+      The lower the better.'
     fieldConfig:
       defaults:
         color:
@@ -1051,7 +1335,8 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: line
+        decimals: 0
         links: []
         mappings: []
         min: 0
@@ -1060,20 +1345,14 @@ panels:
           steps:
           - color: green
             value: null
-          - color: red
-            value: 80
-        unit: percentunit
+        unit: s
       overrides: []
     gridPos:
       h: 8
       w: 12
-      x: 0
-      'y': 98
-    id: 35
-    links:
-    - targetBlank: true
-      title: Profiling
-      url: https://docs.victoriametrics.com/victoriametrics/vmagent/#profiling
+      x: 12
+      'y': 178
+    id: 66
     options:
       legend:
         calcs:
@@ -1095,20 +1374,128 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      exemplar: false
-      expr: "max(\n  rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]) \n  / \n  process_cpu_cores_available{job=~\"$job\", instance=~\"$instance\"}\n) by(job)"
+      expr: sum(rate(process_pressure_cpu_waiting_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
       format: time_series
       interval: ''
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}job{{`}}`}}'
+      intervalFactor: 2
+      legendFormat: '{{`{{`}}instance{{`}}`}} - waiting'
       range: true
       refId: A
-    title: CPU usage %($instance)
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(process_pressure_cpu_stalled_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      hide: false
+      interval: ''
+      intervalFactor: 2
+      legendFormat: '{{`{{`}}instance{{`}}`}} - stalled'
+      range: true
+      refId: B
+    title: CPU pressure
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: Shows the max number of CPU cores used  by a `job` and the corresponding limit.
+    description: 'Shows memory pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html).
+
+
+      The lower the better.'
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ''
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: line
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: s
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      'y': 186
+    id: 67
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 11.5.0
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(process_pressure_memory_waiting_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      interval: ''
+      intervalFactor: 2
+      legendFormat: '{{`{{`}}instance{{`}}`}} - waiting'
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      editorMode: code
+      expr: sum(rate(process_pressure_memory_stalled_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      format: time_series
+      hide: false
+      interval: ''
+      intervalFactor: 2
+      legendFormat: '{{`{{`}}instance{{`}}`}} - stalled'
+      range: true
+      refId: B
+    title: Memory pressure
+    type: timeseries
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
     fieldConfig:
       defaults:
         color:
@@ -1141,6 +1528,7 @@ panels:
             mode: none
           thresholdsStyle:
             mode: 'off'
+        decimals: 0
         links: []
         mappings: []
         min: 0
@@ -1157,12 +1545,8 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 98
-    id: 56
-    links:
-    - targetBlank: true
-      title: Profiling
-      url: https://docs.victoriametrics.com/victoriametrics/vmagent/#profiling
+      'y': 186
+    id: 41
     options:
       legend:
         calcs:
@@ -1172,40 +1556,24 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
-        sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
-        sort: desc
+        sort: none
     pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      exemplar: false
-      expr: max(rate(process_cpu_seconds_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
+      expr: sum(go_goroutines{job=~"$job", instance=~"$instance"}) by(job)
       format: time_series
       interval: ''
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}job{{`}}`}}'
+      intervalFactor: 2
+      legendFormat: __auto
       range: true
       refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      editorMode: code
-      exemplar: false
-      expr: min(process_cpu_cores_available{job=~"$job", instance=~"$instance"}) by(job)
-      format: time_series
-      hide: false
-      interval: ''
-      intervalFactor: 1
-      legendFormat: limit ({{`{{`}}job{{`}}`}})
-      range: true
-      refId: B
-    title: CPU usage ($instance)
+    title: Goroutines ($instance)
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
@@ -1265,7 +1633,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 106
+      'y': 194
     id: 39
     options:
       legend:
@@ -1304,6 +1672,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
+    description: "Shows the time goroutines have spent in runnable state before actually running. The lower is better.\n\nHigh values or values exceeding the threshold is usually a sign of            insufficient CPU resources or CPU throttling. \n\nVerify that service has enough CPU resources. Otherwise, the service could work unreliably with delays in processing."
     fieldConfig:
       defaults:
         color:
@@ -1335,7 +1704,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: line
         decimals: 0
         links: []
         mappings: []
@@ -1346,15 +1715,15 @@ panels:
           - color: green
             value: null
           - color: red
-            value: 80
-        unit: short
+            value: 0.1
+        unit: s
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 106
-    id: 41
+      'y': 194
+    id: 61
     options:
       legend:
         calcs:
@@ -1367,21 +1736,21 @@ panels:
       tooltip:
         hideZeros: false
         mode: multi
-        sort: none
+        sort: desc
     pluginVersion: 11.5.0
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      expr: sum(go_goroutines{job=~"$job", instance=~"$instance"}) by(job)
+      expr: max(histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket{job=~"$job"}[$__rate_interval])) by (job, instance, le))) by(job)
       format: time_series
       interval: ''
       intervalFactor: 2
       legendFormat: __auto
       range: true
       refId: A
-    title: Goroutines ($instance)
+    title: Go scheduling latency
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
@@ -1442,7 +1811,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 114
+      'y': 202
     id: 59
     options:
       legend:
@@ -1471,89 +1840,6 @@ panels:
       range: true
       refId: A
     title: CPU spent on GC ($instance)
-    type: timeseries
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    description: "Shows the time goroutines have spent in runnable state before actually running. The lower is better.\n\nHigh values or values exceeding the threshold is usually a sign of            insufficient CPU resources or CPU throttling. \n\nVerify that service has enough CPU resources. Otherwise, the service could work unreliably with delays in processing."
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ''
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: line
-        decimals: 0
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: null
-          - color: red
-            value: 0.1
-        unit: s
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      'y': 114
-    id: 61
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 11.5.0
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      editorMode: code
-      expr: max(histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket{job=~"$job"}[$__rate_interval])) by (job, instance, le))) by(job)
-      format: time_series
-      interval: ''
-      intervalFactor: 2
-      legendFormat: __auto
-      range: true
-      refId: A
-    title: Go scheduling latency
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
@@ -1606,7 +1892,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 122
+      'y': 210
     id: 64
     options:
       legend:
@@ -1682,7 +1968,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 146
+      'y': 345
     id: 50
     options:
       cellHeight: sm
@@ -1776,7 +2062,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 146
+      'y': 345
     id: 58
     options:
       legend:
@@ -1855,7 +2141,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 153
+      'y': 352
     id: 63
     options:
       legend:
@@ -1941,7 +2227,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 171
+      'y': 370
     id: 14
     options:
       legend:
@@ -2017,7 +2303,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 171
+      'y': 370
     id: 13
     options:
       legend:
@@ -2095,7 +2381,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 179
+      'y': 378
     id: 20
     options:
       legend:
@@ -2172,7 +2458,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 179
+      'y': 378
     id: 32
     options:
       legend:
@@ -2245,7 +2531,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 187
+      'y': 386
     id: 26
     options:
       legend:
@@ -2332,7 +2618,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 186
+      'y': 385
     id: 31
     options:
       legend:
@@ -2410,7 +2696,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 186
+      'y': 385
     id: 33
     options:
       legend:
@@ -2485,7 +2771,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 194
+      'y': 393
     id: 30
     options:
       legend:
@@ -2567,7 +2853,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 152
+      'y': 351
     id: 52
     options:
       legend:
@@ -2634,7 +2920,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 152
+      'y': 351
     id: 53
     options:
       legend:
@@ -2709,7 +2995,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 179
+      'y': 378
     id: 54
     options:
       legend:
@@ -2786,7 +3072,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 179
+      'y': 378
     id: 60
     options:
       legend:
