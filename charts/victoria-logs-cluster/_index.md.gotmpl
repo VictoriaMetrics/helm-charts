@@ -36,6 +36,18 @@ vector:
 ```
 By default, vector will forward logs to VictoriaLogs installation deployed by this chart.
 
+Default chart setup is shown below
+
+```mermaid
+graph TB
+  collector["Logs Collector"] --> vminsert1["vminsert"] & vminsert2["vminsert"]
+  subgraph VictoriaLogs Cluster
+  vminsert1["vminsert"] & vminsert2["vminsert"] --> vmstorage1["vmstorage"] & vmstorage2["vmstorage"]
+  vmstorage1["vmstorage"] & vmstorage2["vmstorage"] <--> vmselect1["vmselect"] & vmselect2["vmselect"]
+  end
+  vmselect1["vmselect"] & vmselect2["vmselect"] <--> user["User"] 
+```
+
 {{ include "chart.installSection" . }}
 
 {{ include "chart.uninstallSection" . }}
