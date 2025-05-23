@@ -84,6 +84,7 @@ vlselect:
     envflag.enable: true
     loggerFormat: json
     httpListenAddr: :9471
+    http.shutdownDelay: 15s
   # -- Pod's termination grace period in seconds
   terminationGracePeriodSeconds: 60
   # -- Deployment annotations
@@ -109,7 +110,7 @@ vlselect:
       initialDelaySeconds: 5
       periodSeconds: 5
       timeoutSeconds: 5
-      failureThreshold: 10
+      failureThreshold: 3
     # -- vlselect liveness probe
     liveness:
       tcpSocket: {}
@@ -327,6 +328,7 @@ vlinsert:
     envflag.enable: true
     loggerFormat: json
     httpListenAddr: :9481
+    http.shutdownDelay: 15s
   # -- Deployment annotations
   annotations: {}
   # -- Deployment additional labels
@@ -357,7 +359,7 @@ vlinsert:
       initialDelaySeconds: 5
       periodSeconds: 5
       timeoutSeconds: 5
-      failureThreshold: 10
+      failureThreshold: 3
     # -- vlinsert liveness probe
     liveness:
       tcpSocket: {}
@@ -584,7 +586,7 @@ vlstorage:
     envflag.enable: true
     loggerFormat: json
     httpListenAddr: :9491
-
+    http.shutdownDelay: 15s
   # -- Extra Volumes for the pod
   extraVolumes:
     []
@@ -727,7 +729,7 @@ vlstorage:
       initialDelaySeconds: 5
       periodSeconds: 5
       timeoutSeconds: 5
-      failureThreshold: 10
+      failureThreshold: 3
     # -- vlstorage startup probe
     startup: {}
 
@@ -809,6 +811,7 @@ vmauth:
     envflag.enable: true
     loggerFormat: json
     httpListenAddr: :8427
+    http.shutdownDelay: 15s
   # -- VMAuth annotations
   annotations: {}
   # -- VMAuth additional labels
@@ -832,7 +835,7 @@ vmauth:
       initialDelaySeconds: 5
       periodSeconds: 5
       timeoutSeconds: 5
-      failureThreshold: 10
+      failureThreshold: 3
     # -- VMAuth liveness probe
     liveness:
       tcpSocket: {}

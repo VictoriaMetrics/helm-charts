@@ -2,6 +2,7 @@
 
 - Updated alerting rules
 - VictoriaLogs upgrade 1.21.0 -> 1.22.2
+- Reduce server readiness probe periodSeconds from 15 to 5 and add `-http.shutdownDelay=15s` cmd-line flag, for graceful shutdown during rolling restarts.
 
 ## 0.9.8
 
