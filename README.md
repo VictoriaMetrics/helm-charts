@@ -130,14 +130,15 @@ helm charts tested at kubernetes versions from 1.28 to 1.30.
 
 - [VictoriaLogs Single](https://docs.victoriametrics.com/helm/victorialogs-single)
 - [VictoriaLogs Cluster](https://docs.victoriametrics.com/helm/victorialogs-cluster)
+- [VictoriaMetrics Single](https://docs.victoriametrics.com/helm/victoriametrics-single)
+- [VictoriaMetrics Cluster](https://docs.victoriametrics.com/helm/victoriametrics-cluster)
 - [VictoriaMetrics Agent](https://docs.victoriametrics.com/helm/victoriametrics-agent)
 - [VictoriaMetrics Alert](https://docs.victoriametrics.com/helm/victoriametrics-alert)
 - [VictoriaMetrics Anomaly](https://docs.victoriametrics.com/helm/victoriametrics-anomaly)
 - [VictoriaMetrics Auth](https://docs.victoriametrics.com/helm/victoriametrics-auth)
-- [VictoriaMetrics Cluster](https://docs.victoriametrics.com/helm/victoriametrics-cluster)
 - [VictoriaMetrics Gateway](https://docs.victoriametrics.com/helm/victoriametrics-gateway)
 - [VictoriaMetrics Distributed](https://docs.victoriametrics.com/helm/victoriametrics-distributed)
 - [VictoriaMetrics K8s Stack](https://docs.victoriametrics.com/helm/victoriametrics-k8s-stack)
 - [VictoriaMetrics Operator](https://docs.victoriametrics.com/helm/victoriametrics-operator)
 - [VictoriaMetrics Operator CRDs](https://docs.victoriametrics.com/helm/victoriametrics-operator-crds)
-- [VictoriaMetrics Single](https://docs.victoriametrics.com/helm/victoriametrics-single)
+
