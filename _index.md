@@ -9,5 +9,9 @@ menu:
 aliases:
   - /helm
   - /helm/index.html
+tags:
+  - logs
+  - kubernetes
+  - metrics
 ---
 {{% content "README.md" %}}

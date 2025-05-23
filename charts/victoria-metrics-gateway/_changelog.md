@@ -9,5 +9,9 @@ menu:
 url: /helm/victoriametrics-gateway/changelog
 aliases:
   - /helm/victoriametrics-gateway/changelog/index.html
+tags:
+  - metrics
+  - kubernetes
+  - enterprise
 ---
 {{% content "CHANGELOG.md" %}}
