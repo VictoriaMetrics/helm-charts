@@ -33,6 +33,7 @@ statefulset should match snapshot:
           containers:
             - args:
                 - --envflag.enable
+                - --http.shutdownDelay=15s
                 - --httpListenAddr=:9491
                 - --loggerFormat=json
                 - --retentionPeriod=7d
@@ -44,7 +45,7 @@ statefulset should match snapshot:
                 - containerPort: 9491
                   name: http
               readinessProbe:
-                failureThreshold: 10
+                failureThreshold: 3
                 httpGet:
                   path: /health
                   port: http
@@ -110,6 +111,7 @@ statefulset should match snapshot with fullnameOverride, extraLabels and podLabe
           containers:
             - args:
                 - --envflag.enable
+                - --http.shutdownDelay=15s
                 - --httpListenAddr=:9492
                 - --loggerFormat=json
                 - --retention.maxDiskSpaceUsageBytes=100GiB
@@ -122,7 +124,7 @@ statefulset should match snapshot with fullnameOverride, extraLabels and podLabe
                 - containerPort: 9492
                   name: http
               readinessProbe:
-                failureThreshold: 10
+                failureThreshold: 3
                 httpGet:
                   path: /health
                   port: http

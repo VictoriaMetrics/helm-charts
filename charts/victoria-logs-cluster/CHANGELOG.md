@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Reduce components readiness probe failureThreshold from 10 to 3 and add `-http.shutdownDelay=15s` cmd-line flag, for graceful shutdown during rolling restarts.
 
 ## 0.0.2
 
