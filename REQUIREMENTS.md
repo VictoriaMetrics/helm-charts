@@ -1,9 +1,9 @@
 ---
-weight: 15
+weight: 99
 title: Requirements
 menu:
   docs:
-    weight: 15
+    weight: 99
     parent: helm
 aliases:
   - /helm/requirements/index.html
