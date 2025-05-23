@@ -1,12 +1,13 @@
 ---
-weight: 0
+weight: 14
 title: Requirements
 menu:
   docs:
-    weight: 1
+    weight: 14
     parent: helm
 aliases:
   - /helm/requirements/index.html
+  - /helm/requirements.html
 tags:
   - kubernetes
 ---
