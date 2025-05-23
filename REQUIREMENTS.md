@@ -7,6 +7,8 @@ menu:
     parent: helm
 aliases:
   - /helm/requirements/index.html
+tags:
+  - kubernetes
 ---
 ## Kubernetes Cluster
 
