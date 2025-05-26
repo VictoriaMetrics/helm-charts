@@ -1,6 +1,7 @@
 ## Next release
 
 - Updated dashboards and rules
+- bump version of VM components to [v1.118.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.118.0)
 
 ## 0.48.1
 
