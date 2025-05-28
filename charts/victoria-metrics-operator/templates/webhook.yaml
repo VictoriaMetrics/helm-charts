@@ -5,6 +5,9 @@
 {{- $domain := ((.Values.global).cluster).dnsDomain }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $certManager := .Values.admissionWebhooks.certManager }}
+{{- $files := .Files }}
+{{- $crds := $files.Get "crd.yaml" | splitList "---" }}
+{{- $enabledHooks := .Values.admissionWebhooks.enabledCRDValidation }}
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -17,20 +20,24 @@ metadata:
   {{- end }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 webhooks:
-{{- range $name, $enabled := .Values.admissionWebhooks.enabledCRDValidation }}
-{{- if $enabled }}
+{{- range $crds }}
+{{- $crd := fromYaml . }}
+{{- $name := $crd.spec.names.singular }}
+{{- if index $enabledHooks $name }}
+{{- range $version := $crd.spec.versions }}
   - clientConfig:
       service:
         namespace: {{ $ns }}
         name: {{ $fullname }}
-        path: /validate-operator-victoriametrics-com-v1beta1-{{ $name }}
+        path: /validate-operator-victoriametrics-com-{{ $version.name }}-{{ $crd.spec.names.singular }}
         port: {{ $.Values.service.webhookPort }}
       {{- if not $certManager.enabled }}
       caBundle: {{ $tls.caCert }}
       {{- end }}
     failurePolicy: {{ $.Values.admissionWebhooks.policy }}
-    name: {{ $name }}.victoriametrics.com
-    admissionReviewVersions: ["v1", "v1beta1"]
+    name: '{{ $crd.metadata.name }}'
+    admissionReviewVersions:
+      - {{ $version.name }}
     sideEffects: None
     objectSelector:
       matchExpressions:
@@ -41,12 +48,13 @@ webhooks:
       - apiGroups:
           - operator.victoriametrics.com
         apiVersions:
-          - v1beta1
+          - {{ $version.name }}
         operations:
           - CREATE
           - UPDATE
         resources:
-          - {{ $name }}{{ ternary "" "s" (hasSuffix "s" $name) }}
+          - {{ $crd.spec.names.plural }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- if $certManager.enabled }}

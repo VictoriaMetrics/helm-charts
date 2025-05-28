@@ -60,17 +60,3 @@ rules:
   labels:
     severity: warning
     show_at: dashboard
-- alert: BadObjects
-  annotations:
-    dashboard: '{{`{{`}} $externalURL {{`}}`}}/d/1H179hunk/victoriametrics-operator?ds={{`{{`}} $labels.dc {{`}}`}}&orgId=1'
-    description: 'Operator got incorrect resources in controller {{`{{`}} $labels.controller {{`}}`}}, check operator logs'
-    summary: 'Incorrect `{{`{{`}} $labels.controller {{`}}`}}` resources in the cluster'
-  condition: '{{ true }}'
-  expr: |-
-    sum(
-      operator_controller_bad_objects_count{job=~".*((victoria.*)|vm)-?operator"}
-    ) by (controller,{{ $groupLabels }}) > 0
-  for: 15m
-  labels:
-    severity: warning
-    show_at: dashboard

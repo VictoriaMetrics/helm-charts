@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- Updated rules and dashboards
+- Allow overriding default vmagent remoteWrite options
 
 ## 0.49.0
 

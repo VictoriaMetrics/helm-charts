@@ -159,9 +159,11 @@
 {{- /* VM Agent remoteWrites */ -}}
 {{- define "vm.agent.remote.write" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $remoteWrites := $Values.vmagent.additionalRemoteWrites | default list -}}
+  {{- $remoteWrites := $Values.vmagent.additionalRemoteWrites | default list }}
   {{- with include "vm.write.endpoint" . -}}
-    {{- $remoteWrites = append $remoteWrites (fromYaml .) -}}
+    {{- $rws := $Values.vmagent.spec.remoteWrite | list (default dict) }}
+    {{- $rw := fromYaml . }}
+    {{- $remoteWrites = append $remoteWrites (mergeOverwrite $rw (deepCopy (first $rws))) }}
   {{- end -}}
   {{- toYaml (dict "remoteWrite" $remoteWrites) -}}
 {{- end -}}
@@ -176,7 +178,7 @@
   {{- end -}}
   {{- $image := dict "tag" (include "vm.image.tag" .) }}
   {{- $_ := set $spec "image" $image -}}
-  {{- tpl (deepCopy $Values.vmagent.spec | mergeOverwrite $spec | toYaml) . -}}
+  {{- tpl (mergeOverwrite (deepCopy $Values.vmagent.spec) (deepCopy $spec) | toYaml) . -}}
 {{- end }}
 
 {{- /* VMAuth spec */ -}}
