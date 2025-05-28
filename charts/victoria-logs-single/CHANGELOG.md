@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Create sink per statefulset node in Vector
 
 ## 0.10.0
 

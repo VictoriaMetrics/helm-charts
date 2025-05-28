@@ -21,27 +21,3 @@
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
-
-{{- define "vlogs.es.urls" -}}
-  {{- $_ := set . "path" "/insert/elasticsearch" -}}
-  {{- include "vlogs.urls" . -}}
-{{- end -}}
-
-{{- define "vlogs.urls" -}}
-  {{- $ctx := . -}}
-  {{- $path := .path -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- $app := $Values.server }}
-  {{- $port := int $app.service.servicePort -}}
-  {{- $fullname := include "vm.plain.fullname" $ctx }}
-  {{- $urls := default list }}
-  {{- if (eq $app.mode "statefulSet") }}
-    {{- range $i := until (int $app.replicaCount) }}
-      {{- $_ := set $ctx "appIdx" $i }}
-      {{- $urls = append $urls (printf "%s%s" (include "vm.url" $ctx) $path) }}
-    {{- end }}
-  {{- else }}
-    {{- $urls = append $urls (printf "%s%s" (include "vm.url" $ctx) $path) }}
-  {{- end }}
-  {{- toJson $urls -}}
-{{- end -}}
