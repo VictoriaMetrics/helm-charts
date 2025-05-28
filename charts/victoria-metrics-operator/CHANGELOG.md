@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Support scrape and probe CRs validation webhooks
 
 ## 0.47.0
 
