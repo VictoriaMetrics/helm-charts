@@ -1,15 +1,33 @@
-{{- if and (or (.Values.vector).enabled (.Values.vector).customConfigNamespace) (.Values.vector).existingConfigMaps }}
+{{- $app := (.Values).server | default dict }}
+{{- $vector := (.Values).vector | default dict }}
+{{- if and (or $vector.enabled $vector.customConfigNamespace) $vector.existingConfigMaps }}
+{{- $config := ($vector).customConfig | default dict }}
+{{- $sink := ($config.sinks).vlogs }}
+{{- $_ := unset $config.sinks "vlogs" }}
+{{- $port := int $app.service.servicePort -}}
 {{- $ctx := dict "helm" . "appKey" "server" "style" "plain" }}
+{{- $sinks := default list }}
+{{- if (eq $app.mode "statefulSet") }}
+  {{- range $i := until (int $app.replicaCount) }}
+    {{- $_ := set $ctx "appIdx" $i }}
+    {{- $url := printf "%s/insert/elasticsearch" (include "vm.url" $ctx) }}
+    {{- $_ := set $sink "endpoints" (list $url) }}
+    {{- $_ := set $config.sinks (printf "vlogs-%d" $i) (deepCopy $sink) }}
+  {{- end }}
+{{- else }}
+  {{- $url := printf "%s/insert/elasticsearch" (include "vm.url" $ctx) }}
+  {{- $_ := set $sink "endpoints" (list $url) }}
+  {{- $_ := set $config.sinks "vlogs" (deepCopy $sink) }}
+{{- end }}
 {{- $ns := include "vm.namespace" $ctx }}
-{{- $ns = ternary $ns ((.Values.vector).customConfigNamespace | default $ns) .Values.vector.enabled }}
+{{- $ns = ternary $ns (($vector).customConfigNamespace | default $ns) $vector.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ index (.Values.vector).existingConfigMaps 0 }}
+  name: {{ index $vector.existingConfigMaps 0 }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   namespace: {{ $ns }}
 data:
-  {{- $tpl := toYaml (.Values.vector).customConfig | replace "<<" "{{" | replace ">>" "}}" }}
-  {{ include "vm.fullname" $ctx }}-vector.yaml: |{{ tpl $tpl $ctx | nindent 4 }}
+  {{ include "vm.fullname" $ctx }}-vector.yaml: |{{ tpl (toYaml $config) $ctx | nindent 4 }}
 {{- end }}
