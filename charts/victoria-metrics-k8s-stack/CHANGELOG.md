@@ -2,6 +2,7 @@
 
 - Updated rules and dashboards
 - Allow overriding default vmagent remoteWrite options
+- upgrade dependency Grafana chart 8.11.x -> 9.2.x, Grafana v11.y.z -> v12.y.z
 
 ## 0.49.0
 
