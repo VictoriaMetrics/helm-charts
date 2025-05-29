@@ -6,19 +6,21 @@
   {{- if $app.enabled }}
     {{- $port := int $app.service.servicePort -}}
     {{- range $sinkName, $sinkConfig := $config.sinks }}
-      {{- if and (eq $sinkConfig.type "elasticsearch") (not $sinkConfig.endpoints) }}
-        {{- $_ := unset $config.sinks $sinkName }}
-        {{- if (eq $app.mode "statefulSet") }}
-          {{- range $i := until (int $app.replicaCount) }}
-            {{- $_ := set $ctx "appIdx" $i }}
+      {{- if and (eq $sinkConfig.type "elasticsearch") }}
+        {{ if or (not $sinkConfig.endpoints) (contains "vlogs.es.urls" $sinkConfig.endpoints) }}
+          {{- $_ := unset $config.sinks $sinkName }}
+          {{- if (eq $app.mode "statefulSet") }}
+            {{- range $i := until (int $app.replicaCount) }}
+              {{- $_ := set $ctx "appIdx" $i }}
+              {{- $url := printf "%s/insert/elasticsearch" (include "vm.url" $ctx) }}
+              {{- $_ := set $sinkConfig "endpoints" (list $url) }}
+              {{- $_ := set $config.sinks (printf "%s-%d" $sinkName $i) (deepCopy $sinkConfig) }}
+            {{- end }}
+          {{- else }}
             {{- $url := printf "%s/insert/elasticsearch" (include "vm.url" $ctx) }}
             {{- $_ := set $sinkConfig "endpoints" (list $url) }}
-            {{- $_ := set $config.sinks (printf "%s-%d" $sinkName $i) (deepCopy $sinkConfig) }}
+            {{- $_ := set $config.sinks $sinkName (deepCopy $sinkConfig) }}
           {{- end }}
-        {{- else }}
-          {{- $url := printf "%s/insert/elasticsearch" (include "vm.url" $ctx) }}
-          {{- $_ := set $sinkConfig "endpoints" (list $url) }}
-          {{- $_ := set $config.sinks $sinkName (deepCopy $sinkConfig) }}
         {{- end }}
       {{- end }}
     {{- end }}
