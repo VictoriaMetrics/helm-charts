@@ -1,6 +1,7 @@
 ## Next release
 
-- Create sink per statefulset node in Vector
+- Removed `vlogs.es.urls` template. Leave `endpoints` parameter of each `type: elasticsearch` Vector sink blank instead.
+- Create sink per statefulset node in Vector.
 
 ## 0.10.0
 

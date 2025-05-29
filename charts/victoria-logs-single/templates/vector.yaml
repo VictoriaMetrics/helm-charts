@@ -1,26 +1,30 @@
 {{- $app := (.Values).server | default dict }}
 {{- $vector := (.Values).vector | default dict }}
 {{- if and (or $vector.enabled $vector.customConfigNamespace) $vector.existingConfigMaps }}
-{{- $config := ($vector).customConfig | default dict }}
-{{- $sink := ($config.sinks).vlogs }}
-{{- $_ := unset $config.sinks "vlogs" }}
-{{- $port := int $app.service.servicePort -}}
-{{- $ctx := dict "helm" . "appKey" "server" "style" "plain" }}
-{{- $sinks := default list }}
-{{- if (eq $app.mode "statefulSet") }}
-  {{- range $i := until (int $app.replicaCount) }}
-    {{- $_ := set $ctx "appIdx" $i }}
-    {{- $url := printf "%s/insert/elasticsearch" (include "vm.url" $ctx) }}
-    {{- $_ := set $sink "endpoints" (list $url) }}
-    {{- $_ := set $config.sinks (printf "vlogs-%d" $i) (deepCopy $sink) }}
+  {{- $config := ($vector).customConfig | default dict }}
+  {{- $ctx := dict "helm" . "appKey" "server" "style" "plain" }}
+  {{- if $app.enabled }}
+    {{- $port := int $app.service.servicePort -}}
+    {{- range $sinkName, $sinkConfig := $config.sinks }}
+      {{- if and (eq $sinkConfig.type "elasticsearch") (not $sinkConfig.endpoints) }}
+        {{- $_ := unset $config.sinks $sinkName }}
+        {{- if (eq $app.mode "statefulSet") }}
+          {{- range $i := until (int $app.replicaCount) }}
+            {{- $_ := set $ctx "appIdx" $i }}
+            {{- $url := printf "%s/insert/elasticsearch" (include "vm.url" $ctx) }}
+            {{- $_ := set $sinkConfig "endpoints" (list $url) }}
+            {{- $_ := set $config.sinks (printf "%s-%d" $sinkName $i) (deepCopy $sinkConfig) }}
+          {{- end }}
+        {{- else }}
+          {{- $url := printf "%s/insert/elasticsearch" (include "vm.url" $ctx) }}
+          {{- $_ := set $sinkConfig "endpoints" (list $url) }}
+          {{- $_ := set $config.sinks $sinkName (deepCopy $sinkConfig) }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
   {{- end }}
-{{- else }}
-  {{- $url := printf "%s/insert/elasticsearch" (include "vm.url" $ctx) }}
-  {{- $_ := set $sink "endpoints" (list $url) }}
-  {{- $_ := set $config.sinks "vlogs" (deepCopy $sink) }}
-{{- end }}
-{{- $ns := include "vm.namespace" $ctx }}
-{{- $ns = ternary $ns (($vector).customConfigNamespace | default $ns) $vector.enabled }}
+  {{- $ns := include "vm.namespace" $ctx }}
+  {{- $ns = ternary $ns (($vector).customConfigNamespace | default $ns) $vector.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
