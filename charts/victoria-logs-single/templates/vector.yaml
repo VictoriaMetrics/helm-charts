@@ -6,7 +6,7 @@
   {{- if $app.enabled }}
     {{- $port := int $app.service.servicePort -}}
     {{- range $sinkName, $sinkConfig := $config.sinks }}
-      {{- if and (eq $sinkConfig.type "elasticsearch") }}
+      {{- if and $sinkConfig (eq $sinkConfig.type "elasticsearch") }}
         {{ if or (not $sinkConfig.endpoints) (contains "vlogs.es.urls" $sinkConfig.endpoints) }}
           {{- $_ := unset $config.sinks $sinkName }}
           {{- if (eq $app.mode "statefulSet") }}

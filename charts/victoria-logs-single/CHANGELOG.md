@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Check if sink is not empty
 
 ## 0.11.0
 
