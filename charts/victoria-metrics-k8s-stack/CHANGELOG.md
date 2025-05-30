@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.50.0
+
+**Release date:** 30 May 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.118.0](https://img.shields.io/badge/v1.118.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11180)
+
 **Update note**: This release contains new CRDs VLCluster and VLSingle. It requires to perform CRD versions update.
 Please follow this doc https://docs.victoriametrics.com/helm/victoriametrics-k8s-stack/
 
