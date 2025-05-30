@@ -1,5 +1,11 @@
 ## Next release
 
+**Update note**: This release contains new CRDs VLCluster and VLSingle. It requires to perform CRD versions update.
+Please follow this doc https://docs.victoriametrics.com/helm/victoriametrics-k8s-stack/
+
+- Support scrape and probe CRs validation webhooks
+- updates operator to [v0.59.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.0) version
+
 - Updated rules and dashboards
 - Allow overriding default vmagent remoteWrite options
 - upgrade dependency Grafana chart 8.11.x -> 9.2.x, Grafana v11.y.z -> v12.y.z
