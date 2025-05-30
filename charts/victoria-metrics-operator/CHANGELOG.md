@@ -1,6 +1,9 @@
 ## Next release
 
+**Update note**: This release contains new CRDs VLCluster and VLSingle. It requires to perform CRD versions update.
+
 - Support scrape and probe CRs validation webhooks
+- updates operator to [v0.59.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.0) version
 
 ## 0.47.0
 
