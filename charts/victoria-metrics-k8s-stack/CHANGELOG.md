@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fix incorrect configuration of `image.tag` for `VMAgent` component.
 
 ## 0.50.0
 

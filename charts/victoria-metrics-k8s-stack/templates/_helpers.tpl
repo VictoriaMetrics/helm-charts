@@ -178,7 +178,7 @@
   {{- end -}}
   {{- $image := dict "tag" (include "vm.image.tag" .) }}
   {{- $_ := set $spec "image" $image -}}
-  {{- tpl (mergeOverwrite (deepCopy $Values.vmagent.spec) (deepCopy $spec) | toYaml) . -}}
+  {{- tpl (mergeOverwrite (deepCopy $spec) (deepCopy $Values.vmagent.spec) | toYaml) . -}}
 {{- end }}
 
 {{- /* VMAuth spec */ -}}
