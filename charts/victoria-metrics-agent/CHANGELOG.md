@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added `internalTrafficPolicy` option to service section to control how traffic from Kubernetes internal sources is routed to endpoints
 
 ## 0.21.0
 
