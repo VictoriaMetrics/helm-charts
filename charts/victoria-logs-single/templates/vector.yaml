@@ -7,7 +7,7 @@
     {{- $port := int $app.service.servicePort -}}
     {{- range $sinkName, $sinkConfig := $config.sinks }}
       {{- if and $sinkConfig (eq $sinkConfig.type "elasticsearch") }}
-        {{ if or (not $sinkConfig.endpoints) (contains "vlogs.es.urls" $sinkConfig.endpoints) }}
+        {{ if or (not $sinkConfig.endpoints) (kindIs "string" $sinkConfig.endpoints) }}
           {{- $_ := unset $config.sinks $sinkName }}
           {{- if (eq $app.mode "statefulSet") }}
             {{- range $i := until (int $app.replicaCount) }}
@@ -35,5 +35,5 @@ metadata:
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   namespace: {{ $ns }}
 data:
-  {{ include "vm.fullname" $ctx }}-vector.yaml: |{{ tpl (toYaml $config) $ctx | nindent 4 }}
+  {{ include "vm.fullname" $ctx }}-vector.yaml: |{{ tpl (toYaml $config) . | nindent 4 }}
 {{- end }}

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fixed vector endpoints rendering. See [#2214](https://github.com/VictoriaMetrics/helm-charts/issues/2214) for details.
 
 ## 0.11.1
 
