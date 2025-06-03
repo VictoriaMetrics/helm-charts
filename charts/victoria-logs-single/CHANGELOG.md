@@ -1,6 +1,7 @@
 ## Next release
 
 - TODO
+- Fixed relabeling config for the VMServiceScrape of the server. See [#2216](https://github.com/VictoriaMetrics/helm-charts/issues/2216) for details.
 
 ## 0.11.2
 
