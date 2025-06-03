@@ -49,7 +49,7 @@ annotations:
     iconColor: dark-yellow
     name: restarts
     textFormat: '{{`{{`}}job{{`}}`}} restarted'
-condition: {{ ($Values.vmcluster).enabled }}
+condition: {{ or (($Values.vmcluster).enabled) (($Values.vmcluster).dashboardEnabled) }}
 description: Overview for cluster VictoriaMetrics v1.117.0 or higher
 editable: false
 fiscalYearStartMonth: 0

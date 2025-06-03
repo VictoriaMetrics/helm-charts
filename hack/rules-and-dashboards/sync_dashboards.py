@@ -187,7 +187,7 @@ condition_map = {
     "proxy": "$Values.kubeProxy.enabled",
     "scheduler": "$Values.kubeScheduler.enabled",
     "victoriametrics-backupmanager": "or (not (empty (((($Values).vmsingle).spec).vmBackup).destination)) (not (empty ((((($Values).vmcluster).spec).storage).vmBackup).destination))",
-    "victoriametrics-cluster": "($Values.vmcluster).enabled",
+    "victoriametrics-cluster": "or (($Values.vmcluster).enabled) (($Values.vmcluster).dashboardEnabled)",
     "victoriametrics-operator": '(index $Values "victoria-metrics-operator" "enabled")',
     "victoriametrics-single-node": "($Values.vmsingle).enabled",
     "victoriametrics-vmalert": "($Values.vmalert).enabled",
