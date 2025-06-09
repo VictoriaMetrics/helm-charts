@@ -1,6 +1,7 @@
 ## Next release
 
 - Added `internalTrafficPolicy` option to service section to control how traffic from Kubernetes internal sources is routed to endpoints
+- bump version of VM components to [v1.119.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.119.0)
 
 ## 0.21.0
 
