@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 1.9.5
+
+**Release date:** 09 Jun 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.23.2](https://img.shields.io/badge/v1.23.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1232)
+
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.23.2](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1232).
 
 ## 1.9.4
