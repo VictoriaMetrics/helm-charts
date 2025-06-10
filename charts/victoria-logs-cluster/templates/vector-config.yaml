@@ -1,15 +1,30 @@
-{{- if and (or (.Values.vector).enabled (.Values.vector).customConfigNamespace) (.Values.vector).existingConfigMaps }}
-{{- $ctx := dict "helm" . "style" "plain" }}
-{{- $ns := include "vm.namespace" $ctx }}
-{{- $ns = ternary $ns ((.Values.vector).customConfigNamespace | default $ns) .Values.vector.enabled }}
+{{- $app := (.Values).vlinsert | default dict }}
+{{- $vector := (.Values).vector | default dict }}
+{{- if and (or $vector.enabled $vector.customConfigNamespace) $vector.existingConfigMaps }}
+  {{- $config := ($vector).customConfig | default dict }}
+  {{- $ctx := dict "helm" . "appKey" "vlinsert" "style" "plain" }}
+  {{- if $app.enabled }}
+    {{- $port := int $app.service.servicePort -}}
+    {{- range $sinkName, $sinkConfig := $config.sinks }}
+      {{- if and $sinkConfig (eq $sinkConfig.type "elasticsearch") }}
+        {{ if or (not $sinkConfig.endpoints) (kindIs "string" $sinkConfig.endpoints) }}
+          {{- $_ := unset $config.sinks $sinkName }}
+          {{- $url := printf "%s/insert/elasticsearch" (include "vm.url" $ctx) }}
+          {{- $_ := set $sinkConfig "endpoints" (list $url) }}
+          {{- $_ := set $config.sinks $sinkName (deepCopy $sinkConfig) }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- $ns := include "vm.namespace" $ctx }}
+  {{- $ns = ternary $ns (($vector).customConfigNamespace | default $ns) $vector.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ index (.Values.vector).existingConfigMaps 0 }}
+  name: {{ index $vector.existingConfigMaps 0 }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   namespace: {{ $ns }}
 data:
-  {{- $tpl := toYaml (.Values.vector).customConfig | replace "<<" "{{" | replace ">>" "}}" }}
-  {{ include "vm.fullname" $ctx }}-vector.yaml: |{{ tpl $tpl $ctx | nindent 4 }}
+  {{ include "vm.fullname" $ctx }}-vector.yaml: |{{ tpl (toYaml $config) . | nindent 4 }}
 {{- end }}

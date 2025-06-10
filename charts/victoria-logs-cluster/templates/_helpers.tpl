@@ -143,25 +143,3 @@
   targetPort: {{ .targetPort }}
 {{- end }}
 {{- end -}}
-
-{{- define "vlogs.es.urls" -}}
-  {{- $_ := set . "path" "/insert/elasticsearch" -}}
-  {{- include "vlinsert.urls" . -}}
-{{- end -}}
-
-{{- define "vlinsert.urls" -}}
-  {{- $ctx := . -}}
-  {{- $path := .path -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- $app := $Values.server }}
-  {{- $port := int $app.service.servicePort -}}
-  {{- if $Values.vmauth.enabled }}
-    {{- $_ := set $ctx "appKey" "vmauth" }}
-  {{- else }}
-    {{- $_ := set $ctx "appKey" "vlinsert" }}
-  {{- end }}
-  {{- $fullname := include "vm.plain.fullname" $ctx }}
-  {{- $urls := default list }}
-  {{- $urls = append $urls (printf "%s%s" (include "vm.url" $ctx) $path) }}
-  {{- toJson $urls -}}
-{{- end -}}
