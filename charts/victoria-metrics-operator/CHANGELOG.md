@@ -1,6 +1,7 @@
 ## Next release
 
 - updates operator to [v0.59.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.2) version
+- propagate .Values.global.image.registry to operator container VM_CONTAINERREGISTRY env variable. This will allow to use .Values.global.image.registry in k8s-stack chart. Related issue [#2226](https://github.com/VictoriaMetrics/helm-charts/issues/2226).
 
 ## 0.49.1
 

@@ -65,6 +65,10 @@ spec:
             - name: VM_USECUSTOMCONFIGRELOADER
               value: "true"
             {{- end }}
+            {{- with (((.Values).global).image).registry }}
+            - name: VM_CONTAINERREGISTRY
+              value: {{ quote . }}
+            {{- end -}}
             {{- if .Values.operator.disable_prometheus_converter }}
             - name: VM_ENABLEDPROMETHEUSCONVERTER_PODMONITOR
               value: "false"
@@ -81,7 +85,7 @@ spec:
               value: "true"
             {{- end }}
             - name: VM_ENABLEDPROMETHEUSCONVERTEROWNERREFERENCES
-              value: {{.Values.operator.enable_converter_ownership | quote}}
+              value: {{ .Values.operator.enable_converter_ownership | quote}}
           args:
             - --zap-log-level={{ .Values.logLevel }}
             - --leader-elect
