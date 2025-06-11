@@ -227,7 +227,7 @@
       {{- $_ := unset $spec.unauthorizedUserAccessSpec "disabled" }}
     {{- end -}}
   {{- end -}}
-  {{- $_ := set $spec "image" $image -}}
+  {{- $_ := set $spec "image" (mergeOverwrite (deepCopy $image) (deepCopy ($spec.image | default dict))) -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
