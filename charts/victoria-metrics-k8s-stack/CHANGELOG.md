@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Merge default image params for VMAuth with custom ones. See issue [#2236](https://github.com/VictoriaMetrics/helm-charts/issues/2236).
 
 ## 0.51.0
 
