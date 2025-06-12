@@ -1,5 +1,7 @@
 ## Next release
 
+**Update note**: This release contains changes to validation webhooks and it requires operator version v0.59.2 or above
+
 - updates operator to [v0.59.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.2) version
 - propagate .Values.global.image.registry to operator container VM_CONTAINERREGISTRY env variable. This will allow to use .Values.global.image.registry in k8s-stack chart. Related issue [#2226](https://github.com/VictoriaMetrics/helm-charts/issues/2226).
 
@@ -9,7 +11,8 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.59.1](https://img.shields.io/badge/v0.59.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%23v0591)
 
-**Update note**: This release contains new CRDs VLCluster and VLSingle. It requires to perform CRD versions update.
+**Update note 1**: This release contains new CRDs VLCluster and VLSingle. It requires to perform CRD versions update.
+**Update note 2**: This release contains changes to validation webhooks and it requires operator version v0.59.2 or above
 
 - Support scrape and probe CRs validation webhooks
 - updates operator to [v0.59.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.1) version
