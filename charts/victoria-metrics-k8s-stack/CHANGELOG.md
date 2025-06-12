@@ -1,6 +1,9 @@
 ## Next release
 
+**Update note**: This release contains changes to validation webhooks and it requires operator version v0.59.2 or above
+
 - Merge default image params for VMAuth with custom ones. See issue [#2236](https://github.com/VictoriaMetrics/helm-charts/issues/2236).
+- updates operator to [v0.59.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.2) version
 
 ## 0.51.0
 
@@ -24,8 +27,9 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.118.0](https://img.shields.io/badge/v1.118.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11180)
 
-**Update note**: This release contains new CRDs VLCluster and VLSingle. It requires to perform CRD versions update.
+**Update note 1**: This release contains new CRDs VLCluster and VLSingle. It requires to perform CRD versions update.
 Please follow this doc https://docs.victoriametrics.com/helm/victoriametrics-k8s-stack/
+**Update note 2**: This release contains changes to validation webhooks and it requires operator version v0.59.2 or above
 
 - Support scrape and probe CRs validation webhooks
 - updates operator to [v0.59.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.0) version
