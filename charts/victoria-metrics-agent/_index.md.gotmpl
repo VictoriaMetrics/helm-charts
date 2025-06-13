@@ -54,17 +54,30 @@ remoteWrite:
 
 ### Daemonset mode
 
- It's possible to configure vmagent to use [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) instead of Deployment and StatefulSet.
+vmagent can be deployed as a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/), launching one pod per Kubernetes node.
+This setup is a suitable alternative to using a Deployment or StatefulSet.
 
-Key features:
-* reduce network traffic for metric scrapping.
-* spread load for metrics collection.
-* provide resilience for single pod failure.
+Key Benefits:
+- Reduced network traffic for scraping metrics by collecting them locally from each node.
+- Distributed scraping load across all nodes.
+- Improved resilience. Scraping continues uninterrupted if a pod fails on one node.
 
- In this scenario, vmagent pods will be launched one per each Kubernetes Node. It is required to manually adjust the scrape configuration with `spec.nodeName` pod [field selector](https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors/#list-of-supported-fields) for Kubernetes API requests.
-vmagent `kubernetes_sd_configs` section must have either `role: pod` or `role: node`. Other roles could lead to excessive CPU and memory usage, and potentially may overload Kubernetes API server.
-An example of configuration:
+To use DaemonSet mode effectively, the scraping configuration must be adjusted.
+Use the `spec.nodeName` field selector to ensure each vmagent pod scrapes only targets local to its node.
+In the `kubernetes_sd_configs` section use `role: pod` or `role: node`.
+Using other roles (e.g., `endpoints`, `service`, etc.) may result in increased CPU and memory usage and overload of the Kubernetes API server.
 
+Restrictions and Limitations:
+- Sharding is not supported.
+- PodDisruptionBudget is not supported.
+- HorizontalPodAutoscaler is not supported.
+- Persistent queue volume must be mounted using extraVolumes and extraVolumeMounts, and must use a hostPath volume source.
+- Pod restarts may lead to small gaps in metrics collection, as only a single `vmagent` pod is scheduled per node.
+
+Below are three common scrape configurations typically used in `DaemonSet` mode.
+Each configuration ensures metrics are collected only from the local node.
+
+Scraping kubelet (node) metrics:
 ```yaml
 # values.yaml
 
@@ -107,7 +120,29 @@ config:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/$1/proxy/metrics
+```
 
+Scraping cAdvisor:
+```yaml
+# values.yaml
+
+mode: daemonSet
+
+env:
+  - name: KUBE_NODE_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: spec.nodeName
+
+remoteWrite:
+   # replace with your remote write url
+  - url: http://vmsingle-vms-victoria-metrics-k8s-stack:8428/api/v1/write
+
+config:
+  global:
+    scrape_interval: 10s
+
+  scrape_configs:
     - job_name: "kubernetes-nodes-cadvisor"
       scheme: https
       tls_config:
@@ -130,7 +165,29 @@ config:
           target_label: __metrics_path__
           replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
       honor_timestamps: false
+```
 
+Scraping pod metrics:
+```yaml
+# values.yaml
+
+mode: daemonSet
+
+env:
+  - name: KUBE_NODE_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: spec.nodeName
+
+remoteWrite:
+   # replace with your remote write url
+  - url: http://vmsingle-vms-victoria-metrics-k8s-stack:8428/api/v1/write
+
+config:
+  global:
+    scrape_interval: 10s
+
+  scrape_configs:
     - job_name: "kubernetes-pods"
       kubernetes_sd_configs:
         - role: pod
@@ -165,7 +222,8 @@ config:
           target_label: namespace
         - source_labels: [__meta_kubernetes_pod_node_name]
           action: replace
-          target_label: node```
+          target_label: node
+```
 
  daemonSet mode has the following restrictions and limitations:
 * sharding not supported.
