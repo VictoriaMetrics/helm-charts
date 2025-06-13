@@ -62,7 +62,7 @@ Key features:
 * provide resilience for single pod failure.
 
  In this scenario, vmagent pods will be launched one per each Kubernetes Node. It is required to manually adjust the scrape configuration with `spec.nodeName` pod [field selector](https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors/#list-of-supported-fields) for Kubernetes API requests.
-vmagent must configuration must have either `role: pod` or `role: node`. Other `role` values will lead to excessive CPU and Memory usage, and potentially may overload Kubernetes API server.
+vmagent `kubernetes_sd_configs` section must have either `role: pod` or `role: node`. Other roles could lead to excessive CPU and memory usage, and potentially may overload Kubernetes API server.
 An example of configuration:
 ```yaml
 mode: daemonSet
