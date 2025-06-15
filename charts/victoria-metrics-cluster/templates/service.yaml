@@ -48,6 +48,9 @@ spec:
   {{- with $service.ipFamilies }}
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
+  {{- with $service.trafficDistribution }}
+  trafficDistribution: {{ . }}
+  {{- end }}
   {{- $portsTpl := printf "%s.ports" $name }}
   {{- with include $portsTpl $app }}
   ports: {{ . | nindent 4 }}
