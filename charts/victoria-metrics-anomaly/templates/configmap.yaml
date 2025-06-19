@@ -7,6 +7,9 @@
   {{- $ := unset $app.config.writer "tenant_id" }}
 {{- end -}}
 
+{{- $defaultSettings := dict "settings" (dict "restore_state" .Values.persistentVolume.enabled) }}
+{{- $resultingConfig := mergeOverwrite $defaultSettings ($app.config | default dict) }}
+
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" $ctx }}
 ---
@@ -20,4 +23,4 @@ metadata:
   annotations: {{ toYaml . | nindent 10 }}
   {{- end }}
 data:
-  config.yml: |{{ toYaml ($app.config | default dict) | nindent 4 }}
+  config.yml: |{{ toYaml $resultingConfig | nindent 4 }}

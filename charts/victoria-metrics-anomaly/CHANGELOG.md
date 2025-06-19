@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.24.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1240).
+- Automatically enable [restoring state](http://docs.victoriametrics.com/anomaly-detection/components/settings/#state-restoration) when persistence is enabled via `.Values.persistentVolume.enabled`.
 
 ## 1.9.6
 
