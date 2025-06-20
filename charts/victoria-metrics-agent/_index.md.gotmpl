@@ -50,6 +50,178 @@ remoteWrite:
 
 {{ include "chart.helmDocs" . }}
 
+## Examples
+
+### Daemonset mode
+
+The `vmagent` can be deployed as a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/), launching one pod per Kubernetes node.
+This setup is a suitable alternative to using a Deployment or StatefulSet.
+If you are using the VictoriaMetrics [Operator](https://docs.victoriametrics.com/operator/) and deploying vmagent as a Custom Resource (CRD), refer to [VMAgent - Daemon Set](https://docs.victoriametrics.com/operator/resources/vmagent/#daemonset-mode) documentation.
+
+Key Benefits:
+- Reduced network traffic for scraping metrics by collecting them locally from each node.
+- Distributed scraping load across all nodes.
+- Improved resilience. Scraping continues uninterrupted if a vmagent pod fails on one node.
+
+To use DaemonSet mode effectively, the scraping configuration must be adjusted.
+Use the `spec.nodeName` field selector to ensure each vmagent pod scrapes only targets local to its node.
+In the `kubernetes_sd_configs` section use `role: pod` or `role: node`.
+Using other roles (e.g., `endpoints`, `service`, etc.) may result in increased CPU and memory usage and overload of the Kubernetes API server.
+
+Restrictions and Limitations:
+- Sharding is not supported.
+- PodDisruptionBudget is not supported.
+- HorizontalPodAutoscaler is not supported.
+- Persistent queue volume must be mounted using extraVolumes and extraVolumeMounts, and must use a hostPath volume source.
+- Pod restarts may lead to small gaps in metrics collection, as only a single `vmagent` pod is scheduled per node.
+
+Below are three common scrape configurations typically used in `DaemonSet` mode.
+Each configuration ensures metrics are collected only from the local node.
+
+Scraping kubelet (node) metrics:
+```yaml
+# values.yaml
+
+mode: daemonSet
+
+env:
+  - name: KUBE_NODE_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: spec.nodeName
+
+remoteWrite:
+   # replace with your remote write url
+  - url: http://vmsingle-vms-victoria-metrics-k8s-stack:8428/api/v1/write
+
+config:
+  global:
+    scrape_interval: 10s
+
+  scrape_configs:
+    - job_name: "kubernetes-nodes"
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      kubernetes_sd_configs:
+        - role: node
+      relabel_configs:
+        # filter node for local one
+        - action: keep
+          source_labels: [__meta_kubernetes_node_name]
+          regex: "^%{KUBE_NODE_NAME}$"
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - target_label: __address__
+          source_labels: [__address__]
+          regex: ([^:]+)(:[0-9]+)?
+          replacement: $1:10250
+```
+
+Scraping cAdvisor metrics:
+```yaml
+# values.yaml
+
+mode: daemonSet
+
+env:
+  - name: KUBE_NODE_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: spec.nodeName
+
+remoteWrite:
+   # replace with your remote write url
+  - url: http://vmsingle-vms-victoria-metrics-k8s-stack:8428/api/v1/write
+
+config:
+  global:
+    scrape_interval: 10s
+
+  scrape_configs:
+    - job_name: "kubernetes-nodes-cadvisor"
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      metrics_path: /metrics/cadvisor
+      kubernetes_sd_configs:
+        - role: node
+      relabel_configs:
+        # filter node for local one
+        - action: keep
+          source_labels: [__meta_kubernetes_node_name]
+          regex: "^%{KUBE_NODE_NAME}$"
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - target_label: __address__
+          source_labels: [__address__]
+          regex: ([^:]+)(:[0-9]+)?
+          replacement: $1:10250
+      honor_timestamps: false
+```
+
+Scraping pod metrics:
+```yaml
+# values.yaml
+
+mode: daemonSet
+
+env:
+  - name: KUBE_NODE_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: spec.nodeName
+
+remoteWrite:
+   # replace with your remote write url
+  - url: http://vmsingle-vms-victoria-metrics-k8s-stack:8428/api/v1/write
+
+config:
+  global:
+    scrape_interval: 10s
+
+  scrape_configs:
+    - job_name: "kubernetes-pods"
+      kubernetes_sd_configs:
+        - role: pod
+          selectors:
+            # use server side selector for pods
+            - role: pod
+              field: spec.nodeName=%{KUBE_NODE_NAME}
+      relabel_configs:
+        - action: drop
+          source_labels: [__meta_kubernetes_pod_container_init]
+          regex: true
+        - action: keep_if_equal
+          source_labels:
+            [__meta_kubernetes_pod_annotation_prometheus_io_port, __meta_kubernetes_pod_container_port_number]
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+          action: replace
+          target_label: __metrics_path__
+          regex: (.+)
+        - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+          action: replace
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          target_label: __address__
+        - source_labels: [__meta_kubernetes_pod_name]
+          target_label: pod
+        - source_labels: [__meta_kubernetes_pod_container_name]
+          target_label: container
+        - source_labels: [__meta_kubernetes_namespace]
+          target_label: namespace
+        - source_labels: [__meta_kubernetes_pod_node_name]
+          action: replace
+          target_label: node
+```
+
 ## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
