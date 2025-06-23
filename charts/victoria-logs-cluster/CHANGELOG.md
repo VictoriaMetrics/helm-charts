@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Set app version to existing one
 
 ## 0.0.4
 
