@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Bump VictoriaLogs version to [v1.24.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.24.0-victorialogs).
 - Fixed relabeling config for the VMServiceScrape of the server. See [#2216](https://github.com/VictoriaMetrics/helm-charts/issues/2216) for details.
 
 ## 0.11.2
