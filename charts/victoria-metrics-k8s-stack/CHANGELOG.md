@@ -1,6 +1,9 @@
 ## Next release
 
-- TODO
+**Update note 1**: This release contains new CRD VMAnomaly. It requires to perform CRD versions update.
+**Update note 2**: This release contains changes to validation webhooks and it requires operator version v0.60.0 or above
+
+- updates operator to [v0.60.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.60.0) version
 
 ## 0.53.0
 
