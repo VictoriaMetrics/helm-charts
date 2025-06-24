@@ -43,12 +43,12 @@ Default chart setup is shown below
 
 ```mermaid
 graph TB
-  collector["Logs Collector"] --> vminsert1["vminsert"] & vminsert2["vminsert"]
+  collector["Logs Collector"] --> vlinsert1["vlinsert"] & vlinsert2["vlinsert"]
   subgraph VictoriaLogs Cluster
-  vminsert1["vminsert"] & vminsert2["vminsert"] --> vmstorage1["vmstorage"] & vmstorage2["vmstorage"]
-  vmstorage1["vmstorage"] & vmstorage2["vmstorage"] <--> vmselect1["vmselect"] & vmselect2["vmselect"]
+  vlinsert1["vlinsert"] & vlinsert2["vlinsert"] --> vlstorage1["vlstorage"] & vlstorage2["vlstorage"]
+  vlstorage1["vlstorage"] & vlstorage2["vlstorage"] <--> vlselect1["vlselect"] & vlselect2["vlselect"]
   end
-  vmselect1["vmselect"] & vmselect2["vmselect"] <--> user["User"] 
+  vlselect1["vlselect"] & vlselect2["vlselect"] <--> user["User"] 
 ```
 
 {{ include "chart.installSection" . }}
