@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+- Synced rules and dashboards
+- upgrade dependency KSM chart 5.31.2 -> 6.0.0
+- upgrade dependency node-exporter chart 4.45.3 -> 4.47.0
 
 ## 0.54.0
 
