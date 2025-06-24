@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- enabled VMAnomaly webhook
 
 ## 0.50.0
 
