@@ -3,6 +3,7 @@
 - Synced rules and dashboards
 - upgrade dependency KSM chart 5.31.2 -> 6.0.0
 - upgrade dependency node-exporter chart 4.45.3 -> 4.47.0
+- updates operator to [v0.60.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.60.1) version
 
 ## 0.54.0
 
