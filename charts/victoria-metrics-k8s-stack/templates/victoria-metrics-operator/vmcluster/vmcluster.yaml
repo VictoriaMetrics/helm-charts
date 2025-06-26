@@ -16,7 +16,9 @@ metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
   {{- $_ := set $ctx "style" "managed" }}
+  {{- $_ := set $ctx "extraLabels" ($app.labels | default dict) }}
   {{- $labels := include "vm.labels" $ctx | fromYaml }}
+  {{- $_ := unset $ctx "extraLabels" }}
   {{- if $app.spec.clusterVersion }}
     {{- $_ := set $labels "app.kubernetes.io/version" $app.spec.clusterVersion }}
   {{- end }}

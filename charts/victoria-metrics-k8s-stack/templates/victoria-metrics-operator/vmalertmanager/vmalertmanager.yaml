@@ -39,6 +39,8 @@ metadata:
   {{- end  }}
   name: {{ $fullname }}
   namespace: {{ $ns }}
+  {{- $_ := set $ctx "extraLabels" ($app.labels | default dict) }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
 spec: {{ include "vm.alertmanager.spec" $ctx | nindent 2 }}
 {{- end }}

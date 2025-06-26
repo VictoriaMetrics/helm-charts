@@ -13,6 +13,8 @@ metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
   {{- $_ := set $ctx "style" "managed" }}
+  {{- $_ := set $ctx "extraLabels" ($app.labels | default dict) }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
 spec: {{ include "vm.agent.spec" $ctx | nindent 2 }}
 {{- end }}
