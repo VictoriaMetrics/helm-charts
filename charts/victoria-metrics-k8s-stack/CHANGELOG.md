@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.55.1
+
+**Release date:** 27 Jun 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.120.0](https://img.shields.io/badge/v1.120.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11200)
+
 - Allow overriding default labels for managed in chart operator CRs using `.Values.<resource>.labels` property. Related issue [#2255](https://github.com/VictoriaMetrics/helm-charts/issues/2255)
 
 ## 0.55.0
