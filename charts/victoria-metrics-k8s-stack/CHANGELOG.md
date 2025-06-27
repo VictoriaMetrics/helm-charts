@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Allow overriding default labels for managed in chart operator CRs using `.Values.<resource>.labels` property. Related issue [#2255](https://github.com/VictoriaMetrics/helm-charts/issues/2255)
 
 ## 0.55.0
 

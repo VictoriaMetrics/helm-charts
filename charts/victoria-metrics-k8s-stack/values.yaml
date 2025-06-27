@@ -271,6 +271,8 @@ external:
 
 # Configures vmsingle params
 vmsingle:
+  # -- VMSingle labels
+  labels: {}
   # -- VMSingle annotations
   annotations: {}
   # -- Create VMSingle CR
@@ -327,6 +329,8 @@ vmsingle:
 vmcluster:
   # -- Create VMCluster CR
   enabled: false
+  # -- VMCluster labels
+  labels: {}
   # -- VMCluster annotations
   annotations: {}
   # -- Full spec for VMCluster CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
@@ -508,7 +512,9 @@ vmcluster:
 alertmanager:
   # -- Create VMAlertmanager CR
   enabled: true
-  # -- Alertmanager annotations
+  # -- VMAlertmanager labels
+  labels: {}
+  # -- VMAlertmanager annotations
   annotations: {}
   # -- (object) Full spec for VMAlertmanager CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmalertmanagerspec)
   spec:
@@ -525,12 +531,12 @@ alertmanager:
   # --
   # @raw
   # enable storing .Values.alertmanager.config in VMAlertmanagerConfig instead of k8s Secret.
-  # Note: VMAlertmanagerConfig and plain Alertmanager config structures are not equal.
+  # Note: VMAlertmanagerConfig and plain VMAlertmanager config structures are not equal.
   # If you're migrating existing config, please make sure that `.Values.alertmanager.config`:
   # - with `useManagedConfig: false` has structure described [here](https://prometheus.io/docs/alerting/latest/configuration/).
   # - with `useManagedConfig: true` has structure described [here](https://docs.victoriametrics.com/operator/api/#vmalertmanagerconfig).
   useManagedConfig: false
-  # -- (object) Alertmanager configuration
+  # -- (object) VMAlertmanager configuration
   config:
     route:
       receiver: "blackhole"
@@ -644,7 +650,7 @@ alertmanager:
     #   {{- end }}
     # template_2.tmpl: ""
 
-  # -- (object) Alertmanager ingress configuration
+  # -- (object) VMAlertmanager ingress configuration
   ingress:
     enabled: false
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
@@ -678,6 +684,8 @@ alertmanager:
 vmalert:
   # -- VMAlert annotations
   annotations: {}
+  # -- VMAlert labels
+  labels: {}
   # -- Create VMAlert CR
   enabled: true
 
@@ -746,6 +754,8 @@ vmalert:
 vmauth:
   # -- Enable VMAuth CR
   enabled: false
+  # -- VMAuth labels
+  labels: {}
   # -- VMAuth annotations
   annotations: {}
   # -- (object) Full spec for VMAuth CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
@@ -771,6 +781,8 @@ vmauth:
 vmagent:
   # -- Create VMAgent CR
   enabled: true
+  # -- VMAgent labels
+  labels: {}
   # -- VMAgent annotations
   annotations: {}
   # -- Remote write configuration of VMAgent, allowed parameters defined in a [spec](https://docs.victoriametrics.com/operator/api#vmagentremotewritespec)
@@ -847,7 +859,7 @@ defaultDatasources:
         type: victoriametrics-metrics-datasource
         version: "0.15.1"
   # -- List of alertmanager datasources.
-  # Alertmanager generated `url` will be added to each datasource in template if alertmanager is enabled
+  # VMAlertmanager generated `url` will be added to each datasource in template if alertmanager is enabled
   alertmanager:
     # -- Create per replica alertmanager compatible datasource
     perReplica: false
