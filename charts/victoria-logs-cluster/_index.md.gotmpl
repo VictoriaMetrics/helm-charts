@@ -36,6 +36,8 @@ For installation instructions, refer to the official documentation:
 
 ## Chart Details
 
+### VictoriaLogs Cluster
+
 When you install the chart, it creates three core services and an optional log collector:
 
 - `vlinsert` receives incoming log streams from various sources and load-balances them across remote nodes.
@@ -67,8 +69,8 @@ graph LR
         VLS2 <--> VLQ2
     end
     
-    VLQ1 --> Users["Users"]
-    VLQ2 --> Users
+    VLQ1 <--> Users["Users/Grafana/vlogscli"]
+    VLQ2 <--> Users
 ```
 
 ### Vector
@@ -119,8 +121,8 @@ graph LR
         VLS2 <--> VLQ2
     end
     
-    VLQ1 --> Users["vmauth"]
-    VLQ2 --> Users
+    VLQ1 <--> Users["vmauth"]
+    VLQ2 <--> Users
 ```
 
 Note that `vmauth` can send requests to `vlinsert` as needed. The diagram above shows a common use case.
