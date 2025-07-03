@@ -114,6 +114,16 @@ spec:
       {{- with $app.affinity }}
       affinity: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $app.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range $constraint := . }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+          {{- if not $constraint.labelSelector }}
+          labelSelector:
+            matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 14 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

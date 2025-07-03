@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Add default label selector to all `.Values.*.topologySpreadConstraints` properties. See [#2219](https://github.com/VictoriaMetrics/helm-charts/issues/2219)
 
 ## 0.0.5
 

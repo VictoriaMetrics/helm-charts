@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Support `.Values.server.topologySpreadConstraints` and `.Values.alertmanager.topologySpreadConstraints` properties. See [#2219](https://github.com/VictoriaMetrics/helm-charts/issues/2219)
 
 ## 0.22.0
 

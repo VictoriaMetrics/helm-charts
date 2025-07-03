@@ -90,6 +90,12 @@ server:
   # -- Replica count
   replicaCount: 1
 
+  # -- Pod topologySpreadConstraints
+  topologySpreadConstraints: []
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
+
   # -- Deployment strategy, set to standard k8s default
   strategy:
     type: RollingUpdate
@@ -421,6 +427,11 @@ alertmanager:
   # -- Security context to be added to server pods
   securityContext:
     enabled: false
+  # -- Pod topologySpreadConstraints
+  topologySpreadConstraints: []
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
   # -- Alertmanager listen address
   listenAddress: "0.0.0.0:9093"
   # -- Extra command line arguments for container of component

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Support `.Values.topologySpreadConstraints` property. See [#2219](https://github.com/VictoriaMetrics/helm-charts/issues/2219)
 
 ## 1.10.1
 

@@ -106,7 +106,14 @@ spec:
       affinity: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with $app.topologySpreadConstraints }}
-      topologySpreadConstraints: {{ toYaml . | nindent 8 }}
+      topologySpreadConstraints:
+        {{- range $constraint := . }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+          {{- if not $constraint.labelSelector }}
+          labelSelector:
+            matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 14 }}
+          {{- end }}
+        {{- end }}
       {{- end }}
       terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
       {{- if or $app.extraVolumes (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim (include "vm.license.volume" .) }}
