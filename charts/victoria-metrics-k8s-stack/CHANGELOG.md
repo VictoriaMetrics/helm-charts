@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- force storage nodes count be more than 2 * replicationFactor - 1. See [#2285](https://github.com/VictoriaMetrics/helm-charts/issues/2285).
 
 ## 0.55.2
 
