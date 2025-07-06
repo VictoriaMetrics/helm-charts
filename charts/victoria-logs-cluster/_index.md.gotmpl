@@ -24,10 +24,10 @@ tags:
 
 ### VictoriaLogs Cluster
 
-When you install the chart, it creates three core services and an optional log collector:
+When you install the chart, it creates the following core services and an optional log collector:
 
 - `vlinsert` receives incoming log streams from various sources and load-balances them across remote nodes.
-- `vlstorage` forms a StatefulSet that stores raw data on persistent volumes, applies the configured retention policy, and replicates the data across the number of replicas you define.
+- `vlstorage` forms a StatefulSet that stores raw data on persistent volumes.
 - `vlselect` provides the query API and reads data from any storage replica, so adding more `vlselect` pods increases read throughput without impacting the stored data.
 - The log collector `vector` is disabled by default, but as soon as you set `vector.enabled: true`, a DaemonSet is deployed on every node. It starts tailing pod logs using the default parsing pipeline and automatically discovers the internal `vlinsert` addresses.
 
