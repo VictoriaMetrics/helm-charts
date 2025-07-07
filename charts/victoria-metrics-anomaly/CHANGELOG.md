@@ -1,6 +1,7 @@
 ## Next release
 
 - Support `.Values.topologySpreadConstraints` property. See [#2219](https://github.com/VictoriaMetrics/helm-charts/issues/2219)
+- Add support of using [`VMPodScrape`](https://docs.victoriametrics.com/operator/resources/vmpodscrape/) for monitoring configuration. See `.Values.podMonitor.vmPodScrape`. 
 
 ## 1.10.1
 
