@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.0.7
+
+**Release date:** 07 Jul 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.25.0](https://img.shields.io/badge/v1.25.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v1250)
+
 - Remove `-victorialogs` suffix from the tag rendered by chart. This is no longer needed after moving VictoriaLogs to its [own repository](https://github.com/victoriaMetrics/victorialogs).
 
 ## 0.0.6
