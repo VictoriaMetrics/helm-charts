@@ -1,6 +1,7 @@
 ## Next release
 
 - Support `.Values.server.topologySpreadConstraints` and `.Values.alertmanager.topologySpreadConstraints` properties. See [#2219](https://github.com/VictoriaMetrics/helm-charts/issues/2219)
+- bump version of VM components to [v1.121.0](https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/docs/victoriametrics/changelog/CHANGELOG.md#v11210)
 
 ## 0.22.0
 
