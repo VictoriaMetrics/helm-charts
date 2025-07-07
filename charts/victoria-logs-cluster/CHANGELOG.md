@@ -1,6 +1,7 @@
 ## Next release
 
 - Add default label selector to all `.Values.*.topologySpreadConstraints` properties. See [#2219](https://github.com/VictoriaMetrics/helm-charts/issues/2219)
+- Bump VictoriaLogs version to [v1.25.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.25.0).
 
 ## 0.0.5
 
