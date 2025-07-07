@@ -7,8 +7,13 @@
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
+{{- if $podMonitor.vm }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+{{- else }}
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
+{{- end }}
 metadata:
   {{- with $podMonitor.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
