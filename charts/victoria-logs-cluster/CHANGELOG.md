@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Remove `-victorialogs` suffix from the tag rendered by chart. This is no longer needed after moving VictoriaLogs to its [own repository](https://github.com/victoriaMetrics/victorialogs).
 
 ## 0.0.6
 
