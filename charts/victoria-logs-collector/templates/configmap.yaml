@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "victoria-logs-collector.fullname" . }}-config
+  labels:
+    app.kubernetes.io/name: {{ include "victoria-logs-collector.fullname" . }}
+data:
+  vector.yaml: |
+    data_dir: /vl-collector
+
+    sources:
+      k8s:
+        type: kubernetes_logs
+        auto_partial_merge: true
+
+    transforms:
+      json_parser:
+        type: remap
+        inputs: [k8s]
+        source: |
+          .log = parse_json(.message) ?? .message
+          del(.message)
+
+    {{- if empty .Values.remoteWrite }}
+      {{ fail "specify at least one remoteWrite with valid url"}}
+    {{ end }}
+
+    sinks:
+    {{- range $i, $rw := .Values.remoteWrite }}
+      {{- if empty $rw.url }}
+        {{ fail (printf "'url' field must be set for remoteWrite[%d]" $i) }}
+      {{- end }}
+      {{- range $rwKey, $_ := $rw }}
+        {{- if ne $rwKey "url" }}
+          {{ fail (printf "unknown field %q for remoteWrite[%d]" $rwKey $i) }}
+        {{- end }}
+      {{- end }}
+      remote_write_{{ $i }}:
+        type: http
+        inputs: [json_parser]
+        uri: {{ printf "%s/insert/jsonline" (trimSuffix "/" $rw.url) | quote }}
+        encoding:
+          codec: json
+        healthcheck: true
+        request:
+          headers:
+            Content-Type: "application/json"
+        compression: "zstd"
+    {{- end -}}
