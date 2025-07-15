@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+**Update note 1**: This release contains new CRD VLAgent. It requires to perform CRD versions update.
+
+- updates operator to [v0.61.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.61.0) version
 
 ## 0.50.3
 
