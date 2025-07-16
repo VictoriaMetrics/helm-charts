@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add missing `pods/eviction` RBAC permission. Thanks to the @kevinastone
 
 ## 0.51.0
 
