@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.25.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1250).
+- Remove config has from pod annotations, when anomaly detection version is <1.25.0 to support hot-reload
 
 ## 1.10.2
 
