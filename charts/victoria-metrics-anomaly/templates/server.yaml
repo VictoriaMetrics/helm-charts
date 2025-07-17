@@ -17,6 +17,7 @@
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $shardingEnabled := gt (int .Values.shardsCount) 1 }}
 {{- $useSts := or .Values.persistentVolume.enabled $shardingEnabled }}
+{{- $tag := include "vm.image.tag" $ctx | splitList "-" | first }}
 ---
 apiVersion: apps/v1
 kind: {{ ternary "StatefulSet" "Deployment" $useSts }}
@@ -30,8 +31,10 @@ spec:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
-      {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum) }}
-      {{- $annotations = merge $annotations (deepCopy .Values.podAnnotations) }}
+      {{- $annotations := deepCopy .Values.podAnnotations }}
+      {{- if semverCompare "<1.25.0" $tag }}
+      {{- $_ := set $annotations "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum) }}
+      {{- end }}
       annotations: {{ toYaml $annotations | nindent 8 }}
       {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
       labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
