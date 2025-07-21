@@ -297,12 +297,6 @@
   {{- $Chart := (.helm).Chart | default .Chart }}
   {{- $selectSpec := include "vm.select.spec" . | fromYaml -}}
   {{- $clusterSpec := deepCopy $Values.vmcluster.spec -}}
-  {{- $replicationFactor := (int $clusterSpec.replicationFactor) | default 1 }}
-  {{- $storageNodes := (int ($clusterSpec.vmstorage).replicaCount) | default 1 }}
-  {{- $minStorageNodes := sub (mul 2 $replicationFactor) 1 }}
-  {{- if gt $minStorageNodes $storageNodes }}
-    {{ fail (printf "storage nodes count %d is smaller than expected %d" $storageNodes $minStorageNodes) }}
-  {{- end }}
   {{- $image := dict "image" (dict "tag" (printf "%s-cluster" (include "vm.image.tag" .))) }}
   {{- $clusterSpec = mergeOverwrite (dict "vminsert" (deepCopy $image)) $clusterSpec -}}
   {{- $clusterSpec = mergeOverwrite (dict "vmstorage" (deepCopy $image)) $clusterSpec -}}
