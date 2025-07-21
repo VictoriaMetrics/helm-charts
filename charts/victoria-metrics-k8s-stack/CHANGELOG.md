@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Replaced error with warning for a cased described in [#2285](https://github.com/VictoriaMetrics/helm-charts/issues/2285).
 
 ## 0.58.0
 
