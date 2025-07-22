@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add readme to chart
 
 ## 0.24.0
 
