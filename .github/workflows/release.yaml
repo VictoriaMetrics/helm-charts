@@ -89,6 +89,8 @@ jobs:
 
                 # ArtifactHub annotation in Chart.yaml file
                 yq -M -i '.annotations["artifacthub.io/changes"] = (load_str(strenv(CHANGELOG)) | capture("## Next release[\s]*(?P<changes>[\s\S]*?)[\s]*##") | .changes | split("\n") | .[] |= sub("^[\s]*-[\s]+", "") | filter(length > 0) | to_yaml)' $CHART_FILE
+                export README=${CHART_DIR}/README.md
+                yq -M -i '.annotations["artifacthub.io/readme"] = load_str(strenv(README))' $CHART_FILE
 
                 # Create release notes
                 cat <<EOT > ${CHART_DIR}/RELEASE_NOTES
