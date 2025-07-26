@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Changed default VMSingle port 8429 -> 8428. Related issue [#1345](https://github.com/VictoriaMetrics/operator/issues/1345).
 
 ## 0.58.2
 
