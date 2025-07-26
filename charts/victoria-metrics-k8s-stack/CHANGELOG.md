@@ -1,5 +1,7 @@
 ## Next release
 
+**Update note 1**: In this release default VMSingle port was changed from 8429 to 8428. To prevent unwanted VMSingle restart please set it to old value using `.Values.vmsingle.spec.port: 8429`.
+
 - Changed default VMSingle port 8429 -> 8428. Related issue [#1345](https://github.com/VictoriaMetrics/operator/issues/1345).
 
 ## 0.58.2
