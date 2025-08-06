@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "victoria-logs-collector.fullname" . }}-node-reader
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "namespaces", "pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "victoria-logs-collector.fullname" . }}-node-reader-binding
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "victoria-logs-collector.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "victoria-logs-collector.fullname" . }}-node-reader
+  apiGroup: rbac.authorization.k8s.io
