@@ -4,11 +4,11 @@ title: CHANGELOG
 menu:
   docs:
     weight: 1
-    identifier: helm-victoriametrics-auth-changelog
-    parent: helm-victoriametrics-auth
-url: /helm/victoriametrics-auth/changelog
+    identifier: helm-victoria-metrics-auth-changelog
+    parent: helm-victoria-metrics-auth
+url: /helm/victoria-metrics-auth/changelog/
 aliases:
-  - /helm/victoriametrics-auth/changelog/index.html
+  - /helm/victoriametrics-auth/changelog/
 tags:
   - metrics
   - kubernetes

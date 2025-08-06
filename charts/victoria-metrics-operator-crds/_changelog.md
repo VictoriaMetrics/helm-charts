@@ -4,11 +4,11 @@ title: CHANGELOG
 menu:
   docs:
     weight: 1
-    identifier: helm-victoriametrics-operator-crds-changelog
-    parent: helm-victoriametrics-operator-crds
-url: /helm/victoriametrics-operator-crds/changelog
+    identifier: helm-victoria-metrics-operator-crds-changelog
+    parent: helm-victoria-metrics-operator-crds
+url: /helm/victoria-metrics-operator-crds/changelog/
 aliases:
-  - /helm/victoriametrics-operator-crds/changelog/index.html
+  - /helm/victoriametrics-operator-crds/changelog/
 tags:
   - metrics
   - kubernetes
