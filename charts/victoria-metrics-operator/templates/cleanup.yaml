@@ -1,7 +1,7 @@
 {{- if and .Values.crds.enabled .Values.crds.cleanup.enabled }}
 {{- $app := .Values.crds.cleanup }}
 {{- if empty ($app.image).tag }}
-  {{- $tag := (printf "v%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor) | replace "+" "" -}}
+  {{- $tag := regexSplit "[+-]" .Capabilities.KubeVersion.Version -1 | first -}}
   {{- $_ := set $app.image "tag" $tag }}
 {{- else if not (kindIs "string" ($app.image).tag) }}
   {{- fail "`crd.cleanup.image.tag` is not string, most probably you need to enquote provided value" -}}

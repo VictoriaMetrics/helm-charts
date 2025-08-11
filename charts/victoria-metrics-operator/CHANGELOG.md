@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Include patch version while building default cleanup image tag. See [#2339](https://github.com/VictoriaMetrics/helm-charts/issues/2339).
 
 ## 0.51.4
 
