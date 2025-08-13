@@ -290,7 +290,14 @@ def write_group_to_file(group, url, charts):
             content += "{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}\n"
             content += '{{- $groupLabels := join "," $additionalGroupByLabels }}\n'
             content += "{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}\n"
-            content += '{{- $jobLabel := (index $Values "prometheus-node-exporter").service.labels.jobLabel | default "node-exporter" }}\n'
+            node_exporter_groups = [
+                "node-exporter.rules",
+                "node-exporter",
+                "node-network",
+                "node.rules",
+            ]
+            if group_name in node_exporter_groups:
+                content += '{{- $jobLabel := (index $Values "prometheus-node-exporter").service.labels.jobLabel | default "node-exporter" }}\n'
             content += escape(lines)
             f.write(content)
 
