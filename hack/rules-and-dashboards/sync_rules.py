@@ -188,6 +188,15 @@ replacement_map = {
         "replacement": 'namespace="[[ include "vm.namespace" . ]]"',
         "limitGroup": ["alertmanager.rules"],
     },
+    'job="node-exporter"': {
+        "replacement": 'job="[[ $jobLabel ]]"',
+        "limitGroup": [
+            "node-exporter.rules",
+            "node-exporter",
+            "node-network",
+            "node.rules",
+        ],
+    },
     "(by|on)\\s*\\(([\\w\\s,]*)\\)": {
         "replacement": cluster_label_var,
     },
@@ -281,6 +290,7 @@ def write_group_to_file(group, url, charts):
             content += "{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}\n"
             content += '{{- $groupLabels := join "," $additionalGroupByLabels }}\n'
             content += "{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}\n"
+            content += '{{- $jobLabel := (index $Values "prometheus-node-exporter").service.labels.jobLabel | default "node-exporter" }}\n'
             content += escape(lines)
             f.write(content)
 

@@ -4,6 +4,7 @@
 {{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
 {{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
+{{- $jobLabel := (index $Values "prometheus-node-exporter").service.labels.jobLabel | default "node-exporter" }}
 condition: '{{ true }}'
 name: kube-prometheus-node-recording.rules
 rules:
@@ -20,8 +21,8 @@ rules:
   expr: sum(rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal"}[5m])) WITHOUT (cpu, mode) / ON (instance,{{ $groupLabels }}) GROUP_LEFT() count(sum(node_cpu_seconds_total) BY (instance,cpu,{{ $groupLabels }})) BY (instance,{{ $groupLabels }})
   record: instance:node_cpu:ratio
 - condition: '{{ true }}'
-  expr: sum(rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal"}[5m])) BY ({{ $groupLabels }})
+  expr: sum(rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal"}[5m]))
   record: cluster:node_cpu:sum_rate5m
 - condition: '{{ true }}'
-  expr: cluster:node_cpu:sum_rate5m / count(sum(node_cpu_seconds_total) BY (instance,cpu,{{ $groupLabels }})) BY ({{ $groupLabels }})
+  expr: cluster:node_cpu:sum_rate5m / count(sum(node_cpu_seconds_total) BY (instance,cpu,{{ $groupLabels }}))
   record: cluster:node_cpu:ratio

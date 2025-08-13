@@ -4,6 +4,7 @@
 {{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
 {{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
+{{- $jobLabel := (index $Values "prometheus-node-exporter").service.labels.jobLabel | default "node-exporter" }}
 condition: '{{ true }}'
 name: node.rules
 rules:
@@ -17,7 +18,7 @@ rules:
 - condition: '{{ true }}'
   expr: |-
     count by (node,{{ $groupLabels }}) (
-      node_cpu_seconds_total{mode="idle",job="node-exporter"}
+      node_cpu_seconds_total{mode="idle",job="{{ $jobLabel }}"}
       * on (namespace,pod,{{ $groupLabels }}) group_left(node)
       topk by (namespace,pod,{{ $groupLabels }}) (1, node_namespace_pod:kube_pod_info:)
     )
@@ -25,12 +26,12 @@ rules:
 - condition: '{{ true }}'
   expr: |-
     sum(
-      node_memory_MemAvailable_bytes{job="node-exporter"} or
+      node_memory_MemAvailable_bytes{job="{{ $jobLabel }}"} or
       (
-        node_memory_Buffers_bytes{job="node-exporter"} +
-        node_memory_Cached_bytes{job="node-exporter"} +
-        node_memory_MemFree_bytes{job="node-exporter"} +
-        node_memory_Slab_bytes{job="node-exporter"}
+        node_memory_Buffers_bytes{job="{{ $jobLabel }}"} +
+        node_memory_Cached_bytes{job="{{ $jobLabel }}"} +
+        node_memory_MemFree_bytes{job="{{ $jobLabel }}"} +
+        node_memory_Slab_bytes{job="{{ $jobLabel }}"}
       )
     ) by ({{ $groupLabels }})
   record: :node_memory_MemAvailable_bytes:sum
@@ -38,7 +39,7 @@ rules:
   expr: |-
     avg by (node,{{ $groupLabels }}) (
       sum without (mode) (
-        rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal",job="node-exporter"}[5m])
+        rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal",job="{{ $jobLabel }}"}[5m])
       )
     )
   record: node:node_cpu_utilization:ratio_rate5m
