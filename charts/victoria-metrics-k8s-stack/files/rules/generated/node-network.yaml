@@ -4,7 +4,6 @@
 {{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
 {{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
-{{- $jobLabel := (index $Values "prometheus-node-exporter").service.labels.jobLabel | default "node-exporter" }}
 condition: '{{ true }}'
 name: node-network
 rules:
@@ -14,7 +13,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/general/nodenetworkinterfaceflapping'
     summary: 'Network interface is often changing its status'
   condition: '{{ true }}'
-  expr: changes(node_network_up{job="{{ $jobLabel }}",device!~"veth.+"}[2m]) > 2
+  expr: changes(node_network_up{job="node-exporter",device!~"veth.+"}[2m]) > 2
   for: 2m
   labels:
     severity: warning
