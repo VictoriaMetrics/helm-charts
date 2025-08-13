@@ -1,4 +1,4 @@
-{{- $Values := (.helm).Values }}
+{{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
