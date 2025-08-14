@@ -33,7 +33,7 @@ spec:
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
       labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraLabels" }}
-      {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/server-alerts-configmap.yaml") . | sha256sum) }}
+      {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/alert-configmap.yaml") . | sha256sum) }}
       {{- $annotations = merge $annotations $app.podAnnotations }}
       annotations: {{ toYaml $annotations | nindent 8 }}
     spec:

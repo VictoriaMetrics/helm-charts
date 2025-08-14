@@ -1,27 +1,32 @@
 {{- $app := .Values.alertmanager }}
-{{- if $app.enabled -}}
-{{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim)}}
+{{- $pvc := $app.persistentVolume }}
+{{- if and $pvc.enabled (not $pvc.existingClaim) (eq $app.mode "deployment") -}}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ $fullname }}
+  name: {{ $pvc.name | default $fullname }}
   namespace: {{ $ns }}
+  {{- $_ := set $ctx "extraLabels" $pvc.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
-  {{- with $app.persistentVolume.annotations  }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  {{- with $pvc.annotations  }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- with $app.persistentVolume.accessModes }}
+  {{- with $pvc.accessModes }}
   accessModes: {{ toYaml . | nindent 4 }}
   {{- end }}
   resources:
     requests:
-      storage: {{ $app.persistentVolume.size }}
-  {{- with $app.persistentVolume.storageClassName }}
+      storage: {{ $pvc.size }}
+  {{- with $pvc.storageClassName }}
   storageClassName: {{ . }}
   {{- end }}
-{{- end }}
+  {{- with $pvc.matchLabels }}
+  selector:
+    matchLabels: {{ toYaml . | nindent 6 }}
+  {{- end }}
 {{- end }}

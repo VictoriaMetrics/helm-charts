@@ -1,24 +1,30 @@
 {{- $app := .Values.alertmanager }}
-{{- if $app.enabled -}}
+{{- $mode := $app.mode }}
+{{- if and $mode $app.enabled (hasKey $app $mode) -}}
+{{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $sa := include "vm.fullname" . }}
+{{- if and (ne $mode "statefulSet") (gt (int $app.replicaCount) 1) }}
+  {{- fail "Alertmanager HA mode is not supported for Deployment. Consider switching to statefulset instead using `server.mode: statefulSet: true`" -}}
+{{- end }}
 apiVersion: apps/v1
-kind: Deployment
+kind: {{ title $mode }}
 metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
-  replicas: 1
+  {{- with $modeOpts.spec }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  replicas: {{ $app.replicaCount | default 1 }}
+  {{- if eq $mode "statefulSet" }}
+  serviceName: {{ $fullname }}
+  {{- end }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
-  {{- if $app.persistentVolume.enabled }}
-  strategy:
-    # Must be "Recreate" when we have a persistent volume
-    type: Recreate
-  {{- end }}
   template:
     metadata:
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
@@ -51,6 +57,14 @@ spec:
           ports:
             - name: web
               containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.listenAddress "default" "9093") }}
+              {{- if gt (int $app.replicaCount) 1 }}
+            - name: cluster-tcp
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") }}
+              protocol: TCP
+            - name: cluster-udp
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") }}
+              protocol: UDP
+              {{- end }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -70,7 +84,7 @@ spec:
           startupProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: storage
+            - name: server-volume
               mountPath: {{ ternary $app.persistentVolume.mountPath "/data" $app.persistentVolume.enabled }}
             - name: config
               mountPath: /config
@@ -117,14 +131,7 @@ spec:
       tolerations: {{ toYaml . | nindent 8 }}
       {{ end }}
       volumes:
-        - name: storage
-          {{- if $app.persistentVolume.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ $app.persistentVolume.existingClaim | default $fullname }}
-          {{- else }}
-          emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
-          {{- end }}
-          {{- $_ := set $ctx "appKey" "alertmanager" }}
+        {{- $_ := set $ctx "appKey" "alertmanager" }}
         - name: config
           configMap:
             name: {{ include "alertmanager.config.name" $ctx }}
@@ -136,4 +143,37 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- if or (eq $mode "deployment") (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
+        - name: server-volume
+          {{- if or (and (eq $mode "deployment") $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{  $app.persistentVolume.existingClaim | default $app.persistentVolume.name | default $fullname }}
+          {{- else }}
+          emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
+          {{- end }}
+        {{- end }}
+  {{- if and (eq $mode "statefulSet") $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: server-volume
+        {{- with $app.persistentVolume.annotations }}
+        annotations: {{ toYaml . | nindent 10 }}
+        {{- end }}
+      spec:
+        {{- with $app.persistentVolume.accessModes }}
+        accessModes: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ $app.persistentVolume.size }}
+        {{- with $app.persistentVolume.storageClassName }}
+        storageClassName: {{ ternary "" . (eq "-" .) }}
+        {{- end }}
+        {{- with $app.persistentVolume.matchLabels }}
+        selector:
+          matchLabels: {{ toYaml . | nindent 12 }}
+        {{- end }}
+  {{- end }}
 {{- end -}}

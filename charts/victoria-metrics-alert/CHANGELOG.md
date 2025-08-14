@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- Support alertmanager statefulset mode using `.Values.alertmanager.mode: statefulSet`
+- Support alertmanager in HA mode when `.Values.alertmanager.mode: statefulSet` and `.Values.alertmanager.replicaCount` is greater than 1.
 
 ## 0.24.1
 

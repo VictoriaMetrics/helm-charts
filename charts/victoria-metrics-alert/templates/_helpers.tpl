@@ -1,29 +1,36 @@
 {{/*
 Create base alertmanager url for notifers
 */}}
-{{- define "vmalert.alertmanager.url" -}}
+{{- define "vmalert.alertmanager.urls" -}}
+  {{- $urls := default list }}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- if $Values.alertmanager.enabled -}}
+  {{- $app := $Values.alertmanager }}
+  {{- if $app.enabled -}}
     {{- $ctx := . -}}
     {{- if not (hasKey . "helm") -}}
       {{- $ctx = dict "helm" . }}
     {{- end -}}
     {{- $_ := set $ctx "style" "plain" -}}
     {{- $_ := set $ctx "appKey" "alertmanager" -}}
-    {{- $appSecure := not (empty (($Values.alertmanager).webConfig).tls_server_config) -}}
+    {{- $appSecure := not (empty ($app.webConfig).tls_server_config) -}}
     {{- $_ := set $ctx "appSecure" $appSecure -}}
-    {{- $_ := set $ctx "appRoute" ($Values.alertmanager).baseURLPrefix -}}
-    {{- include "vm.url" $ctx -}}
+    {{- $_ := set $ctx "appRoute" $app.baseURLPrefix -}}
+    {{- if gt (int ($app.replicaCount | default 1)) 1 }}
+      {{- $fullname := include "vm.plain.fullname" $ctx -}}
+      {{- $alertmanager := deepCopy $app }}
+      {{- $_ := set $alertmanager "fullnameOverride" (printf "%s-headless" $fullname) }}
+      {{- $_ := set $ctx "headless" (dict "alertmanager" $alertmanager) }}
+      {{- $_ := set $ctx "appKey" (list "headless" "alertmanager") }}
+      {{- range $idx := (until (int $app.replicaCount)) }}
+        {{- $_ := set $ctx "appIdx" $idx }}
+        {{- $urls = append $urls (include "vm.url" $ctx) -}}
+      {{- end }}
+      {{- $_ := unset $ctx "appIdx" }}
+    {{- else }}
+      {{- $urls = append $urls (include "vm.url" $ctx) -}}
+    {{- end }}
   {{- else -}}
-    {{- $Values.server.notifier.alertmanager.url -}}
-  {{- end -}}
-{{- end -}}
-
-{{- define "vmalert.alertmanager.urls" -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- $urls := list -}}
-  {{- with (include "vmalert.alertmanager.url" .) -}}
-    {{- $urls = append $urls . -}}
+    {{- $urls = append $urls ($Values.server.notifier.alertmanager.url) -}}
   {{- end -}}
   {{- range $Values.server.notifiers }}
     {{- if not (empty .alertmanager.url) -}}
@@ -119,11 +126,48 @@ Create base alertmanager url for notifers
   {{- $_ := set $args "web.listen-address" $app.listenAddress -}}
   {{- $_ := set $args "cluster.advertise-address" "[$(POD_IP)]:6783" -}}
   {{- with $app.baseURL -}}
-    {{- $_ := set $args "web.external-url" $app.baseURL -}}
+    {{- $_ := set $args "web.external-url" . -}}
   {{- end -}}
   {{ with $app.baseURLPrefix }}
-    {{- $_ := set $args "web.route-prefix" $app.baseURLPrefix -}}
+    {{- $_ := set $args "web.route-prefix" . -}}
   {{- end -}}
+  {{- $replicaCount := $app.replicaCount | default 1 | int }}
+  {{- if gt $replicaCount 1 }}
+    {{- $_ := set $args "cluster.listen-address" $app.cluster.listenAddress -}}
+    {{- $port := include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") -}}
+    {{- $_ := set $args "cluster.advertise-address" (printf "[$(POD_IP)]:%s" $port) -}}
+    {{- with $app.cluster.pushPullInterval -}}
+      {{- $_ := set $args "cluster.pushpull-interval" . -}}
+    {{- end -}}
+    {{- with $app.cluster.gossipInterval -}}
+      {{- $_ := set $args "cluster.gossip-interval" . -}}
+    {{- end -}}
+    {{- with $app.cluster.peerTimeout -}}
+      {{- $_ := set $args "cluster.peer-timeout" . -}}
+    {{- end -}}
+    {{- with $app.cluster.settleTimeout -}}
+      {{- $_ := set $args "cluster.settle-timeout" . -}}
+    {{- end -}}
+    {{- $ctx := . -}}
+    {{- if not (hasKey . "helm") -}}
+      {{- $ctx = dict "helm" . }}
+    {{- end -}}
+    {{- $_ := set $ctx "appKey" "alertmanager" -}}
+    {{- $_ := set $ctx "style" "plain" -}}
+    {{- $fullname := include "vm.plain.fullname" $ctx -}}
+    {{- $alertmanager := deepCopy $app }}
+    {{- $_ := set $alertmanager "fullnameOverride" (printf "%s-headless" $fullname) }}
+    {{- $_ := set $ctx "headless" (dict "alertmanager" $alertmanager) }}
+    {{- $_ := set $ctx "appKey" (list "headless" "alertmanager") }}
+    {{- $port := include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") -}}
+    {{- $peers := default list }}
+    {{- range $idx := (until (int $replicaCount)) }}
+      {{- $_ := set $ctx "appIdx" $idx }}
+      {{- $peers = append $peers (printf "%s:%s" (include "vm.fqdn" $ctx) $port) -}}
+    {{- end }}
+    {{- $_ := unset $ctx "appIdx" }}
+    {{- $_ := set $args "cluster.peer" $peers }}
+  {{- end }}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
