@@ -393,6 +393,27 @@ alertmanager:
     tag: v0.27.0
   # -- Alertmanager retention
   retention: 120h
+  # -- Replica count
+  replicaCount: 1
+  # -- Cluster configuration for alertmanager
+  cluster:
+    # -- Enable cluster mode
+    enabled: false
+    # -- Cluster listen address
+    listenAddress: "0.0.0.0:9094"
+    # -- Cluster advertise address (will be auto-generated if empty)
+    advertiseAddress: ""
+    # -- Cluster peers (will be auto-generated if empty)
+    peers: []
+    # -- Cluster push/pull interval
+    pushPullInterval: 60s
+    # -- Cluster gossip interval
+    gossipInterval: 200ms
+    # -- Cluster peer timeout
+    peerTimeout: 15s
+    # -- Cluster settle timeout
+    settleTimeout: 1m
+
   # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
   nodeSelector: {}
   # -- Name of Priority Class

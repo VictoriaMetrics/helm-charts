@@ -1,6 +1,6 @@
 {{- $app := .Values.alertmanager }}
 {{- $service := $app.service }}
-{{- if $app.enabled -}}
+{{- if and $app.enabled $app.cluster.enabled (gt ($app.replicaCount | default 1 | int) 1) -}}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
@@ -14,43 +14,18 @@ metadata:
   {{- $_ := set $ctx "extraLabels" $app.service.labels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
-  name: {{ $fullname }}
+  name: {{ $fullname }}-headless
 spec:
-  {{- with $service.clusterIP }}
-  clusterIP: {{ . }}
-  {{- end }}
-  {{- with $service.externalIPs }}
-  externalIPs: {{ toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $service.loadBalancerIP }}
-  loadBalancerIP: {{ . }}
-  {{- end }}
-  {{- with $service.loadBalancerSourceRanges }}
-  loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
-  {{- end }}
-  type: {{ $service.type }}
-  {{- with $service.healthCheckNodePort }}
-  healthCheckNodePort: {{ . }}
-  {{- end }}
-  {{- with $service.externalTrafficPolicy }}
-  externalTrafficPolicy: {{ . }}
-  {{- end }}
-  {{- with $service.ipFamilyPolicy }}
-  ipFamilyPolicy: {{ . }}
-  {{- end }}
-  {{- with $service.ipFamilies }}
-  ipFamilies: {{ toYaml . | nindent 4 }}
-  {{- end }}
+  clusterIP: None
+  type: ClusterIP
   ports:
     - name: web
       port: {{ $service.servicePort }}
       targetPort: web
       protocol: TCP
-    {{- if $app.cluster.enabled }}
     - name: cluster
       port: {{ include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") }}
       targetPort: cluster
       protocol: TCP
-    {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}

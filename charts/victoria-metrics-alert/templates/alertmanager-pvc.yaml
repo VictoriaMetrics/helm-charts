@@ -1,5 +1,5 @@
 {{- $app := .Values.alertmanager }}
-{{- if $app.enabled -}}
+{{- if and $app.enabled (or (not $app.cluster.enabled) (eq ($app.replicaCount | default 1 | int) 1)) -}}
 {{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim)}}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
