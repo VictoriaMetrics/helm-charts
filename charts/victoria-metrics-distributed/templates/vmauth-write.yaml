@@ -36,7 +36,7 @@ metadata:
   {{- if empty $urls }}
     {{- fail "No global vmauth write backend urls defined" -}}
   {{- end }}
-  {{- $defaultPaths := list "/api/v1/write" "/prometheus/api/v1/write" "/write" "/api/v1/import" "/api/v1/import/.+" }}
+  {{- $defaultPaths := list "/api/v1/write" "/prometheus/api/v1/write" "/write" "/api/v1/import" "/api/v1/import/.+" "/opentelemetry/.+" "/insert/.+"}}
   {{- $defaultUrlMapItem := dict "src_paths" $defaultPaths "url_prefix" $urls }}
   {{- $spec := deepCopy $auth.spec | default dict -}}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}

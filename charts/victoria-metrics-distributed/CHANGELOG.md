@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Add `/opentelemetry/.+` and `/insert/.+` to vmauth-global-write default `src_paths`, to allow ingestion via OpenTelemetry protocol and the [multitenancy endpoint](https://docs.victoriametrics.com/victoriametrics/vmagent/#multitenancy) by default.
 
 ## 0.20.1
 
