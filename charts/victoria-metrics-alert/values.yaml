@@ -221,7 +221,7 @@ server:
     # -- Service labels
     labels: {}
     # -- Service ClusterIP
-    clusterIP: ""
+    clusterIP: "None"
     # -- Service external IPs. Check [here](https://kubernetes.io/docs/concepts/services-networking/service/#external-ips) for details
     externalIPs: []
     # -- Service load balancer IP
@@ -386,6 +386,24 @@ alertmanager:
   fullnameOverride: ""
   # -- Alertmanager Pod annotations
   podAnnotations: {}
+  # -- Alertmanager mode: deployment, statefulSet
+  mode: deployment
+  # -- [K8s Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) specific variables
+  deployment:
+    spec:
+      strategy:
+        # Must be "Recreate" when we have a persistent volume
+        type: Recreate
+        maxSurge: 1
+        maxUnavailable: 1
+  # -- [K8s StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) specific variables
+  statefulSet:
+    spec:
+      # -- Deploy order policy for StatefulSet pods
+      podManagementPolicy: OrderedReady
+      # -- StatefulSet update strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies) for details.
+      updateStrategy: {}
+        # type: RollingUpdate
   # -- Alertmanager image configuration
   image:
     registry: ""
@@ -393,6 +411,20 @@ alertmanager:
     tag: v0.27.0
   # -- Alertmanager retention
   retention: 120h
+  # -- Replica count
+  replicaCount: 1
+  # -- Cluster configuration for alertmanager
+  cluster:
+    # -- Cluster listen address
+    listenAddress: "0.0.0.0:9094"
+    # -- Cluster push/pull interval
+    pushPullInterval: 60s
+    # -- Cluster gossip interval
+    gossipInterval: 200ms
+    # -- Cluster peer timeout
+    peerTimeout: 15s
+    # -- Cluster settle timeout
+    settleTimeout: 1m
   # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
   nodeSelector: {}
   # -- Name of Priority Class

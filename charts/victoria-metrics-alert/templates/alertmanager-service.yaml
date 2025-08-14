@@ -1,9 +1,11 @@
 {{- $app := .Values.alertmanager }}
+{{- $mode := $app.mode }}
 {{- $service := $app.service }}
-{{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
+{{- if $app.enabled -}}
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -16,6 +18,7 @@ metadata:
   {{- $_ := unset $ctx "extraLabels" }}
   name: {{ $fullname }}
 spec:
+  type: {{ $service.type }}
   {{- with $service.clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
@@ -28,7 +31,6 @@ spec:
   {{- with $service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
   {{- end }}
-  type: {{ $service.type }}
   {{- with $service.healthCheckNodePort }}
   healthCheckNodePort: {{ . }}
   {{- end }}
@@ -46,5 +48,37 @@ spec:
       port: {{ $service.servicePort }}
       targetPort: web
       protocol: TCP
+  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
+{{- end }}
+{{- if and (eq $mode "statefulSet") (gt (int $app.replicaCount) 1) }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ $ns }}
+  {{- with $service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $_ := set $ctx "extraLabels" $app.service.labels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}-headless
+spec:
+  clusterIP: None
+  ports:
+    - name: web
+      port: {{ $service.servicePort }}
+      targetPort: web
+      protocol: TCP
+    {{- if gt (int $app.replicaCount) 1 }}
+    - port: {{ include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") }}
+      targetPort: cluster-tcp
+      protocol: TCP
+      name: cluster-tcp
+    - port: {{ include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") }}
+      targetPort: cluster-udp
+      protocol: UDP
+      name: cluster-udp
+    {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}
