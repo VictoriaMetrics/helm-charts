@@ -24008,6 +24008,57 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - Add `/opentelemetry/.+` and `/insert/.+` to vmauth-global-write default `src_paths`, to allow ingestion via OpenTelemetry protocol and the [multitenancy endpoint](https://docs.victoriametrics.com/victoriametrics/vmagent/#multitenancy) by default.
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-distributed
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com
+        - name: Changelog
+          url: https://docs.victoriametrics.com/changelog
+      artifacthub.io/operator: "true"
+      artifacthub.io/readme: |
+        # VictoriaMetrics Distributed Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoriametrics-distributed/)
+    apiVersion: v2
+    appVersion: v1.123.0
+    created: "2025-08-14T04:56:40.172797418Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    - condition: victoria-metrics-k8s-stack.enabled
+      name: victoria-metrics-k8s-stack
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.48.*
+    description: A Helm chart for Running VMCluster on Multiple Availability Zones
+    digest: 54edc50846ce7305c5e12136dec85b543bb12897fac23d7113eed59cde08361e
+    home: https://github.com/VictoriaMetrics/helm-charts
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-distributed
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-distributed-0.20.2/victoria-metrics-distributed-0.20.2.tgz
+    version: 0.20.2
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - bump version of VM components to [v1.123.0](https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/docs/victoriametrics/changelog/CHANGELOG.md#v11230)
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -51256,4 +51307,4 @@ entries:
     urls:
     - https://victoriametrics.github.io/helm-charts/packages/victoria-metrics-single-0.0.1.tgz
     version: 0.0.1
-generated: "2025-08-13T15:38:31.570310272Z"
+generated: "2025-08-14T04:56:40.174917985Z"
