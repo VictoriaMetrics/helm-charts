@@ -1,30 +1,23 @@
 {{- $app := .Values.alertmanager }}
-{{- if and $app.enabled (or (not $app.cluster.enabled) (eq ($app.replicaCount | default 1 | int) 1)) -}}
+{{- if and $app.enabled $app.cluster.enabled (gt ($app.replicaCount | default 1 | int) 1) -}}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $sa := include "vm.fullname" . }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
+  serviceName: {{ $fullname }}-headless
   replicas: {{ $app.replicaCount | default 1 }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
-  {{- if and $app.persistentVolume.enabled (eq ($app.replicaCount | default 1 | int) 1) }}
-  strategy:
-    # Must be "Recreate" when we have a persistent volume and single replica
-    type: Recreate
-  {{- else if gt ($app.replicaCount | default 1 | int) 1 }}
-  strategy:
+  updateStrategy:
     type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-  {{- end }}
+  podManagementPolicy: Parallel
   template:
     metadata:
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
@@ -57,10 +50,8 @@ spec:
           ports:
             - name: web
               containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.listenAddress "default" "9093") }}
-            {{- if $app.cluster.enabled }}
             - name: cluster
               containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") }}
-            {{- end }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -70,7 +61,6 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: status.podIP
-            {{- if $app.cluster.enabled }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -81,7 +71,6 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.namespace
-            {{- end }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -139,14 +128,11 @@ spec:
       tolerations: {{ toYaml . | nindent 8 }}
       {{ end }}
       volumes:
+        {{- if not $app.persistentVolume.enabled }}
         - name: storage
-          {{- if $app.persistentVolume.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ $app.persistentVolume.existingClaim | default $fullname }}
-          {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
-          {{- end }}
-          {{- $_ := set $ctx "appKey" "alertmanager" }}
+        {{- end }}
+        {{- $_ := set $ctx "appKey" "alertmanager" }}
         - name: config
           configMap:
             name: {{ include "alertmanager.config.name" $ctx }}
@@ -158,4 +144,20 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+  {{- if $app.persistentVolume.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+        {{- with $app.persistentVolume.annotations }}
+        annotations: {{ toYaml . | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes: {{ toYaml $app.persistentVolume.accessModes | nindent 10 }}
+        {{- with $app.persistentVolume.storageClassName }}
+        storageClassName: {{ . }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ $app.persistentVolume.size }}
+  {{- end }}
 {{- end -}}
