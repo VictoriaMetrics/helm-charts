@@ -188,6 +188,9 @@ replacement_map = {
         "replacement": 'namespace="[[ include "vm.namespace" . ]]"',
         "limitGroup": ["alertmanager.rules"],
     },
+    'job="node-exporter"': {
+        "replacement": 'job="[[ include "vm-k8s-stack.nodeExporter.name" . ]]"',
+    },
     "(by|on)\\s*\\(([\\w\\s,]*)\\)": {
         "replacement": cluster_label_var,
     },
@@ -243,7 +246,7 @@ def yaml_dump(struct):
     )
 
 
-def write_group_to_file(group, url, charts):
+def write_group_to_file(group, charts):
     fix_expr(group["rules"])
     group_name = group["name"]
     group["condition"] = "[[ %(condition)s ]]" % {
@@ -344,7 +347,7 @@ def main():
         for group in groups:
             if group["name"] in skip_list:
                 continue
-            write_group_to_file(group, url, src["charts"])
+            write_group_to_file(group, src["charts"])
 
     print("Finished")
 

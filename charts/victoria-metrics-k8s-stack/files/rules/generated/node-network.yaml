@@ -13,7 +13,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/general/nodenetworkinterfaceflapping'
     summary: 'Network interface is often changing its status'
   condition: '{{ true }}'
-  expr: changes(node_network_up{job="node-exporter",device!~"veth.+"}[2m]) > 2
+  expr: changes(node_network_up{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",device!~"veth.+"}[2m]) > 2
   for: 2m
   labels:
     severity: warning

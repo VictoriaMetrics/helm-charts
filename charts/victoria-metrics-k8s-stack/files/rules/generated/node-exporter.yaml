@@ -15,11 +15,11 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 15
+      node_filesystem_avail_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} * 100 < 15
     and
-      predict_linear(node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""}[6h], 24*60*60) < 0
+      predict_linear(node_filesystem_avail_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""}[6h], 24*60*60) < 0
     and
-      node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      node_filesystem_readonly{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} == 0
     )
   for: 1h
   labels:
@@ -32,11 +32,11 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 10
+      node_filesystem_avail_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} * 100 < 10
     and
-      predict_linear(node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""}[6h], 4*60*60) < 0
+      predict_linear(node_filesystem_avail_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""}[6h], 4*60*60) < 0
     and
-      node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      node_filesystem_readonly{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} == 0
     )
   for: 1h
   labels:
@@ -49,9 +49,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 5
+      node_filesystem_avail_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} * 100 < 5
     and
-      node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      node_filesystem_readonly{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} == 0
     )
   for: 30m
   labels:
@@ -64,9 +64,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 3
+      node_filesystem_avail_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} * 100 < 3
     and
-      node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      node_filesystem_readonly{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} == 0
     )
   for: 30m
   labels:
@@ -79,11 +79,11 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 40
+      node_filesystem_files_free{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} / node_filesystem_files{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} * 100 < 40
     and
-      predict_linear(node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""}[6h], 24*60*60) < 0
+      predict_linear(node_filesystem_files_free{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""}[6h], 24*60*60) < 0
     and
-      node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      node_filesystem_readonly{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} == 0
     )
   for: 1h
   labels:
@@ -96,11 +96,11 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 20
+      node_filesystem_files_free{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} / node_filesystem_files{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} * 100 < 20
     and
-      predict_linear(node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""}[6h], 4*60*60) < 0
+      predict_linear(node_filesystem_files_free{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""}[6h], 4*60*60) < 0
     and
-      node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      node_filesystem_readonly{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} == 0
     )
   for: 1h
   labels:
@@ -113,9 +113,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 5
+      node_filesystem_files_free{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} / node_filesystem_files{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} * 100 < 5
     and
-      node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      node_filesystem_readonly{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} == 0
     )
   for: 1h
   labels:
@@ -128,9 +128,9 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 3
+      node_filesystem_files_free{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} / node_filesystem_files{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} * 100 < 3
     and
-      node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      node_filesystem_readonly{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",fstype!="",mountpoint!=""} == 0
     )
   for: 1h
   labels:
@@ -141,7 +141,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodenetworkreceiveerrs'
     summary: 'Network interface is reporting many receive errors.'
   condition: '{{ true }}'
-  expr: rate(node_network_receive_errs_total{job="node-exporter"}[2m]) / rate(node_network_receive_packets_total{job="node-exporter"}[2m]) > 0.01
+  expr: rate(node_network_receive_errs_total{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}[2m]) / rate(node_network_receive_packets_total{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}[2m]) > 0.01
   for: 1h
   labels:
     severity: warning
@@ -151,7 +151,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodenetworktransmiterrs'
     summary: 'Network interface is reporting many transmit errors.'
   condition: '{{ true }}'
-  expr: rate(node_network_transmit_errs_total{job="node-exporter"}[2m]) / rate(node_network_transmit_packets_total{job="node-exporter"}[2m]) > 0.01
+  expr: rate(node_network_transmit_errs_total{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}[2m]) / rate(node_network_transmit_packets_total{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}[2m]) > 0.01
   for: 1h
   labels:
     severity: warning
@@ -161,7 +161,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodehighnumberconntrackentriesused'
     summary: 'Number of conntrack are getting close to the limit.'
   condition: '{{ true }}'
-  expr: (node_nf_conntrack_entries{job="node-exporter"} / node_nf_conntrack_entries_limit) > 0.75
+  expr: (node_nf_conntrack_entries{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} / node_nf_conntrack_entries_limit) > 0.75
   labels:
     severity: warning
 - alert: NodeTextFileCollectorScrapeError
@@ -170,7 +170,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodetextfilecollectorscrapeerror'
     summary: 'Node Exporter text file collector failed to scrape.'
   condition: '{{ true }}'
-  expr: node_textfile_scrape_error{job="node-exporter"} == 1
+  expr: node_textfile_scrape_error{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} == 1
   labels:
     severity: warning
 - alert: NodeClockSkewDetected
@@ -181,15 +181,15 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_timex_offset_seconds{job="node-exporter"} > 0.05
+      node_timex_offset_seconds{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} > 0.05
     and
-      deriv(node_timex_offset_seconds{job="node-exporter"}[5m]) >= 0
+      deriv(node_timex_offset_seconds{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}[5m]) >= 0
     )
     or
     (
-      node_timex_offset_seconds{job="node-exporter"} < -0.05
+      node_timex_offset_seconds{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} < -0.05
     and
-      deriv(node_timex_offset_seconds{job="node-exporter"}[5m]) <= 0
+      deriv(node_timex_offset_seconds{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}[5m]) <= 0
     )
   for: 10m
   labels:
@@ -201,9 +201,9 @@ rules:
     summary: 'Clock not synchronising.'
   condition: '{{ true }}'
   expr: |-
-    min_over_time(node_timex_sync_status{job="node-exporter"}[5m]) == 0
+    min_over_time(node_timex_sync_status{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}[5m]) == 0
     and
-    node_timex_maxerror_seconds{job="node-exporter"} >= 16
+    node_timex_maxerror_seconds{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} >= 16
   for: 10m
   labels:
     severity: warning
@@ -213,7 +213,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/noderaiddegraded'
     summary: 'RAID Array is degraded.'
   condition: '{{ true }}'
-  expr: node_md_disks_required{job="node-exporter",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"} - ignoring (state) (node_md_disks{state="active",job="node-exporter",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"}) > 0
+  expr: node_md_disks_required{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"} - ignoring (state) (node_md_disks{state="active",job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"}) > 0
   for: 15m
   labels:
     severity: critical
@@ -223,7 +223,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/noderaiddiskfailure'
     summary: 'Failed device in RAID array.'
   condition: '{{ true }}'
-  expr: node_md_disks{state="failed",job="node-exporter",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"} > 0
+  expr: node_md_disks{state="failed",job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"} > 0
   labels:
     severity: warning
 - alert: NodeFileDescriptorLimit
@@ -234,7 +234,7 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_filefd_allocated{job="node-exporter"} * 100 / node_filefd_maximum{job="node-exporter"} > 70
+      node_filefd_allocated{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} * 100 / node_filefd_maximum{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} > 70
     )
   for: 15m
   labels:
@@ -247,7 +247,7 @@ rules:
   condition: '{{ true }}'
   expr: |-
     (
-      node_filefd_allocated{job="node-exporter"} * 100 / node_filefd_maximum{job="node-exporter"} > 90
+      node_filefd_allocated{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} * 100 / node_filefd_maximum{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} > 90
     )
   for: 15m
   labels:
@@ -260,7 +260,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodecpuhighusage'
     summary: 'High CPU usage.'
   condition: '{{ true }}'
-  expr: sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job="node-exporter", mode!~"idle|iowait"}[2m]))) * 100 > 90
+  expr: sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}", mode!~"idle|iowait"}[2m]))) * 100 > 90
   for: 15m
   labels:
     severity: info
@@ -275,8 +275,8 @@ rules:
     summary: 'System saturated, load per core is very high.'
   condition: '{{ true }}'
   expr: |-
-    node_load1{job="node-exporter"}
-    / count without (cpu, mode) (node_cpu_seconds_total{job="node-exporter", mode="idle"}) > 2
+    node_load1{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}
+    / count without (cpu, mode) (node_cpu_seconds_total{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}", mode="idle"}) > 2
   for: 15m
   labels:
     severity: warning
@@ -290,7 +290,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodememorymajorpagesfaults'
     summary: 'Memory major page faults are occurring at very high rate.'
   condition: '{{ true }}'
-  expr: rate(node_vmstat_pgmajfault{job="node-exporter"}[5m]) > 500
+  expr: rate(node_vmstat_pgmajfault{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}[5m]) > 500
   for: 15m
   labels:
     severity: warning
@@ -302,7 +302,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodememoryhighutilization'
     summary: 'Host is running out of memory.'
   condition: '{{ true }}'
-  expr: 100 - (node_memory_MemAvailable_bytes{job="node-exporter"} / node_memory_MemTotal_bytes{job="node-exporter"} * 100) > 90
+  expr: 100 - (node_memory_MemAvailable_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} / node_memory_MemTotal_bytes{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} * 100) > 90
   for: 15m
   labels:
     severity: warning
@@ -316,7 +316,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodediskiosaturation'
     summary: 'Disk IO queue is high.'
   condition: '{{ true }}'
-  expr: rate(node_disk_io_time_weighted_seconds_total{job="node-exporter", device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"}[5m]) > 10
+  expr: rate(node_disk_io_time_weighted_seconds_total{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}", device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"}[5m]) > 10
   for: 30m
   labels:
     severity: warning
@@ -326,7 +326,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodesystemdservicefailed'
     summary: 'Systemd service has entered failed state.'
   condition: '{{ true }}'
-  expr: node_systemd_unit_state{job="node-exporter", state="failed"} == 1
+  expr: node_systemd_unit_state{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}", state="failed"} == 1
   for: 5m
   labels:
     severity: warning
@@ -336,7 +336,7 @@ rules:
     runbook_url: '{{ $runbookUrl }}/node/nodesystemdservicecrashlooping'
     summary: 'Systemd service keeps restaring, possibly crash looping.'
   condition: '{{ true }}'
-  expr: increase(node_systemd_service_restart_total{job="node-exporter"}[5m]) > 2
+  expr: increase(node_systemd_service_restart_total{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}[5m]) > 2
   for: 15m
   labels:
     severity: warning
