@@ -20,8 +20,8 @@ rules:
   expr: sum(rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal"}[5m])) WITHOUT (cpu, mode) / ON (instance,{{ $groupLabels }}) GROUP_LEFT() count(sum(node_cpu_seconds_total) BY (instance,cpu,{{ $groupLabels }})) BY (instance,{{ $groupLabels }})
   record: instance:node_cpu:ratio
 - condition: '{{ true }}'
-  expr: sum(rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal"}[5m]))
+  expr: sum(rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal"}[5m])) BY ({{ $groupLabels }})
   record: cluster:node_cpu:sum_rate5m
 - condition: '{{ true }}'
-  expr: cluster:node_cpu:sum_rate5m / count(sum(node_cpu_seconds_total) BY (instance,cpu,{{ $groupLabels }}))
+  expr: cluster:node_cpu:sum_rate5m / count(sum(node_cpu_seconds_total) BY (instance,cpu,{{ $groupLabels }})) BY ({{ $groupLabels }})
   record: cluster:node_cpu:ratio

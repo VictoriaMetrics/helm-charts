@@ -189,13 +189,7 @@ replacement_map = {
         "limitGroup": ["alertmanager.rules"],
     },
     'job="node-exporter"': {
-        "replacement": 'job="[[ $jobLabel ]]"',
-        "limitGroup": [
-            "node-exporter.rules",
-            "node-exporter",
-            "node-network",
-            "node.rules",
-        ],
+        "replacement": 'job="[[ include "vm-k8s-stack.nodeExporter.name" . ]]"',
     },
     "(by|on)\\s*\\(([\\w\\s,]*)\\)": {
         "replacement": cluster_label_var,
@@ -252,7 +246,7 @@ def yaml_dump(struct):
     )
 
 
-def write_group_to_file(group, url, charts):
+def write_group_to_file(group, charts):
     fix_expr(group["rules"])
     group_name = group["name"]
     group["condition"] = "[[ %(condition)s ]]" % {
@@ -290,14 +284,6 @@ def write_group_to_file(group, url, charts):
             content += "{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}\n"
             content += '{{- $groupLabels := join "," $additionalGroupByLabels }}\n'
             content += "{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}\n"
-            node_exporter_groups = [
-                "node-exporter.rules",
-                "node-exporter",
-                "node-network",
-                "node.rules",
-            ]
-            if group_name in node_exporter_groups:
-                content += '{{- $jobLabel := (index $Values "prometheus-node-exporter").service.labels.jobLabel | default "node-exporter" }}\n'
             content += escape(lines)
             f.write(content)
 
@@ -361,7 +347,7 @@ def main():
         for group in groups:
             if group["name"] in skip_list:
                 continue
-            write_group_to_file(group, url, src["charts"])
+            write_group_to_file(group, src["charts"])
 
     print("Finished")
 

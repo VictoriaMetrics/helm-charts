@@ -398,3 +398,8 @@
   {{- $_ := set . "appKey" (list "alertmanager" "spec") -}}
   {{- $Values.alertmanager.name | default (include "vm.managed.fullname" .) -}}
 {{- end -}}
+
+{{- define "vm-k8s-stack.nodeExporter.name" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- (index $Values "prometheus-node-exporter").service.labels.jobLabel | default "node-exporter" }}
+{{- end -}}
