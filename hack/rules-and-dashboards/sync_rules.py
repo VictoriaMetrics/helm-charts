@@ -95,7 +95,7 @@ sources = [
         ],
     },
     {
-        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-vlogs.yml",
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/deployment/docker/rules/alerts-vlogs.yml",
         "charts": [
             "victoria-logs-single",
         ],

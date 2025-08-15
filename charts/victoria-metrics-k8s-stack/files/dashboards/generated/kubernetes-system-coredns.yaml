@@ -623,7 +623,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(coredns_forward_requests_total{ {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(coredns_proxy_request_duration_seconds_count{proxy_name="forward", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: total forward requests
     refId: A
@@ -694,7 +694,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     exemplar: true
-    expr: sum(rate(coredns_forward_responses_total{rcode=~"SERVFAIL|REFUSED", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (rcode)
+    expr: sum(rate(coredns_proxy_request_duration_seconds_count{proxy_name="forward", rcode=~"SERVFAIL|REFUSED", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (rcode)
     interval: $resolution
     legendFormat: '{{`{{`}} rcode {{`}}`}}'
     refId: A
@@ -1185,5 +1185,5 @@ timepicker: {}
 timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
 title: Kubernetes / System / CoreDNS
 uid: k8s_system_coredns
-version: 20
+version: 21
 weekStart: ''

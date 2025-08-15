@@ -111,7 +111,19 @@ rules:
     runbook_url: '{{ $runbookUrl }}/kubernetes/kubeletpodstartuplatencyhigh'
     summary: 'Kubelet Pod startup latency is too high.'
   condition: '{{ true }}'
-  expr: histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{job="kubelet", metrics_path="/metrics"}[5m])) by (instance,le,{{ $groupLabels }})) * on (instance,{{ $groupLabels }}) group_left(node) kubelet_node_name{job="kubelet", metrics_path="/metrics"} > 60
+  expr: |-
+    histogram_quantile(0.99,
+      sum by (instance,le,{{ $groupLabels }}) (
+        topk by (instance,le,operation_type,{{ $groupLabels }}) (1,
+          rate(kubelet_pod_worker_duration_seconds_bucket{job="kubelet", metrics_path="/metrics"}[5m])
+        )
+      )
+    )
+    * on (instance,{{ $groupLabels }}) group_left(node)
+    topk by (instance,node,{{ $groupLabels }}) (1,
+      kubelet_node_name{job="kubelet", metrics_path="/metrics"}
+    )
+    > 60
   for: 15m
   labels:
     severity: warning

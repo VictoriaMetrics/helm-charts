@@ -14,9 +14,30 @@ rules:
     summary: 'Cluster has overcommitted CPU resource requests.'
   condition: '{{ true }}'
   expr: |-
-    sum(namespace_cpu:kube_pod_container_resource_requests:sum{}) by ({{ $groupLabels }}) - (sum(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $groupLabels }}) - max(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $groupLabels }})) > 0
-    and
-    (sum(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $groupLabels }}) - max(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ $groupLabels }})) > 0
+    # Non-HA clusters.
+    (
+      (
+        sum by ({{ $groupLabels }}) (namespace_cpu:kube_pod_container_resource_requests:sum{})
+        -
+        sum by ({{ $groupLabels }}) (kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) > 0
+      )
+      and
+      count by ({{ $groupLabels }}) (max by (node,{{ $groupLabels }}) (kube_node_role{job="kube-state-metrics", role="control-plane"})) < 3
+    )
+    or
+    # HA clusters.
+    (
+      sum by ({{ $groupLabels }}) (namespace_cpu:kube_pod_container_resource_requests:sum{})
+      -
+      (
+        # Skip clusters with only one allocatable node.
+        (
+          sum by ({{ $groupLabels }}) (kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"})
+          -
+          max by ({{ $groupLabels }}) (kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"})
+        ) > 0
+      ) > 0
+    )
   for: 10m
   labels:
     severity: warning
@@ -27,9 +48,30 @@ rules:
     summary: 'Cluster has overcommitted memory resource requests.'
   condition: '{{ true }}'
   expr: |-
-    sum(namespace_memory:kube_pod_container_resource_requests:sum{}) by ({{ $groupLabels }}) - (sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $groupLabels }}) - max(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $groupLabels }})) > 0
-    and
-    (sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $groupLabels }}) - max(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ $groupLabels }})) > 0
+    # Non-HA clusters.
+    (
+      (
+        sum by ({{ $groupLabels }}) (namespace_memory:kube_pod_container_resource_requests:sum{})
+        -
+        sum by ({{ $groupLabels }}) (kube_node_status_allocatable{job="kube-state-metrics",resource="memory"}) > 0
+      )
+      and
+      count by ({{ $groupLabels }}) (max by (node,{{ $groupLabels }}) (kube_node_role{job="kube-state-metrics", role="control-plane"})) < 3
+    )
+    or
+    # HA clusters.
+    (
+      sum by ({{ $groupLabels }}) (namespace_memory:kube_pod_container_resource_requests:sum{})
+      -
+      (
+        # Skip clusters with only one allocatable node.
+        (
+          sum by ({{ $groupLabels }}) (kube_node_status_allocatable{job="kube-state-metrics",resource="memory"})
+          -
+          max by ({{ $groupLabels }}) (kube_node_status_allocatable{job="kube-state-metrics",resource="memory"})
+        ) > 0
+      ) > 0
+    )
   for: 10m
   labels:
     severity: warning

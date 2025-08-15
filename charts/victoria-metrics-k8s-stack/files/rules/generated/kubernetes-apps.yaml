@@ -123,13 +123,13 @@ rules:
           unless
         kube_statefulset_status_update_revision{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
       )
-        *
+        * on (namespace,statefulset,job,{{ $groupLabels }})
       (
         kube_statefulset_replicas{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
           !=
         kube_statefulset_status_replicas_updated{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
       )
-    )  and (
+    )  and on (namespace,statefulset,job,{{ $groupLabels }}) (
       changes(kube_statefulset_status_replicas_updated{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}[5m])
         ==
       0
@@ -147,19 +147,19 @@ rules:
     (
       (
         kube_daemonset_status_current_number_scheduled{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
-         !=
+          !=
         kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
       ) or (
         kube_daemonset_status_number_misscheduled{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
-         !=
+          !=
         0
       ) or (
         kube_daemonset_status_updated_number_scheduled{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
-         !=
+          !=
         kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
       ) or (
         kube_daemonset_status_number_available{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
-         !=
+          !=
         kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~"{{ .targetNamespace }}"}
       )
     ) and (

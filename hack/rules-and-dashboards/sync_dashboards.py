@@ -82,7 +82,7 @@ sources = [
         ],
     },
     {
-        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victorialogs.json",
+        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/dashboards/victorialogs.json",
         "charts": [
             "victoria-logs-single",
         ],
