@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- vmcluster: set chart's app version to spec.clusterVersion instead of setting tag for each component. See [#2348](https://github.com/VictoriaMetrics/helm-charts/issues/2348).
+- fixed bug, when explicitly defined tag for vminsert appears in vmagent spec. See [#2349](https://github.com/VictoriaMetrics/helm-charts/issues/2349).
 
 ## 0.58.3
 
