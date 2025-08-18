@@ -64,7 +64,10 @@ Export default values of `{{ template "chart.name" . }}` chart to file `values.y
     ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
+
 {{- $release := (include "chart.name" .) | replace "-" " " | initials }}
+
+> Consider setting `.Values.nameOverride` to a small value like `{{ $release }}` to avoid hitting resource name limits of 63 characters
 
 Test the installation with command:
 
