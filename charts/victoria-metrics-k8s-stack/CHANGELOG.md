@@ -4,6 +4,7 @@
 - fixed bug, when explicitly defined tag for vminsert appears in vmagent spec. See [#2349](https://github.com/VictoriaMetrics/helm-charts/issues/2349).
 - updated dashboards and rules
 - use `.Values.prometheus-node-exporter.service.labels.jobLabel` as a value for `job` label in node exporter rules. See [#2340](https://github.com/VictoriaMetrics/helm-charts/pull/2340).
+- updates operator to [v0.62.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.62.0) version
 
 ## 0.58.3
 
