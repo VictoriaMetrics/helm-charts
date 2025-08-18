@@ -1,5 +1,8 @@
 ## Next release
 
+**Update note 1**: set default `.Values.nameOverride` to `vm-alert`, which impacts default resource naming and can lead to resources recreation. For existing setups it's recommended to set `.Values.nameOverride: victoria-metrics-alert` to avoid resource recreation if it wasn't previously set.
+
+- set `.Values.nameOverride` to `vm-alert` to avoid hitting k8s resource name limit.
 - Support alertmanager statefulset mode using `.Values.alertmanager.mode: statefulSet`
 - Support alertmanager in HA mode when `.Values.alertmanager.mode: statefulSet` and `.Values.alertmanager.replicaCount` is greater than 1.
 

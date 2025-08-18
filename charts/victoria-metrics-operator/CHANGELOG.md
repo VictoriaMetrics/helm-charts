@@ -1,6 +1,9 @@
 ## Next release
 
+**Update note 1**: set default `.Values.nameOverride` to `vm-operator`, which impacts default resource naming and can lead to resources recreation. For existing setups it's recommended to set `.Values.nameOverride: victoria-metrics-operator` to avoid resource recreation if it wasn't previously set.
+
 - Include patch version while building default cleanup image tag. See [#2339](https://github.com/VictoriaMetrics/helm-charts/issues/2339).
+- set `.Values.nameOverride` to `vm-operator` to avoid hitting k8s resource name limit.
 
 ## 0.51.4
 

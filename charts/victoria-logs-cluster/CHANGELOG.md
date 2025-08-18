@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+**Update note 1**: set default `.Values.nameOverride` to `vl-cluster`, which impacts default resource naming and can lead to resources recreation. For existing setups it's recommended to set `.Values.nameOverride: victoria-logs-cluster` to avoid resource recreation if it wasn't previously set.
+
+- set `.Values.nameOverride` to `vl-cluster` to avoid hitting k8s resource name limit.
 
 ## 0.0.9
 
