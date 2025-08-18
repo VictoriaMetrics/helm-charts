@@ -1,6 +1,7 @@
 ## Next release
 
 - Include patch version while building default cleanup image tag. See [#2339](https://github.com/VictoriaMetrics/helm-charts/issues/2339).
+- updates operator to [v0.62.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.62.0) version
 
 ## 0.51.4
 
