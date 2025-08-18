@@ -2,6 +2,7 @@
 
 - Support alertmanager statefulset mode using `.Values.alertmanager.mode: statefulSet`
 - Support alertmanager in HA mode when `.Values.alertmanager.mode: statefulSet` and `.Values.alertmanager.replicaCount` is greater than 1.
+- bump version of VM components to [v1.124.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.124.0)
 
 ## 0.24.1
 
