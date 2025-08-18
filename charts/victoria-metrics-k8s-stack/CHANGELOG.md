@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- updates operator to [v0.62.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.62.0) version. See issue [#2357](https://github.com/VictoriaMetrics/helm-charts/issues/2357).
 
 ## 0.59.0
 
