@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.52.0
+
+**Release date:** 18 Aug 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.60.0](https://img.shields.io/badge/v0.60.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%23v0600)
+
 - Include patch version while building default cleanup image tag. See [#2339](https://github.com/VictoriaMetrics/helm-charts/issues/2339).
 - updates operator to [v0.62.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.62.0) version
 
