@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- updates operator to [v0.62.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.62.0) version
 
 ## 0.52.0
 
