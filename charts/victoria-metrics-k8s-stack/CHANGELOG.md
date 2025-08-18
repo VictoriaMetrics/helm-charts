@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.59.0
+
+**Release date:** 18 Aug 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.123.0](https://img.shields.io/badge/v1.123.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11230)
+
 - vmcluster: set chart's app version to spec.clusterVersion instead of setting tag for each component. See [#2348](https://github.com/VictoriaMetrics/helm-charts/issues/2348).
 - fixed bug, when explicitly defined tag for vminsert appears in vmagent spec. See [#2349](https://github.com/VictoriaMetrics/helm-charts/issues/2349).
 - updated dashboards and rules
