@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- add default node selector only of none are defined. See [#2362](https://github.com/VictoriaMetrics/helm-charts/issues/2362).
+- upgrade k8s-stack to 0.59.1
 
 ## 0.20.3
 

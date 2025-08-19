@@ -56,6 +56,9 @@ metadata:
   {{- $remoteWriteSettings := (dict "useMultiTenantMode" true) }}
   {{- $_ := set $zone.vmagent.spec "remoteWriteSettings" (mergeOverwrite (deepCopy ($zone.vmagent.spec.remoteWriteSettings | default dict)) $remoteWriteSettings) }}
 {{- end }}
+{{- if not $zone.vmagent.spec.nodeSelector }}
+  {{- $_ := set $zone.vmagent.spec "nodeSelector" (dict "topology.kubernetes.io/zone" "{{ (.zone).name }}") }}
+{{- end }}
 spec: {{ tpl (toYaml $zone.vmagent.spec) $ctx | nindent 2 }}
 {{- end }}
 {{- end }}

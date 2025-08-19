@@ -48,6 +48,9 @@ metadata:
   {{- $firstUrlMapItem := mergeOverwrite (deepCopy $defaultUrlMapItem) (deepCopy (index $urlMap 0)) }}
   {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
+  {{- if not $spec.nodeSelector }}
+    {{- $_ := set $spec "nodeSelector" (dict "topology.kubernetes.io/zone" "{{ (.zone).name }}") }}
+  {{- end }}
 spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
   {{- end }}
 {{- end }}
