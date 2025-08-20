@@ -30,7 +30,9 @@ Create base alertmanager url for notifers
       {{- $urls = append $urls (include "vm.url" $ctx) -}}
     {{- end }}
   {{- else -}}
-    {{- $urls = append $urls ($Values.server.notifier.alertmanager.url) -}}
+    {{- with $Values.server.notifier.alertmanager.url -}}
+      {{- $urls = append $urls . -}}
+    {{- end -}}
   {{- end -}}
   {{- range $Values.server.notifiers }}
     {{- if not (empty .alertmanager.url) -}}

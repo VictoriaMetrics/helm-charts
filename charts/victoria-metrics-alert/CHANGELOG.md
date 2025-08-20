@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Avoid empty notifier url in cmd args. See [#2367](https://github.com/VictoriaMetrics/helm-charts/pull/2368).
 
 ## 0.25.0
 
