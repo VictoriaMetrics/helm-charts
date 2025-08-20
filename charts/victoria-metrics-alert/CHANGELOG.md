@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.25.1
+
+**Release date:** 20 Aug 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.124.0](https://img.shields.io/badge/v1.124.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11240)
+
 - Avoid empty notifier url in cmd args. See [#2367](https://github.com/VictoriaMetrics/helm-charts/pull/2368).
 
 ## 0.25.0
