@@ -24,7 +24,10 @@ tags:
 ## Chart Details
 
 This Helm chart deploys a log collection agent as a DaemonSet.
-It collects logs from all nodes in a Kubernetes cluster and forwards them to one or more VictoriaLogs instances.
+It collects logs from all containers in a Kubernetes cluster and forwards them to the configured VictoriaLogs destinations.
+If more than one destination is specified, then the collected logs are replicated among the configured destinations.
+
+This chart will expand its functionality as the corresponding features are added to [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/index.html).
 
 The simplest working configuration includes specifying the `remoteWrite` array and setting CPU and memory resources for the chart.
 
@@ -114,6 +117,44 @@ remoteWrite:
     tls:
       insecureSkipVerify: true
 ```
+
+### Ignore fields
+
+VictoriaLogs efficiently compresses repeated values, such as pod and node labels.
+However, if you prefer not to store certain fields, you can ignore them using the `ignoreFields` option.
+For example:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+    ignoreFields:
+      - file
+      - kubernetes.container_id
+      - kubernetes.pod_annotations*
+      - kubernetes.node_labels*
+      - kubernetes.namespace_labels*
+      - kubernetes.pod_labels*
+```
+
+This allows you to exclude unnecessary or sensitive fields from being ingested.
+If sensitive data has already been ingested, see how to
+[exclude logs from search result](https://docs.victoriametrics.com/victorialogs/security-and-lb/#access-control-inside-a-single-tenant).
+
+### Extra fields
+
+You can add custom fields to your logs by including the `extraFields` section in your configuration.
+For example:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428/
+    extraFields:
+      zone: us-east1-c
+      source: victoria-logs-collector
+```
+
+This feature lets you attach metadata to every log entry,
+making it easier to filter, group, or analyze logs based on these additional attributes.
 
 ## Parameters
 

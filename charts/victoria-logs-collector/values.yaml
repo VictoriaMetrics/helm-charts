@@ -8,39 +8,45 @@
 #
 # If using a proxy (e.g., vmauth, nginx) in front of VictoriaLogs, make sure /insert/jsonline and /internal/insert endpoints are properly routed.
 remoteWrite:
-#  - url: http://victoria-logs:9428
-#
-#  - url: http://victoria-logs:9428
-#    basicAuth:
-#      passwordEnvKey: 'VL_PASSWORD'
-#      usernameEnvKey: 'victoria-logs-collector'
-#
-#  - url: http://victoria-logs:9428
-#    projectID: 0
-#    accountID: 0
-#
-#  - url: https://victoria-logs:9428
-#    tls:
-#      caFile: "/etc/tls/ca.crt"
-#  - url: https://victoria-logs:9428
-#    tls:
-#      insecureSkipVerify: true
+  # - url: http://victoria-logs:9428
+
+  # - url: http://victoria-logs:9428
+  #   basicAuth:
+  #     passwordEnvKey: "VL_PASSWORD"
+  #     usernameEnvKey: "victoria-logs-collector"
+
+  # - url: http://victoria-logs:9428
+  #   projectID: 0
+  #   accountID: 0
+  #   extraFields:
+  #     zone: us-east1-c
+  #     source: victoria-logs-collector
+  #   ignoreFields:
+  #     - kubernetes.node_labels*
+  #     - kubernetes.pod_annotations*
+
+  # - url: https://victoria-logs:9428
+  #   tls:
+  #     caFile: "/etc/tls/ca.crt"
+  # - url: https://victoria-logs:9428
+  #   tls:
+  #     insecureSkipVerify: true
 
 # -- Environment variables (ex.: secret tokens).
 env: []
-# - name: VL_PASSWORD
-#   valueFrom:
-#     secretKeyRef:
-#       name: auth-secret
-#       key: VL_PASSWORD
+  # - name: VL_PASSWORD
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: auth-secret
+  #       key: VL_PASSWORD
 
 resources:
-#   limits:
-#     cpu: 100m
-#     memory: 128Mi
-#   requests:
-#     cpu: 100m
-#     memory: 128Mi
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
 # Advanced helm-chart configuration below, it is recommended to pass default parameters
 
@@ -87,22 +93,22 @@ securityContext:
   enabled: true
   # capabilities:
   #   drop:
-  #   - ALL
+  #     - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
 
 # -- Extra Volumes for the pod
 extraVolumes: []
-#  - name: tls-certs
-#    secret:
-#      secretName: mtls-secret
+  # - name: tls-certs
+  #   secret:
+  #     secretName: mtls-secret
 
 # -- Extra Volume Mounts for the container
 extraVolumeMounts: []
-#  - name: tls-certs
-#    mountPath: /etc/mtls
-#    readOnly: true
+  # - name: tls-certs
+  #   mountPath: /etc/mtls
+  #   readOnly: true
 
 # -- Annotations to be added to the deployment
 annotations: {}
@@ -117,10 +123,10 @@ nodeSelector: {}
 tolerations: []
 
 # -- Pod topologySpreadConstraints
-topologySpreadConstraints: []
+topologySpreadConstraints: # []
   # - maxSkew: 1
   #   topologyKey: topology.kubernetes.io/zone
-#   whenUnsatisfiable: DoNotSchedule
+  #   whenUnsatisfiable: DoNotSchedule
 
 # -- Pod affinity
 affinity: {}

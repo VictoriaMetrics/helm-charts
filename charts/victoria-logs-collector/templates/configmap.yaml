@@ -33,7 +33,7 @@ data:
         {{ fail (printf "'url' field must be set for remoteWrite[%d]" $i) }}
       {{- end }}
       {{- range $rwKey, $_ := $rw }}
-        {{- if and (ne $rwKey "url") (ne $rwKey "basicAuth") (ne $rwKey "accountID") (ne $rwKey "projectID") (ne $rwKey "tls") }}
+        {{- if and (ne $rwKey "url") (ne $rwKey "basicAuth") (ne $rwKey "accountID") (ne $rwKey "projectID") (ne $rwKey "tls") (ne $rwKey "extraFields") (ne $rwKey "ignoreFields") }}
           {{ fail (printf "unknown field %q for remoteWrite[%d]" $rwKey $i) }}
         {{- end }}
       {{- end }}
@@ -54,6 +54,20 @@ data:
             VL-Stream-Fields: kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
             VL-Msg-Field: message
             VL-Time-Field: timestamp
+            {{- with $rw.extraFields }}
+            VL-Extra-Fields: {{- $pairs := list -}}
+              {{- range $k, $v := $rw.extraFields }}
+                {{- $pairs = append $pairs (printf "%s=%s" $k $v) -}}
+              {{- end }}
+              {{ $pairs | join "," | quote }}
+            {{- end }}
+            {{- with $rw.ignoreFields }}
+            VL-Ignore-Fields: {{- $pairs := list -}}
+              {{- range $field := $rw.ignoreFields }}
+                {{- $pairs = append $pairs $field -}}
+              {{- end }}
+              {{ $pairs | join "," | quote }}
+            {{- end }}
         compression: "zstd"
 
         {{- with $rw.basicAuth }}
