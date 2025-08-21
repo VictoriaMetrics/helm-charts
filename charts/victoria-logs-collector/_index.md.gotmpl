@@ -1,0 +1,165 @@
+---
+weight: 2
+title: VictoriaLogs Collector
+menu:
+  docs:
+    parent: helm
+    weight: 2
+    identifier: helm-victorialogs-collector
+url: /helm/victorialogs-collector
+aliases:
+  - /helm/victorialogs-collector/changelog/index.html
+tags:
+  - logs
+  - kubernetes
+---
+{{ template "chart.badges" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.prerequisites" . }}
+
+{{ include "chart.installSection" . }}
+
+## Chart Details
+
+This Helm chart deploys a log collection agent as a DaemonSet.
+It collects logs from all containers in a Kubernetes cluster and forwards them to the configured VictoriaLogs destinations.
+If more than one destination is specified, then the collected logs are replicated among the configured destinations.
+
+This chart will expand its functionality as the corresponding features are added to [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/index.html).
+
+The simplest working configuration includes specifying the `remoteWrite` array and setting CPU and memory resources for the chart.
+
+Example of a minimal working configuration:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+```
+
+If multiple `remoteWrite` entries are defined, logs will be replicated to all specified destinations.
+
+### Basic auth
+
+If you need to use basic auth, define the secrets via environment variables and fill out the `basicAuth` object as shown below:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+    basicAuth:
+      passwordEnvKey: 'VL_PASSWORD'
+      usernameEnvKey: 'VL_USERNAME'
+
+env:
+  - name: VL_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: auth-secret
+        key: VL_PASSWORD
+  - name: VL_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: auth-secret
+        key: VL_USERNAME
+```
+
+### Multitenancy
+
+To define [tenant](https://docs.victoriametrics.com/victorialogs/#multitenancy), use `projectID` and `accountID` as shown below:
+
+```yaml
+remoteWrite:
+  - url: http://localhost:9428
+    projectID: 12
+    accountID: 42
+```
+
+### TLS
+
+To enable TLS verification for the remoteWrite target, you can specify the `tls` block inside each remoteWrite entry.
+
+At a minimum, you should provide the `caFile` path so that the collector can verify the server's TLS certificate.
+This is useful when the target endpoint uses a certificate signed by a custom or self-signed Certificate Authority (CA).
+
+```yaml
+remoteWrite:
+  - url: https://victoria-logs:9428
+    tls:
+      caFile: "/etc/tls/ca.crt"
+
+extraVolumes:
+  - name: tls-certs
+    secret:
+      secretName: tls-secret
+
+extraVolumeMounts:
+  - name: tls-certs
+    mountPath: /etc/tls
+    readOnly: true
+```
+
+If you want to disable TLS certificate verification (not recommended in production), you can set `insecureSkipVerify` to true.
+
+This will skip verification of the server's certificate and allow connecting to targets with self-signed or invalid certificates.
+
+```yaml
+remoteWrite:
+  - url: https://victoria-logs:9428
+    tls:
+      insecureSkipVerify: true
+```
+
+### Ignore fields
+
+VictoriaLogs efficiently compresses repeated values, such as pod and node labels.
+However, if you prefer not to store certain fields, you can ignore them using the `ignoreFields` option.
+For example:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+    ignoreFields:
+      - file
+      - kubernetes.container_id
+      - kubernetes.pod_annotations*
+      - kubernetes.node_labels*
+      - kubernetes.namespace_labels*
+      - kubernetes.pod_labels*
+```
+
+This allows you to exclude unnecessary or sensitive fields from being ingested.
+If sensitive data has already been ingested, see how to
+[exclude logs from search result](https://docs.victoriametrics.com/victorialogs/security-and-lb/#access-control-inside-a-single-tenant).
+
+### Extra fields
+
+You can add custom fields to your logs by including the `extraFields` section in your configuration.
+For example:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428/
+    extraFields:
+      zone: us-east1-c
+      source: victoria-logs-collector
+```
+
+This feature lets you attach metadata to every log entry,
+making it easier to filter, group, or analyze logs based on these additional attributes.
+
+## Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-logs-collector/values.yaml`` file.
+
+{{ template "chart.valuesTableHtml" . }}
