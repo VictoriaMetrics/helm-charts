@@ -81,7 +81,7 @@ rules:
 - alert: TooHighChurnRate
   annotations:
     dashboard: '{{ $grafanaHost }}/d/wNf0q_kZk?viewPanel=66&var-instance={{`{{`}} $labels.instance {{`}}`}}'
-    description: "VM constantly creates new time series on \"{{`{{`}} $labels.instance {{`}}`}}\".\n This effect is known as Churn Rate.\n High Churn Rate tightly connected with database performance and may result in unexpected OOM's or slow queries."
+    description: "VM constantly creates new time series on \"{{`{{`}} $labels.instance {{`}}`}}\".\n This effect is known as Churn Rate.\n High Churn Rate is tightly connected with database performance and may result in unexpected OOM's or slow queries."
     summary: 'Churn rate is more than 10% on "{{`{{`}} $labels.instance {{`}}`}}" for the last 15m'
   condition: '{{ true }}'
   expr: |-
@@ -96,7 +96,7 @@ rules:
 - alert: TooHighChurnRate24h
   annotations:
     dashboard: '{{ $grafanaHost }}/d/wNf0q_kZk?viewPanel=66&var-instance={{`{{`}} $labels.instance {{`}}`}}'
-    description: "The number of created new time series over last 24h is 3x times higher than current number of active series on \"{{`{{`}} $labels.instance {{`}}`}}\".\n This effect is known as Churn Rate.\n High Churn Rate tightly connected with database performance and may result in unexpected OOM's or slow queries."
+    description: "The number of created new time series over last 24h is 3x times higher than current number of active series on \"{{`{{`}} $labels.instance {{`}}`}}\".\n This effect is known as Churn Rate.\n High Churn Rate is tightly connected with database performance and may result in unexpected OOM's or slow queries."
     summary: 'Too high number of new series on "{{`{{`}} $labels.instance {{`}}`}}" created over last 24h'
   condition: '{{ true }}'
   expr: |-

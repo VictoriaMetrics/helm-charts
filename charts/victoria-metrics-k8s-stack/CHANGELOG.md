@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- updated rules. See [#2350](https://github.com/VictoriaMetrics/helm-charts/issues/2350).
 
 ## 0.59.2
 

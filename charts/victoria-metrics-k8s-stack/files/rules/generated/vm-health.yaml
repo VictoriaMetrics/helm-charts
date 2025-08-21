@@ -14,7 +14,7 @@ rules:
       '
     summary: '{{`{{`}} $labels.job {{`}}`}} too many restarts (instance {{`{{`}} $labels.instance {{`}}`}})'
   condition: '{{ true }}'
-  expr: changes(process_start_time_seconds{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth|victorialogs|vlstorage|vlselect|vlinsert).*"}[15m]) > 2
+  expr: changes(process_start_time_seconds{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth).*"}[15m]) > 2
   labels:
     severity: critical
 - alert: ServiceDown
@@ -22,7 +22,7 @@ rules:
     description: '{{`{{`}} $labels.instance {{`}}`}} of job {{`{{`}} $labels.job {{`}}`}} has been down for more than 2 minutes.'
     summary: 'Service {{`{{`}} $labels.job {{`}}`}} is down on {{`{{`}} $labels.instance {{`}}`}}'
   condition: '{{ true }}'
-  expr: up{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth|victorialogs|vlstorage|vlselect|vlinsert).*"} == 0
+  expr: up{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth).*"} == 0
   for: 2m
   labels:
     severity: critical
@@ -70,7 +70,7 @@ rules:
       '
     summary: '"{{`{{`}} $labels.job {{`}}`}}"("{{`{{`}} $labels.instance {{`}}`}}") has insufficient CPU resources for >15m'
   condition: '{{ true }}'
-  expr: histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket[5m])) by (le,job,instance,{{ $groupLabels }})) > 0.1
+  expr: histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket{job=~".*(victoriametrics|vmselect|vminsert|vmstorage|vmagent|vmalert|vmsingle|vmalertmanager|vmauth).*"}[5m])) by (le,job,instance,{{ $groupLabels }})) > 0.1
   for: 15m
   labels:
     severity: critical
