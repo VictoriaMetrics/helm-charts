@@ -23,12 +23,15 @@ tags:
 
 ### VictoriaLogs Cluster
 
-When you install the chart, it creates the following core services and an optional log collector:
+The chart deploys VictoriaLogs cluster database. It deploys the following components according to [VictoriaLogs cluster architecture](https://docs.victoriametrics.com/victorialogs/cluster/#architecture):
 
-- `vlinsert` receives incoming log streams from various sources and load-balances them across remote nodes.
-- `vlstorage` forms a StatefulSet that stores raw data on persistent volumes.
-- `vlselect` provides the query API and reads data from any storage replica, so adding more `vlselect` pods increases read throughput without impacting the stored data.
-- The log collector `vector` is disabled by default, but as soon as you set `vector.enabled: true`, a DaemonSet is deployed on every node. It starts tailing pod logs using the default parsing pipeline and automatically discovers the internal `vlinsert` addresses.
+- `vlstorage` stores the ingested logs the the configured persistent volumes
+- `vlinsert` receives incoming log streams and spreads them evenly across `vlstorage` nodes
+- `vlselect` provides API for querying the ingested logs
+
+It is possible to deploy an optional log collector, which will automatically discover and collect
+all the logs from all the containers in Kubernetes, and send them to the deployed VictoriaLogs database.
+Set `vector.enabled: true` in the configs in order to enable the collector:
 
 ```yaml
 vector:
@@ -58,19 +61,6 @@ graph LR
     VLQ2 <--> Users
 ```
 
-### Vector
-
-When [Vector](https://github.com/vectordotdev/helm-charts/tree/develop/charts/vector) is enabled with `vector.enabled: true`, the default configuration works out of the box:
-
-* The default role is set to "Agent" (typically deployed as a DaemonSet with a data directory at `/vector-data-dir`).
-* Vector is configured with the `k8s` source, using the `kubernetes_logs` type to collect logs from all Kubernetes pods in the cluster.
-* The default transform configuration includes a parser component that performs JSON parsing on incoming log messages.
-  * It attempts to parse the `message` field as JSON, and if successful, stores the parsed content in a `.log` field.
-  * If JSON parsing fails, it falls back to the original message content.
-* The default sink configuration includes a `vlogs` sink, configured as an Elasticsearch-compatible endpoint, which sends processed logs to `vlinsert` using bulk mode with `gzip` compression.
-
-When you scale the number of `vlinsert` replicas using `vlinsert.replicaCount`, the chart automatically updates Vector's configuration to include all new instances, providing horizontal scaling of ingestion capacity without service interruption.
-
 ### vmauth
 
 When you enable `vmauth` with:
@@ -80,14 +70,10 @@ vmauth:
   enabled: true
 ```
 
-The chart automatically launches a [`vmauth`](https://docs.victoriametrics.com/victoriametrics/vmauth/) service with a routing configuration that splits read and write traffic according to VictoriaLogs cluster architecture patterns.
+The chart launches an [`vmauth`](https://docs.victoriametrics.com/victoriametrics/vmauth/) service
+for proxying and load-balancing incoming data ingestion requests to `vlinsert` nodes and for proxying and load-balancing incoming queries to `vlselect` nodes.
 
-External applications can send requests to `vmauth`, which will intelligently route:
-
-- Write requests (log ingestion) to `vlinsert`.
-- Read requests (log queries) to `vlselect`. 
-
-The default Vector configuration bypasses this and continues sending logs directly to `vlinsert`. So, the chart can now be thought of as:
+The default Vector configuration bypasses `vmauth` and continues sending logs directly to `vlinsert`. So, the chart can now be thought of as:
 
 ```mermaid
 graph LR

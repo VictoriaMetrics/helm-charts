@@ -23,99 +23,63 @@ tags:
 
 ### VictoriaLogs
 
-The chart's architecture centers around deploying VictoriaLogs as either a StatefulSet or Deployment, with StatefulSet being the default mode.
+The chart deploys VictoriaLogs database in StatefulSet mode.
 
-The chart provides extensive configuration options for:
+The chart provides the following configuration options:
 
-- Persistent volume support is enabled by default with a 10GB volume size.
-- Data retention (how long to keep logs): supporting both time-based retention periods (with units of hours, days, weeks, or years) and disk space-based retention limits. The default retention period is set to 1 month, with a minimum requirement of 24 hours. 
-
-Out of the box, the chart only deploys VictoriaLogs itself without any log collector. Users need to explicitly enable Vector if they want automated log collection from Kubernetes pods:
-
-```yaml
-vector:
-  enabled: true
-```
-
-```mermaid
-graph TB
-    subgraph "Kubernetes Node 1"
-        Pod1["App Pod"]
-        Pod2["App Pod"]
-        Vector1["Vector<br/>DaemonSet"]
-        style Vector1 fill:#d0ebff,stroke:#339af0,stroke-width:2px
-    end
-
-    subgraph "Kubernetes Node 2"
-        Pod3["App Pod"]
-        Pod4["App Pod"]
-        Vector2["Vector<br/>DaemonSet"]
-        style Vector2 fill:#d0ebff,stroke:#339af0,stroke-width:2px
-    end
-
-    Pod1 -.-> Vector1
-    Pod2 -.-> Vector1
-    Pod3 -.-> Vector2
-    Pod4 -.-> Vector2
-
-    Vector1 --> VL["VictoriaLogs<br/>StatefulSet"]
-    Vector2 --> VL
-    style VL fill:#e6fcf5,stroke:#20c997,stroke-width:2px
-```
-
-### Vector
-
-When [Vector](https://github.com/vectordotdev/helm-charts/tree/develop/charts/vector) is enabled, the default configuration is quite comprehensive and well-structured:
-
-* The default role is set to "Agent" (typically deployed as a DaemonSet with a data directory at `/vector-data-dir`.
-* Vector is configured with the `k8s` source uses the `kubernetes_logs` type to collect logs from all Kubernetes pods in the cluster. 
-* The default transform configuration includes a parser component that performs JSON parsing on incoming log messages. 
-  * It attempts to parse the message field as JSON, and if successful, stores the parsed content in a `.log` field.
-  * If JSON parsing fails, it falls back to keeping the original message content.
-* The default sink configuration includes a `vlogs` sink, configured as an Elasticsearch-compatible endpoint, which sends processed logs to VictoriaLogs using bulk mode with `gzip` compression.
+- Persistent volume size for storing the ingested logs. See `server.persistentVolume.size` config option at the [minimal configuration example](#minimal-configuration).
+- Data retention (how long to keep logs in the database). It can be configurated via time-based retention (with units of days, weeks, or years)
+  or via disk space-based retention limits. See `server.retentionPeriod` and `server.retentionDiskSpaceUsage` config options in the [minimal configuration example](#minimal-configuration).
+  See [retention docs](https://docs.victoriametrics.com/victorialogs/#retention) for details.
+- Ability to enable automatic collecting all the logs from all the containers in Kubernetes and sending them to the deployed VictoriaLogs database.
+  See `vector.enabled` option at the [minimal configuration example](#minimal-configuration).
 
 ### Minimal Configuration
 
-You can install the chart right away without any configuration ([How to install](#how-to-install)), but here is the minimal configuration that is commonly customized:
+You can install the chart right away without any configuration (see [how to install](#how-to-install)), but here is the minimal configuration that is commonly customized:
 
 ```yaml
-# VictoriaLogs server (enabled by default)
+# VictoriaLogs server
 server:
-  enabled: true
-  # Time-based retention (default: 1 month)
-  retentionPeriod: 7d  
 
-  # OR disk-based retention (default: none)
-  retentionDiskSpaceUsage: 5GB
+  # Time-based retention
+  retentionPeriod: 7d
 
-  # Storage size
+  # Or disk-based retention
+  # retentionDiskSpaceUsage: 5GB
+
+  # Storage size for the ingested logs
   persistentVolume:
-    size: 20Gi  # Adjust based on your log volume
+    size: 20Gi
 
-# Vector log collector (disabled by default, needs to be enabled)
+# Log collector (disabled by default, needs to be enabled).
+#
+# If enabled, it collects all the logs from all the containers in Kubernetes
+# and sends them to the deployed VictoriaLogs database.
 vector:
   enabled: true
 ```
 
-The beauty of this chart is that with just `vector.enabled: true`, you get a fully functional log collection and storage system. Vector automatically discovers all pods in the cluster, parses their logs, and forwards them to the VictoriaLogs instance with proper metadata enrichment.
+The beauty of this chart is that with just `vector.enabled: true`, you get automatic collection all the logs
+across all the Kubernetes containers, enriching them with Kubernetes-specific log fields (the names for these log fields start with `kubernetes.` prefix)
+and storing them into the deployed VictoriaLogs database.
 
-### Sending logs to external VictoriaLogs
+### Sending logs to external VictoriaLogs databases
 
-The VictoriaLogs single chart provides an option to install logs collection agents only and send logs to external VictoriaLogs:
-
-* `.Values.server.enabled: false` skips deploying any VictoriaLogs server components (StatefulSet/Deployment, Service, PVC, etc.)
-* `.Values.vector.enabled: true` chart deploys Vector as a DaemonSet (by default) with the specified configuration
-* `.Values.vector.customConfig.sinks.vlogs.endpoints: [<remote-endpoint-1>/insert/elasticsearch, <remote-endpoint-n>/insert/elasticsearch]` overrides the destination endpoints to external VictoriaLogs single-node or cluster instances.
+This chart provides an option to run logs' collection only and to send logs to external VictoriaLogs databases.
+This can be done with the following configs:
 
 ```yaml
-# Disable the VictoriaLogs server deployment
+# Disable the VictoriaLogs database
 server:
   enabled: false
 
-# Enable Vector log collector
+# Enable log collection from all the containers in Kubernetes
 vector:
   enabled: true
   customConfig:
+
+    # Configure sending the collected logs to external VictoriaLogs databases
     sinks:
       vlogs:
         type: elasticsearch
@@ -125,7 +89,8 @@ vector:
         compression: gzip
         healthcheck:
           enabled: false
-        # Specify your external VictoriaLogs endpoints
+        # Specify your external VictoriaLogs endpoints. They must end with /insert/elasticsearch
+        # The collected logs are sent (replicated) to all the configured endpoints.
         endpoints:
           - "https://external-vlogs.example.com/insert/elasticsearch"
           - "https://backup-vlogs.example.com/insert/elasticsearch"
@@ -133,9 +98,7 @@ vector:
           headers:
             VL-Time-Field: timestamp
             VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
-            VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
-            AccountID: "0"
-            ProjectID: "0"
+            VL-Msg-Field: message
 ```
 
 {{ include "chart.installSection" . }}
