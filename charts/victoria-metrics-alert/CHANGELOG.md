@@ -1,6 +1,5 @@
 ## Next release
 
-- TODO
 - Remove broken deployment strategy fields for alertmanager. See [#2373](https://github.com/VictoriaMetrics/helm-charts/pull/2373).
 
 ## 0.25.1
