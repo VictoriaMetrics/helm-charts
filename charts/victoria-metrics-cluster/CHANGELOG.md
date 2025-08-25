@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Support PVC for vmselect in deployment mode with persistence enabled
 
 ## 0.27.2
 
