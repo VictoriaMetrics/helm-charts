@@ -61,6 +61,7 @@ jobs:
             --exclude="*" \
             charts/ ../__vm-docs/content/helm/
           cp *.md ../__vm-docs/content/helm/
+          rm -r ../__vm-docs/content/helm/charts/**/README.md
           echo "SHORT_SHA=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
           cp -f README.md ${{ runner.temp }}/README.md
           for readme in $(find charts/*/README.md)
