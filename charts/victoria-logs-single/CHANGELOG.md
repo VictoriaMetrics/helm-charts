@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Sync dashboard
 
 ## 0.11.6
 
