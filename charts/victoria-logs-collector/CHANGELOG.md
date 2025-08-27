@@ -1,5 +1,7 @@
 ## Next release
 
+- trigger OCI release
+
 ## 0.0.1
 
 **Release date:**
