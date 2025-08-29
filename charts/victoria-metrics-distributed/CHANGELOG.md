@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- proxy /admin/tenants API on global read proxy. See [#2380](https://github.com/VictoriaMetrics/helm-charts/issues/2380).
 
 ## 0.21.0
 

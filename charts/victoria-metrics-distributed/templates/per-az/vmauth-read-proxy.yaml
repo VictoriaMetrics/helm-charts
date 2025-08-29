@@ -42,7 +42,7 @@ metadata:
   {{- if empty $urls }}
     {{- fail (printf "No read backend urls defined for vmauth in AZ %s" $zone.name) -}}
   {{- end }}
-  {{- $defaultUrlMapItem := dict "src_paths" (list "/select/.+") "url_prefix" $urls }}
+  {{- $defaultUrlMapItem := dict "src_paths" (list "/select/.+" "/admin/tenants") "url_prefix" $urls }}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
   {{- $urlMap := $accessSpec.url_map | default (list (default dict))  }}
   {{- $firstUrlMapItem := mergeOverwrite (deepCopy $defaultUrlMapItem) (deepCopy (index $urlMap 0)) }}
