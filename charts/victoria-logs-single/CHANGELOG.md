@@ -1,6 +1,7 @@
 ## Next release
 
 - Sync dashboard
+- Bump VictoriaLogs version to [v1.31.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.31.0).
 
 ## 0.11.6
 
