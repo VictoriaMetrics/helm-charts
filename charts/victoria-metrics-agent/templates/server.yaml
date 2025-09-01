@@ -55,6 +55,9 @@ spec:
       {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $app.hostAliases }}
+      hostAliases: {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: vmagent
           {{- if $app.securityContext.enabled }}
