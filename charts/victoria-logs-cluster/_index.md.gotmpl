@@ -19,47 +19,108 @@ tags:
 
 {{ template "chart.prerequisites" . }}
 
-## Chart Details
+## Quick start
 
-### VictoriaLogs Cluster
-
-The chart deploys VictoriaLogs cluster database. It deploys the following components according to [VictoriaLogs cluster architecture](https://docs.victoriametrics.com/victorialogs/cluster/#architecture):
+The chart deploys VictoriaLogs cluster database.
+It deploys the following components according to [VictoriaLogs cluster architecture](https://docs.victoriametrics.com/victorialogs/cluster/#architecture):
 
 - `vlstorage` stores the ingested logs to the configured persistent volumes
 - `vlinsert` receives incoming logs and spreads them evenly across `vlstorage` nodes
 - `vlselect` provides API for querying the ingested logs
 
-It is possible to deploy an optional log collector, which will automatically discover and collect
-all the logs from all the containers in Kubernetes, and send them to the deployed VictoriaLogs database.
-Set `vector.enabled: true` in the configs in order to enable the collector:
-
-```yaml
-vector:
-  enabled: true
-```
-
 The default chart setup is shown below:
 
 ```mermaid
 graph LR
-    Vector["Log Collector"] --> VLI1["vlinsert-1"]
-    Vector --> VLI2["vlinsert-2"]
-    
+    Collector["Log Collector"] --> VLI1["vlinsert-1"]
+    Collector --> VLI2["vlinsert-2"]
+
     subgraph "VictoriaLogs Cluster"
         VLI1 --> VLS1["vlstorage-1"]
         VLI1 --> VLS2["vlstorage-2"]
         VLI2 --> VLS1
         VLI2 --> VLS2
-        
+
         VLS1 <--> VLQ1["vlselect-1"]
         VLS1 <--> VLQ2["vlselect-2"]
         VLS2 <--> VLQ1
         VLS2 <--> VLQ2
     end
-    
+
     VLQ1 <--> Users["Users/Grafana/vlogscli"]
     VLQ2 <--> Users
 ```
+
+For a quick start, install `victoria-logs-cluster` and
+[`victoria-logs-collector`](https://docs.victoriametrics.com/helm/victorialogs-collector/) charts using the following commands,
+making sure to replace the environment variables with your own values:
+
+```sh
+export RETENTION=30d
+export PVC_SIZE=10Gi
+export VLSTORAGE_REPLICAS=2
+export NAMESPACE=logging
+
+# Install victoria-logs-cluster chart
+helm install vlc vm/victoria-logs-cluster --namespace $NAMESPACE --wait \
+    --set "vlstorage.retentionPeriod=$RETENTION" --set "vlstorage.persistentVolume.size=$PVC_SIZE" \
+    --set vmauth.enabled=true \
+    --set vlstorage.replicaCount=$VLSTORAGE_REPLICAS
+
+# Install victoria-logs-collector chart
+helm install collector vm/victoria-logs-collector --namespace $NAMESPACE \
+    --set "remoteWrite[0].url=http://vlc-victoria-logs-cluster-vmauth:8427"
+```
+
+These commands configure the collector to send data through the [vmauth](#vmauth) to `vlinsert`, which shards the data across `vlstorage`.
+In this example, two `vlstorage` instances will be deployed, each with a 30-day retention period and a 10 Gi PVC.
+
+To access the data within the cluster, use the vmauth address: `http://vlc-victoria-logs-cluster-vmauth.logging.svc.cluster.local:8427`.
+You can use this address as Data Source URL in Grafana.
+The vmui interface will be available at: `http://vlc-victoria-logs-cluster-vmauth.logging.svc.cluster.local:8427/select/vmui/`.
+
+To uninstall these charts, run: `helm uninstall vls collector`.
+Note that this *will not* remove the PVCs, so you will need to delete them manually if no longer needed.
+
+For finer control and easier maintenance, it is recommended to set these
+values in a separate `values` file and use it during installation.
+See [how to install victoria-logs-single](https://docs.victoriametrics.com/helm/victoria-logs-single/#install-victoria-logs-single-chart) for an example.
+You can do this later if you want to configure more settings than shown in the default example.
+
+### High Availability
+
+To set up High Availability for VictoriaLogs Cluster, deploy multiple instances of `victoria-logs-cluster` and list them in
+[`remoteWrite.url`](https://docs.victoriametrics.com/helm/victorialogs-collector/#chart-configuration).
+
+For a quick start, use the following commands:
+
+```sh
+export RETENTION=30d
+export PVC_SIZE=10Gi
+export VLSTORAGE_REPLICAS=2
+export NAMESPACE=logging
+
+helm install vlc-1 vm/victoria-logs-cluster --namespace $NAMESPACE --wait \
+    --set "vlstorage.retentionPeriod=$RETENTION" --set "vlstorage.persistentVolume.size=$PVC_SIZE" \
+    --set vmauth.enabled=true \
+    --set vlstorage.replicaCount=$VLSTORAGE_REPLICAS
+helm install vlc-2 vm/victoria-logs-cluster --namespace $NAMESPACE --wait \
+    --set "vlstorage.retentionPeriod=$RETENTION" --set "vlstorage.persistentVolume.size=$PVC_SIZE" \
+    --set vmauth.enabled=true \
+    --set vlstorage.replicaCount=$VLSTORAGE_REPLICAS
+
+helm install collector vm/victoria-logs-collector --namespace $NAMESPACE \
+    --set "remoteWrite[0].url=http://vlc-1-victoria-logs-cluster-vmauth:8427" \
+    --set "remoteWrite[1].url=http://vlc-2-victoria-logs-cluster-vmauth:8427"
+```
+
+These commands install the collector, which replicates data to two `victoria-logs-cluster`
+instances with a 30-day retention period and a 10Gi PVC each.
+
+To uninstall these charts, use the following command: `helm uninstall vlc-1 vlc-2 collector`.
+Note that this *will not* remove the PVCs, so you will need to delete them manually.
+
+## Chart configuration
 
 ### vmauth
 
@@ -77,21 +138,21 @@ The default Vector configuration bypasses `vmauth` and continues sending logs di
 
 ```mermaid
 graph LR
-    Vector["Log Collector"] --> VLI1["vlinsert-1"]
-    Vector --> VLI2["vlinsert-2"]
-    
+    Collector["Log Collector"] --> VLI1["vlinsert-1"]
+    Collector --> VLI2["vlinsert-2"]
+
     subgraph "VictoriaLogs Cluster"
         VLI1 --> VLS1["vlstorage-1"]
         VLI1 --> VLS2["vlstorage-2"]
         VLI2 --> VLS1
         VLI2 --> VLS2
-        
+
         VLS1 <--> VLQ1["vlselect-1"]
         VLS1 <--> VLQ2["vlselect-2"]
         VLS2 <--> VLQ1
         VLS2 <--> VLQ2
     end
-    
+
     VLQ1 <--> Users["vmauth"]
     VLQ2 <--> Users
 ```
