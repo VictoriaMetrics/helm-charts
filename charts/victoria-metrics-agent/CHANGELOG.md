@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added hostAliases to add additional DNS entries to be injected directly into pods
 
 ## 0.25.2
 
