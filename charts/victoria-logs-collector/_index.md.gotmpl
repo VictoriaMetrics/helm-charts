@@ -19,15 +19,19 @@ tags:
 
 {{ template "chart.prerequisites" . }}
 
-{{ include "chart.installSection" . }}
-
-## Chart Details
+## Quick start
 
 This Helm chart deploys a log collection agent as a DaemonSet.
 It collects logs from all containers in a Kubernetes cluster and forwards them to the configured VictoriaLogs destinations.
 If more than one destination is specified, then the collected logs are replicated among the configured destinations.
 
 This chart will expand its functionality as the corresponding features are added to [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/index.html).
+
+- To quickly install VictoriaLogs single and `victoria-logs-collector` follow [this quick start guide](https://docs.victoriametrics.com/helm/victoria-logs-single/#quick-start).
+- For a High Availability VictoriaLogs single setup, see the [HA quick start guide](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#high-availability).
+- To start with a VictoriaLogs cluster and `victoria-logs-collector`, see [the cluster quick start guide](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#quick-start).
+
+## Chart configuration
 
 The simplest working configuration includes specifying the `remoteWrite` array and setting CPU and memory resources for the chart.
 
@@ -155,6 +159,12 @@ remoteWrite:
 
 This feature lets you attach metadata to every log entry,
 making it easier to filter, group, or analyze logs based on these additional attributes.
+
+{{ include "chart.installSection" . }}
+
+{{ include "chart.uninstallSection" . }}
+
+{{ include "chart.helmDocs" . }}
 
 ## Parameters
 
