@@ -23,8 +23,8 @@ tags:
 
 The chart deploys VictoriaLogs database in StatefulSet mode.
 For a quick start, install `victoria-logs-single` and
-[`victoria-logs-collector`](http://docs.victoriametrics.com/helm/victorialogs-collector/) charts using the following commands,
-making sure to replace the environment variables with your own values:
+[`victoria-logs-collector`](http://docs.victoriametrics.com/helm/victorialogs-collector/) charts using the following commands.
+Make sure to replace the environment variables with your own values:
 
 ```sh
 export RETENTION=30d
@@ -42,9 +42,8 @@ helm install collector vm/victoria-logs-collector --namespace $NAMESPACE \
     --set "remoteWrite[0].url=http://vls-victoria-logs-single-server:9428"
 ```
 
-These commands install the collector,
-which gathers logs from all containers and sends them to a VictoriaLogs instance
-with a 30-day retention period and a 10Gi PersistentVolumeClaim (PVC).
+These commands install the collector, which collects logs from all the containers in Kubernetes and sends them to the installed VictoriaLogs instance
+with a 30-day [retention period](https://docs.victoriametrics.com/victorialogs/#retention) and a 10Gi PersistentVolumeClaim (PVC).
 
 To uninstall these charts, run: `helm uninstall vls collector`.
 Note that this *will not* remove the PVCs, so you will need to delete them manually if no longer needed.
@@ -52,56 +51,7 @@ Note that this *will not* remove the PVCs, so you will need to delete them manua
 For finer control and easier maintenance, it is recommended to set these
 values in a separate `values` file and use it during installation.
 See [how to install victoria-logs-single](https://docs.victoriametrics.com/helm/victoria-logs-single/#install-victoria-logs-single-chart) for an example.
-You can do this later if you want to configure more settings than shown in the default example.
-
-### High Availability
-
-To set up High Availability, deploy multiple instances of `victoria-logs-single` and list them in
-[`remoteWrite.url`](https://docs.victoriametrics.com/helm/victorialogs-collector/#chart-configuration).
-
-For a quick start, use the following commands:
-
-```sh
-export RETENTION=30d
-export PVC_SIZE=10Gi
-export NAMESPACE=logging
-
-kubectl create namespace $NAMESPACE
-
-# Install two instances of victoria-logs-single
-helm install vls-1 vm/victoria-logs-single --namespace $NAMESPACE --wait \
-    --set server.retentionPeriod=$RETENTION --set server.persistentVolume.size=$PVC_SIZE
-helm install vls-2 vm/victoria-logs-single --namespace $NAMESPACE --wait \
-    --set server.retentionPeriod=$RETENTION --set server.persistentVolume.size=$PVC_SIZE
-
-# Install collector
-helm install collector vm/victoria-logs-collector --namespace $NAMESPACE \
-    --set "remoteWrite[0].url=http://vls-1-victoria-logs-single-server:9428" \
-    --set "remoteWrite[1].url=http://vls-2-victoria-logs-single-server:9428"
-```
-
-These commands install the collector, which replicates data to two `victoria-logs-single`
-instances with a 30-day retention period and a 10Gi PVC each.
-
-To uninstall these charts, use the following command: `helm uninstall vls-1 vls-2 collector`.
-Note that this *will not* remove the PVCs, so you will need to delete them manually.
-
-In the High Availability setup, it's recommended to set up load balancing to ensure smooth operation.
-Below is an example of installing
-[`victoria-metrics-auth`](https://docs.victoriametrics.com/helm/victoria-metrics-auth/) for a quick start:
-
-```sh
-export NAMESPACE=logging
-
-helm install vls-auth vm/victoria-metrics-auth --namespace $NAMESPACE \
-    --set "config.unauthorized_user.url_prefix[0]=http://vls-0-victoria-logs-single-server:9428" \
-    --set "config.unauthorized_user.url_prefix[1]=http://vls-1-victoria-logs-single-server:9428"
-```
-
-This command installs [vmauth](https://docs.victoriametrics.com/vmauth/),
-which will evenly distribute the load among the `victoria-logs-single`
-when accessed at `http://vls-auth.logging.svc.cluster.local:8428`.
-You can use this address as a Data Source URL in Grafana. To access vmui, append `/select/vmui/` to the URL.
+You can do this later if you want to configure more settings than shown in the example.
 
 ## Chart configuration
 
