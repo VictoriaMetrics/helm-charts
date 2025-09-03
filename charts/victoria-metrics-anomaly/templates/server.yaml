@@ -120,9 +120,9 @@ spec:
           configMap:
             name: {{ $fullname }}
         {{- include "vm.license.volume" . | nindent 8 }}
-        {{- if or (not .Values.persistentVolume.enabled) .Values.persistentVolume.existingClaim }}
+        {{- if or (and (not $useSts) (not .Values.persistentVolume.enabled)) (and (not $useSts) .Values.persistentVolume.existingClaim) }}
         - name: models-dump
-          {{- if .Values.persistentVolume.enabled }}
+          {{- if and (not $useSts) .Values.persistentVolume.enabled .Values.persistentVolume.existingClaim }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolume.existingClaim }}
           {{- else }}
@@ -132,12 +132,12 @@ spec:
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-  {{- if and .Values.persistentVolume.enabled (not .Values.persistentVolume.existingClaim) }}
+  {{- if .Values.persistentVolume.enabled }}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: models-dump
+        name: {{ .Values.persistentVolume.existingClaim | default "models-dump" }}
         {{- with .Values.persistentVolume.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fix persistentVolume.existingClaim functionality for StatefulSet mode. When existingClaim is set, the chart now properly uses volumeClaimTemplates instead of trying to reference a single PVC name for all replicas.
 
 ## 0.11.7
 

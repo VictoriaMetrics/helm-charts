@@ -245,29 +245,24 @@ spec:
         {{- end }}
       {{- end }}
       terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
-      {{- if or $app.extraVolumes (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim (include "vm.license.volume" .) }}
+      {{- if or $app.extraVolumes (not $app.persistentVolume.enabled) (include "vm.license.volume" .) }}
       volumes:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- if or (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
+        {{- if not $app.persistentVolume.enabled }}
         - name: vmstorage-volume
-          {{- if $app.persistentVolume.enabled }}
-          persistentVolumeClaim: 
-            claimName: {{ $app.persistentVolume.existingClaim }}
-          {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
-          {{- end }}
         {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
       {{- end }}
   minReadySeconds: {{ $app.minReadySeconds }}
-  {{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
+  {{- if $app.persistentVolume.enabled }}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ $app.persistentVolume.name }}
+        name: {{ $app.persistentVolume.existingClaim | default $app.persistentVolume.name }}
         {{- with $app.persistentVolume.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
