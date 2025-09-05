@@ -171,9 +171,9 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
-        {{- if or (eq $mode "deployment") (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
+        {{- if or (not $app.persistentVolume.enabled) (and (eq $mode "deployment") $app.persistentVolume.existingClaim) }}
         - name: tmpdata
-          {{- if or (and (eq $mode "deployment") $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
+          {{- if and (eq $mode "deployment") $app.persistentVolume.enabled $app.persistentVolume.existingClaim }}
           persistentVolumeClaim:
             claimName: {{ $app.persistentVolume.existingClaim | default $app.persistentVolume.name | default $fullname }}
           {{- else }}
@@ -197,12 +197,12 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
-  {{- if and (eq $mode "statefulSet") $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
+  {{- if and (eq $mode "statefulSet") $app.persistentVolume.enabled }}
   volumeClaimTemplates:
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-      name: tmpdata
+      name: {{ $app.persistentVolume.existingClaim | default "tmpdata" }}
       {{- with $app.persistentVolume.extraLabels }}
       labels: {{ toYaml . | nindent 8 }}
       {{- end }}
