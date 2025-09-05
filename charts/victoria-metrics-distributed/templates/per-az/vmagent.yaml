@@ -37,12 +37,8 @@ metadata:
     {{- else if ($rwZone.vmsingle).enabled -}}
       {{- $_ := set $rwZone.vmsingle "spec" (mergeOverwrite (deepCopy $.Values.common.vmsingle.spec) (deepCopy ($rwZone.common).spec) (deepCopy ($rwZone.vmsingle.spec))) -}}
       {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
-      {{- $replicas := (($rwZone.vmsingle).spec).replicaCount | default 1 }}
-      {{- range $id := until (int $replicas) -}}
-        {{- $_ := set $urlCtx "appIdx" $id -}}
-        {{- $remoteWrite := printf "%s/prometheus/api/v1/write" (include "vm.url" $urlCtx) -}}
-        {{- $remoteWrites = append $remoteWrites (dict "url" $remoteWrite) -}}
-      {{- end -}}
+      {{- $remoteWrite := printf "%s/prometheus/api/v1/write" (include "vm.url" $urlCtx) -}}
+      {{- $remoteWrites = append $remoteWrites (dict "url" $remoteWrite) -}}
     {{- end -}}
     {{- $_ := unset $urlCtx "style" }}
   {{- end }}

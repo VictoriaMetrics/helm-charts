@@ -5,6 +5,11 @@ Creates vmcluster spec map, insert zone's nodeselector and topologySpreadConstra
   {{- $ctx := (.helm) | default . }}
   {{- $Values := $ctx.Values }}
   {{- $zones := (dict) -}}
+  {{- $components := default dict }}
+  {{- $_ := set $components "vmstorage" (default list) }}
+  {{- $_ := set $components "vmselect" (default list) }}
+  {{- $_ := set $components "vminsert" (default list) }}
+  {{- $_ := set $components "requestsLoadBalancer" (list "spec") }}
   {{- $commonClusterSpec := ((($Values.common).vmcluster).spec) | default dict -}}
   {{- range $idx, $z := $Values.availabilityZones -}}
     {{- $rolloutZone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
@@ -16,8 +21,12 @@ Creates vmcluster spec map, insert zone's nodeselector and topologySpreadConstra
     {{- $commonSpec := $rolloutZone.common.spec | default dict -}}
     {{- $clusterSpec := mergeOverwrite (deepCopy $commonClusterSpec) (deepCopy $rolloutZone.vmcluster.spec) -}}
     {{- range $name, $config := $clusterSpec -}}
-      {{- if and (hasPrefix "vm" $name) (kindIs "map" $config) -}}
-        {{ $config = mergeOverwrite (deepCopy $commonSpec) (deepCopy $config) }}
+      {{- if and (hasKey $components $name) (kindIs "map" $config) -}}
+        {{- $mergeSpec := (deepCopy $commonSpec) }}
+        {{- range (reverse (get $components $name)) }}
+          {{- $mergeSpec = (dict . $mergeSpec) }}
+        {{- end }}
+        {{- $config = mergeOverwrite (deepCopy $mergeSpec) (deepCopy $config) }}
         {{- if not $config.nodeSelector }}
           {{- $_ := set $config "nodeSelector" (dict "topology.kubernetes.io/zone" "{{ (.zone).name }}") }}
         {{- end }}

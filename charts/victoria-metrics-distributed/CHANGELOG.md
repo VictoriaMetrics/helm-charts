@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- merge zoneTpl.common with vmcluster.requestsLoadBalancer. See [#2393](https://github.com/VictoriaMetrics/helm-charts/issues/2393).
+- fixed remote write url, while using vmsingle. See [#2390](https://github.com/VictoriaMetrics/helm-charts/issues/2390).
 
 ## 0.21.3
 
