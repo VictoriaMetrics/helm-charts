@@ -18,7 +18,10 @@ Creates vmcluster spec map, insert zone's nodeselector and topologySpreadConstra
       {{- $fullname = $rolloutZone.vmcluster.name -}}
     {{- end -}}
     {{- $fullname = tpl $fullname (dict "zone" $rolloutZone) -}}
-    {{- $commonSpec := $rolloutZone.common.spec | default dict -}}
+    {{- $commonSpec := deepCopy ($rolloutZone.common.spec | default dict) -}}
+    {{- if not $commonSpec.nodeSelector }}
+      {{- $_ := set $commonSpec "nodeSelector" (dict "topology.kubernetes.io/zone" "{{ (.zone).name }}") }}
+    {{- end }}
     {{- $clusterSpec := mergeOverwrite (deepCopy $commonClusterSpec) (deepCopy $rolloutZone.vmcluster.spec) -}}
     {{- range $name, $config := $clusterSpec -}}
       {{- if and (hasKey $components $name) (kindIs "map" $config) -}}
@@ -27,9 +30,6 @@ Creates vmcluster spec map, insert zone's nodeselector and topologySpreadConstra
           {{- $mergeSpec = (dict . $mergeSpec) }}
         {{- end }}
         {{- $config = mergeOverwrite (deepCopy $mergeSpec) (deepCopy $config) }}
-        {{- if not $config.nodeSelector }}
-          {{- $_ := set $config "nodeSelector" (dict "topology.kubernetes.io/zone" "{{ (.zone).name }}") }}
-        {{- end }}
         {{- $_ := set $clusterSpec $name $config -}}
       {{- end -}}
     {{- end -}}

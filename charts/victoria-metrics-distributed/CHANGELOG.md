@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- properly add default nodeSelector for requestsLoadBalancer. See [#2393](https://github.com/VictoriaMetrics/helm-charts/issues/2393).
 
 ## 0.21.4
 
