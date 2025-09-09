@@ -143,9 +143,9 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- if or (not $app.persistentVolume.enabled) (and (eq $mode "deployment") $app.persistentVolume.existingClaim) }}
+        {{- if or (not $app.persistentVolume.enabled) (eq $mode "deployment") }}
         - name: server-volume
-          {{- if and (eq $mode "deployment") $app.persistentVolume.enabled $app.persistentVolume.existingClaim }}
+          {{- if and (eq $mode "deployment") $app.persistentVolume.enabled }}
           persistentVolumeClaim:
             claimName: {{  $app.persistentVolume.existingClaim | default $app.persistentVolume.name | default $fullname }}
           {{- else }}

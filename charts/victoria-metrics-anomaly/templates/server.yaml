@@ -120,9 +120,9 @@ spec:
           configMap:
             name: {{ $fullname }}
         {{- include "vm.license.volume" . | nindent 8 }}
-        {{- if or (and (not $useSts) (not .Values.persistentVolume.enabled)) (and (not $useSts) .Values.persistentVolume.existingClaim) }}
+        {{- if not $useSts }}
         - name: models-dump
-          {{- if and (not $useSts) .Values.persistentVolume.enabled .Values.persistentVolume.existingClaim }}
+          {{- if .Values.persistentVolume.existingClaim }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolume.existingClaim }}
           {{- else }}
