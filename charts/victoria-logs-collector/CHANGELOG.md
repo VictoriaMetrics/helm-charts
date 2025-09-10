@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added support for configurable `msgField` in `values.yaml` to extend `VL-Msg-Field` beyond the default `message`.
 
 ## 0.0.2
 
