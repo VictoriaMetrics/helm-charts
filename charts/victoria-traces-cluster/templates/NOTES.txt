@@ -1,0 +1,33 @@
+{{- if .Values.printNotes }}
+{{- $ctx := dict "helm" . "style" "plain" }}
+{{- $ns := include "vm.namespace" $ctx }}
+{{- if .Values.vtinsert.enabled }}
+{{- if .Values.vmauth.enabled }}
+  {{- $_ := set $ctx "appKey" "vmauth" }}
+{{- else }}
+  {{- $_ := set $ctx "appKey" "vtinsert" }}
+{{- end }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+Write API:
+
+The VictoriaTraces ingest APIs can be accessed with the following url:
+{{ include "vm.url" $ctx }}
+
+Check how to ingest data in https://docs.victoriametrics.com/victoriatraces/data-ingestion/
+{{- end }}
+
+{{- if .Values.vtselect.enabled }}
+{{- if .Values.vmauth.enabled }}
+  {{- $_ := set $ctx "appKey" "vmauth" }}
+{{- else }}
+  {{- $_ := set $ctx "appKey" "vtselect" }}
+{{- end }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+Read API:
+
+The VictoriaTraces query APIs can be accessed with the following url:
+{{ include "vm.url" $ctx }}
+
+Check how to query data in https://docs.victoriametrics.com/victoriatraces/querying/
+{{- end }}
+{{- end }}

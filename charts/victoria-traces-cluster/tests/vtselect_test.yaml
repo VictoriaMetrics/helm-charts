@@ -1,0 +1,32 @@
+suite: vtselect templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - vtselect-server.yaml
+tests:
+  - it: deployment should match snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: deployment should match snapshot with fullnameOverride, extraLabels and podLabels
+    set:
+      vtselect:
+        name: select
+        fullnameOverride: vtselect-node
+        extraLabels:
+          extraLabelName: extraLabelValue
+        podLabels:
+          podLabelName: podLabelValue
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+      vtstorage:
+        extraArgs:
+          httpListenAddr: :10492
+    asserts:
+      - matchSnapshot: {}
+

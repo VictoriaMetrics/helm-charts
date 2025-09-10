@@ -1,0 +1,86 @@
+ingress should match snapshot:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: vt-cluster
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: RELEASE-NAME-vt-cluster-vmauth
+      namespace: NAMESPACE
+    spec:
+      rules:
+        - host: vtselect.node.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-vt-cluster-vmauth
+                    port:
+                      name: http
+                path: /select/test
+                pathType: Prefix
+  2: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: alb
+      labels:
+        app: vtinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: vt-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: RELEASE-NAME-vt-cluster-vtinsert
+      namespace: NAMESPACE
+    spec:
+      rules:
+        - host: vtinsert.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-vt-cluster-vtinsert
+                    port:
+                      name: http
+                path: /insert
+                pathType: Prefix
+      tls:
+        - hosts:
+            - insert.local
+          secretName: insert-ingress-tls
+  3: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: kong
+      labels:
+        app: vtselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: vt-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: RELEASE-NAME-vt-cluster-vtselect
+      namespace: NAMESPACE
+    spec:
+      rules:
+        - host: vtselect.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-vt-cluster-vtselect
+                    port:
+                      name: http
+                path: /select
+                pathType: Prefix
