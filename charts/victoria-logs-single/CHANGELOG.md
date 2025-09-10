@@ -578,7 +578,7 @@ to update your agent configuration if you are using it.
 ![AppVersion: v0.4.1](https://img.shields.io/badge/v0.4.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v041)
 ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?color=informational&logo=helm)
 
-- Add `kubernetes_container_name` into default [stream fields](https://docs.victoriametrics.com/victorialogs/keyconcepts#stream-fields) configuration `fluent-bit`.
+- Add `kubernetes_container_name` into default [stream fields](https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields) configuration `fluent-bit`.
 
 ## 0.3.2
 

@@ -16,12 +16,12 @@ common:
       port: "8427"
   vmagent:
     # -- Common VMAgent spec, which can be overridden by each VMAgent configuration.
-    # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/index.html#vmagentspec)
+    # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/#vmagentspec)
     spec:
       port: "8429"
   vmcluster:
     # -- Common VMCluster spec, which can be overridden by each VMCluster configuration.
-    # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/index.html#vmclusterspec)
+    # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/#vmclusterspec)
     spec:
       requestsLoadBalancer:
         enabled: true
@@ -33,7 +33,7 @@ common:
         port: "8480"
   vmsingle:
     # -- Common VMSingle spec, which can be overridden by each VMSingle configuration.
-    # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/index.html#vmsinglespec)
+    # Available parameters can be found [here](https://docs.victoriametrics.com/operator/api/#vmsinglespec)
     spec:
       port: "8428"
 
@@ -44,7 +44,7 @@ write:
       enabled: true
       # -- Override the name of the vmauth object
       name: "vmauth-global-write-{{ .fullname }}"
-      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
       spec: {}
 
 read:
@@ -54,7 +54,7 @@ read:
       enabled: true
       # -- Override the name of the vmauth object
       name: "vmauth-global-read-{{ .fullname }}"
-      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
       spec:
         unauthorizedUserAccessSpec:
           url_map:
@@ -96,7 +96,7 @@ zoneTpl:
       enabled: true
       # -- Override the name of the vmauth object
       name: "vmauth-read-proxy-{{ (.zone).name }}"
-      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api#vmauthspec)
+      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
       spec:
         unauthorizedUserAccessSpec:
           url_map:
@@ -111,14 +111,14 @@ zoneTpl:
     name: "vmagent-{{ (.zone).name }}"
     # -- VMAgent remote write proxy annotations
     annotations: {}
-    # -- Spec for VMAgent CRD, see [here](https://docs.victoriametrics.com/operator/api#vmagentspec)
+    # -- Spec for VMAgent CRD, see [here](https://docs.victoriametrics.com/operator/api/#vmagentspec)
     spec: {}
   vmcluster:
     # -- Create VMCluster
     enabled: true
     # -- Override the name of the vmcluster, by default is <zoneName>
     name: "vmcluster-{{ (.zone).name }}"
-    # -- Spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
+    # -- Spec for VMCluster CRD, see [here](https://docs.victoriametrics.com/operator/api/#vmclusterspec)
     spec:
       retentionPeriod: "14"
       replicationFactor: 2
@@ -139,7 +139,7 @@ zoneTpl:
     enabled: false
     # -- Override the name of the vmsingle, by default is <zoneName>
     name: "{{ (.zone).name }}"
-    # -- Spec for VMSingle CRD, see [here](https://docs.victoriametrics.com/operator/api#vmsinglespec)
+    # -- Spec for VMSingle CRD, see [here](https://docs.victoriametrics.com/operator/api/#vmsinglespec)
     spec:
       retentionPeriod: "14"
       resources: {}
