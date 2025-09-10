@@ -396,7 +396,7 @@
 ![AppVersion: v1.103.0](https://img.shields.io/badge/v1.103.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%2F%23v11030)
 ![Helm: v3.14](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
 
-**Update note**: `remoteWriteUrls` and `multiTenantUrls` parameters were replaced by `remoteWrite`. Please follow [upgrade guide](./README.md#upgrade-to-0130)
+**Update note**: `remoteWriteUrls` and `multiTenantUrls` parameters were replaced by `remoteWrite`. Please follow [upgrade guide](https://docs.victoriametrics.com/helm/victoria-metrics-agent/#upgrade-to-0130)
 
 - Fail if no remoteWriteUrls set
 - Added `remoteWrite` array param, which can contain all `remoteWrite.*` flag values. Please check chart docs for details.
