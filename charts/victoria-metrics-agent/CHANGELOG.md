@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `.Values.rbac.extraRules` to allow setting extra Role/ClusterRole rules
 
 ## 0.25.5
 
