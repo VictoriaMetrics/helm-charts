@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- minor refactoring
 
 ## 0.0.3
 
