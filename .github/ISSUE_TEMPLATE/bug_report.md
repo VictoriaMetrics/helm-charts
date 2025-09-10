@@ -6,6 +6,8 @@ labels: ''
 assignees: ''
 
 ---
+> [!WARNING]
+> **Before creating an issue please make sure it's reproducible on a latest chart version!**
 
 **Chart name and version**
 chart: victoria-metrics-operator
