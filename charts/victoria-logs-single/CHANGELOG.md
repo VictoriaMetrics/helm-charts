@@ -522,7 +522,7 @@ to update your agent configuration if you are using it.
 ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?color=informational&logo=helm)
 
 - Upgrade VictoriaLogs to [v0.8.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.8.0-victorialogs)
-- Move `.Values.server.name`, `.Values.server.fullnameOverride` to `.Values.global.victoriaLogs.server`. This allows to avoid issues with Fluent Bit output definition. See the [pull request]() for the details.
+- Move `.Values.server.name`, `.Values.server.fullnameOverride` to `.Values.global.victoriaLogs.server`. This allows to avoid issues with Fluent Bit output definition. See the [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1028) for the details.
 - Include `kubernetes_namespace_name` field in the [stream fields](https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields) configuration of Fluent Bit output.
 
 ## 0.3.8
