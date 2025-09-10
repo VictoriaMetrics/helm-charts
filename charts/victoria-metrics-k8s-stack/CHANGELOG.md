@@ -1531,7 +1531,7 @@ Please follow this doc https://docs.victoriametrics.com/helm/victoriametrics-k8s
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
 - Update VictoriaMetrics components from v1.92.1 to v1.93.0
-- delete an obsolete parameter remaining by mistake (see <https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack#upgrade-to-0130>) (#602)
+- delete an obsolete parameter remaining by mistake (see <https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/#upgrade-to-0130>) (#602)
 
 ## 0.17.3
 
