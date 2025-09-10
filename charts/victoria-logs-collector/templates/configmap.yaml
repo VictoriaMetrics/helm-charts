@@ -33,7 +33,7 @@ data:
         {{ fail (printf "'url' field must be set for remoteWrite[%d]" $i) }}
       {{- end }}
       {{- range $rwKey, $_ := $rw }}
-        {{- if and (ne $rwKey "url") (ne $rwKey "basicAuth") (ne $rwKey "accountID") (ne $rwKey "projectID") (ne $rwKey "tls") (ne $rwKey "extraFields") (ne $rwKey "ignoreFields") }}
+        {{- if and (ne $rwKey "url") (ne $rwKey "basicAuth") (ne $rwKey "accountID") (ne $rwKey "projectID") (ne $rwKey "tls") (ne $rwKey "extraFields") (ne $rwKey "ignoreFields") (ne $rwKey "msgField") }}
           {{ fail (printf "unknown field %q for remoteWrite[%d]" $rwKey $i) }}
         {{- end }}
       {{- end }}
