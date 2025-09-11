@@ -195,7 +195,7 @@
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.118.0](https://img.shields.io/badge/v1.118.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%2F%23v11180)
 
 **Update note 1**: This release contains new CRDs VLCluster and VLSingle. It requires to perform CRD versions update.
-Please follow this doc https://docs.victoriametrics.com/helm/victoriametrics-k8s-stack/
+Please follow this doc https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/
 **Update note 2**: This release contains changes to validation webhooks and it requires operator version v0.59.2 or above
 
 - Support scrape and probe CRs validation webhooks
@@ -787,7 +787,7 @@ Please follow this doc https://docs.victoriametrics.com/helm/victoriametrics-k8s
 ![AppVersion: v1.105.0](https://img.shields.io/badge/v1.105.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%2F%23v11050)
 ![Helm: v3.14](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
 
-- Add an explicit fail in case both Grafana dashboard via sidecar and `grafana.dashboards` are enabled. Previously, this configuration would be accepted and sidecar configuration would silently override `.grafana.dashboards` configuration. See [these docs](https://docs.victoriametrics.com/helm/victoriametrics-k8s-stack/#adding-external-dashboards) for information about adding external dashboards.
+- Add an explicit fail in case both Grafana dashboard via sidecar and `grafana.dashboards` are enabled. Previously, this configuration would be accepted and sidecar configuration would silently override `.grafana.dashboards` configuration. See [these docs](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/#adding-external-dashboards) for information about adding external dashboards.
 - bump version of VM components to [v1.105.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.105.0)
 
 ## 0.27.5
