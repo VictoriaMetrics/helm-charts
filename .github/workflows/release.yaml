@@ -78,7 +78,7 @@ jobs:
                 if [ "$APP_VERSION" != "null" ]; then
                   export APP_VERSION_HASH="$(echo $APP_VERSION | tr -d '.' | cut -f1 -d '-')"
                   export APP_LABEL=$(echo $APP_VERSION | sed 's/-/--/g')
-                  export APP_CHANGELOG=$(yq '.annotations["artifacthub.io/links"] | from_yaml | .[] | select(.name == "Changelog").url + "#" + env(APP_VERSION_HASH)| @uri' $CHART_FILE)
+                  export APP_CHANGELOG=$(yq '.annotations["artifacthub.io/links"] | from_yaml | .[] | select(.name == "Changelog").url + "/#" + env(APP_VERSION_HASH)| @uri' $CHART_FILE)
                   BADGES+=' ![AppVersion: '$APP_VERSION'](https://img.shields.io/badge/'$APP_LABEL'-success?logo=VictoriaMetrics&labelColor=gray&link='$APP_CHANGELOG')'
                 fi
 
