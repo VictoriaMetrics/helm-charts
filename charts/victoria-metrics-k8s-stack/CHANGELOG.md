@@ -700,7 +700,7 @@ Please follow this doc https://docs.victoriametrics.com/helm/victoriametrics-k8s
 ![AppVersion: v1.106.1](https://img.shields.io/badge/v1.106.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%2F%23v11061)
 ![Helm: v3.14](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
 
-**Update note**: This release contains breaking changes. please follow [upgrade guide](./#upgrade-to-0290)
+**Update note**: This release contains breaking changes. please follow [upgrade guide](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/#upgrade-to-0290)
 
 - fixed ability to override CR names using `<component>.name`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1778)
 - updated common dependency 0.0.28 -> 0.0.29
