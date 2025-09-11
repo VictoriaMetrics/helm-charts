@@ -249,11 +249,11 @@ victoria-metrics-operator:
 
 ### Install operator separately
 
-To have control over an order of managed resources removal or to be able to remove a whole namespace with managed resources it's recommended to disable operator in k8s-stack chart (`victoria-metrics-operator.enabled: false`) and [install it](https://docs.victoriametrics.com/helm/victoriametrics-operator/) separately. To move operator from existing k8s-stack release to a separate one please follow the steps below:
+To have control over an order of managed resources removal or to be able to remove a whole namespace with managed resources it's recommended to disable operator in k8s-stack chart (`victoria-metrics-operator.enabled: false`) and [install it](https://docs.victoriametrics.com/helm/victoria-metrics-operator/) separately. To move operator from existing k8s-stack release to a separate one please follow the steps below:
 
 - disable cleanup webhook (`victoria-metrics-operator.crds.cleanup.enabled: false`) and apply changes
 - disable operator (`victoria-metrics-operator.enabled: false`) and apply changes
-- [deploy operator](https://docs.victoriametrics.com/helm/victoriametrics-operator/) separately with `crds.plain: true`
+- [deploy operator](https://docs.victoriametrics.com/helm/victoria-metrics-operator/) separately with `crds.plain: true`
 
 If you're planning to delete k8s-stack by a whole namespace removal please consider deploying operator in a separate namespace as due to uncontrollable removal order process can hang if operator is removed before at least one resource it manages.
 
