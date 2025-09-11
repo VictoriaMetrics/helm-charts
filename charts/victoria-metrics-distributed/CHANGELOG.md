@@ -179,7 +179,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.115.0](https://img.shields.io/badge/v1.115.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%2F%23v11150)
 
-**Update note**: This release contains breaking changes. Please follow [upgrade guide](./#upgrade-to-0130)
+**Update note**: This release contains breaking changes. Please follow [upgrade guide](https://docs.victoriametrics.com/helm/victoria-metrics-distributed/#upgrade-to-0130)
 
 - allow overriding vmauth unauthorizedUserAccessSpec options
 - fix read vmauth retry status codes, to cover more cases
@@ -325,7 +325,7 @@
 ![AppVersion: v1.106.1](https://img.shields.io/badge/v1.106.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%2F%23v11061)
 ![Helm: v3.14](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
 
-**Update note**: This release contains breaking changes. Please follow [upgrade guide](./#upgrade-to-050)
+**Update note**: This release contains breaking changes. Please follow [upgrade guide](https://docs.victoriametrics.com/helm/victoria-metrics-distributed/#upgrade-to-050)
 
 - set default DNS domain to `cluster.local.`
 - added `.Values.zoneTpl` to define a default configuration for each `.Values.availabilityZones`
