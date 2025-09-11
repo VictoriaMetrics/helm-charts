@@ -6,7 +6,7 @@
 
 **Release date:** 19 Aug 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.25.3](https://img.shields.io/badge/v1.25.3-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1253)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.25.3](https://img.shields.io/badge/v1.25.3-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1253)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.25.3](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1253).
 
@@ -14,7 +14,7 @@
 
 **Release date:** 30 Jul 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.25.2](https://img.shields.io/badge/v1.25.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1252)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.25.2](https://img.shields.io/badge/v1.25.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1252)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.25.2](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1252).
 
@@ -22,7 +22,7 @@
 
 **Release date:** 24 Jul 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.25.1](https://img.shields.io/badge/v1.25.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1251)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.25.1](https://img.shields.io/badge/v1.25.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1251)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.25.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1251).
 
@@ -30,7 +30,7 @@
 
 **Release date:** 17 Jul 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.25.0](https://img.shields.io/badge/v1.25.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1250)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.25.0](https://img.shields.io/badge/v1.25.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1250)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.25.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1250).
 - Remove config has from pod annotations, when anomaly detection version is <1.25.0 to support hot-reload
@@ -39,7 +39,7 @@
 
 **Release date:** 07 Jul 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.24.1](https://img.shields.io/badge/v1.24.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1241)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.24.1](https://img.shields.io/badge/v1.24.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1241)
 
 - Support `.Values.topologySpreadConstraints` property. See [#2219](https://github.com/VictoriaMetrics/helm-charts/issues/2219)
 - Add support of using [`VMPodScrape`](https://docs.victoriametrics.com/operator/resources/vmpodscrape/) for monitoring configuration. See `.Values.podMonitor.vm`. 
@@ -48,7 +48,7 @@
 
 **Release date:** 20 Jun 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.24.1](https://img.shields.io/badge/v1.24.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1241)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.24.1](https://img.shields.io/badge/v1.24.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1241)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.24.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1241). Upgrading from [1.23.0] - [1.24.0] **is recommended to a critical bug fixed**, see [v1.23.0 note](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1230) for details.
 
@@ -56,7 +56,7 @@
 
 **Release date:** 19 Jun 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.24.0](https://img.shields.io/badge/v1.24.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1240)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.24.0](https://img.shields.io/badge/v1.24.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1240)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.24.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1240).
 - Automatically enable [restoring state](http://docs.victoriametrics.com/anomaly-detection/components/settings/#state-restoration) when persistence is enabled via `.Values.persistentVolume.enabled`.
@@ -65,7 +65,7 @@
 
 **Release date:** 13 Jun 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.23.3](https://img.shields.io/badge/v1.23.3-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1233)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.23.3](https://img.shields.io/badge/v1.23.3-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1233)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.23.3](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1233).
 
@@ -74,7 +74,7 @@
 
 **Release date:** 09 Jun 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.23.2](https://img.shields.io/badge/v1.23.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1232)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.23.2](https://img.shields.io/badge/v1.23.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1232)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.23.2](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1232).
 
@@ -82,7 +82,7 @@
 
 **Release date:** 09 Jun 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.23.1](https://img.shields.io/badge/v1.23.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1231)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.23.1](https://img.shields.io/badge/v1.23.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1231)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.23.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1231).
 
@@ -90,7 +90,7 @@
 
 **Release date:** 05 Jun 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.23.0](https://img.shields.io/badge/v1.23.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1230)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.23.0](https://img.shields.io/badge/v1.23.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1230)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.23.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1230).
 
@@ -98,7 +98,7 @@
 
 **Release date:** 11 May 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.22.1](https://img.shields.io/badge/v1.22.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1221)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.22.1](https://img.shields.io/badge/v1.22.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1221)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.22.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1221).
 
@@ -106,7 +106,7 @@
 
 **Release date:** 18 Apr 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.22.0-experimental](https://img.shields.io/badge/v1.22.0--experimental-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1220)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.22.0-experimental](https://img.shields.io/badge/v1.22.0--experimental-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1220)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.22.0-experimental](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1220-experimental).
 
@@ -114,7 +114,7 @@
 
 **Release date:** 19 Mar 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.21.0](https://img.shields.io/badge/v1.21.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1210)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.21.0](https://img.shields.io/badge/v1.21.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1210)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.21.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1210).
 - Add support of sharding and replication via `.Values.shardsCount` and `.Values.replicationFactor`. See [these docs](https://docs.victoriametrics.com/anomaly-detection/faq/#scaling-vmanomaly) for the details
@@ -124,7 +124,7 @@
 
 **Release date:** 16 Mar 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.20.1](https://img.shields.io/badge/v1.20.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1201)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.20.1](https://img.shields.io/badge/v1.20.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1201)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.20.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1201).
 
@@ -132,7 +132,7 @@
 
 **Release date:** 04 Mar 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.20.0](https://img.shields.io/badge/v1.20.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1200)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.20.0](https://img.shields.io/badge/v1.20.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1200)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.20.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1200).
 - updated common dependency 0.0.37 -> 0.0.39
@@ -141,7 +141,7 @@
 
 **Release date:** 27 Jan 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.19.2](https://img.shields.io/badge/v1.19.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1192)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.19.2](https://img.shields.io/badge/v1.19.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1192)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.19.2](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1192).
 
@@ -149,7 +149,7 @@
 
 **Release date:** 21 Jan 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.19.1](https://img.shields.io/badge/v1.19.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1191)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.19.1](https://img.shields.io/badge/v1.19.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1191)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.19.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1191).
 
@@ -157,7 +157,7 @@
 
 **Release date:** 21 Jan 2025
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.19.0](https://img.shields.io/badge/v1.19.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%23v1190)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.19.0](https://img.shields.io/badge/v1.19.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1190)
 
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.19.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1190).
 - updated common dependency 0.0.34 -> 0.0.37
