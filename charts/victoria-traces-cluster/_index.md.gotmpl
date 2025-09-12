@@ -1,0 +1,131 @@
+---
+weight: 2
+title: VictoriaTraces Cluster
+menu:
+  docs:
+    parent: helm
+    weight: 2
+    identifier: helm-victoria-traces-cluster
+url: /helm/victoria-traces-cluster/
+aliases:
+  - /helm/victoriatraces-cluster/
+tags:
+  - traces
+  - kubernetes
+---
+{{ template "chart.badges" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.prerequisites" . }}
+
+## Quick start
+
+The chart deploys VictoriaTraces cluster database.
+It deploys the following components according to [VictoriaTraces cluster architecture](https://docs.victoriametrics.com/victoriatraces/cluster/#architecture):
+
+- `vtstorage` stores the ingested traces to the configured persistent volumes
+- `vtinsert` receives incoming traces and spreads them evenly across `vtstorage` nodes
+- `vtselect` provides API for querying the ingested traces
+
+The default chart setup is shown below:
+
+```mermaid
+graph LR
+    Collector["Log Collector"] --> VTI1["vtinsert-1"]
+    Collector --> VTI2["vtinsert-2"]
+
+    subgraph "VictoriaTraces Cluster"
+        VTI1 --> VTS1["vtstorage-1"]
+        VTI1 --> VTS2["vtstorage-2"]
+        VTI2 --> VTS1
+        VTI2 --> VTS2
+
+        VTS1 <--> VTQ1["vtselect-1"]
+        VTS1 <--> VTQ2["vtselect-2"]
+        VTS2 <--> VTQ1
+        VTS2 <--> VTQ2
+    end
+
+    VTQ2 <--> Users
+```
+
+For a quick start, install `victoria-traces-cluster` using the following commands,
+making sure to replace the environment variables with your own values:
+
+```sh
+export RETENTION=30d
+export PVC_SIZE=10Gi
+export VTSTORAGE_REPLICAS=2
+export NAMESPACE=traces
+
+# Install victoria-traces-cluster chart
+helm install vtc vm/victoria-traces-cluster --namespace $NAMESPACE --wait \
+    --set "vtstorage.retentionPeriod=$RETENTION" --set "vtstorage.persistentVolume.size=$PVC_SIZE" \
+    --set vmauth.enabled=true \
+    --set vtstorage.replicaCount=$VTSTORAGE_REPLICAS
+
+In the example above, two `vtstorage` instances are deployed, each with a 30-day retention period and a 10 Gi PVC.
+
+To access the data within the cluster, use the vmauth address: `http://vtc-victoria-traces-cluster-vmauth.logging.svc.cluster.local:8427`.
+You can use this address as Data Source URL in Grafana.
+The vmui interface is available at: `http://vtc-victoria-traces-cluster-vmauth.logging.svc.cluster.local:8427/select/vmui/`.
+
+To uninstall these charts, run: `helm uninstall vts`.
+Note that this *will not* remove the PVCs, so you will need to delete them manually if no longer needed.
+
+For finer control and easier maintenance, it is recommended to set these
+values in a separate `values` file and use it during installation.
+See [how to install victoria-traces-single](https://docs.victoriametrics.com/helm/victoria-traces-single/#install-victoria-traces-single-chart) for an example.
+You can do this later if you want to configure more settings than shown in the default example.
+
+## Chart configuration
+
+### vmauth
+
+When you enable `vmauth` with:
+
+```yaml
+vmauth:
+  enabled: true
+```
+
+The chart launches an [`vmauth`](https://docs.victoriametrics.com/victoriametrics/vmauth/) service
+for proxying and load-balancing incoming data ingestion requests to `vtinsert` nodes and for proxying and load-balancing incoming queries to `vtselect` nodes.
+
+So, the chart can now be thought of as:
+
+```mermaid
+graph LR
+    Collector["Traces Collector"] --> VTI1["vtinsert-1"]
+    Collector --> VTI2["vtinsert-2"]
+
+    subgraph "VictoriaTraces Cluster"
+        VTI1 --> VTS1["vtstorage-1"]
+        VTI1 --> VTS2["vtstorage-2"]
+        VTI2 --> VTS1
+        VTI2 --> VTS2
+
+        VTS1 <--> VTQ1["vtselect-1"]
+        VTS1 <--> VTQ2["vtselect-2"]
+        VTS2 <--> VTQ1
+        VTS2 <--> VTQ2
+    end
+
+    VTQ1 <--> Users["vmauth"]
+    VTQ2 <--> Users
+```
+
+{{ include "chart.installSection" . }}
+
+{{ include "chart.uninstallSection" . }}
+
+{{ include "chart.helmDocs" . }}
+
+## Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-traces-cluster/values.yaml`` file.
+
+{{ template "chart.valuesTableHtml" . }}

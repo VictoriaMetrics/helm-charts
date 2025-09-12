@@ -1,0 +1,197 @@
+service should match snapshot:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-cluster
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: RELEASE-NAME-victoria-traces-cluster-vmauth
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 8427
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-traces-cluster
+      type: ClusterIP
+  2: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vtinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: RELEASE-NAME-victoria-traces-cluster-vtinsert
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 10481
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vtinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-traces-cluster
+      type: ClusterIP
+  3: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vtselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: RELEASE-NAME-victoria-traces-cluster-vtselect
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 10471
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vtselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-traces-cluster
+      type: ClusterIP
+  4: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vtstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: RELEASE-NAME-victoria-traces-cluster-vtstorage
+      namespace: NAMESPACE
+    spec:
+      clusterIP: None
+      ports:
+        - name: http
+          port: 10491
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vtstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-traces-cluster
+      type: ClusterIP
+service should match snapshot with fullnameOverride and extraLabels:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-cluster
+        app.kubernetes.io/version: v1.116.0
+        extraServiceLabelName: authExtraServiceLabelValue
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: vmauth-node
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 8427
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-traces-cluster
+      type: ClusterIP
+  2: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vtinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: RELEASE-NAME-victoria-traces-cluster-vtinsert
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 10481
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vtinsert
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-traces-cluster
+      type: ClusterIP
+  3: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vtselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: RELEASE-NAME-victoria-traces-cluster-vtselect
+      namespace: NAMESPACE
+    spec:
+      ports:
+        - name: http
+          port: 10471
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vtselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-traces-cluster
+      type: ClusterIP
+  4: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: vtstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-cluster
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-traces-cluster-0.1.1
+      name: RELEASE-NAME-victoria-traces-cluster-vtstorage
+      namespace: NAMESPACE
+    spec:
+      clusterIP: None
+      ports:
+        - name: http
+          port: 10491
+          protocol: TCP
+          targetPort: http
+      selector:
+        app: vtstorage
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: victoria-traces-cluster
+      type: ClusterIP
