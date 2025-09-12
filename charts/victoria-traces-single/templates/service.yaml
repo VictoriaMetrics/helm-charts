@@ -1,0 +1,68 @@
+{{- $app := .Values.server }}
+{{- $mode := $app.mode }}
+{{- $service := $app.service }}
+{{- if $app.enabled -}}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  {{- with $service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $_ := set $ctx "extraLabels" $app.service.labels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
+spec:
+  {{- $type := $service.type }}
+  {{- if and (not $type) (eq $mode "statefulSet") }}
+    {{- $type = "ClusterIP" }}
+  {{- end }}
+  type: {{ $type }}
+  {{- $clusterIP := $service.clusterIP }}
+  {{- if eq $type "ClusterIP" }}
+  {{- with $service.clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
+  {{- end }}
+  {{- with $service.externalIPs }}
+  externalIPs: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- with $service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with $service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
+  {{- with $service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ . }}
+  {{- end }}
+  {{- with $service.ipFamilies }}
+  ipFamilies: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  ports:
+    - name: http
+      port: {{ $service.servicePort }}
+      protocol: TCP
+      targetPort: {{ $service.targetPort }}
+      {{- with $service.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
+    {{- range $service.extraPorts }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      protocol: {{ .protocol | default "TCP" }}
+      targetPort: {{ .targetPort }}
+    {{- end }}
+  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
+{{- end }}

@@ -1,0 +1,338 @@
+deployment should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: server
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-single
+        app.kubernetes.io/version: 0.2.0
+        helm.sh/chart: victoria-traces-single-0.0.1
+      name: RELEASE-NAME-victoria-traces-single-server
+      namespace: NAMESPACE
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: server
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-traces-single
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-traces-single
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --http.shutdownDelay=15s
+                - --httpListenAddr=:10428
+                - --loggerFormat=json
+                - --retentionPeriod=1
+                - --storageDataPath=/storage
+              image: victoriametrics/victoria-traces:0.2.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 10
+                initialDelaySeconds: 30
+                periodSeconds: 30
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vtraces
+              ports:
+                - containerPort: 10428
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /storage
+                  name: server-volume
+          securityContext:
+            fsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 1000
+          terminationGracePeriodSeconds: 60
+          volumes:
+            - name: server-volume
+              persistentVolumeClaim:
+                claimName: RELEASE-NAME-victoria-traces-single-server
+deployment with volume should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: server
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-single
+        app.kubernetes.io/version: 0.2.0
+        helm.sh/chart: victoria-traces-single-0.0.1
+      name: RELEASE-NAME-victoria-traces-single-server
+      namespace: NAMESPACE
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: server
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-traces-single
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-traces-single
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --http.shutdownDelay=15s
+                - --httpListenAddr=:10428
+                - --loggerFormat=json
+                - --retentionPeriod=1
+                - --storageDataPath=/storage
+              image: victoriametrics/victoria-traces:0.2.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 10
+                initialDelaySeconds: 30
+                periodSeconds: 30
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vtraces
+              ports:
+                - containerPort: 10428
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /storage
+                  name: server-volume
+          securityContext:
+            fsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 1000
+          terminationGracePeriodSeconds: 60
+          volumes:
+            - name: server-volume
+              persistentVolumeClaim:
+                claimName: RELEASE-NAME-victoria-traces-single-server
+statefulset should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      labels:
+        app: server
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-single
+        app.kubernetes.io/version: 0.2.0
+        helm.sh/chart: victoria-traces-single-0.0.1
+      name: RELEASE-NAME-victoria-traces-single-server
+      namespace: NAMESPACE
+    spec:
+      podManagementPolicy: OrderedReady
+      replicas: 1
+      selector:
+        matchLabels:
+          app: server
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-traces-single
+      serviceName: RELEASE-NAME-victoria-traces-single-server
+      template:
+        metadata:
+          labels:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-traces-single
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --http.shutdownDelay=15s
+                - --httpListenAddr=:10428
+                - --loggerFormat=json
+                - --retentionPeriod=1
+                - --storageDataPath=/storage
+              image: victoriametrics/victoria-traces:0.2.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 10
+                initialDelaySeconds: 30
+                periodSeconds: 30
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vtraces
+              ports:
+                - containerPort: 10428
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /storage
+                  name: server-volume
+          securityContext:
+            fsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 1000
+          terminationGracePeriodSeconds: 60
+          volumes: null
+      updateStrategy: {}
+      volumeClaimTemplates:
+        - apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: server-volume
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 10Gi
+statefulset with volume should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      labels:
+        app: server
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-traces-single
+        app.kubernetes.io/version: 0.2.0
+        helm.sh/chart: victoria-traces-single-0.0.1
+      name: RELEASE-NAME-victoria-traces-single-server
+      namespace: NAMESPACE
+    spec:
+      podManagementPolicy: OrderedReady
+      replicas: 1
+      selector:
+        matchLabels:
+          app: server
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-traces-single
+      serviceName: RELEASE-NAME-victoria-traces-single-server
+      template:
+        metadata:
+          labels:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-traces-single
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VM_
+                - --http.shutdownDelay=15s
+                - --httpListenAddr=:10428
+                - --loggerFormat=json
+                - --retentionPeriod=1
+                - --storageDataPath=/storage
+              image: victoriametrics/victoria-traces:0.2.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 10
+                initialDelaySeconds: 30
+                periodSeconds: 30
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vtraces
+              ports:
+                - containerPort: 10428
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /storage
+                  name: server-volume
+          securityContext:
+            fsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 1000
+          terminationGracePeriodSeconds: 60
+          volumes: null
+      updateStrategy: {}
+      volumeClaimTemplates:
+        - apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: server-volume
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 10Gi

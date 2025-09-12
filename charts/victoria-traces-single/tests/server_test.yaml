@@ -1,0 +1,32 @@
+suite: server templates test
+chart:
+  version: 0.0.1
+  appVersion: 0.2.0
+templates:
+  - server.yaml
+tests:
+  - it: deployment should match snapshot
+    asserts:
+      - matchSnapshot: {}
+    set:
+      server:
+        mode: deployment
+  - it: deployment with volume should match snapshot
+    asserts:
+      - matchSnapshot: {}
+    set:
+      server:
+        mode: deployment
+        persistentVolume:
+          enabled: true
+  - it: statefulset should match snapshot
+    set: {}
+    asserts:
+      - matchSnapshot: {}
+  - it: statefulset with volume should match snapshot
+    set:
+      server:
+        persistentVolume:
+          enabled: true
+    asserts:
+      - matchSnapshot: {}
