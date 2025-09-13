@@ -34,6 +34,9 @@ spec:
       {{- with $app.serviceMonitor.basicAuth }}
       basicAuth: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $app.serviceMonitor.params }}
+      params: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- with $app.serviceMonitor.scheme }}
       scheme: {{ . }}
       {{- end }}

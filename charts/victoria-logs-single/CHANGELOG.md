@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added `params` support for `ServiceMonitor`
 
 ## 0.11.8
 
