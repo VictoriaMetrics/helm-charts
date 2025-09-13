@@ -178,6 +178,8 @@ server:
 
   # -- StatefulSet/Deployment additional labels
   extraLabels: {}
+  # -- StatefulSet/Deployment annotations
+  annotations: {}
   # -- Pod's additional labels
   podLabels: {}
   # -- Pod's annotations
@@ -327,6 +329,10 @@ server:
     annotations: {}
     # -- Basic auth params for Service Monitor
     basicAuth: {}
+    # -- Commented. Params to use for scraping (supports helm templates)
+#    params:
+#      authKey:
+#      - '{{ .Values.server.extraArgs.metricsAuthKey }}'
     # -- Commented. Prometheus scrape interval for server component
 #    interval: 15s
     # -- Commented. Prometheus pre-scrape timeout for server component
@@ -422,7 +428,7 @@ vector:
             VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
             AccountID: "0"
             ProjectID: "0"
-      
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 
