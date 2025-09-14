@@ -1,3 +1,4 @@
+{{- $storageName := "server-volume" }}
 {{- $app := .Values.server }}
 {{- $mode := $app.mode }}
 {{- if and $mode $app.enabled (hasKey $app $mode) }}
@@ -94,7 +95,7 @@ spec:
           {{- end }}
           volumeMounts:
             {{- with $app.persistentVolume }}
-            - name: server-volume
+            - name: {{ $storageName }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
               subPath: {{ . }}
@@ -161,7 +162,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- if or (eq $mode "deployment") (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
-        - name: server-volume
+        - name: {{ $storageName }}
           {{- if or (and (eq $mode "deployment") $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
           persistentVolumeClaim:
             claimName: {{ $app.persistentVolume.existingClaim | default $app.persistentVolume.name | default $fullname }}
@@ -174,7 +175,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: server-volume
+        name: {{ $app.persistentVolume.name | default $storageName }}
         {{- with $app.persistentVolume.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}

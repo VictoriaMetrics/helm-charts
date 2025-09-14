@@ -1,3 +1,4 @@
+{{- $storageName := "tmpdata" }}
 {{- $app := .Values }}
 {{- $mode := $app.mode }}
 {{- if and $mode (hasKey $app $mode) }}
@@ -126,7 +127,7 @@ spec:
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: tmpdata
+            - name: {{ $storageName }}
               mountPath: /tmpData
             - name: scrape-config
               mountPath: /config/scrape
@@ -172,7 +173,7 @@ spec:
       {{- end }}
       volumes:
         {{- if or (eq $mode "deployment") (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
-        - name: tmpdata
+        - name: {{ $storageName }}
           {{- if or (and (eq $mode "deployment") $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
           persistentVolumeClaim:
             claimName: {{ $app.persistentVolume.existingClaim | default $app.persistentVolume.name | default $fullname }}
@@ -202,7 +203,7 @@ spec:
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-      name: tmpdata
+      name: {{ $app.persistentVolume.name | default $storageName }}
       {{- with $app.persistentVolume.extraLabels }}
       labels: {{ toYaml . | nindent 8 }}
       {{- end }}

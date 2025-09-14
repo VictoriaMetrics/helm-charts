@@ -1,3 +1,4 @@
+{{- $storageName := "models-dump" }}
 {{- include "vm.enterprise.only" . -}}
 
 {{- if not .Values.config.reader.datasource_url -}}
@@ -90,7 +91,7 @@ spec:
               mountPath: /etc/config
             {{- include "vm.license.mount" . | nindent 12 }}
             {{- if .Values.persistentVolume.enabled }}
-            - name: models-dump
+            - name: {{ $storageName }}
               mountPath: /tmp/vmanomaly-storage
             {{- end }}
             {{- with .Values.extraVolumeMounts }}
@@ -121,7 +122,7 @@ spec:
             name: {{ $fullname }}
         {{- include "vm.license.volume" . | nindent 8 }}
         {{- if or (not .Values.persistentVolume.enabled) .Values.persistentVolume.existingClaim }}
-        - name: models-dump
+        - name: {{ $storageName }}
           {{- if .Values.persistentVolume.enabled }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolume.existingClaim }}
@@ -137,7 +138,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: models-dump
+        name: {{ .Values.persistentVolume.name | default $storageName }}
         {{- with .Values.persistentVolume.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}

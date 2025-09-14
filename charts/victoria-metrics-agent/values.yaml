@@ -351,26 +351,21 @@ emptyDir: {}
 persistentVolume:
   # -- Create/use Persistent Volume Claim for server component. Empty dir if false
   enabled: false
-
+  # -- Override Persistent Volume Claim name
+  name: ""
   # -- StorageClass to use for persistent volume. Requires server.persistentVolume.enabled: true. If defined, PVC created automatically
   storageClassName: ""
-
   # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
   accessModes:
     - ReadWriteOnce
-
   # -- Size of the volume. Should be calculated based on the logs you send and retention policy you set.
   size: 10Gi
-
   # -- Persistent volume annotations
   annotations: {}
-
   # -- Persistent volume additional labels
   extraLabels: {}
-
   # -- Existing Claim name. If defined, PVC must be created manually before volume will be bound
   existingClaim: ""
-
   # -- Bind Persistent Volume by labels. Must match all labels of targeted PV.
   matchLabels: {}
 

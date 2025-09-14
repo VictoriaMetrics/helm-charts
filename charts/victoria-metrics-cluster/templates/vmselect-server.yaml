@@ -1,3 +1,4 @@
+{{- $storageName := "cache-volume" }}
 {{- $app := merge (deepCopy .Values.vmselect) (deepCopy .Values.common) -}}
 {{- $_ := set .Values "vmselect" $app }}
 {{- $mode := $app.mode }}
@@ -100,7 +101,7 @@ spec:
           {{- end }}
           volumeMounts:
             - mountPath: {{ $app.cacheMountPath }}
-              name: cache-volume
+              name: {{ $storageName }}
             {{- range $app.extraHostPathMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
@@ -143,7 +144,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- if or (eq $mode "deployment") (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
-        - name: cache-volume
+        - name: {{ $storageName }}
           {{- if or (and (eq $mode "deployment") $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
           persistentVolumeClaim:
             claimName: {{ $app.persistentVolume.existingClaim | default $fullname }}
@@ -157,7 +158,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: cache-volume
+        name: {{ $app.persistentVolume.name | default $storageName }}
         {{- with $app.persistentVolume.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
