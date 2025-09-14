@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added `securityContext` to the `cleanup` job
 
 ## 0.53.0
 
