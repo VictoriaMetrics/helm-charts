@@ -33,6 +33,9 @@ spec:
           image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           resources: {{ toYaml $app.resources | nindent 12 }}
+          {{- if .Values.securityContext.enabled }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.securityContext "helm" .) | nindent 12 }}
+          {{- end }}
           args:
             - delete
             - {{ (keys .Values.admissionWebhooks.enabledCRDValidation) | sortAlpha | join "," }}
