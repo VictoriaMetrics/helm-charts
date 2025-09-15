@@ -1,7 +1,11 @@
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
-{{- if empty .Values.configMap }}
+{{- if and (empty .Values.configMap) .Values.config }}
+  {{- $cfg := deepCopy .Values.config }}
+  {{- if .Values.extraScrapeConfigs }}
+    {{- $_ := set $cfg "scrape_configs" (concat (.Values.config.scrape_configs | default list) .Values.extraScrapeConfigs) }}
+  {{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -10,14 +14,7 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
-  scrape.yml: |
-    {{- range $k, $v := .Values.config }}
-    {{- if and (eq $k "scrape_configs") ($.Values.extraScrapeConfigs) }}
-    {{ tpl ((dict $k (concat $v $.Values.extraScrapeConfigs)) | toYaml) $ | nindent 4 }}
-    {{- else }}
-    {{ tpl ((dict $k $v) | toYaml) $ | nindent 4 }}
-    {{- end }}
-    {{- end }}
+  scrape.yml: |{{ tpl (toYaml $cfg) . | nindent 4 }}
 {{- end }}
 {{- $rwcm := default dict }}
 {{- range $i, $rw := .Values.remoteWrite }}
