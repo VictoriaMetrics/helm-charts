@@ -13,9 +13,9 @@ data:
   scrape.yml: |
     {{- range $k, $v := .Values.config }}
     {{- if and (eq $k "scrape_configs") ($.Values.extraScrapeConfigs) }}
-    {{ dict $k (concat $v $.Values.extraScrapeConfigs) | toYaml | nindent 4 }}
+    {{ tpl ((dict $k (concat $v $.Values.extraScrapeConfigs)) | toYaml) $ | nindent 4 }}
     {{- else }}
-    {{ dict $k $v | toYaml | nindent 4 }}
+    {{ tpl ((dict $k $v) | toYaml) $ | nindent 4 }}
     {{- end }}
     {{- end }}
 {{- end }}
