@@ -1,6 +1,8 @@
 ## Next release
 
-- Added `securityContext` to the `cleanup` job
+- Added `securityContext` to the `cleanup` job.
+- Removed `.Values.crds.plain` property, CRDs as templates are not supported by chart anymore.
+- Replaced `.Values.admissionWebhooks.enabledCRDValidation` with `.Values.admissionWebhooks.disabledFor` list of CRD names to disable validation for.
 
 ## 0.53.0
 

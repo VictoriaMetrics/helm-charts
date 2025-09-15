@@ -30,14 +30,8 @@ image:
   pullPolicy: IfNotPresent
 
 crds:
-  # -- manages CRD creation. Disables CRD creation only in combination with `crds.plain: false` due to helm dependency conditions limitation
+  # -- enables CRD creation.
   enabled: true
-  # -- check if plain or templated CRDs should be created.
-  # with this option set to `false`, all CRDs will be rendered from templates.
-  # with this option set to `true`, all CRDs are immutable and require manual upgrade.
-  plain: false
-  # -- additional CRD annotations, when `.Values.crds.plain: false`
-  annotations: {}
   cleanup:
     # -- Tells helm to clean up all the vm resources under this release's namespace when uninstalling
     enabled: false
@@ -253,26 +247,11 @@ hostNetwork: false
 admissionWebhooks:
   # -- Enables validation webhook.
   enabled: true
-  enabledCRDValidation:
-    vmagent: true
-    vmalert: true
-    vmanomaly: true
-    vmsingle: true
-    vmauth: true
-    vmrule: true
-    vmalertmanagerconfig: true
-    vmalertmanager: true
-    vmcluster: true
-    vmuser: true
-    vlagent: true
-    vlogs: true
-    vlsingle: true
-    vlcluster: true
-    vmservicescrape: true
-    vmpodscrape: true
-    vmnodescrape: true
-    vmprobe: true
-    vmstaticscrape: true
+  # -- List of CRD names to disable validation for
+  disabledFor: []
+  # - vmagent
+  # - vmsingle
+
   # -- What to do in case, when operator not available to validate request.
   policy: Fail
   # -- Enables custom ca bundle, if you are not using cert-manager. In case of custom ca, you have to create secret - {chart-name}-validation with keys: tls.key, tls.crt, ca.crt
