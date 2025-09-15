@@ -5,9 +5,8 @@
 {{- $domain := ((.Values.global).cluster).dnsDomain }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $certManager := .Values.admissionWebhooks.certManager }}
-{{- $files := .Files }}
-{{- $crds := $files.Get "crd.yaml" | splitList "---" }}
-{{- $enabledHooks := .Values.admissionWebhooks.enabledCRDValidation }}
+{{- $crds := include "vm-operator.crds" . | fromYaml }}
+{{- $disabledFor := .Values.admissionWebhooks.disabledFor | default list }}
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -20,24 +19,23 @@ metadata:
   {{- end }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 webhooks:
-{{- range $crds }}
-{{- $crd := fromYaml . }}
-{{- $name := $crd.spec.names.singular }}
-{{- if index $enabledHooks $name }}
-{{- range $version := $crd.spec.versions }}
+{{- range $crd := $crds.crds }}
+{{- $name := $crd.names.singular }}
+{{- if not (has $name $disabledFor) }}
+{{- range $version := $crd.versions }}
   - clientConfig:
       service:
         namespace: {{ $ns }}
         name: {{ $fullname }}
-        path: /validate-operator-victoriametrics-com-{{ $version.name }}-{{ $crd.spec.names.singular }}
+        path: /validate-operator-victoriametrics-com-{{ $version }}-{{ $crd.names.singular }}
         port: {{ $.Values.service.webhookPort }}
       {{- if not $certManager.enabled }}
       caBundle: {{ $tls.caCert }}
       {{- end }}
     failurePolicy: {{ $.Values.admissionWebhooks.policy }}
-    name: '{{ $crd.metadata.name }}'
+    name: '{{ $crd.names.singular }}.{{ $crd.group }}'
     admissionReviewVersions:
-      - {{ $version.name }}
+      - {{ $version }}
     sideEffects: None
     objectSelector:
       matchExpressions:
@@ -46,14 +44,14 @@ webhooks:
           values: [{{ include "vm.name" $ }}]
     rules:
       - apiGroups:
-          - operator.victoriametrics.com
+          - {{ $crd.group }}
         apiVersions:
-          - {{ $version.name }}
+          - {{ $version }}
         operations:
           - CREATE
           - UPDATE
         resources:
-          - {{ $crd.spec.names.plural }}
+          - {{ $crd.names.plural }}
 {{- end }}
 {{- end }}
 {{- end }}
