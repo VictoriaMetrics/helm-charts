@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- render helm variables in the ConfigMap
 
 ## 0.25.7
 
