@@ -1,0 +1,84 @@
+---
+weight: 15
+title: VictoriaTraces Single
+menu:
+  docs:
+    parent: helm
+    weight: 15
+    identifier: helm-victoria-traces-single
+url: /helm/victoria-traces-single/
+aliases:
+  - /helm/victoriatraces-single/
+tags:
+  - traces
+  - kubernetes
+---
+{{ template "chart.badges" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.prerequisites" . }}
+
+## Quick start
+
+The chart deploys VictoriaTraces database in StatefulSet mode.
+For a quick start, install `victoria-traces-single` chart using the following commands.
+Make sure to replace the environment variables with your own values:
+
+```sh
+export RETENTION=30d
+export PVC_SIZE=10Gi
+export NAMESPACE=tracing
+
+kubectl create namespace $NAMESPACE
+
+# Install victoria-traces-single chart
+helm install vts vm/victoria-traces-single --namespace $NAMESPACE --wait \
+    --set "server.retentionPeriod=$RETENTION" --set "server.persistentVolume.size=$PVC_SIZE"
+
+For finer control and easier maintenance, it is recommended to set these
+values in a separate `values` file and use it during installation.
+See [how to install victoria-traces-single](https://docs.victoriametrics.com/helm/victoria-traces-single/#install-victoria-traces-single-chart) for an example.
+You can do this later if you want to configure more settings than shown in the example.
+
+## Chart configuration
+
+The chart provides the following configuration options:
+
+- Persistent volume size for storing the ingested traces. See `server.persistentVolume.size` config option at the [minimal configuration example](#minimal-configuration).
+- Data retention (how long to keep traces in the database). It can be configurated via time-based retention (with units of days, weeks, or years)
+  or via disk space-based retention limits. See `server.retentionPeriod` and `server.retentionDiskSpaceUsage` config options in the [minimal configuration example](#minimal-configuration).
+  See [retention docs](https://docs.victoriametrics.com/victoriatraces/#retention) for details.
+
+### Minimal Configuration
+
+You can install the chart right away without any configuration (see [how to install](#how-to-install)), but here is the minimal configuration that is commonly customized:
+
+```yaml
+# VictoriaTraces server
+server:
+
+  # Time-based retention
+  retentionPeriod: 7d
+
+  # Or disk-based retention
+  # retentionDiskSpaceUsage: 5GB
+
+  # Storage size for the ingested traces
+  persistentVolume:
+    size: 20Gi
+```
+
+{{ include "chart.installSection" . }}
+
+{{ include "chart.uninstallSection" . }}
+
+{{ include "chart.helmDocs" . }}
+
+## Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-traces-single/values.yaml`` file.
+
+{{ template "chart.valuesTableHtml" . }}
