@@ -1,7 +1,10 @@
 ## Next release
 
+**Update note 1**: CRD template was replaced by CRD upgrade job. `Values.crds.plain` property was removed. Consider replacing it with `.Values.crds.upgrade.enabled: true` if automatic CRD upgrade is expected.
+**Update note 2**: Replaced `.Values.admissionWebhooks.enabledCRDValidation` map with `.Values.admissionWebhooks.disabledFor` list of CRD names to disable validation for.
+
 - Added `securityContext` to the `cleanup` job.
-- Removed `.Values.crds.plain` property, CRDs as templates are not supported by chart anymore.
+- Removed `.Values.crds.plain` property, CRDs as templates are not supported by chart anymore. Added upgrade job instead, which is enabled by `.Values.crds.upgrade.enabled` property.
 - Replaced `.Values.admissionWebhooks.enabledCRDValidation` with `.Values.admissionWebhooks.disabledFor` list of CRD names to disable validation for.
 
 ## 0.53.0
