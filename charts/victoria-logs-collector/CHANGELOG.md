@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- Bump Vector version to [v0.49.0](https://vector.dev/releases/0.49.0/).
+- Switch to alpine-based build. See [#2429](https://github.com/VictoriaMetrics/helm-charts/issues/2429) for details.
 
 ## 0.0.4
 

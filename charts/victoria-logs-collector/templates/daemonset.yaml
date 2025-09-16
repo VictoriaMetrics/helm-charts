@@ -42,7 +42,7 @@ spec:
       {{- end }}
       containers:
         - name: victoria-logs-collector
-          image: {{ .Values.global.image.registry | default "docker.io" }}/timberio/vector:0.48.0-distroless-libc
+          image: {{ .Values.global.image.registry | default "docker.io" }}/timberio/vector:0.49.0-alpine
           imagePullPolicy: IfNotPresent
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ omit .Values.securityContext "enabled" | toYaml | nindent 12 }}
