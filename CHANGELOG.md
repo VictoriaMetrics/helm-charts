@@ -4,7 +4,7 @@
 
 See changelog for `victoria-logs-single` helm chart
 
-* [In documentation](https://docs.victoriametrics.com/helm/victorialogs-single/changelog/)
+* [In documentation](https://docs.victoriametrics.com/helm/victoria-logs-single/changelog/)
 * [In repository](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-logs-single/CHANGELOG.md)
 
 ## `victoria-metrics-agent`
