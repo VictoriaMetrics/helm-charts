@@ -1,0 +1,24 @@
+suite: vtstorage templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - vtstorage-server.yaml
+tests:
+  - it: statefulset should match snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: statefulset should match snapshot with fullnameOverride, extraLabels and podLabels
+    set:
+      vtstorage:
+        name: storage
+        fullnameOverride: vtstorage-node
+        extraLabels:
+          extraLabelName: extraLabelValue
+        podLabels:
+          podLabelName: podLabelValue
+        retentionDiskSpaceUsage: 100
+        extraArgs:
+          httpListenAddr: :10492
+    asserts:
+      - matchSnapshot: {}
