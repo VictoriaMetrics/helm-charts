@@ -137,9 +137,9 @@ helm charts tested at kubernetes versions from 1.28 to 1.30.
 
 ## List of Charts
 
-- [VictoriaLogs Single](https://docs.victoriametrics.com/helm/victorialogs-single/)
-- [VictoriaLogs Cluster](https://docs.victoriametrics.com/helm/victorialogs-cluster/)
-- [VictoriaLogs Collector](https://docs.victoriametrics.com/helm/victorialogs-collector/)
+- [VictoriaLogs Single](https://docs.victoriametrics.com/helm/victoria-logs-single/)
+- [VictoriaLogs Cluster](https://docs.victoriametrics.com/helm/victoria-logs-cluster/)
+- [VictoriaLogs Collector](https://docs.victoriametrics.com/helm/victoria-logs-collector/)
 - [VictoriaMetrics Single](https://docs.victoriametrics.com/helm/victoria-metrics-single/)
 - [VictoriaMetrics Cluster](https://docs.victoriametrics.com/helm/victoria-metrics-cluster/)
 - [VictoriaMetrics Agent](https://docs.victoriametrics.com/helm/victoria-metrics-agent/)
