@@ -1,14 +1,11 @@
 {{- $files := .Files }}
-{{- $name := .Chart.Name }}
 {{- $crds := $files.Get "crd.yaml" | splitList "---" }}
 {{- $extra := dict "metadata" (dict "annotations" .Values.annotations "labels" .Values.labels) -}}
 {{- range $crds }}
   {{- $crd := merge (fromYaml .) $extra }}
-  {{- if hasPrefix $name $crd.metadata.name }}
-    {{- range $attrKey, $attrValue := $crd }}
-      {{- $attrKey }}: {{ toJson $attrValue }}
-      {{- printf "\n" -}}
-    {{ end }}
-    {{- print "\n---\n" }}
-  {{- end }}
+  {{- range $attrKey, $attrValue := $crd }}
+    {{- $attrKey }}: {{ toJson $attrValue }}
+    {{- printf "\n" -}}
+  {{ end }}
+  {{- print "\n---\n" }}
 {{- end }}

@@ -1,10 +1,13 @@
 {{- $rules := default dict }}
-{{- $crds := include "vm-operator.crds" . | fromYaml }}
+{{- $crds := .Files.Get "crd.yaml" | splitList "---" }}
 {{- $groups := dict }}
-{{- range $crd := $crds.crds }}
-  {{- $resources := get $groups $crd.group | default list }}
-  {{- $resources = concat $resources (list $crd.names.plural (printf "%s/finalizers" $crd.names.plural) (printf "%s/status" $crd.names.plural)) }}
-  {{- $groups = set $groups $crd.group $resources }}
+{{- range $crds }}
+  {{- $crd := . | fromYaml }}
+  {{- $group := $crd.spec.group }}
+  {{- $plural:= $crd.spec.names.plural }}
+  {{- $resources := get $groups $group | default (list) }}
+  {{- $resources = concat $resources (list $plural (printf "%s/finalizers" $plural) (printf "%s/status" $plural)) }}
+  {{- $groups = set $groups $group $resources }}
 {{- end }}
 
 {{- $verbs := dict "admin" (list "*") "view" (list "get" "list" "watch") }}

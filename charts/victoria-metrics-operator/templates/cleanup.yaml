@@ -37,9 +37,10 @@ spec:
           securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           {{- $names := default list }}
-          {{- $crds := fromYaml (include "vm-operator.crds" .) }}
-          {{- range $crd := $crds.crds }}
-            {{- $names = append $names $crd.names.singular }}
+          {{- $crds := .Files.Get "crd.yaml" | splitList "---" }}
+          {{- range $crds }}
+            {{- $crd := . | fromYaml }}
+            {{- $names = append $names $crd.spec.names.singular }}
           {{- end }}
           args:
             - delete
