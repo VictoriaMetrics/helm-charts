@@ -1,6 +1,6 @@
 ## Next release
 
-**Update note 1**: CRD template was replaced by CRD upgrade job. `Values.crds.plain` property was removed. Consider replacing it with `.Values.crds.upgrade.enabled: true` if automatic CRD upgrade is expected.
+**Update note 1**: `Values.crds.plain` property was removed. Automatic CRD upgrade is now enabled by default with `.Values.crds.upgrade.enabled: true`, which creates a job to perform the upgrade.
 **Update note 2**: Replaced `.Values.admissionWebhooks.enabledCRDValidation` map with `.Values.admissionWebhooks.disabledFor` list of CRD names to disable validation for.
 
 - Added `securityContext` to the `cleanup` job.
