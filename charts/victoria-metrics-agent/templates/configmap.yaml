@@ -14,7 +14,7 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
-  scrape.yml: |{{ tpl (toYaml $cfg) . | nindent 4 }}
+  scrape.yml: |{{ toYaml $cfg | nindent 4 }}
 {{- end }}
 {{- $rwcm := default dict }}
 {{- range $i, $rw := .Values.remoteWrite }}

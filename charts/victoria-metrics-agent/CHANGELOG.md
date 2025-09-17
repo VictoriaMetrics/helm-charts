@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Reverting templating support for scrape configuration. See [#2432](https://github.com/VictoriaMetrics/helm-charts/issues/2432).
 
 ## 0.25.8
 
