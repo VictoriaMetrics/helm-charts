@@ -27,8 +27,10 @@ spec:
   {{- end }}
   template:
     metadata:
+      annotations:
+        vmauth-sha256sum: {{ include (print $.Template.BasePath "/vmauth-config.yaml") . | sha256sum }}
       {{- with $app.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
       labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
