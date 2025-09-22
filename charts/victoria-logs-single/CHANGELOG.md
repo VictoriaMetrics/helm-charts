@@ -1,6 +1,7 @@
 ## Next release
 
 - Added `params` support for `ServiceMonitor`
+- Bump VictoriaLogs version to [v1.34.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.34.0).
 
 ## 0.11.8
 

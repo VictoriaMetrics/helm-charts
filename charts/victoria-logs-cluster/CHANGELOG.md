@@ -1,6 +1,7 @@
 ## Next release
 
 - Add vmauth-sha256sum annotation to vmauth-server template. See [#2434](https://github.com/VictoriaMetrics/helm-charts/pull/2434) for details.
+- Bump VictoriaLogs version to [v1.34.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.34.0).
 
 ## 0.0.11
 
