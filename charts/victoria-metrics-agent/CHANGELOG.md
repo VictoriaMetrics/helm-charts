@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added .Values.config.useTemplating flag to enable scrape config templating.
 
 ## 0.25.9
 

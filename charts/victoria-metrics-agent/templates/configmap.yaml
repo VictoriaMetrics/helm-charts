@@ -6,6 +6,10 @@
   {{- if .Values.extraScrapeConfigs }}
     {{- $_ := set $cfg "scrape_configs" (concat (.Values.config.scrape_configs | default list) .Values.extraScrapeConfigs) }}
   {{- end }}
+  {{- $data := toYaml (omit $cfg "useTpl") }}
+  {{- if $cfg.useTpl }}
+    {{- $data = tpl $data . }}
+  {{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -14,7 +18,7 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
-  scrape.yml: |{{ toYaml $cfg | nindent 4 }}
+  scrape.yml: |{{ $data | nindent 4 }}
 {{- end }}
 {{- $rwcm := default dict }}
 {{- range $i, $rw := .Values.remoteWrite }}
