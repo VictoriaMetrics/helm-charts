@@ -1,6 +1,14 @@
 ## Next release
 
-- added .Values.config.useTemplating flag to enable scrape config templating.
+- TODO
+
+## 0.25.10
+
+**Release date:** 22 Sep 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.126.0](https://img.shields.io/badge/v1.126.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11260)
+
+- added `.Values.config.useTpl` flag to enable scrape config templating.
 
 ## 0.25.9
 
