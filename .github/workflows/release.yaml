@@ -117,6 +117,9 @@ jobs:
         with:
           config: .github/ci/cr.yaml
 
+      - name: Cosign sign
+        uses: sigstore/cosign-installer@v3
+
       - name: Release OCI
         if: ${{ hashFiles('charts/*/RELEASE_NOTES') != '' }}
         run: |
@@ -133,7 +136,13 @@ jobs:
               rm -rf .cr-release-packages/$(basename $chart)-${CHART_VERSION}.tgz
             fi
           done
-          find .cr-release-packages -name "*.tgz" -exec helm push {} oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts \;
+          REPO="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts"
+          for package in .cr-release-packages/*.tgz; do
+            HELM_OUTPUT=$(helm push $package oci://${REPO} 2>&1)
+            CHART_DIGEST=$(echo "$HELM_OUTPUT" | awk '/^Digest: sha256:[0-9a-f]{64}$/ { print $2 }')
+            CHART_NAME=$(basename $package | cut -d. -f1)
+            cosign sign --yes ${REPO}/${CHART_NAME}@${CHART_DIGEST}
+          done
 
       - name: Automatic update changelogs and readme
         if: ${{ hashFiles('charts/*/RELEASE_NOTES') != '' }}
