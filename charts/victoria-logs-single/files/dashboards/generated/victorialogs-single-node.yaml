@@ -58,7 +58,7 @@ annotations:
     textFormat: GC event
     useValueForTime: true
 condition: {{ true }}
-description: Overview for single-node VictoriaLogs v1.22.0 or higher
+description: Overview for single-node VictoriaLogs v1.29.0 or higher
 editable: false
 fiscalYearStartMonth: 0
 graphTooltip: 0
@@ -310,8 +310,6 @@ panels:
         steps:
         - color: green
           value: 0
-        - color: red
-          value: 80
       unit: short
     overrides: []
   gridPos:
@@ -2141,77 +2139,6 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: 'The higher the better.
-
-
-      This computes the fraction of read bytes that came from the page cache (i.e., not from disk). It answers: "Of all the bytes my process read via read(), how many were cache hits?"
-
-
-      That''s why you can see many read syscalls (read() calls), but the actual disk reads stay low; because the data was already in RAM.
-
-
-
-
-
-
-
-
-
-
-      '
-    fieldConfig:
-      defaults:
-        color:
-          mode: thresholds
-        mappings: []
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 8
-      w: 4
-      x: 0
-      'y': 78
-    id: 80
-    maxDataPoints: 100
-    options:
-      colorMode: value
-      graphMode: area
-      justifyMode: auto
-      orientation: horizontal
-      percentChangeColorMode: standard
-      reduceOptions:
-        calcs:
-        - lastNotNull
-        fields: ''
-        values: false
-      showPercentChange: false
-      text: {}
-      textMode: auto
-      wideLayout: true
-    pluginVersion: 12.1.0
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      editorMode: code
-      exemplar: false
-      expr: 1 - (sum(rate(process_io_storage_read_bytes_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) / sum(rate(process_io_read_bytes_total{job=~"$job", instance=~"$instance"}[$__rate_interval])))
-      format: time_series
-      instant: true
-      interval: ''
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      refId: A
-    title: Page-cache hit ratio
-    type: stat
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
     description: 'Number of read/write calls application makes:
 
 
@@ -2269,8 +2196,8 @@ panels:
           value: negative-Y
     gridPos:
       h: 8
-      w: 8
-      x: 4
+      w: 12
+      x: 0
       'y': 78
     id: 56
     options:
@@ -3149,8 +3076,6 @@ panels:
           steps:
           - color: green
             value: 0
-          - color: red
-            value: 80
         unit: short
       overrides: []
     gridPos:
@@ -3363,7 +3288,7 @@ panels:
       editorMode: code
       exemplar: true
       expr: |-
-        max(vl_max_disk_space_usage_bytes{job=~"$job", instance=~"$instance"}[$__rate_interval]) by (job)
+        max(max_over_time(vl_max_disk_space_usage_bytes{job=~"$job", instance=~"$instance"}[$__rate_interval])) by (job)
         /
         max(vl_total_disk_space_bytes{job=~"$job", instance=~"$instance"}) by (job) > 0
       hide: false
@@ -3377,7 +3302,7 @@ panels:
       editorMode: code
       exemplar: true
       expr: |-
-        max(vl_data_size_bytes{job=~"$job", instance=~"$instance"}[$__rate_interval]) by (job)
+        max(max_over_time(vl_data_size_bytes{job=~"$job", instance=~"$instance"}[$__rate_interval])) by (job)
         /
         max(vl_total_disk_space_bytes{job=~"$job", instance=~"$instance"}) by (job)
       hide: false
@@ -4084,7 +4009,7 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      expr: max(vl_insert_processors_count{job=~"$job", instance=~"$instance"}[$__rate_interval]) by (instance)
+      expr: max(max_over_time(vl_insert_processors_count{job=~"$job", instance=~"$instance"}[$__rate_interval])) by (instance)
       format: time_series
       interval: ''
       intervalFactor: 1
@@ -4095,7 +4020,7 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      expr: max(vm_concurrent_insert_capacity{job=~"$job", instance=~"$instance"}[$__rate_interval])
+      expr: max(max_over_time(vm_concurrent_insert_capacity{job=~"$job", instance=~"$instance"}[$__rate_interval]))
       hide: false
       instant: false
       legendFormat: soft limit
@@ -4186,7 +4111,7 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      expr: sum(vl_pending_rows{job=~"$job", instance=~"$instance"}[$__rate_interval]) by (type)
+      expr: sum(vl_pending_rows{job=~"$job", instance=~"$instance"}) by (type)
       format: time_series
       interval: ''
       intervalFactor: 1
@@ -4280,7 +4205,7 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      expr: max(rate(vm_concurrent_insert_limit_reached_total)) by (instance)
+      expr: max(increase(vm_concurrent_insert_limit_reached_total[$__rate_interval])) by (instance)
       format: time_series
       interval: ''
       intervalFactor: 1
@@ -4744,7 +4669,7 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $ds
       editorMode: code
-      expr: max(vl_concurrent_select_capacity{job=~"$job", instance=~"$instance"}[$__rate_interval])
+      expr: max(max_over_time(vl_concurrent_select_capacity{job=~"$job", instance=~"$instance"}[$__rate_interval]))
       format: time_series
       hide: false
       interval: ''
@@ -4910,7 +4835,7 @@ panels:
             value: 0
           - color: red
             value: 80
-        unit: none
+        unit: bytes
       overrides: []
     gridPos:
       h: 8

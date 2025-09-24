@@ -1,6 +1,9 @@
 ## Next release
 
-- TODO
+- Bump KSM chart version 6.0.* -> 6.3.*
+- Bump node-exporter chart version 4.47.* -> 4.48.*
+- Bump grafana chart version 9.2.* -> 9.4.*
+- Upgrade dashboards
 
 ## 0.60.1
 

@@ -344,9 +344,9 @@ rules:
   annotations:
     description: 'Bonding interface {{`{{`}} $labels.master {{`}}`}} on {{`{{`}} $labels.instance {{`}}`}} is in degraded state due to one or more slave failures.'
     runbook_url: '{{ $runbookUrl }}/node/nodebondingdegraded'
-    summary: 'Bonding interface is degraded'
+    summary: 'Bonding interface is degraded.'
   condition: '{{ true }}'
-  expr: (node_bonding_slaves - node_bonding_active) != 0
+  expr: (node_bonding_slaves{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"} - node_bonding_active{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}"}) != 0
   for: 5m
   labels:
     severity: warning
