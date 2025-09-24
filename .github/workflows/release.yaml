@@ -117,6 +117,13 @@ jobs:
         with:
           config: .github/ci/cr.yaml
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Cosign sign
         uses: sigstore/cosign-installer@v3
 
@@ -128,20 +135,21 @@ jobs:
             -p ${{ github.token }} \
             ghcr.io
           mkdir -p .cr-release-packages
+          CHART_REPO="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts"
           for chart in charts/*; do
+            export CHART_FILE="${chart}/Chart.yaml"
+            export CHART_VERSION="$(yq -M '.version' $CHART_FILE)"
+            export CHART_NAME=$(basename $chart)
+            package=".cr-release-packages/${CHART_NAME}-${CHART_VERSION}.tgz";
             if [ ! -f $chart/RELEASE_NOTES ]; then
-              export CHART_FILE="${chart}/Chart.yaml"
-              export CHART_VERSION="$(yq -M '.version' $CHART_FILE)"
               echo "no release notes for chart $chart. removing it from uploading..."
-              rm -rf .cr-release-packages/$(basename $chart)-${CHART_VERSION}.tgz
+              rm -rf $package
+            else
+              echo "publishing ${CHART_NAME} ${CHART_VERSION}"
+              HELM_OUTPUT=$(helm push $package oci://${CHART_REPO} 2>&1)
+              CHART_DIGEST=$(echo "$HELM_OUTPUT" | awk '/^Digest: sha256:[0-9a-f]{64}$/ { print $2 }')
+              cosign sign --yes ${CHART_REPO}/${CHART_NAME}@${CHART_DIGEST}
             fi
-          done
-          REPO="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/helm-charts"
-          for package in .cr-release-packages/*.tgz; do
-            HELM_OUTPUT=$(helm push $package oci://${REPO} 2>&1)
-            CHART_DIGEST=$(echo "$HELM_OUTPUT" | awk '/^Digest: sha256:[0-9a-f]{64}$/ { print $2 }')
-            CHART_NAME=$(basename $package | cut -d. -f1)
-            cosign sign --yes ${REPO}/${CHART_NAME}@${CHART_DIGEST}
           done
 
       - name: Automatic update changelogs and readme
