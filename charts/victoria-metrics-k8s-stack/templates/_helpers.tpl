@@ -150,7 +150,7 @@
     {{- end -}}
     {{- if not (index $output.extraArgs "external.url") -}}
       {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
-      {{- $_ := set $output.extraArgs "external.url" (printf "http://%s" $grafanaHost) -}}
+      {{- $_ := set $output.extraArgs "external.url" $grafanaHost -}}
     {{- end -}}
   {{- end -}}
   {{- tpl ($output | toYaml) . -}}
