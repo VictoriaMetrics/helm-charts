@@ -1,6 +1,11 @@
 ## Next release
 
-- Added `securityContext` to the `cleanup` job
+**Update node 1**: CRDs generated with `.Values.crds.plain: false` are now specless. For this case operator is fully responsible for VM specs validation. This was done to decrease helm release secret size limit. This change affects `kubectl explain` users and tools, that are rely on CRD specs during input data validation. If this behaviour is not acceptable consider using either `victoria-metrics-operator-crds` chart for CRDs management or set `.Values.crds.plain: true` to use plain CRDs.
+
+- Added `securityContext` to the `cleanup` job.
+- Make CRDs, that are rendered using template, specless. This allows to decrease size of k8s secret significantly. If this option is not acceptable for you consider installing CRDs separately using `victoria-metrics-operator-crds` chart or set `.Values.crds.plain: true` and `.Values.crds.upgrade.enabled: true` to use plain CRDs with upgrade job instead.
+- Replaced `.Values.admissionWebhooks.enabledCRDValidation` with `.Values.admissionWebhooks.disabledFor` list of CRD names to disable validation for. This change should not affect anyone, since before condition with `.Values.admissionWebhooks.enabledCRDValidation` was not working at all.
+- Added CRDs upgrade job, which is only available only for plain CRDs (`.Values.crds.plain: true`). See [#2334](https://github.com/VictoriaMetrics/helm-charts/issues/2334).
 
 ## 0.53.0
 

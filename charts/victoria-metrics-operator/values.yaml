@@ -55,6 +55,109 @@ crds:
       requests:
         cpu: "100m"
         memory: "56Mi"
+  upgrade:
+    # -- Enables CRD upgrade job
+    enabled: false
+    # -- Adds `--force-conflics` argument to kubectl
+    forceConflicts: false
+    busybox:
+      image:
+        repository: busybox
+        tag: latest
+        pullPolicy: IfNotPresent
+    kubectl:
+      image:
+        repository: rancher/kubectl
+        # use image tag that matches k8s API version by default
+        tag: ""
+        pullPolicy: IfNotPresent
+
+    # -- Extra settings for CRD upgrade job
+    env: []
+
+    # -- Upgrade job resources.
+    resources: {}
+    # limits:
+    #   cpu: 120m
+    #   memory: 320Mi
+    # requests:
+    #   cpu: 80m
+    #   memory: 120Mi
+
+    # -- Additional upgrade job volumes
+    extraVolumes: []
+
+    # -- Additional upgrade job volume mounts
+    extraVolumeMounts: []
+
+    # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+    nodeSelector: {}
+
+    # -- Upgrade job pod affinity
+    affinity: {}
+    # nodeAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #     nodeSelectorTerms:
+    #     - matchExpressions:
+    #       - key: kubernetes.io/e2e-az-name
+    #         operator: In
+    #         values:
+    #         - e2e-az1
+    #         - e2e-az2
+
+    # -- Array of upgrade job tolerations object. Spec is [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+    tolerations: []
+    # - key: "key"
+    #   operator: "Equal"
+    #   value: "value"
+    #   effect: "NoSchedule"
+
+    # -- Upgrade job Pod Topology Spread Constraints. Spec is [here](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+    topologySpreadConstraints: []
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
+    #   labelSelector:
+    #     matchLabels:
+    #       app: alertmanager
+
+    # -- Labels to add to the upgrade job
+    labels: {}
+
+    # -- Annotations to add to the upgrade job
+    annotations: {}
+
+    # -- Labels to add to the upgrade job pod
+    podLabels: {}
+
+    # -- Annotations to add to the upgrade job pod
+    podAnnotations: {}
+
+    # -- Service account for upgrade CRD job to use.
+    serviceAccount:
+      create: true
+      name: ""
+      annotations: {}
+      labels: {}
+      automountServiceAccountToken: true
+
+    # -- Container-specific security context configuration. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
+
+    # -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+    podSecurityContext:
+      enabled: true
+      fsGroup: 65534
+      runAsGroup: 65534
+      runAsNonRoot: true
+      runAsUser: 65534
+      seccompProfile:
+        type: RuntimeDefault
 
 # -- Number of operator replicas
 replicaCount: 1
@@ -253,26 +356,11 @@ hostNetwork: false
 admissionWebhooks:
   # -- Enables validation webhook.
   enabled: true
-  enabledCRDValidation:
-    vmagent: true
-    vmalert: true
-    vmanomaly: true
-    vmsingle: true
-    vmauth: true
-    vmrule: true
-    vmalertmanagerconfig: true
-    vmalertmanager: true
-    vmcluster: true
-    vmuser: true
-    vlagent: true
-    vlogs: true
-    vlsingle: true
-    vlcluster: true
-    vmservicescrape: true
-    vmpodscrape: true
-    vmnodescrape: true
-    vmprobe: true
-    vmstaticscrape: true
+  # -- List of CRD names to disable validation for
+  disabledFor: []
+  # - vmagent
+  # - vmsingle
+
   # -- What to do in case, when operator not available to validate request.
   policy: Fail
   # -- Enables custom ca bundle, if you are not using cert-manager. In case of custom ca, you have to create secret - {chart-name}-validation with keys: tls.key, tls.crt, ca.crt

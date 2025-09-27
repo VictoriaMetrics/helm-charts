@@ -7,7 +7,7 @@
 {{- $certManager := .Values.admissionWebhooks.certManager }}
 {{- $files := .Files }}
 {{- $crds := $files.Get "crd.yaml" | splitList "---" }}
-{{- $enabledHooks := .Values.admissionWebhooks.enabledCRDValidation }}
+{{- $disabledFor := .Values.admissionWebhooks.disabledFor | default list }}
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -23,7 +23,7 @@ webhooks:
 {{- range $crds }}
 {{- $crd := fromYaml . }}
 {{- $name := $crd.spec.names.singular }}
-{{- if index $enabledHooks $name }}
+{{- if not (has $name $disabledFor) }}
 {{- range $version := $crd.spec.versions }}
   - clientConfig:
       service:
@@ -46,7 +46,7 @@ webhooks:
           values: [{{ include "vm.name" $ }}]
     rules:
       - apiGroups:
-          - operator.victoriametrics.com
+          - {{ $crd.spec.group }}
         apiVersions:
           - {{ $version.name }}
         operations:

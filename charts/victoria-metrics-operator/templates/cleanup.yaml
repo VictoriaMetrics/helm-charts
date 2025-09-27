@@ -1,4 +1,4 @@
-{{- if and .Values.crds.enabled .Values.crds.cleanup.enabled }}
+{{- if .Values.crds.cleanup.enabled }}
 {{- $app := .Values.crds.cleanup }}
 {{- if empty ($app.image).tag }}
   {{- $tag := regexSplit "[+-]" .Capabilities.KubeVersion.Version -1 | first -}}
@@ -36,9 +36,15 @@ spec:
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.securityContext "helm" .) | nindent 12 }}
           {{- end }}
+          {{- $names := default list }}
+          {{- $crds := .Files.Get "crd.yaml" | splitList "---" }}
+          {{- range $crds }}
+            {{- $crd := . | fromYaml }}
+            {{- $names = append $names $crd.spec.names.singular }}
+          {{- end }}
           args:
             - delete
-            - {{ (keys .Values.admissionWebhooks.enabledCRDValidation) | sortAlpha | join "," }}
+            - {{ $names | sortAlpha | join "," }}
             - --all
             - --ignore-not-found=true
       restartPolicy: OnFailure

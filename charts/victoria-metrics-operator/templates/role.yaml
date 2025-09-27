@@ -1,10 +1,10 @@
 {{- $rules := default dict }}
-{{- $fileContentsList := .Files.Get "crd.yaml" | splitList "---" }}
+{{- $crds := .Files.Get "crd.yaml" | splitList "---" }}
 {{- $groups := dict }}
-{{- range $fileContentsList }}
-  {{- $fileContents := . | fromYaml }}
-  {{- $group := $fileContents.spec.group }}
-  {{- $plural:= $fileContents.spec.names.plural }}
+{{- range $crds }}
+  {{- $crd := . | fromYaml }}
+  {{- $group := $crd.spec.group }}
+  {{- $plural:= $crd.spec.names.plural }}
   {{- $resources := get $groups $group | default (list) }}
   {{- $resources = concat $resources (list $plural (printf "%s/finalizers" $plural) (printf "%s/status" $plural)) }}
   {{- $groups = set $groups $group $resources }}
@@ -180,7 +180,7 @@ rules:
 {{ toYaml . }}
 {{- end }}
 {{- end }}
-{{- if and .Values.crds.enabled .Values.crds.cleanup.enabled }}
+{{- if .Values.crds.cleanup.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
