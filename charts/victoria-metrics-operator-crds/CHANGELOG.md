@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Moved crds into a supchart to decrease helm release secret size. See [#2420](https://github.com/VictoriaMetrics/helm-charts/issues/2420).
 
 ## 0.5.0
 
