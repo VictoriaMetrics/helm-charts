@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.54.0
+
+**Release date:** 27 Sep 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.63.0](https://img.shields.io/badge/v0.63.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0630)
+
 **Update node 1**: CRDs generated with `.Values.crds.plain: false` are now specless. For this case operator is fully responsible for VM specs validation. This was done to decrease helm release secret size limit. This change affects `kubectl explain` users and tools, that are rely on CRD specs during input data validation. If this behaviour is not acceptable consider using either `victoria-metrics-operator-crds` chart for CRDs management or set `.Values.crds.plain: true` to use plain CRDs.
 
 - Added `securityContext` to the `cleanup` job.
