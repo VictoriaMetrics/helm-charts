@@ -4,6 +4,7 @@
 - Bump node-exporter chart version 4.47.* -> 4.48.*
 - Bump grafana chart version 9.2.* -> 9.4.*
 - Upgrade dashboards
+- Allow optional scheme at `.Values.external.grafana.host`. Thanks to @a-bali for [initial implementation](https://github.com/VictoriaMetrics/helm-charts/pull/2439).
 
 ## 0.60.1
 

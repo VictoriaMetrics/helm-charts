@@ -149,8 +149,7 @@
       {{- $_ := set $output.extraArgs "external.alert.source" (printf "explore?left=%s" $alertSource) -}}
     {{- end -}}
     {{- if not (index $output.extraArgs "external.url") -}}
-      {{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
-      {{- $_ := set $output.extraArgs "external.url" (printf "http://%s" $grafanaHost) -}}
+      {{- $_ := set $output.extraArgs "external.url" (include "vm-k8s-stack.grafana.addr" .) -}}
     {{- end -}}
   {{- end -}}
   {{- tpl ($output | toYaml) . -}}
@@ -402,4 +401,17 @@
 {{- define "vm-k8s-stack.nodeExporter.name" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- (index $Values "prometheus-node-exporter").service.labels.jobLabel | default "node-exporter" }}
+{{- end -}}
+
+{{- define "vm-k8s-stack.grafana.addr" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $grafanaAddr := (($Values.external).grafana).host -}}
+  {{- if not (or (hasPrefix "http://" $grafanaAddr) (hasPrefix "https://" $grafanaAddr)) -}}
+    {{- $grafanaAddr = printf "http://%s" $grafanaAddr -}}
+  {{- end -}}
+  {{- if ($Values.grafana).enabled -}}
+    {{- $grafanaScheme := ternary "https" "http" (gt (len (($Values.grafana).ingress).tls) 0) -}}
+    {{- $grafanaAddr = printf "%s://%s" $grafanaScheme (index (($Values.grafana).ingress).hosts 0) -}}
+  {{- end -}}
+  {{- $grafanaAddr -}}
 {{- end -}}

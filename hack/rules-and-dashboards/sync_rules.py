@@ -95,12 +95,6 @@ sources = [
         ],
     },
     {
-        "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/deployment/docker/rules/alerts-vlogs.yml",
-        "charts": [
-            "victoria-logs-single",
-        ],
-    },
-    {
         "url": "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts.yml",
         "charts": [
             "victoria-metrics-k8s-stack",
@@ -178,7 +172,7 @@ replacement_map = {
         "limitGroup": ["kubernetes-storage"],
     },
     "http://localhost:3000": {
-        "replacement": "[[ $grafanaHost ]]",
+        "replacement": "[[ $grafanaAddr ]]",
         "init": "",
     },
     'job="alertmanager-main"': {
@@ -283,7 +277,7 @@ def write_group_to_file(group, charts):
             content += '{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}\n'
             content += "{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}\n"
             content += '{{- $groupLabels := join "," $additionalGroupByLabels }}\n'
-            content += "{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}\n"
+            content += '{{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}\n'
             content += escape(lines)
             f.write(content)
 

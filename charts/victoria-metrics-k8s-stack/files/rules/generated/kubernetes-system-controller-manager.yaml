@@ -3,7 +3,7 @@
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
 {{- $groupLabels := join "," $additionalGroupByLabels }}
-{{- $grafanaHost := ternary (index (($Values.grafana).ingress).hosts 0) (($Values.external).grafana).host ($Values.grafana).enabled }}
+{{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
 condition: '{{ ($Values.kubeControllerManager).enabled }}'
 name: kubernetes-system-controller-manager
 rules:
