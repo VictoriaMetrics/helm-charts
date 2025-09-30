@@ -43,6 +43,7 @@ subsets:
     {{- $selector := default dict }}
     {{- if and ($config.service).enabled (empty (index $.Subcharts $name)) }}
       {{- $extraLabels := dict "app" $fullnameLabel "jobLabel" $svc }}
+      {{- $extraLabels = mergeOverwrite $extraLabels (deepCopy ($config.service.labels | default dict)) }}
       {{- $_ := set $ctx "extraLabels" $extraLabels }}
       {{- $selector = dict "matchLabels" (fromYaml (include "vm.selectorLabels" $ctx)) }}
 ---
