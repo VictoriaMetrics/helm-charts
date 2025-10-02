@@ -11,10 +11,10 @@ data:
   {{- $config := .Values.vmauth.config }}
   {{- $_ := set . "style" "plain" }}
   {{- $_ := set . "appKey" "vminsert" -}}
-  {{- $writeURL := urlParse (include "vm.url" .) -}}
+  {{- $writeURL := urlParse (include "vm.url" $ctx) -}}
   {{- $_ := set $writeURL "path" (printf "%s/insert" $writeURL.path) -}}
   {{- $_ := set . "appKey" "vmselect" -}}
-  {{- $readURL := urlParse (include "vm.url" .) -}}
+  {{- $readURL := urlParse (include "vm.url" $ctx) -}}
   {{- $_ := set $readURL "path" (printf "%s/select" $readURL.path) -}}
   {{- $_ := set . "vm" (dict "read" $readURL "write" $writeURL) -}}
   {{- if or (empty $config) $config.unauthorized_user }}
