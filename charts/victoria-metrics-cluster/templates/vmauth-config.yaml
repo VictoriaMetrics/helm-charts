@@ -23,12 +23,12 @@ data:
       {{- if $.Values.vmselect.service.enabled }}
         {{- $readPaths := list (printf "%s/*" $readURL.path) }}
         {{- $readPrefix := urlJoin (omit .vm.read "path") }}
-        {{- $urlMap = append $urlMap (dict "src_paths" (quote $readPaths) "url_prefix" (quote $readPrefix) "discover_backend_ips" true) }}
+        {{- $urlMap = append $urlMap (dict "src_paths" ($readPaths) "url_prefix" ($readPrefix) "discover_backend_ips" true) }}
       {{- end }}
       {{- if $.Values.vminsert.service.enabled }}
         {{- $writePaths := list (printf "%s/*" $writeURL.path) }}
         {{- $writePrefix := urlJoin (omit .vm.write "path") }}
-        {{- $urlMap = append $urlMap (dict "src_paths" (quote $writePaths) "url_prefix" (quote $writePrefix) "discover_backend_ips" true) }}
+        {{- $urlMap = append $urlMap (dict "src_paths" ($writePaths) "url_prefix" ($writePrefix) "discover_backend_ips" true) }}
       {{- end }}
       {{- $_ := set $config "unauthorized_user" (dict "url_map" $urlMap) }}
     {{- end }}
