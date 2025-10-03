@@ -462,10 +462,11 @@ def main():
             data = yaml.full_load(raw_text)
             for group in data["items"]:
                 for r in group["data"]:
-                    name = r.replace(".json", "")
+                    d = json.loads(group["data"][r])
+                    name = re.sub("[ /-]+", "-", d["title"].lower())
                     if name not in allowed_dashboards:
                         continue
-                    dashboards[name] = json.loads(group["data"][r])
+                    dashboards[name] = d
         else:
             print(f"Format {suffix} is not supported")
             continue
