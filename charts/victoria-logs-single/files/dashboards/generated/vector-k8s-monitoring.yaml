@@ -1,69 +1,106 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-__elements: {}
-__inputs:
-- description: ''
-  label: VictoriaMetrics
-  name: DS_VICTORIAMETRICS
-  pluginId: prometheus
-  pluginName: Prometheus
-  type: datasource
-__requires:
-- id: bargauge
-  name: Bar gauge
-  type: panel
-  version: ''
-- id: grafana
-  name: Grafana
-  type: grafana
-  version: 11.3.0
-- id: prometheus
-  name: Prometheus
-  type: datasource
-  version: 1.0.0
-- id: timeseries
-  name: Time series
-  type: panel
-  version: ''
+title: Vector K8S Monitoring
+templating:
+  list:
+  - name: datasource
+    type: datasource
+    query: {{ $defaultDatasource }}
+    current: {}
+    options: []
+    refresh: 1
+    regex: ""
+  - name: cluster
+    label: cluster
+    type: {{ ternary "query" "constant" $multicluster }}
+    query:
+      qryType: 1
+      query: {{ ternary (printf "label_values(vector_build_info, %s)" $clusterLabel) ".*" $multicluster }}
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    hide: {{ ternary 0 2 $multicluster }}
+    current: {}
+    definition: label_values(vector_build_info,cluster)
+    options: []
+    refresh: 1
+    regex: ""
+  - name: instance
+    label: instance
+    multi: true
+    includeAll: true
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    type: query
+    query:
+      qryType: 1
+      query: label_values(vector_build_info, instance)
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    current: {}
+    definition: label_values(vector_build_info,instance)
+    options: []
+    refresh: 1
+    regex: ""
+    sort: 1
+  - name: namespace
+    multi: true
+    includeAll: true
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    type: query
+    query:
+      qryType: 1
+      query: {{ printf "label_values(vector_component_received_events_total{component_type=\"kubernetes_logs\",%s=~\"$cluster\"}, pod_namespace)" $clusterLabel }}
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    current: {}
+    definition: label_values(vector_component_received_events_total{component_type="kubernetes_logs"},pod_namespace)
+    options: []
+    refresh: 1
+    regex: ""
+    sort: 1
+editable: false
+timezone: {{ default "browser" ($Values.defaultDashboards).defaultTimezone }}
+tags:
+- vm-k8s-stack
 annotations:
   list:
-  - $$hashKey: object:1058
-    builtIn: 1
+  - name: Annotations & Alerts
     datasource:
       type: datasource
       uid: grafana
+    $$hashKey: object:1058
+    builtIn: 1
     enable: true
     hide: true
     iconColor: rgba(0, 211, 255, 1)
-    name: Annotations & Alerts
     target:
       limit: 100
       matchAny: false
       tags: []
       type: dashboard
     type: dashboard
-condition: {{ true }}
-description: Vector.dev Kubernetes cluster monitoring dashboard
-editable: false
-fiscalYearStartMonth: 0
-graphTooltip: 1
-id: null
-links: []
 panels:
-- collapsed: true
-  gridPos:
-    h: 1
-    w: 24
-    x: 0
-    'y': 0
-  id: 364
+- title: Source
   panels:
-  - datasource:
+  - title: Log events by top 10 namespaces (events/sec)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      expr: {{ printf "topk(10, sum(rate(vector_component_received_events_total{component_kind=\"source\",pod_namespace=~\"$namespace\",%s=~\"$cluster\",instance=~\"$instance\"}[1m])) by(component_id,%s,pod_namespace)) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
+      editorMode: code
+      exemplar: false
+      instant: true
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_namespace {{`}}`}}'
+      range: false
+      refId: A
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     fieldConfig:
@@ -82,7 +119,7 @@ panels:
       h: 12
       w: 6
       x: 0
-      'y': 1
+      "y": 1
     id: 360
     options:
       displayMode: lcd
@@ -98,27 +135,27 @@ panels:
       orientation: horizontal
       reduceOptions:
         calcs: []
-        fields: ''
+        fields: ""
         values: false
       showUnfilled: true
       sizing: auto
       text: {}
       valueMode: color
     pluginVersion: 11.3.0
+    type: bargauge
+  - title: Log bytes by top 10 namespaces (bytes/sec)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "topk(10, sum(rate(vector_component_received_event_bytes_total{component_kind=\"source\",pod_namespace=~\"$namespace\",%s=~\"$cluster\",instance=~\"$instance\"}[1m])) by(component_id,pod_namespace,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
-      expr: topk(10, sum by (component_id, cluster, pod_namespace) (rate(vector_component_received_events_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
       instant: true
       legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_namespace {{`}}`}}'
       range: false
       refId: A
-    title: Log events by top 10 namespaces (events/sec)
-    type: bargauge
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     fieldConfig:
@@ -137,7 +174,7 @@ panels:
       h: 12
       w: 6
       x: 6
-      'y': 1
+      "y": 1
     id: 365
     options:
       displayMode: lcd
@@ -153,26 +190,26 @@ panels:
       orientation: horizontal
       reduceOptions:
         calcs: []
-        fields: ''
+        fields: ""
         values: false
       showUnfilled: true
       sizing: auto
       valueMode: color
     pluginVersion: 11.3.0
+    type: bargauge
+  - title: Log events by top 10 pods (events/sec)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "topk(10, sum(rate(vector_component_received_events_total{component_kind=\"source\",pod_namespace=~\"$namespace\",%s=~\"$cluster\",instance=~\"$instance\"}[1m])) by(component_id,pod_name,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
-      expr: topk(10, sum by (component_id, pod_namespace) (rate(vector_component_received_event_bytes_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
       instant: true
-      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_namespace {{`}}`}}'
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_name {{`}}`}}'
       range: false
       refId: A
-    title: Log bytes by top 10 namespaces (bytes/sec)
-    type: bargauge
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     fieldConfig:
@@ -191,7 +228,7 @@ panels:
       h: 12
       w: 6
       x: 12
-      'y': 1
+      "y": 1
     id: 367
     options:
       displayMode: lcd
@@ -207,27 +244,27 @@ panels:
       orientation: horizontal
       reduceOptions:
         calcs: []
-        fields: ''
+        fields: ""
         values: false
       showUnfilled: true
       sizing: auto
       text: {}
       valueMode: color
     pluginVersion: 11.3.0
+    type: bargauge
+  - title: Log bytes by top 10 pods (bytes/sec)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "topk(10, sum(rate(vector_component_received_event_bytes_total{component_kind=\"source\",pod_namespace=~\"$namespace\",%s=~\"$cluster\",instance=~\"$instance\"}[1m])) by(pod_name,component_id,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
-      expr: topk(10, sum by (component_id, pod_name) (rate(vector_component_received_events_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
       instant: true
       legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_name {{`}}`}}'
       range: false
       refId: A
-    title: Log events by top 10 pods (events/sec)
-    type: bargauge
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     fieldConfig:
@@ -246,7 +283,7 @@ panels:
       h: 12
       w: 6
       x: 18
-      'y': 1
+      "y": 1
     id: 366
     options:
       displayMode: lcd
@@ -262,26 +299,28 @@ panels:
       orientation: horizontal
       reduceOptions:
         calcs: []
-        fields: ''
+        fields: ""
         values: false
       showUnfilled: true
       sizing: auto
       valueMode: color
     pluginVersion: 11.3.0
+    type: bargauge
+  - title: Events lag seconds
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "histogram_quantile(0.95, sum(rate(vector_source_lag_time_seconds_bucket{%s=~\"$cluster\",instance=~\"$instance\"}[5m])) by(le,component_type,instance,%s))" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
-      expr: topk(10, sum by (pod_name, component_id) (rate(vector_component_received_event_bytes_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
-      instant: true
-      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_name {{`}}`}}'
-      range: false
+      format: time_series
+      instant: false
+      interval: ""
+      legendFormat: '{{`{{`}}component_type{{`}}`}}: {{`{{`}}instance{{`}}`}}'
+      range: true
       refId: A
-    title: Log bytes by top 10 pods (bytes/sec)
-    type: bargauge
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     fieldConfig:
@@ -292,7 +331,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -315,7 +354,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -330,7 +369,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 13
+      "y": 13
     id: 328
     options:
       legend:
@@ -342,22 +381,22 @@ panels:
         mode: single
         sort: none
     pluginVersion: 11.3.0
+    type: timeseries
+  - title: Open files
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "avg(vector_open_files{component_kind=\"source\",%s=~\"$cluster\",instance=~\"$instance\"}) by(component_id,instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
-      expr: histogram_quantile(0.95, sum(rate(vector_source_lag_time_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[5m])) by (le,component_type, instance))
       format: time_series
       instant: false
-      interval: ''
-      legendFormat: '{{`{{`}}component_type{{`}}`}}: {{`{{`}}instance{{`}}`}}'
+      interval: ""
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}instance{{`}}`}}'
       range: true
       refId: A
-    title: Events lag seconds
-    type: timeseries
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     fieldConfig:
@@ -368,7 +407,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -391,7 +430,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -406,7 +445,7 @@ panels:
       h: 7
       w: 6
       x: 12
-      'y': 13
+      "y": 13
     id: 368
     options:
       legend:
@@ -418,22 +457,22 @@ panels:
         mode: single
         sort: none
     pluginVersion: 11.3.0
+    type: timeseries
+  - title: Errors
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "avg(vector_component_errors_total{component_kind=\"source\",%s=~\"$cluster\",instance=~\"$instance\"}) by(component_id,error_type,%s) or 0" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
-      expr: avg by (component_id, instance) (vector_open_files{component_kind="source", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"})
       format: time_series
       instant: false
-      interval: ''
-      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}instance{{`}}`}}'
+      interval: ""
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
       range: true
       refId: A
-    title: Open files
-    type: timeseries
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     fieldConfig:
@@ -444,7 +483,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -467,7 +506,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -482,7 +521,7 @@ panels:
       h: 7
       w: 6
       x: 18
-      'y': 13
+      "y": 13
     id: 369
     options:
       legend:
@@ -494,32 +533,34 @@ panels:
         mode: single
         sort: none
     pluginVersion: 11.3.0
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $datasource
-      editorMode: code
-      exemplar: false
-      expr: avg by (component_id, error_type) (vector_component_errors_total{component_kind="source", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
-      format: time_series
-      instant: false
-      interval: ''
-      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
-      range: true
-      refId: A
-    title: Errors
     type: timeseries
-  title: Source
-  type: row
-- collapsed: true
+  collapsed: true
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 1
-  id: 363
+    "y": 0
+  id: 364
+  type: row
+- title: Transform
   panels:
-  - datasource:
+  - title: Events bytes rate (bytes/sec)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      expr: {{ printf "sum(rate(vector_component_received_event_bytes_total{component_kind=\"transform\",%s=~\"$cluster\",instance=~\"$instance\"}[1m])) by(component_id,instance,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      group: []
+      hide: false
+      interval: ""
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
+      metricColumn: none
+      range: true
+      rawQuery: false
+      refId: A
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     description: The rate of bytes processed by the component.
@@ -531,7 +572,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -554,7 +595,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -567,7 +608,7 @@ panels:
       h: 8
       w: 6
       x: 0
-      'y': 21
+      "y": 21
     id: 330
     options:
       legend:
@@ -579,24 +620,18 @@ panels:
         mode: multi
         sort: none
     pluginVersion: 11.3.0
+    type: timeseries
+  - title: Utilization
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "avg(vector_utilization{component_kind=\"transform\",%s=~\"$cluster\",instance=~\"$instance\"}) by(component_id,instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
-      expr: sum by (component_id, instance) (rate(vector_component_received_event_bytes_total{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m]))
-      format: time_series
-      group: []
-      hide: false
-      interval: ''
-      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
-      metricColumn: none
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}} instance {{`}}`}}'
       range: true
-      rawQuery: false
       refId: A
-    title: Events bytes rate (bytes/sec)
-    type: timeseries
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     description: A ratio from 0 to 1 of the load on a component. A value of 0 would indicate a completely idle component that is simply waiting for input. A value of 1 would indicate a that is never idle. This value is updated every 5 seconds.
@@ -608,7 +643,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -631,7 +666,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -646,7 +681,7 @@ panels:
       h: 8
       w: 6
       x: 6
-      'y': 21
+      "y": 21
     id: 332
     options:
       legend:
@@ -658,18 +693,22 @@ panels:
         mode: multi
         sort: none
     pluginVersion: 11.3.0
+    type: timeseries
+  - title: Errors
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "avg(vector_component_errors_total{component_kind=\"transform\",%s=~\"$cluster\",instance=~\"$instance\"}) by(component_id,error_type,%s) or 0" $clusterLabel $clusterLabel }}
       editorMode: code
-      expr: avg by (component_id, instance) (vector_utilization{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"})
-      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}} instance {{`}}`}}'
+      exemplar: false
+      format: time_series
+      instant: false
+      interval: ""
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
       range: true
       refId: A
-    title: Utilization
-    type: timeseries
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     fieldConfig:
@@ -680,7 +719,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -703,7 +742,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -718,7 +757,7 @@ panels:
       h: 8
       w: 6
       x: 12
-      'y': 21
+      "y": 21
     id: 370
     options:
       legend:
@@ -730,22 +769,22 @@ panels:
         mode: single
         sort: none
     pluginVersion: 11.3.0
+    type: timeseries
+  - title: Discarded events
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "avg(vector_events_discarded_total{component_kind=\"transform\",%s=~\"$cluster\",instance=~\"$instance\"}) by(component_id,reason,%s) or 0" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
-      expr: avg by (component_id, error_type) (vector_component_errors_total{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
       format: time_series
       instant: false
-      interval: ''
-      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
+      interval: ""
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}reason{{`}}`}}'
       range: true
       refId: A
-    title: Errors
-    type: timeseries
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     fieldConfig:
@@ -756,7 +795,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -779,7 +818,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -794,7 +833,7 @@ panels:
       h: 8
       w: 6
       x: 18
-      'y': 21
+      "y": 21
     id: 371
     options:
       legend:
@@ -806,32 +845,28 @@ panels:
         mode: single
         sort: none
     pluginVersion: 11.3.0
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $datasource
-      editorMode: code
-      exemplar: false
-      expr: avg by (component_id, reason) (vector_events_discarded_total{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
-      format: time_series
-      instant: false
-      interval: ''
-      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}reason{{`}}`}}'
-      range: true
-      refId: A
-    title: Discarded events
     type: timeseries
-  title: Transform
-  type: row
-- collapsed: true
+  collapsed: true
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 2
-  id: 324
+    "y": 1
+  id: 363
+  type: row
+- title: Sink
   panels:
-  - datasource:
+  - title: Events rate (events/sec)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $datasource
+      expr: {{ printf "sum(rate(vector_component_received_events_total{component_kind=\"sink\",%s=~\"$cluster\",instance=~\"$instance\"}[1m])) by(component_id,instance,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
+      range: true
+      refId: A
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     description: The count of bytes processed by the component.
@@ -843,7 +878,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -866,7 +901,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -879,7 +914,7 @@ panels:
       h: 8
       w: 6
       x: 0
-      'y': 22
+      "y": 22
     id: 362
     options:
       legend:
@@ -891,18 +926,26 @@ panels:
         mode: multi
         sort: none
     pluginVersion: 11.3.0
+    type: timeseries
+  - title: Events bytes rate (bytes/sec)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "sum(rate(vector_component_received_event_bytes_total{component_kind=\"sink\",%s=~\"$cluster\",instance=~\"$instance\"}[1m])) by(component_id,instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
-      expr: sum by (component_id, instance) (rate(vector_component_received_events_total{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m]))
+      exemplar: false
+      format: time_series
+      group: []
+      hide: false
+      instant: false
+      interval: ""
       legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
+      metricColumn: none
       range: true
+      rawQuery: false
       refId: A
-    title: Events rate (events/sec)
-    type: timeseries
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     description: The rate of bytes processed by the component.
@@ -914,7 +957,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -937,7 +980,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -968,7 +1011,7 @@ panels:
       h: 8
       w: 6
       x: 6
-      'y': 22
+      "y": 22
     id: 336
     options:
       legend:
@@ -980,26 +1023,18 @@ panels:
         mode: multi
         sort: none
     pluginVersion: 11.3.0
+    type: timeseries
+  - title: Utilization
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "avg(vector_utilization{component_kind=\"sink\",%s=~\"$cluster\",instance=~\"$instance\"}) by(component_id,instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
-      exemplar: false
-      expr: sum by (component_id, instance) (rate(vector_component_received_event_bytes_total{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m]))
-      format: time_series
-      group: []
-      hide: false
-      instant: false
-      interval: ''
-      legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
-      metricColumn: none
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}} instance{{`}}`}}'
       range: true
-      rawQuery: false
       refId: A
-    title: Events bytes rate (bytes/sec)
-    type: timeseries
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     description: A ratio from 0 to 1 of the load on a component. A value of 0 would indicate a completely idle component that is simply waiting for input. A value of 1 would indicate a that is never idle. This value is updated every 5 seconds.
@@ -1011,7 +1046,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1034,7 +1069,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -1049,7 +1084,7 @@ panels:
       h: 8
       w: 6
       x: 12
-      'y': 22
+      "y": 22
     id: 338
     options:
       legend:
@@ -1061,18 +1096,22 @@ panels:
         mode: multi
         sort: none
     pluginVersion: 11.3.0
+    type: timeseries
+  - title: Errors
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $datasource
+      expr: {{ printf "avg(vector_component_errors_total{component_kind=\"sink\",%s=~\"$cluster\",instance=~\"$instance\"}) by(component_id,error_type,%s) or 0" $clusterLabel $clusterLabel }}
       editorMode: code
-      expr: avg by (component_id, instance) (vector_utilization{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"})
-      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}} instance{{`}}`}}'
+      exemplar: false
+      format: time_series
+      instant: false
+      interval: ""
+      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
       range: true
       refId: A
-    title: Utilization
-    type: timeseries
-  - datasource:
+    datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
     fieldConfig:
@@ -1083,7 +1122,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1106,7 +1145,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         mappings: []
         thresholds:
           mode: absolute
@@ -1121,7 +1160,7 @@ panels:
       h: 8
       w: 6
       x: 18
-      'y': 22
+      "y": 22
     id: 372
     options:
       legend:
@@ -1133,88 +1172,27 @@ panels:
         mode: single
         sort: none
     pluginVersion: 11.3.0
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $datasource
-      editorMode: code
-      exemplar: false
-      expr: avg by (component_id, error_type) (vector_component_errors_total{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
-      format: time_series
-      instant: false
-      interval: ''
-      legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
-      range: true
-      refId: A
-    title: Errors
     type: timeseries
-  title: Sink
+  collapsed: true
+  gridPos:
+    h: 1
+    w: 24
+    x: 0
+    "y": 2
+  id: 324
   type: row
+condition: true
+description: Vector.dev Kubernetes cluster monitoring dashboard
+fiscalYearStartMonth: 0
+graphTooltip: 1
+id: null
+links: []
 refresh: 10s
 schemaVersion: 40
-tags:
-- vm-k8s-stack
-templating:
-  list:
-  - current: {}
-    includeAll: false
-    name: datasource
-    options: []
-    query: {{ $defaultDatasource }}
-    refresh: 1
-    regex: ''
-    type: datasource
-  - current: {}
-    definition: label_values(vector_build_info,{{ $clusterLabel }})
-    hide: {{ ternary 0 2 $multicluster }}
-    label: cluster
-    name: cluster
-    options: []
-    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyh2ZWN0b3JfYnVpbGRfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $clusterLabel) ".*" $multicluster }}
-    refresh: 1
-    regex: ''
-    type: {{ ternary "query" "constant" $multicluster }}
-  - current: {}
-    datasource:
-      type: prometheus
-      uid: $datasource
-    definition: label_values(vector_build_info,instance)
-    includeAll: true
-    label: instance
-    multi: true
-    name: instance
-    options: []
-    query:
-      qryType: 1
-      query: label_values(vector_build_info,instance)
-      refId: PrometheusVariableQueryEditor-VariableQuery
-    refresh: 1
-    regex: ''
-    sort: 1
-    type: query
-  - current: {}
-    datasource:
-      type: prometheus
-      uid: $datasource
-    definition: label_values(vector_component_received_events_total{component_type="kubernetes_logs"},pod_namespace)
-    includeAll: true
-    multi: true
-    name: namespace
-    options: []
-    query:
-      qryType: 1
-      query: label_values(vector_component_received_events_total{component_type="kubernetes_logs"},pod_namespace)
-      refId: PrometheusVariableQueryEditor-VariableQuery
-    refresh: 1
-    regex: ''
-    sort: 1
-    type: query
 time:
   from: now-1h
   to: now
 timepicker: {}
-timezone: {{ default "browser" ($Values.defaultDashboards).defaultTimezone }}
-title: Vector K8S Monitoring
 uid: ce3e6irowgf0gf
 version: 7
-weekStart: ''
+weekStart: ""

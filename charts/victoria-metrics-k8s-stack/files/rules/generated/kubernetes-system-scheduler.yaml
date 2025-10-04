@@ -1,19 +1,21 @@
+
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
-{{- $groupLabels := join "," $additionalGroupByLabels }}
+{{- $groupLabels := join "," (uniq $additionalGroupByLabels) }}
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
-condition: '{{ ($Values.kubeScheduler).enabled }}'
 name: kubernetes-system-scheduler
 rules:
 - alert: KubeSchedulerDown
+  expr: |
+    absent(up{job="kube-scheduler"} == 1)
   annotations:
-    description: 'KubeScheduler has disappeared from Prometheus target discovery.'
-    runbook_url: '{{ $runbookUrl }}/kubernetes/kubeschedulerdown'
-    summary: 'Target disappeared from Prometheus target discovery.'
-  condition: '{{ ($Values.kubeScheduler).enabled }}'
-  expr: absent(up{job="kube-scheduler"} == 1)
+    description: KubeScheduler has disappeared from Prometheus target discovery.
+    runbook_url: {{ $runbookUrl }}/kubernetes/kubeschedulerdown
+    summary: Target disappeared from Prometheus target discovery.
+  condition: {{ ($Values.kubeScheduler).enabled }}
   for: 15m
   labels:
     severity: critical
+condition: {{ "($Values.kubeScheduler).enabled" }}

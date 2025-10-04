@@ -1,107 +1,172 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-__elements: {}
-__inputs:
-- description: ''
-  label: Prometheus
-  name: DS_PROMETHEUS
-  pluginId: prometheus
-  pluginName: Prometheus
-  type: datasource
-__requires:
-- id: gauge
-  name: Gauge
-  type: panel
-  version: ''
-- id: grafana
-  name: Grafana
-  type: grafana
-  version: 10.3.1
-- id: prometheus
-  name: Prometheus
-  type: datasource
-  version: 1.0.0
-- id: stat
-  name: Stat
-  type: panel
-  version: ''
-- id: table
-  name: Table
-  type: panel
-  version: ''
-- id: timeseries
-  name: Time series
-  type: panel
-  version: ''
+title: Kubernetes / Views / Nodes
+templating:
+  list:
+  - name: datasource
+    type: datasource
+    query: {{ $defaultDatasource }}
+    current: {}
+    options: []
+    queryValue: ""
+    refresh: 1
+    regex: ""
+    skipUrlSync: false
+  - name: cluster
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: {{ ternary "query" "constant" $multicluster }}
+    query:
+      qryType: 1
+      query: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    hide: {{ ternary 0 2 $multicluster }}
+    current: {}
+    definition: label_values(kube_node_info,cluster)
+    options: []
+    refresh: 1
+    regex: ""
+    skipUrlSync: false
+    sort: 1
+  - name: resolution
+    type: custom
+    query: 1s, 15s, 30s, 1m, 3m, 5m
+    current:
+      selected: false
+      text: 30s
+      value: 30s
+    options:
+    - selected: false
+      text: 1s
+      value: 1s
+    - selected: false
+      text: 15s
+      value: 15s
+    - selected: true
+      text: 30s
+      value: 30s
+    - selected: false
+      text: 1m
+      value: 1m
+    - selected: false
+      text: 3m
+      value: 3m
+    - selected: false
+      text: 5m
+      value: 5m
+    queryValue: ""
+    skipUrlSync: false
+  - name: node
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: query
+    query:
+      query: {{ printf "label_values(kube_node_info{%s=~\"$cluster\"}, node)" $clusterLabel }}
+      refId: StandardVariableQuery
+    current: {}
+    definition: label_values(kube_node_info{cluster="$cluster"}, node)
+    options: []
+    refresh: 2
+    regex: ""
+    skipUrlSync: false
+    sort: 1
+  - name: instance
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: query
+    query:
+      query: {{ printf "label_values(node_uname_info{nodename=~\"(?i:($node)(.[a-z0-9.]+)?)\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
+      refId: StandardVariableQuery
+    hide: ""
+    current: {}
+    definition: label_values(node_uname_info{nodename=~"(?i:($node)(.[a-z0-9.]+)?)", cluster="$cluster"}, instance)
+    options: []
+    refresh: 2
+    regex: ""
+    skipUrlSync: false
+    sort: 1
+editable: false
+timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
+tags:
+- Kubernetes
+- Prometheus
+- vm-k8s-stack
 annotations:
   list:
-  - builtIn: 1
+  - name: Annotations & Alerts
     datasource:
       type: datasource
       uid: grafana
+    builtIn: 1
     enable: true
     hide: true
     iconColor: rgba(0, 211, 255, 1)
-    name: Annotations & Alerts
     target:
       limit: 100
       matchAny: false
       tags: []
       type: dashboard
     type: dashboard
-  - datasource:
+  - name: terraform
+    datasource:
       type: datasource
       uid: grafana
     enable: true
     hide: false
     iconColor: '#5c4ee5'
-    name: terraform
     target:
       limit: 100
       matchAny: false
       tags:
       - terraform
       type: tags
-  - datasource:
+  - name: oncall
+    datasource:
       type: datasource
       uid: grafana
     enable: true
     hide: false
     iconColor: red
-    name: oncall
     target:
       limit: 100
       matchAny: false
       tags:
       - oncall
       type: tags
-condition: {{ ($Values.kubelet).enabled }}
-description: 'This is a modern ''Nodes View'' dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
-editable: false
-fiscalYearStartMonth: 0
-graphTooltip: 1
-links: []
-liveNow: false
 panels:
-- collapsed: false
+- title: Overview
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 0
+    "y": 0
   id: 40
-  panels: []
-  title: Overview
   type: row
-- datasource:
+- title: CPU  Usage
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "avg(sum(rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\",instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(cpu,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
+    exemplar: false
+    instant: true
+    interval: $resolution
+    legendFormat: ""
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -125,7 +190,7 @@ panels:
     h: 8
     w: 4
     x: 0
-    'y': 1
+    "y": 1
   id: 7
   options:
     minVizHeight: 75
@@ -134,26 +199,26 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showThresholdLabels: false
     showThresholdMarkers: true
     sizing: auto
     text: {}
   pluginVersion: 11.2.0
+  type: gauge
+- title: RAM Usage
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(node_memory_MemTotal_bytes{instance=\"$instance\",%s=~\"$cluster\"} - node_memory_MemAvailable_bytes{instance=\"$instance\",%s=~\"$cluster\"}) by(%s) / sum(node_memory_MemTotal_bytes{instance=\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: false
-    expr: avg(sum by (cpu) (rate(node_cpu_seconds_total{mode!~"idle|iowait|steal", instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])))
     instant: true
     interval: $resolution
-    legendFormat: ''
+    legendFormat: ""
     refId: A
-  title: CPU  Usage
-  type: gauge
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -177,7 +242,7 @@ panels:
     h: 8
     w: 4
     x: 4
-    'y': 1
+    "y": 1
   id: 13
   options:
     minVizHeight: 75
@@ -186,32 +251,31 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showThresholdLabels: false
     showThresholdMarkers: true
     sizing: auto
     text: {}
   pluginVersion: 11.2.0
+  type: gauge
+- title: Pods on node
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    exemplar: false
-    expr: sum(node_memory_MemTotal_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"} - node_memory_MemAvailable_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"}) / sum(node_memory_MemTotal_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"})
-    instant: true
-    interval: $resolution
-    legendFormat: ''
+    expr: {{ printf "sum(kube_pod_info{node=\"$node\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    exemplar: true
+    interval: ""
+    legendFormat: ""
     refId: A
-  title: RAM Usage
-  type: gauge
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
       mappings: []
-      noValue: '0'
+      noValue: "0"
       thresholds:
         mode: absolute
         steps:
@@ -222,7 +286,7 @@ panels:
     h: 8
     w: 4
     x: 8
-    'y': 1
+    "y": 1
   id: 24
   options:
     colorMode: value
@@ -233,25 +297,26 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
     textMode: value
     wideLayout: true
   pluginVersion: 11.2.0
+  type: stat
+- title: List of pods on node ($node)
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "kube_pod_info{node=\"$node\",%s=~\"$cluster\"}" $clusterLabel }}
     exemplar: true
-    expr: sum(kube_pod_info{node="$node", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: ''
+    format: table
+    interval: ""
+    legendFormat: ""
     refId: A
-  title: Pods on node
-  type: stat
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -310,37 +375,26 @@ panels:
     h: 11
     w: 12
     x: 12
-    'y': 1
+    "y": 1
   id: 5
   options:
     cellHeight: sm
     footer:
       countRows: false
-      fields: ''
+      fields: ""
       reducer:
       - sum
       show: false
     showHeader: true
     sortBy: []
   pluginVersion: 11.2.0
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: kube_pod_info{node="$node", {{ $clusterLabel }}=~"$cluster"}
-    format: table
-    interval: ''
-    legendFormat: ''
-    refId: A
-  title: List of pods on node ($node)
   transformations:
   - id: organize
     options:
       excludeByName:
+        __name__: true
         Time: true
         Value: true
-        __name__: true
         container: true
         created_by_kind: false
         created_by_name: true
@@ -356,9 +410,9 @@ panels:
         service: true
         uid: true
       indexByName:
+        __name__: 7
         Time: 6
         Value: 20
-        __name__: 7
         container: 8
         created_by_kind: 2
         created_by_name: 9
@@ -401,14 +455,25 @@ panels:
           aggregations: []
           operation: groupby
   type: table
-- datasource:
+- title: CPU Used
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\",instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    exemplar: false
+    instant: true
+    interval: $resolution
+    legendFormat: ""
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
       decimals: 3
       mappings: []
-      noValue: '0'
+      noValue: "0"
       thresholds:
         mode: absolute
         steps:
@@ -420,7 +485,7 @@ panels:
     h: 3
     w: 2
     x: 0
-    'y': 9
+    "y": 9
   id: 9
   options:
     colorMode: none
@@ -431,32 +496,31 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
     textMode: auto
     wideLayout: true
   pluginVersion: 11.2.0
+  type: stat
+- title: CPU Total
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    exemplar: false
-    expr: sum(rate(node_cpu_seconds_total{mode!~"idle|iowait|steal", instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
-    instant: true
+    expr: {{ printf "sum(machine_cpu_cores{node=\"$node\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    exemplar: true
     interval: $resolution
-    legendFormat: ''
+    legendFormat: ""
     refId: A
-  title: CPU Used
-  type: stat
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
       mappings: []
-      noValue: '0'
+      noValue: "0"
       thresholds:
         mode: absolute
         steps:
@@ -468,7 +532,7 @@ panels:
     h: 3
     w: 2
     x: 2
-    'y': 9
+    "y": 9
   id: 11
   options:
     colorMode: none
@@ -479,31 +543,32 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
     textMode: auto
     wideLayout: true
   pluginVersion: 11.2.0
+  type: stat
+- title: RAM Used
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    exemplar: true
-    expr: sum(machine_cpu_cores{node="$node", {{ $clusterLabel }}=~"$cluster"})
-    interval: $resolution
-    legendFormat: ''
+    expr: {{ printf "sum(node_memory_MemTotal_bytes{instance=\"$instance\",%s=~\"$cluster\"} - node_memory_MemAvailable_bytes{instance=\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
+    exemplar: false
+    instant: true
+    interval: ""
+    legendFormat: ""
     refId: A
-  title: CPU Total
-  type: stat
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
       mappings: []
-      noValue: '0'
+      noValue: "0"
       thresholds:
         mode: absolute
         steps:
@@ -515,7 +580,7 @@ panels:
     h: 3
     w: 2
     x: 4
-    'y': 9
+    "y": 9
   id: 15
   options:
     colorMode: none
@@ -526,32 +591,32 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
     textMode: auto
     wideLayout: true
   pluginVersion: 11.2.0
+  type: stat
+- title: RAM Total
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    exemplar: false
-    expr: sum(node_memory_MemTotal_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"} - node_memory_MemAvailable_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"})
-    instant: true
-    interval: ''
-    legendFormat: ''
+    expr: {{ printf "machine_memory_bytes{node=\"$node\",%s=~\"$cluster\"}" $clusterLabel }}
+    exemplar: true
+    instant: false
+    interval: ""
+    legendFormat: ""
     refId: A
-  title: RAM Used
-  type: stat
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
       mappings: []
-      noValue: '0'
+      noValue: "0"
       thresholds:
         mode: absolute
         steps:
@@ -563,7 +628,7 @@ panels:
     h: 3
     w: 2
     x: 6
-    'y': 9
+    "y": 9
   id: 17
   options:
     colorMode: none
@@ -574,48 +639,48 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
     textMode: auto
     wideLayout: true
   pluginVersion: 11.2.0
+  type: stat
+- title: uptime
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "node_time_seconds{instance=\"$instance\",%s=~\"$cluster\"} - node_boot_time_seconds{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: machine_memory_bytes{node="$node", {{ $clusterLabel }}=~"$cluster"}
     instant: false
-    interval: ''
-    legendFormat: ''
+    interval: ""
+    legendFormat: ""
     refId: A
-  title: RAM Total
-  type: stat
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
       mappings: []
-      noValue: '0'
+      noValue: "0"
       thresholds:
         mode: absolute
         steps:
         - color: green
           value: null
         - color: '#EAB839'
-          value: 25228800
+          value: 2.52288e+07
         - color: red
-          value: 31536000
+          value: 3.1536e+07
       unit: s
     overrides: []
   gridPos:
     h: 3
     w: 4
     x: 8
-    'y': 9
+    "y": 9
   id: 18
   options:
     colorMode: value
@@ -626,39 +691,39 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
     textMode: auto
     wideLayout: true
   pluginVersion: 11.2.0
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: node_time_seconds{instance="$instance", {{ $clusterLabel }}=~"$cluster"} - node_boot_time_seconds{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    instant: false
-    interval: ''
-    legendFormat: ''
-    refId: A
-  title: uptime
   type: stat
-- collapsed: false
+- title: Resources
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 12
+    "y": 12
   id: 38
-  panels: []
-  title: Resources
   type: row
-- datasource:
+- title: CPU Usage
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "avg(rate(node_cpu_seconds_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) * 100) by(mode,%s)" $clusterLabel $clusterLabel }}
+    exemplar: true
+    hide: false
+    instant: false
+    interval: $resolution
+    legendFormat: '{{`{{`}} mode {{`}}`}}'
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -669,7 +734,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -694,7 +759,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       max: 100
       thresholds:
@@ -710,7 +775,7 @@ panels:
     h: 9
     w: 12
     x: 0
-    'y': 13
+    "y": 13
   id: 2
   options:
     legend:
@@ -721,20 +786,73 @@ panels:
     tooltip:
       mode: multi
       sort: none
+  type: timeseries
+- title: Memory Usage
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "(node_memory_MemTotal_bytes{instance=\"$instance\",%s=~\"$cluster\"} - node_memory_MemFree_bytes{instance=\"$instance\",%s=~\"$cluster\"}) - (node_memory_Cached_bytes{instance=\"$instance\",%s=~\"$cluster\"} + node_memory_Buffers_bytes{instance=\"$instance\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: avg(rate(node_cpu_seconds_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]) * 100) by (mode)
-    hide: false
     instant: false
     interval: $resolution
-    legendFormat: '{{`{{`}} mode {{`}}`}}'
+    legendFormat: RAM Used
     refId: A
-  title: CPU Usage
-  type: timeseries
-- datasource:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "node_memory_MemTotal_bytes{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+    exemplar: true
+    hide: false
+    interval: $resolution
+    legendFormat: RAM Total
+    refId: B
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "node_memory_Cached_bytes{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+    exemplar: true
+    hide: false
+    interval: $resolution
+    legendFormat: RAM Cache
+    refId: C
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "node_memory_Buffers_bytes{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+    exemplar: true
+    hide: false
+    interval: $resolution
+    legendFormat: RAM Buffer
+    refId: D
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "node_memory_MemFree_bytes{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+    exemplar: true
+    hide: false
+    interval: $resolution
+    legendFormat: RAM Free
+    refId: E
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "node_memory_SwapTotal_bytes{instance=\"$instance\",%s=~\"$cluster\"} - node_memory_SwapFree_bytes{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    exemplar: true
+    hide: false
+    interval: $resolution
+    legendFormat: SWAP Used
+    refId: F
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "node_memory_SwapTotal_bytes{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+    exemplar: true
+    hide: false
+    interval: $resolution
+    legendFormat: SWAP Total
+    refId: G
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -745,7 +863,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -770,7 +888,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -785,7 +903,7 @@ panels:
     h: 9
     w: 12
     x: 12
-    'y': 13
+    "y": 13
   id: 3
   options:
     legend:
@@ -796,73 +914,18 @@ panels:
     tooltip:
       mode: multi
       sort: desc
+  type: timeseries
+- title: CPU usage by Pod
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{node=\"$node\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: node_memory_MemTotal_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"} - node_memory_MemFree_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"} - (node_memory_Cached_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"} + node_memory_Buffers_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"})
-    instant: false
     interval: $resolution
-    legendFormat: RAM Used
+    legendFormat: '{{`{{`}} pod {{`}}`}}'
     refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: node_memory_MemTotal_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    hide: false
-    interval: $resolution
-    legendFormat: RAM Total
-    refId: B
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: node_memory_Cached_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    hide: false
-    interval: $resolution
-    legendFormat: RAM Cache
-    refId: C
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: node_memory_Buffers_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    hide: false
-    interval: $resolution
-    legendFormat: RAM Buffer
-    refId: D
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: node_memory_MemFree_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    hide: false
-    interval: $resolution
-    legendFormat: RAM Free
-    refId: E
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: node_memory_SwapTotal_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"} - node_memory_SwapFree_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    hide: false
-    interval: $resolution
-    legendFormat: SWAP Used
-    refId: F
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: node_memory_SwapTotal_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    hide: false
-    interval: $resolution
-    legendFormat: SWAP Total
-    refId: G
-  title: Memory Usage
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -896,7 +959,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -911,7 +974,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 22
+    "y": 22
   id: 26
   options:
     legend:
@@ -923,18 +986,18 @@ panels:
       mode: single
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Memory usage by Pod
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(container_memory_working_set_bytes{node=\"$node\",image!=\"\",%s=~\"$cluster\"}) by(pod,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: sum(rate(container_cpu_usage_seconds_total{node="$node", image!="", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod)
     interval: $resolution
     legendFormat: '{{`{{`}} pod {{`}}`}}'
     refId: A
-  title: CPU usage by Pod
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -945,7 +1008,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -968,7 +1031,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -983,7 +1046,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 22
+    "y": 22
   id: 28
   options:
     legend:
@@ -995,18 +1058,20 @@ panels:
       mode: single
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Number of CPU Core Throttled
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(node_cpu_core_throttles_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
     exemplar: true
-    expr: sum(container_memory_working_set_bytes{node="$node", image!="", {{ $clusterLabel }}=~"$cluster"}) by (pod)
     interval: $resolution
-    legendFormat: '{{`{{`}} pod {{`}}`}}'
+    legendFormat: Nb of cpu core throttles
+    range: true
     refId: A
-  title: Memory usage by Pod
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: Number of times a CPU core has been throttled on an instance.
@@ -1043,7 +1108,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -1059,7 +1124,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 30
+    "y": 30
   id: 66
   options:
     legend:
@@ -1076,33 +1141,54 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: sum(rate(node_cpu_core_throttles_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
-    interval: $resolution
-    legendFormat: Nb of cpu core throttles
-    range: true
-    refId: A
-  title: Number of CPU Core Throttled
   type: timeseries
-- collapsed: false
+- title: System
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 38
+    "y": 38
   id: 44
-  panels: []
-  title: System
   type: row
-- datasource:
+- title: System Load
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "node_load1{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    interval: $resolution
+    legendFormat: 1m
+    range: true
+    refId: A
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "node_load5{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    hide: false
+    interval: $resolution
+    legendFormat: 5m
+    range: true
+    refId: B
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "node_load15{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    hide: false
+    interval: $resolution
+    legendFormat: 15m
+    range: true
+    refId: C
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1113,7 +1199,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1138,7 +1224,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1152,7 +1238,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 39
+    "y": 39
   id: 48
   options:
     legend:
@@ -1163,42 +1249,32 @@ panels:
     tooltip:
       mode: multi
       sort: desc
+  type: timeseries
+- title: Context Switches & Interrupts
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "rate(node_context_switches_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: node_load1{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
     interval: $resolution
-    legendFormat: 1m
+    intervalFactor: 1
+    legendFormat: Context switches
     range: true
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "rate(node_intr_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: node_load5{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
     hide: false
     interval: $resolution
-    legendFormat: 5m
+    legendFormat: Interrupts
     range: true
     refId: B
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: node_load15{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    hide: false
-    interval: $resolution
-    legendFormat: 15m
-    range: true
-    refId: C
-  title: System Load
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1209,7 +1285,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1232,7 +1308,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1246,7 +1322,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 39
+    "y": 39
   id: 46
   options:
     legend:
@@ -1257,32 +1333,31 @@ panels:
     tooltip:
       mode: multi
       sort: desc
+  type: timeseries
+- title: File Descriptors
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "node_filefd_maximum{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: rate(node_context_switches_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
+    instant: false
     interval: $resolution
-    intervalFactor: 1
-    legendFormat: Context switches
-    range: true
+    legendFormat: Maximum file descriptors
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "node_filefd_allocated{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: rate(node_intr_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
     hide: false
+    instant: false
     interval: $resolution
-    legendFormat: Interrupts
-    range: true
+    legendFormat: Allocated file descriptors
     refId: B
-  title: Context Switches & Interrupts
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1293,7 +1368,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1318,7 +1393,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1332,7 +1407,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 47
+    "y": 47
   id: 49
   options:
     legend:
@@ -1343,31 +1418,33 @@ panels:
     tooltip:
       mode: multi
       sort: none
+  type: timeseries
+- title: Time Sync
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "node_timex_estimated_error_seconds{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: node_filefd_maximum{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
     instant: false
     interval: $resolution
-    legendFormat: Maximum file descriptors
+    intervalFactor: 1
+    legendFormat: Estimated error in seconds
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "node_timex_maxerror_seconds{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: node_filefd_allocated{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
     hide: false
-    instant: false
     interval: $resolution
-    legendFormat: Allocated file descriptors
+    intervalFactor: 1
+    legendFormat: Maximum error in seconds
+    range: true
     refId: B
-  title: File Descriptors
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1378,7 +1455,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1403,7 +1480,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1418,7 +1495,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 47
+    "y": 47
   id: 50
   options:
     legend:
@@ -1429,46 +1506,42 @@ panels:
     tooltip:
       mode: multi
       sort: desc
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: node_timex_estimated_error_seconds{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    instant: false
-    interval: $resolution
-    intervalFactor: 1
-    legendFormat: Estimated error in seconds
-    refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: node_timex_maxerror_seconds{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    hide: false
-    interval: $resolution
-    intervalFactor: 1
-    legendFormat: Maximum error in seconds
-    range: true
-    refId: B
-  title: Time Sync
   type: timeseries
-- collapsed: false
+- title: Network
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 55
+    "y": 55
   id: 36
-  panels: []
-  title: Network
   type: row
-- datasource:
+- title: Network usage (bytes/s)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(node_network_receive_bytes_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    interval: $resolution
+    legendFormat: In
+    range: true
+    refId: A
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "0 - sum(rate(node_network_transmit_bytes_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    interval: $resolution
+    legendFormat: Out
+    range: true
+    refId: B
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1502,7 +1575,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1517,7 +1590,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 56
+    "y": 56
   id: 20
   options:
     legend:
@@ -1529,30 +1602,28 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Network errors
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    editorMode: code
+    expr: {{ printf "sum(rate(node_network_receive_errs_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: sum(rate(node_network_receive_bytes_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: In
-    range: true
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "0 - sum(rate(node_network_transmit_errs_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: '- sum(rate(node_network_transmit_bytes_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))'
     interval: $resolution
     legendFormat: Out
     range: true
     refId: B
-  title: Network usage (bytes/s)
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1563,7 +1634,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1586,7 +1657,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1601,7 +1672,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 56
+    "y": 56
   id: 61
   options:
     legend:
@@ -1613,28 +1684,30 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Network usage (packet/s)
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(node_network_receive_packets_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
     exemplar: true
-    expr: sum(rate(node_network_receive_errs_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
     legendFormat: In
+    range: true
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "0 - sum(rate(node_network_transmit_packets_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: '- sum(rate(node_network_transmit_errs_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))'
     interval: $resolution
     legendFormat: Out
     range: true
     refId: B
-  title: Network errors
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1645,7 +1718,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1668,7 +1741,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1683,7 +1756,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 64
+    "y": 64
   id: 62
   options:
     legend:
@@ -1695,30 +1768,28 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Network total drops
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    editorMode: code
+    expr: {{ printf "sum(rate(node_network_receive_drop_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: sum(rate(node_network_receive_packets_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    hide: false
     interval: $resolution
     legendFormat: In
-    range: true
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    editorMode: code
+    expr: {{ printf "0 - sum(rate(node_network_transmit_drop_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: '- sum(rate(node_network_transmit_packets_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))'
+    hide: false
     interval: $resolution
     legendFormat: Out
-    range: true
     refId: B
-  title: Network usage (packet/s)
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1729,7 +1800,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1752,7 +1823,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1767,7 +1838,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 64
+    "y": 64
   id: 64
   options:
     legend:
@@ -1779,28 +1850,20 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: TCP Currently Established
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "node_netstat_Tcp_CurrEstab{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+    editorMode: code
     exemplar: true
-    expr: sum(rate(node_network_receive_drop_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
-    hide: false
+    instant: false
     interval: $resolution
-    legendFormat: In
+    legendFormat: TCP Currently Established
     refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: '- sum(rate(node_network_transmit_drop_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))'
-    hide: false
-    interval: $resolution
-    legendFormat: Out
-    refId: B
-  title: Network total drops
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1811,7 +1874,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1834,7 +1897,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1849,7 +1912,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 72
+    "y": 72
   id: 60
   options:
     legend:
@@ -1861,20 +1924,31 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: NF Conntrack
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "node_nf_conntrack_entries{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: node_netstat_Tcp_CurrEstab{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
     instant: false
     interval: $resolution
-    legendFormat: TCP Currently Established
+    legendFormat: NF Conntrack entries
     refId: A
-  title: TCP Currently Established
-  type: timeseries
-- datasource:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "node_nf_conntrack_entries_limit{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    hide: false
+    interval: $resolution
+    legendFormat: NF Conntrack limit
+    range: true
+    refId: B
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1885,7 +1959,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1908,7 +1982,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1931,7 +2005,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 72
+    "y": 72
   id: 63
   options:
     legend:
@@ -1943,44 +2017,32 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: node_nf_conntrack_entries{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    instant: false
-    interval: $resolution
-    legendFormat: NF Conntrack entries
-    refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: node_nf_conntrack_entries_limit{instance="$instance", {{ $clusterLabel }}=~"$cluster"}
-    hide: false
-    interval: $resolution
-    legendFormat: NF Conntrack limit
-    range: true
-    refId: B
-  title: NF Conntrack
   type: timeseries
-- collapsed: false
+- title: Kubernetes Storage
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 80
+    "y": 80
   id: 54
-  panels: []
-  title: Kubernetes Storage
   type: row
-- datasource:
+- title: Persistent Volumes - Usage in %
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kubelet_volume_stats_used_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s) / sum(kubelet_volume_stats_capacity_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    interval: $resolution
+    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
+    range: true
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1991,7 +2053,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2014,7 +2076,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -2030,7 +2092,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 81
+    "y": 81
   id: 30
   options:
     legend:
@@ -2042,20 +2104,30 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Persistent Volumes - Usage in GB
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    editorMode: code
+    expr: {{ printf "sum(kubelet_volume_stats_used_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: sum(kubelet_volume_stats_used_bytes{node="$node", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim) / sum(kubelet_volume_stats_capacity_bytes{node="$node", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
-    interval: $resolution
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
-    range: true
+    format: table
+    hide: false
+    interval: ""
+    legendFormat: ""
     refId: A
-  title: Persistent Volumes - Usage in %
-  type: timeseries
-- datasource:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kubelet_volume_stats_capacity_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel }}
+    exemplar: true
+    format: table
+    hide: false
+    interval: ""
+    legendFormat: ""
+    refId: B
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -2094,41 +2166,19 @@ panels:
     h: 16
     w: 12
     x: 12
-    'y': 81
+    "y": 81
   id: 34
   options:
     cellHeight: sm
     footer:
       countRows: false
-      fields: ''
+      fields: ""
       reducer:
       - sum
       show: false
     showHeader: true
     sortBy: []
   pluginVersion: 11.2.0
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(kubelet_volume_stats_used_bytes{node="$node", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
-    format: table
-    hide: false
-    interval: ''
-    legendFormat: ''
-    refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(kubelet_volume_stats_capacity_bytes{node="$node", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
-    format: table
-    hide: false
-    interval: ''
-    legendFormat: ''
-    refId: B
-  title: Persistent Volumes - Usage in GB
   transformations:
   - id: groupBy
     options:
@@ -2160,7 +2210,19 @@ panels:
         'Value #B (lastNotNull)': Total
         persistentvolumeclaim: Persistent Volume Claim
   type: table
-- datasource:
+- title: Persistent Volumes - Inodes
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "(sum(kubelet_volume_stats_inodes_used{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s) / sum(kubelet_volume_stats_inodes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)) * 100" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    interval: $resolution
+    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
+    range: true
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -2171,7 +2233,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2194,7 +2256,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -2210,7 +2272,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 89
+    "y": 89
   id: 32
   options:
     legend:
@@ -2222,33 +2284,33 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: sum(kubelet_volume_stats_inodes_used{node="$node", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim) / sum(kubelet_volume_stats_inodes{node="$node", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim) * 100
-    interval: $resolution
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
-    range: true
-    refId: A
-  title: Persistent Volumes - Inodes
   type: timeseries
-- collapsed: false
+- title: Node Storage
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 97
+    "y": 97
   id: 42
-  panels: []
-  title: Node Storage
   type: row
-- datasource:
+- title: FS usage in %
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "100 - ((node_filesystem_avail_bytes{instance=\"$instance\",%s=~\"$cluster\"} * 100) / node_filesystem_size_bytes{instance=\"$instance\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    hide: false
+    interval: $resolution
+    legendFormat: '{{`{{`}} mountpoint {{`}}`}}'
+    range: true
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -2259,7 +2321,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2282,7 +2344,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -2298,7 +2360,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 98
+    "y": 98
   id: 33
   options:
     legend:
@@ -2310,21 +2372,21 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: FS inode usage in %
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "100 - ((node_filesystem_files_free{instance=\"$instance\",%s=~\"$cluster\"} / node_filesystem_files{instance=\"$instance\",%s=~\"$cluster\"}) * 100)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: 100 - ((node_filesystem_avail_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"} * 100) / node_filesystem_size_bytes{instance="$instance", {{ $clusterLabel }}=~"$cluster"})
     hide: false
     interval: $resolution
     legendFormat: '{{`{{`}} mountpoint {{`}}`}}'
     range: true
     refId: A
-  title: FS usage in %
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -2335,7 +2397,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2358,7 +2420,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -2374,7 +2436,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 98
+    "y": 98
   id: 59
   options:
     legend:
@@ -2386,21 +2448,20 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Reads by disk (bytes)
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "rate(node_disk_read_bytes_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: 100 - (node_filesystem_files_free{instance="$instance", {{ $clusterLabel }}=~"$cluster"} / node_filesystem_files{instance="$instance", {{ $clusterLabel }}=~"$cluster"} * 100)
-    hide: false
     interval: $resolution
-    legendFormat: '{{`{{`}} mountpoint {{`}}`}}'
+    legendFormat: '{{`{{`}}device{{`}}`}}'
     range: true
     refId: A
-  title: FS inode usage in %
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -2411,7 +2472,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2434,7 +2495,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -2450,7 +2511,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 106
+    "y": 106
   id: 52
   options:
     legend:
@@ -2462,20 +2523,21 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Writes by disk (bytes)
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "rate(node_disk_written_bytes_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: rate(node_disk_read_bytes_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
+    hide: false
     interval: $resolution
     legendFormat: '{{`{{`}}device{{`}}`}}'
     range: true
     refId: A
-  title: Reads by disk (bytes)
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -2486,7 +2548,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2509,7 +2571,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -2525,7 +2587,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 106
+    "y": 106
   id: 57
   options:
     legend:
@@ -2537,21 +2599,20 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Completed reads by disk
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "rate(node_disk_reads_completed_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: rate(node_disk_written_bytes_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
-    hide: false
     interval: $resolution
     legendFormat: '{{`{{`}}device{{`}}`}}'
     range: true
     refId: A
-  title: Writes by disk (bytes)
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -2562,7 +2623,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2585,7 +2646,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -2601,7 +2662,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 114
+    "y": 114
   id: 51
   options:
     legend:
@@ -2613,20 +2674,21 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Completed writes by disk
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "rate(node_disk_writes_completed_total{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: rate(node_disk_reads_completed_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
+    hide: false
     interval: $resolution
     legendFormat: '{{`{{`}}device{{`}}`}}'
     range: true
     refId: A
-  title: Completed reads by disk
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -2637,7 +2699,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2660,7 +2722,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -2676,7 +2738,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 114
+    "y": 114
   id: 56
   options:
     legend:
@@ -2688,21 +2750,20 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Disk(s) io/s
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "rate(node_disk_io_now{instance=\"$instance\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: rate(node_disk_writes_completed_total{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
-    hide: false
     interval: $resolution
     legendFormat: '{{`{{`}}device{{`}}`}}'
     range: true
     refId: A
-  title: Completed writes by disk
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -2713,7 +2774,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2736,7 +2797,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -2752,7 +2813,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 122
+    "y": 122
   id: 58
   options:
     legend:
@@ -2764,20 +2825,20 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: FS - Device Errors
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(node_filesystem_device_error{instance=\"$instance\",%s=~\"$cluster\"}) by(mountpoint,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: rate(node_disk_io_now{instance="$instance", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
     interval: $resolution
-    legendFormat: '{{`{{`}}device{{`}}`}}'
+    legendFormat: '{{`{{`}} mountpoint {{`}}`}}'
     range: true
     refId: A
-  title: Disk(s) io/s
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -2788,7 +2849,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2811,7 +2872,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -2827,7 +2888,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 122
+    "y": 122
   id: 55
   options:
     legend:
@@ -2839,128 +2900,52 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: sum(node_filesystem_device_error{instance="$instance", {{ $clusterLabel }}=~"$cluster"}) by (mountpoint)
-    interval: $resolution
-    legendFormat: '{{`{{`}} mountpoint {{`}}`}}'
-    range: true
-    refId: A
-  title: FS - Device Errors
   type: timeseries
+__elements: {}
+__inputs:
+- description: ""
+  label: Prometheus
+  name: DS_PROMETHEUS
+  pluginId: prometheus
+  pluginName: Prometheus
+  type: datasource
+__requires:
+- id: gauge
+  name: Gauge
+  type: panel
+  version: ""
+- id: grafana
+  name: Grafana
+  type: grafana
+  version: 10.3.1
+- id: prometheus
+  name: Prometheus
+  type: datasource
+  version: 1.0.0
+- id: stat
+  name: Stat
+  type: panel
+  version: ""
+- id: table
+  name: Table
+  type: panel
+  version: ""
+- id: timeseries
+  name: Time series
+  type: panel
+  version: ""
+condition: {{ "($Values.kubelet).enabled" }}
+description: 'This is a modern ''Nodes View'' dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
+fiscalYearStartMonth: 0
+graphTooltip: 1
+links: []
+liveNow: false
 refresh: 30s
 schemaVersion: 39
-tags:
-- Kubernetes
-- Prometheus
-- vm-k8s-stack
-templating:
-  list:
-  - current: {}
-    hide: 0
-    includeAll: false
-    multi: false
-    name: datasource
-    options: []
-    query: {{ $defaultDatasource }}
-    queryValue: ''
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    type: datasource
-  - current: {}
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(kube_node_info,{{ $clusterLabel }})
-    hide: {{ ternary 0 2 $multicluster }}
-    includeAll: false
-    multi: false
-    name: cluster
-    options: []
-    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyhrdWJlX25vZGVfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $clusterLabel) ".*" $multicluster }}
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    type: {{ ternary "query" "constant" $multicluster }}
-  - current:
-      selected: false
-      text: 30s
-      value: 30s
-    hide: 0
-    includeAll: false
-    multi: false
-    name: resolution
-    options:
-    - selected: false
-      text: 1s
-      value: 1s
-    - selected: false
-      text: 15s
-      value: 15s
-    - selected: true
-      text: 30s
-      value: 30s
-    - selected: false
-      text: 1m
-      value: 1m
-    - selected: false
-      text: 3m
-      value: 3m
-    - selected: false
-      text: 5m
-      value: 5m
-    query: 1s, 15s, 30s, 1m, 3m, 5m
-    queryValue: ''
-    skipUrlSync: false
-    type: custom
-  - current: {}
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(kube_node_info{ {{ $clusterLabel }}=~"$cluster"}, node)
-    hide: 0
-    includeAll: false
-    multi: false
-    name: node
-    options: []
-    query:
-      query: label_values(kube_node_info{ {{ $clusterLabel }}=~"$cluster"}, node)
-      refId: StandardVariableQuery
-    refresh: 2
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    type: query
-  - current: {}
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(node_uname_info{nodename=~"(?i:($node)(.[a-z0-9.]+)?)", {{ $clusterLabel }}=~"$cluster"}, instance)
-    hide: 2
-    includeAll: false
-    multi: false
-    name: instance
-    options: []
-    query:
-      query: label_values(node_uname_info{nodename=~"(?i:($node)(.[a-z0-9.]+)?)", {{ $clusterLabel }}=~"$cluster"}, instance)
-      refId: StandardVariableQuery
-    refresh: 2
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    type: query
 time:
   from: now-1h
   to: now
 timepicker: {}
-timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
-title: Kubernetes / Views / Nodes
 uid: k8s_views_nodes
 version: 37
-weekStart: ''
+weekStart: ""

@@ -1,5 +1,11 @@
-FROM python:3.12.4-alpine
+FROM golang:1.25-alpine3.22
 
 RUN apk add make g++
-COPY requirements.txt .
-RUN pip3 install --no-build-isolation -r requirements.txt
+WORKDIR /app
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+COPY ./main.go ./
+ENV GOEXPERIMENT=jsonv2
+RUN go build -o /app/hack .
+ENTRYPOINT ["/app/hack"]

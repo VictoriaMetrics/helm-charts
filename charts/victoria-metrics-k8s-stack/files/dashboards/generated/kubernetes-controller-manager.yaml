@@ -1,24 +1,58 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-condition: {{ ($Values.kubeControllerManager).enabled }}
+title: Kubernetes / Controller Manager
+templating:
+  list:
+  - name: datasource
+    label: Data source
+    type: datasource
+    query: {{ $defaultDatasource }}
+    current:
+      selected: true
+      text: default
+      value: default
+    regex: ""
+  - name: cluster
+    label: cluster
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: {{ ternary "query" "constant" $multicluster }}
+    query: {{ ternary (printf "label_values(up{job=\"kube-controller-manager\"}, %s)" $clusterLabel) ".*" $multicluster }}
+    hide: {{ ternary 0 2 $multicluster }}
+    refresh: 2
+    sort: 1
+  - name: instance
+    label: instance
+    includeAll: true
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: query
+    query: {{ printf "label_values(up{%s=~\"$cluster\",job=\"kube-controller-manager\"}, instance)" $clusterLabel }}
+    refresh: 2
+    sort: 1
 editable: false
-links:
-- asDropdown: true
-  includeVars: true
-  keepTime: true
-  tags:
-  - kubernetes-mixin
-  targetBlank: false
-  title: Kubernetes
-  type: dashboards
+timezone: {{ default "UTC" ($Values.defaultDashboards).defaultTimezone }}
+tags:
+- kubernetes-mixin
+- vm-k8s-stack
 panels:
-- datasource:
-    type: {{ $defaultDatasource }}
+- title: Up
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(up{%s=~\"$cluster\",job=\"kube-controller-manager\"}) by(%s)" $clusterLabel $clusterLabel }}
+    instant: true
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -27,22 +61,22 @@ panels:
     h: 7
     w: 4
     x: 0
-    'y': 0
+    "y": 0
   id: 1
   interval: 1m
   options:
     colorMode: none
   pluginVersion: v11.4.0
+  type: stat
+- title: Work Queue Add Rate
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(up{ {{ $clusterLabel }}=~"$cluster", job="kube-controller-manager"})
-    instant: true
-  title: Up
-  type: stat
-- datasource:
-    type: {{ $defaultDatasource }}
+    expr: {{ printf "sum(rate(workqueue_adds_total{%s=~\"$cluster\",job=\"kube-controller-manager\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,name)" $clusterLabel $clusterLabel }}
+    legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} {{`{{`}}name{{`}}`}}'
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -55,7 +89,7 @@ panels:
     h: 7
     w: 20
     x: 4
-    'y': 0
+    "y": 0
   id: 2
   interval: 1m
   options:
@@ -69,16 +103,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Work Queue Depth
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(workqueue_adds_total{ {{ $clusterLabel }}=~"$cluster", job="kube-controller-manager", instance=~"$instance"}[$__rate_interval])) by (cluster, instance, name)
+    expr: {{ printf "sum(rate(workqueue_depth{%s=~\"$cluster\",job=\"kube-controller-manager\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,name)" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} {{`{{`}}name{{`}}`}}'
-  title: Work Queue Add Rate
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -91,7 +125,7 @@ panels:
     h: 7
     w: 24
     x: 0
-    'y': 7
+    "y": 7
   id: 3
   interval: 1m
   options:
@@ -105,16 +139,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Work Queue Latency
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(workqueue_depth{ {{ $clusterLabel }}=~"$cluster", job="kube-controller-manager", instance=~"$instance"}[$__rate_interval])) by (cluster, instance, name)
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-controller-manager\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,name,le))" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} {{`{{`}}name{{`}}`}}'
-  title: Work Queue Depth
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -127,7 +161,7 @@ panels:
     h: 7
     w: 24
     x: 0
-    'y': 14
+    "y": 14
   id: 4
   interval: 1m
   options:
@@ -141,16 +175,31 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Kube API Request Rate
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-controller-manager", instance=~"$instance"}[$__rate_interval])) by (cluster, instance, name, le))
-    legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} {{`{{`}}name{{`}}`}}'
-  title: Work Queue Latency
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+    expr: {{ printf "sum(rate(rest_client_requests_total{job=\"kube-controller-manager\",instance=~\"$instance\",code=~\"2..\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    legendFormat: 2xx
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(rest_client_requests_total{job=\"kube-controller-manager\",instance=~\"$instance\",code=~\"3..\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    legendFormat: 3xx
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(rest_client_requests_total{job=\"kube-controller-manager\",instance=~\"$instance\",code=~\"4..\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    legendFormat: 4xx
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(rest_client_requests_total{job=\"kube-controller-manager\",instance=~\"$instance\",code=~\"5..\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    legendFormat: 5xx
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -163,7 +212,7 @@ panels:
     h: 7
     w: 8
     x: 0
-    'y': 21
+    "y": 21
   id: 5
   interval: 1m
   options:
@@ -177,31 +226,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Post Request Latency 99th Quantile
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{job="kube-controller-manager", instance=~"$instance",code=~"2.."}[$__rate_interval]))
-    legendFormat: 2xx
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{job="kube-controller-manager", instance=~"$instance",code=~"3.."}[$__rate_interval]))
-    legendFormat: 3xx
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{job="kube-controller-manager", instance=~"$instance",code=~"4.."}[$__rate_interval]))
-    legendFormat: 4xx
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{job="kube-controller-manager", instance=~"$instance",code=~"5.."}[$__rate_interval]))
-    legendFormat: 5xx
-  title: Kube API Request Rate
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-controller-manager\",instance=~\"$instance\",verb=\"POST\"}[$__rate_interval])) by(verb,le,%s))" $clusterLabel $clusterLabel }}
+    legendFormat: '{{`{{`}}verb{{`}}`}}'
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -214,7 +248,7 @@ panels:
     h: 7
     w: 16
     x: 8
-    'y': 21
+    "y": 21
   id: 6
   interval: 1m
   options:
@@ -228,16 +262,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Get Request Latency 99th Quantile
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-controller-manager", instance=~"$instance", verb="POST"}[$__rate_interval])) by (verb, le))
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-controller-manager\",instance=~\"$instance\",verb=\"GET\"}[$__rate_interval])) by(verb,le,%s))" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}verb{{`}}`}}'
-  title: Post Request Latency 99th Quantile
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -250,7 +284,7 @@ panels:
     h: 7
     w: 24
     x: 0
-    'y': 28
+    "y": 28
   id: 7
   interval: 1m
   options:
@@ -264,16 +298,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Memory
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-controller-manager", instance=~"$instance", verb="GET"}[$__rate_interval])) by (verb, le))
-    legendFormat: '{{`{{`}}verb{{`}}`}}'
-  title: Get Request Latency 99th Quantile
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+    expr: {{ printf "process_resident_memory_bytes{%s=~\"$cluster\",job=\"kube-controller-manager\",instance=~\"$instance\"}" $clusterLabel }}
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -286,7 +320,7 @@ panels:
     h: 7
     w: 8
     x: 0
-    'y': 35
+    "y": 35
   id: 8
   interval: 1m
   options:
@@ -300,16 +334,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: CPU usage
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: process_resident_memory_bytes{ {{ $clusterLabel }}=~"$cluster", job="kube-controller-manager",instance=~"$instance"}
+    expr: {{ printf "rate(process_cpu_seconds_total{%s=~\"$cluster\",job=\"kube-controller-manager\",instance=~\"$instance\"}[$__rate_interval])" $clusterLabel }}
     legendFormat: '{{`{{`}}instance{{`}}`}}'
-  title: Memory
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -322,7 +356,7 @@ panels:
     h: 7
     w: 8
     x: 8
-    'y': 35
+    "y": 35
   id: 9
   interval: 1m
   options:
@@ -336,16 +370,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Goroutines
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: rate(process_cpu_seconds_total{ {{ $clusterLabel }}=~"$cluster", job="kube-controller-manager",instance=~"$instance"}[$__rate_interval])
+    expr: {{ printf "go_goroutines{%s=~\"$cluster\",job=\"kube-controller-manager\",instance=~\"$instance\"}" $clusterLabel }}
     legendFormat: '{{`{{`}}instance{{`}}`}}'
-  title: CPU usage
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -358,7 +392,7 @@ panels:
     h: 7
     w: 8
     x: 16
-    'y': 35
+    "y": 35
   id: 10
   interval: 1m
   options:
@@ -372,55 +406,20 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: go_goroutines{ {{ $clusterLabel }}=~"$cluster", job="kube-controller-manager",instance=~"$instance"}
-    legendFormat: '{{`{{`}}instance{{`}}`}}'
-  title: Goroutines
   type: timeseries
+condition: {{ "($Values.kubeControllerManager).enabled" }}
+links:
+- asDropdown: true
+  includeVars: true
+  keepTime: true
+  tags:
+  - kubernetes-mixin
+  targetBlank: false
+  title: Kubernetes
+  type: dashboards
 refresh: 10s
 schemaVersion: 39
-tags:
-- kubernetes-mixin
-- vm-k8s-stack
-templating:
-  list:
-  - current:
-      selected: true
-      text: default
-      value: default
-    hide: 0
-    label: Data source
-    name: datasource
-    query: {{ $defaultDatasource }}
-    regex: ''
-    type: datasource
-  - datasource:
-      type: prometheus
-      uid: ${datasource}
-    hide: {{ ternary 0 2 $multicluster }}
-    label: cluster
-    name: cluster
-    query: {{ ternary (b64dec "ImxhYmVsX3ZhbHVlcyh1cHtqb2I9XCJrdWJlLWNvbnRyb2xsZXItbWFuYWdlclwifSwgY2x1c3Rlciki" | replace "cluster" $clusterLabel) ".*" $multicluster }}
-    refresh: 2
-    sort: 1
-    type: {{ ternary "query" "constant" $multicluster }}
-  - datasource:
-      type: prometheus
-      uid: ${datasource}
-    hide: 0
-    includeAll: true
-    label: instance
-    name: instance
-    query: label_values(up{ {{ $clusterLabel }}=~"$cluster", job="kube-controller-manager"}, instance)
-    refresh: 2
-    sort: 1
-    type: query
 time:
   from: now-1h
   to: now
-timezone: {{ default "UTC" ($Values.defaultDashboards).defaultTimezone }}
-title: Kubernetes / Controller Manager
 uid: 72e0e05bef5099e5f049b05fdc429ed4
