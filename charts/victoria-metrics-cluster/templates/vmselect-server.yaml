@@ -47,7 +47,7 @@ spec:
       schedulerName: {{ . }}
       {{- end }}
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
-      serviceAccountName: {{ (.Values.serviceAccount).name | default $sa }}
+      serviceAccountName: {{ tpl (.Values.serviceAccount).name $ctx | default $sa }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- end }}
       {{- if $app.podSecurityContext.enabled }}
@@ -103,7 +103,7 @@ spec:
             - mountPath: {{ $app.cacheMountPath }}
               name: {{ $storageName }}
             {{- range $app.extraHostPathMounts }}
-            - name: {{ .name }}
+            - name: {{ tpl .name $ctx }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
               subPath: {{ . }}
@@ -158,7 +158,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ $app.persistentVolume.name | default $storageName }}
+        name: {{ tpl $app.persistentVolume.name $ctx | default $storageName }}
         {{- with $app.persistentVolume.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
@@ -182,7 +182,7 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ $pvc.name | default $fullname }}
+  name: {{ tpl $pvc.name $ctx | default $fullname }}
   namespace: {{ $ns }}
   {{- $_ := set $ctx "extraLabels" $pvc.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}

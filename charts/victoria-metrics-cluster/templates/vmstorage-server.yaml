@@ -71,7 +71,7 @@ spec:
               mountPath: {{ $app.persistentVolume.mountPath }}
               subPath: {{ $app.persistentVolume.subPath }}
             {{- range $manager.extraSecretMounts }}
-            - name: {{ .name }}
+            - name: {{ tpl .name $ctx }}
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
             {{- end }}
@@ -122,14 +122,14 @@ spec:
           {{- end }}
           volumeMounts:
             {{- with $app.persistentVolume }}
-            - name: {{ .name }}
+            - name: {{ tpl .name $ctx }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
               subPath: {{ . }}
               {{- end }}
             {{- end }}
             {{- range $app.extraHostPathMounts }}
-            - name: {{ .name }}
+            - name: {{ tpl .name $ctx }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
               subPath: {{ . }}
@@ -197,14 +197,14 @@ spec:
               containerPort: 8300
           volumeMounts:
             {{- with $app.persistentVolume }}
-            - name: {{ .name }}
+            - name: {{ tpl .name $ctx }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
               subPath: {{ . }}
               {{- end }}
             {{- end }}
             {{- range $manager.extraSecretMounts }}
-            - name: {{ .name }}
+            - name: {{ tpl .name $ctx }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
               subPath: {{ . }}
@@ -225,7 +225,7 @@ spec:
       securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
-      serviceAccountName: {{ (.Values.serviceAccount).name | default $sa }}
+      serviceAccountName: {{ tpl (.Values.serviceAccount).name $ctx | default $sa }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- end }}
       {{- with $app.tolerations }}
@@ -267,7 +267,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ $app.persistentVolume.name }}
+        name: {{ tpl $app.persistentVolume.name $ctx }}
         {{- with $app.persistentVolume.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
