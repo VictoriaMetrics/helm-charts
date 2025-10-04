@@ -1,10 +1,128 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
+templating:
+  list:
+  - current:
+      text: VictoriaMetrics - cluster
+      value: PAF93674D0B4E9963
+    includeAll: false
+    name: ds
+    query: {{ $defaultDatasource }}
+    refresh: 1
+    regex: ""
+    type: datasource
+  - current:
+      text: null
+      value: null
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    includeAll: true
+    multi: true
+    name: job
+    query:
+      query: label_values(vm_app_version{version=~"^vmalert.*",cluster=~"$cluster"},
+        job)
+      refId: StandardVariableQuery
+    refresh: 1
+    regex: ""
+    type: query
+  - allValue: .*
+    current:
+      text: null
+      value: null
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    includeAll: true
+    multi: true
+    name: instance
+    query:
+      query: label_values(vm_app_version{job=~"$job",cluster=~"$cluster"}, instance)
+      refId: StandardVariableQuery
+    refresh: 1
+    regex: ""
+    type: query
+  - allValue: .*
+    current:
+      text: null
+      value: null
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    includeAll: true
+    multi: true
+    name: file
+    query:
+      query: label_values(vmalert_iteration_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"},
+        file)
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    refresh: 1
+    regex: ""
+    type: query
+  - allValue: .*
+    current:
+      text: null
+      value: null
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    includeAll: true
+    multi: true
+    name: group
+    query:
+      query: label_values(vmalert_iteration_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"},
+        group)
+      refId: StandardVariableQuery
+    refresh: 1
+    regex: ""
+    type: query
+  - current:
+      text: "5"
+      value: "5"
+    includeAll: false
+    name: topk
+    options:
+    - selected: true
+      text: "5"
+      value: "5"
+    - selected: false
+      text: "10"
+      value: "10"
+    - selected: false
+      text: "20"
+      value: "20"
+    - selected: false
+      text: "30"
+      value: "30"
+    - selected: false
+      text: "40"
+      value: "40"
+    - selected: false
+      text: "50"
+      value: "50"
+    query: 5, 10, 20, 30, 40, 50
+    type: custom
+  - datasource:
+      type: prometheus
+      uid: ${ds}
+    name: filter
+    type: adhoc
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    hide: {{ ternary 0 2 $multicluster }}
+    includeAll: true
+    label: Cluster
+    multi: true
+    name: cluster
+    query: label_values(vm_app_version, cluster)
+    type: query
 annotations:
   list:
   - builtIn: 1
@@ -25,21 +143,21 @@ annotations:
       type: prometheus
       uid: $ds
     enable: true
-    expr: sum(vm_app_version{job=~"$job", instance=~"$instance"}) by(short_version) unless (sum(vm_app_version{job=~"$job", instance=~"$instance"} offset $__interval) by(short_version))
+    expr: sum(vm_app_version{job=~"$job",instance=~"$instance",cluster=~"$cluster"})
+      by(short_version,cluster) unless sum(vm_app_version{job=~"$job",instance=~"$instance",cluster=~"$cluster"}
+      offset $__interval) by(short_version,cluster)
     hide: true
     iconColor: dark-blue
     name: version
-    textFormat: '{{`{{`}}short_version{{`}}`}}'
-    titleFormat: Version change
   - datasource:
       type: prometheus
       uid: $ds
     enable: true
-    expr: sum(changes(vm_app_start_timestamp{job=~"$job", instance=~"$instance"}[$__interval])) by(job, instance)
+    expr: sum(changes(vm_app_start_timestamp{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__interval]))
+      by(job,instance,cluster)
     hide: false
     iconColor: dark-yellow
     name: restarts
-    textFormat: '{{`{{`}}job{{`}}`}}:{{`{{`}}instance{{`}}`}} restarted'
 condition: {{ ($Values.vmalert).enabled }}
 description: Overview for VictoriaMetrics vmalert v1.117.0 or higher
 editable: false
@@ -54,7 +172,7 @@ links:
   tags: []
   targetBlank: true
   title: vmalert docs
-  tooltip: ''
+  tooltip: ""
   type: link
   url: https://docs.victoriametrics.com/victoriametrics/vmalert/
 - asDropdown: false
@@ -64,7 +182,7 @@ links:
   tags: []
   targetBlank: true
   title: Found a bug?
-  tooltip: ''
+  tooltip: ""
   type: link
   url: ' https://github.com/VictoriaMetrics/VictoriaMetrics/issues'
 - asDropdown: false
@@ -74,7 +192,7 @@ links:
   tags: []
   targetBlank: true
   title: New releases
-  tooltip: ''
+  tooltip: ""
   type: link
   url: ' https://github.com/VictoriaMetrics/VictoriaMetrics/releases'
 panels:
@@ -83,20 +201,22 @@ panels:
     h: 1
     w: 24
     x: 0
-    'y': 0
+    "y": 0
   id: 47
   panels: []
   title: Stats
   type: row
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
-  description: Shows if the last configuration update was successful. "Not Ok" means there was an unsuccessful attempt to update the configuration due to some error. Check the log for details.
+    uid: $datasource
+  description: Shows if the last configuration update was successful. "Not Ok" means
+    there was an unsuccessful attempt to update the configuration due to some error.
+    Check the log for details.
   fieldConfig:
     defaults:
       mappings:
       - options:
-          match: 'null'
+          match: "null"
           result:
             color: green
             index: 0
@@ -114,12 +234,13 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: null
     overrides: []
   gridPos:
     h: 3
     w: 4
     x: 0
-    'y': 1
+    "y": 1
   id: 6
   options:
     colorMode: value
@@ -130,7 +251,7 @@ panels:
     reduceOptions:
       calcs:
       - last
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
@@ -140,34 +261,36 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     editorMode: code
     exemplar: false
-    expr: count(vmalert_config_last_reload_successful{job=~"$job", instance=~"$instance"} < 1 )
-    interval: ''
-    legendFormat: ''
+    expr: count(vmalert_config_last_reload_successful{job=~"$job",instance=~"$instance",cluster=~"$cluster"}
+      < 1) by(cluster)
+    interval: ""
+    legendFormat: ""
     range: true
     refId: A
   title: Config update
   type: stat
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
-  description: Shows the total number of loaded alerting rules across selected instances and groups.
+    uid: $datasource
+  description: Shows the total number of loaded alerting rules across selected instances
+    and groups.
   fieldConfig:
     defaults:
-      mappings: []
       min: 0
       thresholds:
         mode: absolute
         steps:
         - color: green
+          value: null
     overrides: []
   gridPos:
     h: 3
     w: 5
     x: 4
-    'y': 1
+    "y": 1
   id: 9
   options:
     colorMode: value
@@ -178,7 +301,7 @@ panels:
     reduceOptions:
       calcs:
       - last
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
@@ -188,32 +311,34 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     exemplar: false
-    expr: count(vmalert_alerting_rules_last_evaluation_samples{job=~"$job", instance=~"$instance", group=~"$group", file=~"$file"})
-    interval: ''
-    legendFormat: ''
+    expr: count(vmalert_alerting_rules_last_evaluation_samples{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"})
+      by(cluster)
+    interval: ""
+    legendFormat: ""
     refId: A
   title: Alerting rules
   type: stat
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
-  description: Shows the total number of loaded recording rules across selected instances and groups.
+    uid: $datasource
+  description: Shows the total number of loaded recording rules across selected instances
+    and groups.
   fieldConfig:
     defaults:
-      mappings: []
       min: 0
       thresholds:
         mode: absolute
         steps:
         - color: green
+          value: null
     overrides: []
   gridPos:
     h: 3
     w: 5
     x: 9
-    'y': 1
+    "y": 1
   id: 7
   options:
     colorMode: value
@@ -224,7 +349,7 @@ panels:
     reduceOptions:
       calcs:
       - last
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
@@ -234,26 +359,28 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     exemplar: false
-    expr: count(vmalert_recording_rules_last_evaluation_samples{job=~"$job", instance=~"$instance", group=~"$group", file=~"$file"})
-    interval: ''
-    legendFormat: ''
+    expr: count(vmalert_recording_rules_last_evaluation_samples{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"})
+      by(cluster)
+    interval: ""
+    legendFormat: ""
     refId: A
   title: Recording rules
   type: stat
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
-  description: Shows the total number of errors generated by recording/alerting rules for selected instances and groups.
+    uid: $datasource
+  description: Shows the total number of errors generated by recording/alerting rules
+    for selected instances and groups.
   fieldConfig:
     defaults:
-      mappings: []
       min: 0
       thresholds:
         mode: absolute
         steps:
         - color: green
+          value: null
         - color: red
           value: 1
     overrides: []
@@ -261,7 +388,7 @@ panels:
     h: 3
     w: 5
     x: 14
-    'y': 1
+    "y": 1
   id: 8
   options:
     colorMode: value
@@ -272,7 +399,7 @@ panels:
     reduceOptions:
       calcs:
       - last
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
@@ -282,34 +409,41 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     editorMode: code
     exemplar: false
-    expr: "(sum(increase(vmalert_alerting_rules_errors_total{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}[$__rate_interval]))) + \n(sum(increase(vmalert_recording_rules_errors_total{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}[$__rate_interval])))"
-    interval: ''
-    legendFormat: ''
+    expr: sum(increase(vmalert_alerting_rules_errors_total{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"}[$__rate_interval]))
+      by(cluster) + sum(increase(vmalert_recording_rules_errors_total{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"}[$__rate_interval]))
+      by(cluster)
+    interval: ""
+    legendFormat: ""
     range: true
     refId: A
   title: Errors
   type: stat
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
-  description: "Shows number of Recording Rules which produce no data.\n\n Usually it means that such rules are misconfigured, since they give no output during the evaluation.\nPlease check if rule's expression is correct and it is working as expected."
+    uid: $datasource
+  description: |-
+    Shows number of Recording Rules which produce no data.
+
+     Usually it means that such rules are misconfigured, since they give no output during the evaluation.
+    Please check if rule's expression is correct and it is working as expected.
   fieldConfig:
     defaults:
       mappings:
       - options:
-          match: 'null'
+          match: "null"
           result:
             index: 1
-            text: '0'
+            text: "0"
         type: special
       min: 0
       thresholds:
         mode: absolute
         steps:
         - color: green
+          value: null
         - color: red
           value: 1
     overrides: []
@@ -317,7 +451,7 @@ panels:
     h: 3
     w: 5
     x: 19
-    'y': 1
+    "y": 1
   id: 48
   options:
     colorMode: value
@@ -328,7 +462,7 @@ panels:
     reduceOptions:
       calcs:
       - last
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
@@ -338,19 +472,20 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     editorMode: code
     exemplar: false
-    expr: count(vmalert_recording_rules_last_evaluation_samples{job=~"$job", instance=~"$instance"} < 1)
-    interval: ''
-    legendFormat: ''
+    expr: count(vmalert_recording_rules_last_evaluation_samples{job=~"$job",instance=~"$instance",cluster=~"$cluster"}
+      < 1) by(cluster)
+    interval: ""
+    legendFormat: ""
     range: true
     refId: A
   title: No data errors
   type: stat
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -361,11 +496,11 @@ panels:
           type: auto
         inspect: false
         minWidth: 50
-      mappings: []
       thresholds:
         mode: absolute
         steps:
         - color: green
+          value: null
         - color: red
           value: 80
     overrides:
@@ -385,34 +520,37 @@ panels:
     h: 4
     w: 9
     x: 0
-    'y': 4
+    "y": 4
   id: 45
   options:
     cellHeight: sm
     footer:
       countRows: false
-      fields: ''
+      fields:
+      - ""
       reducer:
       - sum
       show: false
+    frameIndex: 0
     showHeader: true
   pluginVersion: 12.0.2
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     editorMode: code
     exemplar: false
-    expr: sum(vm_app_version{job=~"$job", instance=~"$instance"}) by(job, short_version)
+    expr: sum(vm_app_version{job=~"$job",instance=~"$instance",cluster=~"$cluster"})
+      by(job,short_version,cluster)
     format: table
     instant: true
     range: false
     refId: A
-  title: ''
+  title: ""
   type: table
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -421,7 +559,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -444,15 +582,14 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 0
-      links: []
-      mappings: []
       min: 0
       thresholds:
         mode: absolute
         steps:
         - color: green
+          value: null
         - color: red
           value: 80
       unit: short
@@ -461,7 +598,7 @@ panels:
     h: 4
     w: 15
     x: 9
-    'y': 4
+    "y": 4
   id: 4
   options:
     legend:
@@ -480,13 +617,14 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     editorMode: code
     exemplar: false
-    expr: sum(min_over_time(up{job=~"$job", instance=~"$instance"}[$__rate_interval])) by (job)
+    expr: sum(min_over_time(up{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+      by(job,cluster)
     format: time_series
     instant: false
-    interval: ''
+    interval: ""
     legendFormat: '{{`{{`}}job{{`}}`}}'
     refId: A
   title: Uptime
@@ -496,14 +634,14 @@ panels:
     h: 1
     w: 24
     x: 0
-    'y': 8
+    "y": 8
   id: 11
   panels: []
   title: Overview ($instance)
   type: row
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: $datasource
   description: Shows the number of fired alerts by job.
   fieldConfig:
     defaults:
@@ -513,7 +651,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -536,12 +674,12 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
         - color: green
+          value: null
         - color: red
           value: 80
       unit: short
@@ -550,7 +688,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 9
+    "y": 9
   id: 15
   options:
     legend:
@@ -571,11 +709,12 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     editorMode: code
     exemplar: false
-    expr: sum(increase(vmalert_alerts_fired_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
-    interval: ''
+    expr: sum(increase(vmalert_alerts_fired_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+      by(job,cluster)
+    interval: ""
     legendFormat: '{{`{{`}}job{{`}}`}}'
     range: true
     refId: A
@@ -583,8 +722,9 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
-  description: Top $topk groups by evaluation duration. Shows groups that take the most of time during the evaluation across all instances.
+    uid: $datasource
+  description: Top $topk groups by evaluation duration. Shows groups that take the
+    most of time during the evaluation across all instances.
   fieldConfig:
     defaults:
       color:
@@ -593,7 +733,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -616,12 +756,12 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
         - color: green
+          value: null
         - color: red
           value: 80
       unit: s
@@ -630,7 +770,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 9
+    "y": 9
   id: 23
   options:
     legend:
@@ -651,11 +791,13 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     editorMode: code
     exemplar: false
-    expr: "topk($topk, max(sum(\n    rate(vmalert_iteration_duration_seconds_sum{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}[$__rate_interval])\n/\n    rate(vmalert_iteration_duration_seconds_count{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}[$__rate_interval])\n) by(job, instance, group, file)) \nby(job, group, file))"
-    interval: ''
+    expr: topk($topk, max(sum(rate(vmalert_iteration_duration_seconds_sum{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"}[$__rate_interval])
+      / rate(vmalert_iteration_duration_seconds_count{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"}[$__rate_interval]))
+      by(job,instance,group,file,cluster)) by(job,group,file,cluster)) by(cluster)
+    interval: ""
     legendFormat: ({{`{{`}}job{{`}}`}}) {{`{{`}}group{{`}}`}}({{`{{`}}file{{`}}`}})
     range: true
     refId: A
@@ -663,8 +805,9 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
-  description: Shows how many requests (executions) per second vmalert sends to the configured datasource.
+    uid: $datasource
+  description: Shows how many requests (executions) per second vmalert sends to the
+    configured datasource.
   fieldConfig:
     defaults:
       color:
@@ -673,7 +816,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -696,12 +839,12 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
         - color: green
+          value: null
         - color: red
           value: 80
       unit: short
@@ -710,7 +853,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 17
+    "y": 17
   id: 24
   options:
     legend:
@@ -729,11 +872,12 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     editorMode: code
     exemplar: false
-    expr: sum(rate(vmalert_execution_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by (job)
-    interval: ''
+    expr: sum(rate(vmalert_execution_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+      by(job,cluster)
+    interval: ""
     legendFormat: '{{`{{`}}job{{`}}`}}'
     range: true
     refId: A
@@ -741,8 +885,9 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
-  description: Shows the error rate while executing configured rules. Non-zero value means there are some issues with existing rules. Check the logs to get more details.
+    uid: $datasource
+  description: Shows the error rate while executing configured rules. Non-zero value
+    means there are some issues with existing rules. Check the logs to get more details.
   fieldConfig:
     defaults:
       color:
@@ -751,7 +896,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -774,12 +919,12 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
         - color: green
+          value: null
         - color: red
           value: 80
       unit: short
@@ -788,7 +933,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 17
+    "y": 17
   id: 25
   options:
     legend:
@@ -807,11 +952,12 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     editorMode: code
     exemplar: false
-    expr: sum(rate(vmalert_execution_errors_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job) > 0
-    interval: ''
+    expr: sum(rate(vmalert_execution_errors_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+      by(job,cluster) > 0
+    interval: ""
     legendFormat: __auto
     range: true
     refId: A
@@ -822,18 +968,17 @@ panels:
     h: 1
     w: 24
     x: 0
-    'y': 25
+    "y": 25
   id: 43
   panels:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'How much resident memory (RAM) the process is actually using, compared to its allowed container or system limit.
-
+      uid: $datasource
+    description: |-
+      How much resident memory (RAM) the process is actually using, compared to its allowed container or system limit.
 
       - Good: Below 70% most of the time, maybe spiking a bit under load.
-
-      - Bad: Above 90% for more than 5 minutes = risk of out-of-memory (OOM) kill.'
+      - Bad: Above 90% for more than 5 minutes = risk of out-of-memory (OOM) kill.
     fieldConfig:
       defaults:
         color:
@@ -842,7 +987,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -865,14 +1010,13 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        links: []
-        mappings: []
+            mode: "off"
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -881,11 +1025,18 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 162
+      "y": 162
     id: 37
     links:
-    - targetBlank: true
+    - asDropdown: false
+      icon: ""
+      includeVars: false
+      keepTime: false
+      tags: null
+      targetBlank: true
       title: Profiling
+      tooltip: ""
+      type: ""
       url: https://docs.victoriametrics.com/victoriametrics/vmagent/#profiling
     options:
       legend:
@@ -906,16 +1057,13 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: |-
-        max(
-            max_over_time(process_resident_memory_bytes{job=~"$job", instance=~"$instance"}[$__rate_interval])
-            /
-            vm_available_memory_bytes{job=~"$job", instance=~"$instance"}
-        ) by(job)
-      interval: ''
+      expr: max(max_over_time(process_resident_memory_bytes{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval])
+        / vm_available_memory_bytes{job=~"$job",instance=~"$instance",cluster=~"$cluster"})
+        by(job,cluster)
+      interval: ""
       legendFormat: __auto
       range: true
       refId: A
@@ -923,8 +1071,10 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: "Shows the CPU usage percentage per vmalert instance. \nIf you think that usage is abnormal or unexpected pls file an issue and attach CPU profile if possible."
+      uid: $datasource
+    description: "Shows the CPU usage percentage per vmalert instance. \nIf you think
+      that usage is abnormal or unexpected pls file an issue and attach CPU profile
+      if possible."
     fieldConfig:
       defaults:
         color:
@@ -933,7 +1083,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -956,14 +1106,13 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        links: []
-        mappings: []
+            mode: "off"
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -972,11 +1121,18 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 162
+      "y": 162
     id: 35
     links:
-    - targetBlank: true
+    - asDropdown: false
+      icon: ""
+      includeVars: false
+      keepTime: false
+      tags: null
+      targetBlank: true
       title: Profiling
+      tooltip: ""
+      type: ""
       url: https://docs.victoriametrics.com/victoriametrics/vmagent/#profiling
     options:
       legend:
@@ -997,12 +1153,14 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: "max(\n  rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]) \n  / \n  process_cpu_cores_available{job=~\"$job\", instance=~\"$instance\"}\n) by(job)"
+      expr: max(rate(process_cpu_seconds_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval])
+        / process_cpu_cores_available{job=~"$job",instance=~"$instance",cluster=~"$cluster"})
+        by(job,cluster)
       format: time_series
-      interval: ''
+      interval: ""
       intervalFactor: 1
       legendFormat: '{{`{{`}}job{{`}}`}}'
       range: true
@@ -1011,10 +1169,10 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'Share for memory allocated by the process itself. When memory usage reaches 100% it will be likely OOM-killed.
-
-      Safe memory usage % considered to be below 80%'
+      uid: $datasource
+    description: |-
+      Share for memory allocated by the process itself. When memory usage reaches 100% it will be likely OOM-killed.
+      Safe memory usage % considered to be below 80%
     fieldConfig:
       defaults:
         color:
@@ -1023,7 +1181,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1046,14 +1204,13 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        links: []
-        mappings: []
+            mode: "off"
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1062,7 +1219,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 170
+      "y": 170
     id: 65
     options:
       legend:
@@ -1083,16 +1240,13 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: |-
-        max(
-            max_over_time(process_resident_memory_anon_bytes{job=~"$job", instance=~"$instance"}[$__rate_interval])
-            /
-            vm_available_memory_bytes{job=~"$job", instance=~"$instance"}
-        ) by(instance)
-      interval: ''
+      expr: max(max_over_time(process_resident_memory_anon_bytes{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval])
+        / vm_available_memory_bytes{job=~"$job",instance=~"$instance",cluster=~"$cluster"})
+        by(instance,cluster)
+      interval: ""
       legendFormat: __auto
       range: true
       refId: A
@@ -1100,8 +1254,9 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Shows the max number of CPU cores used  by a `job` and the corresponding limit.
+      uid: $datasource
+    description: Shows the max number of CPU cores used  by a `job` and the corresponding
+      limit.
     fieldConfig:
       defaults:
         color:
@@ -1110,7 +1265,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1133,14 +1288,13 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        links: []
-        mappings: []
+            mode: "off"
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -1149,11 +1303,18 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 170
+      "y": 170
     id: 56
     links:
-    - targetBlank: true
+    - asDropdown: false
+      icon: ""
+      includeVars: false
+      keepTime: false
+      tags: null
+      targetBlank: true
       title: Profiling
+      tooltip: ""
+      type: ""
       url: https://docs.victoriametrics.com/victoriametrics/vmagent/#profiling
     options:
       legend:
@@ -1174,25 +1335,27 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: max(rate(process_cpu_seconds_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
+      expr: max(rate(process_cpu_seconds_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,cluster)
       format: time_series
-      interval: ''
+      interval: ""
       intervalFactor: 1
       legendFormat: '{{`{{`}}job{{`}}`}}'
       range: true
       refId: A
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: min(process_cpu_cores_available{job=~"$job", instance=~"$instance"}) by(job)
+      expr: min(process_cpu_cores_available{job=~"$job",instance=~"$instance",cluster=~"$cluster"})
+        by(job,cluster)
       format: time_series
       hide: false
-      interval: ''
+      interval: ""
       intervalFactor: 1
       legendFormat: limit ({{`{{`}}job{{`}}`}})
       range: true
@@ -1201,11 +1364,11 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'Amount of used RSS memory
+      uid: $datasource
+    description: |-
+      Amount of used RSS memory
 
-
-      If you think that usage is abnormal or unexpected, please file an issue and attach memory profile if possible.'
+      If you think that usage is abnormal or unexpected, please file an issue and attach memory profile if possible.
     fieldConfig:
       defaults:
         color:
@@ -1214,7 +1377,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1237,14 +1400,13 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        links: []
-        mappings: []
+            mode: "off"
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: bytes
@@ -1253,11 +1415,18 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 178
+      "y": 178
     id: 57
     links:
-    - targetBlank: true
+    - asDropdown: false
+      icon: ""
+      includeVars: false
+      keepTime: false
+      tags: null
+      targetBlank: true
       title: Profiling
+      tooltip: ""
+      type: ""
       url: https://docs.victoriametrics.com/victoriametrics/vmagent/#profiling
     options:
       legend:
@@ -1278,14 +1447,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: |-
-        max(
-            max_over_time(process_resident_memory_bytes{job=~"$job", instance=~"$instance"}[$__rate_interval])
-        ) by(job)
-      interval: ''
+      expr: max(max_over_time(process_resident_memory_bytes{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,cluster)
+      interval: ""
       legendFormat: '{{`{{`}}job{{`}}`}}'
       range: true
       refId: A
@@ -1293,8 +1460,15 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: "CPU pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html). Helps troubleshoot high CPU usage or throttling.\nLower is better.\n\n- waiting: The percentage of time at least one task in the process was ready to run (runnable) but couldn't get scheduled on the CPU.\n- stalled: The percentage of time all tasks in the process (except idle ones) were unable to get CPU time \u2014 a full CPU stall.\n\nIf there's a CPU burst, it's normal to see waiting or stalled > 1%. It only becomes a concern if it consistently climbs above 5\u201310% and aligns with latency spikes or GC slowdowns."
+      uid: $datasource
+    description: |-
+      CPU pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html). Helps troubleshoot high CPU usage or throttling.
+      Lower is better.
+
+      - waiting: The percentage of time at least one task in the process was ready to run (runnable) but couldn't get scheduled on the CPU.
+      - stalled: The percentage of time all tasks in the process (except idle ones) were unable to get CPU time — a full CPU stall.
+
+      If there's a CPU burst, it's normal to see waiting or stalled > 1%. It only becomes a concern if it consistently climbs above 5–10% and aligns with latency spikes or GC slowdowns.
     fieldConfig:
       defaults:
         color:
@@ -1303,7 +1477,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1328,20 +1502,19 @@ panels:
           thresholdsStyle:
             mode: line
         decimals: 0
-        links: []
-        mappings: []
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
         unit: s
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      'y': 178
+      "y": 178
     id: 66
     options:
       legend:
@@ -1362,23 +1535,25 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: sum(rate(process_pressure_cpu_waiting_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      expr: sum(rate(process_pressure_cpu_waiting_seconds_total{job=~"$job",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,instance,cluster)
       format: time_series
-      interval: ''
+      interval: ""
       intervalFactor: 2
       legendFormat: '{{`{{`}}instance{{`}}`}} - waiting'
       range: true
       refId: A
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: sum(rate(process_pressure_cpu_stalled_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      expr: sum(rate(process_pressure_cpu_stalled_seconds_total{job=~"$job",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,instance,cluster)
       format: time_series
       hide: false
-      interval: ''
+      interval: ""
       intervalFactor: 2
       legendFormat: '{{`{{`}}instance{{`}}`}} - stalled'
       range: true
@@ -1387,18 +1562,15 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'Shows memory pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html).
-
+      uid: $datasource
+    description: |-
+      Shows memory pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html).
       Lower is better.
 
-
       - waiting: Time fraction where at least one thread was blocked on memory.
-
       - stalled: Time fraction where every thread was blocked on memory (severe pressure).
 
-
-      If queries slow down and both series spike, the host is likely limited by RAM or I/O throughput.'
+      If queries slow down and both series spike, the host is likely limited by RAM or I/O throughput.
     fieldConfig:
       defaults:
         color:
@@ -1407,7 +1579,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1432,20 +1604,19 @@ panels:
           thresholdsStyle:
             mode: line
         decimals: 0
-        links: []
-        mappings: []
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
         unit: s
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 186
+      "y": 186
     id: 67
     options:
       legend:
@@ -1466,23 +1637,25 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: sum(rate(process_pressure_memory_waiting_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      expr: sum(rate(process_pressure_memory_waiting_seconds_total{job=~"$job",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,instance,cluster)
       format: time_series
-      interval: ''
+      interval: ""
       intervalFactor: 2
       legendFormat: '{{`{{`}}instance{{`}}`}} - waiting'
       range: true
       refId: A
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: sum(rate(process_pressure_memory_stalled_seconds_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      expr: sum(rate(process_pressure_memory_stalled_seconds_total{job=~"$job",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,instance,cluster)
       format: time_series
       hide: false
-      interval: ''
+      interval: ""
       intervalFactor: 2
       legendFormat: '{{`{{`}}instance{{`}}`}} - stalled'
       range: true
@@ -1491,7 +1664,7 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     fieldConfig:
       defaults:
         color:
@@ -1500,7 +1673,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1523,15 +1696,14 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         decimals: 0
-        links: []
-        mappings: []
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -1540,7 +1712,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 186
+      "y": 186
     id: 41
     options:
       legend:
@@ -1559,11 +1731,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: sum(go_goroutines{job=~"$job", instance=~"$instance"}) by(job)
+      expr: sum(go_goroutines{job=~"$job",instance=~"$instance",cluster=~"$cluster"})
+        by(job,cluster)
       format: time_series
-      interval: ''
+      interval: ""
       intervalFactor: 2
       legendFormat: __auto
       range: true
@@ -1572,13 +1745,12 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'Panel shows the percentage of open file descriptors in the OS.
-
+      uid: $datasource
+    description: |-
+      Panel shows the percentage of open file descriptors in the OS.
       Reaching the limit of open files can cause various issues and must be prevented.
 
-
-      See how to change limits here https://medium.com/@muhammadtriwibowo/set-permanently-ulimit-n-open-files-in-ubuntu-4d61064429a'
+      See how to change limits here https://medium.com/@muhammadtriwibowo/set-permanently-ulimit-n-open-files-in-ubuntu-4d61064429a
     fieldConfig:
       defaults:
         color:
@@ -1587,7 +1759,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1610,15 +1782,14 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         decimals: 3
-        links: []
-        mappings: []
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1627,7 +1798,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 194
+      "y": 194
     id: 39
     options:
       legend:
@@ -1646,17 +1817,14 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: |-
-        max(
-            max_over_time(process_open_fds{job=~"$job", instance=~"$instance"}[$__rate_interval])
-            /
-            process_max_fds{job=~"$job", instance=~"$instance"}
-        ) by(job)
+      expr: max(max_over_time(process_open_fds{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval])
+        / process_max_fds{job=~"$job",instance=~"$instance",cluster=~"$cluster"})
+        by(job,cluster)
       format: time_series
-      interval: ''
+      interval: ""
       intervalFactor: 2
       legendFormat: __auto
       range: true
@@ -1665,8 +1833,12 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: "Shows the time goroutines have spent in runnable state before actually running. The lower is better.\n\nHigh values or values exceeding the threshold is usually a sign of            insufficient CPU resources or CPU throttling. \n\nVerify that service has enough CPU resources. Otherwise, the service could work unreliably with delays in processing."
+      uid: $datasource
+    description: "Shows the time goroutines have spent in runnable state before actually
+      running. The lower is better.\n\nHigh values or values exceeding the threshold
+      is usually a sign of            insufficient CPU resources or CPU throttling.
+      \n\nVerify that service has enough CPU resources. Otherwise, the service could
+      work unreliably with delays in processing."
     fieldConfig:
       defaults:
         color:
@@ -1675,7 +1847,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1700,13 +1872,12 @@ panels:
           thresholdsStyle:
             mode: line
         decimals: 0
-        links: []
-        mappings: []
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 0.1
         unit: s
@@ -1715,7 +1886,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 194
+      "y": 194
     id: 61
     options:
       legend:
@@ -1734,11 +1905,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: max(histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket{job=~"$job"}[$__rate_interval])) by (job, instance, le))) by(job)
+      expr: max(histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket{job=~"$job",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,instance,le,cluster))) by(job,cluster)
       format: time_series
-      interval: ''
+      interval: ""
       intervalFactor: 2
       legendFormat: __auto
       range: true
@@ -1747,14 +1919,11 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'Shows the percent of CPU spent on garbage collection.
-
-
-      If % is high, then CPU usage can be decreased by changing GOGC to higher values. Increasing GOGC value will increase memory usage, and decrease CPU usage.
-
-
-      Try searching for keyword `GOGC` at https://docs.victoriametrics.com/victoriametrics/troubleshooting/ '
+      uid: $datasource
+    description: "Shows the percent of CPU spent on garbage collection.\n\nIf % is
+      high, then CPU usage can be decreased by changing GOGC to higher values. Increasing
+      GOGC value will increase memory usage, and decrease CPU usage.\n\nTry searching
+      for keyword `GOGC` at https://docs.victoriametrics.com/victoriametrics/troubleshooting/ "
     fieldConfig:
       defaults:
         color:
@@ -1763,7 +1932,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1786,15 +1955,14 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         decimals: 0
-        links: []
-        mappings: []
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: percentunit
@@ -1803,7 +1971,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 202
+      "y": 202
     id: 59
     options:
       legend:
@@ -1822,11 +1990,13 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: "max(\n  rate(go_gc_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]) \n / rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])\n ) by(job)"
+      expr: max(rate(go_gc_cpu_seconds_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval])
+        / rate(process_cpu_seconds_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,cluster)
       format: time_series
-      interval: ''
+      interval: ""
       intervalFactor: 2
       legendFormat: __auto
       range: true
@@ -1835,8 +2005,10 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Shows the rate of allocations in memory. Sudden increase in allocations would mean increased pressure on Go Garbage Collector and can saturate CPU resources of the application.
+      uid: $datasource
+    description: Shows the rate of allocations in memory. Sudden increase in allocations
+      would mean increased pressure on Go Garbage Collector and can saturate CPU resources
+      of the application.
     fieldConfig:
       defaults:
         color:
@@ -1845,7 +2017,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1870,20 +2042,19 @@ panels:
           thresholdsStyle:
             mode: line
         decimals: 0
-        links: []
-        mappings: []
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
         unit: bytes
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      'y': 210
+      "y": 210
     id: 64
     options:
       legend:
@@ -1902,11 +2073,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: sum(rate(go_memstats_alloc_bytes_total{job=~"$job"}[$__rate_interval])) by (job, instance)
+      expr: sum(rate(go_memstats_alloc_bytes_total{job=~"$job",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,instance,cluster)
       format: time_series
-      interval: ''
+      interval: ""
       intervalFactor: 2
       legendFormat: __auto
       range: true
@@ -1920,12 +2092,12 @@ panels:
     h: 1
     w: 24
     x: 0
-    'y': 26
+    "y": 26
   id: 62
   panels:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     fieldConfig:
       defaults:
         color:
@@ -1935,11 +2107,11 @@ panels:
           cellOptions:
             type: auto
           inspect: false
-        mappings: []
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
       overrides:
@@ -1959,16 +2131,18 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 345
+      "y": 345
     id: 50
     options:
       cellHeight: sm
       footer:
         countRows: false
-        fields: ''
+        fields:
+        - ""
         reducer:
         - sum
         show: false
+      frameIndex: 0
       showHeader: true
       sortBy:
       - desc: true
@@ -1977,10 +2151,11 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: sum(flag{is_set="true", job=~"$job", instance=~"$instance"}) by(job, instance, name, value)
+      expr: sum(flag{is_set="true",job=~"$job",instance=~"$instance",cluster=~"$cluster"})
+        by(job,instance,name,value,cluster)
       format: table
       instant: true
       legendFormat: __auto
@@ -2007,8 +2182,12 @@ panels:
     type: table
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: "Missed evaluation means that group evaluation time takes longer than the configured evaluation interval. \nThis may result in missed alerting notifications or recording rules samples. Try increasing evaluation interval or concurrency for such groups. See https://docs.victoriametrics.com/victoriametrics/vmalert/#groups\n\nIf rule expressions are taking longer than expected, please see https://docs.victoriametrics.com/victoriametrics/troubleshooting/#slow-queries.\""
+      uid: $datasource
+    description: "Missed evaluation means that group evaluation time takes longer
+      than the configured evaluation interval. \nThis may result in missed alerting
+      notifications or recording rules samples. Try increasing evaluation interval
+      or concurrency for such groups. See https://docs.victoriametrics.com/victoriametrics/vmalert/#groups\n\nIf
+      rule expressions are taking longer than expected, please see https://docs.victoriametrics.com/victoriametrics/troubleshooting/#slow-queries.\""
     fieldConfig:
       defaults:
         color:
@@ -2017,7 +2196,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: bars
@@ -2039,12 +2218,12 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2053,7 +2232,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      'y': 345
+      "y": 345
     id: 58
     options:
       legend:
@@ -2071,10 +2250,11 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: sum(increase(vmalert_iteration_missed_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job, group, file) > 0
+      expr: sum(increase(vmalert_iteration_missed_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,group,file,cluster) > 0
       interval: 1m
       legendFormat: ({{`{{`}}job{{`}}`}}) {{`{{`}}group{{`}}`}}({{`{{`}}file{{`}}`}})
       range: true
@@ -2083,8 +2263,12 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'Shows the number of restarts per job. The chart can be useful to identify periodic process restarts and correlate them with potential issues or anomalies. Normally, processes shouldn''t restart unless restart was inited by user. The reason of restarts should be figured out by checking the logs of each specific service. '
+      uid: $datasource
+    description: 'Shows the number of restarts per job. The chart can be useful to
+      identify periodic process restarts and correlate them with potential issues
+      or anomalies. Normally, processes shouldn''t restart unless restart was inited
+      by user. The reason of restarts should be figured out by checking the logs of
+      each specific service. '
     fieldConfig:
       defaults:
         color:
@@ -2093,7 +2277,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           axisSoftMin: 0
           barAlignment: 0
@@ -2116,14 +2300,13 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
+            mode: "off"
         decimals: 0
-        links: []
-        mappings: []
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: none
@@ -2132,7 +2315,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 352
+      "y": 352
     id: 63
     options:
       legend:
@@ -2150,9 +2333,10 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: sum(changes(vm_app_start_timestamp{job=~"$job", instance=~"$instance"}[$__rate_interval]) > 0) by(job)
+      expr: sum(changes(vm_app_start_timestamp{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval])
+        > 0) by(job,cluster)
       format: time_series
       instant: false
       legendFormat: '{{`{{`}}job{{`}}`}}'
@@ -2166,12 +2350,12 @@ panels:
     h: 1
     w: 24
     x: 0
-    'y': 27
+    "y": 27
   id: 17
   panels:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     description: Shows top $topk current active (firing) alerting rules.
     fieldConfig:
       defaults:
@@ -2180,7 +2364,7 @@ panels:
         custom:
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2201,12 +2385,12 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2215,7 +2399,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 370
+      "y": 370
     id: 14
     options:
       legend:
@@ -2235,11 +2419,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: topk($topk, sum(vmalert_alerts_firing{job=~"$job", instance=~"$instance", group=~"$group", file=~"$file"}) by(job, group, file, alertname) > 0)
-      interval: ''
+      expr: topk($topk, sum(vmalert_alerts_firing{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"})
+        by(job,group,file,alertname,cluster) > 0) by(cluster)
+      interval: ""
       legendFormat: ({{`{{`}}job{{`}}`}}) {{`{{`}}group{{`}}`}}.{{`{{`}}alertname{{`}}`}}({{`{{`}}file{{`}}`}})
       range: true
       refId: A
@@ -2247,8 +2432,9 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Shows the events when rule execution resulted into an error. Check the logs for more details.
+      uid: $datasource
+    description: Shows the events when rule execution resulted into an error. Check
+      the logs for more details.
     fieldConfig:
       defaults:
         color:
@@ -2256,7 +2442,7 @@ panels:
         custom:
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2277,12 +2463,12 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2291,7 +2477,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 370
+      "y": 370
     id: 13
     options:
       legend:
@@ -2311,11 +2497,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: sum(increase(vmalert_alerting_rules_errors_total{job=~"$job", instance=~"$instance", group=~"$group", file=~"$file"}[$__rate_interval])) by(job, group, file, alertname) > 0
-      interval: ''
+      expr: sum(increase(vmalert_alerting_rules_errors_total{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,group,file,alertname,cluster) > 0
+      interval: ""
       legendFormat: ({{`{{`}}job{{`}}`}}) {{`{{`}}group{{`}}`}}.{{`{{`}}alertname{{`}}`}}({{`{{`}}file{{`}}`}})
       range: true
       refId: A
@@ -2323,10 +2510,10 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'Shows the current pending alerting rules per group.
-
-      By pending means the rule which remains active less than configured `for` parameter.'
+      uid: $datasource
+    description: |-
+      Shows the current pending alerting rules per group.
+      By pending means the rule which remains active less than configured `for` parameter.
     fieldConfig:
       defaults:
         color:
@@ -2334,7 +2521,7 @@ panels:
         custom:
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2355,12 +2542,12 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2369,7 +2556,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 378
+      "y": 378
     id: 20
     options:
       legend:
@@ -2389,11 +2576,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: sum(vmalert_alerts_pending{job=~"$job", instance=~"$instance", group=~"$group", file=~"$file"}) by(job, group, file, alertname) > 0
-      interval: ''
+      expr: sum(vmalert_alerts_pending{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"})
+        by(job,group,file,alertname,cluster) > 0
+      interval: ""
       legendFormat: ({{`{{`}}job{{`}}`}}) {{`{{`}}group{{`}}`}}.{{`{{`}}alertname{{`}}`}}({{`{{`}}file{{`}}`}})
       range: true
       refId: A
@@ -2401,8 +2589,10 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Shows the error rate for the attempts to send alerts to Alertmanager. If not zero it means there issues on attempt to send notification to Alertmanager and some alerts may be not delivered properly. Check the logs for more details.
+      uid: $datasource
+    description: Shows the error rate for the attempts to send alerts to Alertmanager.
+      If not zero it means there issues on attempt to send notification to Alertmanager
+      and some alerts may be not delivered properly. Check the logs for more details.
     fieldConfig:
       defaults:
         color:
@@ -2410,7 +2600,7 @@ panels:
         custom:
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2431,13 +2621,13 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2446,7 +2636,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 378
+      "y": 378
     id: 32
     options:
       legend:
@@ -2464,18 +2654,20 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       exemplar: false
-      expr: sum(rate(vmalert_alerts_send_errors_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(instance, addr) > 0
-      interval: ''
+      expr: sum(rate(vmalert_alerts_send_errors_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+        by(instance,addr,cluster) > 0
+      interval: ""
       legendFormat: '{{`{{`}}instance{{`}}`}} => {{`{{`}}addr{{`}}`}}'
       refId: A
     title: Errors rate to Alertmanager
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Shows how many alerts are sent to Alertmanager per second. Only active alerts are sent.
+      uid: $datasource
+    description: Shows how many alerts are sent to Alertmanager per second. Only active
+      alerts are sent.
     fieldConfig:
       defaults:
         color:
@@ -2483,7 +2675,7 @@ panels:
         custom:
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2504,13 +2696,13 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2519,7 +2711,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 386
+      "y": 386
     id: 26
     options:
       legend:
@@ -2537,11 +2729,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: sum(rate(vmalert_alerts_sent_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job, addr) > 0
-      interval: ''
+      expr: sum(rate(vmalert_alerts_sent_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,addr,cluster) > 0
+      interval: ""
       legendFormat: '{{`{{`}}job{{`}}`}} => {{`{{`}}addr{{`}}`}}'
       range: true
       refId: A
@@ -2554,13 +2747,16 @@ panels:
     h: 1
     w: 24
     x: 0
-    'y': 28
+    "y": 28
   id: 28
   panels:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Shows the top $topk recording rules which generate the most of [samples](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples). Each generated sample is basically a time series which then ingested into configured remote storage. Rules with high numbers may cause the most pressure on the remote database and become a source of too high cardinality.
+      uid: $datasource
+    description: Shows the top $topk recording rules which generate the most of [samples](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples).
+      Each generated sample is basically a time series which then ingested into configured
+      remote storage. Rules with high numbers may cause the most pressure on the remote
+      database and become a source of too high cardinality.
     fieldConfig:
       defaults:
         color:
@@ -2568,7 +2764,7 @@ panels:
         custom:
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2589,12 +2785,12 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2603,7 +2799,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 385
+      "y": 385
     id: 31
     options:
       legend:
@@ -2623,11 +2819,13 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: "topk($topk, \n  max(\n    sum(vmalert_recording_rules_last_evaluation_samples{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}) by(job, instance, group, file, recording) > 0\n  ) by(job, group, file, recording)\n)"
-      interval: ''
+      expr: topk($topk, max(sum(vmalert_recording_rules_last_evaluation_samples{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"})
+        by(job,instance,group,file,recording,cluster) > 0) by(job,group,file,recording,cluster))
+        by(cluster)
+      interval: ""
       legendFormat: ({{`{{`}}job{{`}}`}}) {{`{{`}}group{{`}}`}}.{{`{{`}}recording{{`}}`}}({{`{{`}}file{{`}}`}})
       range: true
       refId: A
@@ -2635,10 +2833,10 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'Shows the rules which do not produce any [samples](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples) during the evaluation. Usually it means that such rules are misconfigured, since they give no output during the evaluation.
-
-      Please check if rule''s expression is correct and it is working as expected.'
+      uid: $datasource
+    description: |-
+      Shows the rules which do not produce any [samples](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples) during the evaluation. Usually it means that such rules are misconfigured, since they give no output during the evaluation.
+      Please check if rule's expression is correct and it is working as expected.
     fieldConfig:
       defaults:
         color:
@@ -2646,7 +2844,7 @@ panels:
         custom:
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2667,12 +2865,12 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2681,7 +2879,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 385
+      "y": 385
     id: 33
     options:
       legend:
@@ -2701,11 +2899,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: count(vmalert_recording_rules_last_evaluation_samples{job=~"$job", instance=~"$instance", group=~"$group", file=~"$file"} < 1) by(job, group, file, recording)
-      interval: ''
+      expr: count(vmalert_recording_rules_last_evaluation_samples{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"}
+        < 1) by(job,group,file,recording,cluster)
+      interval: ""
       legendFormat: ({{`{{`}}job{{`}}`}}) {{`{{`}}group{{`}}`}}.{{`{{`}}recording{{`}}`}}({{`{{`}}file{{`}}`}})
       range: true
       refId: A
@@ -2713,7 +2912,7 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     fieldConfig:
       defaults:
         color:
@@ -2721,7 +2920,7 @@ panels:
         custom:
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2742,12 +2941,12 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2756,7 +2955,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 393
+      "y": 393
     id: 30
     options:
       legend:
@@ -2774,11 +2973,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: false
-      expr: sum(increase(vmalert_recording_rules_errors_total{job=~"$job", instance=~"$instance", group=~"$group", file=~"$file"}[$__rate_interval])) by(job, group, file, recording) > 0
-      interval: ''
+      expr: sum(increase(vmalert_recording_rules_errors_total{job=~"$job",instance=~"$instance",group=~"$group",file=~"$file",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,group,file,recording,cluster) > 0
+      interval: ""
       legendFormat: ({{`{{`}}job{{`}}`}}) {{`{{`}}group{{`}}`}}.{{`{{`}}recording{{`}}`}}({{`{{`}}file{{`}}`}})
       range: true
       refId: A
@@ -2791,12 +2991,12 @@ panels:
     h: 1
     w: 24
     x: 0
-    'y': 29
+    "y": 29
   id: 55
   panels:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: $datasource
     fieldConfig:
       defaults:
         color:
@@ -2804,7 +3004,7 @@ panels:
         custom:
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2825,12 +3025,12 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
       overrides: []
@@ -2838,7 +3038,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 351
+      "y": 351
     id: 52
     options:
       legend:
@@ -2852,9 +3052,10 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: sum(rate(vmalert_remotewrite_sent_rows_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
+      expr: sum(rate(vmalert_remotewrite_sent_rows_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,cluster)
       legendFormat: __auto
       range: true
       refId: A
@@ -2862,8 +3063,10 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Shows the number of datapoints dropped by vmalert while sending to the configured remote write URL. vmalert performs up to 5 retries before dropping the data. Check vmalert's error logs for the specific error message.
+      uid: $datasource
+    description: Shows the number of datapoints dropped by vmalert while sending to
+      the configured remote write URL. vmalert performs up to 5 retries before dropping
+      the data. Check vmalert's error logs for the specific error message.
     fieldConfig:
       defaults:
         color:
@@ -2871,7 +3074,7 @@ panels:
         custom:
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2892,12 +3095,12 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
       overrides: []
@@ -2905,7 +3108,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 351
+      "y": 351
     id: 53
     options:
       legend:
@@ -2919,9 +3122,10 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
-      expr: sum(rate(vmalert_remotewrite_dropped_rows_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job) > 0
+      expr: sum(rate(vmalert_remotewrite_dropped_rows_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,cluster) > 0
       legendFormat: __auto
       range: true
       refId: A
@@ -2929,11 +3133,10 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: 'Shows current number of established connections to remote write endpoints.
+      uid: $datasource
+    description: |+
+      Shows current number of established connections to remote write endpoints.
 
-
-      '
     fieldConfig:
       defaults:
         color:
@@ -2942,7 +3145,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -2964,14 +3167,13 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        links: []
-        mappings: []
+            mode: "off"
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: short
@@ -2980,7 +3182,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      'y': 378
+      "y": 378
     id: 54
     options:
       legend:
@@ -2997,11 +3199,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: true
-      expr: sum(max_over_time(vmalert_remotewrite_conns{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job)
-      interval: ''
+      expr: sum(max_over_time(vmalert_remotewrite_conns{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,cluster)
+      interval: ""
       legendFormat: __auto
       range: true
       refId: A
@@ -3009,8 +3212,9 @@ panels:
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Shows the global rate for number of written bytes via remote write connections.
+      uid: $datasource
+    description: Shows the global rate for number of written bytes via remote write
+      connections.
     fieldConfig:
       defaults:
         color:
@@ -3019,7 +3223,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           drawStyle: line
@@ -3041,14 +3245,13 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        links: []
-        mappings: []
+            mode: "off"
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: null
           - color: red
             value: 80
         unit: decbytes
@@ -3057,7 +3260,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      'y': 378
+      "y": 378
     id: 60
     options:
       legend:
@@ -3074,11 +3277,12 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: $datasource
       editorMode: code
       exemplar: true
-      expr: sum(rate(vmalert_remotewrite_conn_bytes_written_total{job=~"$job", instance=~"$instance"}[$__rate_interval])) by(job) > 0
-      interval: ''
+      expr: sum(rate(vmalert_remotewrite_conn_bytes_written_total{job=~"$job",instance=~"$instance",cluster=~"$cluster"}[$__rate_interval]))
+        by(job,cluster) > 0
+      interval: ""
       legendFormat: __auto
       range: true
       refId: A
@@ -3087,124 +3291,16 @@ panels:
   title: Remote write
   type: row
 preload: false
-refresh: ''
+refresh: ""
 schemaVersion: 41
 tags:
 - victoriametrics
 - vm-k8s-stack
-templating:
-  list:
-  - current:
-      text: VictoriaMetrics - cluster
-      value: PAF93674D0B4E9963
-    includeAll: false
-    name: ds
-    options: []
-    query: {{ $defaultDatasource }}
-    refresh: 1
-    regex: ''
-    type: datasource
-  - current: {}
-    datasource:
-      type: prometheus
-      uid: $ds
-    definition: label_values(vm_app_version{version=~"^vmalert.*"}, job)
-    includeAll: true
-    multi: true
-    name: job
-    options: []
-    query:
-      query: label_values(vm_app_version{version=~"^vmalert.*"}, job)
-      refId: StandardVariableQuery
-    refresh: 1
-    regex: ''
-    type: query
-  - allValue: .*
-    current: {}
-    datasource:
-      type: prometheus
-      uid: $ds
-    definition: label_values(vm_app_version{job=~"$job"}, instance)
-    includeAll: true
-    multi: true
-    name: instance
-    options: []
-    query:
-      query: label_values(vm_app_version{job=~"$job"}, instance)
-      refId: StandardVariableQuery
-    refresh: 1
-    regex: ''
-    type: query
-  - allValue: .*
-    current: {}
-    datasource:
-      type: prometheus
-      uid: $ds
-    definition: label_values(vmalert_iteration_total{job=~"$job", instance=~"$instance"},file)
-    includeAll: true
-    multi: true
-    name: file
-    options: []
-    query:
-      query: label_values(vmalert_iteration_total{job=~"$job", instance=~"$instance"},file)
-      refId: PrometheusVariableQueryEditor-VariableQuery
-    refresh: 1
-    regex: ''
-    type: query
-  - allValue: .*
-    current: {}
-    datasource:
-      type: prometheus
-      uid: $ds
-    definition: label_values(vmalert_iteration_total{job=~"$job", instance=~"$instance"}, group)
-    includeAll: true
-    multi: true
-    name: group
-    options: []
-    query:
-      query: label_values(vmalert_iteration_total{job=~"$job", instance=~"$instance"}, group)
-      refId: StandardVariableQuery
-    refresh: 1
-    regex: ''
-    type: query
-  - current:
-      text: '5'
-      value: '5'
-    includeAll: false
-    name: topk
-    options:
-    - selected: true
-      text: '5'
-      value: '5'
-    - selected: false
-      text: '10'
-      value: '10'
-    - selected: false
-      text: '20'
-      value: '20'
-    - selected: false
-      text: '30'
-      value: '30'
-    - selected: false
-      text: '40'
-      value: '40'
-    - selected: false
-      text: '50'
-      value: '50'
-    query: 5, 10, 20, 30, 40, 50
-    type: custom
-  - baseFilters: []
-    datasource:
-      type: prometheus
-      uid: ${ds}
-    filters: []
-    name: filter
-    type: adhoc
 time:
   from: now-3h
   to: now
 timepicker: {}
-timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
+timezone: {{ default "" ($Values.defaultDashboards).defaultTimezone }}
 title: VictoriaMetrics - vmalert
 uid: LzldHAVnz
 version: 1

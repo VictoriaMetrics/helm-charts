@@ -1,19 +1,22 @@
+
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
-{{- $groupLabels := join "," $additionalGroupByLabels }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels "cluster" }}
+{{- $groupLabels := join "," (uniq $additionalGroupByLabels) }}
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
-condition: '{{ true }}'
+type: prometheus
 name: node-network
 rules:
 - alert: NodeNetworkInterfaceFlapping
-  annotations:
-    description: 'Network interface "{{`{{`}} $labels.device {{`}}`}}" changing its up status often on node-exporter {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}}'
-    runbook_url: '{{ $runbookUrl }}/general/nodenetworkinterfaceflapping'
-    summary: 'Network interface is often changing its status'
-  condition: '{{ true }}'
-  expr: changes(node_network_up{job="{{ include "vm-k8s-stack.nodeExporter.name" . }}",device!~"veth.+"}[2m]) > 2
-  for: 2m
+  expr: changes(node_network_up{job="{{ include \"vm-k8s-stack.nodeExporter.name\"
+    . }}",device!~"veth.+"}[2m]) > 2
+  for: 2m0s
   labels:
     severity: warning
+  annotations:
+    description: Network interface "{{`{{`}} $labels.device {{`}}`}}" changing its up status often
+      on node-exporter {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}}
+    runbook_url: {{ $runbookUrl }}/general/nodenetworkinterfaceflapping'
+    summary: Network interface is often changing its status
+  condition: {{ true }}
+condition: {{ true }}

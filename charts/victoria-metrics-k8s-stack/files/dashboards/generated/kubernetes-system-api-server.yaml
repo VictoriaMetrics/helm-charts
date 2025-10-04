@@ -1,35 +1,77 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-__elements: []
-__inputs:
-- description: ''
-  label: Prometheus
-  name: DS_PROMETHEUS
-  pluginId: prometheus
-  pluginName: Prometheus
-  type: datasource
-__requires:
-- id: grafana
-  name: Grafana
-  type: grafana
-  version: 8.4.4
-- id: prometheus
-  name: Prometheus
-  type: datasource
-  version: 5.0.0
-- id: timeseries
-  name: Time series
-  type: panel
-  version: ''
-- id: stat
-  name: Stat
-  type: panel
-  version: ''
+templating:
+  list:
+  - current:
+      selected: false
+      text: Prometheus
+      value: Prometheus
+    hide: 0
+    includeAll: false
+    label: ""
+    multi: false
+    name: datasource
+    query: {{ $defaultDatasource }}
+    refresh: 1
+    regex: ""
+    skipUrlSync: false
+    type: datasource
+  - current:
+      selected: false
+      text: None
+      value: ""
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    hide: {{ ternary 0 2 $multicluster }}
+    includeAll: false
+    multi: false
+    name: cluster
+    query:
+      qryType: 1
+      query: {{ ternary "label_values(kube_node_info, cluster)" ".*" $multicluster
+        }}
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    refresh: 1
+    regex: ""
+    skipUrlSync: false
+    sort: 1
+    type: {{ ternary "query" "constant" $multicluster }}
+  - current:
+      selected: true
+      text: 30s
+      value: 30s
+    hide: 0
+    includeAll: false
+    multi: false
+    name: resolution
+    options:
+    - selected: false
+      text: 1s
+      value: 1s
+    - selected: false
+      text: 15s
+      value: 15s
+    - selected: true
+      text: 30s
+      value: 30s
+    - selected: false
+      text: 1m
+      value: 1m
+    - selected: false
+      text: 3m
+      value: 3m
+    - selected: false
+      text: 5m
+      value: 5m
+    query: 1s, 15s, 30s, 1m, 3m, 5m
+    skipUrlSync: false
+    type: custom
 annotations:
   list:
   - builtIn: 1
@@ -73,23 +115,24 @@ annotations:
       - oncall
       type: tags
 condition: {{ ($Values.kubeApiServer).enabled }}
-description: 'This is a modern API Server dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
+description: 'This is a modern API Server dashboard for your Kubernetes cluster(s).
+  Made for kube-prometheus-stack and take advantage of the latest Grafana features.
+  GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
 editable: false
 fiscalYearStartMonth: 0
 graphTooltip: 1
-links: []
 liveNow: false
 panels:
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       mappings:
       - options:
-          '0':
+          "0":
             text: DOWN
-          '1':
+          "1":
             text: UP
         type: value
       thresholds:
@@ -104,34 +147,37 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 0
+    "y": 0
   id: 42
   options:
     colorMode: background
     graphMode: none
     justifyMode: auto
     orientation: horizontal
+    percentChangeColorMode: ""
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
+    showPercentChange: false
     textMode: value_and_name
+    wideLayout: false
   pluginVersion: 10.0.1
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: up{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}
-    interval: ''
+    expr: up{job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}
+    interval: ""
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
   title: API Server - Health Status
   type: stat
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       custom:
@@ -139,7 +185,6 @@ panels:
         cellOptions:
           type: auto
         inspect: false
-      mappings: []
       thresholds:
         mode: absolute
         steps:
@@ -158,16 +203,18 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 0
+    "y": 0
   id: 60
   options:
     cellHeight: sm
     footer:
       countRows: false
-      fields: ''
+      fields:
+      - ""
       reducer:
       - sum
       show: false
+    frameIndex: 0
     showHeader: true
     sortBy:
     - desc: false
@@ -176,11 +223,11 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: apiserver_requested_deprecated_apis{ {{ $clusterLabel }}=~"$cluster"}
-    interval: ''
-    legendFormat: ''
+    expr: apiserver_requested_deprecated_apis{cluster=~"$cluster"}
+    interval: ""
+    legendFormat: ""
     refId: A
   title: Deprecated Kubernetes Resources
   transformations:
@@ -239,7 +286,7 @@ panels:
   type: table
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -247,7 +294,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -268,8 +315,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
@@ -283,7 +329,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 8
+    "y": 8
   id: 38
   options:
     legend:
@@ -298,9 +344,10 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: sum by (code) (rate(apiserver_request_total{ {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(apiserver_request_total{cluster=~"$cluster"}[$__rate_interval]))
+      by(code,cluster)
     interval: $resolution
     legendFormat: '{{`{{`}} code {{`}}`}}'
     refId: A
@@ -308,7 +355,7 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -316,7 +363,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -337,8 +384,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
@@ -352,7 +398,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 8
+    "y": 8
   id: 39
   options:
     legend:
@@ -367,9 +413,10 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: sum by (verb) (rate(apiserver_request_total{ {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(apiserver_request_total{cluster=~"$cluster"}[$__rate_interval]))
+      by(verb,cluster)
     interval: $resolution
     legendFormat: '{{`{{`}} verb{{`}}`}}'
     refId: A
@@ -377,7 +424,7 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -385,7 +432,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -406,8 +453,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
@@ -421,7 +467,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 16
+    "y": 16
   id: 53
   options:
     legend:
@@ -436,12 +482,11 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: |-
-      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
-      /
-      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    expr: sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}[$__rate_interval]))
+      by(instance,cluster) / sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}[$__rate_interval]))
+      by(instance,cluster)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -449,7 +494,7 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -457,7 +502,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -478,8 +523,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
@@ -493,7 +537,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 16
+    "y": 16
   id: 54
   options:
     legend:
@@ -508,12 +552,11 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: |-
-      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
-      /
-      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
+    expr: sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}[$__rate_interval]))
+      by(verb,cluster) / sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}[$__rate_interval]))
+      by(verb,cluster)
     interval: $resolution
     legendFormat: '{{`{{`}} verb {{`}}`}}'
     refId: A
@@ -521,7 +564,7 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -529,7 +572,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -550,8 +593,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
@@ -565,7 +607,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 24
+    "y": 24
   id: 50
   options:
     legend:
@@ -580,11 +622,11 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: |-
-      sum by(instance) (rate(apiserver_request_total{code=~"5..", job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
-       / sum by(instance) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(apiserver_request_total{code=~"5..",job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}[$__rate_interval]))
+      by(instance,cluster) / sum(rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}[$__rate_interval]))
+      by(instance,cluster)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -592,7 +634,7 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -600,7 +642,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -621,8 +663,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
@@ -636,7 +677,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 24
+    "y": 24
   id: 51
   options:
     legend:
@@ -651,11 +692,11 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: |-
-      sum by(verb) (rate(apiserver_request_total{code=~"5..",job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
-       / sum by(verb) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
+    expr: sum(rate(apiserver_request_total{code=~"5..",job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}[$__rate_interval]))
+      by(verb,cluster) / sum(rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}[$__rate_interval]))
+      by(verb,cluster)
     interval: $resolution
     legendFormat: '{{`{{`}} verb {{`}}`}}'
     refId: A
@@ -663,7 +704,7 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -671,7 +712,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -692,8 +733,7 @@ panels:
           group: A
           mode: normal
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
@@ -707,7 +747,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 32
+    "y": 32
   id: 40
   options:
     legend:
@@ -722,9 +762,10 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: sum(rate(apiserver_request_total{ {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    expr: sum(rate(apiserver_request_total{cluster=~"$cluster"}[$__rate_interval]))
+      by(instance,cluster)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -732,7 +773,7 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -740,7 +781,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -761,8 +802,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
@@ -776,7 +816,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 32
+    "y": 32
   id: 56
   options:
     legend:
@@ -791,9 +831,10 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: sum(rate(workqueue_depth{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
+    expr: sum(rate(workqueue_depth{job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}[$__rate_interval]))
+      by(instance,cluster)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -801,7 +842,7 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -809,7 +850,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -830,9 +871,8 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
-      mappings: []
       thresholds:
         mode: absolute
         steps:
@@ -846,7 +886,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 40
+    "y": 40
   id: 47
   options:
     legend:
@@ -861,9 +901,9 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: rate(process_cpu_seconds_total{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
+    expr: rate(process_cpu_seconds_total{job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}[$__rate_interval])
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -871,7 +911,7 @@ panels:
   type: timeseries
 - datasource:
     type: {{ $defaultDatasource }}
-    uid: ${datasource}
+    uid: $datasource
   fieldConfig:
     defaults:
       color:
@@ -879,7 +919,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -900,8 +940,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
-      mappings: []
+          mode: "off"
       thresholds:
         mode: absolute
         steps:
@@ -915,7 +954,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 40
+    "y": 40
   id: 48
   options:
     legend:
@@ -930,9 +969,9 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
+      uid: $datasource
     exemplar: true
-    expr: process_resident_memory_bytes{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}
+    expr: process_resident_memory_bytes{job=~"kubernetes-apiservers|apiserver",cluster=~"$cluster"}
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
@@ -940,86 +979,16 @@ panels:
   type: timeseries
 refresh: 30s
 schemaVersion: 38
-style: dark
 tags:
 - Kubernetes
 - Prometheus
 - vm-k8s-stack
-templating:
-  list:
-  - current:
-      selected: false
-      text: Prometheus
-      value: Prometheus
-    hide: 0
-    includeAll: false
-    label: ''
-    multi: false
-    name: datasource
-    options: []
-    query: {{ $defaultDatasource }}
-    queryValue: ''
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    type: datasource
-  - current:
-      isNone: true
-      selected: false
-      text: None
-      value: ''
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(kube_node_info,{{ $clusterLabel }})
-    hide: {{ ternary 0 2 $multicluster }}
-    includeAll: false
-    multi: false
-    name: cluster
-    options: []
-    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyhrdWJlX25vZGVfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $clusterLabel) ".*" $multicluster }}
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    type: {{ ternary "query" "constant" $multicluster }}
-  - current:
-      selected: true
-      text: 30s
-      value: 30s
-    hide: 0
-    includeAll: false
-    multi: false
-    name: resolution
-    options:
-    - selected: false
-      text: 1s
-      value: 1s
-    - selected: false
-      text: 15s
-      value: 15s
-    - selected: true
-      text: 30s
-      value: 30s
-    - selected: false
-      text: 1m
-      value: 1m
-    - selected: false
-      text: 3m
-      value: 3m
-    - selected: false
-      text: 5m
-      value: 5m
-    query: 1s, 15s, 30s, 1m, 3m, 5m
-    queryValue: ''
-    skipUrlSync: false
-    type: custom
 time:
   from: now-1h
   to: now
 timepicker: {}
-timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
+timezone: {{ default "" ($Values.defaultDashboards).defaultTimezone }}
 title: Kubernetes / System / API Server
 uid: k8s_system_apisrv
 version: 19
-weekStart: ''
+weekStart: ""
