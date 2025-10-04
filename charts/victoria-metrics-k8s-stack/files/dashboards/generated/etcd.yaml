@@ -1,43 +1,65 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
+templating:
+  list:
+  - label: Data Source
+    name: datasource
+    query: {{ $defaultDatasource }}
+    type: datasource
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    hide: {{ ternary 0 2 $multicluster }}
+    label: cluster
+    name: cluster
+    query: {{ ternary "label_values(etcd_server_has_leader{job=~\".*etcd.*\",cluster=~\"$cluster\"},
+      job)" ".*" $multicluster }}
+    refresh: 2
+    type: {{ ternary "query" "constant" $multicluster }}
+annotations: {}
 condition: {{ ($Values.kubeEtcd).enabled }}
 description: etcd sample Grafana dashboard with Prometheus
 editable: false
 panels:
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   gridPos:
     h: 7
     w: 6
     x: 0
-    'y': 0
+    "y": 0
   id: 1
   interval: 1m
   options:
     colorMode: none
     graphMode: none
+    justifyMode: ""
+    orientation: ""
+    percentChangeColorMode: ""
     reduceOptions:
       calcs:
       - lastNotNull
+    showPercentChange: false
+    textMode: ""
+    wideLayout: false
   pluginVersion: v10.0.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: sum(etcd_server_has_leader{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"})
-    legendFormat: '{{`{{`}}cluster{{`}}`}} - {{`{{`}}namespace{{`}}`}}
-
-      '
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Up
   type: stat
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -46,11 +68,12 @@ panels:
         lineWidth: 2
         showPoints: never
       unit: ops
+    overrides: null
   gridPos:
     h: 7
     w: 10
     x: 6
-    'y': 0
+    "y": 0
   id: 2
   interval: 1m
   pluginVersion: v10.0.0
@@ -58,17 +81,19 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: sum(rate(grpc_server_started_total{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster",grpc_type="unary"}[$__rate_interval]))
-    legendFormat: RPC rate
+    panelId: 0
+    refId: ""
+    withTransforms: false
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: sum(rate(grpc_server_handled_total{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster",grpc_type="unary",grpc_code=~"Unknown|FailedPrecondition|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded"}[$__rate_interval]))
-    legendFormat: RPC failed rate
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: RPC rate
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -76,11 +101,12 @@ panels:
         fillOpacity: 0
         lineWidth: 2
         showPoints: never
+    overrides: null
   gridPos:
     h: 7
     w: 8
     x: 16
-    'y': 0
+    "y": 0
   id: 3
   interval: 1m
   pluginVersion: v10.0.0
@@ -88,17 +114,19 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: sum(grpc_server_started_total{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{ {{ $clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"})
-    legendFormat: Watch streams
+    panelId: 0
+    refId: ""
+    withTransforms: false
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: sum(grpc_server_started_total{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{ {{ $clusterLabel }}=~"$cluster",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"})
-    legendFormat: Lease streams
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Active streams
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -107,11 +135,12 @@ panels:
         lineWidth: 2
         showPoints: never
       unit: bytes
+    overrides: null
   gridPos:
     h: 7
     w: 8
     x: 0
-    'y': 25
+    "y": 25
   id: 4
   interval: 1m
   pluginVersion: v10.0.0
@@ -119,12 +148,13 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}
-    legendFormat: '{{`{{`}}instance{{`}}`}} DB size'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: DB size
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -133,11 +163,12 @@ panels:
         lineWidth: 2
         showPoints: never
       unit: s
+    overrides: null
   gridPos:
     h: 7
     w: 8
     x: 8
-    'y': 25
+    "y": 25
   id: 5
   interval: 1m
   pluginVersion: v10.0.0
@@ -145,17 +176,19 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}} WAL fsync'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}} DB fsync'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Disk sync duration
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -164,11 +197,12 @@ panels:
         lineWidth: 2
         showPoints: never
       unit: bytes
+    overrides: null
   gridPos:
     h: 7
     w: 8
     x: 16
-    'y': 25
+    "y": 25
   id: 6
   interval: 1m
   pluginVersion: v10.0.0
@@ -176,12 +210,13 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: process_resident_memory_bytes{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}
-    legendFormat: '{{`{{`}}instance{{`}}`}} resident memory'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Memory
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -190,11 +225,12 @@ panels:
         lineWidth: 2
         showPoints: never
       unit: Bps
+    overrides: null
   gridPos:
     h: 7
     w: 6
     x: 0
-    'y': 50
+    "y": 50
   id: 7
   interval: 1m
   pluginVersion: v10.0.0
@@ -202,12 +238,13 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: rate(etcd_network_client_grpc_received_bytes_total{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
-    legendFormat: '{{`{{`}}instance{{`}}`}} client traffic in'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Client traffic in
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -216,11 +253,12 @@ panels:
         lineWidth: 2
         showPoints: never
       unit: Bps
+    overrides: null
   gridPos:
     h: 7
     w: 6
     x: 6
-    'y': 50
+    "y": 50
   id: 8
   interval: 1m
   pluginVersion: v10.0.0
@@ -228,12 +266,13 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: rate(etcd_network_client_grpc_sent_bytes_total{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
-    legendFormat: '{{`{{`}}instance{{`}}`}} client traffic out'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Client traffic out
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -242,11 +281,12 @@ panels:
         lineWidth: 2
         showPoints: never
       unit: Bps
+    overrides: null
   gridPos:
     h: 7
     w: 6
     x: 12
-    'y': 50
+    "y": 50
   id: 9
   interval: 1m
   pluginVersion: v10.0.0
@@ -254,12 +294,13 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: sum(rate(etcd_network_peer_received_bytes_total{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
-    legendFormat: '{{`{{`}}instance{{`}}`}} peer traffic in'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Peer traffic in
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -268,11 +309,12 @@ panels:
         lineWidth: 2
         showPoints: never
       unit: Bps
+    overrides: null
   gridPos:
     h: 7
     w: 6
     x: 18
-    'y': 50
+    "y": 50
   id: 10
   interval: 1m
   pluginVersion: v10.0.0
@@ -280,12 +322,13 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: sum(rate(etcd_network_peer_sent_bytes_total{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
-    legendFormat: '{{`{{`}}instance{{`}}`}} peer traffic out'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Peer traffic out
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -293,11 +336,12 @@ panels:
         fillOpacity: 0
         lineWidth: 2
         showPoints: never
+    overrides: null
   gridPos:
     h: 7
     w: 8
     x: 0
-    'y': 75
+    "y": 75
   id: 11
   interval: 1m
   pluginVersion: v10.0.0
@@ -305,12 +349,13 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: changes(etcd_server_leader_changes_seen_total{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}[1d])
-    legendFormat: '{{`{{`}}instance{{`}}`}} total leader elections per day'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Raft proposals
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -318,11 +363,12 @@ panels:
         fillOpacity: 0
         lineWidth: 2
         showPoints: never
+    overrides: null
   gridPos:
     h: 7
     w: 8
     x: 8
-    'y': 75
+    "y": 75
   id: 12
   interval: 1m
   pluginVersion: v10.0.0
@@ -330,12 +376,13 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: changes(etcd_server_leader_changes_seen_total{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}[1d])
-    legendFormat: '{{`{{`}}instance{{`}}`}} total leader elections per day'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Total leader elections per day
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -344,11 +391,12 @@ panels:
         lineWidth: 2
         showPoints: never
       unit: s
+    overrides: null
   gridPos:
     h: 7
     w: 8
     x: 16
-    'y': 75
+    "y": 75
   id: 13
   interval: 1m
   pluginVersion: v10.0.0
@@ -356,8 +404,9 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    expr: histogram_quantile(0.99, sum by (instance, le) (rate(etcd_network_peer_round_trip_time_seconds_bucket{job=~".*etcd.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])))
-    legendFormat: '{{`{{`}}instance{{`}}`}} peer round trip time'
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Peer round trip time
   type: timeseries
 refresh: 10s
@@ -365,21 +414,6 @@ schemaVersion: 36
 tags:
 - etcd-mixin
 - vm-k8s-stack
-templating:
-  list:
-  - label: Data Source
-    name: datasource
-    query: {{ $defaultDatasource }}
-    type: datasource
-  - datasource:
-      type: prometheus
-      uid: ${datasource}
-    hide: {{ ternary 0 2 $multicluster }}
-    label: cluster
-    name: cluster
-    query: {{ ternary (b64dec "ImxhYmVsX3ZhbHVlcyhldGNkX3NlcnZlcl9oYXNfbGVhZGVye2pvYj1+XCIuKmV0Y2QuKlwifSwgY2x1c3Rlciki" | replace "cluster" $clusterLabel) ".*" $multicluster }}
-    refresh: 2
-    type: {{ ternary "query" "constant" $multicluster }}
 time:
   from: now-15m
   to: now

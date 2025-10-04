@@ -1,39 +1,74 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-__elements: {}
-__inputs:
-- description: ''
-  label: VictoriaMetrics
-  name: DS_VICTORIAMETRICS
-  pluginId: prometheus
-  pluginName: Prometheus
-  type: datasource
-__requires:
-- id: bargauge
-  name: Bar gauge
-  type: panel
-  version: ''
-- id: grafana
-  name: Grafana
-  type: grafana
-  version: 11.3.0
-- id: prometheus
-  name: Prometheus
-  type: datasource
-  version: 1.0.0
-- id: timeseries
-  name: Time series
-  type: panel
-  version: ''
+templating:
+  list:
+  - current:
+      text: null
+      value: null
+    includeAll: false
+    name: datasource
+    query: {{ $defaultDatasource }}
+    refresh: 1
+    regex: ""
+    type: datasource
+  - current:
+      text: null
+      value: null
+    hide: {{ ternary 0 2 $multicluster }}
+    label: cluster
+    name: cluster
+    query:
+      qryType: 1
+      query: {{ ternary "label_values(vector_build_info, cluster)" ".*" $multicluster
+        }}
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    refresh: 1
+    regex: ""
+    type: {{ ternary "query" "constant" $multicluster }}
+  - current:
+      text: null
+      value: null
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    includeAll: true
+    label: instance
+    multi: true
+    name: instance
+    query:
+      qryType: 1
+      query: label_values(vector_build_info, instance)
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    refresh: 1
+    regex: ""
+    sort: 1
+    type: query
+  - current:
+      text: null
+      value: null
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    includeAll: true
+    multi: true
+    name: namespace
+    query:
+      qryType: 1
+      query: label_values(vector_component_received_events_total{component_type="kubernetes_logs",cluster=~"$cluster"},
+        pod_namespace)
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    refresh: 1
+    regex: ""
+    sort: 1
+    type: query
 annotations:
   list:
-  - $$hashKey: object:1058
-    builtIn: 1
+  - builtIn: 1
     datasource:
       type: datasource
       uid: grafana
@@ -52,15 +87,13 @@ description: Vector.dev Kubernetes cluster monitoring dashboard
 editable: false
 fiscalYearStartMonth: 0
 graphTooltip: 1
-id: null
-links: []
 panels:
 - collapsed: true
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 0
+    "y": 0
   id: 364
   panels:
   - datasource:
@@ -70,7 +103,6 @@ panels:
       defaults:
         color:
           mode: thresholds
-        mappings: []
         thresholds:
           mode: absolute
           steps:
@@ -82,7 +114,7 @@ panels:
       h: 12
       w: 6
       x: 0
-      'y': 1
+      "y": 1
     id: 360
     options:
       displayMode: lcd
@@ -98,7 +130,7 @@ panels:
       orientation: horizontal
       reduceOptions:
         calcs: []
-        fields: ''
+        fields: ""
         values: false
       showUnfilled: true
       sizing: auto
@@ -111,7 +143,8 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: topk(10, sum by (component_id, cluster, pod_namespace) (rate(vector_component_received_events_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
+      expr: topk(10, sum(rate(vector_component_received_events_total{component_kind="source",pod_namespace=~"$namespace",cluster=~"$cluster",instance=~"$instance"}[1m]))
+        by(component_id,cluster,pod_namespace)) by(cluster)
       instant: true
       legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_namespace {{`}}`}}'
       range: false
@@ -125,7 +158,6 @@ panels:
       defaults:
         color:
           mode: thresholds
-        mappings: []
         thresholds:
           mode: absolute
           steps:
@@ -137,7 +169,7 @@ panels:
       h: 12
       w: 6
       x: 6
-      'y': 1
+      "y": 1
     id: 365
     options:
       displayMode: lcd
@@ -153,7 +185,7 @@ panels:
       orientation: horizontal
       reduceOptions:
         calcs: []
-        fields: ''
+        fields: ""
         values: false
       showUnfilled: true
       sizing: auto
@@ -165,7 +197,8 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: topk(10, sum by (component_id, pod_namespace) (rate(vector_component_received_event_bytes_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
+      expr: topk(10, sum(rate(vector_component_received_event_bytes_total{component_kind="source",pod_namespace=~"$namespace",cluster=~"$cluster",instance=~"$instance"}[1m]))
+        by(component_id,pod_namespace,cluster)) by(cluster)
       instant: true
       legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_namespace {{`}}`}}'
       range: false
@@ -179,7 +212,6 @@ panels:
       defaults:
         color:
           mode: thresholds
-        mappings: []
         thresholds:
           mode: absolute
           steps:
@@ -191,7 +223,7 @@ panels:
       h: 12
       w: 6
       x: 12
-      'y': 1
+      "y": 1
     id: 367
     options:
       displayMode: lcd
@@ -207,7 +239,7 @@ panels:
       orientation: horizontal
       reduceOptions:
         calcs: []
-        fields: ''
+        fields: ""
         values: false
       showUnfilled: true
       sizing: auto
@@ -220,7 +252,8 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: topk(10, sum by (component_id, pod_name) (rate(vector_component_received_events_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
+      expr: topk(10, sum(rate(vector_component_received_events_total{component_kind="source",pod_namespace=~"$namespace",cluster=~"$cluster",instance=~"$instance"}[1m]))
+        by(component_id,pod_name,cluster)) by(cluster)
       instant: true
       legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_name {{`}}`}}'
       range: false
@@ -234,7 +267,6 @@ panels:
       defaults:
         color:
           mode: thresholds
-        mappings: []
         thresholds:
           mode: absolute
           steps:
@@ -246,7 +278,7 @@ panels:
       h: 12
       w: 6
       x: 18
-      'y': 1
+      "y": 1
     id: 366
     options:
       displayMode: lcd
@@ -262,7 +294,7 @@ panels:
       orientation: horizontal
       reduceOptions:
         calcs: []
-        fields: ''
+        fields: ""
         values: false
       showUnfilled: true
       sizing: auto
@@ -274,7 +306,8 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: topk(10, sum by (pod_name, component_id) (rate(vector_component_received_event_bytes_total{component_kind="source", pod_namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m])))
+      expr: topk(10, sum(rate(vector_component_received_event_bytes_total{component_kind="source",pod_namespace=~"$namespace",cluster=~"$cluster",instance=~"$instance"}[1m]))
+        by(pod_name,component_id,cluster)) by(cluster)
       instant: true
       legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} pod_name {{`}}`}}'
       range: false
@@ -292,7 +325,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -315,8 +348,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -330,7 +362,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      'y': 13
+      "y": 13
     id: 328
     options:
       legend:
@@ -348,10 +380,11 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: histogram_quantile(0.95, sum(rate(vector_source_lag_time_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[5m])) by (le,component_type, instance))
+      expr: histogram_quantile(0.95, sum(rate(vector_source_lag_time_seconds_bucket{cluster=~"$cluster",instance=~"$instance"}[5m]))
+        by(le,component_type,instance,cluster))
       format: time_series
       instant: false
-      interval: ''
+      interval: ""
       legendFormat: '{{`{{`}}component_type{{`}}`}}: {{`{{`}}instance{{`}}`}}'
       range: true
       refId: A
@@ -368,7 +401,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -391,8 +424,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -406,7 +438,7 @@ panels:
       h: 7
       w: 6
       x: 12
-      'y': 13
+      "y": 13
     id: 368
     options:
       legend:
@@ -424,10 +456,11 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: avg by (component_id, instance) (vector_open_files{component_kind="source", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"})
+      expr: avg(vector_open_files{component_kind="source",cluster=~"$cluster",instance=~"$instance"})
+        by(component_id,instance,cluster)
       format: time_series
       instant: false
-      interval: ''
+      interval: ""
       legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}instance{{`}}`}}'
       range: true
       refId: A
@@ -444,7 +477,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -467,8 +500,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -482,7 +514,7 @@ panels:
       h: 7
       w: 6
       x: 18
-      'y': 13
+      "y": 13
     id: 369
     options:
       legend:
@@ -500,10 +532,11 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: avg by (component_id, error_type) (vector_component_errors_total{component_kind="source", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
+      expr: avg(vector_component_errors_total{component_kind="source",cluster=~"$cluster",instance=~"$instance"})
+        by(component_id,error_type,cluster) or 0
       format: time_series
       instant: false
-      interval: ''
+      interval: ""
       legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
       range: true
       refId: A
@@ -516,7 +549,7 @@ panels:
     h: 1
     w: 24
     x: 0
-    'y': 1
+    "y": 1
   id: 363
   panels:
   - datasource:
@@ -531,7 +564,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -554,8 +587,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -567,7 +599,7 @@ panels:
       h: 8
       w: 6
       x: 0
-      'y': 21
+      "y": 21
     id: 330
     options:
       legend:
@@ -584,22 +616,22 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $datasource
       editorMode: code
-      expr: sum by (component_id, instance) (rate(vector_component_received_event_bytes_total{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m]))
+      expr: sum(rate(vector_component_received_event_bytes_total{component_kind="transform",cluster=~"$cluster",instance=~"$instance"}[1m]))
+        by(component_id,instance,cluster)
       format: time_series
-      group: []
       hide: false
-      interval: ''
+      interval: ""
       legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
-      metricColumn: none
       range: true
-      rawQuery: false
       refId: A
     title: Events bytes rate (bytes/sec)
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    description: A ratio from 0 to 1 of the load on a component. A value of 0 would indicate a completely idle component that is simply waiting for input. A value of 1 would indicate a that is never idle. This value is updated every 5 seconds.
+    description: A ratio from 0 to 1 of the load on a component. A value of 0 would
+      indicate a completely idle component that is simply waiting for input. A value
+      of 1 would indicate a that is never idle. This value is updated every 5 seconds.
     fieldConfig:
       defaults:
         color:
@@ -608,7 +640,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -631,8 +663,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -646,7 +677,7 @@ panels:
       h: 8
       w: 6
       x: 6
-      'y': 21
+      "y": 21
     id: 332
     options:
       legend:
@@ -663,7 +694,8 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $datasource
       editorMode: code
-      expr: avg by (component_id, instance) (vector_utilization{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"})
+      expr: avg(vector_utilization{component_kind="transform",cluster=~"$cluster",instance=~"$instance"})
+        by(component_id,instance,cluster)
       legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}} instance {{`}}`}}'
       range: true
       refId: A
@@ -680,7 +712,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -703,8 +735,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -718,7 +749,7 @@ panels:
       h: 8
       w: 6
       x: 12
-      'y': 21
+      "y": 21
     id: 370
     options:
       legend:
@@ -736,10 +767,11 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: avg by (component_id, error_type) (vector_component_errors_total{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
+      expr: avg(vector_component_errors_total{component_kind="transform",cluster=~"$cluster",instance=~"$instance"})
+        by(component_id,error_type,cluster) or 0
       format: time_series
       instant: false
-      interval: ''
+      interval: ""
       legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
       range: true
       refId: A
@@ -756,7 +788,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -779,8 +811,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -794,7 +825,7 @@ panels:
       h: 8
       w: 6
       x: 18
-      'y': 21
+      "y": 21
     id: 371
     options:
       legend:
@@ -812,10 +843,11 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: avg by (component_id, reason) (vector_events_discarded_total{component_kind="transform", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
+      expr: avg(vector_events_discarded_total{component_kind="transform",cluster=~"$cluster",instance=~"$instance"})
+        by(component_id,reason,cluster) or 0
       format: time_series
       instant: false
-      interval: ''
+      interval: ""
       legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}reason{{`}}`}}'
       range: true
       refId: A
@@ -828,7 +860,7 @@ panels:
     h: 1
     w: 24
     x: 0
-    'y': 2
+    "y": 2
   id: 324
   panels:
   - datasource:
@@ -843,7 +875,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -866,8 +898,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -879,7 +910,7 @@ panels:
       h: 8
       w: 6
       x: 0
-      'y': 22
+      "y": 22
     id: 362
     options:
       legend:
@@ -896,7 +927,8 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $datasource
       editorMode: code
-      expr: sum by (component_id, instance) (rate(vector_component_received_events_total{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m]))
+      expr: sum(rate(vector_component_received_events_total{component_kind="sink",cluster=~"$cluster",instance=~"$instance"}[1m]))
+        by(component_id,instance,cluster)
       legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
       range: true
       refId: A
@@ -914,7 +946,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -937,8 +969,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -968,7 +999,7 @@ panels:
       h: 8
       w: 6
       x: 6
-      'y': 22
+      "y": 22
     id: 336
     options:
       legend:
@@ -986,23 +1017,23 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: sum by (component_id, instance) (rate(vector_component_received_event_bytes_total{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}[1m]))
+      expr: sum(rate(vector_component_received_event_bytes_total{component_kind="sink",cluster=~"$cluster",instance=~"$instance"}[1m]))
+        by(component_id,instance,cluster)
       format: time_series
-      group: []
       hide: false
       instant: false
-      interval: ''
+      interval: ""
       legendFormat: '{{`{{`}} component_id {{`}}`}}: {{`{{`}} instance {{`}}`}}'
-      metricColumn: none
       range: true
-      rawQuery: false
       refId: A
     title: Events bytes rate (bytes/sec)
     type: timeseries
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $datasource
-    description: A ratio from 0 to 1 of the load on a component. A value of 0 would indicate a completely idle component that is simply waiting for input. A value of 1 would indicate a that is never idle. This value is updated every 5 seconds.
+    description: A ratio from 0 to 1 of the load on a component. A value of 0 would
+      indicate a completely idle component that is simply waiting for input. A value
+      of 1 would indicate a that is never idle. This value is updated every 5 seconds.
     fieldConfig:
       defaults:
         color:
@@ -1011,7 +1042,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1034,8 +1065,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -1049,7 +1079,7 @@ panels:
       h: 8
       w: 6
       x: 12
-      'y': 22
+      "y": 22
     id: 338
     options:
       legend:
@@ -1066,7 +1096,8 @@ panels:
         type: {{ $defaultDatasource }}
         uid: $datasource
       editorMode: code
-      expr: avg by (component_id, instance) (vector_utilization{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"})
+      expr: avg(vector_utilization{component_kind="sink",cluster=~"$cluster",instance=~"$instance"})
+        by(component_id,instance,cluster)
       legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}} instance{{`}}`}}'
       range: true
       refId: A
@@ -1083,7 +1114,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: ''
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1106,8 +1137,7 @@ panels:
             group: A
             mode: none
           thresholdsStyle:
-            mode: 'off'
-        mappings: []
+            mode: "off"
         thresholds:
           mode: absolute
           steps:
@@ -1121,7 +1151,7 @@ panels:
       h: 8
       w: 6
       x: 18
-      'y': 22
+      "y": 22
     id: 372
     options:
       legend:
@@ -1139,10 +1169,11 @@ panels:
         uid: $datasource
       editorMode: code
       exemplar: false
-      expr: avg by (component_id, error_type) (vector_component_errors_total{component_kind="sink", {{ $clusterLabel }}=~"$cluster", instance=~"$instance"}) or 0
+      expr: avg(vector_component_errors_total{component_kind="sink",cluster=~"$cluster",instance=~"$instance"})
+        by(component_id,error_type,cluster) or 0
       format: time_series
       instant: false
-      interval: ''
+      interval: ""
       legendFormat: '{{`{{`}}component_id{{`}}`}}: {{`{{`}}error_type{{`}}`}}'
       range: true
       refId: A
@@ -1154,61 +1185,6 @@ refresh: 10s
 schemaVersion: 40
 tags:
 - vm-k8s-stack
-templating:
-  list:
-  - current: {}
-    includeAll: false
-    name: datasource
-    options: []
-    query: {{ $defaultDatasource }}
-    refresh: 1
-    regex: ''
-    type: datasource
-  - current: {}
-    definition: label_values(vector_build_info,{{ $clusterLabel }})
-    hide: {{ ternary 0 2 $multicluster }}
-    label: cluster
-    name: cluster
-    options: []
-    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyh2ZWN0b3JfYnVpbGRfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $clusterLabel) ".*" $multicluster }}
-    refresh: 1
-    regex: ''
-    type: {{ ternary "query" "constant" $multicluster }}
-  - current: {}
-    datasource:
-      type: prometheus
-      uid: $datasource
-    definition: label_values(vector_build_info,instance)
-    includeAll: true
-    label: instance
-    multi: true
-    name: instance
-    options: []
-    query:
-      qryType: 1
-      query: label_values(vector_build_info,instance)
-      refId: PrometheusVariableQueryEditor-VariableQuery
-    refresh: 1
-    regex: ''
-    sort: 1
-    type: query
-  - current: {}
-    datasource:
-      type: prometheus
-      uid: $datasource
-    definition: label_values(vector_component_received_events_total{component_type="kubernetes_logs"},pod_namespace)
-    includeAll: true
-    multi: true
-    name: namespace
-    options: []
-    query:
-      qryType: 1
-      query: label_values(vector_component_received_events_total{component_type="kubernetes_logs"},pod_namespace)
-      refId: PrometheusVariableQueryEditor-VariableQuery
-    refresh: 1
-    regex: ''
-    sort: 1
-    type: query
 time:
   from: now-1h
   to: now
@@ -1217,4 +1193,4 @@ timezone: {{ default "browser" ($Values.defaultDashboards).defaultTimezone }}
 title: Vector K8S Monitoring
 uid: ce3e6irowgf0gf
 version: 7
-weekStart: ''
+weekStart: ""

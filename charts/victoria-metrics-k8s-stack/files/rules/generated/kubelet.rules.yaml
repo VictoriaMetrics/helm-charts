@@ -1,42 +1,34 @@
+
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
-{{- $groupLabels := join "," $additionalGroupByLabels }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels "cluster" }}
+{{- $groupLabels := join "," (uniq $additionalGroupByLabels) }}
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
-condition: '{{ ($Values.kubelet).enabled }}'
+type: prometheus
 name: kubelet.rules
 rules:
-- condition: '{{ true }}'
-  expr: |-
-    histogram_quantile(
-      0.99,
-      sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", metrics_path="/metrics"}[5m])) by (instance,le,{{ $groupLabels }})
-      * on (instance,{{ $groupLabels }}) group_left (node)
-      max by (instance,node,{{ $groupLabels }}) (kubelet_node_name{job="kubelet", metrics_path="/metrics"})
-    )
+- record: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile
+  expr: histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job="kubelet",metrics_path="/metrics"}[5m]))
+    by(\[\[\ \$groupLabels\ \]\],instance,le) * on(cluster,instance) group_left(node)
+    max(kubelet_node_name{job="kubelet",metrics_path="/metrics"}) by(\[\[\ \$groupLabels\
+    \]\],instance,node))
   labels:
-    quantile: '0.99'
-  record: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile
-- condition: '{{ true }}'
-  expr: |-
-    histogram_quantile(
-      0.9,
-      sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", metrics_path="/metrics"}[5m])) by (instance,le,{{ $groupLabels }})
-      * on (instance,{{ $groupLabels }}) group_left (node)
-      max by (instance,node,{{ $groupLabels }}) (kubelet_node_name{job="kubelet", metrics_path="/metrics"})
-    )
+    quantile: "0.99"
+  condition: {{ true }}
+- record: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile
+  expr: histogram_quantile(0.9, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job="kubelet",metrics_path="/metrics"}[5m]))
+    by(\[\[\ \$groupLabels\ \]\],instance,le) * on(cluster,instance) group_left(node)
+    max(kubelet_node_name{job="kubelet",metrics_path="/metrics"}) by(\[\[\ \$groupLabels\
+    \]\],instance,node))
   labels:
-    quantile: '0.9'
-  record: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile
-- condition: '{{ true }}'
-  expr: |-
-    histogram_quantile(
-      0.5,
-      sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", metrics_path="/metrics"}[5m])) by (instance,le,{{ $groupLabels }})
-      * on (instance,{{ $groupLabels }}) group_left (node)
-      max by (instance,node,{{ $groupLabels }}) (kubelet_node_name{job="kubelet", metrics_path="/metrics"})
-    )
+    quantile: "0.9"
+  condition: {{ true }}
+- record: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile
+  expr: histogram_quantile(0.5, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job="kubelet",metrics_path="/metrics"}[5m]))
+    by(\[\[\ \$groupLabels\ \]\],instance,le) * on(cluster,instance) group_left(node)
+    max(kubelet_node_name{job="kubelet",metrics_path="/metrics"}) by(\[\[\ \$groupLabels\
+    \]\],instance,node))
   labels:
-    quantile: '0.5'
-  record: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile
+    quantile: "0.5"
+  condition: {{ true }}
+condition: {{ ($Values.kubelet).enabled }}

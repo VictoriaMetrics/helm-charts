@@ -1,168 +1,271 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
+templating:
+  list:
+  - current:
+      selected: true
+      text: default
+      value: default
+    hide: 0
+    label: Data source
+    name: datasource
+    query: {{ $defaultDatasource }}
+    regex: ""
+    type: datasource
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    hide: {{ ternary 0 2 $multicluster }}
+    label: cluster
+    name: cluster
+    query: {{ ternary "label_values(up{job=\"kubelet\",metrics_path=\"/metrics\",cluster=~\"$cluster\"},
+      cluster)" ".*" $multicluster }}
+    refresh: 2
+    sort: 1
+    type: {{ ternary "query" "constant" $multicluster }}
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $datasource
+    hide: 0
+    includeAll: true
+    label: instance
+    name: instance
+    query: label_values(up{job="kubelet",metrics_path="/metrics",cluster=~"$cluster"},
+      instance)
+    refresh: 2
+    type: query
+annotations: {}
 condition: {{ ($Values.kubelet).enabled }}
 editable: false
 links:
 - asDropdown: true
+  icon: ""
   includeVars: true
   keepTime: true
   tags:
   - kubernetes-mixin
   targetBlank: false
   title: Kubernetes
+  tooltip: ""
   type: dashboards
 panels:
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
       unit: none
+    overrides: null
   gridPos:
     h: 7
     w: 4
     x: 0
-    'y': 0
+    "y": 0
   id: 1
   interval: 1m
   options:
     colorMode: none
+    graphMode: ""
+    justifyMode: ""
+    orientation: ""
+    percentChangeColorMode: ""
+    reduceOptions:
+      calcs: null
+    showPercentChange: false
+    textMode: ""
+    wideLayout: false
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kubelet_node_name{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics"})
-    instant: true
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Running Kubelets
   type: stat
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
       unit: none
+    overrides: null
   gridPos:
     h: 7
     w: 4
     x: 4
-    'y': 0
+    "y": 0
   id: 2
   interval: 1m
   options:
     colorMode: none
+    graphMode: ""
+    justifyMode: ""
+    orientation: ""
+    percentChangeColorMode: ""
+    reduceOptions:
+      calcs: null
+    showPercentChange: false
+    textMode: ""
+    wideLayout: false
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kubelet_running_pods{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"})
-    instant: true
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Running Pods
   type: stat
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
       unit: none
+    overrides: null
   gridPos:
     h: 7
     w: 4
     x: 8
-    'y': 0
+    "y": 0
   id: 3
   interval: 1m
   options:
     colorMode: none
+    graphMode: ""
+    justifyMode: ""
+    orientation: ""
+    percentChangeColorMode: ""
+    reduceOptions:
+      calcs: null
+    showPercentChange: false
+    textMode: ""
+    wideLayout: false
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kubelet_running_containers{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"})
-    instant: true
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Running Containers
   type: stat
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
       unit: none
+    overrides: null
   gridPos:
     h: 7
     w: 4
     x: 12
-    'y': 0
+    "y": 0
   id: 4
   interval: 1m
   options:
     colorMode: none
+    graphMode: ""
+    justifyMode: ""
+    orientation: ""
+    percentChangeColorMode: ""
+    reduceOptions:
+      calcs: null
+    showPercentChange: false
+    textMode: ""
+    wideLayout: false
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(volume_manager_total_volumes{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance", state="actual_state_of_world"})
-    instant: true
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Actual Volume Count
   type: stat
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
       unit: none
+    overrides: null
   gridPos:
     h: 7
     w: 4
     x: 16
-    'y': 0
+    "y": 0
   id: 5
   interval: 1m
   options:
     colorMode: none
+    graphMode: ""
+    justifyMode: ""
+    orientation: ""
+    percentChangeColorMode: ""
+    reduceOptions:
+      calcs: null
+    showPercentChange: false
+    textMode: ""
+    wideLayout: false
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(volume_manager_total_volumes{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance",state="desired_state_of_world"})
-    instant: true
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Desired Volume Count
   type: stat
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
       unit: none
+    overrides: null
   gridPos:
     h: 7
     w: 4
     x: 20
-    'y': 0
+    "y": 0
   id: 6
   interval: 1m
   options:
     colorMode: none
+    graphMode: ""
+    justifyMode: ""
+    orientation: ""
+    percentChangeColorMode: ""
+    reduceOptions:
+      calcs: null
+    showPercentChange: false
+    textMode: ""
+    wideLayout: false
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(kubelet_node_config_error{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval]))
-    instant: true
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Config Error Count
   type: stat
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -171,11 +274,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: ops
+    overrides: null
   gridPos:
     h: 7
     w: 12
     x: 0
-    'y': 7
+    "y": 7
   id: 7
   interval: 1m
   options:
@@ -188,17 +292,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(kubelet_runtime_operations_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (operation_type, instance)
-    legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_type{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Operation Rate
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -207,11 +313,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: ops
+    overrides: null
   gridPos:
     h: 7
     w: 12
     x: 12
-    'y': 7
+    "y": 7
   id: 8
   interval: 1m
   options:
@@ -224,17 +331,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(kubelet_runtime_operations_errors_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_type)
-    legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_type{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Operation Error Rate
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -243,11 +352,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: s
+    overrides: null
   gridPos:
     h: 7
     w: 24
     x: 0
-    'y': 14
+    "y": 14
   id: 9
   interval: 1m
   options:
@@ -260,17 +370,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_runtime_operations_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_type, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_type{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Operation Duration 99th quantile
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -279,11 +391,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: ops
+    overrides: null
   gridPos:
     h: 7
     w: 12
     x: 0
-    'y': 21
+    "y": 21
   id: 10
   interval: 1m
   options:
@@ -296,22 +409,25 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(kubelet_pod_start_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance)
-    legendFormat: '{{`{{`}}instance{{`}}`}} pod'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(kubelet_pod_worker_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance)
-    legendFormat: '{{`{{`}}instance{{`}}`}} worker'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Pod Start Rate
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -320,11 +436,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: s
+    overrides: null
   gridPos:
     h: 7
     w: 12
     x: 12
-    'y': 21
+    "y": 21
   id: 11
   interval: 1m
   options:
@@ -337,22 +454,25 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_pod_start_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}} pod'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}} worker'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Pod Start Duration
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -361,11 +481,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: ops
+    overrides: null
   gridPos:
     h: 7
     w: 12
     x: 0
-    'y': 28
+    "y": 28
   id: 12
   interval: 1m
   options:
@@ -378,17 +499,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(storage_operation_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_name, volume_plugin)
-    legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_name{{`}}`}} {{`{{`}}volume_plugin{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Storage Operation Rate
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -397,11 +520,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: ops
+    overrides: null
   gridPos:
     h: 7
     w: 12
     x: 12
-    'y': 28
+    "y": 28
   id: 13
   interval: 1m
   options:
@@ -414,17 +538,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(storage_operation_errors_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, operation_name, volume_plugin)
-    legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_name{{`}}`}} {{`{{`}}volume_plugin{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Storage Operation Error Rate
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -433,11 +559,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: s
+    overrides: null
   gridPos:
     h: 7
     w: 24
     x: 0
-    'y': 35
+    "y": 35
   id: 14
   interval: 1m
   options:
@@ -450,17 +577,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(storage_operation_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, operation_name, volume_plugin, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_name{{`}}`}} {{`{{`}}volume_plugin{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Storage Operation Duration 99th quantile
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -469,11 +598,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: ops
+    overrides: null
   gridPos:
     h: 7
     w: 12
     x: 0
-    'y': 42
+    "y": 42
   id: 15
   interval: 1m
   options:
@@ -486,17 +616,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(kubelet_cgroup_manager_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, operation_type)
-    legendFormat: '{{`{{`}}operation_type{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Cgroup manager operation rate
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -505,11 +637,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: s
+    overrides: null
   gridPos:
     h: 7
     w: 12
     x: 12
-    'y': 42
+    "y": 42
   id: 16
   interval: 1m
   options:
@@ -522,17 +655,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_cgroup_manager_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, operation_type, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}operation_type{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Cgroup manager 99th quantile
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -541,11 +676,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: ops
+    overrides: null
   gridPos:
     h: 7
     w: 12
     x: 0
-    'y': 49
+    "y": 49
   id: 17
   interval: 1m
   options:
@@ -558,17 +694,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(kubelet_pleg_relist_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster", job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance)
-    legendFormat: '{{`{{`}}instance{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: PLEG relist rate
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -577,11 +715,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: s
+    overrides: null
   gridPos:
     h: 7
     w: 12
     x: 12
-    'y': 49
+    "y": 49
   id: 18
   interval: 1m
   options:
@@ -594,17 +733,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_interval_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: PLEG relist interval
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -613,11 +754,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: s
+    overrides: null
   gridPos:
     h: 7
     w: 24
     x: 0
-    'y': 56
+    "y": 56
   id: 19
   interval: 1m
   options:
@@ -630,17 +772,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])) by (instance, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: PLEG relist duration
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -649,11 +793,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: ops
+    overrides: null
   gridPos:
     h: 7
     w: 24
     x: 0
-    'y': 63
+    "y": 63
   id: 20
   interval: 1m
   options:
@@ -666,32 +811,37 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"2.."}[$__rate_interval]))
-    legendFormat: 2xx
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"3.."}[$__rate_interval]))
-    legendFormat: 3xx
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"4.."}[$__rate_interval]))
-    legendFormat: 4xx
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance",code=~"5.."}[$__rate_interval]))
-    legendFormat: 5xx
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: RPC rate
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -700,11 +850,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: s
+    overrides: null
   gridPos:
     h: 7
     w: 24
     x: 0
-    'y': 70
+    "y": 70
   id: 21
   interval: 1m
   options:
@@ -717,17 +868,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics", instance=~"$instance"}[$__rate_interval])) by (instance, verb, le))
-    legendFormat: '{{`{{`}}instance{{`}}`}} {{`{{`}}verb{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Request duration 99th quantile
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -736,11 +889,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: bytes
+    overrides: null
   gridPos:
     h: 7
     w: 8
     x: 0
-    'y': 77
+    "y": 77
   id: 22
   interval: 1m
   options:
@@ -753,17 +907,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: process_resident_memory_bytes{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}
-    legendFormat: '{{`{{`}}instance{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Memory
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -772,11 +928,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: short
+    overrides: null
   gridPos:
     h: 7
     w: 8
     x: 8
-    'y': 77
+    "y": 77
   id: 23
   interval: 1m
   options:
@@ -789,17 +946,19 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: rate(process_cpu_seconds_total{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}[$__rate_interval])
-    legendFormat: '{{`{{`}}instance{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: CPU usage
   type: timeseries
 - datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -808,11 +967,12 @@ panels:
         showPoints: never
         spanNulls: true
       unit: short
+    overrides: null
   gridPos:
     h: 7
     w: 8
     x: 16
-    'y': 77
+    "y": 77
   id: 24
   interval: 1m
   options:
@@ -825,13 +985,15 @@ panels:
       showLegend: true
     tooltip:
       mode: single
+      sort: ""
   pluginVersion: v11.4.0
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: go_goroutines{ {{ $clusterLabel }}=~"$cluster",job="kubelet", metrics_path="/metrics",instance=~"$instance"}
-    legendFormat: '{{`{{`}}instance{{`}}`}}'
+      uid: $datasource
+    panelId: 0
+    refId: ""
+    withTransforms: false
   title: Goroutines
   type: timeseries
 refresh: 10s
@@ -839,38 +1001,6 @@ schemaVersion: 39
 tags:
 - kubernetes-mixin
 - vm-k8s-stack
-templating:
-  list:
-  - current:
-      selected: true
-      text: default
-      value: default
-    hide: 0
-    label: Data source
-    name: datasource
-    query: {{ $defaultDatasource }}
-    regex: ''
-    type: datasource
-  - datasource:
-      type: prometheus
-      uid: ${datasource}
-    hide: {{ ternary 0 2 $multicluster }}
-    label: cluster
-    name: cluster
-    query: {{ ternary (b64dec "ImxhYmVsX3ZhbHVlcyh1cHtqb2I9XCJrdWJlbGV0XCIsIG1ldHJpY3NfcGF0aD1cIi9tZXRyaWNzXCJ9LCBjbHVzdGVyKSI=" | replace "cluster" $clusterLabel) ".*" $multicluster }}
-    refresh: 2
-    sort: 1
-    type: {{ ternary "query" "constant" $multicluster }}
-  - datasource:
-      type: prometheus
-      uid: ${datasource}
-    hide: 0
-    includeAll: true
-    label: instance
-    name: instance
-    query: label_values(up{job="kubelet", metrics_path="/metrics", {{ $clusterLabel }}=~"$cluster"}, instance)
-    refresh: 2
-    type: query
 time:
   from: now-1h
   to: now
