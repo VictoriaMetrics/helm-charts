@@ -28,8 +28,8 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{version=~\"^vmalert.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(vm_app_version{version=~\"^vmalert.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
     current: {}
-    definition: label_values(vm_app_version{version=~"^vmalert.*"}, job)
     options: []
     refresh: 1
     regex: ""
@@ -43,9 +43,9 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     allValue: .*
     current: {}
-    definition: label_values(vm_app_version{job=~"$job"}, instance)
     options: []
     refresh: 1
     regex: ""
@@ -59,9 +59,9 @@ templating:
     query:
       query: {{ printf "label_values(vmalert_iteration_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, file)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ printf "label_values(vmalert_iteration_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, file)" $clusterLabel }}
     allValue: .*
     current: {}
-    definition: label_values(vmalert_iteration_total{job=~"$job", instance=~"$instance"},file)
     options: []
     refresh: 1
     regex: ""
@@ -75,9 +75,9 @@ templating:
     query:
       query: {{ printf "label_values(vmalert_iteration_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, group)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(vmalert_iteration_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, group)" $clusterLabel }}
     allValue: .*
     current: {}
-    definition: label_values(vmalert_iteration_total{job=~"$job", instance=~"$instance"}, group)
     options: []
     refresh: 1
     regex: ""

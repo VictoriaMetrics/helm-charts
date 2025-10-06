@@ -27,9 +27,9 @@ templating:
       qryType: 1
       query: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current: {}
-    definition: label_values(kube_node_info,cluster)
     options: []
     refresh: 1
     regex: ""
@@ -45,9 +45,9 @@ templating:
     query:
       query: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
     allValue: .*
     current: {}
-    definition: label_values(kube_pod_info{cluster="$cluster"}, namespace)
     options: []
     refresh: 1
     regex: ""
@@ -94,9 +94,9 @@ templating:
     query:
       query: {{ printf "label_values(kube_pod_info{namespace=~\"$namespace\",%s=~\"$cluster\"}, created_by_name)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ printf "label_values(kube_pod_info{namespace=~\"$namespace\",%s=~\"$cluster\"}, created_by_name)" $clusterLabel }}
     allValue: .*
     current: {}
-    definition: label_values(kube_pod_info{namespace=~"$namespace", cluster="$cluster"},created_by_name)
     description: Can be used to filter on a specific deployment, statefulset or deamonset (only relevant panels).
     options: []
     refresh: 2

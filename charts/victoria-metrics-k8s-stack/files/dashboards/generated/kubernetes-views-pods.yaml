@@ -30,13 +30,13 @@ templating:
       qryType: 1
       query: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current:
       isNone: true
       selected: false
       text: None
       value: ""
-    definition: label_values(kube_node_info,cluster)
     options: []
     refresh: 1
     regex: ""
@@ -50,11 +50,11 @@ templating:
     query:
       query: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
       refId: Prometheus-namespace-Variable-Query
+    definition: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
     current:
       selected: false
       text: monitoring
       value: monitoring
-    definition: label_values(kube_pod_info{cluster="$cluster"}, namespace)
     options: []
     refresh: 1
     regex: ""
@@ -73,12 +73,12 @@ templating:
     query:
       query: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, pod)" $clusterLabel }}
       refId: Prometheus-pod-Variable-Query
+    definition: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, pod)" $clusterLabel }}
     allValue: .*
     current:
       selected: false
       text: ""
       value: ""
-    definition: label_values(kube_pod_info{namespace="$namespace", cluster="$cluster"}, pod)
     options: []
     refresh: 2
     regex: ""
@@ -125,11 +125,11 @@ templating:
       qryType: 1
       query: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, job)" $clusterLabel }}
     current:
       selected: false
       text: kube-state-metrics
       value: kube-state-metrics
-    definition: label_values(kube_pod_info{namespace="$namespace", cluster="$cluster"},job)
     options: []
     refresh: 1
     regex: ""

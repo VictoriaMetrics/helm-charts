@@ -26,8 +26,8 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{version=~\"victoria-metrics-.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: VictoriaMetrics-job-Variable-Query
+    definition: {{ printf "label_values(vm_app_version{version=~\"victoria-metrics-.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
     current: {}
-    definition: label_values(vm_app_version{version=~"victoria-metrics-.*"}, job)
     options: []
     refresh: 1
     regex: ""
@@ -39,9 +39,9 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, version)" $clusterLabel }}
       refId: VictoriaMetrics-version-Variable-Query
+    definition: {{ printf "label_values(vm_app_version{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, version)" $clusterLabel }}
     hide: ""
     current: {}
-    definition: label_values(vm_app_version{job=~"$job", instance=~"$instance"},  version)
     options: []
     refresh: 1
     regex: /.*-(?:tags|heads)-(.*)-(?:0|dirty)-.*/
@@ -56,9 +56,9 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: VictoriaMetrics-instance-Variable-Query
+    definition: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     allValue: .*
     current: {}
-    definition: label_values(vm_app_version{job=~"$job"}, instance)
     options: []
     refresh: 1
     regex: ""

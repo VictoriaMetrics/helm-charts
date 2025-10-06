@@ -26,10 +26,10 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{version=~\"victoria-logs-.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(vm_app_version{version=~\"victoria-logs-.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
     current:
       text: kubernetes-pods
       value: kubernetes-pods
-    definition: label_values(vm_app_version{version=~"victoria-logs-.*"}, job)
     options: []
     refresh: 1
     regex: ""
@@ -43,11 +43,11 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     current:
       text: All
       value:
       - $__all
-    definition: label_values(vm_app_version{job=~"$job"}, instance)
     options: []
     refresh: 1
     regex: ""
@@ -60,11 +60,11 @@ templating:
       qryType: 1
       query: {{ printf "label_values(vm_app_version{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, short_version)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ printf "label_values(vm_app_version{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, short_version)" $clusterLabel }}
     hide: ""
     current:
       text: ""
       value: ""
-    definition: label_values(vm_app_version{job=~"$job", instance=~"$instance"},short_version)
     options: []
     refresh: 1
     regex: ""

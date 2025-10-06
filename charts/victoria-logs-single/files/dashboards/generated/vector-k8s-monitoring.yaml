@@ -23,9 +23,9 @@ templating:
       qryType: 1
       query: {{ ternary (printf "label_values(vector_build_info, %s)" $clusterLabel) ".*" $multicluster }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ ternary (printf "label_values(vector_build_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current: {}
-    definition: label_values(vector_build_info,cluster)
     options: []
     refresh: 1
     regex: ""
@@ -41,8 +41,8 @@ templating:
       qryType: 1
       query: label_values(vector_build_info, instance)
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: label_values(vector_build_info, instance)
     current: {}
-    definition: label_values(vector_build_info,instance)
     options: []
     refresh: 1
     regex: ""
@@ -58,8 +58,8 @@ templating:
       qryType: 1
       query: {{ printf "label_values(vector_component_received_events_total{component_type=\"kubernetes_logs\",%s=~\"$cluster\"}, pod_namespace)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ printf "label_values(vector_component_received_events_total{component_type=\"kubernetes_logs\",%s=~\"$cluster\"}, pod_namespace)" $clusterLabel }}
     current: {}
-    definition: label_values(vector_component_received_events_total{component_type="kubernetes_logs"},pod_namespace)
     options: []
     refresh: 1
     regex: ""

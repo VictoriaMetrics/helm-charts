@@ -27,7 +27,6 @@ templating:
       query: label_values(node_uname_info, job)
       refId: Prometheus-job-Variable-Query
     current: {}
-    definition: ""
     options: []
     refresh: 1
     regex: ""
@@ -41,8 +40,8 @@ templating:
     query:
       query: {{ printf "label_values(node_uname_info{job=\"$job\",%s=~\"$cluster\"}, nodename)" $clusterLabel }}
       refId: Prometheus-nodename-Variable-Query
+    definition: {{ printf "label_values(node_uname_info{job=\"$job\",%s=~\"$cluster\"}, nodename)" $clusterLabel }}
     current: {}
-    definition: label_values(node_uname_info{job="$job"}, nodename)
     options: []
     refresh: 1
     regex: ""
@@ -56,8 +55,8 @@ templating:
     query:
       query: {{ printf "label_values(node_uname_info{job=\"$job\",nodename=\"$nodename\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: Prometheus-node-Variable-Query
+    definition: {{ printf "label_values(node_uname_info{job=\"$job\",nodename=\"$nodename\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     current: {}
-    definition: label_values(node_uname_info{job="$job", nodename="$nodename"}, instance)
     options: []
     refresh: 1
     regex: ""

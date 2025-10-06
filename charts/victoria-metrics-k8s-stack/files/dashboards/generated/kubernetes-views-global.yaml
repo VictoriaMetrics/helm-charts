@@ -30,9 +30,9 @@ templating:
       qryType: 1
       query: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current: {}
-    definition: label_values(kube_node_info,cluster)
     options: []
     refresh: 1
     regex: ""
@@ -76,11 +76,11 @@ templating:
       qryType: 1
       query: {{ printf "label_values(node_cpu_seconds_total{%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ printf "label_values(node_cpu_seconds_total{%s=~\"$cluster\"}, job)" $clusterLabel }}
     current:
       selected: false
       text: ""
       value: ""
-    definition: label_values(node_cpu_seconds_total{cluster="$cluster"},job)
     options: []
     refresh: 1
     regex: ""

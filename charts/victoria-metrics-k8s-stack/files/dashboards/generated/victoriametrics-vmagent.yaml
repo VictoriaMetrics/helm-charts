@@ -26,8 +26,8 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{version=~\"^vmagent.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: VictoriaMetrics-job-Variable-Query
+    definition: {{ printf "label_values(vm_app_version{version=~\"^vmagent.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
     current: {}
-    definition: label_values(vm_app_version{version=~"^vmagent.*"}, job)
     options: []
     refresh: 1
     regex: ""
@@ -41,9 +41,9 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: VictoriaMetrics-instance-Variable-Query
+    definition: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     allValue: .*
     current: {}
-    definition: label_values(vm_app_version{job=~"$job"}, instance)
     options: []
     refresh: 1
     regex: ""
@@ -57,9 +57,9 @@ templating:
     query:
       query: {{ printf "label_values(vmagent_remotewrite_requests_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, url)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(vmagent_remotewrite_requests_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, url)" $clusterLabel }}
     allValue: .*
     current: {}
-    definition: label_values(vmagent_remotewrite_requests_total{job=~"$job", instance=~"$instance"}, url)
     description: The remote write URLs
     options: []
     refresh: 1

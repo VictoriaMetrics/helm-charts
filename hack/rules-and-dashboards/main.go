@@ -594,6 +594,7 @@ type dashboardVariable struct {
 	Datasource *stringOrMap   `yaml:"datasource,omitempty" json:"datasource,omitempty"`
 	Type       string         `yaml:"type" json:"type"`
 	Query      *stringOrMap   `yaml:"query,omitempty" json:"query,omitempty"`
+	Definition string         `yaml:"definition,omitempty" json:"definition,omitempty"`
 	Hide       intOrStr       `yaml:"hide,omitempty" json:"hide,omitempty"`
 	XXX        map[string]any `yaml:",inline" json:",unknown"`
 }
@@ -907,9 +908,10 @@ func patchDashboard(d *dashboard, name string) {
 		patchDatasource(t.Datasource, dsName)
 		switch t.Type {
 		case "query":
+			var expr, args string
 			if t.Query != nil {
 				if len(t.Query.String) > 0 {
-					expr, args := patchExpr(t.Query.String, name, t.Name, "dashboards")
+					expr, args = patchExpr(t.Query.String, name, t.Name, "dashboards")
 					if t.Name == "cluster" {
 						expr = fmt.Sprintf(`<< ternary (printf %q %s) ".*" $multicluster >>`, expr, args)
 					} else if len(args) > 0 {
@@ -918,7 +920,7 @@ func patchDashboard(d *dashboard, name string) {
 					t.Query.String = expr
 				} else if len(t.Query.Map) > 0 {
 					if q, ok := t.Query.Map["query"]; ok {
-						expr, args := patchExpr(q.(string), name, t.Name, "dashboards")
+						expr, args = patchExpr(q.(string), name, t.Name, "dashboards")
 						if t.Name == "cluster" {
 							expr = fmt.Sprintf(`<< ternary (printf %q %s) ".*" $multicluster >>`, expr, args)
 						} else if len(args) > 0 {
@@ -927,6 +929,9 @@ func patchDashboard(d *dashboard, name string) {
 						t.Query.Map["query"] = expr
 					}
 				}
+			}
+			if t.Definition != "" {
+				t.Definition = expr
 			}
 		case "datasource":
 			if t.Query != nil {

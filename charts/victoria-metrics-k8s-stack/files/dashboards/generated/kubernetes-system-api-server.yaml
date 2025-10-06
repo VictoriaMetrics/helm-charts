@@ -30,13 +30,13 @@ templating:
       qryType: 1
       query: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current:
       isNone: true
       selected: false
       text: None
       value: ""
-    definition: label_values(kube_node_info,cluster)
     options: []
     refresh: 1
     regex: ""

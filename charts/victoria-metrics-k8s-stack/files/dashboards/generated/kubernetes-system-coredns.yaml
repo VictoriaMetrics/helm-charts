@@ -30,13 +30,13 @@ templating:
       qryType: 1
       query: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current:
       isNone: true
       selected: false
       text: None
       value: ""
-    definition: label_values(kube_node_info,cluster)
     options: []
     refresh: 1
     regex: ""
@@ -52,12 +52,12 @@ templating:
       qryType: 1
       query: {{ printf "label_values(up{job=\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ printf "label_values(up{job=\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     allValue: .*
     current:
       selected: false
       text: All
       value: $__all
-    definition: label_values(up{job="$job", cluster="$cluster"},instance)
     options: []
     refresh: 1
     regex: ""
@@ -74,12 +74,12 @@ templating:
     query:
       query: {{ printf "label_values(coredns_dns_requests_total{%s=~\"$cluster\"}, proto)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(coredns_dns_requests_total{%s=~\"$cluster\"}, proto)" $clusterLabel }}
     allValue: udp,tcp
     current:
       selected: false
       text: udp
       value: udp
-    definition: label_values(coredns_dns_requests_total{cluster="$cluster"}, proto)
     options: []
     refresh: 1
     regex: ""
@@ -126,13 +126,13 @@ templating:
       qryType: 1
       query: {{ printf "label_values(coredns_build_info{%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ printf "label_values(coredns_build_info{%s=~\"$cluster\"}, job)" $clusterLabel }}
     current:
       selected: true
       text:
       - coredns
       value:
       - coredns
-    definition: label_values(coredns_build_info{cluster="$cluster"},job)
     options: []
     refresh: 1
     regex: ""

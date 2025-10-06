@@ -30,9 +30,9 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{version=~\"^vmbackupmanager.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(vm_app_version{version=~\"^vmbackupmanager.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
     allValue: .*
     current: {}
-    definition: label_values(vm_app_version{version=~"^vmbackupmanager.*"}, job)
     options: []
     refresh: 1
     regex: ""
@@ -50,9 +50,9 @@ templating:
     query:
       query: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: VictoriaMetrics-instance-Variable-Query
+    definition: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     allValue: .*
     current: {}
-    definition: label_values(vm_app_version{job=~"$job"}, instance)
     options: []
     refresh: 1
     regex: ""

@@ -27,9 +27,9 @@ templating:
       qryType: 1
       query: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
       refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current: {}
-    definition: label_values(kube_node_info,cluster)
     options: []
     refresh: 1
     regex: ""
@@ -71,8 +71,8 @@ templating:
     query:
       query: {{ printf "label_values(kube_node_info{%s=~\"$cluster\"}, node)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(kube_node_info{%s=~\"$cluster\"}, node)" $clusterLabel }}
     current: {}
-    definition: label_values(kube_node_info{cluster="$cluster"}, node)
     options: []
     refresh: 2
     regex: ""
@@ -86,9 +86,9 @@ templating:
     query:
       query: {{ printf "label_values(node_uname_info{nodename=~\"(?i:($node)(.[a-z0-9.]+)?)\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: StandardVariableQuery
+    definition: {{ printf "label_values(node_uname_info{nodename=~\"(?i:($node)(.[a-z0-9.]+)?)\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     hide: ""
     current: {}
-    definition: label_values(node_uname_info{nodename=~"(?i:($node)(.[a-z0-9.]+)?)", cluster="$cluster"}, instance)
     options: []
     refresh: 2
     regex: ""
