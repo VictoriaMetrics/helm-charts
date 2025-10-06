@@ -21,7 +21,7 @@ rules:
     unless on(cluster, namespace, persistentvolumeclaim)
     kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
   annotations:
-    description: The PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} {{`{{`}} with $labels.cluster -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} is only {{`{{`}} $value | humanizePercentage {{`}}`}} free.
+    description: The PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} {{`{{`}} with $labels.{{ $clusterLabel }} -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} is only {{`{{`}} $value | humanizePercentage {{`}}`}} free.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepersistentvolumefillingup
     summary: PersistentVolume is filling up.
   condition: true
@@ -44,7 +44,7 @@ rules:
     unless on(cluster, namespace, persistentvolumeclaim)
     kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
   annotations:
-    description: Based on recent sampling, the PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} {{`{{`}} with $labels.cluster -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} is expected to fill up within four days. Currently {{`{{`}} $value | humanizePercentage {{`}}`}} is available.
+    description: Based on recent sampling, the PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} {{`{{`}} with $labels.{{ $clusterLabel }} -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} is expected to fill up within four days. Currently {{`{{`}} $value | humanizePercentage {{`}}`}} is available.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepersistentvolumefillingup
     summary: PersistentVolume is filling up.
   condition: true
@@ -65,7 +65,7 @@ rules:
     unless on(cluster, namespace, persistentvolumeclaim)
     kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
   annotations:
-    description: The PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} {{`{{`}} with $labels.cluster -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} only has {{`{{`}} $value | humanizePercentage {{`}}`}} free inodes.
+    description: The PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} {{`{{`}} with $labels.{{ $clusterLabel }} -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} only has {{`{{`}} $value | humanizePercentage {{`}}`}} free inodes.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepersistentvolumeinodesfillingup
     summary: PersistentVolumeInodes are filling up.
   condition: true
@@ -88,7 +88,7 @@ rules:
     unless on(cluster, namespace, persistentvolumeclaim)
     kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
   annotations:
-    description: Based on recent sampling, the PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} {{`{{`}} with $labels.cluster -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} is expected to run out of inodes within four days. Currently {{`{{`}} $value | humanizePercentage {{`}}`}} of its inodes are free.
+    description: Based on recent sampling, the PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} {{`{{`}} with $labels.{{ $clusterLabel }} -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} is expected to run out of inodes within four days. Currently {{`{{`}} $value | humanizePercentage {{`}}`}} of its inodes are free.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepersistentvolumeinodesfillingup
     summary: PersistentVolumeInodes are filling up.
   condition: true
@@ -99,7 +99,7 @@ rules:
   expr: |
     kube_persistentvolume_status_phase{phase=~"Failed|Pending",job="kube-state-metrics"} > 0
   annotations:
-    description: The persistent volume {{`{{`}} $labels.persistentvolume {{`}}`}} {{`{{`}} with $labels.cluster -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} has status {{`{{`}} $labels.phase {{`}}`}}.
+    description: The persistent volume {{`{{`}} $labels.persistentvolume {{`}}`}} {{`{{`}} with $labels.{{ $clusterLabel }} -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} has status {{`{{`}} $labels.phase {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepersistentvolumeerrors
     summary: PersistentVolume is having issues with provisioning.
   condition: true

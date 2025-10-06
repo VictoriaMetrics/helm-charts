@@ -13,7 +13,7 @@ rules:
     and
     on(job, cluster, instance) apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0
   annotations:
-    description: A client certificate used to authenticate to kubernetes apiserver is expiring in less than 7.0 days on cluster {{`{{`}} $labels.cluster {{`}}`}}.
+    description: A client certificate used to authenticate to kubernetes apiserver is expiring in less than 7.0 days on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeclientcertificateexpiration
     summary: Client certificate is about to expire.
   condition: true
@@ -26,7 +26,7 @@ rules:
     and
     on(job, cluster, instance) apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0
   annotations:
-    description: A client certificate used to authenticate to kubernetes apiserver is expiring in less than 24.0 hours on cluster {{`{{`}} $labels.cluster {{`}}`}}.
+    description: A client certificate used to authenticate to kubernetes apiserver is expiring in less than 24.0 hours on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeclientcertificateexpiration
     summary: Client certificate is about to expire.
   condition: true
@@ -36,7 +36,7 @@ rules:
 - alert: KubeAggregatedAPIErrors
   expr: {{ printf "sum(increase(aggregator_unavailable_apiservice_total{job=\"apiserver\"}[1m])) by(%s,instance,name,reason) > 0" $groupLabels }}
   annotations:
-    description: Kubernetes aggregated API {{`{{`}} $labels.instance {{`}}`}}/{{`{{`}} $labels.name {{`}}`}} has reported {{`{{`}} $labels.reason {{`}}`}} errors on cluster {{`{{`}} $labels.cluster {{`}}`}}.
+    description: Kubernetes aggregated API {{`{{`}} $labels.instance {{`}}`}}/{{`{{`}} $labels.name {{`}}`}} has reported {{`{{`}} $labels.reason {{`}}`}} errors on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeaggregatedapierrors
     summary: Kubernetes aggregated API has reported errors.
   condition: true
@@ -46,7 +46,7 @@ rules:
 - alert: KubeAggregatedAPIDown
   expr: {{ printf "((1 - max(avg_over_time(aggregator_unavailable_apiservice{job=\"apiserver\"}[10m])) by(name,namespace,%s)) * 100) < 85" $groupLabels }}
   annotations:
-    description: Kubernetes aggregated API {{`{{`}} $labels.name {{`}}`}}/{{`{{`}} $labels.namespace {{`}}`}} has been only {{`{{`}} $value | humanize {{`}}`}}% available over the last 10m on cluster {{`{{`}} $labels.cluster {{`}}`}}.
+    description: Kubernetes aggregated API {{`{{`}} $labels.name {{`}}`}}/{{`{{`}} $labels.namespace {{`}}`}} has been only {{`{{`}} $value | humanize {{`}}`}}% available over the last 10m on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeaggregatedapidown
     summary: Kubernetes aggregated API is down.
   condition: true
@@ -67,7 +67,7 @@ rules:
 - alert: KubeAPITerminatedRequests
   expr: {{ printf "(sum(rate(apiserver_request_terminations_total{job=\"apiserver\"}[10m])) by(%s) / (sum(rate(apiserver_request_total{job=\"apiserver\"}[10m])) by(%s) + sum(rate(apiserver_request_terminations_total{job=\"apiserver\"}[10m])) by(%s))) > 0.20" $groupLabels $groupLabels $groupLabels }}
   annotations:
-    description: The kubernetes apiserver has terminated {{`{{`}} $value | humanizePercentage {{`}}`}} of its incoming requests on cluster {{`{{`}} $labels.cluster {{`}}`}}.
+    description: The kubernetes apiserver has terminated {{`{{`}} $value | humanizePercentage {{`}}`}} of its incoming requests on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeapiterminatedrequests
     summary: The kubernetes apiserver has terminated {{`{{`}} $value | humanizePercentage {{`}}`}} of its incoming requests.
   condition: true

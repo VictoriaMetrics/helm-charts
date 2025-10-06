@@ -10,7 +10,7 @@ rules:
 - alert: KubeCPUOvercommit
   expr: {{ printf "(((sum(namespace_cpu:kube_pod_container_resource_requests:sum) by(%s) - sum(kube_node_status_allocatable{job=\"kube-state-metrics\",resource=\"cpu\"}) by(%s)) > 0) and (count(max(kube_node_role{job=\"kube-state-metrics\",role=\"control-plane\"}) by(%s,node)) by(%s) < 3)) or ((sum(namespace_cpu:kube_pod_container_resource_requests:sum) by(%s) - ((sum(kube_node_status_allocatable{job=\"kube-state-metrics\",resource=\"cpu\"}) by(%s) - max(kube_node_status_allocatable{job=\"kube-state-metrics\",resource=\"cpu\"}) by(%s)) > 0)) > 0)" $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels }}
   annotations:
-    description: Cluster {{`{{`}} $labels.cluster {{`}}`}} has overcommitted CPU resource requests for Pods by {{`{{`}} printf "%.2f" $value {{`}}`}} CPU shares and cannot tolerate node failure.
+    description: Cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}} has overcommitted CPU resource requests for Pods by {{`{{`}} printf "%.2f" $value {{`}}`}} CPU shares and cannot tolerate node failure.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubecpuovercommit
     summary: Cluster has overcommitted CPU resource requests.
   condition: true
@@ -20,7 +20,7 @@ rules:
 - alert: KubeMemoryOvercommit
   expr: {{ printf "(((sum(namespace_memory:kube_pod_container_resource_requests:sum) by(%s) - sum(kube_node_status_allocatable{job=\"kube-state-metrics\",resource=\"memory\"}) by(%s)) > 0) and (count(max(kube_node_role{job=\"kube-state-metrics\",role=\"control-plane\"}) by(%s,node)) by(%s) < 3)) or ((sum(namespace_memory:kube_pod_container_resource_requests:sum) by(%s) - ((sum(kube_node_status_allocatable{job=\"kube-state-metrics\",resource=\"memory\"}) by(%s) - max(kube_node_status_allocatable{job=\"kube-state-metrics\",resource=\"memory\"}) by(%s)) > 0)) > 0)" $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels }}
   annotations:
-    description: Cluster {{`{{`}} $labels.cluster {{`}}`}} has overcommitted memory resource requests for Pods by {{`{{`}} $value | humanize {{`}}`}} bytes and cannot tolerate node failure.
+    description: Cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}} has overcommitted memory resource requests for Pods by {{`{{`}} $value | humanize {{`}}`}} bytes and cannot tolerate node failure.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubememoryovercommit
     summary: Cluster has overcommitted memory resource requests.
   condition: true
@@ -30,7 +30,7 @@ rules:
 - alert: KubeCPUQuotaOvercommit
   expr: {{ printf "(sum(min(kube_resourcequota{job=\"kube-state-metrics\",type=\"hard\",resource=~\"(cpu|requests.cpu)\"}) without(resource)) by(%s) / sum(kube_node_status_allocatable{resource=\"cpu\",job=\"kube-state-metrics\"}) by(%s)) > 1.5" $groupLabels $groupLabels }}
   annotations:
-    description: Cluster {{`{{`}} $labels.cluster {{`}}`}} has overcommitted CPU resource requests for Namespaces.
+    description: Cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}} has overcommitted CPU resource requests for Namespaces.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubecpuquotaovercommit
     summary: Cluster has overcommitted CPU resource requests.
   condition: true
@@ -40,7 +40,7 @@ rules:
 - alert: KubeMemoryQuotaOvercommit
   expr: {{ printf "(sum(min(kube_resourcequota{job=\"kube-state-metrics\",type=\"hard\",resource=~\"(memory|requests.memory)\"}) without(resource)) by(%s) / sum(kube_node_status_allocatable{resource=\"memory\",job=\"kube-state-metrics\"}) by(%s)) > 1.5" $groupLabels $groupLabels }}
   annotations:
-    description: Cluster {{`{{`}} $labels.cluster {{`}}`}} has overcommitted memory resource requests for Namespaces.
+    description: Cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}} has overcommitted memory resource requests for Namespaces.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubememoryquotaovercommit
     summary: Cluster has overcommitted memory resource requests.
   condition: true
@@ -54,7 +54,7 @@ rules:
     (kube_resourcequota{job="kube-state-metrics", type="hard"} > 0)
       > 0.9 < 1
   annotations:
-    description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.cluster {{`}}`}}.
+    description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubequotaalmostfull
     summary: Namespace quota is going to be full.
   condition: true
@@ -68,7 +68,7 @@ rules:
     (kube_resourcequota{job="kube-state-metrics", type="hard"} > 0)
       == 1
   annotations:
-    description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.cluster {{`}}`}}.
+    description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubequotafullyused
     summary: Namespace quota is fully used.
   condition: true
@@ -82,7 +82,7 @@ rules:
     (kube_resourcequota{job="kube-state-metrics", type="hard"} > 0)
       > 1
   annotations:
-    description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.cluster {{`}}`}}.
+    description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubequotaexceeded
     summary: Namespace quota has exceeded the limits.
   condition: true
@@ -96,7 +96,7 @@ rules:
     sum(increase(container_cpu_cfs_periods_total{job="kubelet", metrics_path="/metrics/cadvisor", }[5m])) without (id, metrics_path, name, image, endpoint, job, node)
       > ( 25 / 100 )
   annotations:
-    description: '{{`{{`}} $value | humanizePercentage {{`}}`}} throttling of CPU in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}} on cluster {{`{{`}} $labels.cluster {{`}}`}}.'
+    description: '{{`{{`}} $value | humanizePercentage {{`}}`}} throttling of CPU in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: {{ $runbookUrl }}/kubernetes/cputhrottlinghigh
     summary: Processes experience elevated CPU throttling.
   condition: true
