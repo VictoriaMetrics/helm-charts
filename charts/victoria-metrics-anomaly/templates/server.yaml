@@ -65,10 +65,10 @@ spec:
           {{- end }}
           {{- $env := default list }}
           {{- if and $pvc.enabled $pvc.dumpModels }}
-          {{- $env = append $env (dict "name" "VMANOMALY_MODEL_DUMPS_DIR" "value" "/tmp/vmanomaly-storage/models") }}
+          {{- $env = append $env (dict "name" "VMANOMALY_MODEL_DUMPS_DIR" "value" (printf "%s/models" $pvc.mountPath)) }}
           {{- end }}
           {{- if and $pvc.enabled $pvc.dumpData }}
-          {{- $env = append $env (dict "name" "VMANOMALY_DATA_DUMPS_DIR" "value" "/tmp/vmanomaly-storage/data") }}
+          {{- $env = append $env (dict "name" "VMANOMALY_DATA_DUMPS_DIR" "value" (printf "%s/data" $pvc.mountPath)) }}
           {{- end }}
           {{- if $shardingEnabled }}
           {{- $env = append $env (dict "name" "VMANOMALY_MEMBER_NUM" "valueFrom" (dict "fieldRef" (dict "fieldPath" "metadata.name")))}}
@@ -93,7 +93,7 @@ spec:
             {{- include "vm.license.mount" . | nindent 12 }}
             {{- if $pvc.enabled }}
             - name: {{ $storageName }}
-              mountPath: /tmp/vmanomaly-storage
+              mountPath: {{ $pvc.mountPath }}
             {{- end }}
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
