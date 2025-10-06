@@ -1,16 +1,13 @@
+
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
-{{- $groupLabels := join "," $additionalGroupByLabels }}
+{{- $groupLabels := join "," (uniq $additionalGroupByLabels) }}
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
-condition: '{{ true }}'
 name: k8s.rules.container_memory_cache
 rules:
-- condition: '{{ true }}'
-  expr: |-
-    container_memory_cache{job="kubelet", metrics_path="/metrics/cadvisor", image!=""}
-    * on (namespace,pod,{{ $groupLabels }}) group_left(node) topk by (namespace,pod,{{ $groupLabels }}) (1,
-      max by (namespace,pod,node,{{ $groupLabels }}) (kube_pod_info{node!=""})
-    )
+- expr: {{ printf "container_memory_cache{job=\"kubelet\",metrics_path=\"/metrics/cadvisor\",image!=\"\"} * on(cluster,namespace,pod) group_left(node) topk(1, max(kube_pod_info{node!=\"\"}) by(%s,namespace,pod,node)) by(%s,namespace,pod)" $groupLabels $groupLabels }}
+  condition: true
   record: node_namespace_pod_container:container_memory_cache
+condition: true

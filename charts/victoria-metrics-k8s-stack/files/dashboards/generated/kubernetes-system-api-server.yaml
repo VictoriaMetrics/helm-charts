@@ -1,95 +1,144 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-__elements: []
-__inputs:
-- description: ''
-  label: Prometheus
-  name: DS_PROMETHEUS
-  pluginId: prometheus
-  pluginName: Prometheus
-  type: datasource
-__requires:
-- id: grafana
-  name: Grafana
-  type: grafana
-  version: 8.4.4
-- id: prometheus
-  name: Prometheus
-  type: datasource
-  version: 5.0.0
-- id: timeseries
-  name: Time series
-  type: panel
-  version: ''
-- id: stat
-  name: Stat
-  type: panel
-  version: ''
+title: Kubernetes / System / API Server
+templating:
+  list:
+  - name: datasource
+    type: datasource
+    query: {{ $defaultDatasource }}
+    current:
+      selected: false
+      text: Prometheus
+      value: Prometheus
+    options: []
+    queryValue: ""
+    refresh: 1
+    regex: ""
+    skipUrlSync: false
+  - name: cluster
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: {{ ternary "query" "constant" $multicluster }}
+    query:
+      qryType: 1
+      query: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    hide: {{ ternary 0 2 $multicluster }}
+    current:
+      isNone: true
+      selected: false
+      text: None
+      value: ""
+    definition: label_values(kube_node_info,cluster)
+    options: []
+    refresh: 1
+    regex: ""
+    skipUrlSync: false
+    sort: 1
+  - name: resolution
+    type: custom
+    query: 1s, 15s, 30s, 1m, 3m, 5m
+    current:
+      selected: true
+      text: 30s
+      value: 30s
+    options:
+    - selected: false
+      text: 1s
+      value: 1s
+    - selected: false
+      text: 15s
+      value: 15s
+    - selected: true
+      text: 30s
+      value: 30s
+    - selected: false
+      text: 1m
+      value: 1m
+    - selected: false
+      text: 3m
+      value: 3m
+    - selected: false
+      text: 5m
+      value: 5m
+    queryValue: ""
+    skipUrlSync: false
+editable: false
+timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
+tags:
+- Kubernetes
+- Prometheus
+- vm-k8s-stack
 annotations:
   list:
-  - builtIn: 1
+  - name: Annotations & Alerts
     datasource:
       type: datasource
       uid: grafana
+    builtIn: 1
     enable: true
     hide: true
     iconColor: rgba(0, 211, 255, 1)
-    name: Annotations & Alerts
     target:
       limit: 100
       matchAny: false
       tags: []
       type: dashboard
     type: dashboard
-  - datasource:
+  - name: terraform
+    datasource:
       type: datasource
       uid: grafana
     enable: true
     hide: false
     iconColor: '#5c4ee5'
-    name: terraform
     target:
       limit: 100
       matchAny: false
       tags:
       - terraform
       type: tags
-  - datasource:
+  - name: oncall
+    datasource:
       type: datasource
       uid: grafana
     enable: true
     hide: false
     iconColor: red
-    name: oncall
     target:
       limit: 100
       matchAny: false
       tags:
       - oncall
       type: tags
-condition: {{ ($Values.kubeApiServer).enabled }}
-description: 'This is a modern API Server dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
-editable: false
-fiscalYearStartMonth: 0
-graphTooltip: 1
-links: []
-liveNow: false
 panels:
-- datasource:
+- title: API Server - Health Status
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "up{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}" $clusterLabel }}
+    exemplar: true
+    interval: ""
+    legendFormat: '{{`{{`}} instance {{`}}`}}'
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
       mappings:
       - options:
-          '0':
+          "0":
             text: DOWN
-          '1':
+          "1":
             text: UP
         type: value
       thresholds:
@@ -104,7 +153,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 0
+    "y": 0
   id: 42
   options:
     colorMode: background
@@ -114,22 +163,22 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     textMode: value_and_name
   pluginVersion: 10.0.1
+  type: stat
+- title: Deprecated Kubernetes Resources
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "apiserver_requested_deprecated_apis{%s=~\"$cluster\"}" $clusterLabel }}
     exemplar: true
-    expr: up{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}
-    interval: ''
-    legendFormat: '{{`{{`}} instance {{`}}`}}'
+    interval: ""
+    legendFormat: ""
     refId: A
-  title: API Server - Health Status
-  type: stat
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -158,13 +207,13 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 0
+    "y": 0
   id: 60
   options:
     cellHeight: sm
     footer:
       countRows: false
-      fields: ''
+      fields: ""
       reducer:
       - sum
       show: false
@@ -173,16 +222,6 @@ panels:
     - desc: false
       displayName: removed_release
   pluginVersion: 10.0.1
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: apiserver_requested_deprecated_apis{ {{ $clusterLabel }}=~"$cluster"}
-    interval: ''
-    legendFormat: ''
-    refId: A
-  title: Deprecated Kubernetes Resources
   transformations:
   - id: labelsToFields
     options:
@@ -237,7 +276,17 @@ panels:
           aggregations: []
           operation: groupby
   type: table
-- datasource:
+- title: API Server - HTTP Requests by code
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(apiserver_request_total{%s=~\"$cluster\"}[$__rate_interval])) by(code,%s)" $clusterLabel $clusterLabel }}
+    exemplar: true
+    interval: $resolution
+    legendFormat: '{{`{{`}} code {{`}}`}}'
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -247,7 +296,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -268,7 +317,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -283,7 +332,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 8
+    "y": 8
   id: 38
   options:
     legend:
@@ -295,18 +344,18 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: API Server - HTTP Requests by verb
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(apiserver_request_total{%s=~\"$cluster\"}[$__rate_interval])) by(verb,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: sum by (code) (rate(apiserver_request_total{ {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
-    legendFormat: '{{`{{`}} code {{`}}`}}'
+    legendFormat: '{{`{{`}} verb{{`}}`}}'
     refId: A
-  title: API Server - HTTP Requests by code
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -316,7 +365,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -337,7 +386,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -352,7 +401,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 8
+    "y": 8
   id: 39
   options:
     legend:
@@ -364,18 +413,18 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: API Server - HTTP Requests Latency by instance
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(apiserver_request_duration_seconds_sum{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s) / sum(rate(apiserver_request_duration_seconds_count{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: sum by (verb) (rate(apiserver_request_total{ {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
-    legendFormat: '{{`{{`}} verb{{`}}`}}'
+    legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
-  title: API Server - HTTP Requests by verb
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -385,7 +434,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -406,7 +455,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -421,7 +470,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 16
+    "y": 16
   id: 53
   options:
     legend:
@@ -433,21 +482,18 @@ panels:
       mode: single
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: API Server - HTTP Requests Latency by verb
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(apiserver_request_duration_seconds_sum{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(verb,%s) / sum(rate(apiserver_request_duration_seconds_count{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(verb,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: |-
-      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
-      /
-      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     interval: $resolution
-    legendFormat: '{{`{{`}} instance {{`}}`}}'
+    legendFormat: '{{`{{`}} verb {{`}}`}}'
     refId: A
-  title: API Server - HTTP Requests Latency by instance
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -457,7 +503,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -478,7 +524,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -493,7 +539,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 16
+    "y": 16
   id: 54
   options:
     legend:
@@ -505,21 +551,18 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: API Server - Errors by Instance
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(apiserver_request_total{code=~\"5..\",job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s) / sum(rate(apiserver_request_total{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: |-
-      sum(rate(apiserver_request_duration_seconds_sum{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
-      /
-      sum(rate(apiserver_request_duration_seconds_count{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (verb)
     interval: $resolution
-    legendFormat: '{{`{{`}} verb {{`}}`}}'
+    legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
-  title: API Server - HTTP Requests Latency by verb
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -529,7 +572,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -550,7 +593,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -565,7 +608,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 24
+    "y": 24
   id: 50
   options:
     legend:
@@ -577,20 +620,18 @@ panels:
       mode: single
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: API Server - Errors by verb
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(apiserver_request_total{code=~\"5..\",job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(verb,%s) / sum(rate(apiserver_request_total{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(verb,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: |-
-      sum by(instance) (rate(apiserver_request_total{code=~"5..", job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
-       / sum by(instance) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
-    legendFormat: '{{`{{`}} instance {{`}}`}}'
+    legendFormat: '{{`{{`}} verb {{`}}`}}'
     refId: A
-  title: API Server - Errors by Instance
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -600,7 +641,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -621,7 +662,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -636,7 +677,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 24
+    "y": 24
   id: 51
   options:
     legend:
@@ -648,20 +689,18 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: API Server - Stacked HTTP Requests by instance
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(apiserver_request_total{%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: |-
-      sum by(verb) (rate(apiserver_request_total{code=~"5..",job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
-       / sum by(verb) (rate(apiserver_request_total{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
     interval: $resolution
-    legendFormat: '{{`{{`}} verb {{`}}`}}'
+    legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
-  title: API Server - Errors by verb
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -671,7 +710,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -692,7 +731,7 @@ panels:
           group: A
           mode: normal
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -707,7 +746,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 32
+    "y": 32
   id: 40
   options:
     legend:
@@ -719,18 +758,18 @@ panels:
       mode: single
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: API Server - Work Queue by instance
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(workqueue_depth{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: sum(rate(apiserver_request_total{ {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
-  title: API Server - Stacked HTTP Requests by instance
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -740,7 +779,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -761,7 +800,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -776,7 +815,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 32
+    "y": 32
   id: 56
   options:
     legend:
@@ -788,18 +827,18 @@ panels:
       mode: single
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: API Server - CPU Usage by instance
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "rate(process_cpu_seconds_total{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     exemplar: true
-    expr: sum(rate(workqueue_depth{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (instance)
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
-  title: API Server - Work Queue by instance
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -809,7 +848,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -830,7 +869,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -846,7 +885,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 40
+    "y": 40
   id: 47
   options:
     legend:
@@ -858,18 +897,18 @@ panels:
       mode: single
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: API Server - Memory Usage by instance
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "process_resident_memory_bytes{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}" $clusterLabel }}
     exemplar: true
-    expr: rate(process_cpu_seconds_total{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     refId: A
-  title: API Server - CPU Usage by instance
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -879,7 +918,7 @@ panels:
       custom:
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         drawStyle: line
@@ -900,7 +939,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -915,7 +954,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 40
+    "y": 40
   id: 48
   options:
     legend:
@@ -927,99 +966,45 @@ panels:
       mode: single
       sort: none
   pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: process_resident_memory_bytes{job=~"kubernetes-apiservers|apiserver", {{ $clusterLabel }}=~"$cluster"}
-    interval: $resolution
-    legendFormat: '{{`{{`}} instance {{`}}`}}'
-    refId: A
-  title: API Server - Memory Usage by instance
   type: timeseries
+__elements: []
+__inputs:
+- description: ""
+  label: Prometheus
+  name: DS_PROMETHEUS
+  pluginId: prometheus
+  pluginName: Prometheus
+  type: datasource
+__requires:
+- id: grafana
+  name: Grafana
+  type: grafana
+  version: 8.4.4
+- id: prometheus
+  name: Prometheus
+  type: datasource
+  version: 5.0.0
+- id: timeseries
+  name: Time series
+  type: panel
+  version: ""
+- id: stat
+  name: Stat
+  type: panel
+  version: ""
+condition: {{ "($Values.kubeApiServer).enabled" }}
+description: 'This is a modern API Server dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
+fiscalYearStartMonth: 0
+graphTooltip: 1
+links: []
+liveNow: false
 refresh: 30s
 schemaVersion: 38
 style: dark
-tags:
-- Kubernetes
-- Prometheus
-- vm-k8s-stack
-templating:
-  list:
-  - current:
-      selected: false
-      text: Prometheus
-      value: Prometheus
-    hide: 0
-    includeAll: false
-    label: ''
-    multi: false
-    name: datasource
-    options: []
-    query: {{ $defaultDatasource }}
-    queryValue: ''
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    type: datasource
-  - current:
-      isNone: true
-      selected: false
-      text: None
-      value: ''
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(kube_node_info,{{ $clusterLabel }})
-    hide: {{ ternary 0 2 $multicluster }}
-    includeAll: false
-    multi: false
-    name: cluster
-    options: []
-    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyhrdWJlX25vZGVfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $clusterLabel) ".*" $multicluster }}
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    type: {{ ternary "query" "constant" $multicluster }}
-  - current:
-      selected: true
-      text: 30s
-      value: 30s
-    hide: 0
-    includeAll: false
-    multi: false
-    name: resolution
-    options:
-    - selected: false
-      text: 1s
-      value: 1s
-    - selected: false
-      text: 15s
-      value: 15s
-    - selected: true
-      text: 30s
-      value: 30s
-    - selected: false
-      text: 1m
-      value: 1m
-    - selected: false
-      text: 3m
-      value: 3m
-    - selected: false
-      text: 5m
-      value: 5m
-    query: 1s, 15s, 30s, 1m, 3m, 5m
-    queryValue: ''
-    skipUrlSync: false
-    type: custom
 time:
   from: now-1h
   to: now
 timepicker: {}
-timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
-title: Kubernetes / System / API Server
 uid: k8s_system_apisrv
 version: 19
-weekStart: ''
+weekStart: ""

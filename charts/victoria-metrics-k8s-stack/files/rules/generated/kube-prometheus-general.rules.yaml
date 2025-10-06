@@ -1,15 +1,16 @@
+
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
-{{- $groupLabels := join "," $additionalGroupByLabels }}
+{{- $groupLabels := join "," (uniq $additionalGroupByLabels) }}
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
-condition: '{{ true }}'
 name: kube-prometheus-general.rules
 rules:
-- condition: '{{ true }}'
-  expr: count without(instance, pod, node) (up == 1)
+- expr: count without(instance, pod, node) (up == 1)
+  condition: true
   record: count:up1
-- condition: '{{ true }}'
-  expr: count without(instance, pod, node) (up == 0)
+- expr: count without(instance, pod, node) (up == 0)
+  condition: true
   record: count:up0
+condition: true
