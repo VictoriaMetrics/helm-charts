@@ -9,11 +9,10 @@ metadata:
 type: Opaque
 data:
   {{- $config := .Values.vmauth.config }}
-  {{- $_ := set . "style" "plain" }}
-  {{- $_ := set . "appKey" "vminsert" -}}
+  {{- $_ := set $ctx "appKey" "vminsert" -}}
   {{- $writeURL := urlParse (include "vm.url" $ctx) -}}
   {{- $_ := set $writeURL "path" (printf "%s/insert" $writeURL.path) -}}
-  {{- $_ := set . "appKey" "vmselect" -}}
+  {{- $_ := set $ctx "appKey" "vmselect" -}}
   {{- $readURL := urlParse (include "vm.url" $ctx) -}}
   {{- $_ := set $readURL "path" (printf "%s/select" $readURL.path) -}}
   {{- $_ := set . "vm" (dict "read" $readURL "write" $writeURL) -}}
@@ -23,12 +22,12 @@ data:
       {{- if $.Values.vmselect.service.enabled }}
         {{- $readPaths := list (printf "%s/*" $readURL.path) }}
         {{- $readPrefix := urlJoin (omit .vm.read "path") }}
-        {{- $urlMap = append $urlMap (dict "src_paths" ($readPaths) "url_prefix" ($readPrefix) "discover_backend_ips" true) }}
+        {{- $urlMap = append $urlMap (dict "src_paths" $readPaths "url_prefix" (quote $readPrefix) "discover_backend_ips" true) }}
       {{- end }}
       {{- if $.Values.vminsert.service.enabled }}
         {{- $writePaths := list (printf "%s/*" $writeURL.path) }}
         {{- $writePrefix := urlJoin (omit .vm.write "path") }}
-        {{- $urlMap = append $urlMap (dict "src_paths" ($writePaths) "url_prefix" ($writePrefix) "discover_backend_ips" true) }}
+        {{- $urlMap = append $urlMap (dict "src_paths" $writePaths "url_prefix" (quote $writePrefix) "discover_backend_ips" true) }}
       {{- end }}
       {{- $_ := set $config "unauthorized_user" (dict "url_map" $urlMap) }}
     {{- end }}
