@@ -560,21 +560,32 @@ alertmanager:
   persistentVolume:
     # -- Create/use Persistent Volume Claim for alertmanager component. Empty dir if false
     enabled: false
+
     # -- Override Persistent Volume Claim name
     name: ""
+
     # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
     accessModes:
       - ReadWriteOnce
+
     # -- Persistent volume annotations
     annotations: {}
+
+    # -- PVC extra labels
+    extraLabels: {}
+
     # -- StorageClass to use for persistent volume. Requires alertmanager.persistentVolume.enabled: true. If defined, PVC created automatically
     storageClassName: ""
+
     # -- Existing Claim name. If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
+
     # -- Mount path. Alertmanager data Persistent Volume mount root path.
     mountPath: /data
+
     # -- Mount subpath
     subPath: ""
+
     # -- Size of the volume. Better to set the same as resource limit memory property.
     size: 50Mi
 

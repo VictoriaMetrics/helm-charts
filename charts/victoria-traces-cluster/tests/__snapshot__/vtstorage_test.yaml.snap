@@ -67,6 +67,13 @@ statefulset should match snapshot:
         - apiVersion: v1
           kind: PersistentVolumeClaim
           metadata:
+            labels:
+              app: vtstorage
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/managed-by: Helm
+              app.kubernetes.io/name: vt-cluster
+              app.kubernetes.io/version: 0.1.0
+              helm.sh/chart: victoria-traces-cluster-0.1.1
             name: vtstorage-volume
           spec:
             accessModes:
@@ -146,6 +153,13 @@ statefulset should match snapshot with fullnameOverride, extraLabels and podLabe
         - apiVersion: v1
           kind: PersistentVolumeClaim
           metadata:
+            labels:
+              app: storage
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/managed-by: Helm
+              app.kubernetes.io/name: vt-cluster
+              app.kubernetes.io/version: 0.1.0
+              helm.sh/chart: victoria-traces-cluster-0.1.1
             name: vtstorage-volume
           spec:
             accessModes:

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- replaced .Values.vtstorage.persistentVolume.labels with .Values.vtstorage.persistentVolume.extraLabels
 
 ## 0.0.1
 

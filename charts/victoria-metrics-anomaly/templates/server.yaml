@@ -17,7 +17,8 @@
 {{- $fullname := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $shardingEnabled := gt (int .Values.shardsCount) 1 }}
-{{- $useSts := or .Values.persistentVolume.enabled $shardingEnabled }}
+{{- $pvc := .Values.persistentVolume }}
+{{- $useSts := or $pvc.enabled $shardingEnabled }}
 {{- $tag := include "vm.image.tag" $ctx | splitList "-" | first }}
 ---
 apiVersion: apps/v1
@@ -63,10 +64,10 @@ spec:
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- $env := default list }}
-          {{- if and .Values.persistentVolume.enabled .Values.persistentVolume.dumpModels }}
+          {{- if and $pvc.enabled $pvc.dumpModels }}
           {{- $env = append $env (dict "name" "VMANOMALY_MODEL_DUMPS_DIR" "value" "/tmp/vmanomaly-storage/models") }}
           {{- end }}
-          {{- if and .Values.persistentVolume.enabled .Values.persistentVolume.dumpData }}
+          {{- if and $pvc.enabled $pvc.dumpData }}
           {{- $env = append $env (dict "name" "VMANOMALY_DATA_DUMPS_DIR" "value" "/tmp/vmanomaly-storage/data") }}
           {{- end }}
           {{- if $shardingEnabled }}
@@ -90,7 +91,7 @@ spec:
             - name: config
               mountPath: /etc/config
             {{- include "vm.license.mount" . | nindent 12 }}
-            {{- if .Values.persistentVolume.enabled }}
+            {{- if $pvc.enabled }}
             - name: {{ $storageName }}
               mountPath: /tmp/vmanomaly-storage
             {{- end }}
@@ -121,11 +122,11 @@ spec:
           configMap:
             name: {{ $fullname }}
         {{- include "vm.license.volume" . | nindent 8 }}
-        {{- if or (not .Values.persistentVolume.enabled) .Values.persistentVolume.existingClaim }}
+        {{- if or (not $pvc.enabled) $pvc.existingClaim }}
         - name: {{ $storageName }}
-          {{- if .Values.persistentVolume.enabled }}
+          {{- if $pvc.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistentVolume.existingClaim }}
+            claimName: {{ $pvc.existingClaim }}
           {{- else }}
           emptyDir: {{ toYaml .Values.emptyDir | nindent 12 }}
           {{- end }}
@@ -133,26 +134,29 @@ spec:
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-  {{- if and .Values.persistentVolume.enabled (not .Values.persistentVolume.existingClaim) }}
+  {{- if and $pvc.enabled (not $pvc.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ .Values.persistentVolume.name | default $storageName }}
-        {{- with .Values.persistentVolume.annotations }}
+        name: {{ $pvc.name | default $storageName }}
+        {{- with $pvc.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
+        {{- $_ := set $ctx "extraLabels" $pvc.extraLabels }}
+        labels: {{ include "vm.labels" $ctx | nindent 10 }}
+        {{- $_ := unset $ctx "extraLabels" }}
       spec:
-        {{- with .Values.persistentVolume.accessModes }}
+        {{- with $pvc.accessModes }}
         accessModes: {{ toYaml . | nindent 10 }}
         {{- end }}
         resources:
           requests:
-            storage: {{ .Values.persistentVolume.size }}
-        {{- with .Values.persistentVolume.storageClassName }}
+            storage: {{ $pvc.size }}
+        {{- with $pvc.storageClassName }}
         storageClassName: {{ ternary "" . (eq "-" .) }}
         {{- end }}
-        {{- with .Values.persistentVolume.matchLabels }}
+        {{- with $pvc.matchLabels }}
         selector:
           matchLabels: {{ toYaml . | nindent 12 }}
         {{- end }}

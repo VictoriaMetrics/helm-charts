@@ -1,5 +1,22 @@
 deployment should match snapshot:
   1: |
+    apiVersion: v1
+    data:
+      auth.yml: |
+        dW5hdXRob3JpemVkX3VzZXI6CiAgdXJsX21hcDoKICAtIGRpc2NvdmVyX2JhY2tlbmRfaXBzOiB0cnVlCiAgICBzcmNfcGF0aHM6CiAgICAtIC9zZWxlY3QvLioKICAgIHVybF9wcmVmaXg6IGh0dHA6Ly9SRUxFQVNFLU5BTUUtdmljdG9yaWEtbG9ncy1jbHVzdGVyLXZsc2VsZWN0Lk5BTUVTUEFDRS5zdmMuY2x1c3Rlci5sb2NhbC46OTQ3MQogIC0gZGlzY292ZXJfYmFja2VuZF9pcHM6IHRydWUKICAgIHNyY19wYXRoczoKICAgIC0gL2luc2VydC8uKgogICAgdXJsX3ByZWZpeDogaHR0cDovL1JFTEVBU0UtTkFNRS12aWN0b3JpYS1sb2dzLWNsdXN0ZXItdmxpbnNlcnQuTkFNRVNQQUNFLnN2Yy5jbHVzdGVyLmxvY2FsLjo5NDgx
+    kind: Secret
+    metadata:
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: RELEASE-NAME-victoria-logs-cluster-vmauth
+      namespace: NAMESPACE
+    type: Opaque
+  2: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -21,6 +38,8 @@ deployment should match snapshot:
           app.kubernetes.io/name: victoria-logs-cluster
       template:
         metadata:
+          annotations:
+            checksum/config: f321b46b76cdf488b571082e5c986345d95c4cda2a9cbc6d744f6d822f3f7f3a
           labels:
             app: vmauth
             app.kubernetes.io/instance: RELEASE-NAME
@@ -71,6 +90,23 @@ deployment should match snapshot:
                 secretName: RELEASE-NAME-victoria-logs-cluster-vmauth
 deployment should match snapshot with fullnameOverride, extraLabels and podLabels:
   1: |
+    apiVersion: v1
+    data:
+      auth.yml: |
+        dW5hdXRob3JpemVkX3VzZXI6CiAgdXJsX21hcDoKICAtIGRpc2NvdmVyX2JhY2tlbmRfaXBzOiB0cnVlCiAgICBzcmNfcGF0aHM6CiAgICAtIC9zZWxlY3QvLioKICAgIHVybF9wcmVmaXg6IGh0dHA6Ly9SRUxFQVNFLU5BTUUtdmljdG9yaWEtbG9ncy1jbHVzdGVyLXZsc2VsZWN0Lk5BTUVTUEFDRS5zdmMuY2x1c3Rlci5sb2NhbC46OTQ3MQogIC0gZGlzY292ZXJfYmFja2VuZF9pcHM6IHRydWUKICAgIHNyY19wYXRoczoKICAgIC0gL2luc2VydC8uKgogICAgdXJsX3ByZWZpeDogaHR0cDovL1JFTEVBU0UtTkFNRS12aWN0b3JpYS1sb2dzLWNsdXN0ZXItdmxpbnNlcnQuTkFNRVNQQUNFLnN2Yy5jbHVzdGVyLmxvY2FsLjo5NDgx
+    kind: Secret
+    metadata:
+      labels:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-cluster
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-cluster-0.1.1
+      name: vmauth-node
+      namespace: NAMESPACE
+    type: Opaque
+  2: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -93,6 +129,8 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
           app.kubernetes.io/name: victoria-logs-cluster
       template:
         metadata:
+          annotations:
+            checksum/config: 3f6c2eab9dd05270bf389345b95195e2e43da2b7589bcef4f505fc117b7b087e
           labels:
             app: auth
             app.kubernetes.io/instance: RELEASE-NAME

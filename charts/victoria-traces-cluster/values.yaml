@@ -638,24 +638,31 @@ vtstorage:
   persistentVolume:
     # -- Create/use Persistent Volume Claim for vtstorage component. Empty dir if false. If true,  vtstorage will create/use a Persistent Volume Claim
     enabled: true
+
     name: vtstorage-volume
 
     # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
     accessModes:
       - ReadWriteOnce
+
     # -- Persistent volume annotations
     annotations: {}
-    # -- Persistent volume labels
-    labels: {}
+
+    # -- Persistent volume extra labels
+    extraLabels: {}
+
     # -- Storage class name. Will be empty if not set
     storageClassName: ""
+
     # --  Existing Claim name. Requires vtstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
 
     # -- Data root path. vtstorage data Persistent Volume mount root path
     mountPath: /storage
+
     # -- Size of the volume.
     size: 10Gi
+
     # -- Mount subpath
     subPath: ""
 

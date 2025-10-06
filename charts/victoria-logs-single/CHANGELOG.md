@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add .Values.server.persistentVolume.extraLabels for PVC specific labels
 
 ## 0.11.11
 

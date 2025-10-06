@@ -309,19 +309,26 @@ vmselect:
   persistentVolume:
     # -- Create/use Persistent Volume Claim for vmselect component. Empty dir if false. If true, vmselect will create/use a Persistent Volume Claim
     enabled: false
+
     # -- Override Persistent Volume Claim name
     name: ""
+
     # -- Array of access mode. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
     accessModes:
       - ReadWriteOnce
+
     # -- Persistent volume annotations
     annotations: {}
-    # -- Persistent volume labels
-    labels: {}
+
+    # -- Persistent volume extra labels
+    extraLabels: {}
+
     # -- Existing Claim name. Requires vmselect.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
+
     # -- Size of the volume. Better to set the same as resource limit memory property
     size: 2Gi
+
     # -- Mount subpath
     subPath: ""
   serviceMonitor:
@@ -995,23 +1002,32 @@ vmstorage:
   persistentVolume:
     # -- Create/use Persistent Volume Claim for vmstorage component. Empty dir if false. If true,  vmstorage will create/use a Persistent Volume Claim
     enabled: true
+
     # -- Override Persistent Volume Claim name
     name: vmstorage-volume
+
     # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
     accessModes:
       - ReadWriteOnce
+
     # -- Persistent volume annotations
     annotations: {}
-    # -- Persistent volume labels
-    labels: {}
+
+    # -- Persistent volume extra labels
+    extraLabels: {}
+
     # -- Storage class name. Will be empty if not set
     storageClassName: ""
+
     # --  Existing Claim name. Requires vmstorage.persistentVolume.enabled: true. If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
+
     # -- Data root path. Vmstorage data Persistent Volume mount root path
     mountPath: /storage
+
     # -- Size of the volume.
     size: 8Gi
+
     # -- Mount subpath
     subPath: ""
 

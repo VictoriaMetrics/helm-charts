@@ -1,4 +1,5 @@
 {{- $app := merge (deepCopy .Values.vmstorage) (deepCopy .Values.common) -}}
+{{- $pvc := $app.persistentVolume }}
 {{- $_ := set .Values "vmstorage" $app }}
 {{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "vmstorage" }}
@@ -68,8 +69,8 @@ spec:
               containerPort: 8300
           volumeMounts:
             - name: vmstorage-volume
-              mountPath: {{ $app.persistentVolume.mountPath }}
-              subPath: {{ $app.persistentVolume.subPath }}
+              mountPath: {{ $pvc.mountPath }}
+              subPath: {{ $pvc.subPath }}
             {{- range $manager.extraSecretMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
@@ -121,7 +122,7 @@ spec:
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            {{- with $app.persistentVolume }}
+            {{- with $pvc }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
@@ -196,7 +197,7 @@ spec:
             - name: manager-http
               containerPort: 8300
           volumeMounts:
-            {{- with $app.persistentVolume }}
+            {{- with $pvc }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
@@ -245,16 +246,16 @@ spec:
         {{- end }}
       {{- end }}
       terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
-      {{- if or $app.extraVolumes (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim (include "vm.license.volume" .) }}
+      {{- if or $app.extraVolumes (not $pvc.enabled) $pvc.existingClaim (include "vm.license.volume" .) }}
       volumes:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- if or (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
+        {{- if or (not $pvc.enabled) $pvc.existingClaim }}
         - name: vmstorage-volume
-          {{- if $app.persistentVolume.enabled }}
+          {{- if $pvc.enabled }}
           persistentVolumeClaim: 
-            claimName: {{ $app.persistentVolume.existingClaim }}
+            claimName: {{ $pvc.existingClaim }}
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
@@ -262,26 +263,26 @@ spec:
         {{- include "vm.license.volume" . | nindent 8 }}
       {{- end }}
   minReadySeconds: {{ $app.minReadySeconds }}
-  {{- if and $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
+  {{- if and $pvc.enabled (not $pvc.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ $app.persistentVolume.name }}
-        {{- with $app.persistentVolume.annotations }}
+        name: {{ $pvc.name }}
+        {{- with $pvc.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
-        {{- with $app.persistentVolume.labels }}
-        labels: {{ toYaml . | nindent 10 }}
-        {{- end }}
+        {{- $_ := set $ctx "extraLabels" $pvc.extraLabels }}
+        labels: {{ include "vm.labels" $ctx | nindent 10 }}
+        {{- $_ := unset $ctx "extraLabels" }}
       spec:
-        {{- with $app.persistentVolume.accessModes }}
+        {{- with $pvc.accessModes }}
         accessModes: {{ toYaml . | nindent 10 }}
         {{- end }}
         resources:
           requests:
-            storage: {{ $app.persistentVolume.size }}
-        {{- with $app.persistentVolume.storageClassName }}
+            storage: {{ $pvc.size }}
+        {{- with $pvc.storageClassName }}
         storageClassName: {{ ternary "" . (eq "-" .) }}
         {{- end }}
   {{- end }}

@@ -1,5 +1,6 @@
 {{- $storageName := "cache-volume" }}
 {{- $app := merge (deepCopy .Values.vmselect) (deepCopy .Values.common) -}}
+{{- $pvc := $app.persistentVolume }}
 {{- $_ := set .Values "vmselect" $app }}
 {{- $mode := $app.mode }}
 {{- if and $mode $app.enabled (hasKey $app $mode) -}}
@@ -143,40 +144,39 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- if or (eq $mode "deployment") (not $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
+        {{- if or (eq $mode "deployment") (not $pvc.enabled) $pvc.existingClaim }}
         - name: {{ $storageName }}
-          {{- if or (and (eq $mode "deployment") $app.persistentVolume.enabled) $app.persistentVolume.existingClaim }}
+          {{- if or (and (eq $mode "deployment") $pvc.enabled) $pvc.existingClaim }}
           persistentVolumeClaim:
-            claimName: {{ $app.persistentVolume.existingClaim | default $fullname }}
+            claimName: {{ $pvc.existingClaim | default $fullname }}
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
         {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
-  {{- if and (eq $mode "statefulSet") $app.persistentVolume.enabled (not $app.persistentVolume.existingClaim) }}
+  {{- if and (eq $mode "statefulSet") $pvc.enabled (not $pvc.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ $app.persistentVolume.name | default $storageName }}
-        {{- with $app.persistentVolume.annotations }}
+        name: {{ $pvc.name | default $storageName }}
+        {{- with $pvc.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
-        {{- with .Values.vmstorage.persistentVolume.labels }}
-        labels: {{ toYaml . | nindent 10 }}
-        {{- end }}
+        {{- $_ := set $ctx "extraLabels" $pvc.extraLabels }}
+        labels: {{ include "vm.labels" $ctx | nindent 10 }}
+        {{- $_ := unset $ctx "extraLabels" }}
       spec:
-        {{- with $app.persistentVolume.accessModes }}
+        {{- with $pvc.accessModes }}
         accessModes: {{ toYaml . | nindent 10 }}
         {{- end }}
         resources:
           requests:
-            storage: {{ $app.persistentVolume.size }}
-        {{- with $app.persistentVolume.storageClassName }}
+            storage: {{ $pvc.size }}
+        {{- with $pvc.storageClassName }}
         storageClassName: {{ ternary "" . (eq "-" .) }}
         {{- end }}
   {{- end }}
-{{- $pvc := $app.persistentVolume }}
 {{- if and $pvc.enabled (not $pvc.existingClaim) (eq $app.mode "deployment") }}
 ---
 kind: PersistentVolumeClaim
