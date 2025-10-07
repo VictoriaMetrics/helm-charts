@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- replaced .Values.vmst/orage.persistentVolume.labels with .Values.vmstorage.persistentVolume.extraLabels
+- replaced .Values.vmselect.persistentVolume.labels with .Values.vmselect.persistentVolume.extraLabels
 
 ## 0.28.4
 

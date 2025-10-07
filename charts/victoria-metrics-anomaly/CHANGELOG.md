@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- add .Values.persistentVolume.extraLabels for PVC specific labels
+- add ability to customize data path using .Values.persistentVolume.mountPath
 
 ## 1.12.0
 

@@ -1,103 +1,183 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-__elements: {}
-__inputs:
-- description: ''
-  label: Prometheus
-  name: DS_PROMETHEUS
-  pluginId: prometheus
-  pluginName: Prometheus
-  type: datasource
-__requires:
-- id: gauge
-  name: Gauge
-  type: panel
-  version: ''
-- id: grafana
-  name: Grafana
-  type: grafana
-  version: 10.3.1
-- id: prometheus
-  name: Prometheus
-  type: datasource
-  version: 1.0.0
-- id: stat
-  name: Stat
-  type: panel
-  version: ''
-- id: timeseries
-  name: Time series
-  type: panel
-  version: ''
+title: Kubernetes / Views / Namespaces
+templating:
+  list:
+  - name: datasource
+    type: datasource
+    query: {{ $defaultDatasource }}
+    current: {}
+    options: []
+    queryValue: ""
+    refresh: 1
+    regex: ""
+    skipUrlSync: false
+  - name: cluster
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: {{ ternary "query" "constant" $multicluster }}
+    query:
+      qryType: 1
+      query: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
+    hide: {{ ternary 0 2 $multicluster }}
+    current: {}
+    options: []
+    refresh: 1
+    regex: ""
+    skipUrlSync: false
+    sort: 1
+  - name: namespace
+    multi: true
+    includeAll: true
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: query
+    query:
+      query: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
+      refId: StandardVariableQuery
+    definition: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
+    allValue: .*
+    current: {}
+    options: []
+    refresh: 1
+    regex: ""
+    skipUrlSync: false
+    sort: 1
+    tagValuesQuery: ""
+    tagsQuery: ""
+    useTags: false
+  - name: resolution
+    type: custom
+    query: 1s, 15s, 30s, 1m, 3m, 5m
+    current:
+      selected: false
+      text: 30s
+      value: 30s
+    options:
+    - selected: false
+      text: 1s
+      value: 1s
+    - selected: false
+      text: 15s
+      value: 15s
+    - selected: true
+      text: 30s
+      value: 30s
+    - selected: false
+      text: 1m
+      value: 1m
+    - selected: false
+      text: 3m
+      value: 3m
+    - selected: false
+      text: 5m
+      value: 5m
+    queryValue: ""
+    skipUrlSync: false
+  - name: created_by
+    multi: true
+    includeAll: true
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: query
+    query:
+      query: {{ printf "label_values(kube_pod_info{namespace=~\"$namespace\",%s=~\"$cluster\"}, created_by_name)" $clusterLabel }}
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ printf "label_values(kube_pod_info{namespace=~\"$namespace\",%s=~\"$cluster\"}, created_by_name)" $clusterLabel }}
+    allValue: .*
+    current: {}
+    description: Can be used to filter on a specific deployment, statefulset or deamonset (only relevant panels).
+    options: []
+    refresh: 2
+    regex: ""
+    skipUrlSync: false
+    sort: 1
+editable: false
+timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
+tags:
+- Kubernetes
+- Prometheus
+- vm-k8s-stack
 annotations:
   list:
-  - builtIn: 1
+  - name: Annotations & Alerts
     datasource:
       type: datasource
       uid: grafana
+    builtIn: 1
     enable: true
     hide: true
     iconColor: rgba(0, 211, 255, 1)
-    name: Annotations & Alerts
     target:
       limit: 100
       matchAny: false
       tags: []
       type: dashboard
     type: dashboard
-  - datasource:
+  - name: terraform
+    datasource:
       type: datasource
       uid: grafana
     enable: true
     hide: false
     iconColor: '#5c4ee5'
-    name: terraform
     target:
       limit: 100
       matchAny: false
       tags:
       - terraform
       type: tags
-  - datasource:
+  - name: oncall
+    datasource:
       type: datasource
       uid: grafana
     enable: true
     hide: false
     iconColor: red
-    name: oncall
     target:
       limit: 100
       matchAny: false
       tags:
       - oncall
       type: tags
-condition: {{ ($Values.kubelet).enabled }}
-description: 'This is a modern ''Namespaces View'' dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
-editable: false
-fiscalYearStartMonth: 0
-graphTooltip: 1
-links: []
-liveNow: false
 panels:
-- collapsed: false
+- title: Overview
   datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: grafana
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 0
+    "y": 0
   id: 38
-  panels: []
-  title: Overview
   type: row
-- datasource:
+- title: Namespace(s) usage on total cluster CPU in %
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / sum(machine_cpu_cores{%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: false
+    instant: true
+    interval: ""
+    legendFormat: ""
+    range: false
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -121,7 +201,7 @@ panels:
     h: 7
     w: 6
     x: 0
-    'y': 1
+    "y": 1
   id: 46
   options:
     minVizHeight: 75
@@ -130,28 +210,25 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showThresholdLabels: false
     showThresholdMarkers: true
     sizing: auto
     text: {}
   pluginVersion: 11.2.1
+  type: gauge
+- title: Namespace(s) usage on total cluster RAM in %
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    editorMode: code
-    exemplar: false
-    expr: sum(rate(container_cpu_usage_seconds_total{namespace=~"$namespace", image!="", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) / sum(machine_cpu_cores{ {{ $clusterLabel }}=~"$cluster"})
-    instant: true
-    interval: ''
-    legendFormat: ''
-    range: false
+    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=~\"$namespace\",image!=\"\",%s=~\"$cluster\"}) by(%s) / sum(machine_memory_bytes{%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    exemplar: true
+    interval: ""
+    legendFormat: ""
     refId: A
-  title: Namespace(s) usage on total cluster CPU in %
-  type: gauge
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -175,7 +252,7 @@ panels:
     h: 7
     w: 6
     x: 6
-    'y': 1
+    "y": 1
   id: 48
   options:
     minVizHeight: 75
@@ -184,25 +261,94 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showThresholdLabels: false
     showThresholdMarkers: true
     sizing: auto
     text: {}
   pluginVersion: 11.2.1
+  type: gauge
+- title: Kubernetes Resource Count
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    exemplar: true
-    expr: sum(container_memory_working_set_bytes{namespace=~"$namespace", image!="", {{ $clusterLabel }}=~"$cluster"}) / sum(machine_memory_bytes{ {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: ''
+    expr: {{ printf "sum(kube_pod_info{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Running Pods
     refId: A
-  title: Namespace(s) usage on total cluster RAM in %
-  type: gauge
-- datasource:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_service_info{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Services
+    refId: B
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_ingress_info{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Ingresses
+    refId: C
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_deployment_labels{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Deployments
+    refId: D
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_statefulset_labels{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Statefulsets
+    refId: E
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_daemonset_labels{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Daemonsets
+    refId: F
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_persistentvolumeclaim_info{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Persistent Volume Claims
+    refId: G
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_hpa_labels{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Horizontal Pod Autoscalers
+    refId: H
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_configmap_info{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Configmaps
+    refId: I
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_secret_info{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Secrets
+    refId: J
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_networkpolicy_labels{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Network Policies
+    refId: K
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -213,7 +359,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -236,7 +382,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -251,7 +397,7 @@ panels:
     h: 11
     w: 12
     x: 12
-    'y': 1
+    "y": 1
   id: 32
   options:
     legend:
@@ -268,93 +414,53 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Namespace(s) CPU Usage in cores
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(kube_pod_info{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Running Pods
+    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    interval: ""
+    legendFormat: Real
+    range: true
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(kube_service_info{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Services
+    expr: {{ printf "sum(kube_pod_container_resource_requests{namespace=~\"$namespace\",resource=\"cpu\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    hide: false
+    legendFormat: Requests
+    range: true
     refId: B
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(kube_ingress_info{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Ingresses
+    expr: {{ printf "sum(kube_pod_container_resource_limits{namespace=~\"$namespace\",resource=\"cpu\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    hide: false
+    legendFormat: Limits
+    range: true
     refId: C
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(kube_deployment_labels{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Deployments
+    expr: {{ printf "sum(machine_cpu_cores{%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    hide: false
+    legendFormat: Cluster Total
+    range: true
     refId: D
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kube_statefulset_labels{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Statefulsets
-    refId: E
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kube_daemonset_labels{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Daemonsets
-    refId: F
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kube_persistentvolumeclaim_info{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Persistent Volume Claims
-    refId: G
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kube_hpa_labels{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Horizontal Pod Autoscalers
-    refId: H
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kube_configmap_info{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Configmaps
-    refId: I
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kube_secret_info{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Secrets
-    refId: J
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kube_networkpolicy_labels{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Network Policies
-    refId: K
-  title: Kubernetes Resource Count
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
       mappings: []
-      noValue: '0'
+      noValue: "0"
       thresholds:
         mode: absolute
         steps:
@@ -366,7 +472,7 @@ panels:
     h: 4
     w: 6
     x: 0
-    'y': 8
+    "y": 8
   id: 62
   options:
     colorMode: none
@@ -377,29 +483,31 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
     textMode: auto
     wideLayout: true
   pluginVersion: 11.2.1
+  type: stat
+- title: Namespace(s) RAM Usage in bytes
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=~\"$namespace\",image!=\"\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: sum(rate(container_cpu_usage_seconds_total{namespace=~"$namespace", image!="", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval]))
-    interval: ''
+    interval: ""
     legendFormat: Real
     range: true
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_container_resource_requests{namespace=~\"$namespace\",resource=\"memory\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
-    expr: sum(kube_pod_container_resource_requests{namespace=~"$namespace", resource="cpu", {{ $clusterLabel }}=~"$cluster"})
     hide: false
     legendFormat: Requests
     range: true
@@ -407,8 +515,8 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_container_resource_limits{namespace=~\"$namespace\",resource=\"memory\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
-    expr: sum(kube_pod_container_resource_limits{namespace=~"$namespace", resource="cpu", {{ $clusterLabel }}=~"$cluster"})
     hide: false
     legendFormat: Limits
     range: true
@@ -416,21 +524,19 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(machine_memory_bytes{%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
-    expr: sum(machine_cpu_cores{ {{ $clusterLabel }}=~"$cluster"})
     hide: false
     legendFormat: Cluster Total
     range: true
     refId: D
-  title: Namespace(s) CPU Usage in cores
-  type: stat
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
     defaults:
       mappings: []
-      noValue: '0'
+      noValue: "0"
       thresholds:
         mode: absolute
         steps:
@@ -442,7 +548,7 @@ panels:
     h: 4
     w: 6
     x: 6
-    'y': 8
+    "y": 8
   id: 64
   options:
     colorMode: none
@@ -453,67 +559,39 @@ panels:
     reduceOptions:
       calcs:
       - lastNotNull
-      fields: ''
+      fields: ""
       values: false
     showPercentChange: false
     text: {}
     textMode: auto
     wideLayout: true
   pluginVersion: 11.2.1
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: sum(container_memory_working_set_bytes{namespace=~"$namespace", image!="", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Real
-    range: true
-    refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    expr: sum(kube_pod_container_resource_requests{namespace=~"$namespace", resource="memory", {{ $clusterLabel }}=~"$cluster"})
-    hide: false
-    legendFormat: Requests
-    range: true
-    refId: B
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    expr: sum(kube_pod_container_resource_limits{namespace=~"$namespace", resource="memory", {{ $clusterLabel }}=~"$cluster"})
-    hide: false
-    legendFormat: Limits
-    range: true
-    refId: C
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    expr: sum(machine_memory_bytes{ {{ $clusterLabel }}=~"$cluster"})
-    hide: false
-    legendFormat: Cluster Total
-    range: true
-    refId: D
-  title: Namespace(s) RAM Usage in bytes
   type: stat
-- collapsed: false
+- title: Resources
   datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: grafana
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 12
+    "y": 12
   id: 40
-  panels: []
-  title: Resources
   type: row
-- datasource:
+- title: CPU usage by Pod
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\",image!=\"\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    interval: $resolution
+    legendFormat: '{{`{{`}} pod {{`}}`}}'
+    range: true
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -547,7 +625,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -562,7 +640,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 13
+    "y": 13
   id: 29
   options:
     legend:
@@ -574,20 +652,20 @@ panels:
       mode: single
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Memory usage by Pod
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=~\"$namespace\",image!=\"\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}) by(pod,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: sum(rate(container_cpu_usage_seconds_total{namespace=~"$namespace", image!="", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod)
     interval: $resolution
     legendFormat: '{{`{{`}} pod {{`}}`}}'
     range: true
     refId: A
-  title: CPU usage by Pod
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -598,7 +676,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -621,7 +699,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -636,7 +714,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 13
+    "y": 13
   id: 30
   options:
     legend:
@@ -648,23 +726,23 @@ panels:
       mode: single
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: CPU Throttled seconds by pod
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=~\"$namespace\",image!=\"\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s) > 0" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: sum(container_memory_working_set_bytes{namespace=~"$namespace", image!="", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}) by (pod)
     interval: $resolution
     legendFormat: '{{`{{`}} pod {{`}}`}}'
     range: true
     refId: A
-  title: Memory usage by Pod
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
-  description: ''
+  description: ""
   fieldConfig:
     defaults:
       color:
@@ -698,7 +776,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -714,7 +792,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 21
+    "y": 21
   id: 68
   options:
     legend:
@@ -731,30 +809,38 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=~"$namespace", image!="", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod) > 0
-    interval: $resolution
-    legendFormat: '{{`{{`}} pod {{`}}`}}'
-    range: true
-    refId: A
-  title: CPU Throttled seconds by pod
   type: timeseries
-- collapsed: false
+- title: Kubernetes
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 29
+    "y": 29
   id: 73
-  panels: []
-  title: Kubernetes
   type: row
-- datasource:
+- title: Kubernetes Pods QoS classes
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_status_qos_class{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(qos_class,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    interval: ""
+    legendFormat: '{{`{{`}} qos_class {{`}}`}} pods'
+    range: true
+    refId: A
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_info{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    hide: false
+    legendFormat: Total pods
+    range: true
+    refId: B
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -765,7 +851,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -788,7 +874,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -803,7 +889,7 @@ panels:
     h: 9
     w: 12
     x: 0
-    'y': 30
+    "y": 30
   id: 70
   options:
     legend:
@@ -820,29 +906,20 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Kubernetes Pods Status Reason
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_status_reason{%s=~\"$cluster\"}) by(reason,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: sum(kube_pod_status_qos_class{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"}) by (qos_class)
-    interval: ''
-    legendFormat: '{{`{{`}} qos_class {{`}}`}} pods'
+    interval: ""
+    legendFormat: '{{`{{`}} reason {{`}}`}}'
     range: true
     refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    expr: sum(kube_pod_info{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    hide: false
-    legendFormat: Total pods
-    range: true
-    refId: B
-  title: Kubernetes Pods QoS classes
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -853,7 +930,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -876,7 +953,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -891,7 +968,7 @@ panels:
     h: 9
     w: 12
     x: 12
-    'y': 30
+    "y": 30
   id: 72
   options:
     legend:
@@ -908,20 +985,20 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: OOM Events by namespace, pod
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(increase(container_oom_events_total{namespace=~\"${namespace}\",%s=~\"$cluster\"}[$__rate_interval])) by(namespace,pod,%s) > 0" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: sum(kube_pod_status_reason{ {{ $clusterLabel }}=~"$cluster"}) by (reason)
-    interval: ''
-    legendFormat: '{{`{{`}} reason {{`}}`}}'
+    interval: ""
+    legendFormat: 'namespace: {{`{{`}} namespace {{`}}`}} - pod: {{`{{`}} pod {{`}}`}}'
     range: true
     refId: A
-  title: Kubernetes Pods Status Reason
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: No data is generally a good thing here.
@@ -933,7 +1010,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -956,7 +1033,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -971,7 +1048,7 @@ panels:
     h: 9
     w: 12
     x: 0
-    'y': 39
+    "y": 39
   id: 74
   options:
     legend:
@@ -988,20 +1065,20 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Container Restarts by namespace, pod
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(increase(kube_pod_container_status_restarts_total{namespace=~\"${namespace}\",%s=~\"$cluster\"}[$__rate_interval])) by(namespace,pod,%s) > 0" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: sum(increase(container_oom_events_total{namespace=~"${namespace}", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (namespace, pod) > 0
-    interval: ''
+    interval: ""
     legendFormat: 'namespace: {{`{{`}} namespace {{`}}`}} - pod: {{`{{`}} pod {{`}}`}}'
     range: true
     refId: A
-  title: OOM Events by namespace, pod
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   description: No data is generally a good thing here.
@@ -1013,7 +1090,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1036,7 +1113,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1051,7 +1128,7 @@ panels:
     h: 9
     w: 12
     x: 12
-    'y': 39
+    "y": 39
   id: 75
   options:
     legend:
@@ -1068,20 +1145,49 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Nb of pods by state
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_container_status_ready{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
-    exemplar: true
-    expr: sum(increase(kube_pod_container_status_restarts_total{namespace=~"${namespace}", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (namespace, pod) > 0
-    interval: ''
-    legendFormat: 'namespace: {{`{{`}} namespace {{`}}`}} - pod: {{`{{`}} pod {{`}}`}}'
+    interval: ""
+    legendFormat: Ready
     range: true
     refId: A
-  title: Container Restarts by namespace, pod
-  type: timeseries
-- datasource:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_container_status_running{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    interval: ""
+    legendFormat: Running
+    range: true
+    refId: B
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_container_status_waiting{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Waiting
+    refId: C
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_container_status_restarts_total{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Restarts Total
+    refId: D
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_container_status_terminated{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: ""
+    legendFormat: Terminated
+    refId: E
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1092,7 +1198,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1115,7 +1221,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 0
       mappings: []
       thresholds:
@@ -1131,7 +1237,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 48
+    "y": 48
   id: 5
   options:
     legend:
@@ -1143,49 +1249,19 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Nb of containers by pod
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_container_info{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}) by(pod,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
-    expr: sum(kube_pod_container_status_ready{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Ready
+    interval: ""
+    legendFormat: '{{`{{`}} pod {{`}}`}}'
     range: true
     refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    expr: sum(kube_pod_container_status_running{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Running
-    range: true
-    refId: B
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kube_pod_container_status_waiting{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Waiting
-    refId: C
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kube_pod_container_status_restarts_total{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Restarts Total
-    refId: D
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(kube_pod_container_status_terminated{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"})
-    interval: ''
-    legendFormat: Terminated
-    refId: E
-  title: Nb of pods by state
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1196,7 +1272,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1219,7 +1295,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 0
       mappings: []
       thresholds:
@@ -1235,7 +1311,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 48
+    "y": 48
   id: 2
   options:
     legend:
@@ -1247,19 +1323,20 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Replicas available by deployment
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(kube_deployment_status_replicas_available{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(deployment,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
-    expr: sum(kube_pod_container_info{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}) by (pod)
-    interval: ''
-    legendFormat: '{{`{{`}} pod {{`}}`}}'
+    exemplar: true
+    interval: ""
+    legendFormat: '{{`{{`}} deployment {{`}}`}}'
     range: true
     refId: A
-  title: Nb of containers by pod
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1270,7 +1347,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1293,7 +1370,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1308,7 +1385,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 56
+    "y": 56
   id: 7
   options:
     legend:
@@ -1320,20 +1397,19 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Replicas unavailable by deployment
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(kube_deployment_status_replicas_unavailable{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}) by(deployment,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
-    exemplar: true
-    expr: sum(kube_deployment_status_replicas_available{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"}) by (deployment)
-    interval: ''
+    interval: ""
     legendFormat: '{{`{{`}} deployment {{`}}`}}'
     range: true
     refId: A
-  title: Replicas available by deployment
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1344,7 +1420,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1367,7 +1443,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1382,7 +1458,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 56
+    "y": 56
   id: 8
   options:
     legend:
@@ -1394,19 +1470,19 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Pods with unexpected status
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(kube_pod_status_phase{phase!~\"Running|Succeeded\",namespace=~\"$namespace\",%s=~\"$cluster\"}) by(pod,%s) > 0" $clusterLabel $clusterLabel }}
     editorMode: code
-    expr: sum(kube_deployment_status_replicas_unavailable{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}) by (deployment)
-    interval: ''
+    interval: ""
     legendFormat: '{{`{{`}} deployment {{`}}`}}'
     range: true
     refId: A
-  title: Replicas unavailable by deployment
-  type: timeseries
-- datasource:
+  datasource:
     default: false
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -1419,7 +1495,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1442,7 +1518,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1457,7 +1533,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 64
+    "y": 64
   id: 83
   options:
     legend:
@@ -1469,19 +1545,19 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Container Image Used
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "count(rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\",image!=\"\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(image,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
-    expr: sum(kube_pod_status_phase{phase!~"Running|Succeeded", namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"}) by (pod) > 0
-    interval: ''
-    legendFormat: '{{`{{`}} deployment {{`}}`}}'
+    interval: ""
+    legendFormat: '{{`{{`}} image {{`}}`}}'
     range: true
     refId: A
-  title: Pods with unexpected status
-  type: timeseries
-- datasource:
+  datasource:
     default: false
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -1493,7 +1569,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1516,7 +1592,7 @@ panels:
           group: A
           mode: normal
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1531,7 +1607,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 64
+    "y": 64
   id: 82
   options:
     legend:
@@ -1546,32 +1622,30 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    expr: count(rate(container_cpu_usage_seconds_total{namespace=~"$namespace", image!="", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (image)
-    interval: ''
-    legendFormat: '{{`{{`}} image {{`}}`}}'
-    range: true
-    refId: A
-  title: Container Image Used
   type: timeseries
-- collapsed: false
+- title: Kubernetes Storage
   datasource:
-    type: {{ $defaultDatasource }}
+    type: datasource
     uid: grafana
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 72
+    "y": 72
   id: 42
-  panels: []
-  title: Kubernetes Storage
   type: row
-- datasource:
+- title: Persistent Volumes - Capacity and usage in %
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kubelet_volume_stats_used_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s) / sum(kubelet_volume_stats_capacity_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    exemplar: true
+    interval: ""
+    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
+    refId: A
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1582,7 +1656,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1605,7 +1679,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -1621,7 +1695,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 73
+    "y": 73
   id: 65
   options:
     legend:
@@ -1633,18 +1707,27 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Persistent Volumes - Capacity and usage in bytes
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(kubelet_volume_stats_used_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: sum(kubelet_volume_stats_used_bytes{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim) / sum(kubelet_volume_stats_capacity_bytes{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
-    interval: ''
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
+    interval: ""
+    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}} - Used'
     refId: A
-  title: Persistent Volumes - Capacity and usage in %
-  type: timeseries
-- datasource:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(kubelet_volume_stats_capacity_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel }}
+    exemplar: true
+    hide: false
+    interval: ""
+    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}} - Capacity'
+    refId: B
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1655,7 +1738,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1678,7 +1761,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -1694,7 +1777,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 73
+    "y": 73
   id: 66
   options:
     legend:
@@ -1706,27 +1789,18 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Persistent Volumes - Inodes
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "1 - (sum(kubelet_volume_stats_inodes_used{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s) / sum(kubelet_volume_stats_inodes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
-    expr: sum(kubelet_volume_stats_used_bytes{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
-    interval: ''
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}} - Used'
+    interval: ""
+    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
     refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: sum(kubelet_volume_stats_capacity_bytes{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
-    hide: false
-    interval: ''
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}} - Capacity'
-    refId: B
-  title: Persistent Volumes - Capacity and usage in bytes
-  type: timeseries
-- datasource:
+  datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
   fieldConfig:
@@ -1737,7 +1811,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1760,7 +1834,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       decimals: 2
       mappings: []
       thresholds:
@@ -1776,7 +1850,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 81
+    "y": 81
   id: 27
   options:
     legend:
@@ -1788,28 +1862,39 @@ panels:
       mode: multi
       sort: desc
   pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    exemplar: true
-    expr: 1 - sum(kubelet_volume_stats_inodes_used{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim) / sum(kubelet_volume_stats_inodes{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"}) by (persistentvolumeclaim)
-    interval: ''
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
-    refId: A
-  title: Persistent Volumes - Inodes
   type: timeseries
-- collapsed: false
+- title: Network
+  collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    'y': 89
+    "y": 89
   id: 76
-  panels: []
-  title: Network
   type: row
-- datasource:
+- title: Network - Bandwidth by pod
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(container_network_receive_bytes_total{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    interval: $resolution
+    legendFormat: Received - {{`{{`}} pod {{`}}`}}
+    range: true
+    refId: A
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "0 - sum(rate(container_network_transmit_bytes_total{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: true
+    interval: $resolution
+    legendFormat: Transmitted - {{`{{`}} pod {{`}}`}}
+    range: true
+    refId: B
+  datasource:
     default: false
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -1821,7 +1906,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1844,7 +1929,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1859,7 +1944,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 90
+    "y": 90
   id: 78
   options:
     legend:
@@ -1871,13 +1956,15 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Network - Packets Rate by pod
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(container_network_receive_packets_total{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: sum(rate(container_network_receive_bytes_total{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod)
     interval: $resolution
     legendFormat: Received - {{`{{`}} pod {{`}}`}}
     range: true
@@ -1885,16 +1972,14 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "0 - sum(rate(container_network_transmit_packets_total{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: '- sum(rate(container_network_transmit_bytes_total{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod)'
     interval: $resolution
     legendFormat: Transmitted - {{`{{`}} pod {{`}}`}}
     range: true
     refId: B
-  title: Network - Bandwidth by pod
-  type: timeseries
-- datasource:
+  datasource:
     default: false
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -1906,7 +1991,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -1929,7 +2014,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -1944,7 +2029,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 90
+    "y": 90
   id: 79
   options:
     legend:
@@ -1956,13 +2041,15 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Network - Packets Dropped by pod
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(container_network_receive_packets_dropped_total{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: sum(rate(container_network_receive_packets_total{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod)
     interval: $resolution
     legendFormat: Received - {{`{{`}} pod {{`}}`}}
     range: true
@@ -1970,16 +2057,14 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "0 - sum(rate(container_network_transmit_packets_dropped_total{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: '- sum(rate(container_network_transmit_packets_total{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod)'
     interval: $resolution
     legendFormat: Transmitted - {{`{{`}} pod {{`}}`}}
     range: true
     refId: B
-  title: Network - Packets Rate by pod
-  type: timeseries
-- datasource:
+  datasource:
     default: false
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -1991,7 +2076,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2014,7 +2099,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -2029,7 +2114,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    'y': 98
+    "y": 98
   id: 80
   options:
     legend:
@@ -2041,13 +2126,15 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
+  type: timeseries
+- title: Network - Errors by pod
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "sum(rate(container_network_receive_errors_total{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: sum(rate(container_network_receive_packets_dropped_total{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod)
     interval: $resolution
     legendFormat: Received - {{`{{`}} pod {{`}}`}}
     range: true
@@ -2055,16 +2142,14 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
+    expr: {{ printf "0 - sum(rate(container_network_transmit_errors_total{namespace=~\"$namespace\",pod=~\"${created_by}.*\",%s=~\"$cluster\"}[$__rate_interval])) by(pod,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
-    expr: '- sum(rate(container_network_transmit_packets_dropped_total{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod)'
     interval: $resolution
     legendFormat: Transmitted - {{`{{`}} pod {{`}}`}}
     range: true
     refId: B
-  title: Network - Packets Dropped by pod
-  type: timeseries
-- datasource:
+  datasource:
     default: false
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -2076,7 +2161,7 @@ panels:
         axisBorderShow: false
         axisCenteredZero: false
         axisColorMode: text
-        axisLabel: ''
+        axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
         barWidthFactor: 0.6
@@ -2099,7 +2184,7 @@ panels:
           group: A
           mode: none
         thresholdsStyle:
-          mode: 'off'
+          mode: "off"
       mappings: []
       thresholds:
         mode: absolute
@@ -2114,7 +2199,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    'y': 98
+    "y": 98
   id: 81
   options:
     legend:
@@ -2126,144 +2211,48 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: sum(rate(container_network_receive_errors_total{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod)
-    interval: $resolution
-    legendFormat: Received - {{`{{`}} pod {{`}}`}}
-    range: true
-    refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    editorMode: code
-    exemplar: true
-    expr: '- sum(rate(container_network_transmit_errors_total{namespace=~"$namespace", pod=~"${created_by}.*", {{ $clusterLabel }}=~"$cluster"}[$__rate_interval])) by (pod)'
-    interval: $resolution
-    legendFormat: Transmitted - {{`{{`}} pod {{`}}`}}
-    range: true
-    refId: B
-  title: Network - Errors by pod
   type: timeseries
+__elements: {}
+__inputs:
+- description: ""
+  label: Prometheus
+  name: DS_PROMETHEUS
+  pluginId: prometheus
+  pluginName: Prometheus
+  type: datasource
+__requires:
+- id: gauge
+  name: Gauge
+  type: panel
+  version: ""
+- id: grafana
+  name: Grafana
+  type: grafana
+  version: 10.3.1
+- id: prometheus
+  name: Prometheus
+  type: datasource
+  version: 1.0.0
+- id: stat
+  name: Stat
+  type: panel
+  version: ""
+- id: timeseries
+  name: Time series
+  type: panel
+  version: ""
+condition: {{ "($Values.kubelet).enabled" }}
+description: 'This is a modern ''Namespaces View'' dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
+fiscalYearStartMonth: 0
+graphTooltip: 1
+links: []
+liveNow: false
 refresh: 30s
 schemaVersion: 39
-tags:
-- Kubernetes
-- Prometheus
-- vm-k8s-stack
-templating:
-  list:
-  - current: {}
-    hide: 0
-    includeAll: false
-    multi: false
-    name: datasource
-    options: []
-    query: {{ $defaultDatasource }}
-    queryValue: ''
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    type: datasource
-  - current: {}
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(kube_node_info,{{ $clusterLabel }})
-    hide: {{ ternary 0 2 $multicluster }}
-    includeAll: false
-    multi: false
-    name: cluster
-    options: []
-    query: {{ ternary (b64dec "eyJxcnlUeXBlIjogMSwgInF1ZXJ5IjogImxhYmVsX3ZhbHVlcyhrdWJlX25vZGVfaW5mbyxjbHVzdGVyKSIsICJyZWZJZCI6ICJQcm9tZXRoZXVzVmFyaWFibGVRdWVyeUVkaXRvci1WYXJpYWJsZVF1ZXJ5In0=" | replace "cluster" $clusterLabel) ".*" $multicluster }}
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    type: {{ ternary "query" "constant" $multicluster }}
-  - allValue: .*
-    current: {}
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(kube_pod_info{ {{ $clusterLabel }}=~"$cluster"}, namespace)
-    hide: 0
-    includeAll: true
-    multi: true
-    name: namespace
-    options: []
-    query:
-      query: label_values(kube_pod_info{ {{ $clusterLabel }}=~"$cluster"}, namespace)
-      refId: StandardVariableQuery
-    refresh: 1
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    tagValuesQuery: ''
-    tagsQuery: ''
-    type: query
-    useTags: false
-  - current:
-      selected: false
-      text: 30s
-      value: 30s
-    hide: 0
-    includeAll: false
-    multi: false
-    name: resolution
-    options:
-    - selected: false
-      text: 1s
-      value: 1s
-    - selected: false
-      text: 15s
-      value: 15s
-    - selected: true
-      text: 30s
-      value: 30s
-    - selected: false
-      text: 1m
-      value: 1m
-    - selected: false
-      text: 3m
-      value: 3m
-    - selected: false
-      text: 5m
-      value: 5m
-    query: 1s, 15s, 30s, 1m, 3m, 5m
-    queryValue: ''
-    skipUrlSync: false
-    type: custom
-  - allValue: .*
-    current: {}
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    definition: label_values(kube_pod_info{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"},created_by_name)
-    description: Can be used to filter on a specific deployment, statefulset or deamonset (only relevant panels).
-    hide: 0
-    includeAll: true
-    multi: true
-    name: created_by
-    options: []
-    query:
-      query: label_values(kube_pod_info{namespace=~"$namespace", {{ $clusterLabel }}=~"$cluster"},created_by_name)
-      refId: PrometheusVariableQueryEditor-VariableQuery
-    refresh: 2
-    regex: ''
-    skipUrlSync: false
-    sort: 1
-    type: query
 time:
   from: now-1h
   to: now
 timepicker: {}
-timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
-title: Kubernetes / Views / Namespaces
 uid: k8s_views_ns
 version: 43
-weekStart: ''
+weekStart: ""

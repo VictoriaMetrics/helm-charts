@@ -1411,6 +1411,12 @@ statefulset with volume should match snapshot:
         - apiVersion: v1
           kind: PersistentVolumeClaim
           metadata:
+            labels:
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/managed-by: Helm
+              app.kubernetes.io/name: victoria-metrics-agent
+              app.kubernetes.io/version: 0.1.0
+              helm.sh/chart: victoria-metrics-agent-0.1.1
             name: tmpdata
           spec:
             accessModes:

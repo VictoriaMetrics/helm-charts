@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add .Values.alertmanager.persistentVolume.extraLabels for PVC specific labels
 
 ## 0.25.5
 

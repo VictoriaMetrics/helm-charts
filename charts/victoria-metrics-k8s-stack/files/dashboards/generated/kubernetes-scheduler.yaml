@@ -1,24 +1,58 @@
+
 {{- $Values := (.helm).Values | default .Values }}
-{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
 {{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
-condition: {{ $Values.kubeScheduler.enabled }}
+title: Kubernetes / Scheduler
+templating:
+  list:
+  - name: datasource
+    label: Data source
+    type: datasource
+    query: {{ $defaultDatasource }}
+    current:
+      selected: true
+      text: default
+      value: default
+    regex: ""
+  - name: cluster
+    label: cluster
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: {{ ternary "query" "constant" $multicluster }}
+    query: {{ ternary (printf "label_values(up{job=\"kube-scheduler\"}, %s)" $clusterLabel) ".*" $multicluster }}
+    hide: {{ ternary 0 2 $multicluster }}
+    refresh: 2
+    sort: 1
+  - name: instance
+    label: instance
+    includeAll: true
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: query
+    query: {{ printf "label_values(up{job=\"kube-scheduler\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
+    allValue: .+
+    refresh: 2
 editable: false
-links:
-- asDropdown: true
-  includeVars: true
-  keepTime: true
-  tags:
-  - kubernetes-mixin
-  targetBlank: false
-  title: Kubernetes
-  type: dashboards
+timezone: {{ default "UTC" ($Values.defaultDashboards).defaultTimezone }}
+tags:
+- kubernetes-mixin
+- vm-k8s-stack
 panels:
-- datasource:
-    type: {{ $defaultDatasource }}
+- title: Up
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(up{%s=~\"$cluster\",job=\"kube-scheduler\"}) by(%s)" $clusterLabel $clusterLabel }}
+    instant: true
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -27,22 +61,37 @@ panels:
     h: 7
     w: 4
     x: 0
-    'y': 0
+    "y": 0
   id: 1
   interval: 1m
   options:
     colorMode: none
   pluginVersion: v11.4.0
+  type: stat
+- title: Scheduling Rate
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(up{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler"})
-    instant: true
-  title: Up
-  type: stat
-- datasource:
-    type: {{ $defaultDatasource }}
+    expr: {{ printf "sum(rate(scheduler_e2e_scheduling_duration_seconds_count{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance)" $clusterLabel $clusterLabel }}
+    legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} e2e'
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(scheduler_binding_duration_seconds_count{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance)" $clusterLabel $clusterLabel }}
+    legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} binding'
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(scheduler_scheduling_algorithm_duration_seconds_count{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance)" $clusterLabel $clusterLabel }}
+    legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} scheduling algorithm'
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    expr: {{ printf "sum(rate(scheduler_volume_scheduling_duration_seconds_count{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance)" $clusterLabel $clusterLabel }}
+    legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} volume'
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -55,7 +104,7 @@ panels:
     h: 7
     w: 10
     x: 4
-    'y': 0
+    "y": 0
   id: 2
   interval: 1m
   options:
@@ -69,31 +118,31 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Scheduling latency 99th Quantile
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(scheduler_e2e_scheduling_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,le))" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} e2e'
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(scheduler_binding_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(scheduler_binding_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,le))" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} binding'
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(scheduler_scheduling_algorithm_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(scheduler_scheduling_algorithm_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,le))" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} scheduling algorithm'
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(scheduler_volume_scheduling_duration_seconds_count{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])) by (cluster, instance)
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(scheduler_volume_scheduling_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,le))" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} volume'
-  title: Scheduling Rate
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -106,7 +155,7 @@ panels:
     h: 7
     w: 10
     x: 14
-    'y': 0
+    "y": 0
   id: 3
   interval: 1m
   options:
@@ -120,31 +169,31 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Kube API Request Rate
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
-    legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} e2e'
+    expr: {{ printf "sum(rate(rest_client_requests_total{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\",code=~\"2..\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    legendFormat: 2xx
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(scheduler_binding_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
-    legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} binding'
+    expr: {{ printf "sum(rate(rest_client_requests_total{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\",code=~\"3..\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    legendFormat: 3xx
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(scheduler_scheduling_algorithm_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
-    legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} scheduling algorithm'
+    expr: {{ printf "sum(rate(rest_client_requests_total{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\",code=~\"4..\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    legendFormat: 4xx
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(scheduler_volume_scheduling_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}[$__rate_interval])) by (cluster, instance, le))
-    legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} volume'
-  title: Scheduling latency 99th Quantile
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+    expr: {{ printf "sum(rate(rest_client_requests_total{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\",code=~\"5..\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    legendFormat: 5xx
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -157,7 +206,7 @@ panels:
     h: 7
     w: 8
     x: 0
-    'y': 7
+    "y": 7
   id: 4
   interval: 1m
   options:
@@ -171,31 +220,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Post Request Latency 99th Quantile
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"2.."}[$__rate_interval]))
-    legendFormat: 2xx
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"3.."}[$__rate_interval]))
-    legendFormat: 3xx
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"4.."}[$__rate_interval]))
-    legendFormat: 4xx
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: sum(rate(rest_client_requests_total{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance",code=~"5.."}[$__rate_interval]))
-    legendFormat: 5xx
-  title: Kube API Request Rate
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\",verb=\"POST\"}[$__rate_interval])) by(verb,le,%s))" $clusterLabel $clusterLabel }}
+    legendFormat: '{{`{{`}}verb{{`}}`}}'
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -208,7 +242,7 @@ panels:
     h: 7
     w: 16
     x: 8
-    'y': 7
+    "y": 7
   id: 5
   interval: 1m
   options:
@@ -222,16 +256,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Get Request Latency 99th Quantile
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance", verb="POST"}[$__rate_interval])) by (verb, le))
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\",verb=\"GET\"}[$__rate_interval])) by(verb,le,%s))" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}verb{{`}}`}}'
-  title: Post Request Latency 99th Quantile
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -244,7 +278,7 @@ panels:
     h: 7
     w: 24
     x: 0
-    'y': 14
+    "y": 14
   id: 6
   interval: 1m
   options:
@@ -258,16 +292,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Memory
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance", verb="GET"}[$__rate_interval])) by (verb, le))
-    legendFormat: '{{`{{`}}verb{{`}}`}}'
-  title: Get Request Latency 99th Quantile
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+    expr: {{ printf "process_resident_memory_bytes{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}" $clusterLabel }}
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -280,7 +314,7 @@ panels:
     h: 7
     w: 8
     x: 0
-    'y': 21
+    "y": 21
   id: 7
   interval: 1m
   options:
@@ -294,16 +328,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: CPU usage
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: process_resident_memory_bytes{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}
+    expr: {{ printf "rate(process_cpu_seconds_total{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])" $clusterLabel }}
     legendFormat: '{{`{{`}}instance{{`}}`}}'
-  title: Memory
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -316,7 +350,7 @@ panels:
     h: 7
     w: 8
     x: 8
-    'y': 21
+    "y": 21
   id: 8
   interval: 1m
   options:
@@ -330,16 +364,16 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
+  type: timeseries
+- title: Goroutines
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: rate(process_cpu_seconds_total{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler", instance=~"$instance"}[$__rate_interval])
+    expr: {{ printf "go_goroutines{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}" $clusterLabel }}
     legendFormat: '{{`{{`}}instance{{`}}`}}'
-  title: CPU usage
-  type: timeseries
-- datasource:
-    type: {{ $defaultDatasource }}
+  datasource:
+    type: datasource
     uid: -- Mixed --
   fieldConfig:
     defaults:
@@ -352,7 +386,7 @@ panels:
     h: 7
     w: 8
     x: 16
-    'y': 21
+    "y": 21
   id: 9
   interval: 1m
   options:
@@ -366,55 +400,20 @@ panels:
     tooltip:
       mode: single
   pluginVersion: v11.4.0
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: go_goroutines{ {{ $clusterLabel }}=~"$cluster", job="kube-scheduler",instance=~"$instance"}
-    legendFormat: '{{`{{`}}instance{{`}}`}}'
-  title: Goroutines
   type: timeseries
+condition: {{ "$Values.kubeScheduler.enabled" }}
+links:
+- asDropdown: true
+  includeVars: true
+  keepTime: true
+  tags:
+  - kubernetes-mixin
+  targetBlank: false
+  title: Kubernetes
+  type: dashboards
 refresh: 10s
 schemaVersion: 39
-tags:
-- kubernetes-mixin
-- vm-k8s-stack
-templating:
-  list:
-  - current:
-      selected: true
-      text: default
-      value: default
-    hide: 0
-    label: Data source
-    name: datasource
-    query: {{ $defaultDatasource }}
-    regex: ''
-    type: datasource
-  - datasource:
-      type: prometheus
-      uid: ${datasource}
-    hide: {{ ternary 0 2 $multicluster }}
-    label: cluster
-    name: cluster
-    query: {{ ternary (b64dec "ImxhYmVsX3ZhbHVlcyh1cHtqb2I9XCJrdWJlLXNjaGVkdWxlclwifSwgY2x1c3Rlciki" | replace "cluster" $clusterLabel) ".*" $multicluster }}
-    refresh: 2
-    sort: 1
-    type: {{ ternary "query" "constant" $multicluster }}
-  - allValue: .+
-    datasource:
-      type: prometheus
-      uid: ${datasource}
-    hide: 0
-    includeAll: true
-    label: instance
-    name: instance
-    query: label_values(up{job="kube-scheduler", {{ $clusterLabel }}=~"$cluster"}, instance)
-    refresh: 2
-    type: query
 time:
   from: now-1h
   to: now
-timezone: {{ default "UTC" ($Values.defaultDashboards).defaultTimezone }}
-title: Kubernetes / Scheduler
 uid: 2e6b6a3b4bddf1427b3a55aa1311c656
