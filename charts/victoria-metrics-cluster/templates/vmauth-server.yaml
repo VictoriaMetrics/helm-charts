@@ -38,7 +38,7 @@ spec:
       priorityClassName: {{ . }}
       {{- end }}
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
-      serviceAccountName: {{ (.Values.serviceAccount).name | default $sa }}
+      serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $sa) $ctx }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- end }}
       {{- with $app.initContainers }}
@@ -117,7 +117,7 @@ spec:
       volumes:
         - name: config
           secret:
-            secretName: {{ ternary $fullname $app.configSecretName (empty $app.configSecretName) }}
+            secretName: {{ ternary $fullname (tpl $app.configSecretName $ctx) (empty $app.configSecretName) }}
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

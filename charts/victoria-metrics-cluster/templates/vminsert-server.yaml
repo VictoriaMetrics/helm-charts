@@ -133,7 +133,7 @@ spec:
       securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
-      serviceAccountName: {{ (.Values.serviceAccount).name | default $sa }}
+      serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $sa) $ctx }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- end }}
       {{- with $app.tolerations }}
