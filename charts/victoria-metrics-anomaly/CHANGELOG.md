@@ -1,5 +1,6 @@
 ## Next release
 
+- Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.26.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1261).
 - add .Values.persistentVolume.extraLabels for PVC specific labels
 - add ability to customize data path using .Values.persistentVolume.mountPath
 
