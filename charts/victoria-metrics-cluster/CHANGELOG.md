@@ -2,6 +2,7 @@
 
 - replaced .Values.vmst/orage.persistentVolume.labels with .Values.vmstorage.persistentVolume.extraLabels
 - replaced .Values.vmselect.persistentVolume.labels with .Values.vmselect.persistentVolume.extraLabels
+- bump version of VM components to [v1.127.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.127.0)
 
 ## 0.28.4
 

@@ -6,6 +6,7 @@
 - Upgrade dashboards
 - Allow optional scheme at `.Values.external.grafana.host`. Thanks to @a-bali for [initial implementation](https://github.com/VictoriaMetrics/helm-charts/pull/2439).
 - Allow overriding service labels for `kubedns`, `coredns`, `kube-controller-manager`, `kube-proxy`, `kube-scheduler`, `etcd`.
+- bump version of VM components to [v1.127.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.127.0)
 
 ## 0.60.1
 
