@@ -1,5 +1,6 @@
 ## Next release
 
+- Bump VictoriaLogs version to [v1.36.1](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.36.1).
 - replaced .Values.vlstorage.persistentVolume.labels with .Values.vlstorage.persistentVolume.extraLabels
 
 ## 0.0.13

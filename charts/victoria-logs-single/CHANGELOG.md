@@ -1,5 +1,6 @@
 ## Next release
 
+- Bump VictoriaLogs version to [v1.36.1](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.36.1).
 - add .Values.server.persistentVolume.extraLabels for PVC specific labels
 
 ## 0.11.11
