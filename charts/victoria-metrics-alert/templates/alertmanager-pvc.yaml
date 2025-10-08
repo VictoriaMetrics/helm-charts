@@ -7,7 +7,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ $pvc.name | default $fullname }}
+  name: {{ tpl ($pvc.name | default $fullname) }}
   namespace: {{ $ns }}
   {{- $_ := set $ctx "extraLabels" $pvc.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}

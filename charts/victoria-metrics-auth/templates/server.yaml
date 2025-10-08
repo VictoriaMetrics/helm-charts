@@ -40,7 +40,7 @@ spec:
       schedulerName: {{ . }}
       {{- end }}
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
-      serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
+      serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $fullname) $ctx }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- end }}
       {{- if $app.podSecurityContext.enabled }}

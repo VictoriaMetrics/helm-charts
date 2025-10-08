@@ -139,7 +139,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ $pvc.name | default $storageName }}
+        name: {{ tpl ($pvc.name | default $storageName) $ctx }}
         {{- with $pvc.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}

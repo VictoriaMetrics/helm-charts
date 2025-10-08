@@ -285,7 +285,7 @@ spec:
         - name: {{ $storageName }}
           {{- if or (and (eq $mode "deployment") $pvc.enabled) $pvc.existingClaim }}
           persistentVolumeClaim:
-            claimName: {{ $pvc.existingClaim | default $pvc.name | default $fullname }}
+            claimName: {{ tpl ($pvc.existingClaim | default $pvc.name | default $fullname) $ctx }}
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
@@ -296,7 +296,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ $pvc.name | default $storageName }}
+        name: {{ tpl ($pvc.name | default $storageName) $ctx }}
         {{- with $pvc.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}

@@ -1,3 +1,4 @@
+{{- $storageName := "server-volume" }}
 {{- $app := .Values.server }}
 {{- $pvc := $app.persistentVolume }}
 {{- $mode := $app.mode }}
@@ -46,7 +47,7 @@ spec:
       schedulerName: {{ . }}
       {{- end }}
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
-      serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
+      serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $fullname) $ctx }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- end }}
       {{- if $app.podSecurityContext.enabled }}
@@ -95,7 +96,7 @@ spec:
           {{- end }}
           volumeMounts:
             {{- with $pvc }}
-            - name: server-volume
+            - name: {{ $storageName }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
               subPath: {{ . }}
@@ -162,10 +163,10 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- if or (eq $mode "deployment") (not $pvc.enabled) $pvc.existingClaim }}
-        - name: server-volume
+        - name: {{ $storageName }}
           {{- if or (and (eq $mode "deployment") $pvc.enabled) $pvc.existingClaim }}
           persistentVolumeClaim:
-            claimName: {{ $pvc.existingClaim | default $pvc.name | default $fullname }}
+            claimName: {{ tpl ($pvc.existingClaim | default $pvc.name | default $fullname) $ctx }}
           {{- else }}
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
@@ -175,7 +176,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: server-volume
+        name: {{ tpl ($pvc.name | default $storageName) $ctx }}
         {{- with $pvc.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
