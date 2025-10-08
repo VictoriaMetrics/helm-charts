@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- do not merge .Values.vmstorage.persistentVolume.extraLabels and .Values.vmselect.persistentVolume.extraLabels with default chart labels. See [#2460](https://github.com/VictoriaMetrics/helm-charts/issues/2460).
 
 ## 0.29.0
 
@@ -8,7 +8,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.127.0](https://img.shields.io/badge/v1.127.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11270)
 
-- replaced .Values.vmst/orage.persistentVolume.labels with .Values.vmstorage.persistentVolume.extraLabels
+- replaced .Values.vmstorage.persistentVolume.labels with .Values.vmstorage.persistentVolume.extraLabels
 - replaced .Values.vmselect.persistentVolume.labels with .Values.vmselect.persistentVolume.extraLabels
 - bump version of VM components to [v1.127.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.127.0)
 

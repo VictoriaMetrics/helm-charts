@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- do not merge .Values.alertmanager.persistentVolume.extraLabels with default chart labels. See [#2460](https://github.com/VictoriaMetrics/helm-charts/issues/2460).
 
 ## 0.26.0
 

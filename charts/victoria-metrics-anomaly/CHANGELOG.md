@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- do not merge .Values.persistentVolume.extraLabels with default chart labels. See [#2460](https://github.com/VictoriaMetrics/helm-charts/issues/2460).
 
 ## 1.12.1
 

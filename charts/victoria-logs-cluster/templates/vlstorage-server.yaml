@@ -142,9 +142,9 @@ spec:
         {{- with $pvc.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
-        {{- $_ := set $ctx "extraLabels" $pvc.extraLabels }}
-        labels: {{ include "vm.labels" $ctx | nindent 10 }}
-        {{- $_ := unset $ctx "extraLabels" }}
+        {{- with $pvc.extraLabels }}
+        labels: {{ toYaml . | nindent 10 }}
+        {{- end }}
       spec:
         {{- with $pvc.accessModes }}
         accessModes: {{ toYaml . | nindent 10 }}
