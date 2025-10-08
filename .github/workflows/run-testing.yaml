@@ -109,14 +109,18 @@ jobs:
           kubectl create namespace ${{ matrix.chart }}-testing
           kubectl create secret -n=${{ matrix.chart }}-testing generic license --from-literal=key=$LICENSE_KEY
           helm dep update charts/${{ matrix.chart }}
+          CRDS=$(helm show crds charts/${{ matrix.chart }})
+          if [[ -n "$CRDS" ]]; then
+            echo "$CRDS" | kubectl apply -f -
+          fi
           helm template charts/${{ matrix.chart }} \
-            --include-crds \
             --namespace ${{ matrix.chart }}-testing \
             --values charts/${{ matrix.chart }}/e2e/simple.yaml \
-            --validate | kubectl apply -f - --dry-run=server
+            --validate | kubectl apply --server-side -f - --dry-run=server
+          cd charts/${{ matrix.chart }}
           ct install \
             --release-name test \
             --namespace ${{ matrix.chart }}-testing \
-            --config .github/ci/ct.yaml \
-            --charts "charts/${{ matrix.chart }}" \
-            --helm-extra-set-args "--values charts/${{ matrix.chart }}/e2e/simple.yaml" --skip-clean-up
+            --config ../../.github/ci/ct.yaml \
+            --charts . \
+            --helm-extra-set-args "--values e2e/simple.yaml" --skip-clean-up
