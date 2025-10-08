@@ -8,13 +8,14 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.127.0](https://img.shields.io/badge/v1.127.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11270)
 
-- Bump KSM chart version 6.0.* -> 6.3.*
-- Bump node-exporter chart version 4.47.* -> 4.48.*
-- Bump grafana chart version 9.2.* -> 9.4.*
-- Upgrade dashboards
-- Allow optional scheme at `.Values.external.grafana.host`. Thanks to @a-bali for [initial implementation](https://github.com/VictoriaMetrics/helm-charts/pull/2439).
-- Allow overriding service labels for `kubedns`, `coredns`, `kube-controller-manager`, `kube-proxy`, `kube-scheduler`, `etcd`.
+- bump KSM chart version 6.0.* -> 6.3.*
+- bump node-exporter chart version 4.47.* -> 4.48.*
+- bump grafana chart version 9.2.* -> 9.4.*
+- upgrade dashboards
+- allow optional scheme at `.Values.external.grafana.host`. Thanks to @a-bali for [initial implementation](https://github.com/VictoriaMetrics/helm-charts/pull/2439).
+- allow overriding service labels for `kubedns`, `coredns`, `kube-controller-manager`, `kube-proxy`, `kube-scheduler`, `etcd`.
 - bump version of VM components to [v1.127.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.127.0)
+- replaced python scripts for dashboards and rules templates generation with golang tool, that uses metricsql library instead of regexp to properly update all expressions with additional labels and produces more compact output.
 
 ## 0.60.1
 
