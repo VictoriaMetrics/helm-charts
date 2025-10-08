@@ -109,13 +109,11 @@ jobs:
           kubectl create namespace ${{ matrix.chart }}-testing
           kubectl create secret -n=${{ matrix.chart }}-testing generic license --from-literal=key=$LICENSE_KEY
           helm dep update charts/${{ matrix.chart }}
-          # Skip run for k8s stack chart as it fails CRD check
-          if [ "${{ matrix.chart }}" != "victoria-metrics-k8s-stack" ] && [ "${{ matrix.chart }}" != "victoria-metrics-distributed" ]; then
-            helm template charts/${{ matrix.chart }} \
-              --namespace ${{ matrix.chart }}-testing \
-              --values charts/${{ matrix.chart }}/e2e/simple.yaml \
-              --validate | kubectl apply -f - --dry-run=server
-          fi
+          helm template charts/${{ matrix.chart }} \
+            --include-crds \
+            --namespace ${{ matrix.chart }}-testing \
+            --values charts/${{ matrix.chart }}/e2e/simple.yaml \
+            --validate | kubectl apply -f - --dry-run=server
           ct install \
             --release-name test \
             --namespace ${{ matrix.chart }}-testing \
