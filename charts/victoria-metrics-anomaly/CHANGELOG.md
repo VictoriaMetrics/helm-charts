@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 1.12.1
+
+**Release date:** 08 Oct 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.26.1](https://img.shields.io/badge/v1.26.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1261)
+
 - Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.26.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1261).
 - add .Values.persistentVolume.extraLabels for PVC specific labels
 - add ability to customize data path using .Values.persistentVolume.mountPath
