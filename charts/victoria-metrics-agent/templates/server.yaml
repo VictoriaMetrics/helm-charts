@@ -29,7 +29,9 @@ spec:
   serviceName: {{ $fullname }}
   {{- end }}
   selector:
+    {{- $_ := set $ctx "extraLabels" .Values.selectorLabels }}
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+    {{- $_ := unset $ctx "extraLabels" }}
   template:
     metadata:
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}

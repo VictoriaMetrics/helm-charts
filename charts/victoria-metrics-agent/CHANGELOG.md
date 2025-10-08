@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added .Values.selectorLabels and .Values.service.selectorLabels to add additional selector labels for pod and service and for service only respectively. See [#2451](https://github.com/VictoriaMetrics/helm-charts/issues/2451).
 
 ## 0.25.10
 

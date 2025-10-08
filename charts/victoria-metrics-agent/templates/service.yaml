@@ -91,5 +91,7 @@ spec:
       port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: opentsdb-tcp
     {{- end }}
+  {{- $_ := set $ctx "extraLabels" (mergeOverwrite (deepCopy .Values.selectorLabels) (deepCopy $service.selectorLabels)) }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
 {{- end }}
