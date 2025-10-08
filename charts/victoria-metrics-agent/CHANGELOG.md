@@ -1,6 +1,7 @@
 ## Next release
 
 - Added .Values.selectorLabels and .Values.service.selectorLabels to add additional selector labels for pod and service and for service only respectively. See [#2451](https://github.com/VictoriaMetrics/helm-charts/issues/2451).
+- bump version of VM components to [v1.127.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.127.0)
 
 ## 0.25.10
 

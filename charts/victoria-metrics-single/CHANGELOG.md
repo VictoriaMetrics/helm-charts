@@ -1,6 +1,7 @@
 ## Next release
 
 - add .Values.server.persistentVolume.extraLabels for PVC specific labels
+- bump version of VM components to [v1.127.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.127.0)
 
 ## 0.24.6
 
