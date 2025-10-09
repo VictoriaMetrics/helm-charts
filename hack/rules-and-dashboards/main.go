@@ -1054,7 +1054,7 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 		case *metricsql.MetricExpr:
 			for i := range t.LabelFilterss {
 				var found bool
-				filters := t.LabelFilterss[i][:0]
+				var filters []metricsql.LabelFilter
 				for _, f := range t.LabelFilterss[i] {
 					if kind == "dashboards" {
 						if f.Label == "cluster" || f.Value == "$cluster" {

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed metricsql expressions filter update in a hack tool.
 
 ## 0.61.1
 
