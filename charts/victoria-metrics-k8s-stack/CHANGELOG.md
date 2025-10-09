@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed `cluster` variable for dashboards, when `.Values.grafana.sidecar.dashboards.multicluster: false`. See [#2468](https://github.com/VictoriaMetrics/helm-charts/issues/2468).
 
 ## 0.61.2
 

@@ -928,12 +928,27 @@ func patchDashboard(d *dashboard, name string) {
 				} else if len(t.Query.Map) > 0 {
 					if q, ok := t.Query.Map["query"]; ok {
 						expr, args = patchExpr(q.(string), name, t.Name, "dashboards")
-						if t.Name == "cluster" {
-							expr = fmt.Sprintf(`<< ternary (printf %q %s) ".*" $multicluster >>`, expr, args)
-						} else if len(args) > 0 {
-							expr = fmt.Sprintf(`<< printf %q %s >>`, expr, args)
-						}
 						t.Query.Map["query"] = expr
+						if t.Name == "cluster" {
+							query := t.Query.Map
+							t.Query.Map = nil
+							rawQueryByte, err := json.Marshal(query)
+							if err != nil {
+								log.Printf("failed to marshal json query in template")
+								break
+							}
+							rawQuery := string(rawQueryByte)
+							if len(args) > 0 {
+								rawQuery = fmt.Sprintf(`(printf %q %s)`, rawQuery, args)
+								expr = fmt.Sprintf(`<< ternary (printf %q %s) ".*" $multicluster >>`, expr, args)
+							}
+							t.Query.String = fmt.Sprintf(`<< ternary %s ".*" $multicluster >>`, rawQuery)
+						} else {
+							if len(args) > 0 {
+								expr = fmt.Sprintf(`<< printf %q %s >>`, expr, args)
+							}
+							t.Query.Map["query"] = expr
+						}
 					}
 				}
 			}
