@@ -8,8 +8,7 @@
 name: kubernetes-apps
 rules:
 - alert: KubePodCrashLooping
-  expr: |
-    max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff", job="kube-state-metrics"}[5m]) >= 1
+  expr: {{ printf "max_over_time(kube_pod_container_status_waiting_reason{reason=\"CrashLoopBackOff\",namespace=~\"%s\",job=\"kube-state-metrics\"}[5m]) >= 1" .targetNamespace }}
   annotations:
     description: 'Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} ({{`{{`}} $labels.container {{`}}`}}) is in waiting state (reason: "CrashLoopBackOff") on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepodcrashlooping
@@ -19,7 +18,7 @@ rules:
   labels:
     severity: warning
 - alert: KubePodNotReady
-  expr: {{ printf "sum(max(kube_pod_status_phase{job=\"kube-state-metrics\",namespace=~\"{{ .targetNamespace }}\",namespace=~\"{{ .targetNamespace }}\"}) by(namespace,pod,%s) * on(namespace,pod,cluster) group_left(owner_kind) topk(1, max(kube_pod_owner{owner_kind!=\"Job\"}) by(namespace,pod,owner_kind,%s)) by(namespace,pod,%s)) by(namespace,pod,%s) > 0" $groupLabels $groupLabels $groupLabels $groupLabels }}
+  expr: {{ printf "sum(max(kube_pod_status_phase{namespace=~\"%s\",job=\"kube-state-metrics\",namespace=~\"%s\",job=\"kube-state-metrics\"}) by(namespace,pod,%s) * on(namespace,pod,cluster) group_left(owner_kind) topk(1, max(kube_pod_owner{owner_kind!=\"Job\"}) by(namespace,pod,owner_kind,%s)) by(namespace,pod,%s)) by(namespace,pod,%s) > 0" .targetNamespace .targetNamespace $groupLabels $groupLabels $groupLabels $groupLabels }}
   annotations:
     description: Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} has been in a non-ready state for longer than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepodnotready
@@ -29,10 +28,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeDeploymentGenerationMismatch
-  expr: |
-    kube_deployment_status_observed_generation{job="kube-state-metrics"}
-      !=
-    kube_deployment_metadata_generation{job="kube-state-metrics"}
+  expr: {{ printf "kube_deployment_status_observed_generation{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_deployment_metadata_generation{namespace=~\"%s\",job=\"kube-state-metrics\"}" .targetNamespace .targetNamespace }}
   annotations:
     description: Deployment generation for {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} does not match, this indicates that the Deployment has failed but has not been rolled back on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubedeploymentgenerationmismatch
@@ -42,16 +38,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeDeploymentReplicasMismatch
-  expr: |
-    (
-      kube_deployment_spec_replicas{job="kube-state-metrics"}
-        >
-      kube_deployment_status_replicas_available{job="kube-state-metrics"}
-    ) and (
-      changes(kube_deployment_status_replicas_updated{job="kube-state-metrics"}[10m])
-        ==
-      0
-    )
+  expr: {{ printf "(kube_deployment_spec_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} > kube_deployment_status_replicas_available{namespace=~\"%s\",job=\"kube-state-metrics\"}) and (changes(kube_deployment_status_replicas_updated{namespace=~\"%s\",job=\"kube-state-metrics\"}[10m]) == 0)" .targetNamespace .targetNamespace .targetNamespace }}
   annotations:
     description: Deployment {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} has not matched the expected number of replicas for longer than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubedeploymentreplicasmismatch
@@ -61,9 +48,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeDeploymentRolloutStuck
-  expr: |
-    kube_deployment_status_condition{condition="Progressing", status="false",job="kube-state-metrics"}
-    != 0
+  expr: {{ printf "kube_deployment_status_condition{condition=\"Progressing\",status=\"false\",namespace=~\"%s\",job=\"kube-state-metrics\"} != 0" .targetNamespace }}
   annotations:
     description: Rollout of deployment {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} is not progressing for longer than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubedeploymentrolloutstuck
@@ -73,16 +58,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeStatefulSetReplicasMismatch
-  expr: |
-    (
-      kube_statefulset_status_replicas_ready{job="kube-state-metrics"}
-        !=
-      kube_statefulset_replicas{job="kube-state-metrics"}
-    ) and (
-      changes(kube_statefulset_status_replicas_updated{job="kube-state-metrics"}[10m])
-        ==
-      0
-    )
+  expr: {{ printf "(kube_statefulset_status_replicas_ready{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_statefulset_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"}) and (changes(kube_statefulset_status_replicas_updated{namespace=~\"%s\",job=\"kube-state-metrics\"}[10m]) == 0)" .targetNamespace .targetNamespace .targetNamespace }}
   annotations:
     description: StatefulSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.statefulset {{`}}`}} has not matched the expected number of replicas for longer than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubestatefulsetreplicasmismatch
@@ -92,10 +68,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeStatefulSetGenerationMismatch
-  expr: |
-    kube_statefulset_status_observed_generation{job="kube-state-metrics"}
-      !=
-    kube_statefulset_metadata_generation{job="kube-state-metrics"}
+  expr: {{ printf "kube_statefulset_status_observed_generation{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_statefulset_metadata_generation{namespace=~\"%s\",job=\"kube-state-metrics\"}" .targetNamespace .targetNamespace }}
   annotations:
     description: StatefulSet generation for {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.statefulset {{`}}`}} does not match, this indicates that the StatefulSet has failed but has not been rolled back on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubestatefulsetgenerationmismatch
@@ -105,7 +78,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeStatefulSetUpdateNotRolledOut
-  expr: {{ printf "(max(kube_statefulset_status_current_revision{job=\"kube-state-metrics\",namespace=~\"{{ .targetNamespace }}\"} unless kube_statefulset_status_update_revision{job=\"kube-state-metrics\",namespace=~\"{{ .targetNamespace }}\"}) by(namespace,statefulset,job,%s) * on(namespace,statefulset,job,cluster) (kube_statefulset_replicas{job=\"kube-state-metrics\",namespace=~\"{{ .targetNamespace }}\"} != kube_statefulset_status_replicas_updated{job=\"kube-state-metrics\",namespace=~\"{{ .targetNamespace }}\"})) and on(namespace,statefulset,job,cluster) (changes(kube_statefulset_status_replicas_updated{job=\"kube-state-metrics\",namespace=~\"{{ .targetNamespace }}\"}[5m]) == 0)" $groupLabels }}
+  expr: {{ printf "(max(kube_statefulset_status_current_revision{namespace=~\"%s\",job=\"kube-state-metrics\"} unless kube_statefulset_status_update_revision{namespace=~\"%s\",job=\"kube-state-metrics\"}) by(namespace,statefulset,job,%s) * on(namespace,statefulset,job,cluster) (kube_statefulset_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_statefulset_status_replicas_updated{namespace=~\"%s\",job=\"kube-state-metrics\"})) and on(namespace,statefulset,job,cluster) (changes(kube_statefulset_status_replicas_updated{namespace=~\"%s\",job=\"kube-state-metrics\"}[5m]) == 0)" .targetNamespace .targetNamespace $groupLabels .targetNamespace .targetNamespace .targetNamespace }}
   annotations:
     description: StatefulSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.statefulset {{`}}`}} update has not been rolled out on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubestatefulsetupdatenotrolledout
@@ -115,30 +88,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeDaemonSetRolloutStuck
-  expr: |
-    (
-      (
-        kube_daemonset_status_current_number_scheduled{job="kube-state-metrics"}
-          !=
-        kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics"}
-      ) or (
-        kube_daemonset_status_number_misscheduled{job="kube-state-metrics"}
-          !=
-        0
-      ) or (
-        kube_daemonset_status_updated_number_scheduled{job="kube-state-metrics"}
-          !=
-        kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics"}
-      ) or (
-        kube_daemonset_status_number_available{job="kube-state-metrics"}
-          !=
-        kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics"}
-      )
-    ) and (
-      changes(kube_daemonset_status_updated_number_scheduled{job="kube-state-metrics"}[5m])
-        ==
-      0
-    )
+  expr: {{ printf "((((kube_daemonset_status_current_number_scheduled{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_daemonset_status_desired_number_scheduled{namespace=~\"%s\",job=\"kube-state-metrics\"}) or (kube_daemonset_status_number_misscheduled{namespace=~\"%s\",job=\"kube-state-metrics\"} != 0)) or (kube_daemonset_status_updated_number_scheduled{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_daemonset_status_desired_number_scheduled{namespace=~\"%s\",job=\"kube-state-metrics\"})) or (kube_daemonset_status_number_available{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_daemonset_status_desired_number_scheduled{namespace=~\"%s\",job=\"kube-state-metrics\"})) and (changes(kube_daemonset_status_updated_number_scheduled{namespace=~\"%s\",job=\"kube-state-metrics\"}[5m]) == 0)" .targetNamespace .targetNamespace .targetNamespace .targetNamespace .targetNamespace .targetNamespace .targetNamespace .targetNamespace }}
   annotations:
     description: DaemonSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.daemonset {{`}}`}} has not finished or progressed for at least 15m on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubedaemonsetrolloutstuck
@@ -148,8 +98,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeContainerWaiting
-  expr: |
-    kube_pod_container_status_waiting_reason{reason!="CrashLoopBackOff", job="kube-state-metrics"} > 0
+  expr: {{ printf "kube_pod_container_status_waiting_reason{reason!=\"CrashLoopBackOff\",namespace=~\"%s\",job=\"kube-state-metrics\"} > 0" .targetNamespace }}
   annotations:
     description: 'pod/{{`{{`}} $labels.pod {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} on container {{`{{`}} $labels.container{{`}}`}} has been in waiting state for longer than 1 hour. (reason: "{{`{{`}} $labels.reason {{`}}`}}") on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: {{ $runbookUrl }}/kubernetes/kubecontainerwaiting
@@ -159,10 +108,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeDaemonSetNotScheduled
-  expr: |
-    kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics"}
-      -
-    kube_daemonset_status_current_number_scheduled{job="kube-state-metrics"} > 0
+  expr: {{ printf "(kube_daemonset_status_desired_number_scheduled{namespace=~\"%s\",job=\"kube-state-metrics\"} - kube_daemonset_status_current_number_scheduled{namespace=~\"%s\",job=\"kube-state-metrics\"}) > 0" .targetNamespace .targetNamespace }}
   annotations:
     description: '{{`{{`}} $value {{`}}`}} Pods of DaemonSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.daemonset {{`}}`}} are not scheduled on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: {{ $runbookUrl }}/kubernetes/kubedaemonsetnotscheduled
@@ -172,8 +118,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeDaemonSetMisScheduled
-  expr: |
-    kube_daemonset_status_number_misscheduled{job="kube-state-metrics"} > 0
+  expr: {{ printf "kube_daemonset_status_number_misscheduled{namespace=~\"%s\",job=\"kube-state-metrics\"} > 0" .targetNamespace }}
   annotations:
     description: '{{`{{`}} $value {{`}}`}} Pods of DaemonSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.daemonset {{`}}`}} are running where they are not supposed to run on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: {{ $runbookUrl }}/kubernetes/kubedaemonsetmisscheduled
@@ -183,7 +128,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeJobNotCompleted
-  expr: {{ printf "(time() - max(kube_job_status_start_time{job=\"kube-state-metrics\",namespace=~\"{{ .targetNamespace }}\"} and (kube_job_status_active{job=\"kube-state-metrics\",namespace=~\"{{ .targetNamespace }}\"} > 0)) by(namespace,job_name,%s)) > 43200" $groupLabels }}
+  expr: {{ printf "(time() - max(kube_job_status_start_time{namespace=~\"%s\",job=\"kube-state-metrics\"} and (kube_job_status_active{namespace=~\"%s\",job=\"kube-state-metrics\"} > 0)) by(namespace,job_name,%s)) > 43200" .targetNamespace .targetNamespace $groupLabels }}
   annotations:
     description: Job {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.job_name {{`}}`}} is taking more than {{`{{`}} "43200" | humanizeDuration {{`}}`}} to complete on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubejobnotcompleted
@@ -192,8 +137,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeJobFailed
-  expr: |
-    kube_job_failed{job="kube-state-metrics"}  > 0
+  expr: {{ printf "kube_job_failed{namespace=~\"%s\",job=\"kube-state-metrics\"} > 0" .targetNamespace }}
   annotations:
     description: Job {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.job_name {{`}}`}} failed to complete. Removing failed job after investigation should clear this alert on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubejobfailed
@@ -203,20 +147,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeHpaReplicasMismatch
-  expr: |
-    (kube_horizontalpodautoscaler_status_desired_replicas{job="kube-state-metrics"}
-      !=
-    kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics"})
-      and
-    (kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics"}
-      >
-    kube_horizontalpodautoscaler_spec_min_replicas{job="kube-state-metrics"})
-      and
-    (kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics"}
-      <
-    kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics"})
-      and
-    changes(kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics"}[15m]) == 0
+  expr: {{ printf "(((kube_horizontalpodautoscaler_status_desired_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_horizontalpodautoscaler_status_current_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"}) and (kube_horizontalpodautoscaler_status_current_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} > kube_horizontalpodautoscaler_spec_min_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"})) and (kube_horizontalpodautoscaler_status_current_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} < kube_horizontalpodautoscaler_spec_max_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"})) and (changes(kube_horizontalpodautoscaler_status_current_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"}[15m]) == 0)" .targetNamespace .targetNamespace .targetNamespace .targetNamespace .targetNamespace .targetNamespace .targetNamespace }}
   annotations:
     description: HPA {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.horizontalpodautoscaler  {{`}}`}} has not matched the desired number of replicas for longer than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubehpareplicasmismatch
@@ -226,10 +157,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeHpaMaxedOut
-  expr: |
-    kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics"}
-      ==
-    kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics"}
+  expr: {{ printf "kube_horizontalpodautoscaler_status_current_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} == kube_horizontalpodautoscaler_spec_max_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"}" .targetNamespace .targetNamespace }}
   annotations:
     description: HPA {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.horizontalpodautoscaler  {{`}}`}} has been running at max replicas for longer than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubehpamaxedout
@@ -239,13 +167,7 @@ rules:
   labels:
     severity: warning
 - alert: KubePdbNotEnoughHealthyPods
-  expr: |
-    (
-      kube_poddisruptionbudget_status_desired_healthy{job="kube-state-metrics"}
-      -
-      kube_poddisruptionbudget_status_current_healthy{job="kube-state-metrics"}
-    )
-    > 0
+  expr: {{ printf "(kube_poddisruptionbudget_status_desired_healthy{namespace=~\"%s\",job=\"kube-state-metrics\"} - kube_poddisruptionbudget_status_current_healthy{namespace=~\"%s\",job=\"kube-state-metrics\"}) > 0" .targetNamespace .targetNamespace }}
   annotations:
     description: PDB {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}/{{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.poddisruptionbudget {{`}}`}} expects {{`{{`}} $value {{`}}`}} more healthy pods. The desired number of healthy pods has not been met for at least 15m.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepdbnotenoughhealthypods

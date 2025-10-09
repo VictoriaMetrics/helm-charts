@@ -8,7 +8,7 @@
 name: alertmanager.rules
 rules:
 - alert: AlertmanagerFailedReload
-  expr: {{ printf "max_over_time(alertmanager_config_last_reload_successful{job=\"%s\",namespace=\"monitoring\"}[5m]) == 0" (include "vm-k8s-stack.alertmanager.name" .) }}
+  expr: {{ printf "max_over_time(alertmanager_config_last_reload_successful{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[5m]) == 0" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) }}
   annotations:
     description: Configuration has failed to load for {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod{{`}}`}}.
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagerfailedreload
@@ -18,7 +18,7 @@ rules:
   labels:
     severity: critical
 - alert: AlertmanagerMembersInconsistent
-  expr: {{ printf "max_over_time(alertmanager_cluster_members{job=\"%s\",namespace=\"monitoring\"}[5m]) < on(namespace,service) group_left() count(max_over_time(alertmanager_cluster_members{job=\"%s\",namespace=\"monitoring\"}[5m])) by(namespace,service,%s)" (include "vm-k8s-stack.alertmanager.name" .) (include "vm-k8s-stack.alertmanager.name" .) $groupLabels }}
+  expr: {{ printf "max_over_time(alertmanager_cluster_members{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[5m]) < on(namespace,service) group_left() count(max_over_time(alertmanager_cluster_members{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[5m])) by(namespace,service,%s)" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels }}
   annotations:
     description: Alertmanager {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod{{`}}`}} has only found {{`{{`}} $value {{`}}`}} members of the {{`{{`}}$labels.job{{`}}`}} cluster.
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagermembersinconsistent
@@ -28,7 +28,7 @@ rules:
   labels:
     severity: critical
 - alert: AlertmanagerFailedToSendAlerts
-  expr: {{ printf "(rate(alertmanager_notifications_failed_total{job=\"%s\",namespace=\"monitoring\"}[15m]) / ignoring(reason) group_left() rate(alertmanager_notifications_total{job=\"%s\",namespace=\"monitoring\"}[15m])) > 0.01" (include "vm-k8s-stack.alertmanager.name" .) (include "vm-k8s-stack.alertmanager.name" .) }}
+  expr: {{ printf "(rate(alertmanager_notifications_failed_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[15m]) / ignoring(reason) group_left() rate(alertmanager_notifications_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[15m])) > 0.01" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) }}
   annotations:
     description: Alertmanager {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod{{`}}`}} failed to send {{`{{`}} $value | humanizePercentage {{`}}`}} of notifications to {{`{{`}} $labels.integration {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagerfailedtosendalerts
@@ -38,7 +38,7 @@ rules:
   labels:
     severity: warning
 - alert: AlertmanagerClusterFailedToSendAlerts
-  expr: {{ printf "min(rate(alertmanager_notifications_failed_total{job=\"%s\",namespace=\"monitoring\",integration=~\".*\"}[15m]) / ignoring(reason) group_left() rate(alertmanager_notifications_total{job=\"%s\",namespace=\"monitoring\",integration=~\".*\"}[15m])) by(namespace,service,integration,%s) > 0.01" (include "vm-k8s-stack.alertmanager.name" .) (include "vm-k8s-stack.alertmanager.name" .) $groupLabels }}
+  expr: {{ printf "min(rate(alertmanager_notifications_failed_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration=~\".*\"}[15m]) / ignoring(reason) group_left() rate(alertmanager_notifications_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration=~\".*\"}[15m])) by(namespace,service,integration,%s) > 0.01" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels }}
   annotations:
     description: The minimum notification failure rate to {{`{{`}} $labels.integration {{`}}`}} sent from any instance in the {{`{{`}}$labels.job{{`}}`}} cluster is {{`{{`}} $value | humanizePercentage {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagerclusterfailedtosendalerts
@@ -48,7 +48,7 @@ rules:
   labels:
     severity: critical
 - alert: AlertmanagerClusterFailedToSendAlerts
-  expr: {{ printf "min(rate(alertmanager_notifications_failed_total{job=\"%s\",namespace=\"monitoring\",integration!~\".*\"}[15m]) / ignoring(reason) group_left() rate(alertmanager_notifications_total{job=\"%s\",namespace=\"monitoring\",integration!~\".*\"}[15m])) by(namespace,service,integration,%s) > 0.01" (include "vm-k8s-stack.alertmanager.name" .) (include "vm-k8s-stack.alertmanager.name" .) $groupLabels }}
+  expr: {{ printf "min(rate(alertmanager_notifications_failed_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration!~\".*\"}[15m]) / ignoring(reason) group_left() rate(alertmanager_notifications_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration!~\".*\"}[15m])) by(namespace,service,integration,%s) > 0.01" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels }}
   annotations:
     description: The minimum notification failure rate to {{`{{`}} $labels.integration {{`}}`}} sent from any instance in the {{`{{`}}$labels.job{{`}}`}} cluster is {{`{{`}} $value | humanizePercentage {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagerclusterfailedtosendalerts
@@ -58,7 +58,7 @@ rules:
   labels:
     severity: warning
 - alert: AlertmanagerConfigInconsistent
-  expr: {{ printf "count(count_values(\"config_hash\", alertmanager_config_hash{job=\"%s\",namespace=\"monitoring\"}) by(namespace,service,%s)) by(namespace,service,%s) != 1" (include "vm-k8s-stack.alertmanager.name" .) $groupLabels $groupLabels }}
+  expr: {{ printf "count(count_values(\"config_hash\", alertmanager_config_hash{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}) by(namespace,service,%s)) by(namespace,service,%s) != 1" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels $groupLabels }}
   annotations:
     description: Alertmanager instances within the {{`{{`}}$labels.job{{`}}`}} cluster have different configurations.
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagerconfiginconsistent
@@ -68,7 +68,7 @@ rules:
   labels:
     severity: critical
 - alert: AlertmanagerClusterDown
-  expr: {{ printf "(count(avg_over_time(up{job=\"%s\",namespace=\"monitoring\"}[5m]) < 0.5) by(namespace,service,%s) / count(up{job=\"%s\",namespace=\"monitoring\"}) by(namespace,service,%s)) >= 0.5" (include "vm-k8s-stack.alertmanager.name" .) $groupLabels (include "vm-k8s-stack.alertmanager.name" .) $groupLabels }}
+  expr: {{ printf "(count(avg_over_time(up{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[5m]) < 0.5) by(namespace,service,%s) / count(up{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}) by(namespace,service,%s)) >= 0.5" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels }}
   annotations:
     description: '{{`{{`}} $value | humanizePercentage {{`}}`}} of Alertmanager instances within the {{`{{`}}$labels.job{{`}}`}} cluster have been up for less than half of the last 5m.'
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagerclusterdown
@@ -78,7 +78,7 @@ rules:
   labels:
     severity: critical
 - alert: AlertmanagerClusterCrashlooping
-  expr: {{ printf "(count(changes(process_start_time_seconds{job=\"%s\",namespace=\"monitoring\"}[10m]) > 4) by(namespace,service,%s) / count(up{job=\"%s\",namespace=\"monitoring\"}) by(namespace,service,%s)) >= 0.5" (include "vm-k8s-stack.alertmanager.name" .) $groupLabels (include "vm-k8s-stack.alertmanager.name" .) $groupLabels }}
+  expr: {{ printf "(count(changes(process_start_time_seconds{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[10m]) > 4) by(namespace,service,%s) / count(up{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}) by(namespace,service,%s)) >= 0.5" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels }}
   annotations:
     description: '{{`{{`}} $value | humanizePercentage {{`}}`}} of Alertmanager instances within the {{`{{`}}$labels.job{{`}}`}} cluster have restarted at least 5 times in the last 10m.'
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagerclustercrashlooping

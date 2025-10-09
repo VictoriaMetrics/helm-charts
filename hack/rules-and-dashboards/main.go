@@ -385,6 +385,13 @@ common.grafanaDashboards
 		},
 	},
 	{
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-vmalert.yml",
+		kind: "rules",
+		charts: []string{
+			"victoria-metrics-k8s-stack",
+		},
+	},
+	{
 		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts.yml",
 		kind: "rules",
 		charts: []string{
@@ -1001,7 +1008,6 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 		log.Printf("failed to parse expression %q: %s", expr, err)
 		return expr, ""
 	}
-	patchFn := patchFns[groupName]
 	args := []string{}
 	metricsql.VisitAll(e, func(ex metricsql.Expr) {
 		switch t := ex.(type) {
@@ -1062,19 +1068,37 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 							found = true
 							args = append(args, "$clusterLabel")
 						}
-					}
-					if f.Label == "job" && f.Value == "alertmanager-main" {
-						f.Value = "VAR__string"
-						args = append(args, `(include "vm-k8s-stack.alertmanager.name" .)`)
-					}
-					if f.Label == "job" && f.Value == "node-exporter" {
+					} else if groupName == "kubernetes-storage" {
+						if f.Label == "job" && f.Value == "kubelet" {
+							filters = append(filters, metricsql.LabelFilter{
+								Label:    "namespace",
+								Value:    "%s",
+								IsRegexp: true,
+							})
+							args = append(args, `.targetNamespace`)
+						}
+					} else if groupName == "alertmanager.rules" {
+						if f.Label == "namespace" && f.Value == "monitoring" {
+							f.Value = "%s"
+							args = append(args, `(include "vm.namespace" .)`)
+						} else if f.Label == "job" && f.Value == "alertmanager-main" {
+							f.Value = "VAR__string"
+							args = append(args, `(include "vm-k8s-stack.alertmanager.name" .)`)
+						}
+					} else if groupName == "kubernetes-apps" {
+						if f.Label == "job" && f.Value == "kube-state-metrics" {
+							filters = append(filters, metricsql.LabelFilter{
+								Label:    "namespace",
+								Value:    "%s",
+								IsRegexp: true,
+							})
+							args = append(args, `.targetNamespace`)
+						}
+					} else if f.Label == "job" && f.Value == "node-exporter" {
 						f.Value = "VAR__string"
 						args = append(args, `(include "vm-k8s-stack.nodeExporter.name" .)`)
 					}
 					filters = append(filters, f)
-					if patchFn != nil {
-						filters = patchFn(filters, &f)
-					}
 				}
 				if !found && len(filters) > 1 && kind == "dashboards" && name != "cluster" {
 					filters = append(filters, metricsql.LabelFilter{
@@ -1089,35 +1113,6 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 		}
 	})
 	return strings.ReplaceAll(string(e.AppendString(nil)), "VAR__string", "%s"), strings.Join(args, " ")
-}
-
-var patchFns = map[string]func([]metricsql.LabelFilter, *metricsql.LabelFilter) []metricsql.LabelFilter{
-	"kubernetes-apps": func(fs []metricsql.LabelFilter, f *metricsql.LabelFilter) []metricsql.LabelFilter {
-		if f.Label == "job" && f.Value == "kube-state-metrics" {
-			fs = append(fs, metricsql.LabelFilter{
-				Label:    "namespace",
-				Value:    "<< .targetNamespace >>",
-				IsRegexp: true,
-			})
-		}
-		return fs
-	},
-	"kubernetes-storage": func(fs []metricsql.LabelFilter, f *metricsql.LabelFilter) []metricsql.LabelFilter {
-		if f.Label == "job" && f.Value == "kubelet" {
-			fs = append(fs, metricsql.LabelFilter{
-				Label:    "namespace",
-				Value:    "<< .targetNamespace >>",
-				IsRegexp: true,
-			})
-		}
-		return fs
-	},
-	"alertmanager": func(fs []metricsql.LabelFilter, f *metricsql.LabelFilter) []metricsql.LabelFilter {
-		if f.Label == "namespace" && f.Value == "monitoring" {
-			f.Value = `<< include "vm.namespace" . >>`
-		}
-		return fs
-	},
 }
 
 func patchPanel(p *dashboardPanel, dsName, name string) {

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added vmalert rules. See [#2465](https://github.com/VictoriaMetrics/helm-charts/issues/2465).
 
 ## 0.61.0
 
