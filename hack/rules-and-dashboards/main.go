@@ -740,7 +740,7 @@ func collectRules(vm *jsonnet.VM, raw []byte, src *source) (map[string][]byte, e
 			g.XXX = make(map[string]any)
 		}
 		if c, ok := rulesMap[n]; ok && len(c) > 0 {
-			g.XXX["condition"] = fmt.Sprintf("<< %q >>", c)
+			g.XXX["condition"] = fmt.Sprintf("<< %s >>", c)
 		} else {
 			g.XXX["condition"] = true
 		}
@@ -882,7 +882,7 @@ func patchDashboard(d *dashboard, name string) {
 		d.XXX = make(map[string]any)
 	}
 	if c, ok := dashboardsMap[name]; ok && len(c) > 0 {
-		d.XXX["condition"] = fmt.Sprintf("<< %q >>", c)
+		d.XXX["condition"] = fmt.Sprintf("<< %s >>", c)
 	} else {
 		d.XXX["condition"] = true
 	}

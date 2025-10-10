@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed conditions conditions generations for rules and dashboards. See [#2472](https://github.com/VictoriaMetrics/helm-charts/issues/2472).
 
 ## 0.61.3
 

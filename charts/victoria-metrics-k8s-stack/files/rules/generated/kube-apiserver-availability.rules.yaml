@@ -70,5 +70,5 @@ rules:
 - expr: {{ printf "sum(increase(apiserver_request_total{job=\"apiserver\",verb=~\"LIST|GET|POST|PUT|PATCH|DELETE\",code=~\"5..\"}[1h])) by(%s,code,verb)" $groupLabels }}
   condition: true
   record: code_verb:apiserver_request_total:increase1h
-condition: {{ "($Values.kubeApiServer).enabled" }}
+condition: {{ ($Values.kubeApiServer).enabled }}
 interval: 3m

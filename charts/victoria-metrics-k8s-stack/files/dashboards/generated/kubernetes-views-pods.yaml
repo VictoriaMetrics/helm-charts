@@ -26,7 +26,7 @@ templating:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "{\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\"}" $clusterLabel) ".*" $multicluster }}
+    query: {{ ternary (printf "{\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\",\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\"}" $clusterLabel) ".*" $multicluster }}
     definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current:
@@ -1990,7 +1990,7 @@ __requires:
   name: Table
   type: panel
   version: ""
-condition: {{ "($Values.kubelet).enabled" }}
+condition: {{ ($Values.kubelet).enabled }}
 description: 'This is a modern ''Pods View'' dashboard for your Kubernetes cluster(s). Made for kube-prometheus-stack and take advantage of the latest Grafana features. GitHub repository: https://github.com/dotdc/grafana-dashboards-kubernetes'
 fiscalYearStartMonth: 0
 graphTooltip: 1
