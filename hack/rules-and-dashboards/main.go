@@ -603,6 +603,7 @@ type dashboardVariable struct {
 	Query      *stringOrMap   `yaml:"query,omitempty" json:"query,omitempty"`
 	Definition string         `yaml:"definition,omitempty" json:"definition,omitempty"`
 	Hide       intOrStr       `yaml:"hide,omitempty" json:"hide,omitempty"`
+	AllValue   string         `yaml:"allValue,omitempty" json:"allValue,omitempty"`
 	XXX        map[string]any `yaml:",inline" json:",unknown"`
 }
 
@@ -1000,6 +1001,7 @@ func patchDashboard(d *dashboard, name string) {
 			Datasource: ds,
 			Multi:      true,
 			IncludeAll: true,
+			AllValue:   ".*",
 		}
 		d.Templating.List = append(d.Templating.List, v)
 	}

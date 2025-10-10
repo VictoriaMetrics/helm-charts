@@ -81,6 +81,7 @@ templating:
     type: {{ ternary "query" "constant" $multicluster }}
     query: {{ ternary (printf "label_values(vm_app_version, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
+    allValue: .*
 editable: false
 timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
 tags:

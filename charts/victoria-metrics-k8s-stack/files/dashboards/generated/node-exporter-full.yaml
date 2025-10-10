@@ -70,6 +70,7 @@ templating:
     type: {{ ternary "query" "constant" $multicluster }}
     query: {{ ternary (printf "label_values(node_uname_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
+    allValue: .*
 editable: false
 timezone: {{ default "browser" ($Values.defaultDashboards).defaultTimezone }}
 tags:
