@@ -2,16 +2,19 @@
 {{- $ctx := dict "helm" . }}
 {{- $urlCtx := dict "helm" . }}
 {{- range $i, $z := .Values.availabilityZones }}
-  {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
+  {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) (deepCopy $z) }}
   {{- if $zone.read.vmauth.enabled }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 metadata:
   {{- $_ := set $ctx "appKey" (list "zone" "read" "vmauth") }}
-  {{- if $zone.vmcluster }}
+  {{- if $zone.vmcluster.enabled }}
     {{- $urlSpec := $zone.vmcluster.spec | default dict }}
     {{- $_ := set $zone.vmcluster "spec" (mergeOverwrite (deepCopy $.Values.common.vmcluster.spec) $urlSpec) }}
+  {{- else if $zone.vmsingle.enabled }}
+    {{- $urlSpec := $zone.vmsingle.spec | default dict }}
+    {{- $_ := set $zone.vmsingle "spec" (mergeOverwrite (deepCopy $.Values.common.vmsingle.spec) $urlSpec) }}
   {{- end }}
   {{- $_ := set $ctx "zone" $zone }}
   {{- $_ := set $urlCtx "zone" $zone }}
@@ -24,29 +27,51 @@ metadata:
 
   {{- $spec := mergeOverwrite (deepCopy $.Values.common.vmauth.spec) (deepCopy (($zone.common).spec)) (deepCopy ((($zone.read).vmauth).spec)) }}
   {{- $_ := set $urlCtx "style" "managed" }}
-  {{- $urls := default list }}
+  {{- $urls := dict "cluster" (default list) "single" (default list) }}
   {{- if $zone.read.allow }}
-    {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
-    {{- $urls = append $urls (include "vm.url" $urlCtx) }}
+    {{- if ($zone.vmcluster).enabled }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
+      {{- $_ := set $urls "cluster" (append $urls.cluster (include "vm.url" $urlCtx)) }}
+    {{- else if ($zone.vmsingle).enabled }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
+      {{- $_ := set $urls "single" (append $urls.single (include "vm.url" $urlCtx)) }}
+    {{- end }}
   {{- end }}
   {{- range $j, $c := $.Values.availabilityZones }}
-    {{- $cross := mergeOverwrite (deepCopy $.Values.zoneTpl) $c }}
-    {{- if and (ne $j $i) $cross.read.allow ($cross.vmcluster).enabled }}
-      {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
-      {{- $_ := set $urlCtx "zone" $cross }}
-      {{- $_ := set $cross.vmcluster "spec" (mergeOverwrite (deepCopy $.Values.common.vmcluster.spec) (deepCopy ( $cross.vmcluster.spec | default dict))) }}
-      {{- $urls = append $urls (include "vm.url" $urlCtx)}}
+    {{- $cross := mergeOverwrite (deepCopy $.Values.zoneTpl) (deepCopy $c) }}
+    {{- if and (ne $j $i) $cross.read.allow }}
+      {{- if ($cross.vmcluster).enabled }}
+        {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
+        {{- $_ := set $cross.vmcluster "spec" (mergeOverwrite (deepCopy $.Values.common.vmcluster.spec) (deepCopy ( $cross.vmcluster.spec | default dict))) }}
+        {{- $_ := set $urlCtx "zone" $cross }}
+        {{- $_ := set $urls "cluster" (append $urls.cluster (include "vm.url" $urlCtx)) }}
+      {{- else if ($cross.vmsingle).enabled }}
+        {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
+        {{- $_ := set $cross.vmsingle "spec" (mergeOverwrite (deepCopy $.Values.common.vmsingle.spec) (deepCopy ( $cross.vmsingle.spec | default dict))) }}
+        {{- $_ := set $urlCtx "zone" $cross }}
+        {{- $_ := set $urls "single" (append $urls.single (include "vm.url" $urlCtx)) }}
+      {{- end }}
     {{- end }}
   {{- end }}
   {{- $_ := unset $urlCtx "style" }}
-  {{- if empty $urls }}
+  {{- if and (empty $urls.cluster) (empty $urls.single) }}
     {{- fail (printf "No read backend urls defined for vmauth in AZ %s" $zone.name) -}}
   {{- end }}
-  {{- $defaultUrlMapItem := dict "src_paths" (list "/select/.+" "/admin/tenants") "url_prefix" $urls }}
+
+  {{- $paths := dict "cluster" (list "/select/.+" "/admin/tenants") "single" (list "/select/.+") }}
+  {{- $dropPrefixParts := dict "cluster" 0 "single" 2 }}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
-  {{- $urlMap := $accessSpec.url_map | default (list (default dict))  }}
-  {{- $firstUrlMapItem := mergeOverwrite (deepCopy $defaultUrlMapItem) (deepCopy (index $urlMap 0)) }}
-  {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
+  {{- $urlMap := $accessSpec.url_map | default (list (default dict)) }}
+  {{- $firstItem := index $urlMap 0 }}
+  {{- $urlMap = slice $urlMap 1 }}
+  {{- range $kind, $backends := $urls }}
+    {{- if $backends }}
+      {{- $item := dict "src_paths" (get $paths $kind) "url_prefix" $backends "drop_src_path_prefix_parts" (get $dropPrefixParts $kind) }}
+      {{- $item = mergeOverwrite (deepCopy $item) (deepCopy $firstItem) }}
+      {{- $urlMap = prepend $urlMap $item }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $accessSpec "url_map" $urlMap }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
   {{- if not $spec.nodeSelector }}
     {{- $_ := set $spec "nodeSelector" (dict "topology.kubernetes.io/zone" "{{ (.zone).name }}") }}

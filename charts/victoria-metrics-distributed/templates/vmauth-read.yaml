@@ -22,7 +22,7 @@ metadata:
   {{- end  }}
 
   {{- $_ := set $urlCtx "style" "managed" }}
-  {{- $urls := default list }}
+  {{- $urls := dict "cluster" (default list) "single" (default list) }}
   {{- range $i, $z := .Values.availabilityZones }}
     {{- $zone := mergeOverwrite (deepCopy $zoneTpl) $z }}
     {{- if $zone.read.vmauth.enabled -}}
@@ -30,31 +30,40 @@ metadata:
       {{- $_ := set $zone.read.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $urlSpec) }}
       {{- $_ := set $urlCtx "zone" $zone }}
       {{- $_ := set $urlCtx "appKey" (list "zone" "read" "vmauth" "spec") }}
-      {{- $urls = append $urls (include "vm.url" $urlCtx) }}
+      {{- $_ = set $urls "cluster" (append $urls.cluster (include "vm.url" $urlCtx)) }}
     {{- else if $zone.vmcluster.enabled -}}
       {{- $urlSpec := mergeOverwrite (deepCopy ((($common.vmcluster).spec | default dict))) (deepCopy ($zone.vmcluster).spec | default dict) }}
       {{- $_ := set $zone.vmcluster "spec" $urlSpec }}
       {{- $_ := set $urlCtx "zone" $zone }}
       {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
-      {{- $urls = append $urls (include "vm.url" $urlCtx) }}
+      {{- $_ := set $urls "cluster" (append $urls.cluster (include "vm.url" $urlCtx)) }}
     {{- else if $zone.vmsingle.enabled -}}
       {{- $urlSpec := mergeOverwrite (deepCopy ((($common.vmsingle).spec | default dict))) (deepCopy ($zone.vmsingle).spec | default dict) }}
       {{- $_ := set $zone.vmsingle "spec" $urlSpec }}
       {{- $_ := set $urlCtx "zone" $zone }}
       {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
-      {{- $urls = append $urls (include "vm.url" $urlCtx) }}
+      {{- $_ := set $urls "single" (append $urls.single (include "vm.url" $urlCtx)) }}
     {{- end -}}
   {{- end }}
   {{- $_ := unset $urlCtx "style" }}
-  {{- if empty $urls }}
+  {{- if and (empty $urls.cluster) (empty $urls.single) }}
     {{- fail "No global vmauth read backend urls defined" -}}
   {{- end }}
-  {{- $defaultUrlMapItem := dict "src_paths" (list "/select/.+") "url_prefix" $urls }}
+  {{- $paths := dict "cluster" (list "/select/.+" "/admin/tenants") "single" (list "/select/.+") }}
+  {{- $dropPrefixParts := dict "cluster" 0 "single" 2 }}
   {{- $spec := deepCopy $auth.spec | default dict -}}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
-  {{- $urlMap := $accessSpec.url_map | default (list (default dict))  }}
-  {{- $firstUrlMapItem := mergeOverwrite $defaultUrlMapItem (deepCopy (index $urlMap 0)) }}
-  {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
+  {{- $urlMap := $accessSpec.url_map | default (list (default dict)) }}
+  {{- $firstItem := index $urlMap 0 }}
+  {{- $urlMap = slice $urlMap 1 }}
+  {{- range $kind, $backends := $urls }}
+    {{- if $backends }}
+      {{- $item := dict "src_paths" (get $paths $kind) "url_prefix" $backends "drop_src_path_prefix_parts" (get $dropPrefixParts $kind) }}
+      {{- $item = mergeOverwrite (deepCopy $item) (deepCopy $firstItem) }}
+      {{- $urlMap = prepend $urlMap $item }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $accessSpec "url_map" $urlMap }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
 spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
 {{- end }}

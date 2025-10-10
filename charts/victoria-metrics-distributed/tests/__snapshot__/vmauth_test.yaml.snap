@@ -25,7 +25,8 @@ vmauth should match snapshot:
           whenUnsatisfiable: ScheduleAnyway
       unauthorizedUserAccessSpec:
         url_map:
-          - load_balancing_policy: first_available
+          - drop_src_path_prefix_parts: 0
+            load_balancing_policy: first_available
             retry_status_codes:
               - 500
               - 502
@@ -62,7 +63,8 @@ vmauth should match snapshot:
           whenUnsatisfiable: ScheduleAnyway
       unauthorizedUserAccessSpec:
         url_map:
-          - load_balancing_policy: first_available
+          - drop_src_path_prefix_parts: 0
+            load_balancing_policy: first_available
             retry_status_codes:
               - 500
               - 502
@@ -92,13 +94,15 @@ vmauth should match snapshot:
       port: "8427"
       unauthorizedUserAccessSpec:
         url_map:
-          - load_balancing_policy: first_available
+          - drop_src_path_prefix_parts: 0
+            load_balancing_policy: first_available
             retry_status_codes:
               - 500
               - 502
               - 503
             src_paths:
               - /select/.+
+              - /admin/tenants
             url_prefix:
               - http://vmauth-vmauth-read-proxy-zone-eu-1.NAMESPACE.svc.cluster.local.:8427
               - http://vmauth-vmauth-read-proxy-zone-us-1.NAMESPACE.svc.cluster.local.:8427

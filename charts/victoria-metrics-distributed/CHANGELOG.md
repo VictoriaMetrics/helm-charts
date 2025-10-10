@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed vmauth read paths, while using vmauth with vmsingle enabled. See [#2471](https://github.com/VictoriaMetrics/helm-charts/issues/2471).
 
 ## 0.21.7
 
