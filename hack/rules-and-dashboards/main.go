@@ -206,6 +206,7 @@ type source struct {
 
 var sources = []source{
 	{
+		// TODO: change branch back to master once it's merged
 		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/dashboard-update-storage-eta-calculation/dashboards/victoriametrics.json",
 		kind: "dashboards",
 		charts: []string{
@@ -220,6 +221,7 @@ var sources = []source{
 		},
 	},
 	{
+		// TODO: change branch back to master once it's merged
 		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/dashboard-update-storage-eta-calculation/dashboards/victoriametrics-cluster.json",
 		kind: "dashboards",
 		charts: []string{
@@ -364,6 +366,7 @@ common.grafanaDashboards
 		},
 	},
 	{
+		// TODO: change branch back to master once it's merged
 		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/dashboard-update-storage-eta-calculation/deployment/docker/rules/alerts-cluster.yml",
 		kind: "rules",
 		charts: []string{
@@ -392,6 +395,7 @@ common.grafanaDashboards
 		},
 	},
 	{
+		// TODO: change branch back to master once it's merged
 		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/dashboard-update-storage-eta-calculation/deployment/docker/rules/alerts.yml",
 		kind: "rules",
 		charts: []string{
