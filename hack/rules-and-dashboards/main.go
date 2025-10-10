@@ -206,7 +206,7 @@ type source struct {
 
 var sources = []source{
 	{
-		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json",
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/dashboard-update-storage-eta-calculation/dashboards/victoriametrics.json",
 		kind: "dashboards",
 		charts: []string{
 			"victoria-metrics-k8s-stack",
@@ -220,7 +220,7 @@ var sources = []source{
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics-cluster.json",
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/dashboard-update-storage-eta-calculation/dashboards/victoriametrics-cluster.json",
 		kind: "dashboards",
 		charts: []string{
 			"victoria-metrics-k8s-stack",

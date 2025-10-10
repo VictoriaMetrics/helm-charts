@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- updated ETA panels in VictoriaMetrics dashboards. See [#2474](https://github.com/VictoriaMetrics/helm-charts/issues/2474).
 
 ## 0.61.4
 
