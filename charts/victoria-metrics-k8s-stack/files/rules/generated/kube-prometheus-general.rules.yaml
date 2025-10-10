@@ -7,10 +7,10 @@
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
 name: kube-prometheus-general.rules
 rules:
-- expr: count without(instance, pod, node) (up == 1)
+- expr: count(up == 1) without(instance,pod,node)
   condition: true
   record: count:up1
-- expr: count without(instance, pod, node) (up == 0)
+- expr: count(up == 0) without(instance,pod,node)
   condition: true
   record: count:up0
 condition: true

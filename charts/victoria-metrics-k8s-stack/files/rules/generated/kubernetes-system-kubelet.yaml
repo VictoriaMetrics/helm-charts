@@ -8,10 +8,7 @@
 name: kubernetes-system-kubelet
 rules:
 - alert: KubeNodeNotReady
-  expr: |
-    kube_node_status_condition{job="kube-state-metrics",condition="Ready",status="true"} == 0
-    and on (cluster, node)
-    kube_node_spec_unschedulable{job="kube-state-metrics"} == 0
+  expr: (kube_node_status_condition{job="kube-state-metrics",condition="Ready",status="true"} == 0) and on(cluster,node) (kube_node_spec_unschedulable{job="kube-state-metrics"} == 0)
   annotations:
     description: '{{`{{`}} $labels.node {{`}}`}} has been unready for more than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: {{ $runbookUrl }}/kubernetes/kubenodenotready
@@ -21,10 +18,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeNodePressure
-  expr: |
-    kube_node_status_condition{job="kube-state-metrics",condition=~"(MemoryPressure|DiskPressure|PIDPressure)",status="true"} == 1
-    and on (cluster, node)
-    kube_node_spec_unschedulable{job="kube-state-metrics"} == 0
+  expr: (kube_node_status_condition{job="kube-state-metrics",condition=~"(MemoryPressure|DiskPressure|PIDPressure)",status="true"} == 1) and on(cluster,node) (kube_node_spec_unschedulable{job="kube-state-metrics"} == 0)
   annotations:
     description: '{{`{{`}} $labels.node {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}} has active Condition {{`{{`}} $labels.condition {{`}}`}}. This is caused by resource usage exceeding eviction thresholds.'
     runbook_url: {{ $runbookUrl }}/kubernetes/kubenodepressure
@@ -34,8 +28,7 @@ rules:
   labels:
     severity: info
 - alert: KubeNodeUnreachable
-  expr: |
-    (kube_node_spec_taint{job="kube-state-metrics",key="node.kubernetes.io/unreachable",effect="NoSchedule"} unless ignoring(key,value) kube_node_spec_taint{job="kube-state-metrics",key=~"ToBeDeletedByClusterAutoscaler|cloud.google.com/impending-node-termination|aws-node-termination-handler/spot-itn"}) == 1
+  expr: (kube_node_spec_taint{job="kube-state-metrics",key="node.kubernetes.io/unreachable",effect="NoSchedule"} unless ignoring(key,value) kube_node_spec_taint{job="kube-state-metrics",key=~"ToBeDeletedByClusterAutoscaler|cloud.google.com/impending-node-termination|aws-node-termination-handler/spot-itn"}) == 1
   annotations:
     description: '{{`{{`}} $labels.node {{`}}`}} is unreachable and some workloads may be rescheduled on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: {{ $runbookUrl }}/kubernetes/kubenodeunreachable
@@ -75,8 +68,7 @@ rules:
   labels:
     severity: info
 - alert: KubeletPlegDurationHigh
-  expr: |
-    node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{quantile="0.99"} >= 10
+  expr: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{quantile="0.99"} >= 10
   annotations:
     description: The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{`{{`}} $value {{`}}`}} seconds on node {{`{{`}} $labels.node {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeletplegdurationhigh
@@ -96,8 +88,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeletClientCertificateExpiration
-  expr: |
-    kubelet_certificate_manager_client_ttl_seconds < 604800
+  expr: kubelet_certificate_manager_client_ttl_seconds < 604800
   annotations:
     description: Client certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeletclientcertificateexpiration
@@ -106,8 +97,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeletClientCertificateExpiration
-  expr: |
-    kubelet_certificate_manager_client_ttl_seconds < 86400
+  expr: kubelet_certificate_manager_client_ttl_seconds < 86400
   annotations:
     description: Client certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeletclientcertificateexpiration
@@ -116,8 +106,7 @@ rules:
   labels:
     severity: critical
 - alert: KubeletServerCertificateExpiration
-  expr: |
-    kubelet_certificate_manager_server_ttl_seconds < 604800
+  expr: kubelet_certificate_manager_server_ttl_seconds < 604800
   annotations:
     description: Server certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeletservercertificateexpiration
@@ -126,8 +115,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeletServerCertificateExpiration
-  expr: |
-    kubelet_certificate_manager_server_ttl_seconds < 86400
+  expr: kubelet_certificate_manager_server_ttl_seconds < 86400
   annotations:
     description: Server certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeletservercertificateexpiration
@@ -136,8 +124,7 @@ rules:
   labels:
     severity: critical
 - alert: KubeletClientCertificateRenewalErrors
-  expr: |
-    increase(kubelet_certificate_manager_client_expiration_renew_errors[5m]) > 0
+  expr: increase(kubelet_certificate_manager_client_expiration_renew_errors[5m]) > 0
   annotations:
     description: Kubelet on node {{`{{`}} $labels.node {{`}}`}} has failed to renew its client certificate ({{`{{`}} $value | humanize {{`}}`}} errors in the last 5 minutes) on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeletclientcertificaterenewalerrors
@@ -147,8 +134,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeletServerCertificateRenewalErrors
-  expr: |
-    increase(kubelet_server_expiration_renew_errors[5m]) > 0
+  expr: increase(kubelet_server_expiration_renew_errors[5m]) > 0
   annotations:
     description: Kubelet on node {{`{{`}} $labels.node {{`}}`}} has failed to renew its server certificate ({{`{{`}} $value | humanize {{`}}`}} errors in the last 5 minutes) on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeletservercertificaterenewalerrors
@@ -158,8 +144,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeletDown
-  expr: |
-    absent(up{job="kubelet", metrics_path="/metrics"} == 1)
+  expr: absent(up{job="kubelet",metrics_path="/metrics"} == 1)
   annotations:
     description: Kubelet has disappeared from Prometheus target discovery.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeletdown

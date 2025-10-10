@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- compact expression for all rules
 
 ## 0.61.5
 

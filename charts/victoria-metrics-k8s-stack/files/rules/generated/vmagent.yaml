@@ -8,7 +8,7 @@
 name: vmagent
 rules:
 - alert: PersistentQueueIsDroppingData
-  expr: sum(increase(vm_persistentqueue_bytes_dropped_total[5m])) without (path) > 0
+  expr: sum(increase(vm_persistentqueue_bytes_dropped_total[5m])) without(path) > 0
   annotations:
     dashboard: {{ $grafanaAddr }}/d/G7Z9GzMGz?viewPanel=49&var-instance={{`{{`}} $labels.instance {{`}}`}}
     description: Vmagent dropped {{`{{`}} $value | humanize1024 {{`}}`}} from persistent queue on instance {{`{{`}} $labels.instance {{`}}`}} for the last 10m.
@@ -18,7 +18,7 @@ rules:
   labels:
     severity: critical
 - alert: RejectedRemoteWriteDataBlocksAreDropped
-  expr: sum(increase(vmagent_remotewrite_packets_dropped_total[5m])) without (url) > 0
+  expr: sum(increase(vmagent_remotewrite_packets_dropped_total[5m])) without(url) > 0
   annotations:
     dashboard: {{ $grafanaAddr }}/d/G7Z9GzMGz?viewPanel=79&var-instance={{`{{`}} $labels.instance {{`}}`}}
     description: Job "{{`{{`}} $labels.job {{`}}`}}" on instance {{`{{`}} $labels.instance {{`}}`}} drops the rejected by remote-write server data blocks. Check the logs to find the reason for rejects.
@@ -38,7 +38,7 @@ rules:
   labels:
     severity: warning
 - alert: ScrapePoolHasNoTargets
-  expr: sum(vm_promscrape_scrape_pool_targets) without (status, instance, pod) == 0
+  expr: sum(vm_promscrape_scrape_pool_targets) without(status,instance,pod) == 0
   annotations:
     description: Vmagent "{{`{{`}} $labels.job {{`}}`}}" has scrape_pool "{{`{{`}} $labels.scrape_job {{`}}`}}" with 0 discovered targets. It is likely a misconfiguration. Please follow https://docs.victoriametrics.com/victoriametrics/vmagent/#debugging-scrape-targets to troubleshoot the scraping config.
     summary: Vmagent has scrape_pool with 0 configured/discovered targets
@@ -47,10 +47,7 @@ rules:
   labels:
     severity: warning
 - alert: TooManyWriteErrors
-  expr: |
-    (sum(increase(vm_ingestserver_request_errors_total[5m])) without (name,net,type)
-    +
-    sum(increase(vmagent_http_request_errors_total[5m])) without (path,protocol)) > 0
+  expr: (sum(increase(vm_ingestserver_request_errors_total[5m])) without(name,net,type) + sum(increase(vmagent_http_request_errors_total[5m])) without(path,protocol)) > 0
   annotations:
     dashboard: {{ $grafanaAddr }}/d/G7Z9GzMGz?viewPanel=77&var-instance={{`{{`}} $labels.instance {{`}}`}}
     description: Job "{{`{{`}} $labels.job {{`}}`}}" on instance {{`{{`}} $labels.instance {{`}}`}} responds with errors to write requests for last 15m.
@@ -72,7 +69,7 @@ rules:
   labels:
     severity: warning
 - alert: RemoteWriteConnectionIsSaturated
-  expr: "(\n rate(vmagent_remotewrite_send_duration_seconds_total[5m])\n / \n vmagent_remotewrite_queues\n) > 0.9\n"
+  expr: (rate(vmagent_remotewrite_send_duration_seconds_total[5m]) / vmagent_remotewrite_queues) > 0.9
   annotations:
     dashboard: {{ $grafanaAddr }}/d/G7Z9GzMGz?viewPanel=84&var-instance={{`{{`}} $labels.instance {{`}}`}}
     description: |-
@@ -124,10 +121,7 @@ rules:
   labels:
     severity: critical
 - alert: ConfigurationReloadFailure
-  expr: |
-    vm_promscrape_config_last_reload_successful != 1
-    or
-    vmagent_relabel_config_last_reload_successful != 1
+  expr: (vm_promscrape_config_last_reload_successful != 1) or (vmagent_relabel_config_last_reload_successful != 1)
   annotations:
     description: Configuration hot-reload failed for vmagent on instance {{`{{`}} $labels.instance {{`}}`}}. Check vmagent's logs for detailed error message.
     summary: Configuration reload failed for vmagent instance {{`{{`}} $labels.instance {{`}}`}}
@@ -135,8 +129,7 @@ rules:
   labels:
     severity: warning
 - alert: StreamAggrFlushTimeout
-  expr: |
-    increase(vm_streamaggr_flush_timeouts_total[5m]) > 0
+  expr: increase(vm_streamaggr_flush_timeouts_total[5m]) > 0
   annotations:
     description: 'Stream aggregation process can''t keep up with the load and might produce incorrect aggregation results. Check logs for more details. Possible solutions: increase aggregation interval; aggregate smaller number of series; reduce samples'' ingestion rate to stream aggregation.'
     summary: Streaming aggregation at "{{`{{`}} $labels.job {{`}}`}}" (instance {{`{{`}} $labels.instance {{`}}`}}) can't be finished within the configured aggregation interval.
@@ -144,8 +137,7 @@ rules:
   labels:
     severity: warning
 - alert: StreamAggrDedupFlushTimeout
-  expr: |
-    increase(vm_streamaggr_dedup_flush_timeouts_total[5m]) > 0
+  expr: increase(vm_streamaggr_dedup_flush_timeouts_total[5m]) > 0
   annotations:
     description: 'Deduplication process can''t keep up with the load and might produce incorrect results. Check docs https://docs.victoriametrics.com/victoriametrics/stream-aggregation/#deduplication and logs for more details. Possible solutions: increase deduplication interval; deduplicate smaller number of series; reduce samples'' ingestion rate.'
     summary: Deduplication "{{`{{`}} $labels.job {{`}}`}}" (instance {{`{{`}} $labels.instance {{`}}`}}) can't be finished within configured deduplication interval.

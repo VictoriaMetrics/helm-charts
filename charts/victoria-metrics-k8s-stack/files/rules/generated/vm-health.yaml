@@ -48,7 +48,7 @@ rules:
   labels:
     severity: critical
 - alert: TooHighCPUUsage
-  expr: rate(process_cpu_seconds_total[5m]) / process_cpu_cores_available > 0.9
+  expr: (rate(process_cpu_seconds_total[5m]) / process_cpu_cores_available) > 0.9
   annotations:
     description: |
       Too high CPU usage may be a sign of insufficient resources and make process unstable. Consider to either increase available CPU resources or decrease the load on the process.
@@ -68,7 +68,7 @@ rules:
   labels:
     severity: critical
 - alert: TooManyLogs
-  expr: sum(increase(vm_log_messages_total{level="error"}[5m])) without (app_version, location) > 0
+  expr: sum(increase(vm_log_messages_total{level="error"}[5m])) without(app_version,location) > 0
   annotations:
     description: |
       Logging rate for job \"{{`{{`}} $labels.job {{`}}`}}\" ({{`{{`}} $labels.instance {{`}}`}}) is {{`{{`}} $value {{`}}`}} for last 15m. Worth to check logs for specific error messages.

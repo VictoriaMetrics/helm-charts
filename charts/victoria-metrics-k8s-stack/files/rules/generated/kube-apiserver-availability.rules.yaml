@@ -7,8 +7,7 @@
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
 name: kube-apiserver-availability.rules
 rules:
-- expr: |
-    avg_over_time(code_verb:apiserver_request_total:increase1h[30d]) * 24 * 30
+- expr: (avg_over_time(code_verb:apiserver_request_total:increase1h[30d]) * 24) * 30
   condition: true
   record: code_verb:apiserver_request_total:increase30d
 - expr: {{ printf "sum(code_verb:apiserver_request_total:increase30d{verb=~\"LIST|GET\"}) by(%s,code)" $groupLabels }}

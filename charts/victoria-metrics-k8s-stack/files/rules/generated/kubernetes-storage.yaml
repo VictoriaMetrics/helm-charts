@@ -48,8 +48,7 @@ rules:
   labels:
     severity: warning
 - alert: KubePersistentVolumeErrors
-  expr: |
-    kube_persistentvolume_status_phase{phase=~"Failed|Pending",job="kube-state-metrics"} > 0
+  expr: kube_persistentvolume_status_phase{phase=~"Failed|Pending",job="kube-state-metrics"} > 0
   annotations:
     description: The persistent volume {{`{{`}} $labels.persistentvolume {{`}}`}} {{`{{`}} with $labels.{{ $clusterLabel }} -{{`}}`}} on Cluster {{`{{`}} . {{`}}`}} {{`{{`}}- end {{`}}`}} has status {{`{{`}} $labels.phase {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepersistentvolumeerrors

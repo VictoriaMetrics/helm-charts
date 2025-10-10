@@ -364,7 +364,7 @@ common.grafanaDashboards
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-cluster.yml",
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/dashboard-update-storage-eta-calculation/deployment/docker/rules/alerts-cluster.yml",
 		kind: "rules",
 		charts: []string{
 			"victoria-metrics-k8s-stack",
@@ -392,7 +392,7 @@ common.grafanaDashboards
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts.yml",
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/dashboard-update-storage-eta-calculation/deployment/docker/rules/alerts.yml",
 		kind: "rules",
 		charts: []string{
 			"victoria-metrics-k8s-stack",
@@ -726,8 +726,9 @@ func collectRules(vm *jsonnet.VM, raw []byte, src *source) (map[string][]byte, e
 			}
 			expr, args := patchExpr(r.Expr, g.Name, r.Name(), "rules")
 			if len(args) > 0 {
-				r.Expr = fmt.Sprintf("<< printf %q %s >>", expr, args)
+				expr = fmt.Sprintf("<< printf %q %s >>", expr, args)
 			}
+			r.Expr = expr
 			if r.XXX == nil {
 				r.XXX = make(map[string]any)
 			}

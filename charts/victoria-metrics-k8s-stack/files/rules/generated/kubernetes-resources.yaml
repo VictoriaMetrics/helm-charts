@@ -48,11 +48,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeQuotaAlmostFull
-  expr: |
-    kube_resourcequota{job="kube-state-metrics", type="used"}
-      / ignoring(instance, job, type)
-    (kube_resourcequota{job="kube-state-metrics", type="hard"} > 0)
-      > 0.9 < 1
+  expr: ((kube_resourcequota{job="kube-state-metrics",type="used"} / ignoring(instance,job,type) (kube_resourcequota{job="kube-state-metrics",type="hard"} > 0)) > 0.9) < 1
   annotations:
     description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubequotaalmostfull
@@ -62,11 +58,7 @@ rules:
   labels:
     severity: info
 - alert: KubeQuotaFullyUsed
-  expr: |
-    kube_resourcequota{job="kube-state-metrics", type="used"}
-      / ignoring(instance, job, type)
-    (kube_resourcequota{job="kube-state-metrics", type="hard"} > 0)
-      == 1
+  expr: (kube_resourcequota{job="kube-state-metrics",type="used"} / ignoring(instance,job,type) (kube_resourcequota{job="kube-state-metrics",type="hard"} > 0)) == 1
   annotations:
     description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubequotafullyused
@@ -76,11 +68,7 @@ rules:
   labels:
     severity: info
 - alert: KubeQuotaExceeded
-  expr: |
-    kube_resourcequota{job="kube-state-metrics", type="used"}
-      / ignoring(instance, job, type)
-    (kube_resourcequota{job="kube-state-metrics", type="hard"} > 0)
-      > 1
+  expr: (kube_resourcequota{job="kube-state-metrics",type="used"} / ignoring(instance,job,type) (kube_resourcequota{job="kube-state-metrics",type="hard"} > 0)) > 1
   annotations:
     description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubequotaexceeded
@@ -90,11 +78,7 @@ rules:
   labels:
     severity: warning
 - alert: CPUThrottlingHigh
-  expr: |
-    sum(increase(container_cpu_cfs_throttled_periods_total{container!="", job="kubelet", metrics_path="/metrics/cadvisor", }[5m])) without (id, metrics_path, name, image, endpoint, job, node)
-      / on (cluster, namespace, pod, container, instance) group_left
-    sum(increase(container_cpu_cfs_periods_total{job="kubelet", metrics_path="/metrics/cadvisor", }[5m])) without (id, metrics_path, name, image, endpoint, job, node)
-      > ( 25 / 100 )
+  expr: (sum(increase(container_cpu_cfs_throttled_periods_total{container!="",job="kubelet",metrics_path="/metrics/cadvisor"}[5m])) without(id,metrics_path,name,image,endpoint,job,node) / on(cluster,namespace,pod,container,instance) group_left() sum(increase(container_cpu_cfs_periods_total{job="kubelet",metrics_path="/metrics/cadvisor"}[5m])) without(id,metrics_path,name,image,endpoint,job,node)) > 0.25
   annotations:
     description: '{{`{{`}} $value | humanizePercentage {{`}}`}} throttling of CPU in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: {{ $runbookUrl }}/kubernetes/cputhrottlinghigh
