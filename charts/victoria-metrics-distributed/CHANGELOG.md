@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Updated k8s-stack dependency 0.59.2 -> 0.61.6
 
 ## 0.21.8
 
