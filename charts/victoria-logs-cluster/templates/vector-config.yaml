@@ -1,7 +1,7 @@
 {{- $app := (.Values).vlinsert | default dict }}
 {{- $vector := (.Values).vector | default dict }}
 {{- $defaultConfig := $vector.customConfigName }}
-{{- if and (or $vector.enabled $vector.customConfigNamespace) (has $vector.existingConfigMaps $defaultConfig) }}
+{{- if and (or $vector.enabled $vector.customConfigNamespace) (has $defaultConfig $vector.existingConfigMaps) }}
   {{- $config := ($vector).customConfig | default dict }}
   {{- $ctx := dict "helm" . "appKey" "vlinsert" "style" "plain" }}
   {{- if $app.enabled }}
