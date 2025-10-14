@@ -151,3 +151,5 @@ helm charts tested at kubernetes versions from 1.28 to 1.30.
 - [VictoriaMetrics K8s Stack](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/)
 - [VictoriaMetrics Operator](https://docs.victoriametrics.com/helm/victoria-metrics-operator/)
 - [VictoriaMetrics Operator CRDs](https://docs.victoriametrics.com/helm/victoria-metrics-operator-crds/)
+- [VictoriaTraces Single](https://docs.victoriametrics.com/helm/victoria-traces-single/)
+- [VictoriaTraces Cluster](https://docs.victoriametrics.com/helm/victoria-traces-cluster/)

@@ -1,6 +1,7 @@
 {{- $app := (.Values).vlinsert | default dict }}
 {{- $vector := (.Values).vector | default dict }}
-{{- if and (or $vector.enabled $vector.customConfigNamespace) $vector.existingConfigMaps }}
+{{- $defaultConfig := $vector.customConfigName }}
+{{- if and (or $vector.enabled $vector.customConfigNamespace) (has $vector.existingConfigMaps $defaultConfig) }}
   {{- $config := ($vector).customConfig | default dict }}
   {{- $ctx := dict "helm" . "appKey" "vlinsert" "style" "plain" }}
   {{- if $app.enabled }}
@@ -22,7 +23,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ index $vector.existingConfigMaps 0 }}
+  name: {{ $defaultConfig }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   namespace: {{ $ns }}
 data:

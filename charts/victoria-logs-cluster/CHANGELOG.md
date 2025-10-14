@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add .Values.vector.customConfigName variable for managed by chart vector custom config map name. See [#2482](https://github.com/VictoriaMetrics/helm-charts/issues/2482).
 
 ## 0.0.15
 
