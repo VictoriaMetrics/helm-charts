@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed template typo in vector config
 
 ## 0.0.16
 
