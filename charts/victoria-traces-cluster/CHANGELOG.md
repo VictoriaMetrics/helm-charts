@@ -1,6 +1,7 @@
 ## Next release
 
 - replaced .Values.vtstorage.persistentVolume.labels with .Values.vtstorage.persistentVolume.extraLabels
+- bump version of VictoriaTraces components to [v0.4.0](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.4.0)
 
 ## 0.0.1
 
