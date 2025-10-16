@@ -1,6 +1,8 @@
 ## Next release
 
 - bump grafana dependency chart to version 10.1.0
+- bump operator dependency chart to version 0.54.0
+- move common namespace configuration for extra scrapes to `.Values.defaultScrapeService.namespace`
 
 ## 0.61.6
 

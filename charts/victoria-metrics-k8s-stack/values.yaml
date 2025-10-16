@@ -955,6 +955,9 @@ grafana:
       endpoints:
         - port: '{{ .Values.grafana.service.portName }}'
 
+defaultScrapeService:
+  namespace: kube-system
+
 # -- prometheus-node-exporter dependency chart configuration. For possible values check [here](https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/values.yaml)
 prometheus-node-exporter:
   enabled: true
@@ -1111,8 +1114,7 @@ kubeControllerManager:
     spec:
       jobLabel: jobLabel
       namespaceSelector:
-        matchNames:
-          - kube-system
+        matchNames: []
       endpoints:
         - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
           # bearerTokenSecret:
@@ -1148,7 +1150,7 @@ kubeDns:
     spec:
       jobLabel: jobLabel
       namespaceSelector:
-        matchNames: [kube-system]
+        matchNames: []
       endpoints:
         - port: http-metrics-dnsmasq
           bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -1177,7 +1179,7 @@ coreDns:
     spec:
       jobLabel: jobLabel
       namespaceSelector:
-        matchNames: [kube-system]
+        matchNames: []
       endpoints:
         - port: http-metrics
           bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -1212,7 +1214,7 @@ kubeEtcd:
     spec:
       jobLabel: jobLabel
       namespaceSelector:
-        matchNames: [kube-system]
+        matchNames: []
       endpoints:
         - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
           # bearerTokenSecret:
@@ -1252,7 +1254,7 @@ kubeScheduler:
     spec:
       jobLabel: jobLabel
       namespaceSelector:
-        matchNames: [kube-system]
+        matchNames: []
       endpoints:
         - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
           # bearerTokenSecret:
@@ -1291,7 +1293,7 @@ kubeProxy:
     spec:
       jobLabel: jobLabel
       namespaceSelector:
-        matchNames: [kube-system]
+        matchNames: []
       endpoints:
         - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
           # bearerTokenSecret:
