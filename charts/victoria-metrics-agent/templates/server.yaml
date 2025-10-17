@@ -164,6 +164,9 @@ spec:
       {{- with $app.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- if and ($app.hostNetwork) (eq $mode "daemonSet") }}
+      hostNetwork: true
+      {{- end }}
       {{- with $app.topologySpreadConstraints }}
       topologySpreadConstraints:
         {{- range $constraint := . }}
