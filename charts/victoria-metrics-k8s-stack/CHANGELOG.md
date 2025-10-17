@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- updated dashboards. See [#2487](https://github.com/VictoriaMetrics/helm-charts/issues/2487).
 
 ## 0.61.7
 

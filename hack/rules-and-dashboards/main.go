@@ -278,7 +278,7 @@ var sources = []source{
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json",
+		url:  "https://raw.githubusercontent.com/AndrewChubatiuk/grafana-dashboards-kubernetes/fixed-dashboard-ns-and-pod-selector/dashboards/k8s-views-pods.json",
 		kind: "dashboards",
 		charts: []string{
 			"victoria-metrics-k8s-stack",

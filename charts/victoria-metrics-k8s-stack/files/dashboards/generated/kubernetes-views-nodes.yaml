@@ -601,7 +601,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "machine_memory_bytes{node=\"$node\",%s=~\"$cluster\"}" $clusterLabel }}
+    expr: {{ printf "sum(machine_memory_bytes{node=\"$node\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     instant: false
     interval: ""
@@ -649,7 +649,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "node_time_seconds{instance=\"$instance\",%s=~\"$cluster\"} - node_boot_time_seconds{instance=\"$instance\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(node_time_seconds{instance=\"$instance\",%s=~\"$cluster\"} - node_boot_time_seconds{instance=\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
     instant: false
     interval: ""
@@ -2944,5 +2944,5 @@ time:
   to: now
 timepicker: {}
 uid: k8s_views_nodes
-version: 37
+version: 38
 weekStart: ""

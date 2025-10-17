@@ -1363,7 +1363,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=~\"$namespace\",pod=~\"$pod\",image!=\"\",container!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",container!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: $resolution
@@ -1455,7 +1455,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(increase(container_oom_events_total{namespace=\"${namespace}\",pod=\"${pod}\",container!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(increase(container_oom_events_total{namespace=\"${namespace}\",pod=~\"${pod}\",container!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: ""
@@ -1540,7 +1540,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(increase(kube_pod_container_status_restarts_total{namespace=~\"${namespace}\",pod=\"${pod}\",container!=\"\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(increase(kube_pod_container_status_restarts_total{namespace=\"${namespace}\",pod=~\"${pod}\",container!=\"\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: ""
@@ -2003,5 +2003,5 @@ time:
   to: now
 timepicker: {}
 uid: k8s_views_pods
-version: 36
+version: 37
 weekStart: ""
