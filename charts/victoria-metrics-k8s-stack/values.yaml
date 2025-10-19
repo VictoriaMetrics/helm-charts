@@ -325,7 +325,26 @@ vmsingle:
     #  - secretName: vmsingle-ingress-tls
     #    hosts:
     #      - vmsingle.domain.com
-
+  route:
+    # -- Enable deployment of HTTPRoute for server component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ dig "spec" "extraArgs" "http.pathPrefix" "/" .Values.vmsingle }}'
 vmcluster:
   # -- Create VMCluster CR
   enabled: false
@@ -508,6 +527,67 @@ vmcluster:
       #  - secretName: vminsert-ingress-tls
       #    hosts:
       #      - vminsert.domain.com
+  route:
+    storage:
+      # -- Enable deployment of HTTPRoute for storage component
+      enabled: false
+      # -- HTTPRoute annotations
+      annotations: {}
+      # -- HTTPRoute extra labels
+      labels: {}
+      # -- HTTPGateway objects refs
+      parentRefs: []
+      # -- Array of hostnames
+      hostnames: []
+      # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+      extraRules: []
+      # -- Filters for a default rule in HTTPRoute
+      filters: []
+      # -- Matches for a default rule in HTTPRoute
+      matches:
+        - path:
+            type: PathPrefix
+            value: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vmstorage }}'
+    select:
+      # -- Enable deployment of HTTPRoute for select component
+      enabled: false
+      # -- HTTPRoute annotations
+      annotations: {}
+      # -- HTTPRoute extra labels
+      labels: {}
+      # -- HTTPGateway objects refs
+      parentRefs: []
+      # -- Array of hostnames
+      hostnames: []
+      # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+      extraRules: []
+      # -- Filters for a default rule in HTTPRoute
+      filters: []
+      # -- Matches for a default rule in HTTPRoute
+      matches:
+        - path:
+            type: PathPrefix
+            value: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vmselect }}'
+    insert:
+      # -- Enable deployment of HTTPRoute for insert component
+      enabled: false
+      # -- HTTPRoute annotations
+      annotations: {}
+      # -- HTTPRoute extra labels
+      labels: {}
+      # -- HTTPGateway objects refs
+      parentRefs: []
+      # -- Array of hostnames
+      hostnames: []
+      # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+      extraRules: []
+      # -- Filters for a default rule in HTTPRoute
+      filters: []
+      # -- Matches for a default rule in HTTPRoute
+      matches:
+        - path:
+            type: PathPrefix
+            value: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmcluster.spec.vminsert }}'
 
 alertmanager:
   # -- Create VMAlertmanager CR
@@ -681,6 +761,28 @@ alertmanager:
     #    hosts:
     #      - alertmanager.domain.com
 
+  # -- (object) VMAlertmanager route configuration
+  route:
+    # -- Enable deployment of HTTPRoute for alertmanager component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ .Values.alertmanager.spec.routePrefix | default "/" }}'
+
 vmalert:
   # -- VMAlert annotations
   annotations: {}
@@ -750,6 +852,28 @@ vmalert:
     #  - secretName: vmalert-ingress-tls
     #    hosts:
     #      - vmalert.domain.com
+
+  # -- (object) VMAlert route configuration
+  route:
+    # -- Enable deployment of HTTPRoute for vmalert component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ dig "spec" "extraArgs" "http.pathPrefix" "/" .Values.vmalert }}'
 
 vmauth:
   # -- Enable VMAuth CR
@@ -832,6 +956,28 @@ vmagent:
     #  - secretName: vmagent-ingress-tls
     #    hosts:
     #      - vmagent.domain.com
+
+  # -- (object) VMAgent route configuration
+  route:
+    # -- Enable deployment of HTTPRoute for vmagent component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ dig "spec" "extraArgs" "http.pathPrefix" "/" .Values.vmagent }}'
 
 defaultDatasources:
   grafanaOperator:
