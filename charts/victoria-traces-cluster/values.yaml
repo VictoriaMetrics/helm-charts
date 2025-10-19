@@ -268,6 +268,27 @@ vtselect:
     # -- Ingress path type
     pathType: Prefix
 
+  route:
+    # -- Enable deployment of HTTPRoute for select component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ dig "extraArgs" "http.pathPrefix" "/select" .Values.vtselect }}'
+
   vmServiceScrape:
     # -- Enable VMServiceScrape for vtselect component, which is managed by [vm-operator](https://docs.victoriametrics.com/operator/quick-start/).
     enabled: false
@@ -517,6 +538,27 @@ vtinsert:
 
     # -- Ingress path type
     pathType: Prefix
+
+  route:
+    # -- Enable deployment of HTTPRoute for insert component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ dig "extraArgs" "http.pathPrefix" "/insert" .Values.vtinsert }}'
 
   vmServiceScrape:
     # -- Enable VMServiceScrape for vtinsert component, which is managed by [vm-operator](https://docs.victoriametrics.com/operator/quick-start/).
@@ -994,6 +1036,27 @@ vmauth:
     # ingressClassName: nginx
     # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
+
+  route:
+    # -- Enable deployment of HTTPRoute for vmauth component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmauth }}'
 
   vmServiceScrape:
     # -- Enable VMServiceScrape for vmauth component, which is managed by [vm-operator](https://docs.victoriametrics.com/operator/quick-start/).

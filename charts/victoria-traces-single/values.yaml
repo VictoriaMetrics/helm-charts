@@ -271,6 +271,27 @@ server:
     # -- Ingress path type
     pathType: Prefix
 
+  route:
+    # -- Enable deployment of HTTPRoute for single component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path: 
+          type: PathPrefix
+          value: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.server }}'
+
   service:
     # -- Service annotations
     annotations: {}

@@ -1,21 +1,18 @@
-{{- $ns := include "vm.namespace" . }}
-{{- range $name, $config := .Values }}
-  {{- if and (kindIs "map" $config) (hasKey $config "route") ($config.enabled) (empty (index $.Subcharts $name)) }}
-    {{- $routes := ternary (dict $name $config.route) $config.route (hasKey $config.route "enabled") }}
-    {{- range $routeName, $route := $routes }}
-      {{- if $route.enabled }}
-        {{- $routeName = ternary $routeName (printf "vm%s" $routeName) (or (hasPrefix "vm" $routeName) (not (hasPrefix "vm" $name))) }}
-        {{- $appKey := ternary $name (list $name "spec" $routeName) (eq $name $routeName) -}}
-        {{- $ctx := dict "helm" $ "appKey" $appKey -}}
-        {{- $fullname := include "vm.managed.fullname" $ctx }}
+{{- $app := .Values.server }}
+{{- $route := $app.route }}
+{{- if and $app.enabled $route.enabled  }}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 ---
 apiVersion: {{ $route.apiVersion | default "gateway.networking.k8s.io/v1" }}
 kind: {{ $route.kind | default "HTTPRoute" }}
 metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
-  {{- $_ := set $ctx "extraLabels" $route.labels }}
+  {{- $_ := set $ctx "extraLabels" $app.route.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
   {{- with $route.annotations }}
   annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
@@ -32,7 +29,7 @@ spec:
     {{- end }}
     - backendRefs:
         - name: {{ $fullname }}
-          port: {{ tpl $route.port $ }}
+          port: {{ $route.port | default (include "vm.port.from.flag" (dict "flag" ($app.extraArgs).httpListenAddr)) }}
           group: ''
           kind: Service
           weight: 1
@@ -43,7 +40,4 @@ spec:
       matches: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
 
-      {{- end }}
-    {{- end }}
-  {{- end }}
 {{- end }}

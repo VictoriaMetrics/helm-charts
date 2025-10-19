@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- support HTTPRoute for chart components, where ingress is available. See [#2492](https://github.com/VictoriaMetrics/helm-charts/issues/2492).
 
 ## 0.11.15
 

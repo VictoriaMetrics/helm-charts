@@ -285,6 +285,27 @@ vmselect:
     # -- Ingress path type
     pathType: Prefix
 
+  route:
+    # -- Enable deployment of HTTPRoute for select component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ dig "extraArgs" "http.pathPrefix" "/select" .Values.vmselect }}'
+
   # -- vmselect mode: deployment, daemonSet
   mode: deployment
 
@@ -558,8 +579,6 @@ vminsert:
     # -- Traffic Distribution. Check [Traffic distribution](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)
     trafficDistribution: ""
 
-
-
   ingress:
     # -- Enable deployment of ingress for vminsert component
     enabled: false
@@ -590,6 +609,28 @@ vminsert:
 
     # -- Ingress path type
     pathType: Prefix
+
+  route:
+    # -- Enable deployment of HTTPRoute for insert component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ dig "extraArgs" "http.pathPrefix" "/insert" .Values.vminsert }}'
+
   serviceMonitor:
     # -- Enable deployment of Service Monitor for vminsert component. This is Prometheus operator object
     enabled: false
@@ -848,6 +889,28 @@ vmauth:
     # ingressClassName: nginx
     # -- pathType is only for k8s >= 1.1=
     pathType: Prefix
+
+  route:
+    # -- Enable deployment of HTTPRoute for vmauth component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmauth }}'
+
   serviceMonitor:
     # -- Enable deployment of Service Monitor for vmauth component. This is Prometheus operator object
     enabled: false
