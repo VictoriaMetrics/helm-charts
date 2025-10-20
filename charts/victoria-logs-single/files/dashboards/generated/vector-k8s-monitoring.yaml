@@ -3,7 +3,7 @@
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+{{- range (($Values.defaultDatasources).victoriametrics).datasources | default list }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
 title: Vector K8S Monitoring
@@ -19,7 +19,7 @@ templating:
   - name: cluster
     label: cluster
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "{\"qryType\":1,\"query\":\"label_values(vector_build_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\"}" $clusterLabel) ".*" $multicluster }}
+    query: {{ ternary (printf "{\"query\":\"label_values(vector_build_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\",\"qryType\":1}" $clusterLabel) ".*" $multicluster }}
     definition: {{ ternary (printf "label_values(vector_build_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current: {}

@@ -3,7 +3,7 @@
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+{{- range (($Values.defaultDatasources).victoriametrics).datasources | default list }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
 title: Kubernetes / Views / Global
@@ -12,6 +12,7 @@ templating:
   - name: datasource
     type: datasource
     query: {{ $defaultDatasource }}
+    hide: 0
     current:
       selected: false
       text: ""
@@ -38,6 +39,7 @@ templating:
   - name: resolution
     type: custom
     query: 1s, 15s, 30s, 1m, 3m, 5m
+    hide: 0
     current:
       selected: false
       text: 30s
@@ -74,6 +76,7 @@ templating:
       query: {{ printf "label_values(node_cpu_seconds_total{%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
     definition: {{ printf "label_values(node_cpu_seconds_total{%s=~\"$cluster\"}, job)" $clusterLabel }}
+    hide: 0
     current:
       selected: false
       text: ""

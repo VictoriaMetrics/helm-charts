@@ -3,7 +3,7 @@
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+{{- range (($Values.defaultDatasources).victoriametrics).datasources | default list }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
 title: Kubernetes / Views / Pods
@@ -12,6 +12,7 @@ templating:
   - name: datasource
     type: datasource
     query: {{ $defaultDatasource }}
+    hide: 0
     current:
       selected: false
       text: ""
@@ -26,7 +27,7 @@ templating:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "{\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\"}" $clusterLabel) ".*" $multicluster }}
+    query: {{ ternary (printf "{\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\",\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\"}" $clusterLabel) ".*" $multicluster }}
     definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current:
@@ -48,6 +49,7 @@ templating:
       query: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
       refId: Prometheus-namespace-Variable-Query
     definition: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
+    hide: 0
     current:
       selected: false
       text: monitoring
@@ -71,6 +73,7 @@ templating:
       query: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, pod)" $clusterLabel }}
       refId: Prometheus-pod-Variable-Query
     definition: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, pod)" $clusterLabel }}
+    hide: 0
     allValue: .*
     current:
       selected: false
@@ -87,6 +90,7 @@ templating:
   - name: resolution
     type: custom
     query: 1s, 15s, 30s, 1m, 3m, 5m
+    hide: 0
     current:
       selected: false
       text: 30s
@@ -123,6 +127,7 @@ templating:
       query: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
     definition: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, job)" $clusterLabel }}
+    hide: 0
     current:
       selected: false
       text: kube-state-metrics

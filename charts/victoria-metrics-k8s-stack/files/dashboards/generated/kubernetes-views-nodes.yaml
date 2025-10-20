@@ -3,7 +3,7 @@
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+{{- range (($Values.defaultDatasources).victoriametrics).datasources | default list }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
 title: Kubernetes / Views / Nodes
@@ -12,6 +12,7 @@ templating:
   - name: datasource
     type: datasource
     query: {{ $defaultDatasource }}
+    hide: 0
     current: {}
     options: []
     queryValue: ""
@@ -35,6 +36,7 @@ templating:
   - name: resolution
     type: custom
     query: 1s, 15s, 30s, 1m, 3m, 5m
+    hide: 0
     current:
       selected: false
       text: 30s
@@ -69,6 +71,7 @@ templating:
       query: {{ printf "label_values(kube_node_info{%s=~\"$cluster\"}, node)" $clusterLabel }}
       refId: StandardVariableQuery
     definition: {{ printf "label_values(kube_node_info{%s=~\"$cluster\"}, node)" $clusterLabel }}
+    hide: 0
     current: {}
     options: []
     refresh: 2
@@ -84,7 +87,7 @@ templating:
       query: {{ printf "label_values(node_uname_info{nodename=~\"(?i:($node)(.[a-z0-9.]+)?)\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: StandardVariableQuery
     definition: {{ printf "label_values(node_uname_info{nodename=~\"(?i:($node)(.[a-z0-9.]+)?)\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
-    hide: ""
+    hide: 2
     current: {}
     options: []
     refresh: 2

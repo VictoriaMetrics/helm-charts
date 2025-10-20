@@ -3,7 +3,7 @@
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+{{- range (($Values.defaultDatasources).victoriametrics).datasources | default list }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
 title: Kubernetes / Scheduler
@@ -13,6 +13,7 @@ templating:
     label: Data source
     type: datasource
     query: {{ $defaultDatasource }}
+    hide: 0
     current:
       selected: true
       text: default
@@ -36,6 +37,7 @@ templating:
       uid: ${datasource}
     type: query
     query: {{ printf "label_values(up{job=\"kube-scheduler\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
+    hide: 0
     allValue: .+
     refresh: 2
 editable: false

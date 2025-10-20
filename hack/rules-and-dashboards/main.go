@@ -41,7 +41,7 @@ var headers = map[string]string{
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+{{- range (($Values.defaultDatasources).victoriametrics).datasources | default list }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
 `,
@@ -477,12 +477,12 @@ type dashboardPanel struct {
 	Title      string            `yaml:"title,omitempty" json:"title,omitempty"`
 	Targets    []dashboardTarget `yaml:"targets,omitempty" json:"targets,omitempty"`
 	Panels     []dashboardPanel  `yaml:"panels,omitempty" json:"panels,omitempty"`
-	Datasource *stringOrMap      `yaml:"datasource,omitempty" json:"datasource,omitempty"`
+	Datasource *strOrMap         `yaml:"datasource,omitempty" json:"datasource,omitempty"`
 	XXX        map[string]any    `yaml:",inline" json:",unknown"`
 }
 
 type dashboardTarget struct {
-	Datasource *stringOrMap   `yaml:"datasource,omitempty" json:"datasource,omitempty"`
+	Datasource *strOrMap      `yaml:"datasource,omitempty" json:"datasource,omitempty"`
 	Expr       string         `yaml:"expr,omitempty" json:"expr,omitempty"`
 	XXX        map[string]any `yaml:",inline" json:",unknown"`
 }
@@ -494,7 +494,7 @@ type dashboardAnnotations struct {
 type dashboardAnnotation struct {
 	Name       string         `yaml:"name,omitempty" json:"name,omitempty"`
 	Expr       string         `yaml:"expr,omitempty" json:"expr,omitempty"`
-	Datasource *stringOrMap   `yaml:"datasource,omitempty" json:"datasource,omitempty"`
+	Datasource *strOrMap      `yaml:"datasource,omitempty" json:"datasource,omitempty"`
 	XXX        map[string]any `yaml:",inline" json:",unknown"`
 }
 
@@ -502,56 +502,105 @@ type dashboardTemplating struct {
 	List []dashboardVariable `yaml:"list" json:"list"`
 }
 
-type stringOrMap struct {
-	String string
-	Map    map[string]any
+type strOrMap struct {
+	StrVal string
+	MapVal map[string]any
 }
 
-func (r stringOrMap) MarshalYAML() (any, error) {
-	if len(r.String) > 0 {
-		return r.String, nil
+func (r strOrMap) MarshalYAML() (any, error) {
+	if len(r.StrVal) > 0 {
+		return r.StrVal, nil
 	}
 
-	if len(r.Map) > 0 {
-		return r.Map, nil
+	if len(r.MapVal) > 0 {
+		return r.MapVal, nil
 	}
 
 	return nil, nil
 }
 
-func (r stringOrMap) MarshalJSON() ([]byte, error) {
-	if len(r.String) > 0 {
-		return json.Marshal(r.String)
+func (r strOrMap) MarshalJSON() ([]byte, error) {
+	if len(r.StrVal) > 0 {
+		return json.Marshal(r.StrVal)
 	}
 
-	if len(r.Map) > 0 {
-		return json.Marshal(r.Map)
+	if len(r.MapVal) > 0 {
+		return json.Marshal(r.MapVal)
 	}
 
 	return []byte("null"), nil
 }
 
-func (r *stringOrMap) UnmarshalJSON(raw []byte) error {
+func (r *strOrMap) UnmarshalJSON(raw []byte) error {
 	if len(raw) == 0 {
 		return nil
 	}
 
 	var o any
 	if err := json.Unmarshal(raw, &o); err != nil {
-		r.String = ""
-		r.Map = nil
+		r.StrVal = ""
+		r.MapVal = nil
 		return err
-	} else {
-		switch v := o.(type) {
-		case string:
-			r.String = v
-		case map[string]any:
-			r.Map = v
-		default:
-			return fmt.Errorf("unexpected type %T", v)
-		}
+	}
+	switch v := o.(type) {
+	case string:
+		r.StrVal = v
+	case map[string]any:
+		r.MapVal = v
+	default:
+		return fmt.Errorf("unexpected type %T", v)
+	}
+	return nil
+}
+
+type boolOrStr struct {
+	BoolVal bool
+	StrVal  string
+	IsBool  bool
+}
+
+func (v boolOrStr) MarshalYAML() (any, error) {
+	if v.IsBool {
+		return v.BoolVal, nil
+	}
+	return v.StrVal, nil
+}
+
+func (v boolOrStr) MarshalJSON() ([]byte, error) {
+	if v.IsBool {
+		return json.Marshal(v.BoolVal)
+	}
+	return json.Marshal(v.StrVal)
+}
+
+func (v boolOrStr) IsZero() bool {
+	if v.IsBool {
+		return !v.BoolVal
+	}
+	return len(v.StrVal) == 0
+}
+
+func (r *boolOrStr) UnmarshalJSON(raw []byte) error {
+	if len(raw) == 0 {
 		return nil
 	}
+	var o any
+	if err := json.Unmarshal(raw, &o); err != nil {
+		r.StrVal = ""
+		r.BoolVal = false
+		r.IsBool = false
+		return err
+	}
+	switch v := o.(type) {
+	case string:
+		r.StrVal = v
+	case bool:
+		r.IsBool = true
+		r.BoolVal = v
+	default:
+		return fmt.Errorf("unexpected type %T", v)
+	}
+	return nil
 }
 
 type intOrStr struct {
@@ -584,27 +633,27 @@ func (r *intOrStr) UnmarshalJSON(raw []byte) error {
 		r.IntVal = 0
 		r.IsInt = false
 		return err
-	} else {
-		switch v := o.(type) {
-		case string:
-			r.StrVal = v
-		case float64:
-			r.IntVal = int(v)
-		default:
-			return fmt.Errorf("unexpected type %T", v)
-		}
-		return nil
 	}
+	switch v := o.(type) {
+	case string:
+		r.StrVal = v
+	case float64:
+		r.IsInt = true
+		r.IntVal = int(v)
+	default:
+		return fmt.Errorf("unexpected type %T", v)
+	}
+	return nil
 }
 
 type dashboardVariable struct {
 	Name       string         `yaml:"name" json:"name"`
 	Label      string         `yaml:"label,omitempty" json:"label,omitempty"`
-	Multi      bool           `yaml:"multi,omitempty" json:"multi,omitempty"`
-	IncludeAll bool           `yaml:"includeAll,omitempty" json:"includeAll,omitempty"`
-	Datasource *stringOrMap   `yaml:"datasource,omitempty" json:"datasource,omitempty"`
+	Multi      *boolOrStr     `yaml:"multi,omitempty" json:"multi,omitempty"`
+	IncludeAll *boolOrStr     `yaml:"includeAll,omitempty" json:"includeAll,omitempty"`
+	Datasource *strOrMap      `yaml:"datasource,omitempty" json:"datasource,omitempty"`
 	Type       string         `yaml:"type" json:"type"`
-	Query      *stringOrMap   `yaml:"query,omitempty" json:"query,omitempty"`
+	Query      *strOrMap      `yaml:"query,omitempty" json:"query,omitempty"`
 	Definition string         `yaml:"definition,omitempty" json:"definition,omitempty"`
 	Hide       intOrStr       `yaml:"hide,omitempty" json:"hide,omitempty"`
 	AllValue   string         `yaml:"allValue,omitempty" json:"allValue,omitempty"`
@@ -923,21 +972,21 @@ func patchDashboard(d *dashboard, name string) {
 		case "query":
 			var expr, args string
 			if t.Query != nil {
-				if len(t.Query.String) > 0 {
-					expr, args = patchExpr(t.Query.String, name, t.Name, "dashboards")
+				if len(t.Query.StrVal) > 0 {
+					expr, args = patchExpr(t.Query.StrVal, name, t.Name, "dashboards")
 					if t.Name == "cluster" {
 						expr = fmt.Sprintf(`<< ternary (printf %q %s) ".*" $multicluster >>`, expr, args)
 					} else if len(args) > 0 {
 						expr = fmt.Sprintf(`<< printf %q %s >>`, expr, args)
 					}
-					t.Query.String = expr
-				} else if len(t.Query.Map) > 0 {
-					if q, ok := t.Query.Map["query"]; ok {
+					t.Query.StrVal = expr
+				} else if len(t.Query.MapVal) > 0 {
+					if q, ok := t.Query.MapVal["query"]; ok {
 						expr, args = patchExpr(q.(string), name, t.Name, "dashboards")
-						t.Query.Map["query"] = expr
+						t.Query.MapVal["query"] = expr
 						if t.Name == "cluster" {
-							query := t.Query.Map
-							t.Query.Map = nil
+							query := t.Query.MapVal
+							t.Query.MapVal = nil
 							rawQueryByte, err := json.Marshal(query)
 							if err != nil {
 								log.Printf("failed to marshal json query in template")
@@ -948,12 +997,12 @@ func patchDashboard(d *dashboard, name string) {
 								rawQuery = fmt.Sprintf(`(printf %q %s)`, rawQuery, args)
 								expr = fmt.Sprintf(`<< ternary (printf %q %s) ".*" $multicluster >>`, expr, args)
 							}
-							t.Query.String = fmt.Sprintf(`<< ternary %s ".*" $multicluster >>`, rawQuery)
+							t.Query.StrVal = fmt.Sprintf(`<< ternary %s ".*" $multicluster >>`, rawQuery)
 						} else {
 							if len(args) > 0 {
 								expr = fmt.Sprintf(`<< printf %q %s >>`, expr, args)
 							}
-							t.Query.Map["query"] = expr
+							t.Query.MapVal["query"] = expr
 						}
 					}
 				}
@@ -963,11 +1012,11 @@ func patchDashboard(d *dashboard, name string) {
 			}
 		case "datasource":
 			if t.Query != nil {
-				if len(t.Query.String) > 0 && t.Query.String == dsName {
-					t.Query.String = "<< $defaultDatasource >>"
-				} else if len(t.Query.Map) > 0 {
-					if q, ok := t.Query.Map["query"]; ok && q == dsName {
-						t.Query.Map["query"] = "<< $defaultDatasource >>"
+				if len(t.Query.StrVal) > 0 && t.Query.StrVal == dsName {
+					t.Query.StrVal = "<< $defaultDatasource >>"
+				} else if len(t.Query.MapVal) > 0 {
+					if q, ok := t.Query.MapVal["query"]; ok && q == dsName {
+						t.Query.MapVal["query"] = "<< $defaultDatasource >>"
 					}
 				}
 			}
@@ -987,8 +1036,8 @@ func patchDashboard(d *dashboard, name string) {
 			log.Printf("no cluster variable found for dashboard %q, also no metrics provided as a source for this label", name)
 			return
 		}
-		ds := &stringOrMap{
-			Map: map[string]any{
+		ds := &strOrMap{
+			MapVal: map[string]any{
 				"type": dsName,
 			},
 		}
@@ -1000,24 +1049,28 @@ func patchDashboard(d *dashboard, name string) {
 			Hide: intOrStr{
 				StrVal: "<< ternary 0 2 $multicluster >>",
 			},
-			Query: &stringOrMap{
-				String: fmt.Sprintf(`<< ternary (printf "label_values(%s, %%s)" $clusterLabel) ".*" $multicluster >>`, metric),
+			Query: &strOrMap{
+				StrVal: fmt.Sprintf(`<< ternary (printf "label_values(%s, %%s)" $clusterLabel) ".*" $multicluster >>`, metric),
 			},
 			Datasource: ds,
-			Multi:      true,
-			IncludeAll: true,
-			AllValue:   ".*",
+			Multi: &boolOrStr{
+				StrVal: "<< ternary true false $multicluster >>",
+			},
+			IncludeAll: &boolOrStr{
+				StrVal: "<< ternary true false $multicluster >>",
+			},
+			AllValue: ".*",
 		}
 		d.Templating.List = append(d.Templating.List, v)
 	}
 }
 
-func patchDatasource(d *stringOrMap, dsName string) {
+func patchDatasource(d *strOrMap, dsName string) {
 	if d == nil {
 		return
 	}
-	if len(d.Map) > 0 && d.Map["type"] == dsName {
-		d.Map["type"] = "<< $defaultDatasource >>"
+	if len(d.MapVal) > 0 && d.MapVal["type"] == dsName {
+		d.MapVal["type"] = "<< $defaultDatasource >>"
 	}
 }
 

@@ -3,7 +3,7 @@
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+{{- range (($Values.defaultDatasources).victoriametrics).datasources | default list }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
 title: VictoriaMetrics - operator
@@ -12,6 +12,7 @@ templating:
   - name: ds
     type: datasource
     query: {{ $defaultDatasource }}
+    hide: 0
     current: {}
     options: []
     queryValue: te
@@ -27,6 +28,7 @@ templating:
       query: label_values(operator_log_messages_total, job)
       refId: StandardVariableQuery
     definition: label_values(operator_log_messages_total, job)
+    hide: 0
     current: {}
     options: []
     refresh: 2
@@ -43,6 +45,7 @@ templating:
       query: {{ printf "label_values(operator_log_messages_total{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: StandardVariableQuery
     definition: {{ printf "label_values(operator_log_messages_total{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
+    hide: 0
     current: {}
     options: []
     refresh: 2
@@ -58,7 +61,7 @@ templating:
       query: {{ printf "label_values(vm_app_version{job=\"$job\",instance=\"$instance\",%s=~\"$cluster\"}, version)" $clusterLabel }}
       refId: StandardVariableQuery
     definition: {{ printf "label_values(vm_app_version{job=\"$job\",instance=\"$instance\",%s=~\"$cluster\"}, version)" $clusterLabel }}
-    hide: ""
+    hide: 2
     current: {}
     options: []
     refresh: 1
@@ -74,8 +77,8 @@ templating:
     filters: []
   - name: cluster
     label: cluster
-    multi: true
-    includeAll: true
+    multi: {{ ternary true false $multicluster }}
+    includeAll: {{ ternary true false $multicluster }}
     datasource:
       type: {{ $defaultDatasource }}
     type: {{ ternary "query" "constant" $multicluster }}

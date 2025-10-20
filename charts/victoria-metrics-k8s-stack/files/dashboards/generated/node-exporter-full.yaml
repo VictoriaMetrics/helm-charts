@@ -3,7 +3,7 @@
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+{{- range (($Values.defaultDatasources).victoriametrics).datasources | default list }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
 title: Node Exporter Full
@@ -63,8 +63,8 @@ templating:
     sort: 1
   - name: cluster
     label: cluster
-    multi: true
-    includeAll: true
+    multi: {{ ternary true false $multicluster }}
+    includeAll: {{ ternary true false $multicluster }}
     datasource:
       type: {{ $defaultDatasource }}
     type: {{ ternary "query" "constant" $multicluster }}

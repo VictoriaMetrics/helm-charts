@@ -3,7 +3,7 @@
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+{{- range (($Values.defaultDatasources).victoriametrics).datasources | default list }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
 title: Kubernetes / Views / Namespaces
@@ -12,6 +12,7 @@ templating:
   - name: datasource
     type: datasource
     query: {{ $defaultDatasource }}
+    hide: 0
     current: {}
     options: []
     queryValue: ""
@@ -43,6 +44,7 @@ templating:
       query: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
       refId: StandardVariableQuery
     definition: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
+    hide: 0
     allValue: .*
     current: {}
     options: []
@@ -56,6 +58,7 @@ templating:
   - name: resolution
     type: custom
     query: 1s, 15s, 30s, 1m, 3m, 5m
+    hide: 0
     current:
       selected: false
       text: 30s
@@ -92,6 +95,7 @@ templating:
       query: {{ printf "label_values(kube_pod_info{namespace=~\"$namespace\",%s=~\"$cluster\"}, created_by_name)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
     definition: {{ printf "label_values(kube_pod_info{namespace=~\"$namespace\",%s=~\"$cluster\"}, created_by_name)" $clusterLabel }}
+    hide: 0
     allValue: .*
     current: {}
     description: Can be used to filter on a specific deployment, statefulset or deamonset (only relevant panels).

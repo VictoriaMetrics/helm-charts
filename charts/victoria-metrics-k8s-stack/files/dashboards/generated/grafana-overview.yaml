@@ -3,7 +3,7 @@
 {{- $multicluster := ((($Values.grafana).sidecar).dashboards).multicluster | default false }}
 {{- $defaultDatasource := "prometheus" -}}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- range (((($Values.grafana).sidecar).datasources).victoriametrics | default list) }}
+{{- range (($Values.defaultDatasources).victoriametrics).datasources | default list }}
   {{- if and .isDefault .type }}{{ $defaultDatasource = .type }}{{- end }}
 {{- end }}
 title: Grafana Overview
@@ -12,6 +12,7 @@ templating:
   - name: datasource
     type: datasource
     query: {{ $defaultDatasource }}
+    hide: 0
     current:
       selected: true
       text: dev-cortex
@@ -32,6 +33,7 @@ templating:
       query: label_values(grafana_build_info, job)
       refId: Billing Admin-job-Variable-Query
     definition: label_values(grafana_build_info, job)
+    hide: 0
     allValue: .*
     current:
       selected: false
@@ -58,6 +60,7 @@ templating:
       query: label_values(grafana_build_info, instance)
       refId: Billing Admin-instance-Variable-Query
     definition: label_values(grafana_build_info, instance)
+    hide: 0
     allValue: .*
     current:
       selected: false
@@ -75,8 +78,8 @@ templating:
     useTags: false
   - name: cluster
     label: cluster
-    multi: true
-    includeAll: true
+    multi: {{ ternary true false $multicluster }}
+    includeAll: {{ ternary true false $multicluster }}
     datasource:
       type: {{ $defaultDatasource }}
     type: {{ ternary "query" "constant" $multicluster }}
