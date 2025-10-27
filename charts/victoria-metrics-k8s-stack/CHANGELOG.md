@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.61.11
+
+**Release date:** 27 Oct 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.128.0](https://img.shields.io/badge/v1.128.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11280)
+
 - synced rules and dashboards with a fix for [#2493](https://github.com/VictoriaMetrics/helm-charts/issues/2493) and with outdated scheduler metrics removed.
 
 ## 0.61.10
