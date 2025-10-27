@@ -75,7 +75,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(scheduler_e2e_scheduling_duration_seconds_count{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(scheduler_scheduling_attempt_duration_seconds_count{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance)" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} e2e'
   - datasource:
       type: {{ $defaultDatasource }}
@@ -126,7 +126,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,le))" $clusterLabel $clusterLabel }}
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(scheduler_scheduling_attempt_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,le))" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} e2e'
   - datasource:
       type: {{ $defaultDatasource }}

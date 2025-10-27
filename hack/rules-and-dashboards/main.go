@@ -306,7 +306,7 @@ var sources = []source{
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml",
+		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/automated-updates-main/manifests/grafana-dashboardDefinitions.yaml",
 		kind: "dashboards",
 		charts: []string{
 			"victoria-metrics-k8s-stack",
@@ -331,35 +331,35 @@ common.grafanaDashboards
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/alertmanager-prometheusRule.yaml",
+		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/automated-updates-main/manifests/alertmanager-prometheusRule.yaml",
 		kind: "rules",
 		charts: []string{
 			"victoria-metrics-k8s-stack",
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetesControlPlane-prometheusRule.yaml",
+		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/automated-updates-main/manifests/kubernetesControlPlane-prometheusRule.yaml",
 		kind: "rules",
 		charts: []string{
 			"victoria-metrics-k8s-stack",
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubePrometheus-prometheusRule.yaml",
+		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/automated-updates-main/manifests/kubePrometheus-prometheusRule.yaml",
 		kind: "rules",
 		charts: []string{
 			"victoria-metrics-k8s-stack",
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubeStateMetrics-prometheusRule.yaml",
+		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/automated-updates-main/manifests/kubeStateMetrics-prometheusRule.yaml",
 		kind: "rules",
 		charts: []string{
 			"victoria-metrics-k8s-stack",
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/nodeExporter-prometheusRule.yaml",
+		url:  "https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/automated-updates-main/manifests/nodeExporter-prometheusRule.yaml",
 		kind: "rules",
 		charts: []string{
 			"victoria-metrics-k8s-stack",

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- synced rules and dashboards with a fix for [#2493](https://github.com/VictoriaMetrics/helm-charts/issues/2493) and with outdated scheduler metrics removed.
 
 ## 0.61.10
 
