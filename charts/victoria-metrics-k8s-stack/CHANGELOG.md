@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add cluster to query arguments list of default rule's `dashboard` annotation value.
 
 ## 0.61.11
 

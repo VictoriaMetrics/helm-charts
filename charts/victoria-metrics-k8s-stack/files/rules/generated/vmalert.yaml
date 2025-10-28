@@ -18,7 +18,7 @@ rules:
 - alert: AlertingRulesError
   expr: sum(increase(vmalert_alerting_rules_errors_total[5m])) without(id) > 0
   annotations:
-    dashboard: {{ $grafanaAddr }}/d/LzldHAVnz?viewPanel=13&var-instance={{`{{`}} $labels.instance {{`}}`}}&var-file={{`{{`}} $labels.file {{`}}`}}&var-group={{`{{`}} $labels.group {{`}}`}}
+    dashboard: {{ $grafanaAddr }}/d/LzldHAVnz?viewPanel=13&var-instance={{`{{`}} $labels.instance {{`}}`}}&var-file={{`{{`}} $labels.file {{`}}`}}&var-group={{`{{`}} $labels.group {{`}}`}}&var-cluster={{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}
     description: Alerting rules execution is failing for "{{`{{`}} $labels.alertname {{`}}`}}" from group "{{`{{`}} $labels.group {{`}}`}}" in file "{{`{{`}} $labels.file {{`}}`}}". Check vmalert's logs for detailed error message.
     summary: Alerting rules are failing for vmalert instance {{`{{`}} $labels.instance {{`}}`}}
   condition: true
@@ -28,7 +28,7 @@ rules:
 - alert: RecordingRulesError
   expr: sum(increase(vmalert_recording_rules_errors_total[5m])) without(id) > 0
   annotations:
-    dashboard: {{ $grafanaAddr }}/d/LzldHAVnz?viewPanel=30&var-instance={{`{{`}} $labels.instance {{`}}`}}&var-file={{`{{`}} $labels.file {{`}}`}}&var-group={{`{{`}} $labels.group {{`}}`}}
+    dashboard: {{ $grafanaAddr }}/d/LzldHAVnz?viewPanel=30&var-instance={{`{{`}} $labels.instance {{`}}`}}&var-file={{`{{`}} $labels.file {{`}}`}}&var-group={{`{{`}} $labels.group {{`}}`}}&var-cluster={{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}
     description: Recording rules execution is failing for "{{`{{`}} $labels.recording {{`}}`}}" from group "{{`{{`}} $labels.group {{`}}`}}" in file "{{`{{`}} $labels.file {{`}}`}}". Check vmalert's logs for detailed error message.
     summary: Recording rules are failing for vmalert instance {{`{{`}} $labels.instance {{`}}`}}
   condition: true
@@ -38,7 +38,7 @@ rules:
 - alert: RecordingRulesNoData
   expr: sum(vmalert_recording_rules_last_evaluation_samples) without(id) < 1
   annotations:
-    dashboard: {{ $grafanaAddr }}/d/LzldHAVnz?viewPanel=33&var-file={{`{{`}} $labels.file {{`}}`}}&var-group={{`{{`}} $labels.group {{`}}`}}
+    dashboard: {{ $grafanaAddr }}/d/LzldHAVnz?viewPanel=33&var-file={{`{{`}} $labels.file {{`}}`}}&var-group={{`{{`}} $labels.group {{`}}`}}&var-cluster={{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}
     description: Recording rule "{{`{{`}} $labels.recording {{`}}`}}" from group "{{`{{`}} $labels.group {{`}}`}} in file "{{`{{`}} $labels.file {{`}}`}}" produces 0 samples over the last 30min. It might be caused by a misconfiguration or incorrect query expression.
     summary: Recording rule {{`{{`}} $labels.recording {{`}}`}} ({{`{{`}} $labels.group {{`}}`}}) produces no data
   condition: true

@@ -772,7 +772,8 @@ func collectRules(vm *jsonnet.VM, raw []byte, src *source) (map[string][]byte, e
 				case strings.HasPrefix(av, "https://runbooks.prometheus-operator.dev/runbooks"):
 					r.Annotations[ak] = strings.ReplaceAll(av, "https://runbooks.prometheus-operator.dev/runbooks", "<< $runbookUrl >>")
 				case strings.HasPrefix(av, "http://localhost:3000"):
-					r.Annotations[ak] = strings.ReplaceAll(av, "http://localhost:3000", "<< $grafanaAddr >>")
+					av = strings.ReplaceAll(av, "http://localhost:3000", "<< $grafanaAddr >>")
+					r.Annotations[ak] = av + "&var-cluster={{ $labels.<< $clusterLabel >> }}"
 				case strings.Contains(av, "$labels.cluster"):
 					r.Annotations[ak] = strings.ReplaceAll(av, "$labels.cluster", "$labels.<< $clusterLabel >>")
 				}
