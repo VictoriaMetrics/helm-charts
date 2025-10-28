@@ -42,6 +42,8 @@ spec:
             {{- $crd := . | fromYaml }}
             {{- $names = append $names $crd.spec.names.singular }}
           {{- end }}
+          command:
+            - kubectl
           args:
             - delete
             - {{ $names | sortAlpha | join "," }}

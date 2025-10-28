@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- set command for cleanup job. fixes [#2501](https://github.com/VictoriaMetrics/helm-charts/issues/2501).
 
 ## 0.54.0
 
