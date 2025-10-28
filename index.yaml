@@ -46975,6 +46975,59 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - set command for cleanup job. fixes [#2501](https://github.com/VictoriaMetrics/helm-charts/issues/2501).
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/operator/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/operator/changelog/
+      artifacthub.io/operator: "true"
+      artifacthub.io/readme: |
+        # VictoriaMetrics Operator Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-operator/)
+    apiVersion: v2
+    appVersion: v0.63.0
+    created: "2025-10-28T08:30:32.286144031Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    - condition: crds.plain
+      name: crds
+      repository: ""
+      version: 0.0.*
+    description: VictoriaMetrics Operator
+    digest: ab087f9ad96dbc3f26e1a03b9d338726a36bd05406db273fd543f4b9d944411e
+    home: https://github.com/VictoriaMetrics/operator
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-operator
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    - https://github.com/VictoriaMetrics/operator
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-operator-0.54.1/victoria-metrics-operator-0.54.1.tgz
+    version: 0.54.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - '**Update node 1**: CRDs generated with `.Values.crds.plain: false` are now specless. For this case operator is fully responsible for VM specs validation. This was done to decrease helm release secret size limit. This change affects `kubectl explain` users and tools, that are rely on CRD specs during input data validation. If this behaviour is not acceptable consider using either `victoria-metrics-operator-crds` chart for CRDs management or set `.Values.crds.plain: true` to use plain CRDs.'
         - Added `securityContext` to the `cleanup` job.
         - 'Make CRDs, that are rendered using template, specless. This allows to decrease size of k8s secret significantly. If this option is not acceptable for you consider installing CRDs separately using `victoria-metrics-operator-crds` chart or set `.Values.crds.plain: true` and `.Values.crds.upgrade.enabled: true` to use plain CRDs with upgrade job instead.'
@@ -57627,4 +57680,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2025-10-27T10:12:01.006111158Z"
+generated: "2025-10-28T08:30:32.288469038Z"
