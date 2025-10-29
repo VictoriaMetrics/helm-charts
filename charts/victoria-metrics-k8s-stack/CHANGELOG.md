@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- allow setting `.Values.victoria-metrics-operator.operator.useCustomConfigReloader` to `false`. This is required to continue using 3rd party config reloaders, which were [deprecated in operator](https://docs.victoriametrics.com/operator/changelog/#v0640).
 
 ## 0.62.0
 
