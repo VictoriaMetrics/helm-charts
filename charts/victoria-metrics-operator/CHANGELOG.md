@@ -1,6 +1,9 @@
 ## Next release
 
-- TODO
+**Update node 1**: operator now uses own config-reloader container image - [victoriametrics/operator:config-reloader](https://github.com/VictoriaMetrics/operator/tree/master/cmd/config-reloader).
+This change could be reverted by providing env variable `VM_USECUSTOMCONFIGRELOADER=false` to the operator binary.
+
+- updates operator to [v0.64.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.64.0) version
 
 ## 0.54.1
 
