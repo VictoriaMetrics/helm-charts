@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Use VM config reloader by default, as operator does starting 0.64.0. See [#2510](https://github.com/VictoriaMetrics/helm-charts/issues/2510).
 
 ## 0.55.0
 
