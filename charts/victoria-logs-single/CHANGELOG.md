@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed usage of `.vector.customConfigName`
 
 ## 0.11.16
 
