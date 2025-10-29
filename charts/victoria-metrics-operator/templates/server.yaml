@@ -61,10 +61,8 @@ spec:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: {{ .Chart.Name }}
-            {{- if .Values.operator.useCustomConfigReloader }}
             - name: VM_USECUSTOMCONFIGRELOADER
-              value: "true"
-            {{- end }}
+              value: "{{ .Values.operator.useCustomConfigReloader }}"
             {{- with (((.Values).global).image).registry }}
             - name: VM_CONTAINERREGISTRY
               value: {{ quote . }}

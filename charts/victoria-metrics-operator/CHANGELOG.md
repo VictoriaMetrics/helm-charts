@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- allow setting `.Values.operator.useCustomConfigReloader` to `false`
 
 ## 0.55.1
 
