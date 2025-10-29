@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- operator: use VM config reloader by default
+- prometheus-node-exporter: 4.48.0 -> 4.49.1
 
 ## 0.61.13
 
