@@ -1,6 +1,7 @@
 ## Next release
 
 - add cluster to query arguments list of default rule's `dashboard` annotation value.
+- updates operator to [v0.64.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.64.0) version.
 
 ## 0.61.11
 
