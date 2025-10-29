@@ -1,9 +1,0 @@
-
-{{- $Values := (.helm).Values | default .Values }}
-{{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
-{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels "cluster" }}
-{{- $groupLabels := join "," (uniq $additionalGroupByLabels) }}
-{{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
-name: ""
-rules: []
-condition: {{ true }}

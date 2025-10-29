@@ -125,6 +125,13 @@ var dashboardClusterMetric = map[string]string{
 	"node-exporter-full":            "node_uname_info",
 }
 
+var ruleGroupDashboard = map[string]string{
+	//"alertmanager.rules": "alertmanager-overview",
+	//"etcd":               "c2f4e12cdf69feb95caa41a5a1b423d9",
+	//"node-exporter":      "rYdddlPWk",
+	//"node-network":       "rYdddlPWk",
+}
+
 func (i *remoteImporter) Import(importedFrom, path string) (jsonnet.Contents, string, error) {
 	iu, err := url.Parse(importedFrom)
 	if err != nil {
@@ -206,7 +213,6 @@ type source struct {
 
 var sources = []source{
 	{
-		// TODO: change branch back to master once it's merged
 		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json",
 		kind: "dashboards",
 		charts: []string{
@@ -221,7 +227,6 @@ var sources = []source{
 		},
 	},
 	{
-		// TODO: change branch back to master once it's merged
 		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics-cluster.json",
 		kind: "dashboards",
 		charts: []string{
@@ -366,7 +371,6 @@ common.grafanaDashboards
 		},
 	},
 	{
-		// TODO: change branch back to master once it's merged
 		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-cluster.yml",
 		kind: "rules",
 		charts: []string{
@@ -395,7 +399,6 @@ common.grafanaDashboards
 		},
 	},
 	{
-		// TODO: change branch back to master once it's merged
 		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts.yml",
 		kind: "rules",
 		charts: []string{
@@ -432,16 +435,16 @@ type ruleSpec struct {
 }
 
 type ruleGroup struct {
-	Name  string         `yaml:"name"`
-	Rules []rule         `yaml:"rules"`
+	Name  string         `yaml:"name" json:"name"`
+	Rules []rule         `yaml:"rules" json:"rules"`
 	XXX   map[string]any `yaml:",inline"`
 }
 
 type rule struct {
-	Rule        string            `yaml:"rule,omitempty"`
-	Alert       string            `yaml:"alert,omitempty"`
-	Expr        string            `yaml:"expr"`
-	Annotations map[string]string `yaml:"annotations,omitempty"`
+	Rule        string            `yaml:"rule,omitempty" json:"rule,omitempty"`
+	Alert       string            `yaml:"alert,omitempty" json:"alert,omitempty"`
+	Expr        string            `yaml:"expr" json:"expr"`
+	Annotations map[string]string `yaml:"annotations,omitempty" json:"annotations,omitempty"`
 	XXX         map[string]any    `yaml:",inline"`
 }
 
@@ -765,6 +768,10 @@ func collectRules(vm *jsonnet.VM, raw []byte, src *source) (map[string][]byte, e
 	}
 	resources := make(map[string][]byte)
 	for n, g := range groups {
+		var dashboardLink string
+		if dashboard, ok := ruleGroupDashboard[g.Name]; ok {
+			dashboardLink = fmt.Sprintf(`<< $grafanaAddr >>/d/%s?{{ template "grafana.args" .CommonLabels }}`, dashboard)
+		}
 		for i := range g.Rules {
 			r := &g.Rules[i]
 			for ak, av := range r.Annotations {
@@ -776,6 +783,14 @@ func collectRules(vm *jsonnet.VM, raw []byte, src *source) (map[string][]byte, e
 					r.Annotations[ak] = av + "&var-cluster={{ $labels.<< $clusterLabel >> }}"
 				case strings.Contains(av, "$labels.cluster"):
 					r.Annotations[ak] = strings.ReplaceAll(av, "$labels.cluster", "$labels.<< $clusterLabel >>")
+				}
+			}
+			if len(r.Alert) > 0 {
+				if r.Annotations == nil {
+					r.Annotations = make(map[string]string)
+				}
+				if _, ok := r.Annotations["dashboard"]; !ok && len(dashboardLink) > 0 {
+					r.Annotations["dashboard"] = dashboardLink
 				}
 			}
 			expr, args := patchExpr(r.Expr, g.Name, r.Name(), "rules")

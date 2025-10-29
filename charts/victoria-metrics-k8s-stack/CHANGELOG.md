@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Fixed etcd rules rendering
 
 ## 0.61.12
 
