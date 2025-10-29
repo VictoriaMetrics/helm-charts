@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Updated k8s-stack dependency 0.61.7 -> 0.61.13
 
 ## 0.22.2
 
@@ -16,7 +16,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.127.0](https://img.shields.io/badge/v1.127.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%23v11270)
 
-- Updated k8s-stack dependency 0.61.6 -> 0.61.8
+- Updated k8s-stack dependency 0.61.6 -> 0.61.7
 
 ## 0.22.0
 
