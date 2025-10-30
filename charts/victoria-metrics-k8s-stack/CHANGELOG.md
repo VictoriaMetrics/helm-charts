@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- updates operator to [v0.64.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.64.1) version.
+- bump grafana dependency chart to version 10.1.4
 
 ## 0.62.1
 
