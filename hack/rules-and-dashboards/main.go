@@ -70,6 +70,10 @@ var rulesMap = map[string]string{
 	"kubernetes-system-scheduler":          "($Values.kubeScheduler).enabled",
 }
 
+var disabledGroups = map[string]bool{
+	"kube-prometheus-general.rules": true,
+}
+
 // Alerts map
 var alertsMap = map[string]string{
 	"KubeAPIDown":               "($Values.kubeApiServer).enabled",
@@ -713,6 +717,9 @@ func main() {
 		}
 
 		for n, data := range resources {
+			if _, ok := disabledGroups[n]; ok {
+				continue
+			}
 			if err := toFile(n, data, &src); err != nil {
 				log.Printf("failed to create %s: %s", src.kind, err)
 			}
