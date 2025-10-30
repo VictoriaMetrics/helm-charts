@@ -1,0 +1,173 @@
+---
+weight: 2
+title: VictoriaLogs Agent
+menu:
+  docs:
+    parent: helm
+    weight: 2
+    identifier: helm-victorialogs-agent
+url: /helm/victoria-logs-agent
+aliases:
+  - /helm/victorialogs-agent/index.html
+  - /helm/victorialogs-agent/
+tags:
+  - logs
+  - kubernetes
+---
+{{ template "chart.badges" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.prerequisites" . }}
+## Quick start
+
+This Helm chart deploys the log receiver agent as a StatefulSet or Deployment (configurable via values in the chart).
+It receives logs using [supported protocols](https://docs.victoriametrics.com/victorialogs/data-ingestion/)
+(for example: syslog, Elasticsearch, OpenTelemetry) from cluster workloads and forwards them to the configured VictoriaLogs destinations.
+If more than one destination is specified, collected logs are replicated to all configured destinations.
+
+- To quickly install single-node version of VictoriaLogs and `victoria-logs-agent`, see [these docs](https://docs.victoriametrics.com/helm/victoria-logs-single/#quick-start).
+- To start with a VictoriaLogs cluster and `victoria-logs-agent`, see [these docs](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#quick-start).
+
+## Chart configuration
+
+The simplest working configuration includes specifying the `remoteWrite` array and setting CPU and memory resources for the chart.
+
+Example of a minimal working configuration:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+```
+
+If multiple `remoteWrite` entries are defined, logs are replicated to all the specified destinations.
+
+### Basic auth
+
+If you need to use basic auth, define the secrets via environment variables and fill out the `basicAuth` object as shown below:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+    basicAuth:
+      passwordEnvKey: 'VL_PASSWORD'
+      usernameEnvKey: 'VL_USERNAME'
+
+env:
+  - name: VL_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: auth-secret
+        key: VL_PASSWORD
+  - name: VL_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: auth-secret
+        key: VL_USERNAME
+```
+
+### Multitenancy
+
+To define [tenant](https://docs.victoriametrics.com/victorialogs/#multitenancy), use `projectID` and `accountID` as shown below:
+
+```yaml
+remoteWrite:
+  - url: http://localhost:9428
+    projectID: 12
+    accountID: 42
+```
+
+### TLS
+
+To enable TLS verification for the remoteWrite target, you can specify the `tls` block inside each remoteWrite entry.
+
+At a minimum, you should provide the `caFile` path so that the agent can verify the server's TLS certificate.
+This is useful when the target endpoint uses a certificate signed by a custom or self-signed Certificate Authority (CA).
+
+```yaml
+remoteWrite:
+  - url: https://victoria-logs:9428
+    tls:
+      caFile: "/etc/tls/ca.crt"
+
+extraVolumes:
+  - name: tls-certs
+    secret:
+      secretName: tls-secret
+
+extraVolumeMounts:
+  - name: tls-certs
+    mountPath: /etc/tls
+    readOnly: true
+```
+
+If you want to disable TLS certificate verification (not recommended in production), you can set `insecureSkipVerify` to true.
+
+This will skip verification of the server's certificate and allow connecting to targets with self-signed or invalid certificates.
+
+```yaml
+remoteWrite:
+  - url: https://victoria-logs:9428
+    tls:
+      insecureSkipVerify: true
+```
+
+### Ignore fields
+
+VictoriaLogs efficiently compresses repeated values, such as pod and node labels.
+However, if you prefer not to store certain fields, you can ignore them using the `ignoreFields` option.
+For example:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+    ignoreFields:
+      - file
+      - kubernetes.container_id
+      - kubernetes.pod_annotations*
+      - kubernetes.node_labels*
+      - kubernetes.namespace_labels*
+      - kubernetes.pod_labels*
+```
+
+This allows you to exclude unnecessary or sensitive fields from being ingested.
+If sensitive data has already been ingested, see how to
+[exclude logs from search result](https://docs.victoriametrics.com/victorialogs/security-and-lb/#access-control-inside-a-single-tenant).
+
+### Extra fields
+
+You can add custom fields to your logs by including the `extraFields` section in your configuration.
+For example:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428/
+    extraFields:
+      zone: us-east1-c
+      source: victoria-logs-agent
+```
+
+This feature lets you attach metadata to every log entry,
+making it easier to filter, group, or analyze logs based on these additional attributes.
+
+{{ include "chart.installSection" . }}
+
+{{ include "chart.uninstallSection" . }}
+
+{{ include "chart.helmDocs" . }}
+
+## Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-logs-agent/values.yaml`` file.
+
+{{ template "chart.valuesTableHtml" . }}

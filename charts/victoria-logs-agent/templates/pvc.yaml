@@ -1,0 +1,36 @@
+{{/*
+Create PersistentVolumeClaim if enabled and not using existing claim in Deployment mode.
+*/}}
+{{- $pvc := .Values.persistentVolume }}
+{{- if and $pvc.enabled (not $pvc.existingClaim) (eq .Values.mode "deployment") }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "victoria-logs-agent.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "victoria-logs-agent.fullname" . }}
+    {{- with $pvc.extraLabels  }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $pvc.annotations  }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with $pvc.accessModes }}
+  accessModes:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $pvc.size }}
+  {{- with $pvc.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
+  {{- with $pvc.matchLabels }}
+  selector:
+    matchLabels:
+      {{- toYaml . | nindent 6 }}
+  {{- end }}
+{{- end }}
