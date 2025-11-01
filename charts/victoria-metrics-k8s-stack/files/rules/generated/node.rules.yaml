@@ -10,7 +10,7 @@ rules:
 - expr: {{ printf "topk(1, max(label_replace(kube_pod_info{job=\"kube-state-metrics\",node!=\"\"}, \"pod\", \"$1\", \"pod\", \"(.*)\")) by(%s,node,namespace,pod)) by(%s,namespace,pod)" $groupLabels $groupLabels }}
   condition: true
   record: 'node_namespace_pod:kube_pod_info:'
-- expr: {{ printf "count(node_cpu_seconds_total{mode=\"idle\",job=\"%s\"} * on(cluster,namespace,pod) group_left(node) topk(1, node_namespace_pod:kube_pod_info:) by(%s,namespace,pod)) by(%s,node)" (include "vm-k8s-stack.nodeExporter.name" .) $groupLabels $groupLabels }}
+- expr: {{ printf "count(node_cpu_seconds_total{mode=\"idle\",job=\"%s\"} * on(%s,namespace,pod) group_left(node) topk(1, node_namespace_pod:kube_pod_info:) by(%s,namespace,pod)) by(%s,node)" (include "vm-k8s-stack.nodeExporter.name" .) $groupLabels $groupLabels $groupLabels }}
   condition: true
   record: node:node_num_cpu:sum
 - expr: {{ printf "sum(node_memory_MemAvailable_bytes{job=\"%s\"} or (((node_memory_Buffers_bytes{job=\"%s\"} + node_memory_Cached_bytes{job=\"%s\"}) + node_memory_MemFree_bytes{job=\"%s\"}) + node_memory_Slab_bytes{job=\"%s\"})) by(%s)" (include "vm-k8s-stack.nodeExporter.name" .) (include "vm-k8s-stack.nodeExporter.name" .) (include "vm-k8s-stack.nodeExporter.name" .) (include "vm-k8s-stack.nodeExporter.name" .) (include "vm-k8s-stack.nodeExporter.name" .) $groupLabels }}

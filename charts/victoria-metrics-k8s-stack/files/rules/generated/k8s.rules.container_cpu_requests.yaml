@@ -7,10 +7,10 @@
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
 name: k8s.rules.container_cpu_requests
 rules:
-- expr: {{ printf "kube_pod_container_resource_requests{resource=\"cpu\",job=\"kube-state-metrics\"} * on(namespace,pod,cluster) group_left() max(kube_pod_status_phase{phase=~\"Pending|Running\"} == 1) by(namespace,pod,%s)" $groupLabels }}
+- expr: {{ printf "kube_pod_container_resource_requests{resource=\"cpu\",job=\"kube-state-metrics\"} * on(namespace,pod,%s) group_left() max(kube_pod_status_phase{phase=~\"Pending|Running\"} == 1) by(namespace,pod,%s)" $groupLabels $groupLabels }}
   condition: true
   record: cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests
-- expr: {{ printf "sum(sum(max(kube_pod_container_resource_requests{resource=\"cpu\",job=\"kube-state-metrics\"}) by(namespace,pod,container,%s) * on(namespace,pod,cluster) group_left() max(kube_pod_status_phase{phase=~\"Pending|Running\"} == 1) by(namespace,pod,%s)) by(namespace,pod,%s)) by(namespace,%s)" $groupLabels $groupLabels $groupLabels $groupLabels }}
+- expr: {{ printf "sum(sum(max(kube_pod_container_resource_requests{resource=\"cpu\",job=\"kube-state-metrics\"}) by(namespace,pod,container,%s) * on(namespace,pod,%s) group_left() max(kube_pod_status_phase{phase=~\"Pending|Running\"} == 1) by(namespace,pod,%s)) by(namespace,pod,%s)) by(namespace,%s)" $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels }}
   condition: true
   record: namespace_cpu:kube_pod_container_resource_requests:sum
 condition: true

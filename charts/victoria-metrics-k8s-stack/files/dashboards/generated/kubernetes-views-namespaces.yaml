@@ -1641,10 +1641,10 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kubelet_volume_stats_used_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s) / sum(kubelet_volume_stats_capacity_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "max(kubelet_volume_stats_used_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,namespace,%s) / max(kubelet_volume_stats_capacity_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
     interval: ""
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
+    legendFormat: '{{`{{`}} namespace {{`}}`}} - {{`{{`}} persistentvolumeclaim {{`}}`}}'
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
@@ -1714,19 +1714,19 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kubelet_volume_stats_used_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "max(kubelet_volume_stats_used_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,namespace,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: ""
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}} - Used'
+    legendFormat: '{{`{{`}} namespace {{`}}`}} - {{`{{`}} persistentvolumeclaim {{`}}`}} - Used'
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kubelet_volume_stats_capacity_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "max(kubelet_volume_stats_capacity_bytes{namespace=~\"$namespace\",%s=~\"$cluster\"}) by(persistentvolumeclaim,namespace,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     hide: false
     interval: ""
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}} - Capacity'
+    legendFormat: '{{`{{`}} namespace {{`}}`}} - {{`{{`}} persistentvolumeclaim {{`}}`}} - Capacity'
     refId: B
   datasource:
     type: {{ $defaultDatasource }}
@@ -2255,5 +2255,5 @@ time:
   to: now
 timepicker: {}
 uid: k8s_views_ns
-version: 43
+version: 44
 weekStart: ""

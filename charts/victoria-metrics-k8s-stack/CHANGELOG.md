@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- patch all expression `on` and `by` modifiers. See [#2524](https://github.com/VictoriaMetrics/helm-charts/issues/2524).
+- updates operator to [v0.65.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.65.0) version.
 
 ## 0.62.2
 

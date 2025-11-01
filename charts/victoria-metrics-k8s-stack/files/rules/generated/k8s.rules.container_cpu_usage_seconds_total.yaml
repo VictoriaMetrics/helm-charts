@@ -7,10 +7,10 @@
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
 name: k8s.rules.container_cpu_usage_seconds_total
 rules:
-- expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{job=\"kubelet\",metrics_path=\"/metrics/cadvisor\",image!=\"\"}[5m])) by(%s,namespace,pod,container) * on(cluster,namespace,pod) group_left(node) topk(1, max(kube_pod_info{node!=\"\"}) by(%s,namespace,pod,node)) by(%s,namespace,pod)" $groupLabels $groupLabels $groupLabels }}
+- expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{job=\"kubelet\",metrics_path=\"/metrics/cadvisor\",image!=\"\"}[5m])) by(%s,namespace,pod,container) * on(%s,namespace,pod) group_left(node) topk(1, max(kube_pod_info{node!=\"\"}) by(%s,namespace,pod,node)) by(%s,namespace,pod)" $groupLabels $groupLabels $groupLabels $groupLabels }}
   condition: true
   record: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m
-- expr: {{ printf "sum(irate(container_cpu_usage_seconds_total{job=\"kubelet\",metrics_path=\"/metrics/cadvisor\",image!=\"\"}[5m])) by(%s,namespace,pod,container) * on(cluster,namespace,pod) group_left(node) topk(1, max(kube_pod_info{node!=\"\"}) by(%s,namespace,pod,node)) by(%s,namespace,pod)" $groupLabels $groupLabels $groupLabels }}
+- expr: {{ printf "sum(irate(container_cpu_usage_seconds_total{job=\"kubelet\",metrics_path=\"/metrics/cadvisor\",image!=\"\"}[5m])) by(%s,namespace,pod,container) * on(%s,namespace,pod) group_left(node) topk(1, max(kube_pod_info{node!=\"\"}) by(%s,namespace,pod,node)) by(%s,namespace,pod)" $groupLabels $groupLabels $groupLabels $groupLabels }}
   condition: true
   record: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate
 condition: true

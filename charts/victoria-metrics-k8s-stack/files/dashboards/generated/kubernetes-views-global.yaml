@@ -27,7 +27,7 @@ templating:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "{\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\"}" $clusterLabel) ".*" $multicluster }}
+    query: {{ ternary (printf "{\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\",\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\"}" $clusterLabel) ".*" $multicluster }}
     definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current: {}
@@ -156,20 +156,9 @@ panels:
     editorMode: code
     exemplar: true
     interval: ""
-    legendFormat: Real Linux
+    legendFormat: Real
     range: true
-    refId: Real Linux
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "avg(sum(rate(windows_cpu_time_total{mode!=\"idle\",%s=~\"$cluster\"}[$__rate_interval])) by(core,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: ""
-    legendFormat: Real Windows
-    range: true
-    refId: Real Windows
+    refId: Real
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
@@ -229,30 +218,6 @@ panels:
     sizing: auto
     valueMode: color
   pluginVersion: 11.2.0
-  transformations:
-  - id: calculateField
-    options:
-      alias: Real
-      mode: reduceRow
-      reduce:
-        include:
-        - Real Linux
-        - Real Windows
-        reducer: mean
-  - id: organize
-    options:
-      excludeByName:
-        Real Linux: true
-        Real Windows: true
-        Time: true
-      indexByName:
-        Limits: 5
-        Real: 1
-        Real Linux: 2
-        Real Windows: 3
-        Requests: 4
-        Time: 0
-      renameByName: {}
   type: bargauge
 - title: Global RAM Usage
   targets:
@@ -264,19 +229,9 @@ panels:
     exemplar: true
     hide: false
     interval: ""
-    legendFormat: Real Linux
+    legendFormat: Real
     range: true
-    refId: Real Linux
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "sum(windows_memory_available_bytes{%s=~\"$cluster\"} + windows_memory_cache_bytes{%s=~\"$cluster\"}) by(%s) / sum(windows_os_visible_memory_bytes{%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    interval: ""
-    legendFormat: Real Windows
-    range: true
-    refId: Real Windows
+    refId: Real
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
@@ -338,31 +293,6 @@ panels:
     text: {}
     valueMode: color
   pluginVersion: 11.2.0
-  transformations:
-  - id: calculateField
-    options:
-      alias: Real
-      mode: reduceRow
-      reduce:
-        include:
-        - Real Linux
-        - Real Windows
-        reducer: mean
-  - id: organize
-    options:
-      excludeByName:
-        Real Linux: true
-        Real Windows: true
-        Time: true
-      includeByName: {}
-      indexByName:
-        Limits: 5
-        Real: 3
-        Real Linux: 1
-        Real Windows: 2
-        Requests: 4
-        Time: 0
-      renameByName: {}
   type: bargauge
 - title: Nodes
   targets:
@@ -643,20 +573,9 @@ panels:
     editorMode: code
     exemplar: true
     interval: ""
-    legendFormat: Real Linux
+    legendFormat: Real
     range: true
-    refId: Real Linux
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "sum(rate(windows_cpu_time_total{mode!=\"idle\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: ""
-    legendFormat: Real Windows
-    range: true
-    refId: Real Windows
+    refId: Real
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
@@ -720,35 +639,6 @@ panels:
     textMode: auto
     wideLayout: true
   pluginVersion: 11.2.0
-  transformations:
-  - id: calculateField
-    options:
-      alias: Real
-      mode: reduceRow
-      reduce:
-        include:
-        - Real Linux
-        - Real Windows
-        reducer: sum
-  - id: organize
-    options:
-      excludeByName:
-        Real Linux: true
-        Real Windows: true
-        Time: true
-        Total Linux: true
-        Total Windows: true
-      indexByName:
-        Limits: 5
-        Real: 3
-        Real Linux: 1
-        Real Windows: 2
-        Requests: 4
-        Time: 0
-        Total: 8
-        Total Linux: 6
-        Total Windows: 7
-      renameByName: {}
   type: stat
 - title: RAM Usage
   targets:
@@ -759,20 +649,9 @@ panels:
     editorMode: code
     exemplar: true
     interval: ""
-    legendFormat: Real Linux
+    legendFormat: Real
     range: true
-    refId: Real Linux
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "sum((windows_os_visible_memory_bytes{%s=~\"$cluster\"} - windows_memory_available_bytes{%s=~\"$cluster\"}) - windows_memory_cache_bytes{%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: ""
-    legendFormat: Real Windows
-    range: true
-    refId: Real Windows
+    refId: Real
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
@@ -836,32 +715,6 @@ panels:
     textMode: auto
     wideLayout: true
   pluginVersion: 11.2.0
-  transformations:
-  - id: calculateField
-    options:
-      alias: Real
-      mode: reduceRow
-      reduce:
-        include:
-        - Real Linux
-        - Real Windows
-        reducer: mean
-  - id: organize
-    options:
-      excludeByName:
-        Real Linux: true
-        Real Windows: true
-        Time: true
-      includeByName: {}
-      indexByName:
-        Limits: 5
-        Real: 3
-        Real Linux: 1
-        Real Windows: 2
-        Requests: 4
-        Time: 0
-        Total: 6
-      renameByName: {}
   type: stat
 - title: Running Pods
   targets:
@@ -929,20 +782,9 @@ panels:
     editorMode: code
     exemplar: true
     interval: $resolution
-    legendFormat: Linux
+    legendFormat: CPU usage in %
     range: true
-    refId: Linux
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "1 - avg(rate(windows_cpu_time_total{%s=~\"$cluster\",mode=\"idle\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: Windows
-    range: true
-    refId: Windows
+    refId: A
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -1028,20 +870,9 @@ panels:
     editorMode: code
     exemplar: true
     interval: $resolution
-    legendFormat: Linux
+    legendFormat: Memory usage in %
     range: true
-    refId: Linux
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "sum(windows_os_visible_memory_bytes{%s=~\"$cluster\"} - windows_memory_available_bytes{%s=~\"$cluster\"}) by(%s) / sum(windows_os_visible_memory_bytes{%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: Windows
-    range: true
-    refId: Windows
+    refId: A
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -1123,7 +954,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s) + on(namespace) sum((rate(windows_container_cpu_usage_seconds_total{container_id!=\"\",%s=~\"$cluster\"}[$__rate_interval]) * on(container_id) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     format: time_series
@@ -1207,7 +1038,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(container_memory_working_set_bytes{image!=\"\",%s=~\"$cluster\"}) by(namespace,%s) + on(namespace) sum((windows_container_memory_usage_commit_bytes{container_id!=\"\",%s=~\"$cluster\"} * on(container_id) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(container_memory_working_set_bytes{image!=\"\",%s=~\"$cluster\"}) by(namespace,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: $resolution
@@ -1292,18 +1123,7 @@ panels:
     interval: $resolution
     legendFormat: '{{`{{`}} node {{`}}`}}'
     range: true
-    refId: Linux
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "avg(sum(rate(windows_cpu_time_total{mode!=\"idle\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,core,%s)) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: '{{`{{`}} node {{`}}`}}'
-    range: true
-    refId: Windows
+    refId: A
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -1384,18 +1204,7 @@ panels:
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
     range: true
-    refId: Linux
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "sum(windows_os_visible_memory_bytes{%s=~\"$cluster\"} - windows_memory_available_bytes{%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: '{{`{{`}} instance {{`}}`}}'
-    range: true
-    refId: Windows
+    refId: A
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -1988,7 +1797,7 @@ panels:
     interval: $resolution
     legendFormat: 'Received : {{`{{`}} device {{`}}`}}'
     range: true
-    refId: Linux Received
+    refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
@@ -1998,29 +1807,7 @@ panels:
     interval: $resolution
     legendFormat: 'Transmitted : {{`{{`}} device {{`}}`}}'
     range: true
-    refId: Linux Transmitted
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "sum(rate(windows_net_bytes_received_total{%s=~\"$cluster\"}[$__rate_interval])) by(nic,%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: 'Received : {{`{{`}} nic {{`}}`}}'
-    range: true
-    refId: Windows Received
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "0 - sum(rate(windows_net_bytes_sent_total{%s=~\"$cluster\"}[$__rate_interval])) by(nic,%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: 'Transmitted : {{`{{`}} device {{`}}`}}'
-    range: true
-    refId: Windows Transmitted
+    refId: B
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -2093,9 +1880,9 @@ panels:
     editorMode: code
     exemplar: true
     interval: $resolution
-    legendFormat: Linux Packets dropped (receive)
+    legendFormat: Packets dropped (receive)
     range: true
-    refId: Linux Packets dropped (receive)
+    refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
@@ -2103,31 +1890,9 @@ panels:
     editorMode: code
     exemplar: true
     interval: $resolution
-    legendFormat: Linux Packets dropped (transmit)
+    legendFormat: Packets dropped (transmit)
     range: true
-    refId: Linux Packets dropped (transmit)
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "sum(rate(windows_net_packets_received_discarded_total{%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: Windows Packets dropped (receive)
-    range: true
-    refId: Windows Packets dropped (receive)
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "0 - sum(rate(windows_net_packets_outbound_discarded_total{%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: Windows Packets dropped (transmit)
-    range: true
-    refId: Windows Packets dropped (transmit)
+    refId: B
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -2189,43 +1954,14 @@ panels:
       mode: multi
       sort: none
   pluginVersion: 8.3.3
-  transformations:
-  - id: calculateField
-    options:
-      alias: Packets dropped (receive)
-      mode: reduceRow
-      reduce:
-        include:
-        - Linux Packets dropped (receive)
-        - Windows Packets dropped (receive)
-        reducer: mean
-  - id: calculateField
-    options:
-      alias: Packets dropped (transmit)
-      mode: reduceRow
-      reduce:
-        include:
-        - Linux Packets dropped (transmit)
-        - Windows Packets dropped (transmit)
-        reducer: mean
-  - id: organize
-    options:
-      excludeByName:
-        Linux Packets dropped (receive): true
-        Linux Packets dropped (transmit): true
-        Time: false
-        Windows Packets dropped (receive): true
-        Windows Packets dropped (transmit): true
-      includeByName: {}
-      indexByName: {}
-      renameByName: {}
+  transformations: []
   type: timeseries
 - title: Network Received by namespace
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(container_network_receive_bytes_total{%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s) + on(namespace) sum((rate(windows_container_network_receive_bytes_total{container_id!=\"\",%s=~\"$cluster\"}[$__rate_interval]) * on(container_id) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(container_network_receive_bytes_total{%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: $resolution
@@ -2235,7 +1971,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "0 - (sum(rate(container_network_transmit_bytes_total{%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s) + on(namespace) sum((rate(windows_container_network_transmit_bytes_total{container_id!=\"\",%s=~\"$cluster\"}[$__rate_interval]) * on(container_id) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "0 - sum(rate(container_network_transmit_bytes_total{%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
     interval: $resolution
@@ -2315,7 +2051,7 @@ panels:
     interval: $resolution
     legendFormat: Received bytes in {{`{{`}} instance {{`}}`}}
     range: true
-    refId: Linux Received bytes
+    refId: A
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
@@ -2325,28 +2061,7 @@ panels:
     interval: $resolution
     legendFormat: Transmitted bytes in {{`{{`}} instance {{`}}`}}
     range: true
-    refId: Linux Transmitted bytes
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "sum(rate(windows_net_bytes_received_total{%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: Received bytes in {{`{{`}} instance {{`}}`}}
-    range: true
-    refId: Windows Received bytes
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "0 - sum(rate(windows_net_bytes_sent_total{%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    hide: false
-    interval: $resolution
-    legendFormat: Transmitted bytes in {{`{{`}} instance {{`}}`}}
-    range: true
-    refId: Windows Transmitted bytes
+    refId: B
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -2431,28 +2146,6 @@ panels:
     legendFormat: Transmitted bytes in {{`{{`}} instance {{`}}`}}
     range: true
     refId: B
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "sum(rate(windows_net_bytes_received_total{nic!~\".*Virtual.*\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: Received bytes in {{`{{`}} instance {{`}}`}}
-    range: true
-    refId: C
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${datasource}
-    expr: {{ printf "0 - sum(rate(windows_net_bytes_sent_total{nic!~\".*Virtual.*\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
-    interval: $resolution
-    legendFormat: Transmitted bytes in {{`{{`}} instance {{`}}`}}
-    range: true
-    refId: D
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${datasource}
@@ -2643,5 +2336,5 @@ time:
   to: now
 timepicker: {}
 uid: k8s_views_global
-version: 43
+version: 44
 weekStart: ""

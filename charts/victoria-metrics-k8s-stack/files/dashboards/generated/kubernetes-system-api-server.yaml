@@ -27,7 +27,7 @@ templating:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "{\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\"}" $clusterLabel) ".*" $multicluster }}
+    query: {{ ternary (printf "{\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\",\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\"}" $clusterLabel) ".*" $multicluster }}
     definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current:
@@ -69,6 +69,24 @@ templating:
       value: 5m
     queryValue: ""
     skipUrlSync: false
+  - name: job
+    multi: true
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${datasource}
+    type: query
+    query:
+      qryType: 1
+      query: {{ printf "label_values(apiserver_request_total{%s=~\"$cluster\"}, job)" $clusterLabel }}
+      refId: PrometheusVariableQueryEditor-VariableQuery
+    definition: {{ printf "label_values(apiserver_request_total{%s=~\"$cluster\"}, job)" $clusterLabel }}
+    hide: 0
+    current: {}
+    options: []
+    refresh: 1
+    regex: ""
+    skipUrlSync: false
+    sort: 1
 editable: false
 timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
 tags:
@@ -123,7 +141,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "up{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}" $clusterLabel }}
+    expr: {{ printf "up{%s=~\"$cluster\",job=~\"$job\"}" $clusterLabel }}
     exemplar: true
     interval: ""
     legendFormat: '{{`{{`}} instance {{`}}`}}'
@@ -418,7 +436,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(apiserver_request_duration_seconds_sum{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s) / sum(rate(apiserver_request_duration_seconds_count{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(apiserver_request_duration_seconds_sum{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(instance,%s) / sum(rate(apiserver_request_duration_seconds_count{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
@@ -487,7 +505,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(apiserver_request_duration_seconds_sum{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(verb,%s) / sum(rate(apiserver_request_duration_seconds_count{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(verb,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(apiserver_request_duration_seconds_sum{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(verb,%s) / sum(rate(apiserver_request_duration_seconds_count{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(verb,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} verb {{`}}`}}'
@@ -556,7 +574,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(apiserver_request_total{code=~\"5..\",job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s) / sum(rate(apiserver_request_total{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(apiserver_request_total{code=~\"5..\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(instance,%s) / sum(rate(apiserver_request_total{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
@@ -625,7 +643,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(apiserver_request_total{code=~\"5..\",job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(verb,%s) / sum(rate(apiserver_request_total{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(verb,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(apiserver_request_total{code=~\"5..\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(verb,%s) / sum(rate(apiserver_request_total{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(verb,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} verb {{`}}`}}'
@@ -763,7 +781,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(workqueue_depth{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(workqueue_depth{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
@@ -832,7 +850,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "rate(process_cpu_seconds_total{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    expr: {{ printf "rate(process_cpu_seconds_total{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])" $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
@@ -902,7 +920,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "process_resident_memory_bytes{job=~\"kubernetes-apiservers|apiserver\",%s=~\"$cluster\"}" $clusterLabel }}
+    expr: {{ printf "process_resident_memory_bytes{%s=~\"$cluster\",job=~\"$job\"}" $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
@@ -1005,5 +1023,5 @@ time:
   to: now
 timepicker: {}
 uid: k8s_system_apisrv
-version: 19
+version: 20
 weekStart: ""

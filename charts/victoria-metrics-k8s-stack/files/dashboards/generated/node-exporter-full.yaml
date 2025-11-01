@@ -1262,7 +1262,7 @@ panels:
       range: true
       refId: H
       step: 240
-    - expr: {{ printf "(sum(irate(node_cpu_guest_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s) / on(instance) group_left() sum(irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)) > 0" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(sum(irate(node_cpu_guest_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s) / on(instance,%s) group_left() sum(irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)) > 0" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Guest CPU usage
@@ -5803,7 +5803,7 @@ panels:
   panels:
   - title: Hardware Temperature Monitor
     targets:
-    - expr: {{ printf "node_hwmon_temp_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "node_hwmon_temp_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip,%s) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -5811,14 +5811,14 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "node_hwmon_temp_crit_alarm_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "node_hwmon_temp_crit_alarm_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip,%s) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel $clusterLabel }}
       format: time_series
       hide: true
       interval: ""
       legendFormat: '{{`{{`}} chip_name {{`}}`}} {{`{{`}} sensor {{`}}`}} Critical Alarm'
       refId: B
       step: 240
-    - expr: {{ printf "node_hwmon_temp_crit_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "node_hwmon_temp_crit_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip,%s) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -5826,14 +5826,14 @@ panels:
       range: true
       refId: C
       step: 240
-    - expr: {{ printf "node_hwmon_temp_crit_hyst_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "node_hwmon_temp_crit_hyst_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip,%s) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel $clusterLabel }}
       format: time_series
       hide: true
       interval: ""
       legendFormat: '{{`{{`}} chip_name {{`}}`}} {{`{{`}} sensor {{`}}`}} Critical Historical'
       refId: D
       step: 240
-    - expr: {{ printf "node_hwmon_temp_max_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "node_hwmon_temp_max_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip,%s) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel $clusterLabel }}
       format: time_series
       hide: true
       interval: ""
@@ -6080,7 +6080,7 @@ panels:
     type: timeseries
   - title: Hardware Fan Speed
     targets:
-    - expr: {{ printf "node_hwmon_fan_rpm{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "node_hwmon_fan_rpm{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip,%s) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -6088,7 +6088,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "node_hwmon_fan_min_rpm{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "node_hwmon_fan_min_rpm{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip,%s) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       hide: true

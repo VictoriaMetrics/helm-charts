@@ -27,7 +27,7 @@ templating:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "{\"query\":\"label_values(kube_node_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\",\"qryType\":1}" $clusterLabel) ".*" $multicluster }}
+    query: {{ ternary (printf "{\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\"}" $clusterLabel) ".*" $multicluster }}
     definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current:
@@ -388,7 +388,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(coredns_dns_requests_total{instance=~\"$instance\",proto=\"$protocol\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(coredns_dns_requests_total{instance=~\"$instance\",proto=\"$protocol\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: total $protocol requests
@@ -459,7 +459,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(coredns_dns_request_size_bytes_sum{instance=~\"$instance\",proto=\"$protocol\",%s=~\"$cluster\"}[$__rate_interval])) by(proto,%s) / sum(rate(coredns_dns_request_size_bytes_count{instance=~\"$instance\",proto=\"$protocol\",%s=~\"$cluster\"}[$__rate_interval])) by(proto,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(coredns_dns_request_size_bytes_sum{instance=~\"$instance\",proto=\"$protocol\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(proto,%s) / sum(rate(coredns_dns_request_size_bytes_count{instance=~\"$instance\",proto=\"$protocol\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(proto,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: average $protocol packet size
@@ -530,7 +530,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(coredns_dns_requests_total{instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(coredns_dns_requests_total{instance=~\"$instance\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} type {{`}}`}}'
@@ -601,7 +601,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(coredns_dns_responses_total{instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(rcode,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(coredns_dns_responses_total{instance=~\"$instance\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(rcode,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} rcode {{`}}`}}'
@@ -672,7 +672,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(coredns_proxy_request_duration_seconds_count{proxy_name=\"forward\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(coredns_proxy_request_duration_seconds_count{proxy_name=\"forward\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: total forward requests
@@ -743,7 +743,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(coredns_proxy_request_duration_seconds_count{proxy_name=\"forward\",rcode=~\"SERVFAIL|REFUSED\",%s=~\"$cluster\"}[$__rate_interval])) by(rcode,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(coredns_proxy_request_duration_seconds_count{proxy_name=\"forward\",rcode=~\"SERVFAIL|REFUSED\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(rcode,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} rcode {{`}}`}}'
@@ -814,7 +814,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(coredns_cache_hits_total{instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(coredns_cache_hits_total{instance=~\"$instance\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} type {{`}}`}}'
@@ -822,7 +822,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(coredns_cache_misses_total{instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(coredns_cache_misses_total{instance=~\"$instance\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: misses
@@ -893,7 +893,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(coredns_cache_entries{%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(coredns_cache_entries{%s=~\"$cluster\",job=~\"$job\"}) by(type,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: ""
     legendFormat: '{{`{{`}} type {{`}}`}}'
@@ -964,7 +964,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(increase(coredns_dns_request_duration_seconds_bucket{instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(le,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(increase(coredns_dns_request_duration_seconds_bucket{instance=~\"$instance\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(le,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: heatmap
     legendFormat: '{{`{{`}}le{{`}}`}}'
@@ -1023,7 +1023,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(increase(coredns_dns_request_size_bytes_bucket{instance=~\"$instance\",le!=\"0\",%s=~\"$cluster\"}[$__rate_interval])) by(le,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(increase(coredns_dns_request_size_bytes_bucket{instance=~\"$instance\",le!=\"0\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(le,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: heatmap
     legendFormat: '{{`{{`}}le{{`}}`}}'
@@ -1082,7 +1082,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(increase(coredns_dns_response_size_bytes_bucket{instance=~\"$instance\",le!=\"0\",%s=~\"$cluster\"}[$__rate_interval])) by(le,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(increase(coredns_dns_response_size_bytes_bucket{instance=~\"$instance\",le!=\"0\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(le,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: heatmap
     legendFormat: '{{`{{`}}le{{`}}`}}'
@@ -1174,5 +1174,5 @@ time:
   to: now
 timepicker: {}
 uid: k8s_system_coredns
-version: 21
+version: 22
 weekStart: ""

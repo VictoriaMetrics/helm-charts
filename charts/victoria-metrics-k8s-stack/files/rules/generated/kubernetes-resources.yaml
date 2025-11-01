@@ -78,7 +78,7 @@ rules:
   labels:
     severity: warning
 - alert: CPUThrottlingHigh
-  expr: {{ printf "(sum(topk(1, increase(container_cpu_cfs_throttled_periods_total{container!=\"\",job=\"kubelet\",metrics_path=\"/metrics/cadvisor\"}[5m])) by(%s,namespace,pod,container,instance)) without(id,metrics_path,name,image,endpoint,job,node) / on(cluster,namespace,pod,container,instance) group_left() sum(topk(1, increase(container_cpu_cfs_periods_total{job=\"kubelet\",metrics_path=\"/metrics/cadvisor\"}[5m])) by(%s,namespace,pod,container,instance)) without(id,metrics_path,name,image,endpoint,job,node)) > 0.25" $groupLabels $groupLabels }}
+  expr: {{ printf "(sum(topk(1, increase(container_cpu_cfs_throttled_periods_total{container!=\"\",job=\"kubelet\",metrics_path=\"/metrics/cadvisor\"}[5m])) by(%s,namespace,pod,container,instance)) without(id,metrics_path,name,image,endpoint,job,node) / on(%s,namespace,pod,container,instance) group_left() sum(topk(1, increase(container_cpu_cfs_periods_total{job=\"kubelet\",metrics_path=\"/metrics/cadvisor\"}[5m])) by(%s,namespace,pod,container,instance)) without(id,metrics_path,name,image,endpoint,job,node)) > 0.25" $groupLabels $groupLabels $groupLabels }}
   annotations:
     description: '{{`{{`}} $value | humanizePercentage {{`}}`}} throttling of CPU in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: {{ $runbookUrl }}/kubernetes/cputhrottlinghigh
