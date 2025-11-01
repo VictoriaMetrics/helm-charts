@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+**Update note**: This release contains breaking changes. Please follow [upgrade guide](https://docs.victoriametrics.com/helm/victoria-metrics-distributed/#upgrade-to-0240)
+
+- added mixed global balancer, that allows to mix write and read traffic.
 
 ## 0.23.0
 
