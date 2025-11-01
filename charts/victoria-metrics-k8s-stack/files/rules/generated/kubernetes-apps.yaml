@@ -18,7 +18,7 @@ rules:
   labels:
     severity: warning
 - alert: KubePodNotReady
-  expr: {{ printf "sum(max(kube_pod_status_phase{namespace=~\"%s\",job=\"kube-state-metrics\",phase=~\"Pending|Unknown\"}) by(namespace,pod,%s) * on(namespace,pod,cluster) group_left(owner_kind) topk(1, max(kube_pod_owner{owner_kind!=\"Job\"}) by(namespace,pod,owner_kind,%s)) by(namespace,pod,%s)) by(namespace,pod,%s) > 0" .targetNamespace $groupLabels $groupLabels $groupLabels $groupLabels }}
+  expr: {{ printf "sum(max(kube_pod_status_phase{namespace=~\"%s\",job=\"kube-state-metrics\",phase=~\"Pending|Unknown\"}) by(namespace,pod,%s) * on(namespace,pod,%s) group_left(owner_kind) topk(1, max(kube_pod_owner{owner_kind!=\"Job\"}) by(namespace,pod,owner_kind,%s)) by(namespace,pod,%s)) by(namespace,pod,%s) > 0" .targetNamespace $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels }}
   annotations:
     description: Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} has been in a non-ready state for longer than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepodnotready
@@ -78,7 +78,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeStatefulSetUpdateNotRolledOut
-  expr: {{ printf "(max(kube_statefulset_status_current_revision{namespace=~\"%s\",job=\"kube-state-metrics\"} unless kube_statefulset_status_update_revision{namespace=~\"%s\",job=\"kube-state-metrics\"}) by(namespace,statefulset,job,%s) * on(namespace,statefulset,job,cluster) (kube_statefulset_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_statefulset_status_replicas_updated{namespace=~\"%s\",job=\"kube-state-metrics\"})) and on(namespace,statefulset,job,cluster) (changes(kube_statefulset_status_replicas_updated{namespace=~\"%s\",job=\"kube-state-metrics\"}[5m]) == 0)" .targetNamespace .targetNamespace $groupLabels .targetNamespace .targetNamespace .targetNamespace }}
+  expr: {{ printf "(max(kube_statefulset_status_current_revision{namespace=~\"%s\",job=\"kube-state-metrics\"} unless kube_statefulset_status_update_revision{namespace=~\"%s\",job=\"kube-state-metrics\"}) by(namespace,statefulset,job,%s) * on(namespace,statefulset,job,%s) (kube_statefulset_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_statefulset_status_replicas_updated{namespace=~\"%s\",job=\"kube-state-metrics\"})) and on(namespace,statefulset,job,%s) (changes(kube_statefulset_status_replicas_updated{namespace=~\"%s\",job=\"kube-state-metrics\"}[5m]) == 0)" .targetNamespace .targetNamespace $groupLabels .targetNamespace .targetNamespace $groupLabels .targetNamespace $groupLabels }}
   annotations:
     description: StatefulSet {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.statefulset {{`}}`}} update has not been rolled out on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubestatefulsetupdatenotrolledout

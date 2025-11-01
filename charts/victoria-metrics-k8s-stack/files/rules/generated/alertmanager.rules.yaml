@@ -18,7 +18,7 @@ rules:
   labels:
     severity: critical
 - alert: AlertmanagerMembersInconsistent
-  expr: {{ printf "max_over_time(alertmanager_cluster_members{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[5m]) < on(namespace,service) group_left() count(max_over_time(alertmanager_cluster_members{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[5m])) by(namespace,service,%s)" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels }}
+  expr: {{ printf "max_over_time(alertmanager_cluster_members{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[5m]) < on(namespace,service,%s) group_left() count(max_over_time(alertmanager_cluster_members{job=\"%s\",container=\"alertmanager\",namespace=\"%s\"}[5m])) by(namespace,service,%s)" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels $groupLabels }}
   annotations:
     description: Alertmanager {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod{{`}}`}} has only found {{`{{`}} $value {{`}}`}} members of the {{`{{`}}$labels.job{{`}}`}} cluster.
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagermembersinconsistent

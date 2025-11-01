@@ -19,7 +19,7 @@ templating:
   - name: cluster
     label: cluster
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "{\"query\":\"label_values(vector_build_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\",\"qryType\":1}" $clusterLabel) ".*" $multicluster }}
+    query: {{ ternary (printf "{\"qryType\":1,\"query\":\"label_values(vector_build_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\"}" $clusterLabel) ".*" $multicluster }}
     definition: {{ ternary (printf "label_values(vector_build_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current: {}

@@ -27,7 +27,7 @@ templating:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "{\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\"}" $clusterLabel) ".*" $multicluster }}
+    query: {{ ternary (printf "{\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\",\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\"}" $clusterLabel) ".*" $multicluster }}
     definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current: {}
@@ -1123,7 +1123,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s) + on(namespace) sum((rate(windows_container_cpu_usage_seconds_total{container_id!=\"\",%s=~\"$cluster\"}[$__rate_interval]) * on(container_id) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s) + on(namespace,%s) sum((rate(windows_container_cpu_usage_seconds_total{container_id!=\"\",%s=~\"$cluster\"}[$__rate_interval]) * on(container_id,%s) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     format: time_series
@@ -1207,7 +1207,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(container_memory_working_set_bytes{image!=\"\",%s=~\"$cluster\"}) by(namespace,%s) + on(namespace) sum((windows_container_memory_usage_commit_bytes{container_id!=\"\",%s=~\"$cluster\"} * on(container_id) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(container_memory_working_set_bytes{image!=\"\",%s=~\"$cluster\"}) by(namespace,%s) + on(namespace,%s) sum((windows_container_memory_usage_commit_bytes{container_id!=\"\",%s=~\"$cluster\"} * on(container_id,%s) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: $resolution
@@ -2225,7 +2225,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(container_network_receive_bytes_total{%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s) + on(namespace) sum((rate(windows_container_network_receive_bytes_total{container_id!=\"\",%s=~\"$cluster\"}[$__rate_interval]) * on(container_id) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(container_network_receive_bytes_total{%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s) + on(namespace,%s) sum((rate(windows_container_network_receive_bytes_total{container_id!=\"\",%s=~\"$cluster\"}[$__rate_interval]) * on(container_id,%s) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: $resolution
@@ -2235,7 +2235,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "0 - (sum(rate(container_network_transmit_bytes_total{%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s) + on(namespace) sum((rate(windows_container_network_transmit_bytes_total{container_id!=\"\",%s=~\"$cluster\"}[$__rate_interval]) * on(container_id) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "0 - (sum(rate(container_network_transmit_bytes_total{%s=~\"$cluster\"}[$__rate_interval])) by(namespace,%s) + on(namespace,%s) sum((rate(windows_container_network_transmit_bytes_total{container_id!=\"\",%s=~\"$cluster\"}[$__rate_interval]) * on(container_id,%s) group_left(container,pod,namespace) max(kube_pod_container_info{container_id!=\"\",%s=~\"$cluster\"}) by(container,container_id,pod,namespace,%s)) or (kube_namespace_created{%s=~\"$cluster\"} * 0)) by(namespace,%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
     interval: $resolution

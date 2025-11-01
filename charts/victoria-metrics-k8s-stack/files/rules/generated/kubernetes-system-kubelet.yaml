@@ -8,7 +8,7 @@
 name: kubernetes-system-kubelet
 rules:
 - alert: KubeNodeNotReady
-  expr: (kube_node_status_condition{job="kube-state-metrics",condition="Ready",status="true"} == 0) and on(cluster,node) (kube_node_spec_unschedulable{job="kube-state-metrics"} == 0)
+  expr: {{ printf "(kube_node_status_condition{job=\"kube-state-metrics\",condition=\"Ready\",status=\"true\"} == 0) and on(%s,node) (kube_node_spec_unschedulable{job=\"kube-state-metrics\"} == 0)" $groupLabels }}
   annotations:
     description: '{{`{{`}} $labels.node {{`}}`}} has been unready for more than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.'
     runbook_url: {{ $runbookUrl }}/kubernetes/kubenodenotready
@@ -18,7 +18,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeNodePressure
-  expr: (kube_node_status_condition{job="kube-state-metrics",condition=~"(MemoryPressure|DiskPressure|PIDPressure)",status="true"} == 1) and on(cluster,node) (kube_node_spec_unschedulable{job="kube-state-metrics"} == 0)
+  expr: {{ printf "(kube_node_status_condition{job=\"kube-state-metrics\",condition=~\"(MemoryPressure|DiskPressure|PIDPressure)\",status=\"true\"} == 1) and on(%s,node) (kube_node_spec_unschedulable{job=\"kube-state-metrics\"} == 0)" $groupLabels }}
   annotations:
     description: '{{`{{`}} $labels.node {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}} has active Condition {{`{{`}} $labels.condition {{`}}`}}. This is caused by resource usage exceeding eviction thresholds.'
     runbook_url: {{ $runbookUrl }}/kubernetes/kubenodepressure
@@ -38,7 +38,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeletTooManyPods
-  expr: {{ printf "((max(kubelet_running_pods{job=\"kubelet\",metrics_path=\"/metrics\"} > 1) by(%s,instance) * on(cluster,instance) group_left(node) max(kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node)) / on(cluster,node) group_left() max(kube_node_status_capacity{job=\"kube-state-metrics\",resource=\"pods\"} != 1) by(%s,node)) > 0.95" $groupLabels $groupLabels $groupLabels }}
+  expr: {{ printf "((max(kubelet_running_pods{job=\"kubelet\",metrics_path=\"/metrics\"} > 1) by(%s,instance) * on(%s,instance) group_left(node) max(kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node)) / on(%s,node) group_left() max(kube_node_status_capacity{job=\"kube-state-metrics\",resource=\"pods\"} != 1) by(%s,node)) > 0.95" $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels }}
   annotations:
     description: Kubelet '{{`{{`}} $labels.node {{`}}`}}' is running at {{`{{`}} $value | humanizePercentage {{`}}`}} of its Pod capacity on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubelettoomanypods
@@ -48,7 +48,7 @@ rules:
   labels:
     severity: info
 - alert: KubeNodeReadinessFlapping
-  expr: {{ printf "(sum(changes(kube_node_status_condition{job=\"kube-state-metrics\",status=\"true\",condition=\"Ready\"}[15m])) by(%s,node) > 2) and on(cluster,node) (kube_node_spec_unschedulable{job=\"kube-state-metrics\"} == 0)" $groupLabels }}
+  expr: {{ printf "(sum(changes(kube_node_status_condition{job=\"kube-state-metrics\",status=\"true\",condition=\"Ready\"}[15m])) by(%s,node) > 2) and on(%s,node) (kube_node_spec_unschedulable{job=\"kube-state-metrics\"} == 0)" $groupLabels $groupLabels }}
   annotations:
     description: The readiness status of node {{`{{`}} $labels.node {{`}}`}} has changed {{`{{`}} $value {{`}}`}} times in the last 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubenodereadinessflapping
@@ -58,7 +58,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeNodeEviction
-  expr: {{ printf "(sum(rate(kubelet_evictions{job=\"kubelet\",metrics_path=\"/metrics\"}[15m])) by(%s,eviction_signal,instance) * on(cluster,instance) group_left(node) max(kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node)) > 0" $groupLabels $groupLabels }}
+  expr: {{ printf "(sum(rate(kubelet_evictions{job=\"kubelet\",metrics_path=\"/metrics\"}[15m])) by(%s,eviction_signal,instance) * on(%s,instance) group_left(node) max(kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node)) > 0" $groupLabels $groupLabels $groupLabels }}
   annotations:
     description: Node {{`{{`}} $labels.node {{`}}`}} on {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}} is evicting Pods due to {{`{{`}} $labels.eviction_signal {{`}}`}}.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubenodeeviction
@@ -78,7 +78,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeletPodStartUpLatencyHigh
-  expr: {{ printf "(histogram_quantile(0.99, sum(topk(1, rate(kubelet_pod_worker_duration_seconds_bucket{job=\"kubelet\",metrics_path=\"/metrics\"}[5m])) by(%s,instance,le,operation_type)) by(%s,instance,le)) * on(cluster,instance) group_left(node) topk(1, kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node)) > 60" $groupLabels $groupLabels $groupLabels }}
+  expr: {{ printf "(histogram_quantile(0.99, sum(topk(1, rate(kubelet_pod_worker_duration_seconds_bucket{job=\"kubelet\",metrics_path=\"/metrics\"}[5m])) by(%s,instance,le,operation_type)) by(%s,instance,le)) * on(%s,instance) group_left(node) topk(1, kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node)) > 60" $groupLabels $groupLabels $groupLabels $groupLabels }}
   annotations:
     description: Kubelet Pod startup 99th percentile latency is {{`{{`}} $value {{`}}`}} seconds on node {{`{{`}} $labels.node {{`}}`}} on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeletpodstartuplatencyhigh

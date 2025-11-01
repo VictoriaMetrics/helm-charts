@@ -1107,37 +1107,46 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 		return expr, ""
 	}
 	args := []string{}
+	modifierFn := func(m *metricsql.ModifierExpr) {
+		if m.Op == "by" || m.Op == "on" {
+			var found bool
+			for i := range m.Args {
+				if m.Args[i] == "cluster" {
+					found = true
+					if kind == "rules" {
+						m.Args[i] = "VAR__string"
+						args = append(args, "$groupLabels")
+					} else {
+						m.Args[i] = "VAR__string"
+						args = append(args, "$clusterLabel")
+					}
+				}
+			}
+			if !found {
+				switch kind {
+				case "dashboards":
+					m.Args = append(m.Args, "VAR__string")
+					args = append(args, "$clusterLabel")
+				case "rules":
+					m.Args = append(m.Args, "VAR__string")
+					args = append(args, "$groupLabels")
+				}
+			}
+		}
+	}
 	metricsql.VisitAll(e, func(ex metricsql.Expr) {
 		switch t := ex.(type) {
+		case *metricsql.BinaryOpExpr:
+			if name == "cluster" {
+				return
+			}
+			modifierFn(&t.JoinModifier)
+			modifierFn(&t.GroupModifier)
 		case *metricsql.AggrFuncExpr:
 			if name == "cluster" {
 				return
 			}
-			if t.Modifier.Op == "by" || t.Modifier.Op == "on" {
-				var found bool
-				for i := range t.Modifier.Args {
-					if t.Modifier.Args[i] == "cluster" {
-						found = true
-						if kind == "rules" {
-							t.Modifier.Args[i] = "VAR__string"
-							args = append(args, "$groupLabels")
-						} else {
-							t.Modifier.Args[i] = "VAR__string"
-							args = append(args, "$clusterLabel")
-						}
-					}
-				}
-				if !found {
-					switch kind {
-					case "dashboards":
-						t.Modifier.Args = append(t.Modifier.Args, "VAR__string")
-						args = append(args, "$clusterLabel")
-					case "rules":
-						t.Modifier.Args = append(t.Modifier.Args, "VAR__string")
-						args = append(args, "$groupLabels")
-					}
-				}
-			}
+			modifierFn(&t.Modifier)
 			if t.Modifier.Op == "" {
 				t.Modifier.Op = "by"
 				switch kind {

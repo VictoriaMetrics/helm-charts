@@ -7,7 +7,7 @@
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
 name: k8s.rules.container_memory_cache
 rules:
-- expr: {{ printf "container_memory_cache{job=\"kubelet\",metrics_path=\"/metrics/cadvisor\",image!=\"\"} * on(cluster,namespace,pod) group_left(node) topk(1, max(kube_pod_info{node!=\"\"}) by(%s,namespace,pod,node)) by(%s,namespace,pod)" $groupLabels $groupLabels }}
+- expr: {{ printf "container_memory_cache{job=\"kubelet\",metrics_path=\"/metrics/cadvisor\",image!=\"\"} * on(%s,namespace,pod) group_left(node) topk(1, max(kube_pod_info{node!=\"\"}) by(%s,namespace,pod,node)) by(%s,namespace,pod)" $groupLabels $groupLabels $groupLabels }}
   condition: true
   record: node_namespace_pod_container:container_memory_cache
 condition: true

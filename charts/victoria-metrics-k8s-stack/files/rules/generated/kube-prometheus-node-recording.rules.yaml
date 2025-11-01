@@ -16,7 +16,7 @@ rules:
 - expr: {{ printf "sum(rate(node_network_transmit_bytes_total[3m])) by(instance,%s)" $groupLabels }}
   condition: true
   record: instance:node_network_transmit_bytes:rate:sum
-- expr: {{ printf "sum(rate(node_cpu_seconds_total{mode!=\"idle\",mode!=\"iowait\",mode!=\"steal\"}[5m])) without(cpu,mode) / on(instance) group_left() count(sum(node_cpu_seconds_total) by(instance,cpu,%s)) by(instance,%s)" $groupLabels $groupLabels }}
+- expr: {{ printf "sum(rate(node_cpu_seconds_total{mode!=\"idle\",mode!=\"iowait\",mode!=\"steal\"}[5m])) without(cpu,mode) / on(instance,%s) group_left() count(sum(node_cpu_seconds_total) by(instance,cpu,%s)) by(instance,%s)" $groupLabels $groupLabels $groupLabels }}
   condition: true
   record: instance:node_cpu:ratio
 - expr: {{ printf "sum(rate(node_cpu_seconds_total{mode!=\"idle\",mode!=\"iowait\",mode!=\"steal\"}[5m])) by(%s)" $groupLabels }}

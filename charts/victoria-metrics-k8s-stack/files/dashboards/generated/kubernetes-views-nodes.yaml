@@ -84,9 +84,9 @@ templating:
       uid: ${datasource}
     type: query
     query:
-      query: {{ printf "label_values(node_uname_info{nodename=~\"(?i:($node)(.[a-z0-9.]+)?)\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
+      query: {{ printf "label_values(node_uname_info{nodename=~\"(?i:($node)(\\\\.[a-z0-9.-]+)?)\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: StandardVariableQuery
-    definition: {{ printf "label_values(node_uname_info{nodename=~\"(?i:($node)(.[a-z0-9.]+)?)\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
+    definition: {{ printf "label_values(node_uname_info{nodename=~\"(?i:($node)(\\\\.[a-z0-9.-]+)?)\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     hide: 2
     current: {}
     options: []
@@ -2035,11 +2035,11 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kubelet_volume_stats_used_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s) / sum(kubelet_volume_stats_capacity_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "max(kubelet_volume_stats_used_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,namespace,%s) / max(kubelet_volume_stats_capacity_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,namespace,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: $resolution
-    legendFormat: '{{`{{`}} persistentvolumeclaim {{`}}`}}'
+    legendFormat: '{{`{{`}} namespace {{`}}`}} - {{`{{`}} persistentvolumeclaim {{`}}`}}'
     range: true
     refId: A
   datasource:
@@ -2110,7 +2110,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kubelet_volume_stats_used_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "max(kubelet_volume_stats_used_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,namespace,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     format: table
     hide: false
@@ -2120,7 +2120,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kubelet_volume_stats_capacity_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "max(kubelet_volume_stats_capacity_bytes{node=\"$node\",%s=~\"$cluster\"}) by(persistentvolumeclaim,namespace,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     format: table
     hide: false
@@ -2947,5 +2947,5 @@ time:
   to: now
 timepicker: {}
 uid: k8s_views_nodes
-version: 38
+version: 40
 weekStart: ""

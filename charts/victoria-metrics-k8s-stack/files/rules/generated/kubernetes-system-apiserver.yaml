@@ -8,7 +8,7 @@
 name: kubernetes-system-apiserver
 rules:
 - alert: KubeClientCertificateExpiration
-  expr: (histogram_quantile(0.01, sum(rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m])) without(namespace,service,endpoint)) < 604800) and on(job,cluster,instance) (apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0)
+  expr: {{ printf "(histogram_quantile(0.01, sum(rate(apiserver_client_certificate_expiration_seconds_bucket{job=\"apiserver\"}[5m])) without(namespace,service,endpoint)) < 604800) and on(job,%s,instance) (apiserver_client_certificate_expiration_seconds_count{job=\"apiserver\"} > 0)" $groupLabels }}
   annotations:
     description: A client certificate used to authenticate to kubernetes apiserver is expiring in less than 7.0 days on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeclientcertificateexpiration
@@ -18,7 +18,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeClientCertificateExpiration
-  expr: (histogram_quantile(0.01, sum(rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m])) without(namespace,service,endpoint)) < 86400) and on(job,cluster,instance) (apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0)
+  expr: {{ printf "(histogram_quantile(0.01, sum(rate(apiserver_client_certificate_expiration_seconds_bucket{job=\"apiserver\"}[5m])) without(namespace,service,endpoint)) < 86400) and on(job,%s,instance) (apiserver_client_certificate_expiration_seconds_count{job=\"apiserver\"} > 0)" $groupLabels }}
   annotations:
     description: A client certificate used to authenticate to kubernetes apiserver is expiring in less than 24.0 hours on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeclientcertificateexpiration

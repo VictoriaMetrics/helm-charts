@@ -7,17 +7,17 @@
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
 name: kubelet.rules
 rules:
-- expr: {{ printf "histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job=\"kubelet\",metrics_path=\"/metrics\"}[5m])) by(%s,instance,le) * on(cluster,instance) group_left(node) max(kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node))" $groupLabels $groupLabels }}
+- expr: {{ printf "histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job=\"kubelet\",metrics_path=\"/metrics\"}[5m])) by(%s,instance,le) * on(%s,instance) group_left(node) max(kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node))" $groupLabels $groupLabels $groupLabels }}
   condition: true
   labels:
     quantile: "0.99"
   record: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile
-- expr: {{ printf "histogram_quantile(0.9, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job=\"kubelet\",metrics_path=\"/metrics\"}[5m])) by(%s,instance,le) * on(cluster,instance) group_left(node) max(kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node))" $groupLabels $groupLabels }}
+- expr: {{ printf "histogram_quantile(0.9, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job=\"kubelet\",metrics_path=\"/metrics\"}[5m])) by(%s,instance,le) * on(%s,instance) group_left(node) max(kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node))" $groupLabels $groupLabels $groupLabels }}
   condition: true
   labels:
     quantile: "0.9"
   record: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile
-- expr: {{ printf "histogram_quantile(0.5, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job=\"kubelet\",metrics_path=\"/metrics\"}[5m])) by(%s,instance,le) * on(cluster,instance) group_left(node) max(kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node))" $groupLabels $groupLabels }}
+- expr: {{ printf "histogram_quantile(0.5, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{job=\"kubelet\",metrics_path=\"/metrics\"}[5m])) by(%s,instance,le) * on(%s,instance) group_left(node) max(kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}) by(%s,instance,node))" $groupLabels $groupLabels $groupLabels }}
   condition: true
   labels:
     quantile: "0.5"
