@@ -1,0 +1,87 @@
+{{- $ctx := dict "helm" . }}
+{{- $urlCtx := dict "helm" . }}
+{{- $values := .Values }}
+{{- $common := $values.common | default dict }}
+{{- $zoneTpl := $values.zoneTpl }}
+{{- $defaultUrlMapItem := $values.defaultUrlMapItem }}
+{{- range $i, $z := $values.availabilityZones }}
+  {{- $zone := mergeOverwrite (deepCopy $zoneTpl) (deepCopy $z) }}
+  {{- if $zone.read.vmauth.enabled }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  {{- $_ := set $ctx "appKey" (list "zone" "read" "vmauth") }}
+  {{- if $zone.vmcluster.enabled }}
+    {{- $urlSpec := $zone.vmcluster.spec | default dict }}
+    {{- $_ := set $zone.vmcluster "spec" (mergeOverwrite (deepCopy $common.vmcluster.spec) $urlSpec) }}
+  {{- else if $zone.vmsingle.enabled }}
+    {{- $urlSpec := $zone.vmsingle.spec | default dict }}
+    {{- $_ := set $zone.vmsingle "spec" (mergeOverwrite (deepCopy $common.vmsingle.spec) $urlSpec) }}
+  {{- end }}
+  {{- $_ := set $ctx "zone" $zone }}
+  {{- $_ := set $urlCtx "zone" $zone }}
+  name: {{ include "vm.cr.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with $zone.read.vmauth.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+
+  {{- $spec := mergeOverwrite (deepCopy $common.vmauth.spec) (deepCopy (($zone.common).spec)) (deepCopy ((($zone.read).vmauth).spec)) }}
+  {{- $_ := set $urlCtx "style" "managed" }}
+  {{- $urls := dict "vmcluster" (default list) "vmsingle" (default list) }}
+  {{- if $zone.read.allow }}
+    {{- if ($zone.vmcluster).enabled }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
+      {{- $_ := set $urls "vmcluster" (append $urls.vmcluster (include "vm.url" $urlCtx)) }}
+    {{- else if ($zone.vmsingle).enabled }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
+      {{- $_ := set $urls "vmsingle" (append $urls.vmsingle (include "vm.url" $urlCtx)) }}
+    {{- end }}
+  {{- end }}
+  {{- range $j, $c := $values.availabilityZones }}
+    {{- $cross := mergeOverwrite (deepCopy $zoneTpl) (deepCopy $c) }}
+    {{- if and (ne $j $i) $cross.read.allow }}
+      {{- if ($cross.vmcluster).enabled }}
+        {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
+        {{- $_ := set $cross.vmcluster "spec" (mergeOverwrite (deepCopy $common.vmcluster.spec) (deepCopy ( $cross.vmcluster.spec | default dict))) }}
+        {{- $_ := set $urlCtx "zone" $cross }}
+        {{- $_ := set $urls "vmcluster" (append $urls.vmcluster (include "vm.url" $urlCtx)) }}
+      {{- else if ($cross.vmsingle).enabled }}
+        {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
+        {{- $_ := set $cross.vmsingle "spec" (mergeOverwrite (deepCopy $common.vmsingle.spec) (deepCopy ( $cross.vmsingle.spec | default dict))) }}
+        {{- $_ := set $urlCtx "zone" $cross }}
+        {{- $_ := set $urls "vmsingle" (append $urls.vmsingle (include "vm.url" $urlCtx)) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := unset $urlCtx "style" }}
+
+  {{- $hasBackends := false }}
+  {{- range $_, $backends := $urls }} 
+    {{- if gt (len $backends) 0 -}}
+      {{- $hasBackends = true -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if not $hasBackends }}
+    {{- fail (printf "No backend urls for vmauth in AZ %q" $zone.name) -}}
+  {{- end -}}
+
+  {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
+  {{- $urlMap := $accessSpec.url_map | default list }}
+  {{- range $type, $backendUrls := $urls }}
+    {{- if $backendUrls }}
+      {{- $item := deepCopy (index $defaultUrlMapItem "read" $type) }}
+      {{- $_ := set $item "url_prefix" $backendUrls }}
+      {{- $urlMap = prepend $urlMap $item }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $accessSpec "url_map" $urlMap }}
+  {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
+  {{- if not $spec.nodeSelector }}
+    {{- $_ := set $spec "nodeSelector" (dict "topology.kubernetes.io/zone" "{{ (.zone).name }}") }}
+  {{- end }}
+spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
+  {{- end }}
+{{- end }}
