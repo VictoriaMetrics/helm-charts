@@ -11,3 +11,10 @@ Global read endpoint is available now!
 {{- $_ := set $ctx "appKey" (list "read" "global" "vmauth") }}
 You can use `{{ include "vm.url" $ctx }}/select/<accountID>/prometheus/<suffix>` as datasource of vmalert or grafana, check more supported APIs [here](https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#url-format).
 {{- end }}
+{{ if (((.Values.rw).global).vmauth).enabled }}
+Global read/write endpoint is available now!
+{{- $_ := set $ctx "appKey" (list "rw" "global" "vmauth") }}
+You can use:
+- `{{ include "vm.url" $ctx }}/select/<accountID>/prometheus/<suffix>` as datasource of vmalert or grafana, check more supported APIs [here](https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#url-format).
+- `{{ include "vm.url" $ctx }}/prometheus/api/v1/write` as write destination for your client like vmagent, check more supported APIs [here](https://docs.victoriametrics.com/victoriametrics/vmagent/#how-to-push-data-to-vmagent).
+{{- end }}

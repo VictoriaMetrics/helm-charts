@@ -1,0 +1,99 @@
+{{- $ctx := dict "helm" . }}
+{{- $urlCtx := dict "helm" . }}
+{{- $values := .Values }}
+{{- $common := $values.common | default dict }}
+{{- $zoneTpl := $values.zoneTpl }}
+{{- $fullname := include "vm.fullname" . }}
+{{- $kinds := list "read" "write" "rw" }}
+{{- $defaultUrlMapItem := $values.defaultUrlMapItem }}
+{{- range $kind := $kinds }}
+  {{- $auth := index $values $kind "global" "vmauth" | default dict }}
+  {{- if $auth.enabled }}
+    {{- $commonAuth := dict "spec" (deepCopy (($common.vmauth).spec | default dict)) }}
+    {{- $commonAgent := dict "spec" (($common.vmagent).spec | default dict) }}
+    {{- $auth = mergeOverwrite (deepCopy $commonAuth) (deepCopy $auth) }}
+    {{- $_ := set $ctx "appKey" (list "vmauth" "spec") }}
+    {{- $_ := set $ctx "fullname" $fullname }}
+    {{- $_ := set $ctx "vmauth" $auth }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: {{ include "vm.cr.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with $auth.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end  }}
+
+  {{- $_ := set $urlCtx "style" "managed" }}
+  {{- $urls := dict "vmcluster" (default list) "vmsingle" (default list) "vmagent" (default list) }}
+  {{- range $i, $z := $values.availabilityZones }}
+    {{- $zone := mergeOverwrite (deepCopy $zoneTpl) $z }}
+    {{- if has $kind (list "read" "rw") -}}
+      {{- if $zone.read.vmauth.enabled -}}
+        {{- $urlSpec := (($zone.read).vmauth).spec | default dict }}
+        {{- $_ := set $zone.read.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $urlSpec) }}
+        {{- $_ := set $urlCtx "zone" $zone }}
+        {{- $_ := set $urlCtx "appKey" (list "zone" "read" "vmauth" "spec") }}
+        {{- if $zone.vmcluster.enabled -}}
+          {{- $_ = set $urls "vmcluster" (append $urls.vmcluster (include "vm.url" $urlCtx)) -}}
+        {{- else if $zone.vmsingle.enabled -}}
+          {{- $_ := set $urls "vmsingle" (append $urls.vmsingle (include "vm.url" $urlCtx)) }}
+        {{- end -}}
+      {{- else if $zone.vmcluster.enabled -}}
+        {{- $urlSpec := mergeOverwrite (deepCopy ((($common.vmcluster).spec | default dict))) (deepCopy ($zone.vmcluster).spec | default dict) }}
+        {{- $_ := set $zone.vmcluster "spec" $urlSpec }}
+        {{- $_ := set $urlCtx "zone" $zone }}
+        {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
+        {{- $_ := set $urls "vmcluster" (append $urls.vmcluster (include "vm.url" $urlCtx)) }}
+      {{- else if $zone.vmsingle.enabled -}}
+        {{- $urlSpec := mergeOverwrite (deepCopy ((($common.vmsingle).spec | default dict))) (deepCopy ($zone.vmsingle).spec | default dict) }}
+        {{- $_ := set $zone.vmsingle "spec" $urlSpec }}
+        {{- $_ := set $urlCtx "zone" $zone }}
+        {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
+        {{- $_ := set $urls "vmsingle" (append $urls.vmsingle (include "vm.url" $urlCtx)) }}
+      {{- end -}}
+    {{- end -}}
+    {{- if has $kind (list "write" "rw") -}}
+      {{- if $zone.vmagent.enabled -}}
+        {{- $agentSpec := $zone.vmagent.spec | default dict }}
+        {{- $_ := set $zone.vmagent "spec" (mergeOverwrite (deepCopy $commonAgent.spec) $agentSpec) }}
+        {{- $_ := set $urlCtx "zone" $zone }}
+        {{- $_ := set $urlCtx "appKey" (list "zone" "vmagent" "spec") }}
+        {{- $_ := set $urls "vmagent" (append $urls.vmagent (include "vm.url" $urlCtx)) }}
+      {{- end -}}
+    {{- end -}}
+
+  {{- end }}
+  {{- $_ := unset $urlCtx "style" -}}
+
+  {{- $hasBackends := false }}
+  {{- range $_, $backends := $urls }}
+    {{- if gt (len $backends) 0 -}}
+      {{- $hasBackends = true -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if not $hasBackends }}
+    {{- fail (printf "No backend urls for global %q vmauth" $kind) -}}
+  {{- end -}}
+
+  {{- $spec := deepCopy $auth.spec | default dict -}}
+  {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
+  {{- $urlMap := $accessSpec.url_map | default list }}
+  
+  {{- range $type, $backends := $urls }}
+    {{- if $backends }}
+      {{- $itemKind := ternary "write" "read" (eq $type "vmagent") }}
+      {{- $item := deepCopy (index $defaultUrlMapItem $itemKind $type ) }}
+      {{- $_ := set $item "url_prefix" $backends }}
+      {{- $urlMap = prepend $urlMap $item }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $accessSpec "url_map" $urlMap }}
+  {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
+spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
+
+  {{- end }}
+{{- end }}
+

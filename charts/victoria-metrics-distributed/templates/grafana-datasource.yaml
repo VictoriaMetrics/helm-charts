@@ -1,16 +1,21 @@
-{{ if and (((.Values.read).global).vmauth).enabled (index .Values "victoria-metrics-k8s-stack" "grafana" "enabled") }}
-{{- $read := deepCopy (.Values.read).global  }}
-{{- $fullname := include "vm.fullname" . }}
-{{- $_ := set $read.vmauth "spec" (mergeOverwrite (deepCopy $.Values.common.vmauth.spec) $read.vmauth.spec) }}
-{{- $ctx := dict "helm" . "appKey" (list "globalRead" "vmauth" "spec") "globalRead" $read "style" "managed" "fullname" $fullname }}
-{{- $url := (printf "%s/select/0/prometheus/" (include "vm.url" $ctx)) }}
-{{- $ns := include "vm.namespace" $ctx }}
+{{- $read := default dict }}
+{{- if (((.Values.read).global).vmauth).enabled }}
+  {{- $read = deepCopy ((.Values.read).global).vmauth }}
+{{- else if (((.Values.rw).global).vmauth).enabled }}
+  {{- $read = deepCopy ((.Values.rw).global).vmauth }}
+{{- end }}
+{{- $common := .Values.common.vmauth.spec }}
+{{ if and $read.enabled (index .Values "victoria-metrics-k8s-stack" "grafana" "enabled") }}
+  {{- $fullname := include "vm.fullname" . }}
+  {{- $_ := set $read "spec" (mergeOverwrite (deepCopy $common) (deepCopy $read.spec)) }}
+  {{- $ctx := dict "helm" . "appKey" (list "globalRead" "vmauth" "spec") "globalRead" (dict "vmauth" $read) "style" "managed" "fullname" $fullname }}
+  {{- $url := (printf "%s/select/0/prometheus/" (include "vm.url" $ctx)) }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "vm.fullname" . }}-grafana-ds
-  namespace: {{ $ns }}
+  name: {{ $fullname }}-grafana-ds
+  namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" . | nindent 4 }}
     {{ index .Values "victoria-metrics-k8s-stack" "grafana" "sidecar" "datasources" "label" }}: "1"
 data:

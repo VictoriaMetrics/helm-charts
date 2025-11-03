@@ -37,6 +37,49 @@ common:
     spec:
       port: "8428"
 
+# -- Default VMAuth url_map item for each access type for each backend type
+defaultUrlMapItem:
+  write:
+    vmagent:
+      src_paths:
+        - /api/v1/write
+        - /prometheus/api/v1/write
+        - /write
+        - /api/v1/import
+        - /api/v1/import/.+
+        - /opentelemetry/.+
+        - /insert/.+
+    vmcluster:
+      src_paths:
+        - /insert/.+
+    vmsingle:
+      drop_src_path_prefix_parts: 2
+      src_paths:
+        - /insert/.+
+  read:
+    vmcluster:
+      load_balancing_policy: first_available
+      retry_status_codes: [500, 502, 503]
+      src_paths:
+        - /select/.+
+        - /admin/tenants
+    vmsingle:
+      load_balancing_policy: first_available
+      retry_status_codes: [500, 502, 503]
+      drop_src_path_prefix_parts: 2
+      src_paths:
+        - /select/.+
+
+rw:
+  global:
+    vmauth:
+      # -- Enable single global VMAuth for reads and writes.
+      enabled: false
+      # -- Override the name of the vmauth object
+      name: "global-rw-{{ .fullname }}"
+      # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
+      spec: {}
+
 write:
   global:
     vmauth:
@@ -55,11 +98,7 @@ read:
       # -- Override the name of the vmauth object
       name: "vmauth-global-read-{{ .fullname }}"
       # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
-      spec:
-        unauthorizedUserAccessSpec:
-          url_map:
-            - load_balancing_policy: first_available
-              retry_status_codes: [500, 502, 503]
+      spec: {}
 
 # -- Default config for each availability zone components, including vmagent, vmcluster, vmsingle, vmauth etc.
 # Defines a template for each availability zone, which can be overridden for each availability zone at `availabilityZones[*]`
@@ -97,11 +136,7 @@ zoneTpl:
       # -- Override the name of the vmauth object
       name: "vmauth-read-proxy-{{ (.zone).name }}"
       # -- Spec for VMAuth CRD, see [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
-      spec:
-        unauthorizedUserAccessSpec:
-          url_map:
-            - load_balancing_policy: first_available
-              retry_status_codes: [500, 502, 503]
+      spec: {}
   # vmagent here only meant to proxy write requests to each az,
   # doesn't support customized other remote write address.
   vmagent:
@@ -193,7 +228,7 @@ availabilityZones:
 extra:
   vmagent:
     enabled: false
-    name: test-vmagent
+    name: extra
     spec:
       selectAllByDefault: true
 

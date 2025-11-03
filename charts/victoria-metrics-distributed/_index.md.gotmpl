@@ -132,6 +132,64 @@ First, performing update on availability zone `zone-eu-1`:
 
 Then, perform update on availability zone `zone-us-1` with the same steps1~4.
 
+### Upgrade to 0.24.0
+
+Starting this release first item of `*.vmauth.spec.unauthorizedUserAccessSpec.url_map` is no longer merged with default backend configuration.
+Custom settings for default backend should now be defined using `defaultUrlMapItem.<accessType>.<backendType>`:
+
+For global read VMAuth:
+
+```
+read:
+  global:
+    vmauth:
+      spec:
+        unauthorizedUserAccessSpec:
+          url_map:
+            - load_balancing_policy: first_available
+              retry_status_codes: [500, 502, 503]
+```
+is now
+```
+defaultUrlMapItem:
+  read:
+    vmsingle:         # if you're using VMSingle
+      load_balancing_policy: first_available
+      retry_status_codes: [500, 502, 503]
+    vmcluster:        # if you're using VMCluster
+      load_balancing_policy: first_available
+      retry_status_codes: [500, 502, 503]
+```
+
+For global write VMAuth:
+
+```
+write:
+  global:
+    vmauth:
+      spec:
+        unauthorizedUserAccessSpec:
+          url_map:
+            - load_balancing_policy: first_available
+              retry_status_codes: [500, 502, 503]
+```
+is now
+```
+defaultUrlMapItem:
+  write:
+    vmagent:          # if you have VMAgents queue enabled
+      load_balancing_policy: first_available
+      retry_status_codes: [500, 502, 503]
+    vmsingle:         # if you're using VMSingle without VMAgents enabled
+      load_balancing_policy: first_available
+      retry_status_codes: [500, 502, 503]
+    vmcluster:        # if you're using VMCluster without VMAgents enabled
+      load_balancing_policy: first_available
+      retry_status_codes: [500, 502, 503]
+```
+
+Same is for per zone VMAuth proxy `zoneTpl.read.vmauth`.
+
 ### Upgrade to 0.13.0
 
 Introduction of VMCluster's [`requestsLoadBalancer`](https://docs.victoriametrics.com/operator/resources/vmcluster/#requests-load-balancing) allowed to simplify distributed chart setup by removing VMAuth CRs for read and write load balancing. Some parameters are not needed anymore:
