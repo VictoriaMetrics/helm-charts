@@ -11,10 +11,8 @@
 {{- define "victoria-logs-collector.image" }}
 {{- $registry := .Values.global.image.registry | default "docker.io" }}
 {{- if .Values.native }}
-  {{- if not .Values.image }}
-  {{- fail "'image' must be set when 'native' is true" }}
-  {{- end }}
-{{- printf "%s/%s:%s" $registry "victoriametrics/vlagent" .Values.image.tag }}
+{{- $tag := required "'image' must be set when 'native' is true" (.Values.image).tag }}
+{{- printf "%s/%s:%s" $registry "victoriametrics/vlagent" $tag }}
 {{- else }}
 {{- printf "%s/%s:%s" $registry "timberio/vector" "0.49.0-alpine" }}
 {{- end }}
