@@ -1,6 +1,13 @@
 remoteWrite:
-  - url: http://victoria-logs:9428
-  - url: http://victoria-logs:9428/
+  - url: http://victoria-logs-1:9428
+    accountID: "123"
+    projectID: "456"
+    msgField: ["message"]
+    extraFields:
+      collector: victoria-logs-collector
+    ignoreFields:
+      - kubernetes.pod_labels*
+  - url: http://victoria-logs-2:9428
 
 resources:
   limits:
@@ -9,3 +16,7 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
+
+native: true
+image:
+  tag: heads-k8s-collector-0-g6d7a87224

@@ -19,7 +19,9 @@ spec:
         {{- with .Values.podAnnotations }}
         {{ toYaml . | nindent 8 }}
         {{- end }}
+        {{- if not .Values.native }}
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
     spec:
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}
@@ -42,13 +44,16 @@ spec:
       {{- end }}
       containers:
         - name: victoria-logs-collector
-          image: {{ .Values.global.image.registry | default "docker.io" }}/timberio/vector:0.49.0-alpine
+          image: {{ include "victoria-logs-collector.image" . }}
           imagePullPolicy: IfNotPresent
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ omit .Values.securityContext "enabled" | toYaml | nindent 12 }}
           {{- end }}
           {{- if .Values.resources }}
           resources: {{ toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.native }}
+          args: {{ include "victoria-logs-collector.args" . | nindent 12 }}
           {{- end }}
           env:
             - name: VECTOR_SELF_NODE_NAME
@@ -69,9 +74,11 @@ spec:
             - name: varlib
               mountPath: /var/lib
               readOnly: true
+            {{- if not .Values.native }}
             - name: config
               mountPath: /etc/vector
               readOnly: true
+            {{- end }}
             - name: vl-collector-data
               mountPath: /vl-collector
       volumes:
@@ -84,9 +91,11 @@ spec:
         - name: varlib
           hostPath:
             path: /var/lib
+        {{- if not .Values.native }}
         - name: config
           configMap:
             name: {{ include "victoria-logs-collector.fullname" . }}-config
+        {{- end }}
         - name: vl-collector-data
           hostPath:
             path: /var/lib/vl-collector
