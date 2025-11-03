@@ -8,7 +8,7 @@
 name: kubernetes-system-scheduler
 rules:
 - alert: KubeSchedulerDown
-  expr: absent(up{job="kube-scheduler"} == 1)
+  expr: absent(up{job="kube-scheduler"})
   annotations:
     description: KubeScheduler has disappeared from Prometheus target discovery.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeschedulerdown

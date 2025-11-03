@@ -12,33 +12,27 @@ templating:
   - name: datasource
     type: datasource
     query: {{ $defaultDatasource }}
-    hide: 0
     current:
       selected: false
       text: ""
       value: ""
     options: []
-    queryValue: ""
     refresh: 1
     regex: ""
-    skipUrlSync: false
   - name: cluster
     datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "{\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\"}" $clusterLabel) ".*" $multicluster }}
+    query: {{ ternary (printf "{\"query\":\"label_values(kube_node_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\",\"qryType\":1}" $clusterLabel) ".*" $multicluster }}
     definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current:
-      isNone: true
-      selected: false
-      text: None
+      text: ""
       value: ""
     options: []
     refresh: 1
     regex: ""
-    skipUrlSync: false
     sort: 1
   - name: namespace
     datasource:
@@ -49,7 +43,6 @@ templating:
       query: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
       refId: Prometheus-namespace-Variable-Query
     definition: {{ printf "label_values(kube_pod_info{%s=~\"$cluster\"}, namespace)" $clusterLabel }}
-    hide: 0
     current:
       selected: false
       text: monitoring
@@ -57,11 +50,7 @@ templating:
     options: []
     refresh: 1
     regex: ""
-    skipUrlSync: false
     sort: 1
-    tagValuesQuery: ""
-    tagsQuery: ""
-    useTags: false
   - name: pod
     multi: true
     includeAll: true
@@ -73,7 +62,6 @@ templating:
       query: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, pod)" $clusterLabel }}
       refId: Prometheus-pod-Variable-Query
     definition: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, pod)" $clusterLabel }}
-    hide: 0
     allValue: .*
     current:
       selected: false
@@ -82,17 +70,11 @@ templating:
     options: []
     refresh: 2
     regex: ""
-    skipUrlSync: false
     sort: 1
-    tagValuesQuery: ""
-    tagsQuery: ""
-    useTags: false
   - name: resolution
     type: custom
     query: 1s, 15s, 30s, 1m, 3m, 5m
-    hide: 0
     current:
-      selected: false
       text: 30s
       value: 30s
     options:
@@ -114,8 +96,6 @@ templating:
     - selected: false
       text: 5m
       value: 5m
-    queryValue: ""
-    skipUrlSync: false
   - name: job
     multi: true
     datasource:
@@ -127,7 +107,6 @@ templating:
       query: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: PrometheusVariableQueryEditor-VariableQuery
     definition: {{ printf "label_values(kube_pod_info{namespace=\"$namespace\",%s=~\"$cluster\"}, job)" $clusterLabel }}
-    hide: 0
     current:
       selected: false
       text: kube-state-metrics
@@ -135,7 +114,6 @@ templating:
     options: []
     refresh: 1
     regex: ""
-    skipUrlSync: false
     sort: 1
 editable: false
 timezone: {{ default "utc" ($Values.defaultDashboards).defaultTimezone }}
@@ -187,14 +165,6 @@ annotations:
       type: tags
 panels:
 - title: Information
-  targets:
-  - datasource:
-      type: datasource
-      uid: grafana
-    refId: A
-  datasource:
-    type: datasource
-    uid: grafana
   collapsed: false
   gridPos:
     h: 1
@@ -226,7 +196,7 @@ panels:
         mode: absolute
         steps:
         - color: rgb(255, 255, 255)
-          value: null
+          value: 0
       unit: none
     overrides: []
   gridPos:
@@ -249,7 +219,7 @@ panels:
     showPercentChange: false
     textMode: name
     wideLayout: true
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Running on
   targets:
@@ -277,7 +247,7 @@ panels:
         mode: absolute
         steps:
         - color: rgb(255, 255, 255)
-          value: null
+          value: 0
       unit: none
     overrides: []
   gridPos:
@@ -300,7 +270,7 @@ panels:
     showPercentChange: false
     textMode: name
     wideLayout: true
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Pod IP
   targets:
@@ -325,7 +295,7 @@ panels:
         mode: absolute
         steps:
         - color: rgb(255, 255, 255)
-          value: null
+          value: 0
       unit: none
     overrides: []
   gridPos:
@@ -348,7 +318,7 @@ panels:
     showPercentChange: false
     textMode: name
     wideLayout: true
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Priority Class
   targets:
@@ -375,7 +345,7 @@ panels:
         mode: absolute
         steps:
         - color: rgb(255, 255, 255)
-          value: null
+          value: 0
       unit: none
     overrides: []
   gridPos:
@@ -398,7 +368,7 @@ panels:
     showPercentChange: false
     textMode: name
     wideLayout: true
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: stat
 - title: QOS Class
   targets:
@@ -425,7 +395,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
       unit: none
     overrides:
     - matcher:
@@ -463,7 +433,7 @@ panels:
     showPercentChange: false
     textMode: name
     wideLayout: true
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Last Terminated Reason
   targets:
@@ -488,7 +458,7 @@ panels:
         mode: absolute
         steps:
         - color: text
-          value: null
+          value: 0
         - color: red
           value: 1
       unit: none
@@ -512,7 +482,7 @@ panels:
     showPercentChange: false
     textMode: name
     wideLayout: true
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Last Terminated Exit Code
   targets:
@@ -538,7 +508,7 @@ panels:
         mode: absolute
         steps:
         - color: text
-          value: null
+          value: 0
         - color: red
           value: 1
         - color: '#EAB839'
@@ -564,17 +534,9 @@ panels:
     showPercentChange: false
     textMode: value
     wideLayout: true
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Resources
-  targets:
-  - datasource:
-      type: datasource
-      uid: grafana
-    refId: A
-  datasource:
-    type: datasource
-    uid: grafana
   collapsed: false
   gridPos:
     h: 1
@@ -588,7 +550,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     instant: true
@@ -611,7 +573,7 @@ panels:
         mode: percentage
         steps:
         - color: green
-          value: null
+          value: 0
         - color: '#EAB839'
           value: 60
         - color: red
@@ -636,14 +598,14 @@ panels:
     showThresholdLabels: false
     showThresholdMarkers: true
     sizing: auto
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: gauge
 - title: Total pod CPU Limits usage
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     instant: true
@@ -663,7 +625,7 @@ panels:
         mode: percentage
         steps:
         - color: green
-          value: null
+          value: 0
         - color: '#EAB839'
           value: 60
         - color: red
@@ -688,14 +650,14 @@ panels:
     showThresholdLabels: false
     showThresholdMarkers: true
     sizing: auto
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: gauge
 - title: Total pod RAM Requests usage
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}) by(%s) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}) by(%s) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     instant: true
@@ -718,7 +680,7 @@ panels:
         mode: percentage
         steps:
         - color: blue
-          value: null
+          value: 0
         - color: '#EAB839'
           value: 80
         - color: red
@@ -743,14 +705,14 @@ panels:
     showThresholdLabels: false
     showThresholdMarkers: true
     sizing: auto
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: gauge
 - title: Total pod RAM Limits usage
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}) by(%s) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}) by(%s) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     instant: true
@@ -770,7 +732,7 @@ panels:
         mode: percentage
         steps:
         - color: green
-          value: null
+          value: 0
         - color: '#EAB839'
           value: 60
         - color: red
@@ -795,14 +757,14 @@ panels:
     showThresholdLabels: false
     showThresholdMarkers: true
     sizing: auto
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   type: gauge
 - title: Resources by container
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"}) by(container,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     format: table
@@ -814,7 +776,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"}) by(container,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     format: table
@@ -826,7 +788,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"}) by(container,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     format: table
@@ -837,7 +799,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"}) by(container,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     format: table
@@ -878,6 +840,8 @@ panels:
         cellOptions:
           type: auto
         filterable: false
+        footer:
+          reducers: []
         inspect: false
         minWidth: 100
       decimals: 4
@@ -886,7 +850,7 @@ panels:
         mode: absolute
         steps:
         - color: blue
-          value: null
+          value: 0
       unit: none
     overrides:
     - matcher:
@@ -921,15 +885,9 @@ panels:
   id: 38
   options:
     cellHeight: sm
-    footer:
-      countRows: false
-      fields: ""
-      reducer:
-      - sum
-      show: false
     showHeader: true
     sortBy: []
-  pluginVersion: 11.2.0
+  pluginVersion: 12.2.1
   transformations:
   - id: seriesToColumns
     options:
@@ -1015,7 +973,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"}) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: $resolution
@@ -1025,7 +983,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"}) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"cpu\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
     legendFormat: '{{`{{`}} container {{`}}`}}  LIMITS'
@@ -1060,6 +1018,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1073,7 +1032,7 @@ panels:
         mode: percentage
         steps:
         - color: red
-          value: null
+          value: 0
         - color: yellow
           value: 20
         - color: green
@@ -1097,16 +1056,17 @@ panels:
       placement: right
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Memory Usage / Requests & Limits by container
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}) by(container,%s) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"}) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}) by(container,%s) / sum(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: ""
@@ -1116,7 +1076,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}) by(container,%s) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"}) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$pod\",image!=\"\",%s=~\"$cluster\"}) by(container,%s) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$pod\",resource=\"memory\",job=~\"$job\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=\"$namespace\",pod=~\"$pod\",job=~\"$job\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(container,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
     legendFormat: '{{`{{`}} container {{`}}`}} LIMITS'
@@ -1154,6 +1114,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1167,7 +1128,7 @@ panels:
         mode: percentage
         steps:
         - color: red
-          value: null
+          value: 0
         - color: yellow
           value: 20
         - color: green
@@ -1191,9 +1152,10 @@ panels:
       placement: right
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 - title: CPU Usage by container
   targets:
@@ -1236,6 +1198,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1248,7 +1211,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: none
@@ -1279,9 +1242,10 @@ panels:
       placement: right
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Memory Usage by container
   targets:
@@ -1326,6 +1290,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1338,7 +1303,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: bytes
@@ -1359,9 +1324,10 @@ panels:
       placement: right
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 - title: CPU Throttled seconds by container
   targets:
@@ -1407,6 +1373,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1419,7 +1386,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: s
@@ -1442,9 +1409,10 @@ panels:
       sortBy: Max
       sortDesc: true
     tooltip:
+      hideZeros: false
       mode: single
       sort: none
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Kubernetes
   collapsed: false
@@ -1460,7 +1428,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(increase(container_oom_events_total{namespace=\"${namespace}\",pod=~\"${pod}\",container!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(increase(container_oom_events_total{namespace=\"${namespace}\",pod=~\"${pod}\",container!=\"\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s) > 0" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: ""
@@ -1499,12 +1467,13 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
           mode: none
         thresholdsStyle:
-          mode: area
+          mode: "off"
       mappings: []
       max: 1
       min: 0
@@ -1512,15 +1481,7 @@ panels:
         mode: percentage
         steps:
         - color: red
-          value: null
-        - color: yellow
-          value: 20
-        - color: green
-          value: 30
-        - color: '#EAB839'
-          value: 70
-        - color: red
-          value: 80
+          value: 0
       unit: none
     overrides: []
   gridPos:
@@ -1536,16 +1497,17 @@ panels:
       placement: right
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Container Restarts by container
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(increase(kube_pod_container_status_restarts_total{namespace=\"${namespace}\",pod=~\"${pod}\",container!=\"\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(increase(kube_pod_container_status_restarts_total{namespace=\"${namespace}\",pod=~\"${pod}\",container!=\"\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(container,%s) > 0" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: true
     interval: ""
@@ -1584,12 +1546,13 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
           mode: none
         thresholdsStyle:
-          mode: area
+          mode: "off"
       mappings: []
       max: 1
       min: 0
@@ -1597,15 +1560,7 @@ panels:
         mode: percentage
         steps:
         - color: red
-          value: null
-        - color: yellow
-          value: 20
-        - color: green
-          value: 30
-        - color: '#EAB839'
-          value: 70
-        - color: red
-          value: 80
+          value: 0
       unit: none
     overrides: []
   gridPos:
@@ -1621,9 +1576,10 @@ panels:
       placement: right
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Pods with Container Issues
   targets:
@@ -1649,15 +1605,17 @@ panels:
         align: auto
         cellOptions:
           type: auto
-          wrapText: false
         filterable: true
+        footer:
+          reducers: []
         inspect: false
+        wrapText: false
       mappings: []
       thresholds:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: '#EAB839'
           value: 1
         - color: red
@@ -1694,14 +1652,8 @@ panels:
   id: 63
   options:
     cellHeight: sm
-    footer:
-      countRows: false
-      fields: ""
-      reducer:
-      - sum
-      show: false
     showHeader: true
-  pluginVersion: 11.3.1
+  pluginVersion: 12.2.1
   transformations:
   - id: labelsToFields
     options:
@@ -1759,15 +1711,17 @@ panels:
         align: auto
         cellOptions:
           type: auto
-          wrapText: false
         filterable: true
+        footer:
+          reducers: []
         inspect: false
+        wrapText: false
       mappings: []
       thresholds:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: '#EAB839'
           value: 1
         - color: red
@@ -1798,15 +1752,9 @@ panels:
   id: 64
   options:
     cellHeight: sm
-    footer:
-      countRows: false
-      fields: ""
-      reducer:
-      - sum
-      show: false
     showHeader: true
     sortBy: []
-  pluginVersion: 11.3.1
+  pluginVersion: 12.2.1
   transformations:
   - id: labelsToFields
     options:
@@ -1840,14 +1788,6 @@ panels:
         pod: Pod Name
   type: table
 - title: Network
-  targets:
-  - datasource:
-      type: datasource
-      uid: grafana
-    refId: A
-  datasource:
-    type: datasource
-    uid: grafana
   collapsed: false
   gridPos:
     h: 1
@@ -1903,6 +1843,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1914,7 +1855,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: binBps
@@ -1932,9 +1873,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Network - Packets Rate
   targets:
@@ -1983,6 +1925,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1994,7 +1937,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: pps
@@ -2012,9 +1955,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Network - Packets Dropped
   targets:
@@ -2063,6 +2007,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -2074,7 +2019,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: pps
@@ -2092,9 +2037,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Network - Errors
   targets:
@@ -2143,6 +2089,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -2154,7 +2101,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: pps
@@ -2172,9 +2119,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 8.3.3
+  pluginVersion: 12.2.1
   type: timeseries
 __elements: []
 __inputs:
@@ -2214,13 +2162,13 @@ description: 'This is a modern ''Pods View'' dashboard for your Kubernetes clust
 fiscalYearStartMonth: 0
 graphTooltip: 1
 links: []
-liveNow: false
+preload: false
 refresh: 30s
-schemaVersion: 39
+schemaVersion: 42
 time:
   from: now-1h
   to: now
 timepicker: {}
 uid: k8s_views_pods
-version: 37
+version: 38
 weekStart: ""

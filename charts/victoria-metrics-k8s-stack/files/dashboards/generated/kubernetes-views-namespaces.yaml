@@ -431,7 +431,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kube_pod_container_resource_requests{namespace=~\"$namespace\",resource=\"cpu\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(kube_pod_container_resource_requests{namespace=~\"$namespace\",resource=\"cpu\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=~\"$namespace\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
     legendFormat: Requests
@@ -440,7 +440,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kube_pod_container_resource_limits{namespace=~\"$namespace\",resource=\"cpu\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(kube_pod_container_resource_limits{namespace=~\"$namespace\",resource=\"cpu\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=~\"$namespace\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
     legendFormat: Limits
@@ -507,7 +507,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kube_pod_container_resource_requests{namespace=~\"$namespace\",resource=\"memory\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(kube_pod_container_resource_requests{namespace=~\"$namespace\",resource=\"memory\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=~\"$namespace\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
     legendFormat: Requests
@@ -516,7 +516,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kube_pod_container_resource_limits{namespace=~\"$namespace\",resource=\"memory\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(kube_pod_container_resource_limits{namespace=~\"$namespace\",resource=\"memory\",%s=~\"$cluster\"} and on(namespace,pod,%s) max(kube_pod_status_phase{phase=\"Running\",namespace=~\"$namespace\",%s=~\"$cluster\"} == 1) by(namespace,pod,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
     legendFormat: Limits
@@ -2255,5 +2255,5 @@ time:
   to: now
 timepicker: {}
 uid: k8s_views_ns
-version: 44
+version: 45
 weekStart: ""

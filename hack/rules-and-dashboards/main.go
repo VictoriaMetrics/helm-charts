@@ -1097,6 +1097,15 @@ func patchDatasource(d *strOrMap, dsName string) {
 	}
 }
 
+var substitutions = map[string]string{
+	"VAR__groupLabels":      `$groupLabels`,
+	"VAR__clusterLabel":     `$clusterLabel`,
+	"VAR__targetNamespace":  `.targetNamespace`,
+	"VAR__namespace":        `(include "vm.namespace" .)`,
+	"VAR__alertmanagerName": `(include "vm-k8s-stack.alertmanager.name" .)`,
+	"VAR__nodeExporterName": `(include "vm-k8s-stack.nodeExporter.name" .)`,
+}
+
 func patchExpr(expr, groupName, name, kind string) (string, string) {
 	if len(expr) == 0 {
 		return expr, ""
@@ -1106,7 +1115,6 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 		log.Printf("failed to parse expression %q: %s", expr, err)
 		return expr, ""
 	}
-	args := []string{}
 	modifierFn := func(m *metricsql.ModifierExpr) {
 		if m.Op == "by" || m.Op == "on" {
 			var found bool
@@ -1114,22 +1122,18 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 				if m.Args[i] == "cluster" {
 					found = true
 					if kind == "rules" {
-						m.Args[i] = "VAR__string"
-						args = append(args, "$groupLabels")
+						m.Args[i] = "VAR__groupLabels"
 					} else {
-						m.Args[i] = "VAR__string"
-						args = append(args, "$clusterLabel")
+						m.Args[i] = "VAR__clusterLabel"
 					}
 				}
 			}
 			if !found {
 				switch kind {
 				case "dashboards":
-					m.Args = append(m.Args, "VAR__string")
-					args = append(args, "$clusterLabel")
+					m.Args = append(m.Args, "VAR__clusterLabel")
 				case "rules":
-					m.Args = append(m.Args, "VAR__string")
-					args = append(args, "$groupLabels")
+					m.Args = append(m.Args, "VAR__groupLabels")
 				}
 			}
 		}
@@ -1137,9 +1141,6 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 	metricsql.VisitAll(e, func(ex metricsql.Expr) {
 		switch t := ex.(type) {
 		case *metricsql.BinaryOpExpr:
-			if name == "cluster" {
-				return
-			}
 			modifierFn(&t.JoinModifier)
 			modifierFn(&t.GroupModifier)
 		case *metricsql.AggrFuncExpr:
@@ -1151,11 +1152,9 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 				t.Modifier.Op = "by"
 				switch kind {
 				case "dashboards":
-					t.Modifier.Args = append(t.Modifier.Args, "VAR__string")
-					args = append(args, "$clusterLabel")
+					t.Modifier.Args = append(t.Modifier.Args, "VAR__clusterLabel")
 				case "rules":
-					t.Modifier.Args = append(t.Modifier.Args, "VAR__string")
-					args = append(args, "$groupLabels")
+					t.Modifier.Args = append(t.Modifier.Args, "VAR__groupLabels")
 				}
 			}
 		case *metricsql.MetricExpr:
@@ -1165,61 +1164,73 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 				for _, f := range t.LabelFilterss[i] {
 					if kind == "dashboards" {
 						if f.Label == "cluster" || f.Value == "$cluster" {
-							f.Label = "VAR__string"
+							f.Label = "VAR__clusterLabel"
 							f.Value = "$cluster"
 							f.IsRegexp = true
 							found = true
-							args = append(args, "$clusterLabel")
 						} else if f.Label == "__name__" && f.Value == "cluster" {
-							f.Value = "VAR__string"
+							f.Value = "VAR__clusterLabel"
 							found = true
-							args = append(args, "$clusterLabel")
 						}
 					} else if groupName == "kubernetes-storage" {
 						if f.Label == "job" && f.Value == "kubelet" {
 							filters = append(filters, metricsql.LabelFilter{
 								Label:    "namespace",
-								Value:    "%s",
+								Value:    "VAR__targetNamespace",
 								IsRegexp: true,
 							})
-							args = append(args, `.targetNamespace`)
 						}
 					} else if groupName == "alertmanager.rules" {
 						if f.Label == "namespace" && f.Value == "monitoring" {
-							f.Value = "%s"
-							args = append(args, `(include "vm.namespace" .)`)
+							f.Value = "VAR__namespace"
 						} else if f.Label == "job" && f.Value == "alertmanager-main" {
-							f.Value = "VAR__string"
-							args = append(args, `(include "vm-k8s-stack.alertmanager.name" .)`)
+							f.Value = "VAR__alertmanagerName"
 						}
 					} else if groupName == "kubernetes-apps" {
 						if f.Label == "job" && f.Value == "kube-state-metrics" {
 							filters = append(filters, metricsql.LabelFilter{
 								Label:    "namespace",
-								Value:    "%s",
+								Value:    "VAR__targetNamespace",
 								IsRegexp: true,
 							})
-							args = append(args, `.targetNamespace`)
 						}
 					} else if f.Label == "job" && f.Value == "node-exporter" {
-						f.Value = "VAR__string"
-						args = append(args, `(include "vm-k8s-stack.nodeExporter.name" .)`)
+						f.Value = "VAR__nodeExporterName"
 					}
 					filters = append(filters, f)
 				}
 				if !found && len(filters) > 1 && kind == "dashboards" && name != "cluster" {
 					filters = append(filters, metricsql.LabelFilter{
-						Label:    "VAR__string",
+						Label:    "VAR__clusterLabel",
 						Value:    "$cluster",
 						IsRegexp: true,
 					})
-					args = append(args, "$clusterLabel")
 				}
 				t.LabelFilterss[i] = filters
 			}
 		}
 	})
-	return strings.ReplaceAll(string(e.AppendString(nil)), "VAR__string", "%s"), strings.Join(args, " ")
+	result := string(e.AppendString(nil))
+	search := result
+	var args []string
+	for {
+		idx := strings.Index(search, "VAR__")
+		if idx < 0 {
+			break
+		}
+		search = search[idx:]
+		for subst, val := range substitutions {
+			if strings.HasPrefix(search, subst) {
+				search = search[len(subst):]
+				args = append(args, val)
+				break
+			}
+		}
+	}
+	for subst := range substitutions {
+		result = strings.ReplaceAll(result, subst, "%s")
+	}
+	return result, strings.Join(args, " ")
 }
 
 func patchPanel(p *dashboardPanel, dsName, name string) {

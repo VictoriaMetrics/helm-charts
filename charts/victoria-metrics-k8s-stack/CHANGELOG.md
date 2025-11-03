@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed order of arguments in rules and dashboards templates. See [#2531](https://github.com/VictoriaMetrics/helm-charts/issues/2531).
 
 ## 0.63.0
 

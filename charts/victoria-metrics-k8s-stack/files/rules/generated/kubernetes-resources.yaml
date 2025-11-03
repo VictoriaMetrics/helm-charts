@@ -48,7 +48,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeQuotaAlmostFull
-  expr: ((kube_resourcequota{job="kube-state-metrics",type="used"} / ignoring(instance,job,type) (kube_resourcequota{job="kube-state-metrics",type="hard"} > 0)) > 0.9) < 1
+  expr: {{ printf "((max(kube_resourcequota{job=\"kube-state-metrics\",type=\"used\"}) without(instance,job,type) / on(%s,namespace,resource,resourcequota) group_left() (max(kube_resourcequota{job=\"kube-state-metrics\",type=\"hard\"}) without(instance,job,type) > 0)) > 0.9) < 1" $groupLabels }}
   annotations:
     description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubequotaalmostfull
@@ -58,7 +58,7 @@ rules:
   labels:
     severity: info
 - alert: KubeQuotaFullyUsed
-  expr: (kube_resourcequota{job="kube-state-metrics",type="used"} / ignoring(instance,job,type) (kube_resourcequota{job="kube-state-metrics",type="hard"} > 0)) == 1
+  expr: {{ printf "(max(kube_resourcequota{job=\"kube-state-metrics\",type=\"used\"}) without(instance,job,type) / on(%s,namespace,resource,resourcequota) group_left() (max(kube_resourcequota{job=\"kube-state-metrics\",type=\"hard\"}) without(instance,job,type) > 0)) == 1" $groupLabels }}
   annotations:
     description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubequotafullyused
@@ -68,7 +68,7 @@ rules:
   labels:
     severity: info
 - alert: KubeQuotaExceeded
-  expr: (kube_resourcequota{job="kube-state-metrics",type="used"} / ignoring(instance,job,type) (kube_resourcequota{job="kube-state-metrics",type="hard"} > 0)) > 1
+  expr: {{ printf "(max(kube_resourcequota{job=\"kube-state-metrics\",type=\"used\"}) without(instance,job,type) / on(%s,namespace,resource,resourcequota) group_left() (max(kube_resourcequota{job=\"kube-state-metrics\",type=\"hard\"}) without(instance,job,type) > 0)) > 1" $groupLabels }}
   annotations:
     description: Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubequotaexceeded
