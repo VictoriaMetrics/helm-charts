@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Bump Vector version to [v0.51.0](https://vector.dev/releases/0.51.0/).
 
 ## 0.0.5
 
