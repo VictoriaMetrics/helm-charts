@@ -19,8 +19,10 @@ metadata:
     {{- with $app.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+  {{- $extraLabels := $app.labels | default dict }}
   {{- $_ := set $ctx "extraLabels" $app.labels }}
-  {{- $_ := set $ctx.extraLabels "app.kubernetes.io/component" "upgrade-crds" }}
+  {{- $_ := set $extraLabels "app.kubernetes.io/component" "upgrade-crds" }}
+  {{- $_ := set $ctx "extraLabels" $extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
 spec:
@@ -34,11 +36,11 @@ spec:
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
     spec:
-      {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      {{- with (.Values.imagePullSecrets | default (.Values.global).imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "crds.upgrade.serviceAccountName" . }}
-      {{- if $app.podSecurityContext.enabled }}
+      {{- if ($app.podSecurityContext).enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
       initContainers:
