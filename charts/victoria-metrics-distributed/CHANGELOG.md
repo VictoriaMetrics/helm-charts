@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- enable ingest only mode for VMAgents. See [#1594](https://github.com/VictoriaMetrics/operator/issues/1594).
 
 ## 0.23.0
 
