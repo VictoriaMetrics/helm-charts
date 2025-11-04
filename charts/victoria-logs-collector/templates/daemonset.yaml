@@ -1,32 +1,27 @@
+{{- $ctx := dict "helm" . }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: {{ include "victoria-logs-collector.fullname" . }}
-  labels:
-    app.kubernetes.io/name: {{ include "victoria-logs-collector.fullname" . }}
+  name: {{ include "vm.fullname" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
   selector:
-    matchLabels:
-      app.kubernetes.io/name: {{ include "victoria-logs-collector.fullname" . }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
-      labels:
-        app.kubernetes.io/name: {{ include "victoria-logs-collector.fullname" . }}
-        {{- with .Values.podLabels }}
-        {{ toYaml . | nindent 8 }}
-        {{- end }}
-      annotations:
-        {{- with .Values.podAnnotations }}
-        {{ toYaml . | nindent 8 }}
-        {{- end }}
-        {{- if not .Values.native }}
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- end }}
+      {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
+      {{- $annotations := deepCopy .Values.podAnnotations }}
+      {{- if not .Values.native }}
+      {{- $_ := set $annotations "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum) }}
+      {{- end }}
+      annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
-      serviceAccountName: {{ include "victoria-logs-collector.fullname" . }}
+      serviceAccountName: {{ include "vm.fullname" $ctx }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
@@ -94,7 +89,7 @@ spec:
         {{- if not .Values.native }}
         - name: config
           configMap:
-            name: {{ include "victoria-logs-collector.fullname" . }}-config
+            name: {{ include "vm.fullname" $ctx }}-config
         {{- end }}
         - name: vl-collector-data
           hostPath:

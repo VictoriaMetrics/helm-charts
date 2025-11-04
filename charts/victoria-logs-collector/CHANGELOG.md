@@ -1,6 +1,9 @@
 ## Next release
 
+**Update note**: All resources that are managed by chart will be recreated due to changes in naming and labels.
+
 - Bump Vector version to [v0.51.0](https://vector.dev/releases/0.51.0/).
+- replace chart's template for fullname generation with common's `vm.fullname`
 
 ## 0.0.5
 
