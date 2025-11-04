@@ -2,28 +2,71 @@ daemonSet should match snapshot:
   1: |
     apiVersion: v1
     data:
-      vector.yaml: "data_dir: /vl-collector\n\nsources:\n  k8s:\n    type: kubernetes_logs\n    pod_annotation_fields:\n      # Disable \"pod_ips\" as \"pod_ip\" already includes required info\n      pod_ips: \"\"\n\ntransforms:\n  json_parser:\n    type: remap\n    inputs: [k8s]\n    source: |\n      .message = parse_json(.message) ?? .message\n\nsinks:\n  \n  remote_write_0:\n    type: http\n    inputs: [json_parser]\n    uri: \"http://victoria-logs:9428/insert/jsonline\"\n    encoding:\n      codec: json\n    framing:\n      method: newline_delimited\n    healthcheck:\n      enabled: false\n    request:\n      headers:\n        AccountID: \"0\"\n        ProjectID: \"0\"\n        VL-Stream-Fields: kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace\n        VL-Msg-Field: message\n        VL-Time-Field: timestamp\n    compression: \"zstd\"\n"
+      vector.yaml: |
+        data_dir: /vl-collector
+        sources:
+          k8s:
+            type: kubernetes_logs
+            pod_annotation_fields:
+              # Disable "pod_ips" as "pod_ip" already includes required info
+              pod_ips: ""
+        transforms:
+          json_parser:
+            type: remap
+            inputs: [k8s]
+            source: |
+              .message = parse_json(.message) ?? .message
+        sinks:
+          remote_write_0:
+            type: http
+            inputs: [json_parser]
+            uri: "http://victoria-logs:9428/insert/jsonline"
+            encoding:
+              codec: json
+            framing:
+              method: newline_delimited
+            healthcheck:
+              enabled: false
+            request:
+              headers:
+                AccountID: "0"
+                ProjectID: "0"
+                VL-Stream-Fields: kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
+                VL-Msg-Field: message
+                VL-Time-Field: timestamp
+            compression: "zstd"
     kind: ConfigMap
     metadata:
       labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-logs-collector
-      name: victoria-logs-collector-config
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-logs-collector-0.1.1
+      name: RELEASE-NAME-victoria-logs-collector-config
   2: |
     apiVersion: apps/v1
     kind: DaemonSet
     metadata:
       labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-logs-collector
-      name: victoria-logs-collector
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-logs-collector-0.1.1
+      name: RELEASE-NAME-victoria-logs-collector
     spec:
       selector:
         matchLabels:
+          app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-logs-collector
       template:
         metadata:
           annotations:
-            checksum/config: 54545d2014de61010a3f06134ac88616b41cf4b9adab576f57ff34c8a79a0f33
+            checksum/config: 4d48db702a3eee6969dfc603924253136385e307ad8aa6a1281df9a3f9869e87
           labels:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/name: victoria-logs-collector
         spec:
           containers:
@@ -49,7 +92,7 @@ daemonSet should match snapshot:
                 - mountPath: /vl-collector
                   name: vl-collector-data
           securityContext: {}
-          serviceAccountName: victoria-logs-collector
+          serviceAccountName: RELEASE-NAME-victoria-logs-collector
           volumes:
             - hostPath:
                 path: /var/log
@@ -58,7 +101,7 @@ daemonSet should match snapshot:
                 path: /var/lib
               name: varlib
             - configMap:
-                name: victoria-logs-collector-config
+                name: RELEASE-NAME-victoria-logs-collector-config
               name: config
             - hostPath:
                 path: /var/lib/vl-collector
@@ -67,7 +110,13 @@ daemonSet should match snapshot:
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
-      name: victoria-logs-collector-node-reader
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-collector
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-logs-collector-0.1.1
+      name: RELEASE-NAME-victoria-logs-collector
     rules:
       - apiGroups:
           - ""
@@ -83,14 +132,20 @@ daemonSet should match snapshot:
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
-      name: victoria-logs-collector-node-reader-binding
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-collector
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-logs-collector-0.1.1
+      name: RELEASE-NAME-victoria-logs-collector
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
-      name: victoria-logs-collector-node-reader
+      name: RELEASE-NAME-victoria-logs-collector
     subjects:
       - kind: ServiceAccount
-        name: victoria-logs-collector
+        name: RELEASE-NAME-victoria-logs-collector
         namespace: NAMESPACE
   5: |
     apiVersion: v1
@@ -98,4 +153,10 @@ daemonSet should match snapshot:
     kind: ServiceAccount
     metadata:
       annotations: {}
-      name: victoria-logs-collector
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-collector
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-logs-collector-0.1.1
+      name: RELEASE-NAME-victoria-logs-collector
