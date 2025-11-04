@@ -54,7 +54,7 @@
       {{- $headers = append $headers (printf "VL-Extra-Fields:%s" ($pairs | join ",")) }}
     {{- end }}
 
-    {{- $args = append $args (printf "--remoteWrite.headers=%q" ($headers | join "^^")) }}
+    {{- $args = append $args (printf "--remoteWrite.headers=%s" ($headers | join "^^")) }}
   {{- end }}
   {{- toYaml $args }}
 {{- end }}
