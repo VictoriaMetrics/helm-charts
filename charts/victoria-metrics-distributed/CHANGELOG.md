@@ -2,7 +2,6 @@
 
 **Update note**: This release contains breaking changes. Please follow [upgrade guide](https://docs.victoriametrics.com/helm/victoria-metrics-distributed/#upgrade-to-0240)
 
-- added `rw` global balancer, that accepts both write and read traffic.
 - enable ingest only mode for VMAgents. See [#1594](https://github.com/VictoriaMetrics/operator/issues/1594).
 
 ## 0.23.0

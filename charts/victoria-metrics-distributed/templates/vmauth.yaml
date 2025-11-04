@@ -4,7 +4,7 @@
 {{- $common := $values.common | default dict }}
 {{- $zoneTpl := $values.zoneTpl }}
 {{- $fullname := include "vm.fullname" . }}
-{{- $kinds := list "read" "write" "rw" }}
+{{- $kinds := list "read" "write" }}
 {{- $defaultUrlMapItem := $values.defaultUrlMapItem }}
 {{- range $kind := $kinds }}
   {{- $auth := index $values $kind "global" "vmauth" | default dict }}
@@ -30,7 +30,7 @@ metadata:
   {{- $urls := dict "vmcluster" (default list) "vmsingle" (default list) "vmagent" (default list) }}
   {{- range $i, $z := $values.availabilityZones }}
     {{- $zone := mergeOverwrite (deepCopy $zoneTpl) $z }}
-    {{- if has $kind (list "read" "rw") -}}
+    {{- if has $kind (list "read") -}}
       {{- if $zone.read.vmauth.enabled -}}
         {{- $urlSpec := (($zone.read).vmauth).spec | default dict }}
         {{- $_ := set $zone.read.vmauth "spec" (mergeOverwrite (deepCopy $commonAuth.spec) $urlSpec) }}
@@ -55,7 +55,7 @@ metadata:
         {{- $_ := set $urls "vmsingle" (append $urls.vmsingle (include "vm.url" $urlCtx)) }}
       {{- end -}}
     {{- end -}}
-    {{- if has $kind (list "write" "rw") -}}
+    {{- if has $kind (list "write") -}}
       {{- if $zone.vmagent.enabled -}}
         {{- $agentSpec := $zone.vmagent.spec | default dict }}
         {{- $_ := set $zone.vmagent "spec" (mergeOverwrite (deepCopy $commonAgent.spec) $agentSpec) }}

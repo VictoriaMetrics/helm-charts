@@ -16,12 +16,6 @@
   {{- $fullname := include "vm.fullname" . }}
   {{- $urlCtx := dict "helm" . "appKey" (list "globalWrite" "vmauth" "spec") "globalWrite" (dict "vmauth" $write) "style" "managed" "fullname" $fullname }}
   {{- $urls = append $urls (printf "%s/prometheus/api/v1/write" (include "vm.url" $urlCtx)) }}
-{{- else if $values.rw.global.vmauth.enabled }}
-  {{- $write := deepCopy (($values.rw).global).vmauth }}
-  {{- $_ := set $write "spec" (mergeOverwrite (deepCopy $common.vmauth.spec) $write.spec) }}
-  {{- $fullname := include "vm.fullname" . }}
-  {{- $urlCtx := dict "helm" . "appKey" (list "globalWrite" "vmauth" "spec") "globalWrite" (dict "vmauth" $write) "style" "managed" "fullname" $fullname }}
-  {{- $urls = append $urls (printf "%s/prometheus/api/v1/write" (include "vm.url" $urlCtx)) }}
 {{- else }}
   {{- range $i, $z := $values.availabilityZones }}
     {{- $zone := mergeOverwrite (deepCopy $zoneTpl) $z }}
