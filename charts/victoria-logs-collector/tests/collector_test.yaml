@@ -1,0 +1,13 @@
+suite: collector templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - '*.yaml'
+tests:
+  - it: daemonSet should match snapshot
+    asserts:
+      - matchSnapshot: {}
+    set:
+      remoteWrite:
+        - url: http://victoria-logs:9428
