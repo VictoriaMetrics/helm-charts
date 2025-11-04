@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.1.0
+
+**Release date:** 04 Nov 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 **Update note**: All resources that are managed by chart will be recreated due to changes in naming and labels.
 
 - Bump Vector version to [v0.51.0](https://vector.dev/releases/0.51.0/).
