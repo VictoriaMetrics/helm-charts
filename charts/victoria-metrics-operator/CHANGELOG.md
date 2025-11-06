@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- revert adding common dependency to crds subchart. See [#2547](https://github.com/VictoriaMetrics/helm-charts/issues/2547).
 
 ## 0.56.1
 
