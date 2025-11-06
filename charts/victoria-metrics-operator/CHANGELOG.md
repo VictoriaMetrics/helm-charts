@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.56.2
+
+**Release date:** 06 Nov 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.65.0](https://img.shields.io/badge/v0.65.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0650)
+
 - revert adding common dependency to crds subchart. See [#2547](https://github.com/VictoriaMetrics/helm-charts/issues/2547).
 
 ## 0.56.1
