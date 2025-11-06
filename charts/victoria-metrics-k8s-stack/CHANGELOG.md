@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump uperator chart version 0.56.0 -> 0.56.1. See [#2535](https://github.com/VictoriaMetrics/helm-charts/issues/2535).
 
 ## 0.63.2
 
