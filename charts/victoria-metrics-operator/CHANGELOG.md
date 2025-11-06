@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix update job templates. See [#2535](https://github.com/VictoriaMetrics/helm-charts/issues/2535).
 
 ## 0.56.0
 
