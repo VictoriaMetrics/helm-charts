@@ -33,26 +33,27 @@ For write:
 1. extra-vmagent(optional): scrapes external targets and all the components installed by this chart, sends data to global write entrypoint.
 2. vmauth-global-write: global write entrypoint, proxies requests to one of the zone `vmagent` with `least_loaded` policy.
 3. vmagent(per-zone): remote writes data to availability zones that enabled `.Values.availabilityZones[*].write.allow`, and [buffer data on disk](https://docs.victoriametrics.com/victoriametrics/vmagent/#calculating-disk-space-for-persistence-queue) when zone is unavailable to ingest.
-4. vmauth-write-balancer(per-zone): proxies requests to vminsert instances inside it's zone with `least_loaded` policy.
-5. vmcluster(per-zone): processes write requests and stores data.
+4. vmcluster(per-zone): processes write requests and stores data.
 
 For read:
 1. vmcluster(per-zone): processes query requests and returns results.
-2. vmauth-read-balancer(per-zone): proxies requests to vmselect instances inside it's zone with `least_loaded` policy.
-3. vmauth-read-proxy(per-zone): uses all the `vmauth-read-balancer` as servers if zone has `.Values.availabilityZones[*].read.allow` enabled, always prefer "local" `vmauth-read-balancer` to reduce cross-zone traffic with `first_available` policy.
-4. vmauth-global-read: global query entrypoint, proxies requests to one of the zone `vmauth-read-proxy` with `first_available` policy.
-5. grafana(optional): uses `vmauth-global-read` as default datasource.
+2. vmauth-read-proxy(per-zone): proxies query requests to zones with `.Values.availabilityZones[*].read.allow` enabled, preferring the "local" zone to reduce cross-zone traffic using the `first_available` policy.
+3. vmauth-global-read: global query entrypoint, proxies requests to one of the zone `vmauth-read-proxy` with `first_available` policy.
+4. grafana(optional): uses `vmauth-global-read` as default datasource.
 
 >Note:
 As the topology shown above, this chart doesn't include components like vmalert, alertmanager, etc by default. 
 You can install them using dependency [victoria-metrics-k8s-stack](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack) or having separate release.
+
+>Note:
+The default topology tolerates zone outages by deploying components in every availability zone and enabling minimum-downtime during outages. If not required, some components(including vmauth-global-write, vmagent(per-zone), vmauth-read-proxy(per-zone)) are optional and can be disabled based on your use case, please refer to [Parameters](#parameters) section for details.
 
 ### Why use `victoria-metrics-distributed` chart?
 
 One of the best practice of running production kubernetes cluster is running with [multiple availability zones](https://kubernetes.io/docs/setup/best-practices/multiple-zones/). And apart from kubernetes control plane components, we also want to spread our application pods on multiple zones, to continue serving even if zone outage happens. 
 
 VictoriaMetrics supports [data replication](https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#replication-and-data-safety) natively which can guarantees data availability when part of the vmstorage instances failed. But it doesn't works well if vmstorage instances are spread on multiple availability zones, since data replication could be stored on single availability zone, which will be lost when zone outage happens.
-To avoid this, vmcluster must be installed on multiple availability zones, each containing a 100% copy of data. As long as one zone is available, both global write and read entrypoints should work without interruption.
+To avoid this, database(such as vmcluster or vmsingle) must be deployed across multiple zones, with each zone containing a full copy of the data. As long as one zone remains available, both global write and read entrypoints should operate without interruption.
 
 ### How to write data?
 
@@ -71,7 +72,7 @@ You can also pick other proxies like kubernetes service which supports [Topology
 If availability zone `zone-eu-1` is experiencing an outage, `vmauth-global-write` and `vmauth-global-read` will work without interruption:
 1. `vmauth-global-write` stops proxying write requests to `zone-eu-1` automatically;
 2. `vmauth-global-read` and `vmauth-read-proxy` stops proxying read requests to `zone-eu-1` automatically;
-3. `vmagent` on `zone-us-1` fails to send data to `zone-eu-1.vmauth-write-balancer`, starts to buffer data on disk(unless `-remoteWrite.disableOnDiskQueue` is specified, which is not recommended for this topology);
+3. `vmagent` on `zone-us-1` fails to send data to `zone-eu-1`, starts to buffer data on disk(unless `-remoteWrite.disableOnDiskQueue` is specified, which is not recommended for this topology);
 To keep data completeness for all the availability zones, make sure you have enough disk space on vmagent for buffer, see [this doc](https://docs.victoriametrics.com/victoriametrics/vmagent/#calculating-disk-space-for-persistence-queue) for size recommendation.
 
 And to avoid getting incomplete responses from `zone-eu-1` which gets recovered from outage, check vmagent on `zone-us-1` to see if persistent queue has been drained. If not, remove `zone-eu-1` from serving query by setting `.Values.availabilityZones.{zone-eu-1}.read.allow=false` and change it back after confirm all data are restored.
