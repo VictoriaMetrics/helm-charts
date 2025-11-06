@@ -15,7 +15,7 @@
   {{- $_ := set $write "spec" (mergeOverwrite (deepCopy $common.vmauth.spec) $write.spec) }}
   {{- $fullname := include "vm.fullname" . }}
   {{- $urlCtx := dict "helm" . "appKey" (list "globalWrite" "vmauth" "spec") "globalWrite" (dict "vmauth" $write) "style" "managed" "fullname" $fullname }}
-  {{- $urls = append $urls (printf "%s/prometheus/api/v1/write" (include "vm.url" $urlCtx)) }}
+  {{- $urls = append $urls (dict "url" (printf "%s/prometheus/api/v1/write" (include "vm.url" $urlCtx))) }}
 {{- else }}
   {{- range $i, $z := $values.availabilityZones }}
     {{- $zone := mergeOverwrite (deepCopy $zoneTpl) $z }}
@@ -23,19 +23,19 @@
       {{- $urlSpec := mergeOverwrite (deepCopy ((($common.vmcluster).spec | default dict))) (deepCopy ($zone.vmcluster).spec | default dict) }}
       {{- $_ := set $zone.vmcluster "spec" $urlSpec }}
       {{- $_ := set $urlCtx "zone" $zone }}
-      {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
-      {{- $urls = append $urls (printf "%s/insert/%s/prometheus/api/v1/write" (include "vm.url" $urlCtx) $tenant) }}
+      {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vminsert") }}
+      {{- $urls = append $urls (dict "url" (printf "%s/insert/%s/prometheus/api/v1/write" (include "vm.url" $urlCtx) $tenant)) }}
     {{- else if $zone.vmsingle.enabled }}
       {{- $urlSpec := mergeOverwrite (deepCopy ((($common.vmsingle).spec | default dict))) (deepCopy ($zone.vmsingle).spec | default dict) }}
       {{- $_ := set $zone.vmsingle "spec" $urlSpec }}
       {{- $_ := set $urlCtx "zone" $zone }}
       {{- $_ := set $urlCtx "appKey" (list "zone" "vmsingle" "spec") }}
-      {{- $urls = append $urls (printf "%s/prometheus/api/v1/write" (include "vm.url" $urlCtx)) }}
+      {{- $urls = append $urls (dict "url" (printf "%s/prometheus/api/v1/write" (include "vm.url" $urlCtx))) }}
     {{- end }}
   {{- end }}
 {{- end -}}
 
-{{- $_ := set $spec "remoteWrites" $urls }}
+{{- $_ := set $spec "remoteWrite" (concat ($spec.remoteWrite | default list) $urls) }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAgent
