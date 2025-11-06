@@ -48358,6 +48358,59 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - revert adding common dependency to crds subchart. See [#2547](https://github.com/VictoriaMetrics/helm-charts/issues/2547).
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/operator/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/operator/changelog/
+      artifacthub.io/operator: "true"
+      artifacthub.io/readme: |
+        # VictoriaMetrics Operator Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-operator/)
+    apiVersion: v2
+    appVersion: v0.65.0
+    created: "2025-11-06T12:14:34.701922049Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    - condition: crds.plain
+      name: crds
+      repository: ""
+      version: 0.0.*
+    description: VictoriaMetrics Operator
+    digest: 29ed5cba12b0a6fd9c03d35aa719dce7bbd7229bea993f95cd72d7caa4df4cd0
+    home: https://github.com/VictoriaMetrics/operator
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-operator
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    - https://github.com/VictoriaMetrics/operator
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-operator-0.56.2/victoria-metrics-operator-0.56.2.tgz
+    version: 0.56.2
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - fix update job templates. See [#2535](https://github.com/VictoriaMetrics/helm-charts/issues/2535).
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -59526,4 +59579,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2025-11-06T09:40:23.635992046Z"
+generated: "2025-11-06T12:14:34.705561695Z"
