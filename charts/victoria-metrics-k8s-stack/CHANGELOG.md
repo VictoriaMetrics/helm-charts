@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump uperator chart version 0.56.1 -> 0.56.3
 
 ## 0.63.3
 
