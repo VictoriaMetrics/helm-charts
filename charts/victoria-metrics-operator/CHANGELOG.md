@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- set `.Values.upgrade.enabled: false` in a nested `crds` chart to fix lint helm issues
 
 ## 0.56.2
 
