@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix alertmanager pvc template. See [#2552](https://github.com/VictoriaMetrics/helm-charts/issues/2552).
 
 ## 0.26.4
 
