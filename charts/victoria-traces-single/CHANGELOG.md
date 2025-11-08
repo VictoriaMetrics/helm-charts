@@ -1,6 +1,8 @@
 ## Next release
 
 - support HTTPRoute for chart components, where ingress is available. See [#2492](https://github.com/VictoriaMetrics/helm-charts/issues/2492).
+- bump version of VictoriaTraces components to [v0.5.0](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.5.0)
+
 
 ## 0.0.2
 
