@@ -50,6 +50,9 @@ Victoria Metrics Image
     {{- end -}}
   {{- end -}}
   {{- $image := ternary $ctx.image $values.image (hasKey $ctx "image") -}}
+  {{- if not $image }}
+    {{- $image = default dict }}
+  {{- end }}
   {{- if not $image.registry }}
     {{- if (($Values.global).image).registry -}}
       {{- $_ := set $image "registry" (($Values.global).image).registry -}}

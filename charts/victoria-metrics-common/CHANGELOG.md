@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fix setting global registry, when no image section is set
 
 ## 0.0.42
 
