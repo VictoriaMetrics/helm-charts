@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.0.44
+
+**Release date:** 10 Nov 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - copy image section to prevent original image section modification
 
 ## 0.0.43
