@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- follow-up for previous release
 
 ## 0.0.44
 
