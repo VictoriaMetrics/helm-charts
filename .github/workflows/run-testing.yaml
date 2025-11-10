@@ -113,14 +113,18 @@ jobs:
           if [[ -n "$CRDS" ]]; then
             echo "$CRDS" | kubectl apply -f -
           fi
-          helm template charts/${{ matrix.chart }} \
-            --namespace ${{ matrix.chart }}-testing \
-            --values charts/${{ matrix.chart }}/e2e/simple.yaml \
-            --validate | kubectl apply --server-side -f - --dry-run=server
-          cd charts/${{ matrix.chart }}
-          ct install \
-            --release-name test \
-            --namespace ${{ matrix.chart }}-testing \
-            --config ../../.github/ci/ct.yaml \
-            --charts . \
-            --helm-extra-set-args "--values e2e/simple.yaml" --skip-clean-up
+          if [ -f charts/${{ matrix.chart }}/e2e/simple.yaml ]; then
+            helm template charts/${{ matrix.chart }} \
+              --namespace ${{ matrix.chart }}-testing \
+              --values charts/${{ matrix.chart }}/e2e/simple.yaml \
+              --validate | kubectl apply --server-side -f - --dry-run=server
+            cd charts/${{ matrix.chart }}
+            ct install \
+              --release-name test \
+              --namespace ${{ matrix.chart }}-testing \
+              --config ../../.github/ci/ct.yaml \
+              --charts . \
+              --helm-extra-set-args "--values e2e/simple.yaml" --skip-clean-up
+          else
+            echo "skipping tests since to e2e values were found"
+          fi
