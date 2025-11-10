@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump operator chart version 0.0.42 -> 0.0.45
 
 ## 1.12.5
 
