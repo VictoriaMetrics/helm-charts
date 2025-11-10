@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump operator chart version 0.0.42 -> 0.0.45
 
 ## 0.63.4
 
@@ -8,7 +8,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.129.1](https://img.shields.io/badge/v1.129.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11291)
 
-- bump uperator chart version 0.56.1 -> 0.56.3
+- bump operator chart version 0.56.1 -> 0.56.3
 
 ## 0.63.3
 
