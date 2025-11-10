@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- copy image section to prevent original image section modification
 
 ## 0.0.43
 
