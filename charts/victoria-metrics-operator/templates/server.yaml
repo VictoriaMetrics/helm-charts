@@ -1,6 +1,10 @@
 {{- $ctx := dict "helm" . "noEnterprise" true }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
+{{- $env := dict -}}
+{{- range .Values.env | default list -}}
+  {{- $_ := set $env .name .value -}}
+{{- end -}}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -63,6 +67,10 @@ spec:
               value: {{ .Chart.Name }}
             - name: VM_USECUSTOMCONFIGRELOADER
               value: "{{ .Values.operator.useCustomConfigReloader }}"
+            {{- if and (.Values.operator.useCustomConfigReloader) (not (hasKey $env "VM_CUSTOMCONFIGRELOADERIMAGE")) }}
+            - name: VM_CUSTOMCONFIGRELOADERIMAGE
+              value: victoriametrics/operator:config-reloader-{{- include "vm.image.tag" . -}}
+            {{ end }}
             {{- with (((.Values).global).image).registry }}
             - name: VM_CONTAINERREGISTRY
               value: {{ quote . }}
