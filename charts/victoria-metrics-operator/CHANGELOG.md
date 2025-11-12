@@ -1,6 +1,7 @@
 ## Next release
 
 - bump operator chart version 0.0.42 -> 0.0.45
+- use same config reloader version as operator by default
 
 ## 0.56.3
 
