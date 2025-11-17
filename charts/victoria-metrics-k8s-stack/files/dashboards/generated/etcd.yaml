@@ -19,7 +19,7 @@ templating:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "label_values(etcd_server_has_leader{job=~\".*etcd.*\"}, job)" ) ".*" $multicluster }}
+    query: {{ ternary (printf "label_values(etcd_server_has_leader{job=~\".*etcd.*\"}, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     refresh: 2
 editable: false

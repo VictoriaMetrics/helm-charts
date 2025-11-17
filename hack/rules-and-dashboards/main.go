@@ -129,12 +129,7 @@ var dashboardClusterMetric = map[string]string{
 	"node-exporter-full":            "node_uname_info",
 }
 
-var ruleGroupDashboard = map[string]string{
-	//"alertmanager.rules": "alertmanager-overview",
-	//"etcd":               "c2f4e12cdf69feb95caa41a5a1b423d9",
-	//"node-exporter":      "rYdddlPWk",
-	//"node-network":       "rYdddlPWk",
-}
+var ruleGroupDashboard = map[string]string{}
 
 func (i *remoteImporter) Import(importedFrom, path string) (jsonnet.Contents, string, error) {
 	iu, err := url.Parse(importedFrom)
@@ -1168,9 +1163,14 @@ func patchExpr(expr, groupName, name, kind string) (string, string) {
 							f.Value = "$cluster"
 							f.IsRegexp = true
 							found = true
-						} else if f.Label == "__name__" && f.Value == "cluster" {
-							f.Value = "VAR__clusterLabel"
-							found = true
+						} else if f.Label == "__name__" {
+							if f.Value == "cluster" {
+								f.Value = "VAR__clusterLabel"
+								found = true
+							} else if groupName == "etcd" && f.Value == "job" {
+								f.Value = "VAR__clusterLabel"
+								found = true
+							}
 						}
 					} else if groupName == "kubernetes-storage" {
 						if f.Label == "job" && f.Value == "kubelet" {

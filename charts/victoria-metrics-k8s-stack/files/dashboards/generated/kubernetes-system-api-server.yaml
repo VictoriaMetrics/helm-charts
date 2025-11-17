@@ -27,7 +27,7 @@ templating:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
     type: {{ ternary "query" "constant" $multicluster }}
-    query: {{ ternary (printf "{\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\",\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\"}" $clusterLabel) ".*" $multicluster }}
+    query: {{ ternary (printf "{\"qryType\":1,\"query\":\"label_values(kube_node_info, %s)\",\"refId\":\"PrometheusVariableQueryEditor-VariableQuery\"}" $clusterLabel) ".*" $multicluster }}
     definition: {{ ternary (printf "label_values(kube_node_info, %s)" $clusterLabel) ".*" $multicluster }}
     hide: {{ ternary 0 2 $multicluster }}
     current:
