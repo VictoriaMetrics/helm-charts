@@ -1,6 +1,7 @@
 ## Next release
 
 - bump operator chart version 0.0.42 -> 0.0.45
+- Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.28.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1280).
 
 ## 1.12.5
 
