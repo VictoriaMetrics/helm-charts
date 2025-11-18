@@ -2,6 +2,7 @@
 
 - enable ingest only mode for VMAgents. See [#1594](https://github.com/VictoriaMetrics/operator/issues/1594).
 - bump operator chart version 0.0.42 -> 0.0.45
+- bump version of VM components to [v1.130.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.130.0)
 
 ## 0.23.0
 
