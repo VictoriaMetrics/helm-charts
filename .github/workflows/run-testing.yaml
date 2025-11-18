@@ -5,6 +5,7 @@ on:
     paths:
       - Makefile
       - 'charts/**'
+      - 'test/**'
       - '!charts/*/lint/**'
       - '!**/*.md.gotmpl'
       - '!**/*.md'
@@ -15,6 +16,7 @@ on:
     paths:
       - Makefile
       - 'charts/**'
+      - 'test/**'
       - '!charts/*/lint/**'
       - '!**/*.md.gotmpl'
       - '!**/*.md'
@@ -26,46 +28,15 @@ env:
   HELM_VERSION: 3.17.4
 
 jobs:
-  get-changed-charts:
-    name: Get changed charts
-    runs-on: ubuntu-24.04
+  chart-tests:
+    name: Run chart tests
+    runs-on: ubuntu-latest
     permissions:
       contents: read
-    outputs:
-      charts: ${{ steps.charts-diff.outputs.charts }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Run changed-files with dir_names
-        id: changed-charts
-        uses: tj-actions/changed-files@v46
-        with:
-          matrix: true
-          files: |
-            charts/**
-
-      # This steps gets output of changes-charts step and filters out only chart names
-      # changed-charts output is space-separated list of changed paths
-      # this bash pipeline extracts unique chart names from the list
-      - name: Build charts diff
-        id: charts-diff
-        run: |
-          charts=$(echo '${{ steps.changed-charts.outputs.all_changed_files }}' | jq -c '. | map(. | split("/").[1] | select(. != null)) | unique');
-          echo "charts=$charts" >> $GITHUB_OUTPUT
-
-  install-chart:
-    name: Install chart
-    runs-on: ubuntu-24.04
-    needs: get-changed-charts
-    if: ${{ needs.get-changed-charts.outputs.charts != '[]' }}
-    permissions:
-      contents: read
+      checks: write
+    if: github.event.pull_request.draft == false
     strategy:
       matrix:
-        chart: ${{ fromJSON(needs.get-changed-charts.outputs.charts) }}
         k8s_version: ["v1.31.12", "v1.32.8", "v1.33.4"]
       fail-fast: false
     steps:
@@ -74,57 +45,44 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Kubernetes tools
-        uses: yokawasa/action-setup-kube-tools@v0.11.2
+      - name: Restore binaries from cache
+        uses: actions/cache/restore@v4
         with:
-          setup-tools: |
-            helmv3
-            kubectl
-          helm: "${{ env.HELM_VERSION }}"
-          kubectl: "${{ matrix.k8s_version }}"
+          path: ./bin
+          key: binary
 
-      - uses: actions/setup-python@v5
+      - name: Setup Go
+        uses: actions/setup-go@v6
         with:
-          python-version: "3.13"
+          go-version-file: "test/go.mod"
+          check-latest: true
+          cache: true
+        id: go
 
-      - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.7.0
-        with:
-          version: 3.13.0
+      - name: Install go-junit-report
+        run: |
+          go install github.com/joschi/go-junit-report/v2/cmd/go-junit-report@latest
 
       - name: Create Kind cluster
         uses: helm/kind-action@v1
         with:
           node_image: kindest/node:${{ matrix.k8s_version }}
-          kubectl_version: ${{ matrix.k8s_version }}
 
-      - name: Remove node taints
-        run: |
-          kubectl taint --all=true nodes node.cloudprovider.kubernetes.io/uninitialized- || true
+      - name: Add helm repo dependencies
+        run: yq -M eval '.repositories[] | (.name + " " + .url)' .github/ci/helm-repos.yaml | xargs -L 1 helm repo add
 
-      - name: Run chart-testing (install)
-        env:
-          LICENSE_KEY: ${{ secrets.ENTERPRISE_COMPONENTS_LICENSE_KEY }}
+      - name: Run tests
         run: |
-          kubectl create namespace ${{ matrix.chart }}-testing
-          kubectl create secret -n=${{ matrix.chart }}-testing generic license --from-literal=key=$LICENSE_KEY
-          helm dep update charts/${{ matrix.chart }}
-          CRDS=$(helm show crds charts/${{ matrix.chart }})
-          if [[ -n "$CRDS" ]]; then
-            echo "$CRDS" | kubectl apply -f -
-          fi
-          if [ -f charts/${{ matrix.chart }}/e2e/simple.yaml ]; then
-            helm template charts/${{ matrix.chart }} \
-              --namespace ${{ matrix.chart }}-testing \
-              --values charts/${{ matrix.chart }}/e2e/simple.yaml \
-              --validate | kubectl apply --server-side -f - --dry-run=server
-            cd charts/${{ matrix.chart }}
-            ct install \
-              --release-name test \
-              --namespace ${{ matrix.chart }}-testing \
-              --config ../../.github/ci/ct.yaml \
-              --charts . \
-              --helm-extra-set-args "--values e2e/simple.yaml" --skip-clean-up
-          else
-            echo "skipping tests since to e2e values were found"
-          fi
+          cd test && go test -json -p 1 ./... 2>&1 | go-junit-report -set-exit-code -parser gojson -iocopy -out ../report.xml
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v6
+        if: success() || failure()
+        with:
+          report_paths: 'report.xml'
+
+      - name: Prepare binary cache
+        uses: actions/cache@v4
+        with:
+          path: ./bin
+          key: binary
