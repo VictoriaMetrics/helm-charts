@@ -24,6 +24,14 @@ data:
       {{ fail "specify at least one remoteWrite with valid url"}}
     {{- end }}
     sinks:
+    {{/* Before 0.1.0, each remoteWrite could specify its own msgField. This was removed in favor of global msgField configuration. */}}
+    {{- $msgField := list }}
+    {{- range $rw := .Values.remoteWrite }}
+      {{ $msgField = concat $msgField ($rw.msgField | default list) }}
+    {{- end }}
+    {{- $msgField = concat $msgField .Values.msgField }}
+    {{- $msgField = uniq $msgField }}
+
     {{- $knownFields := list "url" "basicAuth" "accountID" "projectID" "tls" "extraFields" "ignoreFields" "msgField" }}
     {{- range $i, $rw := .Values.remoteWrite }}
       {{- /* Validate remoteWrite object */}}
@@ -50,8 +58,8 @@ data:
             AccountID: {{ or $rw.accountID 0 | quote }}
             ProjectID: {{ or $rw.projectID 0 | quote }}
             VL-Stream-Fields: kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
-            VL-Msg-Field: {{ join "," ($rw.msgField | default (list "message")) }}
-            VL-Time-Field: timestamp
+            VL-Msg-Field: {{ join "," ($msgField | default (list "message")) }}
+            VL-Time-Field: {{ join "," ($.Values.timeField | default (list "timestamp")) }}
             {{- with $rw.extraFields }}
             VL-Extra-Fields: {{- $pairs := list -}}
               {{- range $k, $v := $rw.extraFields }}
@@ -98,3 +106,4 @@ data:
         {{- end }}
     {{- end }}
 {{- end }}
+    
