@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.1.1
+
+**Release date:** 20 Nov 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - Add support for globally configurable `timeField` and `msgField` parameters that apply across all remoteWrite destinations. Configure via `timeField` and `msgField` in values.yaml.
 
 ## 0.1.0
