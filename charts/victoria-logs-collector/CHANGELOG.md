@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Add support for globally configurable `timeField` and `msgField` parameters that apply across all remoteWrite destinations. Configure via `timeField` and `msgField` in values.yaml.
 
 ## 0.1.0
 

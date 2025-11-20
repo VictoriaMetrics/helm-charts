@@ -32,11 +32,18 @@ remoteWrite: []
   #   tls:
   #     insecureSkipVerify: true
 
-  # - url: http://victoria-logs:9428
-  #   msgField:
-  #     - message._msg
-  #     - msg
-  #     - _msg
+# -- List of fields to be used as `_time` field. The first found field will be used.
+# See https://docs.victoriametrics.com/victorialogs/keyconcepts/#time-field for more details.
+timeField:
+  - time
+  - ts
+  - timestamp
+
+# -- List of fields to be used as `_msg` field. The first found field will be used.
+# See https://docs.victoriametrics.com/victorialogs/keyconcepts/#message-field for more details.
+msgField:
+  - message
+  - msg
 
 # -- Environment variables (ex.: secret tokens).
 env: []
