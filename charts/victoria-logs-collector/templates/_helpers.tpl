@@ -19,6 +19,20 @@
   {{- $args = append $args "--kubernetes.checkpointsPath=/vl-collector/checkpoints.json" }}
   {{- $args = append $args "--remoteWrite.tmpDataPath=/vl-collector/remotewrite-data" }}
 
+  {{- /* Before 0.1.0, each remoteWrite could specify its own msgField. This was removed in favor of global msgField configuration. */}}
+  {{- $msgField := list }}
+  {{- range $rw := .Values.remoteWrite }}
+    {{- $msgField = concat $msgField ($rw.msgField | default list) }}
+  {{- end }}
+  {{- $msgField = concat $msgField .Values.msgField }}
+  {{- $msgField = uniq $msgField }}
+  {{- if not (empty $msgField) }}
+    {{- $args = append $args (printf "--kubernetes.msgField=%s" (join "," $msgField)) }}
+  {{- end }}
+  {{- if not (empty .Values.timeField) }}
+    {{- $args = append $args (printf "--kubernetes.timeField=%s" (join "," .Values.timeField)) }}
+  {{- end }}
+
   {{- range $i, $rw := .Values.remoteWrite }}
     {{- /* Validate remoteWrite object */ -}}
     {{- if empty $rw.url }}
