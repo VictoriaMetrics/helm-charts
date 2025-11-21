@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- allow override dashboards and datasources label names and values. See [#2576](https://github.com/VictoriaMetrics/helm-charts/issues/2576).
 
 ## 0.63.6
 

@@ -11,8 +11,10 @@ kind: ConfigMap
 metadata:
   name: {{ include "vm.fullname" . }}-grafana-ds
   namespace: {{ $ns }}
+  {{ $label := index .Values "victoria-metrics-k8s-stack" "grafana" "sidecar" "datasources" "label" }}
+  {{ $labelValue := index .Values "victoria-metrics-k8s-stack" "grafana" "sidecar" "datasources" "labelValue" }}
   labels: {{ include "vm.labels" . | nindent 4 }}
-    {{ index .Values "victoria-metrics-k8s-stack" "grafana" "sidecar" "datasources" "label" }}: "1"
+    {{ $label }}: {{ quote $labelValue }}
 data:
   datasource.yaml: |-
     apiVersion: 1

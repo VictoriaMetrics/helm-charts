@@ -73,7 +73,7 @@ metadata:
   name: {{ printf "%s-%s" (include "vm.fullname" $) $dashboardName }}
   labels:
     {{- if $.Values.grafana.sidecar.dashboards.label }}
-    {{ $.Values.grafana.sidecar.dashboards.label }}: "1"
+    {{ $.Values.grafana.sidecar.dashboards.label }}: {{ $.Values.grafana.sidecar.dashboards.labelValue | quote }}
     {{- end }}
     {{- range $key, $val := $.Values.defaultDashboards.labels }}
     {{ $key }}: {{ $val | quote }}

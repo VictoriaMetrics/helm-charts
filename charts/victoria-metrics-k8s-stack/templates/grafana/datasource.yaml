@@ -46,7 +46,7 @@ metadata:
   annotations: {{ toYaml $ | nindent 4 }}
   {{- end }}
   labels:
-    {{ $.Values.grafana.sidecar.datasources.label }}: "1"
+    {{ $.Values.grafana.sidecar.datasources.label }}: {{ $.Values.grafana.sidecar.datasources.labelValue | quote }}
     {{- $app := ((printf "%s-grafana" (include "vm.name" $ctx)) | trunc 63 | trimSuffix "-") }}
     app: {{ $app }}
     {{- include "vm.labels" $ctx | nindent 4 }}
