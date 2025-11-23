@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add support of k8s service traffic distribution. See [#2580](https://github.com/VictoriaMetrics/helm-charts/issues/2580).
 
 ## 0.26.5
 

@@ -16,6 +16,9 @@ metadata:
   {{- $_ := unset $ctx "extraLabels" }}
   name: {{ $fullname }}
 spec:
+  {{- with $service.trafficDistribution }}
+  trafficDistribution: {{ . }}
+  {{- end }}
   {{- $type := $service.type }}
   {{- if and (not $type) (eq $app.mode "statefulSet") }}
     {{- $type = "ClusterIP" }}

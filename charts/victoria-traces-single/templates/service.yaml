@@ -18,6 +18,9 @@ metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
 spec:
+  {{- with $service.trafficDistribution }}
+  trafficDistribution: {{ . }}
+  {{- end }}
   {{- $type := $service.type }}
   {{- if and (not $type) (eq $mode "statefulSet") }}
     {{- $type = "ClusterIP" }}

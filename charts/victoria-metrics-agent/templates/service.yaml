@@ -17,6 +17,9 @@ metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
 spec:
+  {{- with $service.trafficDistribution }}
+  trafficDistribution: {{ . }}
+  {{- end }}
   {{- with $service.clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
