@@ -45,18 +45,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore binaries from cache
-        uses: actions/cache/restore@v4
-        with:
-          path: ./bin
-          key: binary
-
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: "test/go.mod"
+          go-version-file: test/go.mod
           check-latest: true
-          cache: true
+          cache-dependency-path: test/go.sum
         id: go
 
       - name: Install go-junit-report
@@ -80,9 +74,3 @@ jobs:
         if: success() || failure()
         with:
           report_paths: 'report.xml'
-
-      - name: Prepare binary cache
-        uses: actions/cache@v4
-        with:
-          path: ./bin
-          key: binary
