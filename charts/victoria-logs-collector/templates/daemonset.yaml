@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ include "vm.fullname" $ctx }}
-  namespace: {{ .Release.Namespace | quote }}
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
   selector:
