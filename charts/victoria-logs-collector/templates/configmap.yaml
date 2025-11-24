@@ -4,6 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "vm.fullname" $ctx }}-config
+  namespace: {{ include "vm.namespace" . }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data:
   vector.yaml: |

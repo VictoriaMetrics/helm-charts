@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- explicitly define namespace for namespaced resources. See [#2578](https://github.com/VictoriaMetrics/helm-charts/issues/2578).
 
 ## 0.1.1
 
