@@ -204,6 +204,17 @@ Create base alertmanager url for notifers
   {{- with (include "vmalert.alertmanager.bearerTokenFiles" .) -}}
     {{- $_ := set $args "notifier.bearerTokenFile" . -}}
   {{- end -}}
+  {{- if .Values.server.notifier.webhookVlogs.enabled -}}
+    {{- with .Values.server.notifier.webhookVlogs.vlogsURL -}}
+      {{- $_ := set $args "notifier.vlogs.url" . -}}
+    {{- end -}}
+    {{- with .Values.server.notifier.webhookVlogs.slackURL -}}
+      {{- $_ := set $args "notifier.slack.url" . -}}
+    {{- end -}}
+    {{- with .Values.server.notifier.webhookVlogs.ingressURL -}}
+      {{- $_ := set $args "notifier.vlogs.ingress" . -}}
+    {{- end -}}
+  {{- end -}}
   {{- with $app.remote.read.url }}
     {{- $_ := set $args "remoteRead.url" . -}}
   {{- end -}}
