@@ -40,7 +40,11 @@
   {{- range $i, $rw := $Values.remoteWrite }}
     {{- range $rwKey, $rwValue := $rw }}
       {{- if or (kindIs "slice" $rwValue) (kindIs "map" $rwValue) }}
-        {{- $_ := set $rwcm (printf "%d-%s.yaml" $i $rwKey) (toYaml $rwValue) }}
+        {{- $rwContent := toYaml $rwValue }}
+        {{- if $Values.config.useTpl }}
+          {{- $rwContent = tpl $rwContent $ | trim }}
+        {{- end }}
+        {{- $_ := set $rwcm (printf "%d-%s.yaml" $i $rwKey) $rwContent }}
       {{- end -}}
     {{- end -}}
   {{- end -}}
