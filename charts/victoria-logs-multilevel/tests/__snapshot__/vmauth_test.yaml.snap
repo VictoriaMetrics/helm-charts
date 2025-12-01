@@ -1,0 +1,272 @@
+deployment should match empty snapshot:
+  1: |
+    apiVersion: v1
+    data:
+      auth.yml: |
+        dW5hdXRob3JpemVkX3VzZXI6CiAgdXJsX21hcDoKICAtIGRpc2NvdmVyX2JhY2tlbmRfaXBzOiB0cnVlCiAgICBzcmNfcGF0aHM6CiAgICAtIC9zZWxlY3QvLioKICAgIHVybF9wcmVmaXg6IGh0dHA6Ly9SRUxFQVNFLU5BTUUtdmljdG9yaWEtbG9ncy1tdWx0aWxldmVsLXZsc2VsZWN0Lk5BTUVTUEFDRS5zdmMuY2x1c3Rlci5sb2NhbC46OTQ3MQ==
+    kind: Secret
+    metadata:
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-multilevel
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-multilevel-0.1.1
+      name: RELEASE-NAME-victoria-logs-multilevel-vmauth
+      namespace: NAMESPACE
+    type: Opaque
+  2: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-multilevel
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-multilevel-0.1.1
+      name: RELEASE-NAME-victoria-logs-multilevel-vmauth
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: vmauth
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-multilevel
+      template:
+        metadata:
+          annotations:
+            checksum/config: b303f8012cbca552fb2c81b6a7236c4756c8a9e4ca950bb2bdbb29d3408967c1
+          labels:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-multilevel
+        spec:
+          containers:
+            - args:
+                - --auth.config=/config/auth.yml
+                - --envflag.enable
+                - --http.shutdownDelay=15s
+                - --httpListenAddr=:8427
+                - --loggerFormat=json
+              image: victoriametrics/vmauth:v1.116.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmauth
+              ports:
+                - containerPort: 8427
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              volumeMounts:
+                - mountPath: /config
+                  name: config
+          securityContext:
+            fsGroup: 1000
+          volumes:
+            - name: config
+              secret:
+                secretName: RELEASE-NAME-victoria-logs-multilevel-vmauth
+deployment should match snapshot:
+  1: |
+    apiVersion: v1
+    data:
+      auth.yml: |
+        dW5hdXRob3JpemVkX3VzZXI6CiAgdXJsX21hcDoKICAtIGRpc2NvdmVyX2JhY2tlbmRfaXBzOiB0cnVlCiAgICBzcmNfcGF0aHM6CiAgICAtIC9zZWxlY3QvLioKICAgIHVybF9wcmVmaXg6IGh0dHA6Ly9SRUxFQVNFLU5BTUUtdmljdG9yaWEtbG9ncy1tdWx0aWxldmVsLXZsc2VsZWN0Lk5BTUVTUEFDRS5zdmMuY2x1c3Rlci5sb2NhbC46OTQ3MQ==
+    kind: Secret
+    metadata:
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-multilevel
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-multilevel-0.1.1
+      name: RELEASE-NAME-victoria-logs-multilevel-vmauth
+      namespace: NAMESPACE
+    type: Opaque
+  2: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-multilevel
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-multilevel-0.1.1
+      name: RELEASE-NAME-victoria-logs-multilevel-vmauth
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: vmauth
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-multilevel
+      template:
+        metadata:
+          annotations:
+            checksum/config: b303f8012cbca552fb2c81b6a7236c4756c8a9e4ca950bb2bdbb29d3408967c1
+          labels:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-multilevel
+        spec:
+          containers:
+            - args:
+                - --auth.config=/config/auth.yml
+                - --envflag.enable
+                - --http.shutdownDelay=15s
+                - --httpListenAddr=:8427
+                - --loggerFormat=json
+              image: victoriametrics/vmauth:v1.116.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmauth
+              ports:
+                - containerPort: 8427
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              volumeMounts:
+                - mountPath: /config
+                  name: config
+          securityContext:
+            fsGroup: 1000
+          volumes:
+            - name: config
+              secret:
+                secretName: RELEASE-NAME-victoria-logs-multilevel-vmauth
+deployment should match snapshot with fullnameOverride, extraLabels and podLabels:
+  1: |
+    apiVersion: v1
+    data:
+      auth.yml: |
+        dW5hdXRob3JpemVkX3VzZXI6CiAgdXJsX21hcDoKICAtIGRpc2NvdmVyX2JhY2tlbmRfaXBzOiB0cnVlCiAgICBzcmNfcGF0aHM6CiAgICAtIC9zZWxlY3QvLioKICAgIHVybF9wcmVmaXg6IGh0dHA6Ly9SRUxFQVNFLU5BTUUtdmljdG9yaWEtbG9ncy1tdWx0aWxldmVsLXZsc2VsZWN0Lk5BTUVTUEFDRS5zdmMuY2x1c3Rlci5sb2NhbC46OTQ3MQ==
+    kind: Secret
+    metadata:
+      labels:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-multilevel
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-multilevel-0.1.1
+      name: vmauth-node
+      namespace: NAMESPACE
+    type: Opaque
+  2: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: auth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-multilevel
+        app.kubernetes.io/version: v1.116.0
+        extraLabelName: extraLabelValue
+        helm.sh/chart: victoria-logs-multilevel-0.1.1
+      name: vmauth-node
+      namespace: NAMESPACE
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: auth
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-multilevel
+      template:
+        metadata:
+          annotations:
+            checksum/config: 9b92376c479c17fec13a45f9b7f8c678adbfc51e88ca5e026246ab947c652d11
+          labels:
+            app: auth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-multilevel
+            podLabelName: podLabelValue
+        spec:
+          containers:
+            - args:
+                - --auth.config=/config/auth.yml
+                - --envflag.enable
+                - --http.shutdownDelay=15s
+                - --httpListenAddr=:8427
+                - --loggerFormat=json
+              image: victoriametrics/vmauth:v1.116.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                tcpSocket:
+                  port: http
+                timeoutSeconds: 5
+              name: vmauth
+              ports:
+                - containerPort: 8427
+                  name: http
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: http
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 5
+              securityContext:
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              volumeMounts:
+                - mountPath: /config
+                  name: config
+          securityContext:
+            fsGroup: 1000
+          volumes:
+            - name: config
+              secret:
+                secretName: vmauth-node

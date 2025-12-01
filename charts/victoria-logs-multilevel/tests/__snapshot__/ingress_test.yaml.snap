@@ -1,0 +1,55 @@
+ingress should match snapshot:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: kong
+      labels:
+        app: vlselect
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-multilevel
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-logs-multilevel-0.1.1
+      name: RELEASE-NAME-victoria-logs-multilevel-vlselect
+      namespace: NAMESPACE
+    spec:
+      rules:
+        - host: vlselect.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-victoria-logs-multilevel-vlselect
+                    port:
+                      name: http
+                path: /select
+                pathType: Prefix
+  2: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+      labels:
+        app: vmauth
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-multilevel
+        app.kubernetes.io/version: v1.116.0
+        helm.sh/chart: victoria-logs-multilevel-0.1.1
+      name: RELEASE-NAME-victoria-logs-multilevel-vmauth
+      namespace: NAMESPACE
+    spec:
+      rules:
+        - host: vlselect.node.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: RELEASE-NAME-victoria-logs-multilevel-vmauth
+                    port:
+                      name: http
+                path: /select/test
+                pathType: Prefix
