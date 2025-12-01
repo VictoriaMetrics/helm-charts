@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.1.2
+
+**Release date:** 01 Dec 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - Explicitly define namespace for namespaced resources. See [#2578](https://github.com/VictoriaMetrics/helm-charts/issues/2578).
 - Bump Vector version to [v0.51.1](https://vector.dev/releases/0.51.1/).
 
