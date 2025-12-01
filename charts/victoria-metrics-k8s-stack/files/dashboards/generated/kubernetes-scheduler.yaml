@@ -80,7 +80,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(scheduler_binding_duration_seconds_count{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(scheduler_pod_scheduling_sli_duration_seconds_count{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance)" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} binding'
   - datasource:
       type: {{ $defaultDatasource }}
@@ -131,7 +131,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "histogram_quantile(0.99, sum(rate(scheduler_binding_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,le))" $clusterLabel $clusterLabel }}
+    expr: {{ printf "histogram_quantile(0.99, sum(rate(scheduler_pod_scheduling_sli_duration_seconds_bucket{%s=~\"$cluster\",job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by(%s,instance,le))" $clusterLabel $clusterLabel }}
     legendFormat: '{{`{{`}}cluster{{`}}`}} {{`{{`}}instance{{`}}`}} binding'
   - datasource:
       type: {{ $defaultDatasource }}

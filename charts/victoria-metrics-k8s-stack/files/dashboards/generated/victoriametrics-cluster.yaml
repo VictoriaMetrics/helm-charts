@@ -30,8 +30,7 @@ templating:
       refId: VictoriaMetrics-job-Variable-Query
     definition: {{ printf "label_values(vm_app_version{version=~\"^vm(insert|select|storage).*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
     current:
-      text:
-      - All
+      text: All
       value:
       - $__all
     options: []
@@ -50,8 +49,7 @@ templating:
     definition: {{ printf "label_values(vm_app_version{job=~\"$job\",version=~\"^vminsert.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
     hide: 2
     current:
-      text:
-      - All
+      text: All
       value:
       - $__all
     options: []
@@ -70,8 +68,7 @@ templating:
     definition: {{ printf "label_values(vm_app_version{job=~\"$job\",version=~\"^vmselect.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
     hide: 2
     current:
-      text:
-      - All
+      text: All
       value:
       - $__all
     options: []
@@ -90,8 +87,7 @@ templating:
     definition: {{ printf "label_values(vm_app_version{job=~\"$job\",version=~\"^vmstorage.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
     hide: 2
     current:
-      text:
-      - All
+      text: All
       value:
       - $__all
     options: []
@@ -110,8 +106,7 @@ templating:
     definition: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     allValue: .*
     current:
-      text:
-      - All
+      text: All
       value:
       - $__all
     options: []
@@ -244,7 +239,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: stat
 - title: Ingestion rate
   targets:
@@ -299,7 +294,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: stat
 - title: Read requests
   targets:
@@ -353,7 +348,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: stat
 - title: Available CPU
   targets:
@@ -407,7 +402,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: stat
 - title: Active series
   targets:
@@ -461,7 +456,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: stat
 - title: Disk space usage
   targets:
@@ -514,7 +509,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: stat
 - title: Bytes per point
   targets:
@@ -568,7 +563,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: stat
 - title: Available memory
   targets:
@@ -622,7 +617,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: stat
 - targets:
   - datasource:
@@ -646,6 +641,8 @@ panels:
         align: auto
         cellOptions:
           type: auto
+        footer:
+          reducers: []
         inspect: false
         minWidth: 50
       mappings: []
@@ -661,7 +658,7 @@ panels:
         id: byName
         options: Time
       properties:
-      - id: custom.hidden
+      - id: custom.hideFrom.viz
         value: true
     - matcher:
         id: byName
@@ -677,17 +674,11 @@ panels:
   id: 149
   options:
     cellHeight: sm
-    footer:
-      countRows: false
-      fields: ""
-      reducer:
-      - sum
-      show: false
     showHeader: true
     sortBy:
     - desc: true
       displayName: Count
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: table
 - title: Uptime ($job)
   targets:
@@ -730,6 +721,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -767,7 +759,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Overview
   collapsed: false
@@ -822,6 +814,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -861,7 +854,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Requests rate ($instance)
   targets:
@@ -912,6 +905,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -951,7 +945,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Active time series ($instance)
   targets:
@@ -993,6 +987,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1032,7 +1027,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Query duration 0.99 quantile ($instance)
   targets:
@@ -1084,6 +1079,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1123,7 +1119,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Requests error rate ($instance)
   targets:
@@ -1174,6 +1170,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1213,7 +1210,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Logging rate
   targets:
@@ -1260,6 +1257,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1302,7 +1300,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.1.1
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Resource usage ($job)
   panels:
@@ -1378,7 +1376,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2293
+      "y": 4694
     id: 66
     options:
       legend:
@@ -1464,7 +1462,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2293
+      "y": 4694
     id: 64
     options:
       legend:
@@ -1553,7 +1551,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2301
+      "y": 4702
     id: 138
     options:
       legend:
@@ -1654,7 +1652,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2301
+      "y": 4702
     id: 219
     options:
       legend:
@@ -1755,7 +1753,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2309
+      "y": 4710
     id: 220
     options:
       legend:
@@ -1857,7 +1855,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2309
+      "y": 4710
     id: 122
     options:
       legend:
@@ -1954,7 +1952,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2317
+      "y": 4718
     id: 117
     options:
       legend:
@@ -2056,7 +2054,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2317
+      "y": 4718
     id: 204
     options:
       legend:
@@ -2140,7 +2138,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2325
+      "y": 4726
     id: 68
     options:
       legend:
@@ -2241,7 +2239,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2325
+      "y": 4726
     id: 221
     options:
       legend:
@@ -2325,7 +2323,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2333
+      "y": 4734
     id: 70
     options:
       legend:
@@ -2404,7 +2402,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2333
+      "y": 4734
     id: 119
     options:
       legend:
@@ -2488,7 +2486,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2341
+      "y": 4742
     id: 210
     options:
       legend:
@@ -2565,7 +2563,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2341
+      "y": 4742
     id: 120
     options:
       legend:
@@ -2647,7 +2645,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2349
+      "y": 4750
     id: 218
     options:
       legend:
@@ -2729,7 +2727,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2349
+      "y": 4750
     id: 213
     options:
       legend:
@@ -2764,7 +2762,7 @@ panels:
       h: 2
       w: 24
       x: 0
-      "y": 1519
+      "y": 3920
     id: 211
     options:
       code:
@@ -2865,7 +2863,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1521
+      "y": 3922
     id: 102
     options:
       legend:
@@ -2946,7 +2944,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1521
+      "y": 3922
     id: 108
     options:
       legend:
@@ -3028,7 +3026,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1529
+      "y": 3930
     id: 170
     options:
       legend:
@@ -3111,7 +3109,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1529
+      "y": 3930
     id: 107
     options:
       legend:
@@ -3189,7 +3187,7 @@ panels:
       h: 9
       w: 12
       x: 0
-      "y": 1537
+      "y": 3938
     id: 144
     options:
       legend:
@@ -3273,7 +3271,7 @@ panels:
       h: 9
       w: 12
       x: 12
-      "y": 1537
+      "y": 3938
     id: 58
     options:
       legend:
@@ -3357,7 +3355,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1546
+      "y": 3947
     id: 142
     links:
     - targetBlank: true
@@ -3452,7 +3450,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1546
+      "y": 3947
     id: 215
     options:
       legend:
@@ -3546,7 +3544,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1554
+      "y": 3955
     id: 135
     options:
       legend:
@@ -3635,7 +3633,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1554
+      "y": 3955
     id: 217
     options:
       legend:
@@ -3702,7 +3700,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1562
+      "y": 3963
     id: 183
     options:
       cellHeight: sm
@@ -3800,7 +3798,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1562
+      "y": 3963
     id: 214
     options:
       legend:
@@ -3892,7 +3890,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1570
+      "y": 3971
     id: 222
     options:
       legend:
@@ -3986,7 +3984,7 @@ panels:
       h: 9
       w: 12
       x: 0
-      "y": 4941
+      "y": 7342
     id: 76
     options:
       legend:
@@ -4083,7 +4081,7 @@ panels:
       h: 9
       w: 12
       x: 12
-      "y": 4941
+      "y": 7342
     id: 86
     options:
       legend:
@@ -4161,7 +4159,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4950
+      "y": 7351
     id: 80
     options:
       legend:
@@ -4237,7 +4235,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4950
+      "y": 7351
     id: 78
     options:
       legend:
@@ -4321,7 +4319,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4958
+      "y": 7359
     id: 82
     options:
       legend:
@@ -4395,7 +4393,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4958
+      "y": 7359
     id: 74
     options:
       legend:
@@ -4421,6 +4419,90 @@ panels:
   type: row
 - title: vmstorage ($instance)
   panels:
+  - title: Ingestion rate ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "sum(rate(vm_vminsert_metrics_read_total{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      intervalFactor: 1
+      legendFormat: ingestion rate
+      range: true
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: Shows the number of datapoints ingested into storage nodes per second. This metric doesn't show all stored datapoints since some of them may be dropped because of wrong timestamps or decode errors.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 10
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: normal
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 41
+    id: 100
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.2.0
+    type: timeseries
   - title: Storage full ETA ($instance)
     targets:
     - datasource:
@@ -4468,6 +4550,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4510,24 +4593,52 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.1
+    pluginVersion: 12.2.0
     type: timeseries
-  - title: Ingestion rate ($instance)
+  - title: CPU usage % ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $ds
-      expr: {{ printf "sum(rate(vm_vminsert_metrics_read_total{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+      expr: {{ printf "max(rate(process_cpu_seconds_total{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_cpu_cores_available{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
+      exemplar: false
       format: time_series
+      interval: ""
       intervalFactor: 1
-      legendFormat: ingestion rate
+      legendFormat: max
       range: true
       refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "min(rate(process_cpu_seconds_total{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_cpu_cores_available{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
+      editorMode: code
+      exemplar: false
+      format: time_series
+      hide: false
+      interval: ""
+      intervalFactor: 1
+      legendFormat: min
+      range: true
+      refId: B
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "quantile(0.5, rate(process_cpu_seconds_total{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_cpu_cores_available{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
+      editorMode: code
+      exemplar: false
+      format: time_series
+      hide: false
+      interval: ""
+      intervalFactor: 1
+      legendFormat: median
+      range: true
+      refId: C
     datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: Shows the number of datapoints ingested into storage nodes per second. This metric doesn't show all stored datapoints since some of them may be dropped because of wrong timestamps or decode errors.
+    description: ""
     fieldConfig:
       defaults:
         color:
@@ -4541,7 +4652,7 @@ panels:
           barAlignment: 0
           barWidthFactor: 0.6
           drawStyle: line
-          fillOpacity: 10
+          fillOpacity: 0
           gradientMode: none
           hideFrom:
             legend: false
@@ -4554,29 +4665,34 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
-            mode: normal
+            mode: none
           thresholdsStyle:
-            mode: "off"
-        links: []
+            mode: line
+        links:
+        - targetBlank: true
+          title: Drilldown
+          url: /d/oS7Bi_0Wz?viewPanel=192&var-job=$job_storage&var-ds=$ds&var-instance=$instance&${__url_time_range}
         mappings: []
         min: 0
         thresholds:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
-            value: 80
-        unit: short
+            value: 0.9
+        unit: percentunit
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      "y": 2387
-    id: 100
+      "y": 49
+    id: 151
     options:
       legend:
         calcs:
@@ -4592,7 +4708,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.1
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Memory (anon) usage % ($instance)
     targets:
@@ -4668,6 +4784,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4684,6 +4801,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 0.9
         unit: percentunit
@@ -4692,7 +4810,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2387
+      "y": 49
     id: 167
     options:
       legend:
@@ -4709,7 +4827,112 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.1
+    pluginVersion: 12.2.0
+    type: timeseries
+  - title: Concurrent flushes on disk ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "max(max_over_time(vm_concurrent_insert_current{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      exemplar: true
+      interval: ""
+      legendFormat: current
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "min(vm_concurrent_insert_capacity{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      exemplar: true
+      hide: false
+      interval: ""
+      legendFormat: max
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: "Shows how many ongoing insertions (not API /write calls) on disk are taking place, where:\n* `max` - equal to number of CPUs;\n* `current` - current number of goroutines busy with inserting rows into underlying storage.\n\nEvery successful API /write call results into flush on disk. The `max` is an internal limit and can't be changed. It is always equal to the number of CPUs. \n\nWhen `current` hits `max` constantly, it means storage is overloaded and requires more CPU (see CPU usage) or disks with more IOPS (see disk writes and reads panels in Resource Usage row)."
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides:
+      - matcher:
+          id: byName
+          options: max
+        properties:
+        - id: color
+          value:
+            fixedColor: '#C4162A'
+            mode: fixed
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 57
+    id: 212
+    links:
+    - targetBlank: true
+      title: Related discussion
+      url: https://github.com/VictoriaMetrics/VictoriaMetrics/issues/632
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Concurrent selects ($instance)
     targets:
@@ -4773,6 +4996,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4784,6 +5008,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -4800,7 +5025,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2394
+      "y": 57
     id: 133
     options:
       legend:
@@ -4817,304 +5042,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.1
-    type: timeseries
-  - title: CPU usage % ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "max(rate(process_cpu_seconds_total{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_cpu_cores_available{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      exemplar: false
-      format: time_series
-      interval: ""
-      intervalFactor: 1
-      legendFormat: max
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "min(rate(process_cpu_seconds_total{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_cpu_cores_available{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      exemplar: false
-      format: time_series
-      hide: false
-      interval: ""
-      intervalFactor: 1
-      legendFormat: min
-      range: true
-      refId: B
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "quantile(0.5, rate(process_cpu_seconds_total{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_cpu_cores_available{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      exemplar: false
-      format: time_series
-      hide: false
-      interval: ""
-      intervalFactor: 1
-      legendFormat: median
-      range: true
-      refId: C
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    description: ""
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: line
-        links:
-        - targetBlank: true
-          title: Drilldown
-          url: /d/oS7Bi_0Wz?viewPanel=192&var-job=$job_storage&var-ds=$ds&var-instance=$instance&${__url_time_range}
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-          - color: red
-            value: 0.9
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 2395
-    id: 151
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.1
-    type: timeseries
-  - title: Concurrent flushes on disk ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "max(max_over_time(vm_concurrent_insert_current{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      exemplar: true
-      interval: ""
-      legendFormat: current
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "min(vm_concurrent_insert_capacity{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      exemplar: true
-      hide: false
-      interval: ""
-      legendFormat: max
-      range: true
-      refId: B
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    description: "Shows how many ongoing insertions (not API /write calls) on disk are taking place, where:\n* `max` - equal to number of CPUs;\n* `current` - current number of goroutines busy with inserting rows into underlying storage.\n\nEvery successful API /write call results into flush on disk. The `max` is an internal limit and can't be changed. It is always equal to the number of CPUs. \n\nWhen `current` hits `max` constantly, it means storage is overloaded and requires more CPU (see CPU usage) or disks with more IOPS (see disk writes and reads panels in Resource Usage row)."
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        mappings: []
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-          - color: red
-            value: 80
-        unit: short
-      overrides:
-      - matcher:
-          id: byName
-          options: max
-        properties:
-        - id: color
-          value:
-            fixedColor: '#C4162A'
-            mode: fixed
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 2402
-    id: 212
-    links:
-    - targetBlank: true
-      title: Related discussion
-      url: https://github.com/VictoriaMetrics/VictoriaMetrics/issues/632
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: none
-    pluginVersion: 12.1.1
-    type: timeseries
-  - title: Merge speed
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "sum(rate(vm_rows_merged_total{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      legendFormat: __auto
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    description: The number of rows merged per second by storage nodes. Merge speed depends on available CPU and disk IO bandwidth.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        decimals: 0
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-          - color: red
-            value: 80
-        unit: short
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 2402
-    id: 55
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.1
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Active merges ($instance)
     targets:
@@ -5159,6 +5087,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5173,6 +5102,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -5181,7 +5111,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2410
+      "y": 65
     id: 54
     options:
       legend:
@@ -5198,42 +5128,22 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.1
+    pluginVersion: 12.2.0
     type: timeseries
-  - title: LSM parts max by type ($instance)
+  - title: Merge speed
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $ds
-      expr: {{ printf "max(vm_parts{job=~\"$job_storage\",instance=~\"$instance\",type=~\"indexdb.*\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
+      expr: {{ printf "sum(rate(vm_rows_merged_total{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
-      format: time_series
-      interval: ""
-      intervalFactor: 1
       legendFormat: __auto
       range: true
       refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "max(vm_last_partition_parts{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      interval: ""
-      intervalFactor: 1
-      legendFormat: __auto
-      range: true
-      refId: B
     datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: |-
-      The max number of data parts of LSM tree across all storage nodes in the last [partition](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#storage).
-      Increase in number of parts (the hard limit is 512) is an evidence of slow merge performance - check the resource utilization.
-      * `indexdb` - inverted index
-      * `storage/small` - recently added parts of data ingested into storage (hot data)
-      * `storage/big` -  small parts gradually merged into bigger parts (cold data)
+    description: The number of rows merged per second by storage nodes. Merge speed depends on available CPU and disk IO bandwidth.
     fieldConfig:
       defaults:
         color:
@@ -5260,12 +5170,14 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
             mode: none
           thresholdsStyle:
             mode: "off"
+        decimals: 0
         links: []
         mappings: []
         min: 0
@@ -5273,6 +5185,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -5281,8 +5194,8 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2410
-    id: 22
+      "y": 65
+    id: 55
     options:
       legend:
         calcs:
@@ -5298,7 +5211,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.1
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Disk space usage %  ($instance)
     targets:
@@ -5364,6 +5277,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5380,6 +5294,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: percentunit
@@ -5388,7 +5303,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2418
+      "y": 73
     id: 20
     options:
       legend:
@@ -5405,7 +5320,208 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.1
+    pluginVersion: 12.2.0
+    type: timeseries
+  - title: LSM parts max by type ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "max(vm_parts{job=~\"$job_storage\",instance=~\"$instance\",type=~\"indexdb.*\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      interval: ""
+      intervalFactor: 1
+      legendFormat: __auto
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "max(vm_last_partition_parts{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      hide: false
+      interval: ""
+      intervalFactor: 1
+      legendFormat: __auto
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: |-
+      The max number of data parts of LSM tree across all storage nodes in the last [partition](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#storage).
+      Increase in number of parts (the hard limit is 512) is an evidence of slow merge performance - check the resource utilization.
+      * `indexdb` - inverted index
+      * `storage/small` - recently added parts of data ingested into storage (hot data)
+      * `storage/big` -  small parts gradually merged into bigger parts (cold data)
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 73
+    id: 22
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.2.0
+    type: timeseries
+  - title: Disk space usage % by type  ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "max(sum(vm_data_size_bytes{job=~\"$job\",instance=~\"$instance\",type=~\"indexdb.*\",%s=~\"$cluster\"}) by(job,instance,%s) / sum(vm_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,instance,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      intervalFactor: 1
+      legendFormat: indexdb
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "max(sum(vm_data_size_bytes{job=~\"$job\",instance=~\"$instance\",type!~\"indexdb.*\",%s=~\"$cluster\"}) by(job,instance,%s) / sum(vm_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,instance,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      hide: false
+      intervalFactor: 1
+      legendFormat: datapoints
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: |-
+      Shows the percentage of used disk space by type: datapoints or indexdb. Normally, indexdb takes much less space comparing to datapoints. But with high [churn rate](https://docs.victoriametrics.com/victoriametrics/faq/#what-is-high-churn-rate) the size of the indexdb could grow significantly.
+
+      The sum of the % can be > 100% since panel shows max % per-job and per-instance. It means different instance can have different ratio between datapoints and indexdb size.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 10
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: percent
+          thresholdsStyle:
+            mode: line
+        links:
+        - targetBlank: true
+          title: Drilldown
+          url: /d/oS7Bi_0Wz?viewPanel=201&var-ds=$ds&var-instance=$instance&${__url_time_range}
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+        unit: percentunit
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 81
+    id: 202
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Pending datapoints ($instance)
     targets:
@@ -5461,6 +5577,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5474,6 +5591,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -5490,7 +5608,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2418
+      "y": 81
     id: 14
     options:
       legend:
@@ -5507,183 +5625,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.1
-    type: timeseries
-  - title: Disk space usage % by type  ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "max(sum(vm_data_size_bytes{job=~\"$job\",instance=~\"$instance\",type=~\"indexdb.*\",%s=~\"$cluster\"}) by(job,instance,%s) / sum(vm_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,instance,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      intervalFactor: 1
-      legendFormat: indexdb
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "max(sum(vm_data_size_bytes{job=~\"$job\",instance=~\"$instance\",type!~\"indexdb.*\",%s=~\"$cluster\"}) by(job,instance,%s) / sum(vm_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,instance,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      intervalFactor: 1
-      legendFormat: datapoints
-      range: true
-      refId: B
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    description: |-
-      Shows the percentage of used disk space by type: datapoints or indexdb. Normally, indexdb takes much less space comparing to datapoints. But with high [churn rate](https://docs.victoriametrics.com/victoriametrics/faq/#what-is-high-churn-rate) the size of the indexdb could grow significantly.
-
-      The sum of the % can be > 100% since panel shows max % per-job and per-instance. It means different instance can have different ratio between datapoints and indexdb size.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: line
-        links:
-        - targetBlank: true
-          title: Drilldown
-          url: /d/oS7Bi_0Wz?viewPanel=201&var-ds=$ds&var-instance=$instance&${__url_time_range}
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 2426
-    id: 202
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.1
-    type: timeseries
-  - title: Readonly mode
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "vm_storage_is_read_only{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"} > 0" $clusterLabel }}
-      editorMode: code
-      exemplar: true
-      interval: ""
-      legendFormat: '{{`{{`}} instance {{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Value > 0 means vmstorage is in readonly mode.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        mappings: []
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-          - color: red
-            value: 80
-        unit: short
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 2426
-    id: 141
-    links:
-    - targetBlank: true
-      title: Readonly mode
-      url: https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#readonly-mode
-    options:
-      legend:
-        calcs: []
-        displayMode: list
-        placement: bottom
-        showLegend: false
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.1
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Network usage ($instance)
     targets:
@@ -5741,6 +5683,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5753,6 +5696,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: bps
@@ -5767,7 +5711,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 2434
+      "y": 89
     id: 206
     options:
       legend:
@@ -5783,7 +5727,88 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.1
+    pluginVersion: 12.2.0
+    type: timeseries
+  - title: Readonly mode
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "vm_storage_is_read_only{job=~\"$job_storage\",instance=~\"$instance\",%s=~\"$cluster\"} > 0" $clusterLabel }}
+      editorMode: code
+      exemplar: true
+      interval: ""
+      legendFormat: '{{`{{`}} instance {{`}}`}}'
+      range: true
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: Value > 0 means vmstorage is in readonly mode.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 89
+    id: 141
+    links:
+    - targetBlank: true
+      title: Readonly mode
+      url: https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#readonly-mode
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: false
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Number of snapshots
     targets:
@@ -5832,6 +5857,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5843,6 +5869,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -5851,7 +5878,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 2434
+      "y": 97
     id: 216
     options:
       legend:
@@ -5863,7 +5890,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.1
+    pluginVersion: 12.2.0
     type: timeseries
   collapsed: true
   gridPos:
@@ -5935,7 +5962,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4954
+      "y": 7355
     id: 92
     options:
       legend:
@@ -6038,7 +6065,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4954
+      "y": 7355
     id: 95
     options:
       legend:
@@ -6146,7 +6173,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4962
+      "y": 7363
     id: 163
     options:
       legend:
@@ -6259,7 +6286,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4962
+      "y": 7363
     id: 165
     options:
       legend:
@@ -6339,7 +6366,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4970
+      "y": 7371
     id: 178
     options:
       legend:
@@ -6419,7 +6446,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4970
+      "y": 7371
     id: 180
     options:
       legend:
@@ -6499,7 +6526,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4978
+      "y": 7379
     id: 179
     options:
       legend:
@@ -6582,7 +6609,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4978
+      "y": 7379
     id: 181
     options:
       legend:
@@ -6676,7 +6703,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4986
+      "y": 7387
     id: 93
     options:
       legend:
@@ -6769,7 +6796,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4986
+      "y": 7387
     id: 207
     options:
       legend:
@@ -6863,7 +6890,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4955
+      "y": 7356
     id: 97
     options:
       legend:
@@ -6970,7 +6997,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4955
+      "y": 7356
     id: 99
     options:
       legend:
@@ -7078,7 +7105,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4963
+      "y": 7364
     id: 185
     options:
       legend:
@@ -7191,7 +7218,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4963
+      "y": 7364
     id: 187
     options:
       legend:
@@ -7272,7 +7299,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4971
+      "y": 7372
     id: 139
     options:
       legend:
@@ -7351,7 +7378,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4971
+      "y": 7372
     id: 114
     options:
       legend:
@@ -7442,7 +7469,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 4979
+      "y": 7380
     id: 208
     options:
       legend:
@@ -7535,7 +7562,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4979
+      "y": 7380
     id: 209
     options:
       legend:
@@ -7614,7 +7641,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 4987
+      "y": 7388
     id: 88
     options:
       legend:
@@ -7649,7 +7676,7 @@ panels:
       h: 2
       w: 24
       x: 0
-      "y": 5004
+      "y": 7405
     id: 198
     options:
       code:
@@ -7721,7 +7748,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 5006
+      "y": 7407
     id: 189
     options:
       legend:
@@ -7797,7 +7824,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 5006
+      "y": 7407
     id: 190
     options:
       legend:
@@ -7875,7 +7902,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 5014
+      "y": 7415
     id: 192
     options:
       legend:
@@ -7958,7 +7985,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 5014
+      "y": 7415
     id: 196
     options:
       legend:
@@ -8037,7 +8064,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 5021
+      "y": 7422
     id: 200
     options:
       legend:
@@ -8125,7 +8152,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 5021
+      "y": 7422
     id: 201
     options:
       legend:
@@ -8206,7 +8233,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 5029
+      "y": 7430
     id: 203
     options:
       legend:
@@ -8236,7 +8263,7 @@ condition: {{ ($Values.vmcluster).enabled }}
 description: Overview for cluster VictoriaMetrics v1.117.0 or higher
 fiscalYearStartMonth: 0
 graphTooltip: 1
-id: 1
+id: 7
 links:
 - icon: doc
   tags: []
@@ -8258,7 +8285,7 @@ links:
   url: https://github.com/VictoriaMetrics/VictoriaMetrics/releases
 preload: false
 refresh: ""
-schemaVersion: 41
+schemaVersion: 42
 time:
   from: now-3h
   to: now
