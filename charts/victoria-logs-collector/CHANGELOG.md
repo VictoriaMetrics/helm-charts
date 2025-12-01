@@ -1,6 +1,7 @@
 ## Next release
 
-- explicitly define namespace for namespaced resources. See [#2578](https://github.com/VictoriaMetrics/helm-charts/issues/2578).
+- Explicitly define namespace for namespaced resources. See [#2578](https://github.com/VictoriaMetrics/helm-charts/issues/2578).
+- Bump Vector version to [v0.51.1](https://vector.dev/releases/0.51.1/).
 
 ## 0.1.1
 

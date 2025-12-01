@@ -4,7 +4,7 @@
     {{- $tag := required "'image' must be set when 'native' is true" (.Values.image).tag }}
     {{- printf "%s/%s:%s" $registry "victoriametrics/vlagent" $tag }}
   {{- else }}
-    {{- printf "%s/%s:%s" $registry "timberio/vector" "0.51.0-alpine" }}
+    {{- printf "%s/%s:%s" $registry "timberio/vector" "0.51.1-alpine" }}
   {{- end }}
 {{- end }}
 
@@ -15,8 +15,8 @@
 
   {{- $args := list }}
   {{- /* Kubernetes integration args */ -}}
-  {{- $args = append $args "--kubernetes=true" }}
-  {{- $args = append $args "--kubernetes.checkpointsPath=/vl-collector/checkpoints.json" }}
+  {{- $args = append $args "--kubernetesCollector" }}
+  {{- $args = append $args "--kubernetesCollector.checkpointsPath=/vl-collector/checkpoints.json" }}
   {{- $args = append $args "--remoteWrite.tmpDataPath=/vl-collector/remotewrite-data" }}
 
   {{- /* Before 0.1.0, each remoteWrite could specify its own msgField. This was removed in favor of global msgField configuration. */}}
@@ -27,10 +27,10 @@
   {{- $msgField = concat $msgField .Values.msgField }}
   {{- $msgField = uniq $msgField }}
   {{- if not (empty $msgField) }}
-    {{- $args = append $args (printf "--kubernetes.msgField=%s" (join "," $msgField)) }}
+    {{- $args = append $args (printf "--kubernetesCollector.msgField=%s" (join "," $msgField)) }}
   {{- end }}
   {{- if not (empty .Values.timeField) }}
-    {{- $args = append $args (printf "--kubernetes.timeField=%s" (join "," .Values.timeField)) }}
+    {{- $args = append $args (printf "--kubernetesCollector.timeField=%s" (join "," .Values.timeField)) }}
   {{- end }}
 
   {{- range $i, $rw := .Values.remoteWrite }}

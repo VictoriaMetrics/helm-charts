@@ -49,6 +49,10 @@ spec:
           resources: {{ toYaml .Values.resources | nindent 12 }}
           {{- end }}
           {{- if .Values.native }}
+          ports:
+            - name: http
+              containerPort: 9429
+              protocol: TCP
           args: {{ include "victoria-logs-collector.args" . | nindent 12 }}
           {{- end }}
           env:

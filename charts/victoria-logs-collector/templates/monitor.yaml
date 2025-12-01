@@ -1,0 +1,43 @@
+{{- $app := .Values }}
+{{- if and $app.podMonitor.enabled $app.native }}
+{{- $podMonitor := $app.podMonitor }}
+{{- $ctx := dict "helm" . }}
+{{- if $podMonitor.vm }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+{{- else }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+{{- end }}
+metadata:
+  name: {{ include "vm.fullname" $ctx }}
+  {{- with $podMonitor.namespace }}
+  namespace: {{ . }}
+  {{- end }}
+  {{- with $podMonitor.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $_ := set $ctx "extraLabels" $podMonitor.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ include "vm.namespace" $ctx }}
+  selector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+  podMetricsEndpoints:
+    - port: http
+      {{- with $podMonitor.interval }}
+      interval: {{ . }}
+      {{- end }}
+      {{- with $podMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ . }}
+      {{- end }}
+      {{- with $podMonitor.relabelings }}
+      relabelings: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $podMonitor.metricRelabelings }}
+      metricRelabelings: {{ toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
