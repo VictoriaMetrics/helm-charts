@@ -1,6 +1,7 @@
 ## Next release
 
 - allow override dashboards and datasources label names and values. See [#2576](https://github.com/VictoriaMetrics/helm-charts/issues/2576).
+- allow setting extra roles for VMAgent service account. See [#2586](https://github.com/VictoriaMetrics/helm-charts/issues/2586).
 
 ## 0.63.6
 
