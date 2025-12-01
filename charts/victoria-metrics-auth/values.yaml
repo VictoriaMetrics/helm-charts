@@ -159,6 +159,27 @@ service:
   # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
   ipFamilies: []
 
+route:
+  # -- Enable deployment of HTTPRoute for VMAuth
+  enabled: false
+  # -- HTTPRoute annotations
+  annotations: {}
+  # -- HTTPRoute extra labels
+  labels: {}
+  # -- HTTPGateway objects refs
+  parentRefs: []
+  # -- Array of hostnames
+  hostnames: []
+  # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+  extraRules: []
+  # -- Filters for a default rule in HTTPRoute
+  filters: []
+  # -- Matches for a default rule in HTTPRoute
+  matches:
+    - path:
+        type: PathPrefix
+        value: /
+
 ingress:
   # -- Enable deployment of ingress for vmauth component
   enabled: false

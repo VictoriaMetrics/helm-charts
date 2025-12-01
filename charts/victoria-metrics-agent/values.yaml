@@ -255,6 +255,27 @@ service:
   # -- Extra selector labels common for service only
   selectorLabels: {}
 
+route:
+  # -- Enable deployment of HTTPRoute for VMAgent
+  enabled: false
+  # -- HTTPRoute annotations
+  annotations: {}
+  # -- HTTPRoute extra labels
+  labels: {}
+  # -- HTTPGateway objects refs
+  parentRefs: []
+  # -- Array of hostnames
+  hostnames: []
+  # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+  extraRules: []
+  # -- Filters for a default rule in HTTPRoute
+  filters: []
+  # -- Matches for a default rule in HTTPRoute
+  matches:
+    - path:
+        type: PathPrefix
+        value: /
+
 ingress:
   # -- Enable deployment of ingress for agent
   enabled: false
