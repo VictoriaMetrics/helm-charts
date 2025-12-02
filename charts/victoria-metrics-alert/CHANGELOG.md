@@ -2,6 +2,7 @@
 
 - add support of k8s service traffic distribution. See [#2580](https://github.com/VictoriaMetrics/helm-charts/issues/2580).
 - support HTTPRoute. See [#2589](https://github.com/VictoriaMetrics/helm-charts/issues/2589).
+- bump version of VM components to [v1.131.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.131.0)
 
 ## 0.26.6
 
