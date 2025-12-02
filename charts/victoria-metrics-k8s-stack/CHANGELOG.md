@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix additional CR and CRB management for VMAgent, when operator dependency is disabled. See [#2595](https://github.com/VictoriaMetrics/helm-charts/issues/2595).
 
 ## 0.64.0
 

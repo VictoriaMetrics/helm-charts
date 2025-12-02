@@ -4,13 +4,12 @@
 {{- $ctx := dict "helm" . "appKey" "vmagent" }}
 {{- $fullname := include "vm.managed.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
-{{- $namespaced := ne (len (index .Values "victoria-metrics-operator" "watchNamespaces")) 0 }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: {{ ternary "RoleBinding" "ClusterRoleBinding" $namespaced }}
+kind: {{ ternary "RoleBinding" "ClusterRoleBinding" $rbac.namespaced }}
 metadata:
   name: {{ $fullname }}
-  {{- if $namespaced }}
+  {{- if $rbac.namespaced }}
   namespace: {{ $ns }}
   {{- end }}
   {{- $_ := set $ctx "extraLabels" $rbac.extraLabels }}
@@ -21,7 +20,7 @@ metadata:
   {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: {{ ternary "Role" "ClusterRole" $namespaced }}
+  kind: {{ ternary "Role" "ClusterRole" $rbac.namespaced }}
   name: {{ $fullname }}
 subjects:
   - kind: ServiceAccount
@@ -29,10 +28,10 @@ subjects:
     namespace: {{ $ns }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: {{ ternary "Role" "ClusterRole" $namespaced }}
+kind: {{ ternary "Role" "ClusterRole" $rbac.namespaced }}
 metadata:
   name: {{ $fullname }}
-  {{- if $namespaced }}
+  {{- if $rbac.namespaced }}
   namespace: {{ include "vm.namespace" $ctx }}
   {{- end }}
   {{- $_ := set $ctx "extraLabels" $rbac.extraLabels }}
