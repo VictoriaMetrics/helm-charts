@@ -2,39 +2,7 @@ daemonSet should match snapshot:
   1: |
     apiVersion: v1
     data:
-      vector.yaml: |
-        data_dir: /vl-collector
-        sources:
-          k8s:
-            type: kubernetes_logs
-            pod_annotation_fields:
-              # Disable "pod_ips" as "pod_ip" already includes required info
-              pod_ips: ""
-        transforms:
-          json_parser:
-            type: remap
-            inputs: [k8s]
-            source: |
-              .message = parse_json(.message) ?? .message
-        sinks:
-          remote_write_0:
-            type: http
-            inputs: [json_parser]
-            uri: "http://victoria-logs:9428/insert/jsonline"
-            encoding:
-              codec: json
-            framing:
-              method: newline_delimited
-            healthcheck:
-              enabled: false
-            request:
-              headers:
-                AccountID: "0"
-                ProjectID: "0"
-                VL-Stream-Fields: kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
-                VL-Msg-Field: message
-                VL-Time-Field: timestamp
-            compression: "zstd"
+      vector.yaml: "data_dir: /vl-collector\nsources:\n  k8s:\n    type: kubernetes_logs\n    pod_annotation_fields:\n      # Disable \"pod_ips\" as \"pod_ip\" already includes required info\n      pod_ips: \"\"\ntransforms:\n  json_parser:\n    type: remap\n    inputs: [k8s]\n    source: |\n      .message = parse_json(.message) ?? .message\nsinks:\n\n  \n  remote_write_0:\n    type: http\n    inputs: [json_parser]\n    uri: \"http://victoria-logs:9428/insert/jsonline\"\n    encoding:\n      codec: json\n    framing:\n      method: newline_delimited\n    healthcheck:\n      enabled: false\n    request:\n      headers:\n        AccountID: \"0\"\n        ProjectID: \"0\"\n        VL-Stream-Fields: kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace\n        VL-Msg-Field: message,msg\n        VL-Time-Field: time,ts,timestamp\n    compression: \"zstd\"\n"
     kind: ConfigMap
     metadata:
       labels:
@@ -44,6 +12,7 @@ daemonSet should match snapshot:
         app.kubernetes.io/version: 0.1.0
         helm.sh/chart: victoria-logs-collector-0.1.1
       name: RELEASE-NAME-victoria-logs-collector-config
+      namespace: NAMESPACE
   2: |
     apiVersion: apps/v1
     kind: DaemonSet
@@ -55,6 +24,7 @@ daemonSet should match snapshot:
         app.kubernetes.io/version: 0.1.0
         helm.sh/chart: victoria-logs-collector-0.1.1
       name: RELEASE-NAME-victoria-logs-collector
+      namespace: NAMESPACE
     spec:
       selector:
         matchLabels:
@@ -63,7 +33,7 @@ daemonSet should match snapshot:
       template:
         metadata:
           annotations:
-            checksum/config: 4d48db702a3eee6969dfc603924253136385e307ad8aa6a1281df9a3f9869e87
+            checksum/config: d77d7b565f69d4a7661c05adcff941b82de2c563d422896f7c4eee4cde7bae46
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -75,7 +45,7 @@ daemonSet should match snapshot:
                   valueFrom:
                     fieldRef:
                       fieldPath: spec.nodeName
-              image: docker.io/timberio/vector:0.51.0-alpine
+              image: docker.io/timberio/vector:0.51.1-alpine
               imagePullPolicy: IfNotPresent
               name: victoria-logs-collector
               securityContext: {}
@@ -160,3 +130,4 @@ daemonSet should match snapshot:
         app.kubernetes.io/version: 0.1.0
         helm.sh/chart: victoria-logs-collector-0.1.1
       name: RELEASE-NAME-victoria-logs-collector
+      namespace: NAMESPACE
