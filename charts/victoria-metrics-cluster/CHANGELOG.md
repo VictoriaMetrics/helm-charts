@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- removed duplicated traffic distribution definitions
 
 ## 0.30.0
 
