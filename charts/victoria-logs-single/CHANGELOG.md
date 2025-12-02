@@ -2,6 +2,7 @@
 
 - bump operator chart version 0.0.42 -> 0.0.45
 - add support of k8s service traffic distribution. See [#2580](https://github.com/VictoriaMetrics/helm-charts/issues/2580).
+- bump VictoriaLogs version to [v1.39.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.39.0).
 
 ## 0.11.17
 
