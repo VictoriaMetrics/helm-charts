@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 1.12.8
+
+**Release date:** 03 Dec 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.28.1](https://img.shields.io/badge/v1.28.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1281)
+
 - added ability to configure Deployment and Statefulset specific options. See [#2597](https://github.com/VictoriaMetrics/helm-charts/issues/2597).
 
 ## 1.12.7
