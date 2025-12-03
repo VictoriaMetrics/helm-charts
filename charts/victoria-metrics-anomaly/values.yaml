@@ -122,6 +122,22 @@ configMapAnnotations: {}
 # -- NodeSelector configurations. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
 nodeSelector: {}
 
+# -- [K8s Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) specific variables
+deployment:
+  spec:
+    # -- VMAnomaly strategy
+    strategy: {}
+      # rollingUpdate:
+      #  maxSurge: 25%
+      #  maxUnavailable: 25%
+      # type: RollingUpdate
+
+# -- [K8s StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) specific variables
+statefulSet:
+  spec:
+    # -- Deploy order policy for StatefulSet pods
+    podManagementPolicy: OrderedReady
+
 # -- Tolerations configurations. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
 tolerations: []
   # - key: "key"

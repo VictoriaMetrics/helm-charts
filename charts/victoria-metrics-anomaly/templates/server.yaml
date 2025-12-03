@@ -18,16 +18,20 @@
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $shardingEnabled := gt (int .Values.shardsCount) 1 }}
 {{- $pvc := .Values.persistentVolume }}
-{{- $useSts := or $pvc.enabled $shardingEnabled }}
+{{- $mode := ternary "statefulSet" "deployment" (or $pvc.enabled $shardingEnabled) }}
+{{- $modeOpts := index .Values $mode }}
 {{- $tag := include "vm.image.tag" $ctx | splitList "-" | first }}
 ---
 apiVersion: apps/v1
-kind: {{ ternary "StatefulSet" "Deployment" $useSts }}
+kind: {{ title $mode }}
 metadata:
   namespace: {{ $ns }}
   name: {{ $fullname }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
+  {{- with $modeOpts.spec }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   replicas: {{ .Values.shardsCount }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}

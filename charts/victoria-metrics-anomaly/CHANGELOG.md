@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added ability to configure Deployment and Statefulset specific options. See [#2597](https://github.com/VictoriaMetrics/helm-charts/issues/2597).
 
 ## 1.12.7
 
