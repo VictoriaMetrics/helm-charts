@@ -12,13 +12,10 @@ templating:
   - name: ds
     type: datasource
     query: {{ $defaultDatasource }}
-    hide: 0
     current: {}
     options: []
-    queryValue: te
     refresh: 1
     regex: ""
-    skipUrlSync: false
   - name: job
     datasource:
       type: {{ $defaultDatasource }}
@@ -28,13 +25,10 @@ templating:
       query: label_values(operator_log_messages_total, job)
       refId: StandardVariableQuery
     definition: label_values(operator_log_messages_total, job)
-    hide: 0
     current: {}
     options: []
     refresh: 2
     regex: ""
-    skipUrlSync: false
-    sort: 0
   - name: instance
     includeAll: true
     datasource:
@@ -45,13 +39,10 @@ templating:
       query: {{ printf "label_values(operator_log_messages_total{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: StandardVariableQuery
     definition: {{ printf "label_values(operator_log_messages_total{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
-    hide: 0
     current: {}
     options: []
     refresh: 2
     regex: ""
-    skipUrlSync: false
-    sort: 0
   - name: version
     datasource:
       type: {{ $defaultDatasource }}
@@ -66,7 +57,6 @@ templating:
     options: []
     refresh: 1
     regex: ""
-    skipUrlSync: false
     sort: 2
   - name: adhoc
     datasource:
@@ -108,14 +98,6 @@ annotations:
     type: dashboard
 panels:
 - title: Overview
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    refId: A
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: $ds
   collapsed: false
   gridPos:
     h: 1
@@ -125,14 +107,9 @@ panels:
   id: 8
   type: row
 - title: Version
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    refId: A
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: $ds
+  fieldConfig:
+    defaults: {}
+    overrides: []
   gridPos:
     h: 3
     w: 4
@@ -146,7 +123,7 @@ panels:
       showMiniMap: false
     content: '<div style="text-align: center;">$version</div>'
     mode: markdown
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: text
 - title: CRD Objects count by controller
   targets:
@@ -172,7 +149,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
     overrides: []
@@ -187,6 +164,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -196,7 +174,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Uptime
   targets:
@@ -224,7 +202,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: s
@@ -240,6 +218,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -248,7 +227,7 @@ panels:
     showPercentChange: false
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Prometheus Objects watchers
   targets:
@@ -275,7 +254,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
     overrides: []
@@ -290,6 +269,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -298,7 +278,7 @@ panels:
     showPercentChange: false
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Elected Leaders
   targets:
@@ -325,7 +305,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
     overrides: []
@@ -340,6 +320,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -348,7 +329,7 @@ panels:
     showPercentChange: false
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Active workers
   targets:
@@ -375,7 +356,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
     overrides: []
@@ -390,6 +371,7 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - lastNotNull
@@ -398,7 +380,7 @@ panels:
     showPercentChange: false
     textMode: auto
     wideLayout: true
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Prometheus Converter Watch events
   targets:
@@ -426,6 +408,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 0
         gradientMode: none
@@ -440,6 +423,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: auto
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -451,7 +435,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
     overrides: []
@@ -470,9 +454,140 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: single
       sort: none
+  pluginVersion: 12.3.0
   type: timeseries
+- title: Non-default flags
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    expr: {{ printf "sum(flag{is_set=\"true\",job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,instance,name,value,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: false
+    format: table
+    instant: true
+    legendFormat: '{{`{{`}}object_type_name{{`}}`}} {{`{{`}}event_type{{`}}`}}'
+    range: false
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $ds
+  description: ""
+  fieldConfig:
+    defaults:
+      color:
+        mode: thresholds
+      custom:
+        align: auto
+        cellOptions:
+          type: auto
+        footer:
+          reducers: []
+        inspect: false
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+    overrides: []
+  gridPos:
+    h: 5
+    w: 12
+    x: 0
+    "y": 13
+  id: 43
+  options:
+    cellHeight: sm
+    showHeader: true
+  pluginVersion: 12.3.0
+  transformations:
+  - id: groupBy
+    options:
+      fields:
+        instance:
+          aggregations:
+          - uniqueValues
+          operation: aggregate
+        job:
+          aggregations: []
+          operation: groupby
+        name:
+          aggregations: []
+          operation: groupby
+        value:
+          aggregations: []
+          operation: groupby
+  type: table
+- title: Global settings
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    expr: {{ printf "sum(config_parameter{job=~\"$job\",instance=~\"$instance\",value!=\"\",%s=~\"$cluster\"}) by(job,instance,name,value,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: false
+    format: table
+    instant: true
+    legendFormat: '{{`{{`}}object_type_name{{`}}`}} {{`{{`}}event_type{{`}}`}}'
+    range: false
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $ds
+  description: ""
+  fieldConfig:
+    defaults:
+      color:
+        mode: thresholds
+      custom:
+        align: auto
+        cellOptions:
+          type: auto
+        footer:
+          reducers: []
+        inspect: false
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+    overrides: []
+  gridPos:
+    h: 5
+    w: 12
+    x: 12
+    "y": 13
+  id: 45
+  options:
+    cellHeight: sm
+    showHeader: true
+  pluginVersion: 12.3.0
+  transformations:
+  - id: groupBy
+    options:
+      fields:
+        instance:
+          aggregations:
+          - uniqueValues
+          operation: aggregate
+        job:
+          aggregations: []
+        name:
+          aggregations: []
+          operation: groupby
+        value:
+          aggregations: []
+          operation: groupby
+  type: table
 - title: Reconciliation rate by controller
   targets:
   - datasource:
@@ -497,6 +612,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -511,6 +627,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -522,7 +639,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: short
@@ -531,7 +648,7 @@ panels:
     h: 13
     w: 12
     x: 0
-    "y": 13
+    "y": 18
   id: 12
   options:
     legend:
@@ -542,9 +659,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Log message rate
   targets:
@@ -571,6 +689,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -585,6 +704,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -596,7 +716,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: short
@@ -605,7 +725,7 @@ panels:
     h: 13
     w: 12
     x: 12
-    "y": 13
+    "y": 18
   id: 16
   options:
     legend:
@@ -616,25 +736,18 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Troubleshooting
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    refId: A
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: $ds
   collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
-    "y": 26
+    "y": 31
   id: 6
   type: row
 - title: reconcile errors by controller
@@ -673,6 +786,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -687,6 +801,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -698,6 +813,7 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: 0
         - color: red
           value: 80
       unit: short
@@ -706,7 +822,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    "y": 27
+    "y": 32
   id: 10
   options:
     legend:
@@ -717,9 +833,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: throttled reconciliation config events
   targets:
@@ -746,6 +863,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -760,6 +878,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -771,6 +890,7 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: 0
         - color: red
           value: 80
       unit: short
@@ -779,7 +899,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    "y": 27
+    "y": 32
   id: 18
   options:
     legend:
@@ -790,9 +910,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Working queue depth
   targets:
@@ -819,6 +940,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -833,6 +955,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -844,6 +967,7 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: 0
         - color: red
           value: 80
       unit: short
@@ -852,7 +976,7 @@ panels:
     h: 11
     w: 12
     x: 0
-    "y": 35
+    "y": 40
   id: 20
   options:
     legend:
@@ -863,9 +987,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Reconciliation latency by controller
   targets:
@@ -892,6 +1017,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 10
         gradientMode: none
@@ -906,6 +1032,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -917,6 +1044,7 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: 0
         - color: red
           value: 80
       unit: s
@@ -925,7 +1053,7 @@ panels:
     h: 11
     w: 12
     x: 12
-    "y": 35
+    "y": 40
   id: 26
   options:
     legend:
@@ -938,9 +1066,10 @@ panels:
       sortBy: Mean
       sortDesc: true
     tooltip:
+      hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 10.4.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Rest client requests
   targets:
@@ -968,6 +1097,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 0
         gradientMode: none
@@ -982,6 +1112,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: auto
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -993,6 +1124,7 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: 0
         - color: red
           value: 80
     overrides: []
@@ -1000,7 +1132,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    "y": 46
+    "y": 51
   id: 36
   options:
     legend:
@@ -1011,8 +1143,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: single
       sort: none
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Concurrent reconcile ($instance)
   targets:
@@ -1055,6 +1189,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 0
         gradientMode: none
@@ -1069,6 +1204,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: auto
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1080,6 +1216,7 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: 0
         - color: red
           value: 80
     overrides:
@@ -1097,7 +1234,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    "y": 46
+    "y": 51
   id: 42
   options:
     legend:
@@ -1106,8 +1243,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: single
       sort: none
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Go scheduling latency
   targets:
@@ -1135,6 +1274,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 0
         gradientMode: none
@@ -1149,6 +1289,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: auto
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1160,6 +1301,7 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: 0
         - color: red
           value: 80
       unit: s
@@ -1168,7 +1310,7 @@ panels:
     h: 8
     w: 12
     x: 0
-    "y": 54
+    "y": 59
   id: 37
   options:
     legend:
@@ -1177,8 +1319,10 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: single
       sort: none
+  pluginVersion: 12.3.0
   type: timeseries
 - title: rest client latency
   targets:
@@ -1206,6 +1350,7 @@ panels:
         axisLabel: ""
         axisPlacement: auto
         barAlignment: 0
+        barWidthFactor: 0.6
         drawStyle: line
         fillOpacity: 0
         gradientMode: none
@@ -1220,6 +1365,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: auto
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1231,6 +1377,7 @@ panels:
         mode: absolute
         steps:
         - color: green
+          value: 0
         - color: red
           value: 80
       unit: s
@@ -1239,7 +1386,7 @@ panels:
     h: 8
     w: 12
     x: 12
-    "y": 54
+    "y": 59
   id: 35
   options:
     legend:
@@ -1250,15 +1397,12 @@ panels:
       placement: bottom
       showLegend: true
     tooltip:
+      hideZeros: false
       mode: single
       sort: none
+  pluginVersion: 12.3.0
   type: timeseries
 - title: resources
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    refId: A
   panels:
   - title: Memory usage ($instance)
     targets:
@@ -1572,30 +1716,26 @@ panels:
         sort: none
     pluginVersion: 10.4.0
     type: timeseries
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: $ds
   collapsed: true
   gridPos:
     h: 1
     w: 24
     x: 0
-    "y": 62
+    "y": 67
   id: 4
   type: row
 condition: {{ (index $Values "victoria-metrics-operator" "enabled") }}
 description: Overview for operator VictoriaMetrics v0.25.0 or higher
 fiscalYearStartMonth: 0
 graphTooltip: 0
-id: null
+id: 0
 links: []
-liveNow: false
+preload: false
 refresh: ""
-schemaVersion: 39
+schemaVersion: 42
 time:
   from: now-15m
   to: now
 timepicker: {}
 uid: 1H179hunk
-version: 7
-weekStart: ""
+version: 8
