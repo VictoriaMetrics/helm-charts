@@ -3,38 +3,25 @@ package test
 import (
 	"context"
 	"fmt"
-	"strings"
 	"testing"
 
-	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/gruntwork-io/terratest/modules/k8s"
-	"github.com/gruntwork-io/terratest/modules/random"
 )
 
 // TestVictoriaMetricsAuthInstallDefault tests that the victoria-metrics-auth chart can be installed with default values.
 func TestVictoriaMetricsAuthInstallDefault(t *testing.T) {
-	const helmChartPath = "../charts/victoria-metrics-auth"
-
-	namespaceName := fmt.Sprintf("vmauth-%s", strings.ToLower(random.UniqueId()))
-	k8sOpts := k8s.NewKubectlOptions("", "", namespaceName)
-
-	helmOpts := &helm.Options{
-		BuildDependencies: true,
-		KubectlOptions:    k8sOpts,
-		ExtraArgs: map[string][]string{
-			"upgrade": {"--create-namespace", "--wait"},
-		},
-	}
-
-	// Install the chart and verify no errors occurred.
-	releaseName := fmt.Sprintf("vmauth-%s", strings.ToLower(random.UniqueId()))
-	defer helmCleanup(context.Background(), t, k8sOpts, helmOpts, releaseName)
-	helm.Upgrade(t, helmOpts, helmChartPath, releaseName)
+	t.Parallel()
+	name := "victoria-metrics-auth"
+	cp := chartInstall(t, name, nil)
+	ctx := context.Background()
+	defer chartCleanup(t, ctx, cp)
+	releaseName := cp.releaseName
+	o := cp.opts
 
 	// Verify the Deployment was created and is ready
-	vmAuthName := fmt.Sprintf("%s-victoria-metrics-auth", releaseName)
-	k8s.WaitUntilDeploymentAvailable(t, k8sOpts, vmAuthName, retries, pollingInterval)
+	vmAuthName := fmt.Sprintf("%s-%s", releaseName, name)
+	k8s.WaitUntilDeploymentAvailable(t, o.KubectlOptions, vmAuthName, retries, pollingInterval)
 
 	// Verify the Service was created and is available
-	k8s.WaitUntilServiceAvailable(t, k8sOpts, vmAuthName, retries, pollingInterval)
+	k8s.WaitUntilServiceAvailable(t, o.KubectlOptions, vmAuthName, retries, pollingInterval)
 }

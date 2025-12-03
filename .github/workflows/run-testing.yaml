@@ -67,7 +67,9 @@ jobs:
 
       - name: Run tests
         run: |
-          cd test && go test -json -p 1 ./... 2>&1 | go-junit-report -set-exit-code -parser gojson -iocopy -out ../report.xml
+          cd test && go test -json -p 4 ./... 2>&1 | go-junit-report -set-exit-code -parser gojson -iocopy -out ../report.xml
+        env:
+          LICENSE_KEY: ${{ secrets.ENTERPRISE_COMPONENTS_LICENSE_KEY }}
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v6

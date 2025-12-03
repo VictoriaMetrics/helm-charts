@@ -1,26 +1,33 @@
 package test
 
 import (
+	"context"
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/k8s"
-	"github.com/gruntwork-io/terratest/modules/random"
 )
 
 // TestVictoriaMetricsGatewayInstallDefault tests that the victoria-metrics-gateway chart can be installed with default values.
 func TestVictoriaMetricsGatewayInstallDefault(t *testing.T) {
-	const helmChartPath = "../charts/victoria-metrics-gateway"
+	t.Parallel()
+	name := "victoria-metrics-gateway"
+	cp := chartInstall(t, name, map[string]string{
+		"clusterMode":         "true",
+		"auth.enabled":        "true",
+		"license.secret.name": "license",
+		"license.secret.key":  "key",
+		"read.url":            "http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481",
+		"write.url":           "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480",
+	})
+	o := cp.opts
+	ctx := context.Background()
+	defer chartCleanup(t, ctx, cp)
 
-	namespaceName := fmt.Sprintf("vmgateway-%s", strings.ToLower(random.UniqueId()))
-	k8sOpts := k8s.NewKubectlOptions("", "", namespaceName)
-	k8s.CreateNamespace(t, k8sOpts, namespaceName)
-	defer k8s.DeleteNamespace(t, k8sOpts, namespaceName)
+	// Install the chart and verify no errors occurred.
+	releaseName := cp.releaseName
 
-	// TODO: needs license
-	// options := &helm.Options{
-	// 	BuildDependencies: true,
-	// 	KubectlOptions:    kubectlOptions,
-	// }
+	// Verify vmgateway Deployment was created and is ready
+	vmGatewayName := fmt.Sprintf("%s-%s", releaseName, name)
+	k8s.WaitUntilDeploymentAvailable(t, o.KubectlOptions, vmGatewayName, retries, pollingInterval)
 }
