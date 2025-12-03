@@ -1,6 +1,7 @@
 ## Next release
 
 - add support of k8s service traffic distribution. See [#2580](https://github.com/VictoriaMetrics/helm-charts/issues/2580).
+- updates operator to [v0.66.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.66.0) version
 
 ## 0.56.4
 
