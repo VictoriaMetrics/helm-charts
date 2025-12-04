@@ -1,0 +1,17 @@
+{{- if .Values.printNotes }}
+{{- $ctx := dict "helm" . "style" "plain" }}
+{{- if .Values.vlselect.enabled }}
+{{- if .Values.vmauth.enabled }}
+  {{- $_ := set $ctx "appKey" "vmauth" }}
+{{- else }}
+  {{- $_ := set $ctx "appKey" "vlselect" }}
+{{- end }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+Global Read Endpoint:
+
+The VictoriaLogs query APIs can be accessed with the following url:
+{{ include "vm.url" $ctx }}
+
+Check how to query data in https://docs.victoriametrics.com/victorialogs/querying/
+{{- end }}
+{{- end }}

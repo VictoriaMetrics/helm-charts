@@ -1,0 +1,84 @@
+---
+weight: 2
+title: VictoriaLogs Multilevel
+menu:
+  docs:
+    parent: helm
+    weight: 18
+    identifier: helm-victoria-logs-multilevel
+url: /helm/victoria-logs-multilevel/
+aliases:
+  - /helm/victorialogs-multilevel/
+tags:
+  - logs
+  - kubernetes
+---
+{{ template "chart.badges" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.prerequisites" . }}
+
+## Quick start
+
+The chart deploys VictoriaLogs global read entrypoint for [multi-level cluster setup](https://docs.victoriametrics.com/victorialogs/cluster/#multi-level-cluster-setup).
+It deploys the following components according to [VictoriaLogs cluster architecture](https://docs.victoriametrics.com/victorialogs/cluster/#architecture):
+
+- `vmauth` provides balancing across `vlselect` instances
+- `vlselect` provides API for querying the ingested logs
+
+This chart is not self-sufficient, it's a building block for multi-level cluster setup that configures global read endpoint for multiple VictoriaLogs clusters.
+Check `VictoriaLogs Multi-level` component below:
+
+```mermaid
+graph TD
+    Users["Users/Grafana/vlogscli"] --> VLG
+    subgraph VLG["VictoriaLogs Multi-level"]
+        AUTH["VMAuth LB"] --> VLQ1["vlselect-1"]
+        AUTH["VMAuth LB"] --> VLQ2["vlselect-2"]
+    end
+        
+    VLQ1 --> VL1["VictoriaLogs Cluster-1"]
+    VLQ1 --> VL2["VictoriaLogs Cluster-2"]
+    VLQ1 --> VL3["VictoriaLogs Cluster-3"]
+    VLQ2 --> VL1["VictoriaLogs Cluster-1"]
+    VLQ2 --> VL2["VictoriaLogs Cluster-2"]
+    VLQ2 --> VL3["VictoriaLogs Cluster-3"]
+```
+
+Chart has the only required parameter `.Values.storageNodes`, which defines list of all endpoints to query data from.
+Let's deploy multilevel chart that points to `vlselect-1`, `vlselect-2` and `vlselect-3` nodes.
+If there no VictoriaLogs cluster configured yet, please check [victoria-logs-cluster chart quick start section](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#quick-start)
+
+```sh
+export NAMESPACE=logging
+
+# Install victoria-logs-multicluster chart
+helm install vlm vm/victoria-logs-multilevel --namespace $NAMESPACE --wait \
+    --set "storageNodes={vlselect-1,vlselect-2,vlselect-n}"
+```
+
+To access the data within the cluster, use the vmauth address: `http://vlm-victoria-logs-multilevel-vmauth.logging.svc.cluster.local:8427`.
+You can use this address as Data Source URL in Grafana.
+The vmui interface is available at: `http://vlm-victoria-logs-multilevel-vmauth.logging.svc.cluster.local:8427/select/vmui/`.
+
+To uninstall these charts, run: `helm uninstall vlm collector`.
+
+For finer control and easier maintenance, it is recommended to set these
+values in a separate `values` file and use it during installation.
+See [how to install victoria-logs-single](https://docs.victoriametrics.com/helm/victoria-logs-single/#install-victoria-logs-single-chart) for an example.
+You can do this later if you want to configure more settings than shown in the default example.
+
+{{ include "chart.installSection" . }}
+
+{{ include "chart.uninstallSection" . }}
+
+{{ include "chart.helmDocs" . }}
+
+## Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-logs-multilevel/values.yaml`` file.
+
+{{ template "chart.valuesTableHtml" . }}
