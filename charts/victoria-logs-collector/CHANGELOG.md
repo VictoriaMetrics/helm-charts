@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- support VLAgent logs collection when `.Values.native: true`
 
 ## 0.1.2
 

@@ -40,7 +40,7 @@ spec:
       {{- end }}
       containers:
         - name: victoria-logs-collector
-          image: {{ include "victoria-logs-collector.image" . }}
+          image: {{ include "victoria-logs-collector.image" $ctx }}
           imagePullPolicy: IfNotPresent
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ omit .Values.securityContext "enabled" | toYaml | nindent 12 }}
