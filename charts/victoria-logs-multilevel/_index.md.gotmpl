@@ -21,14 +21,15 @@ tags:
 
 ## Quick start
 
-The chart deploys VictoriaLogs global read entrypoint for [multi-level cluster setup](https://docs.victoriametrics.com/victorialogs/cluster/#multi-level-cluster-setup).
+The chart deploys VictoriaLogs read entrypoint for [multi-level cluster setup](https://docs.victoriametrics.com/victorialogs/cluster/#multi-level-cluster-setup).
 It deploys the following components according to [VictoriaLogs cluster architecture](https://docs.victoriametrics.com/victorialogs/cluster/#architecture):
 
-- `vmauth` provides balancing across `vlselect` instances
-- `vlselect` provides API for querying the ingested logs
+- [`vmauth`](https://docs.victoriametrics.com/victoriametrics/vmauth/) provides request balancing across `vlselect` instances
+- `vlselect` provides "global querying view" [HTTP APIs](https://docs.victoriametrics.com/victorialogs/querying/#http-api) across
+  the configured VictoriaLogs `selectNode` addresses of VictoriaLogs instances (both [single-node](https://docs.victoriametrics.com/helm/victoria-logs-single/)
+  and [cluster](https://docs.victoriametrics.com/helm/victoria-logs-cluster/) can be queried at the same time).
 
-This chart is not self-sufficient, it's a building block for multi-level cluster setup that configures global read endpoint for multiple VictoriaLogs clusters.
-Check `VictoriaLogs Multi-level` component below:
+Here is a typical architecture deployed by this chart:
 
 ```mermaid
 graph TD
@@ -46,19 +47,26 @@ graph TD
     VLQ2 --> VL3["VictoriaLogs Cluster-3"]
 ```
 
-Chart has the only required parameter `.Values.storageNodes`, which defines list of all endpoints to query data from.
-Let's deploy multilevel chart that points to `vlselect-1`, `vlselect-2` and `vlselect-3` nodes.
-If there no VictoriaLogs cluster configured yet, please check [victoria-logs-cluster chart quick start section](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#quick-start)
+The chart requires setting the list of VictoriaLogs addresses to query in order to get global querying view
+according to [multi-level VictoriaLogs setup](https://docs.victoriametrics.com/victorialogs/cluster/#multi-level-cluster-setup).
+The list of these addresses must be set via `.Values.storageNodes` option.
+
+Let's deploy multilevel VictoriaLogs chart that queries three VictoriaLogs clusters deployed via [victoria-logs-cluster Helm chart](https://docs.victoriametrics.com/helm/victoria-logs-cluster/):
+- `vl-cluster-1:8427`
+- `vl-cluster-2:8427`
+- `vl-cluster-3:8427`
 
 ```sh
 export NAMESPACE=logging
 
 # Install victoria-logs-multicluster chart
 helm install vlm vm/victoria-logs-multilevel --namespace $NAMESPACE --wait \
-    --set "storageNodes={vlselect-1,vlselect-2,vlselect-n}"
+    --set "storageNodes={vl-cluster-1:8427,vl-cluster-2:8427,vl-cluster-3:8427}"
 ```
 
-To access the data within the cluster, use the vmauth address: `http://vlm-victoria-logs-multilevel-vmauth.logging.svc.cluster.local:8427`.
+The chart listens at `http://vlm-victoria-logs-multilevel-vmauth.logging.svc.cluster.local:8427` for incoming queries according
+to [HTTP querying APIs for VictoriaLogs](https://docs.victoriametrics.com/victorialogs/querying/#http-api).
+
 You can use this address as Data Source URL in Grafana.
 The vmui interface is available at: `http://vlm-victoria-logs-multilevel-vmauth.logging.svc.cluster.local:8427/select/vmui/`.
 
