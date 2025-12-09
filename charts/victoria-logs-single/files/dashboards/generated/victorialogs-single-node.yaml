@@ -12,24 +12,20 @@ templating:
   - name: ds
     type: datasource
     query: {{ $defaultDatasource }}
-    current:
-      text: default
-      value: default
+    current: {}
     options: []
     refresh: 1
     regex: ""
   - name: job
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     type: query
     query:
       query: {{ printf "label_values(vm_app_version{version=~\"victoria-logs-.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: StandardVariableQuery
     definition: {{ printf "label_values(vm_app_version{version=~\"victoria-logs-.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
-    current:
-      text: kubernetes-pods
-      value: kubernetes-pods
+    current: {}
     options: []
     refresh: 1
     regex: ""
@@ -44,17 +40,14 @@ templating:
       query: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: StandardVariableQuery
     definition: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
-    current:
-      text: All
-      value:
-      - $__all
+    current: {}
     options: []
     refresh: 1
     regex: ""
   - name: version
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     type: query
     query:
       qryType: 1
@@ -62,9 +55,7 @@ templating:
       refId: PrometheusVariableQueryEditor-VariableQuery
     definition: {{ printf "label_values(vm_app_version{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, short_version)" $clusterLabel }}
     hide: 2
-    current:
-      text: ""
-      value: ""
+    current: {}
     options: []
     refresh: 1
     regex: ""
@@ -121,7 +112,7 @@ annotations:
     expr: {{ printf "sum(changes(vm_app_start_timestamp{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__interval])) by(job,%s)" $clusterLabel $clusterLabel }}
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     enable: true
     hide: true
     iconColor: orange
@@ -169,7 +160,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: Total amount of log entries in the storage.
   fieldConfig:
     defaults:
@@ -205,7 +196,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Ingested logs 24h
   targets:
@@ -223,7 +214,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: The total number of log entries ingested over the past 24 hours.
   fieldConfig:
     defaults:
@@ -259,7 +250,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Insert req/s
   targets:
@@ -277,7 +268,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: Average ingestion rate of log entries.
   fieldConfig:
     defaults:
@@ -313,7 +304,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Disk space usage
   targets:
@@ -331,7 +322,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: |-
     Total amount of used disk space.
     Accounts for all compressed log entries and index size.
@@ -371,7 +362,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Available CPU
   targets:
@@ -389,7 +380,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: Integer number of CPU cores available to the application. This value is automatically rounded down from fractional CPU quotas. For optimal performance, fractional CPU units should be avoided. See the [best practices](https://docs.victoriametrics.com/victoriametrics/bestpractices/#kubernetes) documentation for more details.
   fieldConfig:
     defaults:
@@ -425,13 +416,10 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Version
   description: See [latest releases](https://docs.victoriametrics.com/victorialogs/changelog/).
-  fieldConfig:
-    defaults: {}
-    overrides: []
   gridPos:
     h: 4
     w: 4
@@ -445,7 +433,7 @@ panels:
       showMiniMap: false
     content: '<div style="text-align: center;">$version</div>'
     mode: markdown
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: text
 - title: Ingested bytes 24h
   targets:
@@ -463,7 +451,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: "The cumulative number of log entries ingested over the last 24h. \n\nThe size is calculated before compression."
   fieldConfig:
     defaults:
@@ -499,7 +487,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Read req/s
   targets:
@@ -517,7 +505,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: Rate of HTTP read requests.
   fieldConfig:
     defaults:
@@ -553,7 +541,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Compression ratio
   targets:
@@ -571,7 +559,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: "The ratio between original data size and compressed data stored on disk. This metric excludes indexdb size. \n\nThe ratio can go up or down as the system performs automatic maintenance and applies retention policies. For examples:\n- Background merges: [Merges](https://docs.victoriametrics.com/victorialogs/#forced-merge) improve compression by combining data into larger, more efficiently compressed blocks\n- Retention policies: When old data is deleted due to retention settings, the ratio changes as different time periods have varying compression characteristics\n\n"
   fieldConfig:
     defaults:
@@ -607,7 +595,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Available memory
   targets:
@@ -624,7 +612,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: Total system memory available to the application. This represents the system or container's memory capacity or limit, not the currently free memory.
   fieldConfig:
     defaults:
@@ -660,7 +648,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: stat
 - title: Overview
   collapsed: false
@@ -686,7 +674,7 @@ panels:
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     expr: {{ printf "sum(rate(vl_bytes_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s) > 0" $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
@@ -696,7 +684,7 @@ panels:
     refId: B
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: Ingestion rate in number of log entries and bytes per second.
   fieldConfig:
     defaults:
@@ -724,6 +712,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -770,13 +759,13 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Requests rate
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     expr: {{ printf "sum(rate(vl_http_requests_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s) > 0" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
@@ -819,6 +808,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -859,13 +849,13 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Requests error rate
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     expr: {{ printf "sum(rate(vm_http_request_errors_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -922,6 +912,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -958,7 +949,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Request duration p99
   targets:
@@ -974,7 +965,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: 99th percentile response time for VictoriaLogs HTTP endpoints, grouped by instance and path. This means 99% of requests are faster than this value. **Lower numbers are better**, as they indicate faster responses and fewer slow requests.
   fieldConfig:
     defaults:
@@ -1002,6 +993,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1042,7 +1034,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.1.0
+  pluginVersion: 12.2.1
   type: timeseries
 - title: Disk space usage
   targets:
@@ -1060,7 +1052,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: |-
     Amount of on-disk space occupied by all the data stored in the storage.
 
@@ -1147,7 +1139,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: Rate of VictoriaLogs' own application log messages (errors, warnings, debug) - NOT the logs that VictoriaLogs is collecting from external sources.
   fieldConfig:
     defaults:
@@ -1252,7 +1244,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: "Number of restarts per job. The chart can be useful to identify periodic process restarts and correlate them with potential issues or anomalies. \n\nNormally, processes shouldn't restart unless restart was inited by user. The reason of restarts should be figured out by checking the logs of each specific service. "
   fieldConfig:
     defaults:
@@ -1336,7 +1328,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: The number of new [log streams](https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields) created over the last 24 hours. Lower rate is better. See [How to determine which fields must be associated with log streams?](https://docs.victoriametrics.com/victorialogs/keyconcepts/#how-to-determine-which-fields-must-be-associated-with-log-streams)
   fieldConfig:
     defaults:
@@ -1422,7 +1414,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: Flags explicitly set to non-default values
   fieldConfig:
     defaults:
@@ -1492,7 +1484,7 @@ panels:
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     expr: {{ printf "sum(increase(vl_too_long_lines_skipped_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1h])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
@@ -1502,7 +1494,7 @@ panels:
     refId: B
   datasource:
     type: {{ $defaultDatasource }}
-    uid: $ds
+    uid: ${DS_PROMETHEUS}
   description: |-
     Number of log entries ignored or dropped on insertion due to the following reasons:
     * Timestamp out of the retention period or in the future
@@ -1582,7 +1574,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(max_over_time(process_resident_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / vm_available_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
@@ -1640,7 +1632,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(max_over_time(process_resident_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / vm_available_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
@@ -1728,7 +1720,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(process_resident_memory_anon_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"} / process_resident_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
@@ -1782,7 +1774,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "sum(process_resident_memory_anon_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -1804,7 +1796,7 @@ panels:
       refId: B
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "sum(process_resident_memory_shared_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -1891,7 +1883,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(rate(process_cpu_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_cpu_cores_available{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
@@ -1976,7 +1968,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "sum(rate(process_pressure_memory_waiting_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -2093,7 +2085,7 @@ panels:
       refId: A
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "sum(rate(process_pressure_cpu_stalled_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -2105,7 +2097,7 @@ panels:
       refId: B
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: |-
       Helps troubleshoot high CPU usage or throttling:
 
@@ -2186,7 +2178,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(rate(process_io_read_syscalls_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -2304,7 +2296,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: |-
       Percentage of open file descriptors (files, sockets, pipes, etc.,) compared to the limit set in the OS. Reaching the limit of open files can cause various issues and must be prevented.
 
@@ -2401,7 +2393,7 @@ panels:
       refId: A
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(rate(process_io_storage_written_bytes_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -2413,7 +2405,7 @@ panels:
       refId: C
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: |-
       Measure the actual bytes read from and written to disk by the process:
 
@@ -2495,7 +2487,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(rate(process_pressure_io_waiting_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -2608,7 +2600,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: Current number of active TCP connections to VictoriaLogs. This metric helps monitor connection pool usage and identify potential connection leaks. High values may indicate clients not properly closing connections or connection pooling issues. Monitor for gradual increases that could lead to resource exhaustion.
     fieldConfig:
       defaults:
@@ -2691,7 +2683,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     fieldConfig:
       defaults:
         color:
@@ -2775,7 +2767,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: Rate of incoming TCP connections accepted by VictoriaLogs. This metric indicates network activity and client connection patterns. Sudden spikes may indicate increased load or potential DDoS attacks. Sustained high rates should be correlated with resource usage to ensure adequate capacity.
     fieldConfig:
       defaults:
@@ -2858,7 +2850,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     fieldConfig:
       defaults:
         color:
@@ -2942,7 +2934,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: "Percent of CPU spent on garbage collection.\n\nIf % is high, then CPU usage can be decreased by changing `GOGC` to higher values. Increasing `GOGC` value will increase memory usage, and decrease CPU usage.\n\nTry searching for keyword `GOGC` at https://docs.victoriametrics.com/victoriametrics/troubleshooting/ "
     fieldConfig:
       defaults:
@@ -3025,7 +3017,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: "Time goroutines have spent in runnable state before actually running. The lower is better.\n\nHigh values or values exceeding the threshold is usually a sign of            insufficient CPU resources or CPU throttling. \n\nVerify that service has enough CPU resources. Otherwise, the service could work unreliably with delays in processing."
     fieldConfig:
       defaults:
@@ -3119,7 +3111,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: "Total number of time-based (daily) partitions in storage. The number typically grows over time as new data arrives and is partitioned by time periods. \n\nExcessive partition counts may indicate retention policy issues or very high data ingestion rates that could impact query performance."
     fieldConfig:
       defaults:
@@ -3172,7 +3164,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     description: Number of storage parts (data files) in each tier. More parts mean fragmentation; fewer parts suggest successful merging. High part counts may slow queries and trigger background merge operations.
     fieldConfig:
       defaults:
@@ -3254,7 +3246,7 @@ panels:
       refId: A
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${ds}
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(max_over_time(vl_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s) / max(vl_total_disk_space_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -3265,7 +3257,7 @@ panels:
       refId: B
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     description: |-
       Disk space usage and limits for VictoriaLogs storage. Tracks current data usage against the configured retention limit or available disk space.
 
@@ -3351,7 +3343,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${ds}
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "sum(increase(vl_merges_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -3435,7 +3427,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${ds}
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(vl_merge_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.9\",%s=~\"$cluster\"}) by(type,%s) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -3518,7 +3510,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${ds}
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(vl_merge_bytes{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",%s=~\"$cluster\"}) by(type,%s) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -3612,7 +3604,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "sum(rate(vl_rows_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -3727,7 +3719,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: "Rate of incoming query requests by endpoint path. This metric tracks the query load on VictoriaLogs, including different query interfaces and internal operations. \n\nHigher rates indicate increased query activity from users or applications. Monitor for sudden spikes that might indicate new dashboards, automated queries, or potential performance issues. Sustained high rates may require scaling query processing capacity."
     fieldConfig:
       defaults:
@@ -3811,7 +3803,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: 99th percentile of insert operation duration. This represents the time it takes for 99% of insert operations to complete. High values indicate slow ingestion performance that could affect overall system throughput. Spikes may suggest storage bottlenecks, resource contention, or inefficient data processing.
     fieldConfig:
       defaults:
@@ -3894,7 +3886,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: 99th percentile response time for VictoriaLogs HTTP endpoints, grouped by instance and path. This means 99% of requests are faster than this value. **Lower numbers are better**, as they indicate faster responses and fewer slow requests.
     fieldConfig:
       defaults:
@@ -3979,7 +3971,7 @@ panels:
       refId: A
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(max_over_time(vm_concurrent_insert_capacity{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       hide: false
@@ -3989,7 +3981,7 @@ panels:
       refId: B
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: |-
       Number of active message processors handling log ingestion. These processors parse and process incoming log messages before storage. The count typically correlates with the ingestion load.
 
@@ -4067,7 +4059,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "sum(vl_pending_rows{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -4157,7 +4149,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(increase(vm_concurrent_insert_limit_reached_total[$__rate_interval])) by(instance,%s)" $clusterLabel }}
       editorMode: code
       format: time_series
@@ -4250,7 +4242,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "sum(rate(vm_concurrent_insert_limit_timeout_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       interval: ""
@@ -4338,7 +4330,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "sum(vl_insert_flush_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",%s=~\"$cluster\"}) by(type,%s) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -4431,7 +4423,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "sum(rate(vl_http_requests_total{job=~\"$job\",instance=~\"$instance\",path=~\"^/(internal/)?select.*\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -4516,7 +4508,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(vl_http_request_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",path=~\"^/(internal/)?select.*\",%s=~\"$cluster\"}) by(path,%s) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -4600,7 +4592,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: $ds
+        uid: ${DS_PROMETHEUS}
       expr: {{ printf "max(max_over_time(vl_concurrent_select_current{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -4718,7 +4710,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: $ds
+      uid: ${DS_PROMETHEUS}
     description: |-
       Number of queries that timed out while waiting for available concurrency slots. This indicates sustained query overload beyond configured limits.
 
@@ -4815,7 +4807,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     description: |-
       Number of storage blocks scanned per query (99th percentile). Each block contains logs for a specific time period and field combination. High values indicate queries scanning too many blocks, often caused by:
 
@@ -4906,7 +4898,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     description: |-
       Total bytes read from disk per query (99th percentile). This represents the complete `I/O` overhead for query execution, including:
 
@@ -4998,7 +4990,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     description: |-
       Bytes read from block headers per query (99th percentile). Block headers contain metadata about each storage block including `time ranges`, `field names`, and data location pointers.
 
@@ -5090,7 +5082,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     description: |-
       Bytes read from Bloom filters per query (99th percentile). `Bloom filters` are probabilistic data structures that quickly eliminate blocks that definitely don't contain search terms.
 
@@ -5180,7 +5172,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     description: |-
       Bytes read from actual log values per query (99th percentile). This represents the uncompressed log content being retrieved and processed for the query result.
 
@@ -5273,7 +5265,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     description: |-
       Bytes read from timestamp column (`_time`) per query (99th percentile). The `_time` column is automatically indexed and used for time-range filtering during query execution.
 
@@ -5365,7 +5357,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     description: |-
       Bytes read from column header indexes per query (99th percentile). `Column header indexes` contain metadata about which fields exist in each block and their data types.
 
@@ -5458,7 +5450,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${ds}
+      uid: ${DS_PROMETHEUS}
     description: |-
       Bytes read from column headers per query (99th percentile). `Column headers` store the actual field schema and compression metadata for each block's columns.
 
@@ -5543,15 +5535,51 @@ panels:
     "y": 55
   id: 126
   type: row
+__elements: {}
+__inputs:
+- description: ""
+  label: prometheus
+  name: DS_PROMETHEUS
+  pluginId: prometheus
+  pluginName: Prometheus
+  type: datasource
+__requires:
+- id: grafana
+  name: Grafana
+  type: grafana
+  version: 12.2.1
+- id: prometheus
+  name: Prometheus
+  type: datasource
+  version: 1.0.0
+- id: stat
+  name: Stat
+  type: panel
+  version: ""
+- id: table
+  name: Table
+  type: panel
+  version: ""
+- id: text
+  name: Text
+  type: panel
+  version: ""
+- id: timeseries
+  name: Time series
+  type: panel
+  version: ""
+- id: victoriametrics-metrics-datasource
+  name: VictoriaMetrics
+  type: datasource
+  version: 0.19.7
 condition: {{ ($Values.vlogs).enabled }}
 description: Overview for single-node VictoriaLogs v1.29.0 or higher
 fiscalYearStartMonth: 0
 graphTooltip: 0
-id: 8
+id: null
 links: []
-preload: false
 refresh: ""
-schemaVersion: 41
+schemaVersion: 42
 time:
   from: now-3h
   to: now
