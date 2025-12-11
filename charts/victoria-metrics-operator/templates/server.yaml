@@ -67,10 +67,6 @@ spec:
               value: {{ .Chart.Name }}
             - name: VM_USECUSTOMCONFIGRELOADER
               value: "{{ .Values.operator.useCustomConfigReloader }}"
-            {{- if and (.Values.operator.useCustomConfigReloader) (not (hasKey $env "VM_CUSTOMCONFIGRELOADERIMAGE")) }}
-            - name: VM_CUSTOMCONFIGRELOADERIMAGE
-              value: victoriametrics/operator:config-reloader-{{- include "vm.image.tag" . -}}
-            {{ end }}
             {{- with (((.Values).global).image).registry }}
             - name: VM_CONTAINERREGISTRY
               value: {{ quote . }}
