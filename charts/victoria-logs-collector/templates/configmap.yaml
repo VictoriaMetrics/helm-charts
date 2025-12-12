@@ -20,7 +20,7 @@ data:
         type: remap
         inputs: [k8s]
         source: |
-          .message = parse_json(.message) ?? .message
+          {{ .Values.vectorTransformsJsonparserSource | nindent 10 }}
     {{- if empty .Values.remoteWrite }}
       {{ fail "specify at least one remoteWrite with valid url"}}
     {{- end }}
