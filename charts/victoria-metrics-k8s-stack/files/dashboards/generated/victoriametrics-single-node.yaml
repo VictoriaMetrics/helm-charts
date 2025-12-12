@@ -27,7 +27,9 @@ templating:
       query: {{ printf "label_values(vm_app_version{version=~\"victoria-metrics-.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
       refId: VictoriaMetrics-job-Variable-Query
     definition: {{ printf "label_values(vm_app_version{version=~\"victoria-metrics-.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
-    current: {}
+    current:
+      text: ""
+      value: ""
     options: []
     refresh: 1
     regex: ""
@@ -41,7 +43,9 @@ templating:
       refId: VictoriaMetrics-version-Variable-Query
     definition: {{ printf "label_values(vm_app_version{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}, version)" $clusterLabel }}
     hide: 2
-    current: {}
+    current:
+      text: ""
+      value: ""
     options: []
     refresh: 1
     regex: /.*-(?:tags|heads)-(.*)-(?:0|dirty)-.*/
@@ -58,7 +62,9 @@ templating:
       refId: VictoriaMetrics-instance-Variable-Query
     definition: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
     allValue: .*
-    current: {}
+    current:
+      text: All
+      value: $__all
     options: []
     refresh: 1
     regex: ""
@@ -147,7 +153,7 @@ panels:
       showMiniMap: false
     content: '<div style="text-align: center;">$version</div>'
     mode: markdown
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: text
 - title: Total datapoints
   targets:
@@ -201,7 +207,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Ingestion rate
   targets:
@@ -255,7 +261,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Read requests
   targets:
@@ -309,7 +315,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Available CPU
   targets:
@@ -362,7 +368,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Uptime
   targets:
@@ -414,7 +420,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Active series
   targets:
@@ -468,7 +474,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Disk space usage
   targets:
@@ -522,7 +528,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Bytes per point
   targets:
@@ -576,7 +582,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Available memory
   targets:
@@ -628,7 +634,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: stat
 - title: Overview
   collapsed: false
@@ -720,7 +726,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Requests rate
   targets:
@@ -812,7 +818,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Active time series
   targets:
@@ -898,7 +904,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Query duration 0.99 quantile
   targets:
@@ -990,7 +996,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Requests error rate
   targets:
@@ -1080,7 +1086,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Logging rate
   targets:
@@ -1160,7 +1166,7 @@ panels:
       hideZeros: false
       mode: single
       sort: none
-  pluginVersion: 12.2.0
+  pluginVersion: 12.3.0
   type: timeseries
 - title: Resource usage
   panels:
@@ -1233,7 +1239,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 767
+      "y": 121
     id: 112
     options:
       legend:
@@ -1250,7 +1256,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.2.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: CPU % usage
     targets:
@@ -1318,7 +1324,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 767
+      "y": 121
     id: 114
     options:
       legend:
@@ -1335,7 +1341,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.2.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: RSS anonymous memory % usage
     targets:
@@ -1404,7 +1410,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 775
+      "y": 129
     id: 123
     options:
       legend:
@@ -1421,7 +1427,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.2.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: CPU
     targets:
@@ -1510,7 +1516,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 775
+      "y": 129
     id: 57
     options:
       legend:
@@ -1527,7 +1533,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.2.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Memory usage
     targets:
@@ -1642,7 +1648,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 783
+      "y": 137
     id: 44
     options:
       legend:
@@ -1659,7 +1665,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.2.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: CPU pressure
     targets:
@@ -1745,7 +1751,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 783
+      "y": 137
     id: 134
     options:
       legend:
@@ -1762,7 +1768,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.2.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Memory pressure
     targets:
@@ -1850,7 +1856,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 791
+      "y": 145
     id: 135
     options:
       legend:
@@ -1953,7 +1959,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 791
+      "y": 145
     id: 76
     options:
       legend:
@@ -2037,7 +2043,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 799
+      "y": 153
     id: 47
     options:
       legend:
@@ -2140,7 +2146,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 799
+      "y": 153
     id: 124
     options:
       legend:
@@ -2224,7 +2230,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 807
+      "y": 161
     id: 48
     options:
       legend:
@@ -2323,7 +2329,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 807
+      "y": 161
     id: 136
     options:
       legend:
@@ -2408,7 +2414,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 815
+      "y": 169
     id: 49
     options:
       legend:
@@ -2493,7 +2499,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 815
+      "y": 169
     id: 37
     options:
       legend:
@@ -2592,7 +2598,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 823
+      "y": 177
     id: 75
     options:
       legend:
@@ -2678,7 +2684,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 823
+      "y": 177
     id: 125
     options:
       legend:
@@ -2780,7 +2786,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 831
+      "y": 185
     id: 127
     options:
       legend:
@@ -2864,7 +2870,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 831
+      "y": 185
     id: 133
     options:
       legend:
@@ -2948,7 +2954,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 839
+      "y": 193
     id: 128
     options:
       legend:
@@ -3057,7 +3063,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 257
+      "y": 295
     id: 66
     options:
       legend:
@@ -3144,7 +3150,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 257
+      "y": 295
     id: 68
     options:
       legend:
@@ -3230,7 +3236,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 265
+      "y": 303
     id: 116
     options:
       legend:
@@ -3313,7 +3319,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 265
+      "y": 303
     id: 60
     options:
       legend:
@@ -3395,7 +3401,7 @@ panels:
       h: 9
       w: 12
       x: 0
-      "y": 273
+      "y": 311
     id: 90
     options:
       legend:
@@ -3483,7 +3489,7 @@ panels:
       h: 9
       w: 12
       x: 12
-      "y": 273
+      "y": 311
     id: 118
     options:
       legend:
@@ -3581,7 +3587,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 282
+      "y": 320
     id: 131
     options:
       legend:
@@ -3676,7 +3682,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 282
+      "y": 320
     id: 132
     links:
     - targetBlank: true
@@ -3757,7 +3763,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 290
+      "y": 328
     id: 126
     options:
       cellHeight: sm
@@ -3831,7 +3837,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 290
+      "y": 328
     id: 129
     options:
       legend:
@@ -3853,7 +3859,7 @@ panels:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: ${ds}
-      expr: {{ printf "sum(rate(process_major_pagefaults_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"})) by(job,%s)" $clusterLabel $clusterLabel }}
+      expr: {{ printf "sum(rate(process_major_pagefaults_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       legendFormat: __auto
       range: true
@@ -3922,7 +3928,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 298
+      "y": 336
     id: 137
     options:
       legend:
@@ -4015,7 +4021,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 356
+      "y": 702
     id: 10
     options:
       legend:
@@ -4105,7 +4111,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 356
+      "y": 702
     id: 73
     options:
       legend:
@@ -4210,7 +4216,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 364
+      "y": 710
     id: 53
     options:
       legend:
@@ -4310,7 +4316,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 364
+      "y": 710
     id: 34
     options:
       legend:
@@ -4412,7 +4418,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 372
+      "y": 718
     id: 30
     options:
       legend:
@@ -4509,7 +4515,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 372
+      "y": 718
     id: 36
     options:
       legend:
@@ -4594,7 +4600,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 380
+      "y": 726
     id: 58
     options:
       legend:
@@ -4673,7 +4679,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 380
+      "y": 726
     id: 62
     options:
       legend:
@@ -4773,7 +4779,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 388
+      "y": 734
     id: 59
     options:
       legend:
@@ -4851,7 +4857,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 388
+      "y": 734
     id: 64
     options:
       legend:
@@ -4935,7 +4941,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 396
+      "y": 742
     id: 99
     options:
       legend:
@@ -5019,7 +5025,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 396
+      "y": 742
     id: 103
     options:
       legend:
@@ -5103,7 +5109,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 404
+      "y": 750
     id: 122
     options:
       legend:
@@ -5190,7 +5196,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 404
+      "y": 750
     id: 105
     options:
       legend:
@@ -5275,7 +5281,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 412
+      "y": 758
     id: 130
     options:
       legend:
@@ -5306,16 +5312,16 @@ panels:
       h: 2
       w: 17
       x: 0
-      "y": 259
+      "y": 34
     id: 139
     options:
       code:
         language: plaintext
         showLineNumbers: false
         showMiniMap: false
-      content: Drilldown row is used by other panels on the dashboard to show more detailed metrics per-instance.
+      content: Drilldown row is used by other panels on the dashboard to show more detailed metrics per-instance, or a single instance in cases like memory breakdown.
       mode: markdown
-    pluginVersion: 12.2.0
+    pluginVersion: 12.3.0
     transparent: true
     type: text
   - title: Major page faults rate
@@ -5323,7 +5329,7 @@ panels:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: ${ds}
-      expr: {{ printf "sum(rate(process_major_pagefaults_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"})) by(job,instance,%s)" $clusterLabel $clusterLabel }}
+      expr: {{ printf "sum(rate(process_major_pagefaults_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       legendFormat: '{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}})'
       range: true
@@ -5375,10 +5381,7 @@ panels:
             mode: none
           thresholdsStyle:
             mode: "off"
-        links:
-        - targetBlank: true
-          title: Drilldown
-          url: /d/wNf0q_kZk?viewPanel=140&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+        links: []
         mappings: []
         thresholds:
           mode: absolute
@@ -5392,7 +5395,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 261
+      "y": 36
     id: 140
     options:
       legend:
@@ -5407,7 +5410,146 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.2.0
+    pluginVersion: 12.3.0
+    type: timeseries
+  - title: Memory usage breakdown
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "max(((go_memstats_gc_sys_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"} + go_memstats_mspan_sys_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) + go_memstats_other_sys_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) + go_memstats_mcache_sys_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: 'Go: Other'
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "max(go_memstats_stack_inuse_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      hide: false
+      instant: false
+      legendFormat: 'Go: Stack'
+      range: true
+      refId: B
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "max(go_memstats_heap_inuse_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"} + (go_memstats_heap_idle_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"} - go_memstats_heap_released_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"})) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+      editorMode: code
+      hide: false
+      instant: false
+      legendFormat: 'Go: Heap'
+      range: true
+      refId: C
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "max(go_memstats_heap_released_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      hide: false
+      instant: false
+      legendFormat: 'Go: Heap Reserved'
+      range: true
+      refId: D
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "max(sum(vm_cache_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,instance,%s)) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
+      editorMode: code
+      hide: false
+      instant: false
+      legendFormat: 'Mmap: VM Cache'
+      range: true
+      refId: E
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "max(process_resident_memory_file_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      hide: false
+      instant: false
+      legendFormat: File cache
+      range: true
+      refId: F
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${ds}
+    description: |-
+      This panel breaks down memory usage by type. It’s intended for inspecting a single instance.
+
+      How to use:
+      - Start from the high-level RSS panel.
+      - Identify an instance with unexpected or abnormal memory growth.
+      - Filter to that instance to inspect the detailed breakdown.
+
+      Interpretation
+      - A steadily rising Go Heap usually indicates a memory leak. Collect pprof memory profile.
+      - A growing Go Stack commonly points to a goroutine leak.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 10
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: normal
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: bytes
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 36
+    id: 141
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.3.0
     type: timeseries
   collapsed: true
   gridPos:
@@ -5421,25 +5563,44 @@ condition: {{ ($Values.vmsingle).enabled }}
 description: Overview for single-node VictoriaMetrics v1.117.0 or higher
 fiscalYearStartMonth: 0
 graphTooltip: 1
-id: 1
+id: 0
 links:
 - icon: doc
   tags: []
   targetBlank: true
-  title: Single server Wiki
+  title: Docs
   type: link
-  url: https://docs.victoriametrics.com/
-- icon: external link
+  url: https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/
+- asDropdown: false
+  icon: question
+  includeVars: false
+  keepTime: false
   tags: []
   targetBlank: true
-  title: Found a bug?
-  type: link
-  url: https://github.com/VictoriaMetrics/VictoriaMetrics/issues
-- icon: external link
-  tags: []
-  targetBlank: true
-  title: New releases
+  title: Troubleshooting
   tooltip: ""
+  type: link
+  url: https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#troubleshooting
+- icon: info
+  tags: []
+  targetBlank: true
+  title: Community support
+  type: link
+  url: https://victoriametrics.com/support/community-support/
+- asDropdown: false
+  icon: bolt
+  includeVars: false
+  keepTime: false
+  tags: []
+  targetBlank: true
+  title: Enterprise support
+  tooltip: ""
+  type: link
+  url: https://victoriametrics.com/support/enterprise-support/
+- icon: info
+  tags: []
+  targetBlank: true
+  title: Releases
   type: link
   url: https://github.com/VictoriaMetrics/VictoriaMetrics/releases
 preload: false
