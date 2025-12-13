@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+{{- if and (ne .Values.mode "deployment") (ne .Values.mode "statefulSet") }}
+{{- fail (printf "Invalid mode: %q. Valid modes are: deployment, statefulSet" .Values.mode) }}
+{{- end }}
+kind: {{ title .Values.mode }}
+metadata:
+  name: {{ include "victoria-logs-agent.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "victoria-logs-agent.fullname" . }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "victoria-logs-agent.fullname" . }}
+  {{- if eq "statefulSet" .Values.mode }}
+  serviceName: {{ include "victoria-logs-agent.fullname" . }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "victoria-logs-agent.fullname" . }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{ omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: victoria-logs-agent
+          image: {{ include "vm.image" (dict "helm" .) }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.securityContext.enabled }}
+          securityContext: {{ omit .Values.securityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.resources }}
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          args:
+            {{- include "vlagent.remoteWriteArgs" . | nindent 12 }}
+            {{- include "vlagent.args" . | nindent 12 }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12}}
+          {{- end }}
+          volumeMounts:
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            - name: vl-agent-data
+              mountPath: /vlagent-remotewrite-data
+      volumes:
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.persistentVolume.enabled }}
+          {{- if .Values.persistentVolume.existingClaim }}
+        - name: vl-agent-data
+          persistentVolumeClaim:
+            claimName: {{ tpl .Values.persistentVolume.existingClaim (dict "helm" .) }}
+          {{- else if eq .Values.mode "deployment" }}
+        - name: vl-agent-data
+          persistentVolumeClaim:
+            claimName: {{ include "victoria-logs-agent.fullname" . }}
+          {{- end }}
+        {{- else }}
+        - name: vl-agent-data
+          emptyDir: {}
+        {{- end }}
+
+  {{/*
+  Create PersistentVolumeClaim if enabled and not using existing claim in statefulSet mode.
+  */}}
+  {{- $pvc := .Values.persistentVolume }}
+  {{- if and $pvc.enabled (not $pvc.existingClaim) (eq .Values.mode "statefulSet") }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: {{ include "victoria-logs-agent.fullname" . }}
+        labels:
+          app.kubernetes.io/name: {{ include "victoria-logs-agent.fullname" . }}
+          {{- with $pvc.extraLabels  }}
+          {{- toYaml . | nindent 4 }}
+          {{- end }}
+        {{- with $pvc.annotations  }}
+        annotations:
+          {{- toYaml . | nindent 4 }}
+        {{- end }}
+      spec:
+        {{- with $pvc.accessModes }}
+        accessModes:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ $pvc.size }}
+        {{- with $pvc.storageClassName }}
+        storageClassName: {{ . }}
+        {{- end }}
+        {{- with $pvc.matchLabels }}
+        selector:
+          matchLabels:
+            {{- toYaml . | nindent 6 }}
+        {{- end }}
+  {{- end }}
