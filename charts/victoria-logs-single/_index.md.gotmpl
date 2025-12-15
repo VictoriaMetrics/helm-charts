@@ -45,6 +45,26 @@ helm install collector vm/victoria-logs-collector --namespace $NAMESPACE \
 These commands install the collector, which collects logs from all the containers in Kubernetes and sends them to the installed VictoriaLogs instance
 with a 30-day [retention period](https://docs.victoriametrics.com/victorialogs/#retention) and a 10Gi PersistentVolumeClaim (PVC).
 
+The chart will print out URL to access the VictoriaLogs instance:
+
+```
+kubectl port-forward svc/vls-victoria-logs-single-server 9428:9428
+echo http://localhost:9428
+```
+for ClusterIP service. For NodePort type of the service VictoriaLogs can be accessed via NodeIP:
+
+```
+export NODE_PORT=$(kubectl get --namespace $NAMESPACE -o jsonpath="{.spec.ports[0].nodePort}" services vls-victoria-logs-single-server)
+export NODE_IP=$(kubectl get nodes --namespace $NAMESPACE -o jsonpath="{.items[0].status.addresses[0].address}")
+echo http://$NODE_IP:$NODE_PORT
+```.
+
+If LoadBalancer service is used, VictoriaLogs can be accessed via the external IP:
+```
+export EXTERNAL_IP=$(kubectl get --namespace $NAMESPACE -o jsonpath="{.status.loadBalancer.ingress[0].ip}" services vls-victoria-logs-single-server)
+echo http://$EXTERNAL_IP:9428
+```.
+
 To uninstall these charts, run: `helm uninstall vls collector`.
 Note that this *will not* remove the PVCs, so you will need to delete them manually if no longer needed.
 
@@ -52,6 +72,10 @@ For finer control and easier maintenance, it is recommended to set these
 values in a separate `values` file and use it during installation.
 See [how to install victoria-logs-single](https://docs.victoriametrics.com/helm/victoria-logs-single/#install-victoria-logs-single-chart) for an example.
 You can do this later if you want to configure more settings than shown in the example.
+
+See the documentation for [log querying UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui) or [HTTP API](https://docs.victoriametrics.com/victorialogs/querying/#http-api).
+
+VictoriaLogs can ingest logs from various sources, see [ingestion](https://docs.victoriametrics.com/victorialogs/#ingestion) documentation for more details.
 
 ## Chart configuration
 
