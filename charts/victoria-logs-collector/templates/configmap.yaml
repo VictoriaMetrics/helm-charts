@@ -58,7 +58,7 @@ data:
           headers:
             AccountID: {{ or $rw.accountID 0 | quote }}
             ProjectID: {{ or $rw.projectID 0 | quote }}
-            VL-Stream-Fields: {{ join "," ($.Values.streamField) }}
+            VL-Stream-Fields: kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
             VL-Msg-Field: {{ join "," ($msgField | default (list "message")) }}
             VL-Time-Field: {{ join "," ($.Values.timeField | default (list "timestamp")) }}
             {{- with $rw.extraFields }}
@@ -107,4 +107,4 @@ data:
         {{- end }}
     {{- end }}
 {{- end }}
-    
+
