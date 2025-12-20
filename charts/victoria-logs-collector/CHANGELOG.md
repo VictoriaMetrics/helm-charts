@@ -1,6 +1,6 @@
 ## Next release
 
-- support VLAgent logs collection when `.Values.native: true`
+- update common chart dependency: 0.0.42 -> 0.0.45
 
 ## 0.1.2
 
