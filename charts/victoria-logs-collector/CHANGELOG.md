@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- do not ignore imagePullSecrets
 
 ## 0.1.3
 
