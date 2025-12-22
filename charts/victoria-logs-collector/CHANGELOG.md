@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.1.5
+
+**Release date:** 22 Dec 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - updated native endpoint from `/internal/insert` to `/insert/native`
 
 ## 0.1.4
