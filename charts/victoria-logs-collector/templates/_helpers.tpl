@@ -45,7 +45,7 @@
         {{- fail (printf "unknown field %q for remoteWrite[%d]" $rwKey $i) }}
       {{- end }}
     {{- end }}
-    {{- $args = append $args (printf "--remoteWrite.url=%s/internal/insert" (trimSuffix "/" $rw.url)) }}
+    {{- $args = append $args (printf "--remoteWrite.url=%s/insert/native" (trimSuffix "/" $rw.url)) }}
 
     {{- /* Prepare headers */ -}}
     {{- $headers := list }}

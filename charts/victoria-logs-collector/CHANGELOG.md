@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- updated native endpoint from `/internal/insert` to `/insert/native`
 
 ## 0.1.4
 
