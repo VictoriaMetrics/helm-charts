@@ -1,7 +1,7 @@
 {{- define "vlinsert.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vlinsert -}}
-  {{- $args := default dict -}}
+  {{- $args := dict "select.disable" "true" -}}
   {{- $_ := set . "style" "plain" }}
   {{- $_ := set . "appKey" "vlstorage" }}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
@@ -38,7 +38,7 @@
 {{- define "vlselect.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vlselect -}}
-  {{- $args := default dict -}}
+  {{- $args := dict "insert.disable" "true" -}}
   {{- $_ := set . "style" "plain" }}
   {{- $_ := set . "appKey" "vlstorage" }}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
