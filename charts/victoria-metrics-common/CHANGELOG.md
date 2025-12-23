@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- allow setting global labels for each resource using `.Values.global.extraLabels`. See [#2607](https://github.com/VictoriaMetrics/helm-charts/issues/2607).
 
 ## 0.0.45
 

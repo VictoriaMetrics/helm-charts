@@ -24,6 +24,21 @@ tests:
       - equal:
           path: vm.sa.name
           value: test
+  - it: with global extraLabels
+    set:
+      global:
+        extraLabels:
+          globalName: globalValue
+    asserts:
+      - equal:
+          path: vm.labels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-metrics-common
+            app.kubernetes.io/version: 0.0.0
+            globalName: globalValue
+            helm.sh/chart: victoria-metrics-common-0.0.0
   - it: with appKey only
     set:
       ctx:
