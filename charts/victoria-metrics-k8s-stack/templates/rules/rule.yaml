@@ -81,12 +81,13 @@ Filter out ignore rules
 {{- $filteredRulesSpec := default list }}
 {{- range $_, $ruleSpec := $rulesSpec }}
   {{- $ruleName := $ruleSpec.alert | default $ruleSpec.record | default "" }}
-  {{- $ruleKey := (hasKey $ruleSpec "record" | ternary "recording" "alerting") -}}
+  {{- $ruleKey := hasKey $ruleSpec "record" | ternary "recording" "alerting" -}}
   {{- $ruleCondition := $ruleSpec.condition }}
   {{- $_ := unset $ruleSpec "condition" }}
   {{- $exactRule := index $exactRules $ruleName | default dict }}
   {{- $defaultRule := deepCopy (index $defaultRules $ruleKey) }}
-  {{- $resultRule := mergeOverwrite (deepCopy $commonRule) $defaultRule $commonInGroupRule $exactRule }}
+  {{- $defaultInGroup := deepCopy (index $group $ruleKey | default dict) }}
+  {{- $resultRule := mergeOverwrite (deepCopy $commonRule) $defaultRule $commonInGroupRule $defaultInGroup $exactRule }}
   {{- if (and (dig "create" true $resultRule) $ruleCondition) }}
     {{- $ruleSpec := mergeOverwrite (deepCopy $ruleSpec) (dig "spec" (default dict) $resultRule) }}
     {{- $filteredRulesSpec = append $filteredRulesSpec $ruleSpec }}

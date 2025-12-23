@@ -18,7 +18,7 @@ rules:
   labels:
     severity: warning
 - alert: KubePodNotReady
-  expr: {{ printf "sum(max(kube_pod_status_phase{namespace=~\"%s\",job=\"kube-state-metrics\",phase=~\"Pending|Unknown\"}) by(namespace,pod,%s) * on(namespace,pod,%s) group_left(owner_kind) topk(1, max(kube_pod_owner{owner_kind!=\"Job\"}) by(namespace,pod,owner_kind,%s)) by(namespace,pod,%s)) by(namespace,pod,%s) > 0" .targetNamespace $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels }}
+  expr: {{ printf "sum(max(kube_pod_status_phase{namespace=~\"%s\",job=\"kube-state-metrics\",phase=~\"Pending|Unknown\"}) by(namespace,pod,job,%s) * on(namespace,pod,%s) group_left(owner_kind) topk(1, max(kube_pod_owner{owner_kind!=\"Job\"}) by(namespace,pod,owner_kind,%s)) by(namespace,pod,%s)) by(namespace,pod,job,%s) > 0" .targetNamespace $groupLabels $groupLabels $groupLabels $groupLabels $groupLabels }}
   annotations:
     description: Pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} has been in a non-ready state for longer than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubepodnotready

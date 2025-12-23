@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- added `.Values.defaultRules.groups.<groupName>.recording` and `.Values.defaultRules.groups.<groupName>.alerting` to allow overriding all recording and alerting rules within group. See [#2616](https://github.com/VictoriaMetrics/helm-charts/issues/2616).
+- sync dashboards
 
 ## 0.66.0
 

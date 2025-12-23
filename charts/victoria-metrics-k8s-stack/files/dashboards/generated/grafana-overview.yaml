@@ -12,18 +12,12 @@ templating:
   - name: datasource
     type: datasource
     query: {{ $defaultDatasource }}
-    hide: 0
     current:
-      selected: true
-      text: dev-cortex
-      value: dev-cortex
-    description: null
-    error: null
+      text: Prometheus
+      value: prometheus
     options: []
-    queryValue: ""
     refresh: 1
     regex: ""
-    skipUrlSync: false
   - name: job
     multi: true
     includeAll: true
@@ -33,24 +27,14 @@ templating:
       query: label_values(grafana_build_info, job)
       refId: Billing Admin-job-Variable-Query
     definition: label_values(grafana_build_info, job)
-    hide: 0
     allValue: .*
     current:
-      selected: false
-      text:
-      - default/grafana
+      text: All
       value:
-      - default/grafana
-    description: null
-    error: null
+      - $__all
     options: []
     refresh: 1
     regex: ""
-    skipUrlSync: false
-    sort: 0
-    tagValuesQuery: ""
-    tagsQuery: ""
-    useTags: false
   - name: instance
     multi: true
     includeAll: true
@@ -60,22 +44,13 @@ templating:
       query: label_values(grafana_build_info, instance)
       refId: Billing Admin-instance-Variable-Query
     definition: label_values(grafana_build_info, instance)
-    hide: 0
     allValue: .*
     current:
-      selected: false
       text: All
       value: $__all
-    description: null
-    error: null
     options: []
     refresh: 1
     regex: ""
-    skipUrlSync: false
-    sort: 0
-    tagValuesQuery: ""
-    tagsQuery: ""
-    useTags: false
   - name: cluster
     label: cluster
     multi: {{ ternary true false $multicluster }}
@@ -93,7 +68,9 @@ tags:
 annotations:
   list:
   - name: Annotations & Alerts
-    datasource: -- Grafana --
+    datasource:
+      type: datasource
+      uid: grafana
     builtIn: 1
     enable: true
     hide: true
@@ -107,12 +84,15 @@ annotations:
 panels:
 - title: Firing Alerts
   targets:
-  - expr: {{ printf "grafana_alerting_result_total{job=~\"$job\",instance=~\"$instance\",state=\"alerting\",%s=~\"$cluster\"}" $clusterLabel }}
+  - datasource:
+      uid: $datasource
+    expr: {{ printf "grafana_alerting_result_total{job=~\"$job\",instance=~\"$instance\",state=\"alerting\",%s=~\"$cluster\"}" $clusterLabel }}
     instant: true
-    interval: ""
+    interval: 1m
     legendFormat: ""
     refId: A
-  datasource: $datasource
+  datasource:
+    uid: $datasource
   fieldConfig:
     defaults:
       mappings: []
@@ -121,7 +101,6 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
         - color: red
           value: 80
     overrides: []
@@ -136,24 +115,28 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - mean
       fields: ""
       values: false
+    showPercentChange: false
     text: {}
     textMode: auto
-  pluginVersion: 8.1.3
-  timeFrom: null
-  timeShift: null
+    wideLayout: true
+  pluginVersion: 12.0.2
   type: stat
 - title: Dashboards
   targets:
-  - expr: {{ printf "sum(grafana_stat_totals_dashboard{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
-    interval: ""
+  - datasource:
+      uid: $datasource
+    expr: {{ printf "sum(grafana_stat_totals_dashboard{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    interval: 1m
     legendFormat: ""
     refId: A
-  datasource: $datasource
+  datasource:
+    uid: $datasource
   fieldConfig:
     defaults:
       mappings: []
@@ -161,7 +144,6 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
         - color: red
           value: 80
     overrides: []
@@ -176,36 +158,40 @@ panels:
     graphMode: area
     justifyMode: auto
     orientation: auto
+    percentChangeColorMode: standard
     reduceOptions:
       calcs:
       - mean
       fields: ""
       values: false
+    showPercentChange: false
     text: {}
     textMode: auto
-  pluginVersion: 8.1.3
-  timeFrom: null
-  timeShift: null
+    wideLayout: true
+  pluginVersion: 12.0.2
   type: stat
 - title: Build Info
   targets:
-  - expr: {{ printf "grafana_build_info{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
+  - datasource:
+      uid: $datasource
+    expr: {{ printf "grafana_build_info{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}" $clusterLabel }}
     instant: true
-    interval: ""
+    interval: 1m
     legendFormat: ""
     refId: A
-  datasource: $datasource
+  datasource:
+    uid: $datasource
   fieldConfig:
     defaults:
       custom:
-        align: null
-        displayMode: auto
+        cellOptions:
+          type: auto
+        inspect: false
       mappings: []
       thresholds:
         mode: absolute
         steps:
         - color: green
-          value: null
         - color: red
           value: 80
     overrides: []
@@ -216,12 +202,19 @@ panels:
     "y": 0
   id: 10
   options:
+    cellHeight: sm
+    footer:
+      countRows: false
+      fields: ""
+      reducer:
+      - sum
+      show: false
     showHeader: true
-  pluginVersion: 8.1.3
-  timeFrom: null
-  timeShift: null
+  pluginVersion: 12.0.2
   transformations:
   - id: labelsToFields
+    options: {}
+  - id: merge
     options: {}
   - id: organize
     options:
@@ -251,180 +244,169 @@ panels:
   type: table
 - title: RPS
   targets:
-  - expr: {{ printf "sum(irate(grafana_http_request_duration_seconds_count{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1m])) by(status_code,%s)" $clusterLabel $clusterLabel }}
-    interval: ""
+  - datasource:
+      uid: $datasource
+    expr: {{ printf "sum(irate(grafana_http_request_duration_seconds_count{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1m])) by(status_code,%s)" $clusterLabel $clusterLabel }}
+    interval: 1m
     legendFormat: '{{`{{`}}status_code{{`}}`}}'
     refId: A
-  datasource: $datasource
-  aliasColors: {}
-  bars: false
-  dashLength: 10
-  dashes: false
+  datasource:
+    uid: $datasource
   fieldConfig:
     defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 10
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: normal
+        thresholdsStyle:
+          mode: "off"
       links: []
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+        - color: red
+          value: 80
+      unit: reqps
     overrides: []
-  fill: 1
-  fillGradient: 0
   gridPos:
     h: 8
     w: 12
     x: 0
     "y": 5
-  hiddenSeries: false
   id: 2
-  legend:
-    avg: false
-    current: false
-    max: false
-    min: false
-    show: true
-    total: false
-    values: false
-  lines: true
-  linewidth: 1
-  nullPointMode: "null"
   options:
     alertThreshold: true
-  percentage: false
-  pluginVersion: 8.1.3
-  pointradius: 2
-  points: false
-  renderer: flot
-  seriesOverrides: []
-  spaceLength: 10
-  stack: true
-  steppedLine: false
-  thresholds: []
-  timeFrom: null
-  timeRegions: []
-  timeShift: null
-  tooltip:
-    shared: true
-    sort: 0
-    value_type: individual
-  type: graph
-  xaxis:
-    buckets: null
-    mode: time
-    name: null
-    show: true
-    values: []
-  yaxes:
-  - $$hashKey: object:157
-    format: reqps
-    label: null
-    logBase: 1
-    max: null
-    min: null
-    show: true
-  - $$hashKey: object:158
-    format: short
-    label: null
-    logBase: 1
-    max: null
-    min: null
-    show: false
-  yaxis:
-    align: false
-    alignLevel: null
+    legend:
+      calcs: []
+      displayMode: list
+      placement: bottom
+      showLegend: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: none
+  pluginVersion: 12.0.2
+  type: timeseries
 - title: Request Latency
   targets:
-  - expr: {{ printf "histogram_quantile(0.99, sum(irate(grafana_http_request_duration_seconds_bucket{instance=~\"$instance\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(le,%s)) * 1" $clusterLabel $clusterLabel }}
+  - datasource:
+      uid: $datasource
+    expr: {{ printf "histogram_quantile(0.99, sum(irate(grafana_http_request_duration_seconds_bucket{instance=~\"$instance\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(le,%s)) * 1" $clusterLabel $clusterLabel }}
     exemplar: true
-    interval: ""
+    interval: 1m
     legendFormat: 99th Percentile
     refId: A
-  - expr: {{ printf "histogram_quantile(0.50, sum(irate(grafana_http_request_duration_seconds_bucket{instance=~\"$instance\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(le,%s)) * 1" $clusterLabel $clusterLabel }}
+  - datasource:
+      uid: $datasource
+    expr: {{ printf "histogram_quantile(0.50, sum(irate(grafana_http_request_duration_seconds_bucket{instance=~\"$instance\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(le,%s)) * 1" $clusterLabel $clusterLabel }}
     exemplar: true
-    interval: ""
+    interval: 1m
     legendFormat: 50th Percentile
     refId: B
-  - expr: {{ printf "(sum(irate(grafana_http_request_duration_seconds_sum{instance=~\"$instance\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) * 1) / sum(irate(grafana_http_request_duration_seconds_count{instance=~\"$instance\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+  - datasource:
+      uid: $datasource
+    expr: {{ printf "(sum(irate(grafana_http_request_duration_seconds_sum{instance=~\"$instance\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) * 1) / sum(irate(grafana_http_request_duration_seconds_count{instance=~\"$instance\",job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
-    interval: ""
+    interval: 1m
     legendFormat: Average
     refId: C
-  datasource: $datasource
-  aliasColors: {}
-  bars: false
-  dashLength: 10
-  dashes: false
+  datasource:
+    uid: $datasource
   fieldConfig:
     defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 10
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
       links: []
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+        - color: red
+          value: 80
+      unit: ms
     overrides: []
-  fill: 1
-  fillGradient: 0
   gridPos:
     h: 8
     w: 12
     x: 12
     "y": 5
-  hiddenSeries: false
   id: 4
-  legend:
-    avg: false
-    current: false
-    max: false
-    min: false
-    show: true
-    total: false
-    values: false
-  lines: true
-  linewidth: 1
-  nullPointMode: "null"
   options:
     alertThreshold: true
-  percentage: false
-  pluginVersion: 8.1.3
-  pointradius: 2
-  points: false
-  renderer: flot
-  seriesOverrides: []
-  spaceLength: 10
-  stack: false
-  steppedLine: false
-  thresholds: []
-  timeFrom: null
-  timeRegions: []
-  timeShift: null
-  tooltip:
-    shared: true
-    sort: 0
-    value_type: individual
-  type: graph
-  xaxis:
-    buckets: null
-    mode: time
-    name: null
-    show: true
-    values: []
-  yaxes:
-  - $$hashKey: object:210
-    format: ms
-    label: null
-    logBase: 1
-    max: null
-    min: null
-    show: true
-  - $$hashKey: object:211
-    format: short
-    label: null
-    logBase: 1
-    max: null
-    min: null
-    show: true
-  yaxis:
-    align: false
-    alignLevel: null
+    legend:
+      calcs: []
+      displayMode: list
+      placement: bottom
+      showLegend: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: none
+  pluginVersion: 12.0.2
+  type: timeseries
 condition: {{ ($Values.grafana).enabled }}
-gnetId: null
+fiscalYearStartMonth: 0
 graphTooltip: 0
-id: 3085
-iteration: 1.631554945276e+12
+id: 23
 links: []
-schemaVersion: 30
+preload: false
+refresh: ""
+schemaVersion: 41
 time:
   from: now-6h
   to: now
@@ -440,4 +422,4 @@ timepicker:
   - 2h
   - 1d
 uid: 6be0s85Mk
-version: 2
+version: 1
