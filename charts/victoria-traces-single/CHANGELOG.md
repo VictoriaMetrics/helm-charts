@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.0.4
+
+**Release date:** 23 Dec 2025
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.5.1](https://img.shields.io/badge/v0.5.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriatraces%2Fchangelog%2F%23v051)
+
 - bump operator chart version 0.0.42 -> 0.0.46
 - add support of k8s service traffic distribution. See [#2580](https://github.com/VictoriaMetrics/helm-charts/issues/2580).
 - bump version of VictoriaTraces components to [v0.5.1](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.5.1)
