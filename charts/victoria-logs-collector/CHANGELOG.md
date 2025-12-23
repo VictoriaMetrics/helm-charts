@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- use common template for args generation
 
 ## 0.1.5
 
