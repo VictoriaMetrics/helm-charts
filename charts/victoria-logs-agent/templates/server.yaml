@@ -1,52 +1,50 @@
-apiVersion: apps/v1
 {{- if and (ne .Values.mode "deployment") (ne .Values.mode "statefulSet") }}
 {{- fail (printf "Invalid mode: %q. Valid modes are: deployment, statefulSet" .Values.mode) }}
 {{- end }}
+{{- $ctx := dict "helm" . }}
+---
+apiVersion: apps/v1
 kind: {{ title .Values.mode }}
 metadata:
-  name: {{ include "victoria-logs-agent.fullname" . }}
-  labels:
-    app.kubernetes.io/name: {{ include "victoria-logs-agent.fullname" . }}
+  name: {{ include "vm.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  {{- $_ := set $ctx "extraLabels" .Values.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  {{- with .Values.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   selector:
-    matchLabels:
-      app.kubernetes.io/name: {{ include "victoria-logs-agent.fullname" . }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   {{- if eq "statefulSet" .Values.mode }}
-  serviceName: {{ include "victoria-logs-agent.fullname" . }}
+  serviceName: {{ include "vm.fullname" $ctx }}
   {{- end }}
   template:
     metadata:
-      labels:
-        app.kubernetes.io/name: {{ include "victoria-logs-agent.fullname" . }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
+      annotations: {{ toYaml .Values.podAnnotations | nindent 8 }}
     spec:
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
       {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
+      tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
+      affinity: {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.podSecurityContext.enabled }}
       securityContext: {{ omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       containers:
-        - name: victoria-logs-agent
-          image: {{ include "vm.image" (dict "helm" .) }}
+        - name: vlagent
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: IfNotPresent
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ omit .Values.securityContext "enabled" | toYaml | nindent 12 }}
@@ -54,19 +52,16 @@ spec:
           {{- if .Values.resources }}
           resources: {{ toYaml .Values.resources | nindent 12 }}
           {{- end }}
-          args:
-            {{- include "vlagent.remoteWriteArgs" . | nindent 12 }}
-            {{- include "vlagent.args" . | nindent 12 }}
+          args: {{- include "vlagent.args" . | nindent 12 }}
           {{- with .Values.env }}
-          env:
-            {{- toYaml . | nindent 12}}
+          env: {{- toYaml . | nindent 12}}
           {{- end }}
           volumeMounts:
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
             - name: vl-agent-data
-              mountPath: /vlagent-remotewrite-data
+              mountPath: /vlagent-data
       volumes:
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
@@ -75,11 +70,11 @@ spec:
           {{- if .Values.persistentVolume.existingClaim }}
         - name: vl-agent-data
           persistentVolumeClaim:
-            claimName: {{ tpl .Values.persistentVolume.existingClaim (dict "helm" .) }}
+            claimName: {{ tpl .Values.persistentVolume.existingClaim $ctx }}
           {{- else if eq .Values.mode "deployment" }}
         - name: vl-agent-data
           persistentVolumeClaim:
-            claimName: {{ include "victoria-logs-agent.fullname" . }}
+            claimName: {{ include "vm.fullname" $ctx }}
           {{- end }}
         {{- else }}
         - name: vl-agent-data
@@ -95,20 +90,16 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ include "victoria-logs-agent.fullname" . }}
-        labels:
-          app.kubernetes.io/name: {{ include "victoria-logs-agent.fullname" . }}
-          {{- with $pvc.extraLabels  }}
-          {{- toYaml . | nindent 4 }}
-          {{- end }}
+        name: {{ include "vm.fullname" $ctx }}
+        {{- $_ := set $ctx "extraLabels" $pvc.extraLabels }}
+        labels: {{ include "vm.labels" $ctx | nindent 4 }}
+        {{- $_ := unset $ctx "extraLabels" }}
         {{- with $pvc.annotations  }}
-        annotations:
-          {{- toYaml . | nindent 4 }}
+        annotations: {{ toYaml . | nindent 4 }}
         {{- end }}
       spec:
         {{- with $pvc.accessModes }}
-        accessModes:
-          {{- toYaml . | nindent 10 }}
+        accessModes: {{ toYaml . | nindent 10 }}
         {{- end }}
         resources:
           requests:
@@ -118,7 +109,6 @@ spec:
         {{- end }}
         {{- with $pvc.matchLabels }}
         selector:
-          matchLabels:
-            {{- toYaml . | nindent 6 }}
+          matchLabels: {{ toYaml . | nindent 6 }}
         {{- end }}
   {{- end }}

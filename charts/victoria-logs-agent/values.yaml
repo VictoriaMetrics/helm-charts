@@ -15,32 +15,27 @@ remoteWrite: []
   # - url: http://victoria-logs:9428
 
   # - url: http://victoria-logs:9428
-  #   basicAuth:
-  #     passwordEnvKey: "VL_PASSWORD"
-  #     usernameEnvKey: "victoria-logs-agent"
-
-  # - url: http://victoria-logs:9428
-  #   projectID: 0
-  #   accountID: 0
-  #   extraFields:
-  #     zone: us-east1-c
-  #     source: victoria-logs-agent
-  #   ignoreFields:
-  #     - kubernetes.node_labels*
-  #     - kubernetes.pod_annotations*
+  #   headers:
+  #     ProjectID: 0
+  #     AccountID: 0
+  #     VL-Extra-Fields:
+  #       zone: us-east1-c
+  #       source: victoria-logs-agent
+  #     VL-Ignore-Fields:
+  #       - kubernetes.node_labels*
+  #       - kubernetes.pod_annotations*
 
   # - url: https://victoria-logs:9428
-  #   tls:
-  #     caFile: "/etc/tls/ca.crt"
+  #   tlsCaFile: "/etc/tls/ca.crt"
   # - url: https://victoria-logs:9428
-  #   tls:
-  #     insecureSkipVerify: true
+  #   tlsInsecureSkipVerify: true
 
   # - url: http://victoria-logs:9428
-  #   msgField:
-  #     - message._msg
-  #     - msg
-  #     - _msg
+  #   headers:
+  #     VL-Msg-Field:
+  #       - message._msg
+  #       - msg
+  #       - _msg
 
 persistentVolume:
   # -- Create/use Persistent Volume Claim for server component. Empty dir if false
@@ -70,7 +65,7 @@ persistentVolume:
 
 # -- Environment variables (ex.: secret tokens)
 env: []
-  # - name: VL_PASSWORD
+  # - name: VL_remoteWrite_basicAuth_password
   #   valueFrom:
   #     secretKeyRef:
   #       name: auth-secret
@@ -171,3 +166,40 @@ affinity: {}
 
 # -- Priority class to be assigned to the pod(s)
 priorityClassName: ""
+
+service:
+  # -- Enable agent service
+  enabled: false
+  # -- Service annotations
+  annotations: {}
+  # -- Service labels
+  extraLabels: {}
+  # -- Service ClusterIP
+  clusterIP: ""
+  # -- Service external IPs. Check [here](https://kubernetes.io/docs/concepts/services-networking/service/#external-ips) for details
+  externalIPs: []
+  # -- Service load balancer IP
+  loadBalancerIP: ""
+  # -- Load balancer source range
+  loadBalancerSourceRanges: []
+  # -- Service port
+  servicePort: 8429
+  # -- Target port
+  targetPort: http
+  # nodePort: 30000
+  # -- Service type
+  type: ClusterIP
+  # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+  ipFamilyPolicy: ""
+  # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+  ipFamilies: []
+  # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  externalTrafficPolicy: ""
+  # -- Service internal traffic policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/service/#internal-traffic-policy) for details
+  internalTrafficPolicy: ""
+  # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  healthCheckNodePort: ""
+  # -- Traffic Distribution. Check [Traffic distribution](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)
+  trafficDistribution: ""
+  # -- Extra selector labels common for service only
+  selectorLabels: {}
