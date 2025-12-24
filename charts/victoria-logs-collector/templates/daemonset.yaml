@@ -1,9 +1,10 @@
 {{- $ctx := dict "helm" . }}
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ include "vm.fullname" $ctx }}
-  namespace: {{ include "vm.namespace" . }}
+  namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
   selector:
@@ -13,11 +14,9 @@ spec:
       {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
       labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraLabels" }}
-      {{- $annotations := deepCopy .Values.podAnnotations }}
-      {{- if not .Values.native }}
-      {{- $_ := set $annotations "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum) }}
+      {{- with .Values.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
-      annotations: {{ toYaml $annotations | nindent 8 }}
     spec:
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}
@@ -39,8 +38,8 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: victoria-logs-collector
-          image: {{ include "victoria-logs-collector.image" $ctx }}
+        - name: collector
+          image: {{ include "vm.image" $ctx }}
           imagePullPolicy: IfNotPresent
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ omit .Values.securityContext "enabled" | toYaml | nindent 12 }}
@@ -48,21 +47,14 @@ spec:
           {{- if .Values.resources }}
           resources: {{ toYaml .Values.resources | nindent 12 }}
           {{- end }}
-          {{- if .Values.native }}
           ports:
             - name: http
               containerPort: 9429
               protocol: TCP
-          args: {{ include "victoria-logs-collector.args" . | nindent 12 }}
+          args: {{- include "victoria-logs-collector.args" . | nindent 12 }}
+          {{- with .Values.env }}
+          env: {{ toYaml . | nindent 12}}
           {{- end }}
-          env:
-            - name: VECTOR_SELF_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            {{- with .Values.env }}
-            {{ toYaml . | nindent 12}}
-            {{- end }}
           volumeMounts:
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
@@ -74,11 +66,6 @@ spec:
             - name: varlib
               mountPath: /var/lib
               readOnly: true
-            {{- if not .Values.native }}
-            - name: config
-              mountPath: /etc/vector
-              readOnly: true
-            {{- end }}
             - name: vl-collector-data
               mountPath: /vl-collector
       volumes:
@@ -91,11 +78,6 @@ spec:
         - name: varlib
           hostPath:
             path: /var/lib
-        {{- if not .Values.native }}
-        - name: config
-          configMap:
-            name: {{ include "vm.fullname" $ctx }}-config
-        {{- end }}
         - name: vl-collector-data
           hostPath:
             path: /var/lib/vl-collector
