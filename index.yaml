@@ -1100,6 +1100,57 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '`.Values.remoteWrite[*].basicAuth` section is no longer supported. Chart installation will fail if it''s set'
+        - 'moved management of remote write parameters, that set headers to `.Values.remoteWrite[*].headers`. `.Values.remoteWrite` parameters were renamed:'
+        - '  * `.Values.remoteWrite[*].accountID` => `.Values.remoteWrite[*].headers.AccountID`'
+        - '  * `.Values.remoteWrite[*].projectID` => `.Values.remoteWrite[*].headers.ProjectID`'
+        - '  * `.Values.remoteWrite[*].ignoreFields` => `.Values.remoteWrite[*].headers.VL-Ignore-Fields`'
+        - '  * `.Values.remoteWrite[*].extraFields` => `.Values.remoteWrite[*].headers.VL-Extra-Fields`'
+        - 'replaced `.Values.remoteWrite[*].tls` section with parameters that are equal to VLAgent cmd flag names: `.Values.remoteWrite[*].tlsCAFile` and `.Values.remoteWrite[*].tlsInsecureSkipVerify`.'
+        - switched from vector to vlagent
+        - support `includeNodeAnnotations`, `includePodAnnotations`, `includePodLabels`, `includeNodeAnnotations` and `excludeFilter` parameters
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-logs-collector
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/changelog/
+      artifacthub.io/readme: |
+        # VictoriaLogs Collector Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-logs-collector/)
+    apiVersion: v2
+    appVersion: v1.43.0
+    created: "2025-12-24T19:06:56.228728444Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: VictoriaLogs Collector - collects logs from Kubernetes containers
+      and stores them to VictoriaLogs
+    digest: 7226ea94f07a19413b8e914e50a4698cc8d781919d92b2995c7646e041d3bc5b
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victorialogs
+    - logs
+    - agent
+    - collector
+    - kubernetes
+    - observability
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-logs-collector
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-collector-0.2.0/victoria-logs-collector-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - TODO
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -63212,4 +63263,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2025-12-23T13:19:52.269583183Z"
+generated: "2025-12-24T19:06:56.76329482Z"
