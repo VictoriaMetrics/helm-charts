@@ -4,6 +4,18 @@
 
 # Important helm-chart settings below, modify them with your own settings
 
+image:
+    # -- Image registry
+    registry: ""
+    # -- Image repository
+    repository: victoriametrics/vlagent
+    # -- Image tag
+    tag: ""
+    # -- Image tag suffix, which is appended to `Chart.AppVersion` if no `server.image.tag` is defined
+    variant: ""
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+
 # -- List of log destinations. Logs will be replicated to all listed destinations.
 #
 # If using a proxy (e.g., vmauth, nginx) in front of VictoriaLogs, make sure /insert/jsonline and /insert/native endpoints are properly routed.
@@ -11,26 +23,20 @@ remoteWrite: []
   # - url: http://victoria-logs:9428
 
   # - url: http://victoria-logs:9428
-  #   basicAuth:
-  #     passwordEnvKey: "VL_PASSWORD"
-  #     usernameEnvKey: "victoria-logs-collector"
-
-  # - url: http://victoria-logs:9428
-  #   projectID: 0
-  #   accountID: 0
-  #   extraFields:
-  #     zone: us-east1-c
-  #     source: victoria-logs-collector
-  #   ignoreFields:
-  #     - kubernetes.node_labels*
-  #     - kubernetes.pod_annotations*
+  #   headers:
+  #     ProjectID: 0
+  #     AccountID: 0
+  #     VL-Extra-Fields:
+  #       zone: us-east1-c
+  #       source: victoria-logs-collector
+  #     VL-Ignore-Fields:
+  #       - kubernetes.node_labels*
+  #       - kubernetes.pod_annotations*
 
   # - url: https://victoria-logs:9428
-  #   tls:
-  #     caFile: "/etc/tls/ca.crt"
+  #   tlsCAFile: "/etc/tls/ca.crt"
   # - url: https://victoria-logs:9428
-  #   tls:
-  #     insecureSkipVerify: true
+  #   tlsInsecureSkipVerify: true
 
 # -- List of fields to be used as `_time` field. The first found field will be used.
 # See https://docs.victoriametrics.com/victorialogs/keyconcepts/#time-field for more details.
@@ -44,6 +50,28 @@ timeField:
 msgField:
   - message
   - msg
+
+# -- LogsQL filter for excluding container logs.
+# The filter is applied to container metadata fields (e.g., kubernetes.namespace_name, kubernetes.container_name) before reading the log files.
+# This significantly reduces CPU and I/O usage by skipping logs from unwanted containers.
+# See https://docs.victoriametrics.com/victorialogs/vlagent/#filtering-kubernetes-logs
+excludeFilter: ""
+
+# -- Include Pod labels as additional fields in the log entries.
+# Even this setting is disabled, Pod labels are available for filtering via .Values.excludeFilter parameter
+includePodLabels: true
+
+# -- Include Pod annotations as additional fields in the log entries.
+# Even this setting is disabled, Pod annotations are available for filtering via .Values.excludeFilter parameter
+includePodAnnotations: false
+
+# -- Include Node labels as additional fields in the log entries.
+# Even this setting is disabled, Node labels are available for filtering via .Values.excludeFilter parameter
+includeNodeLabels: false
+
+# -- Include Node annotations as additional fields in the log entries.
+# Even this setting is disabled, Node annotations are available for filtering via .Values.excludeFilter parameter
+includeNodeAnnotations: false
 
 # -- Environment variables (ex.: secret tokens).
 env: []

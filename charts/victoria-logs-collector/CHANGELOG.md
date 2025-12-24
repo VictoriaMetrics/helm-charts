@@ -1,6 +1,14 @@
 ## Next release
 
-- TODO
+- `.Values.remoteWrite[*].basicAuth` section is no longer supported. Chart installation will fail if it's set
+- moved management of remote write parameters, that set headers to `.Values.remoteWrite[*].headers`. `.Values.remoteWrite` parameters were renamed:
+  * `.Values.remoteWrite[*].accountID` => `.Values.remoteWrite[*].headers.AccountID`
+  * `.Values.remoteWrite[*].projectID` => `.Values.remoteWrite[*].headers.ProjectID`
+  * `.Values.remoteWrite[*].ignoreFields` => `.Values.remoteWrite[*].headers.VL-Ignore-Fields`
+  * `.Values.remoteWrite[*].extraFields` => `.Values.remoteWrite[*].headers.VL-Extra-Fields`
+- replaced `.Values.remoteWrite[*].tls` section with parameters that are equal to VLAgent cmd flag names: `.Values.remoteWrite[*].tlsCAFile` and `.Values.remoteWrite[*].tlsInsecureSkipVerify`.
+- switched from vector to vlagent
+- support `includeNodeAnnotations`, `includePodAnnotations`, `includePodLabels`, `includeNodeAnnotations` and `excludeFilter` parameters
 
 ## 0.1.6
 

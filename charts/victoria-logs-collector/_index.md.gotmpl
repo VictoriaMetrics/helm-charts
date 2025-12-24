@@ -54,22 +54,19 @@ If multiple `remoteWrite` entries are defined, logs are replicated to all the sp
 
 ### Basic auth
 
-If you need to use basic auth, define the secrets via environment variables and fill out the `basicAuth` object as shown below:
+If you need to use basic auth, define the secrets via environment variables as shown below:
 
 ```yaml
 remoteWrite:
   - url: http://victoria-logs:9428
-    basicAuth:
-      passwordEnvKey: 'VL_PASSWORD'
-      usernameEnvKey: 'VL_USERNAME'
 
 env:
-  - name: VL_PASSWORD
+  - name: VL_remoteWrite_basicAuth_password
     valueFrom:
       secretKeyRef:
         name: auth-secret
         key: VL_PASSWORD
-  - name: VL_USERNAME
+  - name: VL_remoteWrite_basicAuth_username
     valueFrom:
       secretKeyRef:
         name: auth-secret
@@ -78,27 +75,27 @@ env:
 
 ### Multitenancy
 
-To define [tenant](https://docs.victoriametrics.com/victorialogs/#multitenancy), use `projectID` and `accountID` as shown below:
+To define [tenant](https://docs.victoriametrics.com/victorialogs/#multitenancy), set `ProjectID` and `AccountID` headers as shown below:
 
 ```yaml
 remoteWrite:
   - url: http://localhost:9428
-    projectID: 12
-    accountID: 42
+    headers:
+      ProjectID: 12
+      AccountID: 42
 ```
 
 ### TLS
 
-To enable TLS verification for the remoteWrite target, you can specify the `tls` block inside each remoteWrite entry.
+To enable TLS verification for the remoteWrite target, you can specify the `tls`-prefixed params inside each remoteWrite entry.
 
-At a minimum, you should provide the `caFile` path so that the collector can verify the server's TLS certificate.
+At a minimum, you should provide the `tlsCAFile` path so that the collector can verify the server's TLS certificate.
 This is useful when the target endpoint uses a certificate signed by a custom or self-signed Certificate Authority (CA).
 
 ```yaml
 remoteWrite:
   - url: https://victoria-logs:9428
-    tls:
-      caFile: "/etc/tls/ca.crt"
+    tlsCAFile: /etc/tls/ca.crt
 
 extraVolumes:
   - name: tls-certs
@@ -111,33 +108,33 @@ extraVolumeMounts:
     readOnly: true
 ```
 
-If you want to disable TLS certificate verification (not recommended in production), you can set `insecureSkipVerify` to true.
+If you want to disable TLS certificate verification (not recommended in production), you can set `tlsInsecureSkipVerify` to true.
 
 This will skip verification of the server's certificate and allow connecting to targets with self-signed or invalid certificates.
 
 ```yaml
 remoteWrite:
   - url: https://victoria-logs:9428
-    tls:
-      insecureSkipVerify: true
+    tlsInsecureSkipVerify: true
 ```
 
 ### Ignore fields
 
 VictoriaLogs efficiently compresses repeated values, such as pod and node labels.
-However, if you prefer not to store certain fields, you can ignore them using the `ignoreFields` option.
+However, if you prefer not to store certain fields, you can ignore them using the `VL-Ignore-Fields` header.
 For example:
 
 ```yaml
 remoteWrite:
   - url: http://victoria-logs:9428
-    ignoreFields:
-      - file
-      - kubernetes.container_id
-      - kubernetes.pod_annotations*
-      - kubernetes.node_labels*
-      - kubernetes.namespace_labels*
-      - kubernetes.pod_labels*
+    headers:
+      VL-Ignore-Fields:
+        - file
+        - kubernetes.container_id
+        - kubernetes.pod_annotations*
+        - kubernetes.node_labels*
+        - kubernetes.namespace_labels*
+        - kubernetes.pod_labels*
 ```
 
 This allows you to exclude unnecessary or sensitive fields from being ingested.
@@ -146,15 +143,16 @@ If sensitive data has already been ingested, see how to
 
 ### Extra fields
 
-You can add custom fields to your logs by including the `extraFields` section in your configuration.
+You can add custom fields to your logs by setting the `VL-Extra-Fields` header in your configuration.
 For example:
 
 ```yaml
 remoteWrite:
   - url: http://victoria-logs:9428/
-    extraFields:
-      zone: us-east1-c
-      source: victoria-logs-collector
+    headers:
+      VL-Extra-Fields:
+        zone: us-east1-c
+        source: victoria-logs-collector
 ```
 
 This feature lets you attach metadata to every log entry,
