@@ -1,0 +1,202 @@
+# Default values for victoria-logs-agent.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Important helm-chart settings below, modify them with your own settings
+
+# -- Maximum disk usage per remoteWrite URL. When exceeded, old logs will be deleted.
+maxDiskUsagePerURL: 1GiB
+
+# -- List of log destinations. Logs will be replicated to all listed destinations.
+remoteWrite: []
+  # - url: http://victoria-logs:9428
+
+  # - url: http://victoria-logs:9428
+  #   headers:
+  #     ProjectID: 0
+  #     AccountID: 0
+  #     VL-Extra-Fields:
+  #       zone: us-east1-c
+  #       source: victoria-logs-agent
+  #     VL-Ignore-Fields:
+  #       - kubernetes.node_labels*
+  #       - kubernetes.pod_annotations*
+
+  # - url: https://victoria-logs:9428
+  #   tlsCaFile: "/etc/tls/ca.crt"
+  # - url: https://victoria-logs:9428
+  #   tlsInsecureSkipVerify: true
+
+  # - url: http://victoria-logs:9428
+  #   headers:
+  #     VL-Msg-Field:
+  #       - message._msg
+  #       - msg
+  #       - _msg
+
+persistentVolume:
+  # -- Create/use Persistent Volume Claim for server component. Empty dir if false
+  enabled: false
+
+  # -- Size of the volume. Should be calculated based on the logs you send and retention policy you set
+  size: 10Gi
+
+  # -- Persistent volume additional labels
+  extraLabels: {}
+
+  # -- Persistent volume annotations
+  annotations: {}
+
+  # -- StorageClass to use for persistent volume claim. Empty string means default StorageClass
+  storageClassName: ""
+
+  # -- Bind Persistent Volume by labels. Must match all labels of targeted PV
+  matchLabels: {}
+
+  # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
+  accessModes:
+    - ReadWriteOnce
+
+  # -- Existing Claim name. If defined, PVC must be created manually before volume will be bound
+  existingClaim: ""
+
+# -- Environment variables (ex.: secret tokens)
+env: []
+  # - name: VL_remoteWrite_basicAuth_password
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: auth-secret
+  #       key: VL_PASSWORD
+
+resources:
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+image:
+  # -- Image registry
+  registry: ""
+  # -- Image repository
+  repository: victoriametrics/vlagent
+  # -- Image tag
+  tag: ""
+  # -- Image tag suffix, which is appended to `Chart.AppVersion` if no `server.image.tag` is defined
+  variant: ""
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+
+# Advanced helm-chart configuration below, it is recommended to pass default parameters
+
+# -- Override chart name
+nameOverride: ""
+
+# -- Override resources fullname
+fullnameOverride: ""
+
+global:
+  # -- Image pull secrets, that can be shared across multiple helm charts
+  imagePullSecrets: []
+  image:
+    # -- Image registry, that can be shared across multiple helm charts
+    registry: ""
+  # -- Openshift security context compatibility configuration
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+  cluster:
+    # -- K8s cluster domain suffix, used for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
+    dnsDomain: cluster.local.
+
+# -- Extra labels for Pods only
+podLabels: {}
+
+# -- Security context to be added to pod
+podSecurityContext:
+  enabled: true
+  # fsGroup: 2000
+
+# -- Security context to be added to pod's containers
+securityContext:
+  enabled: true
+  # capabilities:
+  #   drop:
+  #     - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# -- Extra Volumes for the pod
+extraVolumes: []
+  # - name: tls-certs
+  #   secret:
+  #     secretName: mtls-secret
+
+# -- Extra Volume Mounts for the container
+extraVolumeMounts: []
+  # - name: tls-certs
+  #   mountPath: /etc/mtls
+  #   readOnly: true
+
+# -- Annotations to be added to the deployment
+annotations: {}
+
+# -- Annotations to be added to pod
+podAnnotations: {}
+
+# -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+nodeSelector: {}
+
+# -- Node tolerations for server scheduling to nodes with taints. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+tolerations: []
+
+# -- Pod topologySpreadConstraints
+topologySpreadConstraints: # []
+  # - maxSkew: 1
+  #   topologyKey: topology.kubernetes.io/zone
+  #   whenUnsatisfiable: DoNotSchedule
+
+# -- Pod affinity
+affinity: {}
+
+# -- Priority class to be assigned to the pod(s)
+priorityClassName: ""
+
+service:
+  # -- Enable agent service
+  enabled: false
+  # -- Service annotations
+  annotations: {}
+  # -- Service labels
+  extraLabels: {}
+  # -- Service ClusterIP
+  clusterIP: ""
+  # -- Service external IPs. Check [here](https://kubernetes.io/docs/concepts/services-networking/service/#external-ips) for details
+  externalIPs: []
+  # -- Service load balancer IP
+  loadBalancerIP: ""
+  # -- Load balancer source range
+  loadBalancerSourceRanges: []
+  # -- Service port
+  servicePort: 8429
+  # -- Target port
+  targetPort: http
+  # nodePort: 30000
+  # -- Service type
+  type: ClusterIP
+  # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+  ipFamilyPolicy: ""
+  # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+  ipFamilies: []
+  # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  externalTrafficPolicy: ""
+  # -- Service internal traffic policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/service/#internal-traffic-policy) for details
+  internalTrafficPolicy: ""
+  # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  healthCheckNodePort: ""
+  # -- Traffic Distribution. Check [Traffic distribution](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)
+  trafficDistribution: ""
+  # -- Extra selector labels common for service only
+  selectorLabels: {}
