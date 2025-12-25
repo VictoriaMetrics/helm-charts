@@ -60,21 +60,33 @@
     {{- fail "at least one remoteWrite configuration must be provided" }}
   {{- end }}
 
-  {{- $args := dict "kubernetesCollector" true }}
-  {{- $_ := set $args "kubernetesCollector.msgField" (join "," ($Values.msgField | default (list "message"))) }}
-  {{- $_ := set $args "kubernetesCollector.timeField" (join "," ($Values.timeField | default (list "timestamp"))) }}
-  {{- with $Values.excludeFilter }}
-    {{- $_ := set $args "kubernetesCollector.excludeFilter" . }}
-  {{- end }}
-  {{- $_ := set $args "kubernetesCollector.includePodLabels" $Values.includePodLabels }}
-  {{- $_ := set $args "kubernetesCollector.includePodAnnotations" $Values.includePodAnnotations }}
-  {{- $_ := set $args "kubernetesCollector.includeNodeLabels" $Values.includeNodeLabels }}
-  {{- $_ := set $args "kubernetesCollector.includeNodeAnnotations" $Values.includeNodeAnnotations }}
-  {{- $_ := set $args "envflag.enable" true }}
+  {{- $args := dict "envflag.enable" true }}
   {{- $_ := set $args "envflag.prefix" "VL_" }}
   {{- $_ := set $args "tmpDataPath" "/vl-collector" }}
   {{- $_ := set $args "remoteWrite.tmpDataPath" "/vl-collector/remotewrite-data" }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) }}
+
+  {{- $collector := $Values.collector | default dict }}
+  {{- with $collector }}
+    {{- $_ := set $args "kubernetesCollector" true }}
+
+    {{- $collectorProps := list "msgField" "timeField" "excludeFilter" "includePodLabels" "includePodAnnotations" "includeNodeLabels" "includeNodeAnnotations" }}
+    {{- range $prop := $collectorProps }}
+      {{- $value := index $collector $prop }}
+      {{- if hasKey $Values $prop }}
+        {{- $value = index $Values $prop }}
+      {{- end }}
+      {{- if or (kindIs "bool" $value) $value }}
+        {{- $vs := "" }}
+        {{- if kindIs "slice" $value }}
+          {{- $vs = join "," $value }}
+        {{- else }}
+          {{- $vs = toString $value }}
+        {{- end }}
+        {{- $_ := set $args (printf "kubernetesCollector.%s" $prop) $vs }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 
   {{- $requiredParams := list "url" }}
 

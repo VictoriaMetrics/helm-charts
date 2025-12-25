@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- moved all collector-specific properties to `collector` section. List of moved properties: `msgField`, `timeField`, `includeNodeAnnotations`, `includePodAnnotations`, `includePodLabels`, `includeNodeAnnotations` and `excludeFilter`. Old properties are supported as well.
 
 ## 0.2.0
 

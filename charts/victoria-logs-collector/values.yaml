@@ -38,40 +38,43 @@ remoteWrite: []
   # - url: https://victoria-logs:9428
   #   tlsInsecureSkipVerify: true
 
-# -- List of fields to be used as `_time` field. The first found field will be used.
-# See https://docs.victoriametrics.com/victorialogs/keyconcepts/#time-field for more details.
-timeField:
-  - time
-  - ts
-  - timestamp
+# -- List of collector specific properties
+collector:
 
-# -- List of fields to be used as `_msg` field. The first found field will be used.
-# See https://docs.victoriametrics.com/victorialogs/keyconcepts/#message-field for more details.
-msgField:
-  - message
-  - msg
+  # -- List of fields to be used as `_time` field. The first found field will be used.
+  # See https://docs.victoriametrics.com/victorialogs/keyconcepts/#time-field for more details.
+  timeField:
+    - time
+    - ts
+    - timestamp
 
-# -- LogsQL filter for excluding container logs.
-# The filter is applied to container metadata fields (e.g., kubernetes.namespace_name, kubernetes.container_name) before reading the log files.
-# This significantly reduces CPU and I/O usage by skipping logs from unwanted containers.
-# See https://docs.victoriametrics.com/victorialogs/vlagent/#filtering-kubernetes-logs
-excludeFilter: ""
+  # -- List of fields to be used as `_msg` field. The first found field will be used.
+  # See https://docs.victoriametrics.com/victorialogs/keyconcepts/#message-field for more details.
+  msgField:
+    - message
+    - msg
 
-# -- Include Pod labels as additional fields in the log entries.
-# Even this setting is disabled, Pod labels are available for filtering via .Values.excludeFilter parameter
-includePodLabels: true
+  # -- LogsQL filter for excluding container logs.
+  # The filter is applied to container metadata fields (e.g., kubernetes.namespace_name, kubernetes.container_name) before reading the log files.
+  # This significantly reduces CPU and I/O usage by skipping logs from unwanted containers.
+  # See https://docs.victoriametrics.com/victorialogs/vlagent/#filtering-kubernetes-logs
+  excludeFilter: ""
 
-# -- Include Pod annotations as additional fields in the log entries.
-# Even this setting is disabled, Pod annotations are available for filtering via .Values.excludeFilter parameter
-includePodAnnotations: false
+  # -- Include Pod labels as additional fields in the log entries.
+  # Even this setting is disabled, Pod labels are available for filtering via .Values.excludeFilter parameter
+  includePodLabels: true
 
-# -- Include Node labels as additional fields in the log entries.
-# Even this setting is disabled, Node labels are available for filtering via .Values.excludeFilter parameter
-includeNodeLabels: false
+  # -- Include Pod annotations as additional fields in the log entries.
+  # Even this setting is disabled, Pod annotations are available for filtering via .Values.excludeFilter parameter
+  includePodAnnotations: false
 
-# -- Include Node annotations as additional fields in the log entries.
-# Even this setting is disabled, Node annotations are available for filtering via .Values.excludeFilter parameter
-includeNodeAnnotations: false
+  # -- Include Node labels as additional fields in the log entries.
+  # Even this setting is disabled, Node labels are available for filtering via .Values.excludeFilter parameter
+  includeNodeLabels: false
+
+  # -- Include Node annotations as additional fields in the log entries.
+  # Even this setting is disabled, Node annotations are available for filtering via .Values.excludeFilter parameter
+  includeNodeAnnotations: false
 
 # -- Environment variables (ex.: secret tokens).
 env: []
