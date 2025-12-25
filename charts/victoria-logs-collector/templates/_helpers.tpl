@@ -63,7 +63,6 @@
   {{- $args := dict "envflag.enable" true }}
   {{- $_ := set $args "envflag.prefix" "VL_" }}
   {{- $_ := set $args "tmpDataPath" "/vl-collector" }}
-  {{- $_ := set $args "remoteWrite.tmpDataPath" "/vl-collector/remotewrite-data" }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) }}
 
   {{- $collector := $Values.collector | default dict }}

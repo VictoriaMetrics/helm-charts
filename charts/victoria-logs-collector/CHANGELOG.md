@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- removed unneeded `remoteWrite.tmpDataPath`
 
 ## 0.2.1
 
