@@ -1,82 +1,5 @@
 daemonSet should match snapshot:
   1: |
-    apiVersion: v1
-    data:
-      vector.yaml: "data_dir: /vl-collector\nsources:\n  k8s:\n    type: kubernetes_logs\n    pod_annotation_fields:\n      # Disable \"pod_ips\" as \"pod_ip\" already includes required info\n      pod_ips: \"\"\ntransforms:\n  json_parser:\n    type: remap\n    inputs: [k8s]\n    source: |\n      .message = parse_json(.message) ?? .message\nsinks:\n\n  \n  remote_write_0:\n    type: http\n    inputs: [json_parser]\n    uri: \"http://victoria-logs:9428/insert/jsonline\"\n    encoding:\n      codec: json\n    framing:\n      method: newline_delimited\n    healthcheck:\n      enabled: false\n    request:\n      headers:\n        AccountID: \"0\"\n        ProjectID: \"0\"\n        VL-Stream-Fields: kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace\n        VL-Msg-Field: message,msg\n        VL-Time-Field: time,ts,timestamp\n    compression: \"zstd\"\n"
-    kind: ConfigMap
-    metadata:
-      labels:
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: victoria-logs-collector
-        app.kubernetes.io/version: 0.1.0
-        helm.sh/chart: victoria-logs-collector-0.1.1
-      name: RELEASE-NAME-victoria-logs-collector-config
-      namespace: NAMESPACE
-  2: |
-    apiVersion: apps/v1
-    kind: DaemonSet
-    metadata:
-      labels:
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: victoria-logs-collector
-        app.kubernetes.io/version: 0.1.0
-        helm.sh/chart: victoria-logs-collector-0.1.1
-      name: RELEASE-NAME-victoria-logs-collector
-      namespace: NAMESPACE
-    spec:
-      selector:
-        matchLabels:
-          app.kubernetes.io/instance: RELEASE-NAME
-          app.kubernetes.io/name: victoria-logs-collector
-      template:
-        metadata:
-          annotations:
-            checksum/config: d77d7b565f69d4a7661c05adcff941b82de2c563d422896f7c4eee4cde7bae46
-          labels:
-            app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/managed-by: Helm
-            app.kubernetes.io/name: victoria-logs-collector
-        spec:
-          containers:
-            - env:
-                - name: VECTOR_SELF_NODE_NAME
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: spec.nodeName
-              image: docker.io/timberio/vector:0.51.1-alpine
-              imagePullPolicy: IfNotPresent
-              name: victoria-logs-collector
-              securityContext: {}
-              volumeMounts:
-                - mountPath: /var/log
-                  name: varlog
-                  readOnly: true
-                - mountPath: /var/lib
-                  name: varlib
-                  readOnly: true
-                - mountPath: /etc/vector
-                  name: config
-                  readOnly: true
-                - mountPath: /vl-collector
-                  name: vl-collector-data
-          securityContext: {}
-          serviceAccountName: RELEASE-NAME-victoria-logs-collector
-          volumes:
-            - hostPath:
-                path: /var/log
-              name: varlog
-            - hostPath:
-                path: /var/lib
-              name: varlib
-            - configMap:
-                name: RELEASE-NAME-victoria-logs-collector-config
-              name: config
-            - hostPath:
-                path: /var/lib/vl-collector
-              name: vl-collector-data
-  3: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -98,7 +21,7 @@ daemonSet should match snapshot:
           - get
           - list
           - watch
-  4: |
+  2: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
@@ -117,7 +40,74 @@ daemonSet should match snapshot:
       - kind: ServiceAccount
         name: RELEASE-NAME-victoria-logs-collector
         namespace: NAMESPACE
-  5: |
+  3: |
+    apiVersion: apps/v1
+    kind: DaemonSet
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: victoria-logs-collector
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: victoria-logs-collector-0.1.1
+      name: RELEASE-NAME-victoria-logs-collector
+      namespace: NAMESPACE
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: victoria-logs-collector
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: victoria-logs-collector
+        spec:
+          containers:
+            - args:
+                - --envflag.enable
+                - --envflag.prefix=VL_
+                - --kubernetesCollector
+                - --kubernetesCollector.includeNodeAnnotations=false
+                - --kubernetesCollector.includeNodeLabels=false
+                - --kubernetesCollector.includePodAnnotations=false
+                - --kubernetesCollector.includePodLabels
+                - --kubernetesCollector.msgField=message,msg
+                - --kubernetesCollector.timeField=time,ts,timestamp
+                - --remoteWrite.headers="AccountID:0^^ProjectID:0"
+                - --remoteWrite.url=http://victoria-logs:9428/insert/native
+                - --tmpDataPath=/vl-collector
+              image: victoriametrics/vlagent:0.1.0
+              imagePullPolicy: IfNotPresent
+              name: collector
+              ports:
+                - containerPort: 9429
+                  name: http
+                  protocol: TCP
+              securityContext: {}
+              volumeMounts:
+                - mountPath: /var/log
+                  name: varlog
+                  readOnly: true
+                - mountPath: /var/lib
+                  name: varlib
+                  readOnly: true
+                - mountPath: /vl-collector
+                  name: vl-collector-data
+          securityContext: {}
+          serviceAccountName: RELEASE-NAME-victoria-logs-collector
+          volumes:
+            - hostPath:
+                path: /var/log
+              name: varlog
+            - hostPath:
+                path: /var/lib
+              name: varlib
+            - hostPath:
+                path: /var/lib/vl-collector
+              name: vl-collector-data
+  4: |
     apiVersion: v1
     automountServiceAccountToken: true
     kind: ServiceAccount
