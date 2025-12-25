@@ -11,7 +11,7 @@ metadata:
   {{- with $service.annotations }}
   annotations: {{ toYaml . | nindent 4}}
   {{- end }}
-  {{- $_ := set $ctx "extraLabels" .Values.service.extraLabels }}
+  {{- $_ := set $ctx "extraLabels" $service.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
   name: {{ $fullname }}
