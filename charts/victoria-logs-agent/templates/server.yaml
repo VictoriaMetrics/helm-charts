@@ -1,10 +1,7 @@
-{{- if and (ne .Values.mode "deployment") (ne .Values.mode "statefulSet") }}
-{{- fail (printf "Invalid mode: %q. Valid modes are: deployment, statefulSet" .Values.mode) }}
-{{- end }}
 {{- $ctx := dict "helm" . }}
 ---
 apiVersion: apps/v1
-kind: {{ title .Values.mode }}
+kind: StatefulSet
 metadata:
   name: {{ include "vm.fullname" $ctx }}
   namespace: {{ include "vm.namespace" $ctx }}
@@ -17,9 +14,7 @@ metadata:
 spec:
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
-  {{- if eq "statefulSet" .Values.mode }}
   serviceName: {{ include "vm.fullname" $ctx }}
-  {{- end }}
   template:
     metadata:
       {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
@@ -71,21 +66,14 @@ spec:
         - name: vl-agent-data
           persistentVolumeClaim:
             claimName: {{ tpl .Values.persistentVolume.existingClaim $ctx }}
-          {{- else if eq .Values.mode "deployment" }}
-        - name: vl-agent-data
-          persistentVolumeClaim:
-            claimName: {{ include "vm.fullname" $ctx }}
           {{- end }}
         {{- else }}
         - name: vl-agent-data
           emptyDir: {}
         {{- end }}
 
-  {{/*
-  Create PersistentVolumeClaim if enabled and not using existing claim in statefulSet mode.
-  */}}
   {{- $pvc := .Values.persistentVolume }}
-  {{- if and $pvc.enabled (not $pvc.existingClaim) (eq .Values.mode "statefulSet") }}
+  {{- if and $pvc.enabled (not $pvc.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
