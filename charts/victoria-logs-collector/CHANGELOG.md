@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- allow overriding the default `remoteWrite.url` path by specifying a non-empty value other than `/` for the `remoteWrite.url` field
 
 ## 0.2.2
 
