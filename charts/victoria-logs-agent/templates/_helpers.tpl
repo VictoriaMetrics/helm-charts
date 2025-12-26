@@ -26,7 +26,9 @@
       {{- end }}
       {{- $value := $rwValue }}
       {{- if eq $rwKey "url" }}
-        {{- $value = printf "%s/insert/native" (trimSuffix "/" $rwValue) }}
+        {{- $url := urlParse $rwValue }}
+        {{- $_ = set $url "path" (ternary "/insert/native" $url.path (empty (trimPrefix "/" $url.path))) }}
+        {{- $value = urlJoin $url }}
       {{- else if eq $rwKey "headers" }}
         {{- $headers := list }}
         {{- range $hk, $hv := $rwValue }}
