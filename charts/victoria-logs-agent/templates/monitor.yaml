@@ -1,0 +1,49 @@
+{{- $serviceMonitor := .Values.serviceMonitor -}}
+{{- if $serviceMonitor.enabled -}}
+{{- $ctx := dict "helm" . }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  {{- with $serviceMonitor.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $_ := set $ctx "extraLabels" $serviceMonitor.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ include "vm.fullname" $ctx }}
+  {{- with $serviceMonitor.namespace }}
+  namespace: {{ . }}
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ include "vm.namespace" $ctx }}
+  selector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+  endpoints:
+    - port: http
+      {{- with $serviceMonitor.basicAuth }}
+      basicAuth: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $serviceMonitor.scheme }}
+      scheme: {{ . }}
+      {{- end }}
+      {{- with $serviceMonitor.interval }}
+      interval: {{ . }}
+      {{- end }}
+      {{- with $serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ . }}
+      {{- end }}
+      {{- with $serviceMonitor.tlsConfig }}
+      tlsConfig: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $serviceMonitor.relabelings }}
+      relabelings: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $serviceMonitor.targetPort }}
+      targetPort: {{ . }}
+      {{- end }}
+{{- end }}
