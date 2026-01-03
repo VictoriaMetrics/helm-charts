@@ -62,6 +62,17 @@ persistentVolume:
   # -- Existing Claim name. If defined, PVC must be created manually before volume will be bound
   existingClaim: ""
 
+# -- Horizontal Pod Autoscaling.
+horizontalPodAutoscaling:
+  # -- Use HPA for vmagent
+  enabled: false
+  # -- Maximum replicas for HPA to use to to scale vmagent
+  maxReplicas: 10
+  # -- Minimum replicas for HPA to use to scale vmagent
+  minReplicas: 1
+  # -- Metric for HPA to use to scale vmagent
+  metrics: []
+
 # -- Environment variables (ex.: secret tokens)
 env: []
   # - name: VL_remoteWrite_basicAuth_password
