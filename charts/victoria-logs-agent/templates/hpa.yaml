@@ -1,0 +1,23 @@
+{{- $hpa := .Values.horizontalPodAutoscaling }}
+{{- if $hpa.enabled }}
+{{- $ctx := dict "helm" . }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  {{- $_ := set $ctx "extraLabels" .Values.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ include "vm.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+spec:
+  maxReplicas: {{ $hpa.maxReplicas }}
+  minReplicas: {{ $hpa.minReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: {{ title .Values.mode }}
+    name: {{ include "vm.fullname" $ctx }}
+  metrics: {{ toYaml $hpa.metrics | nindent 4 }}
+  {{- with $hpa.behavior }}
+  behavior: {{ toYaml . | nindent 4 }}
+  {{- end -}}
+{{- end -}}
