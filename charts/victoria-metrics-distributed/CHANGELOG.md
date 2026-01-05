@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.27.0
+
+**Release date:** 05 Jan 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.133.0](https://img.shields.io/badge/v1.133.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11330)
+
 - bump common chart version 0.0.45 -> 0.0.46
 - bump version of VM components to [v1.133.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.133.0)
 
