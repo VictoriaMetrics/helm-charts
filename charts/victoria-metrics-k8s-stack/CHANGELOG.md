@@ -1,6 +1,7 @@
 ## Next release
 
 - bump common chart version 0.0.45 -> 0.0.46
+- bump version of VM components to [v1.133.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.133.0)
 
 ## 0.66.1
 
