@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump version of VictoriaTraces components to [v0.6.0](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.6.0)
 
 ## 0.0.4
 
