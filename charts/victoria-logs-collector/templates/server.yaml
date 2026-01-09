@@ -68,6 +68,7 @@ spec:
               readOnly: true
             - name: vl-collector-data
               mountPath: /vl-collector
+            {{- include "vm.license.mount" . | nindent 12 }}
       volumes:
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
@@ -81,3 +82,4 @@ spec:
         - name: vl-collector-data
           hostPath:
             path: /var/lib/vl-collector
+        {{- include "vm.license.volume" . | nindent 8 }}

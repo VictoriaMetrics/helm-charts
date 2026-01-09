@@ -74,11 +74,13 @@ spec:
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "startup"))) }}
           startupProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or $app.extraVolumeMounts }}
+          {{- $license := include "vm.license.mount" . }}
+          {{- if or $app.extraVolumeMounts $license }}
           volumeMounts:
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+            {{- $license | nindent 12 }}
           {{- end }}
           {{- with $app.resources }}
           resources: {{ toYaml . | nindent 12 }}
@@ -113,10 +115,12 @@ spec:
         {{- end }}
       {{- end }}
       terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
-      {{- if $app.extraVolumes }}
+      {{- $license := include "vm.license.volume" . }}
+      {{- if or $app.extraVolumes $license }}
       volumes:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- $license | nindent 8 }}
       {{- end }}
 {{- end }}

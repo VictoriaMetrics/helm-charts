@@ -57,6 +57,7 @@ spec:
             {{- end }}
             - name: vl-agent-data
               mountPath: /vlagent-data
+            {{- include "vm.license.mount" . | nindent 12 }}
       volumes:
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
@@ -71,7 +72,7 @@ spec:
         - name: vl-agent-data
           emptyDir: {}
         {{- end }}
-
+        {{- include "vm.license.volume" . | nindent 8 }}
   {{- $pvc := .Values.persistentVolume }}
   {{- if and $pvc.enabled (not $pvc.existingClaim) }}
   volumeClaimTemplates:

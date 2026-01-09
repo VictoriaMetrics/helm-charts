@@ -4,6 +4,7 @@
   {{- $args := dict "select.disable" "true" -}}
   {{- $_ := set . "style" "plain" }}
   {{- $_ := set . "appKey" "vlstorage" }}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vlstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
@@ -31,6 +32,7 @@
   {{- $app := $Values.vmauth -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
@@ -41,6 +43,7 @@
   {{- $args := dict "insert.disable" "true" -}}
   {{- $_ := set . "style" "plain" }}
   {{- $_ := set . "appKey" "vlstorage" }}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vlstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
@@ -82,6 +85,7 @@
     {{- end -}}
   {{- end -}}  
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}

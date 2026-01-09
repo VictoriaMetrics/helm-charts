@@ -87,6 +87,7 @@ spec:
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+            {{- include "vm.license.mount" . | nindent 12 }}
           {{- with $app.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -122,4 +123,5 @@ spec:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- include "vm.license.volume" . | nindent 8 }}
 {{- end }}

@@ -87,6 +87,7 @@ spec:
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+            {{- include "vm.license.mount" . | nindent 12 }}
         {{- with $app.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -117,7 +118,8 @@ spec:
         {{- end }}
       {{- end }}
       terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
-      {{- if or $app.extraVolumes (not $pvc.enabled) $pvc.existingClaim (include "vm.license.volume" .) }}
+      {{- $license := include "vm.license.volume" . }}
+      {{- if or $app.extraVolumes (not $pvc.enabled) $pvc.existingClaim $license }}
       volumes:
         {{- with $app.extraVolumes }}
         {{- toYaml . | nindent 8 }}
@@ -131,6 +133,7 @@ spec:
           emptyDir: {{ toYaml $app.emptyDir | nindent 12 }}
           {{- end }}
         {{- end }}
+        {{- $license | nindent 8 }}
       {{- end }}
   minReadySeconds: {{ $app.minReadySeconds }}
   {{- if and $pvc.enabled (not $pvc.existingClaim) }}

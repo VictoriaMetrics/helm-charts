@@ -3,6 +3,7 @@
   {{- $app := $Values.vmauth -}}
   {{- $args := default dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
@@ -10,7 +11,9 @@
 {{- define "vlselect.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vlselect -}}
-  {{- $args := $app.extraArgs -}}
+  {{- $args := default dict -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storageNodes := $args.storageNodes | default list }}
   {{- with $Values.storageNodes }}
     {{- $storageNodes = concat $storageNodes . }}

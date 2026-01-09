@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add ability to configure license for VictoriaLogs enterprise. See [#2649](https://github.com/VictoriaMetrics/helm-charts/issues/2649).
 
 ## 0.11.23
 
