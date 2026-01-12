@@ -1,17 +1,16 @@
 {{- define "vlagent.args" -}}
-  {{- if empty .Values.remoteWrite }}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- if empty $Values.remoteWrite }}
     {{- fail "at least one remoteWrite configuration must be provided" }}
   {{- end }}
 
-  {{- $args := dict "envflag.enable" true }}
-  {{- $_ := set $args "envflag.prefix" "VL_" }}
-  {{- $_ := set $args "tmpDataPath" "/vlagent-data" }}
-  {{- $_ := set $args "remoteWrite.maxDiskUsagePerURL" .Values.maxDiskUsagePerURL -}}
+  {{- $args := dict "tmpDataPath" "/vlagent-data" }}
+  {{- $_ := set $args "remoteWrite.maxDiskUsagePerURL" $Values.maxDiskUsagePerURL -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
 
   {{- $requiredParams := list "url" }}
 
-  {{- range $i, $rw := .Values.remoteWrite }}
+  {{- range $i, $rw := $Values.remoteWrite }}
     {{- range $rwKey, $rwValue := $rw }}
       {{- if has $rwKey $requiredParams }}
         {{- if empty $rw }}
@@ -52,5 +51,6 @@
       {{- $_ := set $args $key $param }}
     {{- end }}
   {{- end }}
+  {{- $args = mergeOverwrite $args $Values.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end }}

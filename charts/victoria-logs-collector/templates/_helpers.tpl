@@ -60,9 +60,7 @@
     {{- fail "at least one remoteWrite configuration must be provided" }}
   {{- end }}
 
-  {{- $args := dict "envflag.enable" true }}
-  {{- $_ := set $args "envflag.prefix" "VL_" }}
-  {{- $_ := set $args "tmpDataPath" "/vl-collector" }}
+  {{- $args := dict "tmpDataPath" "/vl-collector" }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) }}
 
   {{- $collector := $Values.collector | default dict }}
@@ -132,5 +130,6 @@
       {{- $_ := set $args $key $param }}
     {{- end }}
   {{- end }}
+  {{- $args = mergeOverwrite $args $Values.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end }}

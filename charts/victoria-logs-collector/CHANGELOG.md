@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- support extraArgs parameter for additional command line arguments
 
 ## 0.2.5
 
