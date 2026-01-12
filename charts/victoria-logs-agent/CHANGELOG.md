@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add service and container ports, when syslog.listenAddr.tcp or syslog.listenAddr.udp flags are defined.
 
 ## 0.0.6
 

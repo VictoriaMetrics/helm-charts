@@ -52,6 +52,18 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    {{- with (index .Values.extraArgs "syslog.listenAddr.udp") }}
+    - name: syslog-udp
+      protocol: UDP
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+      targetPort: syslog-udp
+    {{- end }}
+    {{- with (index .Values.extraArgs "syslog.listenAddr.tcp") }}
+    - name: syslog-tcp
+      protocol: TCP
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+      targetPort: syslog-tcp
+    {{- end }}
   {{- $_ := set $ctx "extraLabels" (mergeOverwrite (deepCopy (.Values.selectorLabels | default dict)) (deepCopy $service.selectorLabels)) }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}

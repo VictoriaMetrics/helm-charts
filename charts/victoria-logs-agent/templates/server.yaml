@@ -51,6 +51,19 @@ spec:
           {{- with .Values.env }}
           env: {{- toYaml . | nindent 12}}
           {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .Values.extraArgs.httpListenAddr "default" "9429") }}
+            {{- with (index .Values.extraArgs "syslog.listenAddr.tcp") }}
+            - name: syslog-tcp
+              protocol: TCP
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
+            {{- end }}
+            {{- with (index .Values.extraArgs "syslog.listenAddr.udp") }}
+            - name: syslog-udp
+              protocol: UDP
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
+            {{- end }}
           volumeMounts:
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
