@@ -1,6 +1,7 @@
 ## Next release
 
 - bump common chart version 0.0.45 -> 0.0.46
+- Upgraded ['vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.28.4](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1284).
 
 ## 1.12.9
 
