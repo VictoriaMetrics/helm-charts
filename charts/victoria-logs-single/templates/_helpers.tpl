@@ -2,8 +2,8 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.server -}}
   {{- $args := default dict -}}
-  {{- if and (empty $app.retentionPeriod) (empty $app.retentionDiskSpaceUsage) -}}
-    {{- fail "either .Values.server.retentionPeriod or .Values.server.retentionDiskSpaceUsage should be defined" -}}
+  {{- if and (empty $app.retentionPeriod) (empty $app.retentionDiskSpaceUsage) (empty $app.retentionMaxDiskUsagePercent) -}}
+    {{- fail "either .Values.server.retentionPeriod, .Values.server.retentionDiskSpaceUsage or .Values.server.retentionMaxDiskUsagePercent should be defined" -}}
   {{- end -}}
   {{- with $app.retentionPeriod -}}
     {{- $_ := set $args "retentionPeriod" $app.retentionPeriod -}}
@@ -15,6 +15,9 @@
     {{- else -}}
       {{- $_ := set $args "retention.maxDiskSpaceUsageBytes" $app.retentionDiskSpaceUsage -}}
     {{- end -}}
+  {{- end -}}
+  {{- with $app.retentionMaxDiskUsagePercent -}}
+    {{- $_ := set $args "retention.maxDiskUsagePercent" $app.retentionMaxDiskUsagePercent -}}
   {{- end -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
