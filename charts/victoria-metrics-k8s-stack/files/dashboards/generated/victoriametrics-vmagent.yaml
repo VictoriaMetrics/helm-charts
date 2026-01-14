@@ -154,7 +154,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
     overrides: []
   gridPos:
     h: 3
@@ -177,7 +177,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: stat
 - title: Targets scraped/s
   targets:
@@ -203,7 +203,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
     overrides: []
   gridPos:
     h: 3
@@ -226,21 +226,21 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: stat
-- title: Log errors (30m)
+- title: Persistent queue size
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    expr: {{ printf "sum(increase(vm_log_messages_total{job=~\"$job\",instance=~\"$instance\",level!=\"info\",%s=~\"$cluster\"}[30m])) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(vmagent_remotewrite_pending_data_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     interval: ""
     legendFormat: ""
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
     uid: $ds
-  description: Shows number of generated  error messages in  logs over last 30m. Non-zero value may be a sign of connectivity or misconfiguration errors.
+  description: "Persistent queue size shows size of pending samples in bytes which hasn't been flushed to remote storage yet. \nIncreasing of value might be a sign of connectivity issues. In such cases, vmagent starts to flush pending data on disk with attempt to send it later once connection is restored."
   fieldConfig:
     defaults:
       mappings: []
@@ -249,21 +249,17 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
-          value: 1
-      unit: short
+          value: 1.048576e+07
+      unit: bytes
     overrides: []
   gridPos:
     h: 3
     w: 6
     x: 12
     "y": 1
-  id: 16
-  links:
-  - targetBlank: true
-    title: Troubleshooting
-    url: https://docs.victoriametrics.com/victoriametrics/vmagent/#troubleshooting
+  id: 56
   options:
     colorMode: value
     graphMode: area
@@ -279,7 +275,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: stat
 - title: Available CPU
   targets:
@@ -308,7 +304,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
       unit: short
     overrides: []
   gridPos:
@@ -333,7 +329,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: stat
 - title: Samples ingested/s
   targets:
@@ -358,7 +354,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
     overrides: []
   gridPos:
     h: 3
@@ -381,7 +377,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: stat
 - title: Scrape targets
   targets:
@@ -416,7 +412,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
     overrides:
     - matcher:
         id: byName
@@ -427,7 +423,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 1
   gridPos:
@@ -451,21 +447,21 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: stat
-- title: Persistent queue size
+- title: Log errors (30m)
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    expr: {{ printf "sum(vmagent_remotewrite_pending_data_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(increase(vm_log_messages_total{job=~\"$job\",instance=~\"$instance\",level!=\"info\",%s=~\"$cluster\"}[30m])) by(%s)" $clusterLabel $clusterLabel }}
     interval: ""
     legendFormat: ""
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
     uid: $ds
-  description: "Persistent queue size shows size of pending samples in bytes which hasn't been flushed to remote storage yet. \nIncreasing of value might be a sign of connectivity issues. In such cases, vmagent starts to flush pending data on disk with attempt to send it later once connection is restored."
+  description: Shows number of generated  error messages in  logs over last 30m. Non-zero value may be a sign of connectivity or misconfiguration errors.
   fieldConfig:
     defaults:
       mappings: []
@@ -474,17 +470,21 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
-          value: 1.048576e+07
-      unit: bytes
+          value: 1
+      unit: short
     overrides: []
   gridPos:
     h: 3
     w: 6
     x: 12
     "y": 4
-  id: 56
+  id: 16
+  links:
+  - targetBlank: true
+    title: Troubleshooting
+    url: https://docs.victoriametrics.com/victoriametrics/vmagent/#troubleshooting
   options:
     colorMode: value
     graphMode: area
@@ -500,7 +500,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: stat
 - title: Available memory
   targets:
@@ -529,7 +529,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
       unit: bytes
     overrides: []
   gridPos:
@@ -554,7 +554,7 @@ panels:
     text: {}
     textMode: auto
     wideLayout: true
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: stat
 - targets:
   - datasource:
@@ -578,6 +578,8 @@ panels:
         align: auto
         cellOptions:
           type: auto
+        footer:
+          reducers: []
         inspect: false
         minWidth: 50
       mappings: []
@@ -585,7 +587,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
     overrides:
@@ -593,7 +595,7 @@ panels:
         id: byName
         options: Time
       properties:
-      - id: custom.hidden
+      - id: custom.hideFrom.viz
         value: true
     - matcher:
         id: byName
@@ -609,14 +611,8 @@ panels:
   id: 101
   options:
     cellHeight: sm
-    footer:
-      countRows: false
-      fields: ""
-      reducer:
-      - sum
-      show: false
     showHeader: true
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: table
 - title: Uptime
   targets:
@@ -659,6 +655,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -673,7 +670,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: short
@@ -697,7 +694,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Overview
   collapsed: false
@@ -759,6 +756,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -773,7 +771,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: short
@@ -805,7 +803,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Persistent queue size  ($instance) to ($url)
   targets:
@@ -849,6 +847,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -857,15 +856,18 @@ panels:
           mode: "off"
       links:
       - targetBlank: true
-        title: Drilldown
+        title: Drilldown - Persistent queue size
         url: /d/G7Z9GzMGz?viewPanel=125&var-url=${__field.labels.url}&var-ds=$ds&var-instance=$instance&var-job=$job&${__url_time_range}
+      - targetBlank: true
+        title: Drilldown - Persistent queue full ETA
+        url: /d/G7Z9GzMGz?viewPanel=161&var-url=${__field.labels.url}&var-ds=$ds&var-instance=$instance&var-job=$job&${__url_time_range}
       mappings: []
       min: 0
       thresholds:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: bytes
@@ -894,7 +896,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Logging rate
   targets:
@@ -941,6 +943,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -954,7 +957,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: short
@@ -980,7 +983,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Persistent queue dropped rate ($instance)
   targets:
@@ -1025,6 +1028,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1038,7 +1042,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: decbytes
@@ -1066,7 +1070,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Requests rate  ($instance)
   targets:
@@ -1109,6 +1113,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1122,7 +1127,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: short
@@ -1146,7 +1151,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Errors rate  ($instance)
   targets:
@@ -1225,6 +1230,7 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1238,7 +1244,7 @@ panels:
         mode: absolute
         steps:
         - color: green
-          value: null
+          value: 0
         - color: red
           value: 80
       unit: short
@@ -1266,7 +1272,7 @@ panels:
       hideZeros: false
       mode: multi
       sort: desc
-  pluginVersion: 11.5.0
+  pluginVersion: 12.2.0
   type: timeseries
 - title: Resource usage
   panels:
@@ -1318,6 +1324,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -1334,7 +1341,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: percentunit
@@ -1343,7 +1350,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 38
+      "y": 698
     id: 111
     options:
       legend:
@@ -1360,7 +1367,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: CPU % usage
     targets:
@@ -1405,6 +1412,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -1421,7 +1429,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: percentunit
@@ -1430,7 +1438,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 38
+      "y": 698
     id: 157
     options:
       legend:
@@ -1447,7 +1455,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: RSS anonymous memory % usage
     targets:
@@ -1495,6 +1503,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -1508,7 +1517,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: percentunit
@@ -1517,7 +1526,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 46
+      "y": 758
     id: 155
     options:
       legend:
@@ -1534,7 +1543,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: CPU pressure
     targets:
@@ -1598,6 +1607,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -1612,14 +1622,14 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
         unit: s
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      "y": 46
+      "y": 758
     id: 158
     options:
       legend:
@@ -1636,7 +1646,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Memory pressure
     targets:
@@ -1700,6 +1710,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -1714,14 +1725,14 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
         unit: s
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      "y": 54
+      "y": 766
     id: 156
     options:
       legend:
@@ -1738,7 +1749,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Disk writes/reads ($instance)
     targets:
@@ -1799,6 +1810,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -1814,7 +1826,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: bytes
@@ -1829,7 +1841,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 54
+      "y": 766
     id: 81
     options:
       legend:
@@ -1846,7 +1858,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Goroutines ($instance)
     targets:
@@ -1890,6 +1902,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -1904,7 +1917,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -1913,7 +1926,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 62
+      "y": 774
     id: 39
     options:
       legend:
@@ -1928,7 +1941,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: IO pressure
     targets:
@@ -1988,6 +2001,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -2002,14 +2016,14 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
         unit: s
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      "y": 62
+      "y": 774
     id: 159
     options:
       legend:
@@ -2026,7 +2040,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Threads ($instance)
     targets:
@@ -2069,6 +2083,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -2083,7 +2098,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -2092,7 +2107,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 70
+      "y": 782
     id: 41
     options:
       legend:
@@ -2107,7 +2122,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Network  usage ($instance)
     targets:
@@ -2161,6 +2176,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -2173,7 +2189,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: bps
@@ -2188,7 +2204,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 70
+      "y": 782
     id: 7
     options:
       legend:
@@ -2205,7 +2221,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: CPU spent on GC ($instance)
     targets:
@@ -2250,6 +2266,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -2264,7 +2281,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: percentunit
@@ -2273,7 +2290,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 78
+      "y": 790
     id: 135
     options:
       legend:
@@ -2288,7 +2305,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Go scheduling latency
     targets:
@@ -2333,6 +2350,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -2347,7 +2365,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 0.1
         unit: s
@@ -2356,7 +2374,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 78
+      "y": 790
     id: 149
     options:
       legend:
@@ -2371,7 +2389,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Memory allocations rate
     targets:
@@ -2416,6 +2434,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -2430,14 +2449,14 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
         unit: bytes
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      "y": 86
+      "y": 798
     id: 154
     options:
       legend:
@@ -2452,7 +2471,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Open FDs usage % ($instance)
     targets:
@@ -2501,6 +2520,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -2515,7 +2535,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: percentunit
@@ -2524,7 +2544,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 86
+      "y": 798
     id: 83
     options:
       legend:
@@ -2539,7 +2559,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   collapsed: true
   gridPos:
@@ -2612,7 +2632,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1580
+      "y": 3116
     id: 92
     options:
       legend:
@@ -2692,7 +2712,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1580
+      "y": 3116
     id: 95
     options:
       legend:
@@ -2775,7 +2795,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1588
+      "y": 3124
     id: 98
     options:
       legend:
@@ -2858,7 +2878,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1588
+      "y": 3124
     id: 99
     options:
       legend:
@@ -2943,7 +2963,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1596
+      "y": 3132
     id: 79
     options:
       legend:
@@ -3024,7 +3044,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1596
+      "y": 3132
     id: 18
     links:
     - targetBlank: true
@@ -3110,7 +3130,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1604
+      "y": 3140
     id: 127
     options:
       legend:
@@ -3190,7 +3210,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1604
+      "y": 3140
     id: 50
     options:
       legend:
@@ -3257,7 +3277,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      "y": 1612
+      "y": 3148
     id: 129
     options:
       cellHeight: sm
@@ -3353,7 +3373,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      "y": 1612
+      "y": 3148
     id: 150
     options:
       legend:
@@ -3431,7 +3451,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1619
+      "y": 3155
     id: 151
     options:
       legend:
@@ -3523,7 +3543,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      "y": 1825
+      "y": 3361
     id: 48
     options:
       legend:
@@ -3605,7 +3625,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      "y": 1825
+      "y": 3361
     id: 76
     options:
       legend:
@@ -3685,7 +3705,7 @@ panels:
       h: 7
       w: 12
       x: 0
-      "y": 1832
+      "y": 3368
     id: 132
     options:
       legend:
@@ -3767,7 +3787,7 @@ panels:
       h: 7
       w: 12
       x: 12
-      "y": 1832
+      "y": 3368
     id: 133
     options:
       legend:
@@ -3847,7 +3867,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1839
+      "y": 3375
     id: 20
     options:
       legend:
@@ -3927,7 +3947,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1839
+      "y": 3375
     id: 126
     options:
       legend:
@@ -4006,7 +4026,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1847
+      "y": 3383
     id: 46
     options:
       legend:
@@ -4085,7 +4105,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1847
+      "y": 3383
     id: 148
     options:
       legend:
@@ -4200,7 +4220,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1855
+      "y": 3391
     id: 31
     options:
       legend:
@@ -4299,7 +4319,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1547
+      "y": 3083
     id: 73
     options:
       legend:
@@ -4377,7 +4397,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1547
+      "y": 3083
     id: 131
     options:
       legend:
@@ -4470,7 +4490,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1823
+      "y": 3359
     id: 130
     options:
       legend:
@@ -4554,7 +4574,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1823
+      "y": 3359
     id: 77
     options:
       legend:
@@ -4639,7 +4659,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1870
+      "y": 3406
     id: 146
     options:
       legend:
@@ -4715,7 +4735,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1870
+      "y": 3406
     id: 143
     options:
       legend:
@@ -4786,7 +4806,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1878
+      "y": 3414
     id: 147
     options:
       legend:
@@ -4873,7 +4893,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1878
+      "y": 3414
     id: 139
     options:
       legend:
@@ -4953,7 +4973,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1886
+      "y": 3422
     id: 142
     options:
       legend:
@@ -5025,7 +5045,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1886
+      "y": 3422
     id: 137
     options:
       legend:
@@ -5120,7 +5140,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1926
+      "y": 3462
     id: 141
     options:
       legend:
@@ -5188,6 +5208,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5202,6 +5223,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -5210,7 +5232,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1828
+      "y": 1411
     id: 60
     options:
       legend:
@@ -5225,7 +5247,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Bytes write rate ($instance)
     targets:
@@ -5269,6 +5291,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5282,6 +5305,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: decbytes
@@ -5290,7 +5314,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1828
+      "y": 1411
     id: 66
     options:
       legend:
@@ -5305,7 +5329,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Retry rate ($instance) to ($url)
     targets:
@@ -5353,6 +5377,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5366,6 +5391,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -5374,7 +5400,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1836
+      "y": 1419
     id: 61
     options:
       legend:
@@ -5389,7 +5415,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Connections ($instance)
     targets:
@@ -5435,6 +5461,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5448,6 +5475,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -5456,7 +5484,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1836
+      "y": 1419
     id: 65
     options:
       legend:
@@ -5471,7 +5499,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Hourly series limit
     targets:
@@ -5518,6 +5546,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5530,6 +5559,7 @@ panels:
           mode: absolute
           steps:
           - color: transparent
+            value: 0
           - color: red
             value: 0.9
         unit: percent
@@ -5538,7 +5568,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1844
+      "y": 1427
     id: 88
     options:
       legend:
@@ -5550,7 +5580,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Remote write connection saturation ($instance)
     targets:
@@ -5594,6 +5624,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5607,6 +5638,7 @@ panels:
           mode: absolute
           steps:
           - color: transparent
+            value: 0
           - color: red
             value: 0.9
         unit: percentunit
@@ -5615,7 +5647,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 1844
+      "y": 1427
     id: 84
     options:
       legend:
@@ -5630,7 +5662,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Daily series limit
     targets:
@@ -5677,6 +5709,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5689,6 +5722,7 @@ panels:
           mode: absolute
           steps:
           - color: transparent
+            value: 0
           - color: red
             value: 0.9
         unit: percentunit
@@ -5697,7 +5731,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 1852
+      "y": 1435
     id: 90
     options:
       legend:
@@ -5709,7 +5743,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   collapsed: true
   gridPos:
@@ -5728,7 +5762,7 @@ panels:
       h: 2
       w: 24
       x: 0
-      "y": 100
+      "y": 70
     id: 115
     options:
       code:
@@ -5737,7 +5771,7 @@ panels:
         showMiniMap: false
       content: Drilldown row is used by other panels on the dashboard to show more detailed metrics per-instance.
       mode: markdown
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     transparent: true
     type: text
   - title: CPU usage ($instance)
@@ -5784,6 +5818,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5797,14 +5832,14 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
         unit: short
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      "y": 102
+      "y": 72
     id: 119
     options:
       legend:
@@ -5821,7 +5856,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: RSS memory usage ($instance)
     targets:
@@ -5867,6 +5902,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5880,14 +5916,14 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
         unit: decbytes
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      "y": 102
+      "y": 72
     id: 117
     options:
       legend:
@@ -5904,7 +5940,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Persistent queue size  ($instance) to ($url)
     targets:
@@ -5948,6 +5984,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5961,7 +5998,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: bytes
@@ -5970,7 +6007,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 110
+      "y": 80
     id: 125
     links:
     - title: Troubleshooting
@@ -5988,7 +6025,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Samples rate ($instance)
     targets:
@@ -6041,6 +6078,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -6053,7 +6091,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -6068,7 +6106,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 110
+      "y": 80
     id: 123
     options:
       legend:
@@ -6085,7 +6123,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
     type: timeseries
   - title: Disk writes/reads ($instance)
     targets:
@@ -6143,6 +6181,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -6155,7 +6194,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-            value: null
+            value: 0
           - color: red
             value: 80
         unit: bytes
@@ -6170,7 +6209,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 118
+      "y": 88
     id: 121
     options:
       legend:
@@ -6187,7 +6226,101 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 11.5.0
+    pluginVersion: 12.2.0
+    type: timeseries
+  - title: Persistent queue Full ETA ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "(sum(vm_persistentqueue_free_disk_space_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,instance,path,%s) / (sum(deriv(vm_persistentqueue_bytes_pending{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1m])) by(job,instance,path,%s) > 0)) * on(job,instance,path,%s) group_left(url) ((vmagent_remotewrite_pending_data_bytes{job=~\"$job\",instance=~\"$instance\",url=~\"$url\",%s=~\"$cluster\"} * 0) + 1)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+      editorMode: code
+      exemplar: true
+      interval: ""
+      legendFormat: '{{`{{`}}instance{{`}}`}} => {{`{{`}}url{{`}}`}}'
+      range: true
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: |-
+      Shows an estimated time until a persistent queue reaches its disk usage limit for a given instance and -remoteWrite.url.
+
+      The ETA is shown only when the pending queue size is actively growing, which typically indicates that remote write cannot keep up with ingestion (e.g. the remote endpoint is slow or unavailable).
+
+      Once the disk usage limit is reached, newly ingested metrics will be dropped.
+
+      The estimation is approximate and may fluctuate due to short-term changes in the queue growth rate.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: s
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 88
+    id: 161
+    links:
+    - title: Troubleshooting
+      url: https://docs.victoriametrics.com/victoriametrics/vmagent/#troubleshooting
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 12.2.0
     type: timeseries
   collapsed: true
   gridPos:
@@ -6243,7 +6376,7 @@ links:
   url: https://github.com/VictoriaMetrics/VictoriaMetrics/releases
 preload: false
 refresh: ""
-schemaVersion: 40
+schemaVersion: 42
 time:
   from: now-3h
   to: now
@@ -6260,4 +6393,3 @@ timepicker:
   - 1d
 uid: G7Z9GzMGz
 version: 1
-weekStart: ""
