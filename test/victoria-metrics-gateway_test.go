@@ -10,6 +10,9 @@ import (
 
 // TestVictoriaMetricsGatewayInstallDefault tests that the victoria-metrics-gateway chart can be installed with default values.
 func TestVictoriaMetricsGatewayInstallDefault(t *testing.T) {
+	if os.Getenv("LICENSE_KEY") == "" {
+		t.Skip("Skipping test in repo fork")
+	}
 	t.Parallel()
 	name := "victoria-metrics-gateway"
 	cp := chartInstall(t, name, map[string]string{
