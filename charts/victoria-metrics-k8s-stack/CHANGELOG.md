@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+- bump grafana dependency chart to version 10.5.1
+- bump kube-state-metrics dependency chart to version 7.1.0
+- bump node-exporter dependency chart to version 4.51.0
 
 ## 0.68.0
 
