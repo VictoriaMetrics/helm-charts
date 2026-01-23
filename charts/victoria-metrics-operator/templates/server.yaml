@@ -71,6 +71,10 @@ spec:
             - name: VM_CONTAINERREGISTRY
               value: {{ quote . }}
             {{- end -}}
+            {{- with .Values.configReloaderImage }}
+            - name: VM_CONFIG_RELOADER_IMAGE
+              value: {{ .repository | default "" }}{{ .registry }}:{{ .tag }}
+            {{- end -}}
             {{- if .Values.operator.disable_prometheus_converter }}
             - name: VM_ENABLEDPROMETHEUSCONVERTER_PODMONITOR
               value: "false"
