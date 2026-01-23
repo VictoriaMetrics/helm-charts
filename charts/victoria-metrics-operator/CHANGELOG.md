@@ -1,6 +1,8 @@
 ## Next release
 
 - bump common chart version 0.0.45 -> 0.0.46
+- updates operator to [v0.67.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.67.0) version
+- added .Values.configReloaderImage section to provide default config reloader image for operator
 
 ## 0.57.1
 
