@@ -51,7 +51,8 @@ spec:
             - name: http
               containerPort: 9429
               protocol: TCP
-          args: {{- include "victoria-logs-collector.args" . | nindent 12 }}
+          {{- $args := (include "victoria-logs-collector.args" . | fromYaml) }}
+          args: {{- include "vm.args" $args | nindent 12 }}
           {{- with .Values.env }}
           env: {{ toYaml . | nindent 12}}
           {{- end }}
@@ -67,7 +68,7 @@ spec:
               mountPath: /var/lib
               readOnly: true
             - name: vl-collector-data
-              mountPath: /vl-collector
+              mountPath: {{ $args.tmpDataPath }}
             {{- include "vm.license.mount" . | nindent 12 }}
       volumes:
         {{- with .Values.extraVolumes }}
@@ -81,5 +82,5 @@ spec:
             path: /var/lib
         - name: vl-collector-data
           hostPath:
-            path: /var/lib/vl-collector
+            path: {{ $args.tmpDataPath }}
         {{- include "vm.license.volume" . | nindent 8 }}
