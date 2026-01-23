@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.58.0
+
+**Release date:** 23 Jan 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.67.0](https://img.shields.io/badge/v0.67.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0670)
+
 - bump common chart version 0.0.45 -> 0.0.46
 - updates operator to [v0.67.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.67.0) version
 - added .Values.configReloaderImage section to provide default config reloader image for operator
