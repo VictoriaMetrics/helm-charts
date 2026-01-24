@@ -3,6 +3,7 @@
 - bump grafana dependency chart to version 10.5.1
 - bump kube-state-metrics dependency chart to version 7.1.0
 - bump node-exporter dependency chart to version 4.51.0
+- updates operator to [v0.67.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.67.0) version
 
 ## 0.68.0
 
