@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- removed operator.useCustomConfigReloader parameter
+- replaced .Values.configReloaderImage with .Values.configReloader.image
 
 ## 0.58.0
 

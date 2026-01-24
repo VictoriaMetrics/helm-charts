@@ -29,10 +29,11 @@ image:
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
-configReloaderImage: {}
+configReloader:
+  image: {}
   # registry: ""
   # repository: ""
-  # tag: "" 
+  # tag: ""
 
 crds:
   # -- manages CRD creation. Disables CRD creation only in combination with `crds.plain: false` due to helm dependency conditions limitation
@@ -227,9 +228,6 @@ operator:
   # -- Enables ownership reference for converted prometheus-operator objects,
   # it will remove corresponding victoria-metrics objects in case of deletion prometheus one.
   enable_converter_ownership: false
-  # -- Enables custom config-reloader, bundled with operator.
-  # It should reduce vmagent and vmauth config sync-time and make it predictable.
-  useCustomConfigReloader: true
 
 # -- By default, the operator will watch all the namespaces
 # If you want to override this behavior, specify the namespace.
