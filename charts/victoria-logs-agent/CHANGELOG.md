@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.0.8
+
+**Release date:** 27 Jan 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.44.0](https://img.shields.io/badge/v1.44.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%2F%23v1440)
+
 - bump vlagent version to [v1.44.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.44.0).
 
 ## 0.0.7
