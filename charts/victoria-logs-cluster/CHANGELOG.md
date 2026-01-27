@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- `nodes/proxy` permission was removed from default clusterrole. This permission may be used to [raise privileges](https://grahamhelton.com/blog/nodes-proxy-rce). In case the vmagent will be used to scrape Kubelet's proxy endpoint, it is recommended to create a custom role with the necessary permissions.
 
 ## 0.0.25
 
