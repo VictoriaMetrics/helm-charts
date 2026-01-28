@@ -499,12 +499,6 @@ config:
       relabel_configs:
         - action: labelmap
           regex: __meta_kubernetes_node_label_(.+)
-        - target_label: __address__
-          replacement: kubernetes.default.svc:443
-        - source_labels: [__meta_kubernetes_node_name]
-          regex: (.+)
-          target_label: __metrics_path__
-          replacement: /api/v1/nodes/$1/proxy/metrics
     - job_name: "kubernetes-nodes-cadvisor"
       # Default to scraping over https. If required, just disable this or change to
       # `http`.
@@ -532,15 +526,10 @@ config:
       # if you are using older version you need to change the replacement to
       # replacement: /api/v1/nodes/$1:4194/proxy/metrics
       # more info here https://github.com/coreos/prometheus-operator/issues/633
+      metrics_path: /metrics/cadvisor
       relabel_configs:
         - action: labelmap
           regex: __meta_kubernetes_node_label_(.+)
-        - target_label: __address__
-          replacement: kubernetes.default.svc:443
-        - source_labels: [__meta_kubernetes_node_name]
-          regex: (.+)
-          target_label: __metrics_path__
-          replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
       # ignore timestamps of cadvisor's metrics by default
       # more info here https://github.com/VictoriaMetrics/VictoriaMetrics/issues/4697#issuecomment-1656540535
       honor_timestamps: false
