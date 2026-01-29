@@ -14,7 +14,7 @@ spec:
   minReplicas: {{ $hpa.minReplicas }}
   scaleTargetRef:
     apiVersion: apps/v1
-    kind: {{ title .Values.mode }}
+    kind: StatefulSet
     name: {{ include "vm.fullname" $ctx }}
   metrics: {{ toYaml $hpa.metrics | nindent 4 }}
   {{- with $hpa.behavior }}
