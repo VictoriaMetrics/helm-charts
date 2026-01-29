@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add an ability to configure number of replicas
 
 ## 0.0.8
 

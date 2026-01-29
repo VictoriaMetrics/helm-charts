@@ -15,6 +15,9 @@ spec:
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   serviceName: {{ include "vm.fullname" $ctx }}
+  {{- if not .Values.horizontalPodAutoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   template:
     metadata:
       {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
