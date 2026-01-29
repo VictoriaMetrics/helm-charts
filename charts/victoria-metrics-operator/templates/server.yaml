@@ -37,6 +37,9 @@ spec:
       {{- if .Values.hostNetwork }}
       hostNetwork: true
       {{- end }}
+      {{- if .Values.shareProcessNamespace }}
+      shareProcessNamespace: true
+      {{- end }}
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
       serviceAccountName: {{ (.Values.serviceAccount).name | default $fullname }}
       {{- end }}

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added .Values.shareProcessNamespace
 
 ## 0.58.1
 
