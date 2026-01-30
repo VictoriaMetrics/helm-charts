@@ -24,17 +24,19 @@ Logs Ingestion:
     export SERVICE_IP=$(kubectl get svc --namespace {{ $ns }} {{ $fullname }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
     echo http://$SERVICE_IP:{{ .Values.server.service.servicePort }}
 {{- else if contains "ClusterIP"  .Values.server.service.type }}
-    export POD_NAME=$(kubectl get pods --namespace {{ $ns }} -l "app={{ include "vm.app.name" $ctx }}" -o jsonpath="{.items[0].metadata.name}")
-    kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.server.service.servicePort }}
+    kubectl --namespace {{ $ns }} port-forward svc/{{ $fullname }} {{ .Values.server.service.servicePort }}:{{ .Values.server.service.servicePort }}
+    echo http://localhost:{{ .Values.server.service.servicePort }}
 {{- end }}
 
   Write URL inside the kubernetes cluster:
     {{ $url }}<protocol-specific-write-endpoint>
 
-  All supported write endpoints can be found at https://docs.victoriametrics.com/victorialogs/data-ingestion/
+  See the documentation for log ingestion and supported write endpoints at https://docs.victoriametrics.com/victorialogs/data-ingestion/.
 
 Read Data:
   The following URL can be used to query data:
     {{ $url }}
+
+  See the documentation for log querying UI at https://docs.victoriametrics.com/victorialogs/querying/#web-ui or HTTP API at https://docs.victoriametrics.com/victorialogs/querying/#http-api
 {{- end }}
 {{- end }}
