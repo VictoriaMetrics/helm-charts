@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump grafana dependency chart to version 10.7.0
 
 ## 0.69.0
 
