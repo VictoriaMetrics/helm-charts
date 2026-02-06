@@ -1,6 +1,5 @@
 {{- $ctx := dict "helm" . }}
 {{- $defaultScrapeService := .Values.defaultScrapeService }}
-{{- $scrapeLabels := include "vm.labels" $ctx }}
 {{- $prefix := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- range $name, $config := .Values }}
@@ -101,7 +100,9 @@ kind: {{ ternary "VMServiceScrape" $sc.kind (empty $sc.kind) }}
 metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
-  labels: {{ $scrapeLabels | nindent 4 }}
+  {{- $_ := set $ctx "extraLabels" $sc.labels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
 {{- $emptyParamsToDrop := list "endpoints" }}
 {{- $scrapeSpec := mergeOverwrite (deepCopy $spec) (deepCopy $sc.spec) }}
 {{- $namespaceSelector := $scrapeSpec.namespaceSelector | default dict }}
