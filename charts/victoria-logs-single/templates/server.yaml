@@ -74,10 +74,10 @@ spec:
           {{- end }}
           args: {{ include "vlogs.args" $ctx | nindent 12 }}
           {{- with $app.envFrom }}
-          envFrom: {{ toYaml . | nindent 12 }}
+          envFrom: {{ tpl (toYaml .) $ctx | nindent 12 }}
           {{- end }}
           {{- with $app.env }}
-          env: {{ toYaml . | nindent 12 }}
+          env: {{ tpl (toYaml .) $ctx | nindent 12 }}
           {{- end }}
           ports:
             - name: http

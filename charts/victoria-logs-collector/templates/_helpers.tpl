@@ -88,7 +88,7 @@
   {{- $requiredParams := list "url" }}
 
   {{- range $i, $oldRw := $Values.remoteWrite }}
-    {{- $rw := deepCopy $oldRw }}
+    {{- $rw := fromYaml (tpl (toYaml (deepCopy $oldRw)) $) }}
     {{- $_ := set $ "idx" $i }}
     {{- $_ := set $rw "headers" (fromYaml (include "victoria-logs-collector.headers" $)) }}
     {{- $_ := unset $rw "accountID" }}

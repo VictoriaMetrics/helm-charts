@@ -59,10 +59,10 @@ spec:
             - name: {{ $app.ports.name | default "http" }}
               containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "9491") }}
           {{- with $app.envFrom }}
-          envFrom: {{ toYaml . | nindent 12 }}
+          envFrom: {{ tpl (toYaml .) $ctx | nindent 12 }}
           {{- end }}
           {{- with $app.env }}
-          env: {{ toYaml . | nindent 12 }}
+          env: {{ tpl (toYaml .) $ctx | nindent 12 }}
           {{- end }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}

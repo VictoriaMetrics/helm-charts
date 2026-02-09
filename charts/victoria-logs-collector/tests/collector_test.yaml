@@ -11,3 +11,28 @@ tests:
     set:
       remoteWrite:
         - url: http://victoria-logs:9428
+
+  - it: should render tpl in env
+    set:
+      remoteWrite:
+        - url: http://victoria-logs:9428
+      env:
+        - name: INSTANCE_NAME
+          value: "{{ .helm.Release.Name }}-collector"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: INSTANCE_NAME
+            value: RELEASE-NAME-collector
+        template: server.yaml
+
+  - it: should render tpl in remoteWrite url
+    set:
+      remoteWrite:
+        - url: "http://{{ .Release.Name }}-vlogs:9428"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: "--remoteWrite.url=http://RELEASE-NAME-vlogs:9428/insert/native"
+        template: server.yaml

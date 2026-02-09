@@ -54,7 +54,7 @@ spec:
           {{- $args := (include "victoria-logs-collector.args" . | fromYaml) }}
           {{- include "vm.args" $args | nindent 10 }}
           {{- with .Values.env }}
-          env: {{ toYaml . | nindent 12}}
+          env: {{ tpl (toYaml .) $ctx | nindent 12 }}
           {{- end }}
           volumeMounts:
             {{- with .Values.extraVolumeMounts }}
