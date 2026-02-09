@@ -1,7 +1,6 @@
 {{- define "victoria-logs-collector.headers" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $idx := .idx }}
-  {{- $rw := index $Values.remoteWrite $idx }}
+  {{- $rw := .rw }}
   {{- $headers := deepCopy ($rw.headers | default dict) }}
   {{- $_ := set $headers "AccountID" (toString ($rw.accountID | default $headers.AccountID | default "0")) }}
   {{- $_ := set $headers "ProjectID" (toString ($rw.projectID | default $headers.ProjectID | default "0")) }}
@@ -32,8 +31,7 @@
 
 {{- define "victoria-logs-collector.tls" }}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $idx := .idx }}
-  {{- $rw := index $Values.remoteWrite $idx }}
+  {{- $rw := .rw }}
   {{- $config := default dict }}
   {{- with index $rw "tlsCAFile" }}
     {{- $_ := set $config "tlsCAFile" . }}
@@ -89,7 +87,7 @@
 
   {{- range $i, $oldRw := $Values.remoteWrite }}
     {{- $rw := fromYaml (tpl (toYaml (deepCopy $oldRw)) $) }}
-    {{- $_ := set $ "idx" $i }}
+    {{- $_ := set $ "rw" $rw }}
     {{- $_ := set $rw "headers" (fromYaml (include "victoria-logs-collector.headers" $)) }}
     {{- $_ := unset $rw "accountID" }}
     {{- $_ := unset $rw "projectID" }}
