@@ -7,6 +7,9 @@ metadata:
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
+  {{- with .Values.updateStrategy }}
+  updateStrategy: {{ toYaml . | nindent 4 }}
+  {{- end }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
