@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add support for daemonSet updateStrategy
 
 ## 0.2.9
 
