@@ -1,6 +1,7 @@
 ## Next release
 
 - feature: add support for `tpl` into `remoteWrite[]` values. See [#2690](https://github.com/VictoriaMetrics/helm-charts/issues/2690)
+- add support for daemonSet updateStrategy
 
 ## 0.2.9
 
