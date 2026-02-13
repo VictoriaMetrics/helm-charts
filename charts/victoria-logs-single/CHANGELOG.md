@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- feature: support `tpl` in `envFrom` and `env` fields. See [#2690](https://github.com/VictoriaMetrics/helm-charts/issues/2690)
 
 ## 0.11.26
 
@@ -752,7 +752,7 @@ to update your agent configuration if you are using it.
 ![AppVersion: v0.3.0](https://img.shields.io/badge/v0.3.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v030)
 ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?color=informational&logo=helm)
 
-* added: extraObjects: [] for dynamic supportive objects configuration
+- added: extraObjects: [] for dynamic supportive objects configuration
 
 ## 0.3.0
 
@@ -761,8 +761,8 @@ to update your agent configuration if you are using it.
 ![AppVersion: v0.3.0](https://img.shields.io/badge/v0.3.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v030)
 ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?color=informational&logo=helm)
 
-* vlogs-single: update to 0.3.0 (#598)
-* Remove repeated volumeMounts section (#610)
+- vlogs-single: update to 0.3.0 (#598)
+- Remove repeated volumeMounts section (#610)
 
 ## 0.1.3
 
@@ -771,9 +771,9 @@ to update your agent configuration if you are using it.
 ![AppVersion: v0.3.0](https://img.shields.io/badge/v0.3.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v030)
 ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?color=informational&logo=helm)
 
-* vlogs-single: fix podSecurityContext and securityContext usage (#597)
-* charts/victoria-logs-single: fix STS render when using statefulset is disabled (#585)
-* charts/victoria-logs-single: add imagePullSecrets (#586)
+- vlogs-single: fix podSecurityContext and securityContext usage (#597)
+- charts/victoria-logs-single: fix STS render when using statefulset is disabled (#585)
+- charts/victoria-logs-single: add imagePullSecrets (#586)
 
 ## 0.1.2
 
@@ -782,8 +782,8 @@ to update your agent configuration if you are using it.
 ![AppVersion: v0.1.0](https://img.shields.io/badge/v0.1.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v010)
 ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?color=informational&logo=helm)
 
-* bump version of logs single
-* Fix wrong condition on fluent-bit dependency (#568)
+- bump version of logs single
+- Fix wrong condition on fluent-bit dependency (#568)
 
 ### Default value changes
 
@@ -798,7 +798,7 @@ to update your agent configuration if you are using it.
 ![AppVersion: v0.1.0](https://img.shields.io/badge/v0.1.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v010)
 ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?color=informational&logo=helm)
 
-* charts/victoria-logs-single: template Host field (#566)
+- charts/victoria-logs-single: template Host field (#566)
 
 ## 0.1.0
 
@@ -807,9 +807,9 @@ to update your agent configuration if you are using it.
 ![AppVersion: v0.1.0](https://img.shields.io/badge/v0.1.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v010)
 ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?color=informational&logo=helm)
 
-* fix the chart image and jsonline endpoint
-* add victoria-logs to build process, make package
-* charts/victoria-logs-single: add fluentbit setup (#563)
+- fix the chart image and jsonline endpoint
+- add victoria-logs to build process, make package
+- charts/victoria-logs-single: add fluentbit setup (#563)
 
 ## 0.0.1
 
@@ -818,4 +818,4 @@ to update your agent configuration if you are using it.
 ![AppVersion: v0.0.0](https://img.shields.io/badge/v0.0.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v000)
 ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?color=informational&logo=helm)
 
-* charts/victoria-logs-single: add new chart (#560)
+- charts/victoria-logs-single: add new chart (#560)
