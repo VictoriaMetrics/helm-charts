@@ -27,3 +27,26 @@ tests:
           podLabelName: podLabelValue
     asserts:
       - matchSnapshot: {}
+  - it: should render tpl in env and envFrom
+    set:
+      vmauth:
+        enabled: true
+        env:
+          - name: INSTANCE_NAME
+            value: "{{ .helm.Release.Name }}-vmauth"
+        envFrom:
+          - configMapRef:
+              name: "{{ .helm.Release.Name }}-config"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: INSTANCE_NAME
+            value: RELEASE-NAME-vmauth
+        template: vmauth-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            configMapRef:
+              name: RELEASE-NAME-config
+        template: vmauth-server.yaml

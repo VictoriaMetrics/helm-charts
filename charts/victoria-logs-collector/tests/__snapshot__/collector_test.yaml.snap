@@ -78,7 +78,7 @@ daemonSet should match snapshot:
                 - --loggerFormat=json
                 - --remoteWrite.headers="AccountID:0^^ProjectID:0"
                 - --remoteWrite.url=http://victoria-logs:9428/insert/native
-                - --tmpDataPath=/vl-collector
+                - --tmpDataPath=/var/lib/vl-collector
               image: victoriametrics/vlagent:0.1.0
               imagePullPolicy: IfNotPresent
               name: vlagent
@@ -94,7 +94,7 @@ daemonSet should match snapshot:
                 - mountPath: /var/lib
                   name: varlib
                   readOnly: true
-                - mountPath: /vl-collector
+                - mountPath: /var/lib/vl-collector
                   name: vl-collector-data
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-logs-collector

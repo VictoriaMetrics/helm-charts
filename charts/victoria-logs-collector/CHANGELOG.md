@@ -1,5 +1,6 @@
 ## Next release
 
+- feature: add support for `tpl` into `remoteWrite[]` values. See [#2690](https://github.com/VictoriaMetrics/helm-charts/issues/2690)
 - add support for daemonSet updateStrategy
 
 ## 0.2.9
@@ -84,10 +85,10 @@
 
 - `.Values.remoteWrite[*].basicAuth` section is no longer supported. Chart installation will fail if it's set
 - moved management of remote write parameters, that set headers to `.Values.remoteWrite[*].headers`. `.Values.remoteWrite` parameters were renamed:
-  * `.Values.remoteWrite[*].accountID` => `.Values.remoteWrite[*].headers.AccountID`
-  * `.Values.remoteWrite[*].projectID` => `.Values.remoteWrite[*].headers.ProjectID`
-  * `.Values.remoteWrite[*].ignoreFields` => `.Values.remoteWrite[*].headers.VL-Ignore-Fields`
-  * `.Values.remoteWrite[*].extraFields` => `.Values.remoteWrite[*].headers.VL-Extra-Fields`
+    - `.Values.remoteWrite[*].accountID` => `.Values.remoteWrite[*].headers.AccountID`
+    - `.Values.remoteWrite[*].projectID` => `.Values.remoteWrite[*].headers.ProjectID`
+    - `.Values.remoteWrite[*].ignoreFields` => `.Values.remoteWrite[*].headers.VL-Ignore-Fields`
+    - `.Values.remoteWrite[*].extraFields` => `.Values.remoteWrite[*].headers.VL-Extra-Fields`
 - replaced `.Values.remoteWrite[*].tls` section with parameters that are equal to VLAgent cmd flag names: `.Values.remoteWrite[*].tlsCAFile` and `.Values.remoteWrite[*].tlsInsecureSkipVerify`.
 - switched from vector to vlagent
 - support `includeNodeAnnotations`, `includePodAnnotations`, `includePodLabels`, `includeNodeAnnotations` and `excludeFilter` parameters
@@ -199,4 +200,4 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?color=informational&logo=helm)
 
-* charts/victoria-logs-collector: add new chart
+- charts/victoria-logs-collector: add new chart

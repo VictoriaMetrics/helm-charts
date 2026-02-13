@@ -57,10 +57,10 @@ spec:
           {{- end }}
           args: {{ include "vlselect.args" $ctx | nindent 12 }}
           {{- with $app.envFrom }}
-          envFrom: {{ toYaml . | nindent 12 }}
+          envFrom: {{ tpl (toYaml .) $ | nindent 12 }}
           {{- end }}
           {{- with $app.env }}
-          env: {{ toYaml . | nindent 12 }}
+          env: {{ tpl (toYaml .) $ctx | nindent 12 }}
           {{- end }}
           ports:
             - name: {{ $app.ports.name  | default "http" }}

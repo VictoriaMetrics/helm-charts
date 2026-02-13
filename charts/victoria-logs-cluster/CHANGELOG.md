@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- feature: support `tpl` in `envFrom` and `env` fields. See [#2690](https://github.com/VictoriaMetrics/helm-charts/issues/2690)
 
 ## 0.0.27
 
